@@ -10,8 +10,8 @@ var sub_t := 0.0
 var paused := false
 var game_over := false
 var price_flash := 0.0
-var taxi_icon: Texture2D = preload("res://assets/art/taxi.png")
-var font: Font = ThemeDB.fallback_font
+var taxi_icon: Texture2D = Cosmetics.paint_texture()
+var font: Font = Fonts.hud
 
 func bind(r: Run) -> void:
 	run = r
@@ -65,6 +65,9 @@ func _draw() -> void:
 	# Leben als kleine Taxi-Symbole
 	for i in Flow.lives:
 		draw_texture_rect(taxi_icon, Rect2(8 + i * 17, 47, 15, 9.4), false)
+	if run.streak >= 1:
+		var stars := mini(run.streak, Tuning.COMBO_MAX)
+		draw_string(font, Vector2(8, 66), "★".repeat(stars) + "  " + tr("HUD_STREAK") % [run.streak, int(round(Tuning.COMBO_STEP * stars * 100.0))], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#ffe14a"))
 	# Auftrag
 	var job := run.current_job()
 	var txt := ""
@@ -108,10 +111,10 @@ func _draw() -> void:
 		draw_string(font, Vector2(gx - 14, gy + i * 8 + 6), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color("#a9b8ff"))
 	if sub_t > 0.0:
 		var line := "%s: %s" % [sub_speaker, sub_text]
-		var w := font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x + 14.0
+		var w := Fonts.ui.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x + 14.0
 		var a := clampf(sub_t / 0.4, 0.0, 1.0)
 		draw_rect(Rect2(size.x * 0.5 - w * 0.5, size.y - 52, w, 16), Color(0.05, 0.06, 0.15, 0.85 * a))
-		draw_string(font, Vector2(size.x * 0.5 - w * 0.5 + 7, size.y - 40.5), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(1, 1, 1, a))
+		draw_string(Fonts.ui, Vector2(size.x * 0.5 - w * 0.5 + 7, size.y - 40.5), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(1, 1, 1, a))
 	var hint := tr("HUD_HINT_PAD") if Controls.last_device == "keyboard" else tr("HUD_HINT_PAD_PAD")
 	draw_string(font, Vector2(8, size.y - 5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#8a93c9"))
 	if message_t > 0.0:

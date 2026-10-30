@@ -209,7 +209,18 @@ def price_tick():
     x = np.concatenate([np.sin(2 * np.pi * f * t(0.06)) * 0.3 * env(int(0.06 * SR), 0.002, 0.03) for f in (880, 660)])
     save("price_tick", x)
 
+def near_miss():
+    """Kurzes tiefes Vorbeizischen (Zeitlupen-Moment)."""
+    d = 0.7; tt = t(d)
+    x = lp(rng.standard_normal(len(tt)), np.interp(tt, [0, 0.35, 0.7], [0.45, 0.04, 0.02])) * np.exp(-((tt - 0.25) / 0.2) ** 2) * 1.6
+    x += np.sin(2 * np.pi * np.interp(tt, [0, 0.7], [300, 70]) * tt) * np.exp(-tt * 5) * 0.4
+    save("near_miss", x * 0.8)
+def perfect():
+    """Kurzes aufsteigendes Glöckchen für eine perfekte Landung."""
+    x = np.concatenate([np.sin(2 * np.pi * f * t(0.12)) * 0.22 * env(int(0.12 * SR), 0.004, 0.08) for f in (784, 988, 1319)])
+    save("perfect", x)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect): f()
     print(sorted(os.listdir(OUT)))

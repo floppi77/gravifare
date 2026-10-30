@@ -45,6 +45,7 @@ func next_level_id() -> String:
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
+	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)
 	get_tree().change_scene_to_file(MENU)

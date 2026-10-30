@@ -6,7 +6,8 @@ var far: Texture2D = preload("res://assets/art/bg_s1_far.png")
 var mid: Texture2D = preload("res://assets/art/bg_s1_mid.png")
 var near: Texture2D = preload("res://assets/art/bg_s1_near.png")
 var nebula: Texture2D = preload("res://assets/art/space_bg.png")
-var taxi: Texture2D = preload("res://assets/art/taxi.png")
+var taxi: Texture2D = Cosmetics.paint_texture()
+var sticker: Texture2D = Cosmetics.sticker_texture()
 var t := 0.0
 var still := false
 var stars: Array = []
@@ -140,4 +141,6 @@ func _draw_hero() -> void:
 		var f := float(i) / 22.0
 		draw_rect(Rect2(-34.0 - i * 3.2, -1.0 + sin(t * 20.0 + i) * 0.5, 3.0, 2.0 - f), Color(1.0, 0.7 - f * 0.3, 0.3, (1.0 - f) * 0.55))
 	draw_texture_rect(taxi, Rect2(-32, -20, 64, 40), false)
+	if sticker != null:
+		draw_texture_rect(sticker, Rect2(-26.0, -8.4, 16.0, 16.0), false)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

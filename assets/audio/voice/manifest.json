@@ -415,6 +415,262 @@
   "en/m1_angry": {
    "text": "Hey, idiot!",
    "seconds": 1.18
+  },
+  "de/f0_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.58
+  },
+  "de/f0_hard": {
+   "text": "Aua!",
+   "seconds": 0.62
+  },
+  "de/f1_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 2.46
+  },
+  "de/f1_hard": {
+   "text": "Aua!",
+   "seconds": 0.7
+  },
+  "de/m0_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.66
+  },
+  "de/m0_hard": {
+   "text": "Aua!",
+   "seconds": 0.54
+  },
+  "de/m1_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 2.62
+  },
+  "de/m1_hard": {
+   "text": "Aua!",
+   "seconds": 0.9
+  },
+  "de/t0_pump_hit_1": {
+   "text": "Vorsicht mit meiner Säule!",
+   "seconds": 2.2
+  },
+  "de/t0_pump_hit_2": {
+   "text": "Hey! Lass das!",
+   "seconds": 1.94
+  },
+  "de/t0_pump_hit_3": {
+   "text": "Nein! Meine Tankstelle!",
+   "seconds": 3.97
+  },
+  "de/t0_price_up": {
+   "text": "Die Preise steigen!",
+   "seconds": 2.14
+  },
+  "de/t0_price_down": {
+   "text": "Preise runter! Kommt tanken!",
+   "seconds": 3.36
+  },
+  "de/d0_intro_1": {
+   "text": "Zentrale an Taxi sieben: Willkommen im Sternenhafen!",
+   "seconds": 4.36
+  },
+  "de/d0_intro_2": {
+   "text": "Neon-Schluchten voraus. Eng, hell und voller Verkehr.",
+   "seconds": 4.68
+  },
+  "de/d0_intro_3": {
+   "text": "Schrottgürtel. Achte auf die Trümmer, Taxi sieben.",
+   "seconds": 4.43
+  },
+  "de/d0_intro_4": {
+   "text": "Magnetfeld erkannt. Dein Taxi wird zappeln.",
+   "seconds": 3.9
+  },
+  "de/d0_intro_5": {
+   "text": "Solarschmiede. Es wird heiß, bleib cool, Pilot.",
+   "seconds": 4.72
+  },
+  "de/d0_intro_6": {
+   "text": "Gezeitenorbit. Oben und unten sind Ansichtssache.",
+   "seconds": 3.4
+  },
+  "de/d0_intro_7": {
+   "text": "Transitknoten. Viel Verkehr, bleib höflich.",
+   "seconds": 4.52
+  },
+  "de/d0_intro_8": {
+   "text": "Schattenring. Funkstille ist keine Option, melde dich.",
+   "seconds": 5.05
+  },
+  "de/d0_intro_9": {
+   "text": "Singularitätsrand. Fast geschafft, Taxi sieben.",
+   "seconds": 4.44
+  },
+  "de/d0_g1": {
+   "text": "Gute Arbeit, Taxi sieben. Weiter geht's.",
+   "seconds": 3.39
+  },
+  "de/d0_g2": {
+   "text": "Der nächste Fahrgast wartet schon.",
+   "seconds": 2.04
+  },
+  "de/d0_g3": {
+   "text": "Die Tankstellen melden schwankende Preise.",
+   "seconds": 2.82
+  },
+  "de/d0_g4": {
+   "text": "Odo schuldet mir noch einen Kaffee.",
+   "seconds": 2.06
+  },
+  "de/d0_g5": {
+   "text": "Die Zentrale hört mit. Fliege sauber.",
+   "seconds": 3.48
+  },
+  "de/d0_g6": {
+   "text": "Denk an den Bonus für saubere Landungen.",
+   "seconds": 2.6
+  },
+  "de/d0_g7": {
+   "text": "Kein Stress, aber die Uhr tickt.",
+   "seconds": 2.52
+  },
+  "de/d0_g8": {
+   "text": "Taxi sieben, du bist mein Lieblingspilot.",
+   "seconds": 3.0
+  },
+  "de/d0_g9": {
+   "text": "Melde dich, wenn du Hilfe brauchst.",
+   "seconds": 2.52
+  },
+  "de/d0_g10": {
+   "text": "Ein Fahrgast hat nach dir gefragt.",
+   "seconds": 3.24
+  },
+  "en/f0_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.3
+  },
+  "en/f0_hard": {
+   "text": "Ouch!",
+   "seconds": 0.7
+  },
+  "en/f1_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.66
+  },
+  "en/f1_hard": {
+   "text": "Ouch!",
+   "seconds": 0.7
+  },
+  "en/m0_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.58
+  },
+  "en/m0_hard": {
+   "text": "Ouch!",
+   "seconds": 0.54
+  },
+  "en/m1_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.99
+  },
+  "en/m1_hard": {
+   "text": "Ouch!",
+   "seconds": 0.86
+  },
+  "en/t0_pump_hit_1": {
+   "text": "Careful with my pump!",
+   "seconds": 1.66
+  },
+  "en/t0_pump_hit_2": {
+   "text": "Hey! Knock it off!",
+   "seconds": 1.81
+  },
+  "en/t0_pump_hit_3": {
+   "text": "No! My station!",
+   "seconds": 1.58
+  },
+  "en/t0_price_up": {
+   "text": "Prices are going up!",
+   "seconds": 1.74
+  },
+  "en/t0_price_down": {
+   "text": "Prices down! Come fill up!",
+   "seconds": 3.02
+  },
+  "en/d0_intro_1": {
+   "text": "Dispatch to Taxi seven: welcome to Star Harbor!",
+   "seconds": 4.04
+  },
+  "en/d0_intro_2": {
+   "text": "Neon Canyons ahead. Tight, bright and busy.",
+   "seconds": 4.28
+  },
+  "en/d0_intro_3": {
+   "text": "Scrap Belt. Watch the debris, Taxi seven.",
+   "seconds": 2.68
+  },
+  "en/d0_intro_4": {
+   "text": "Magnetic field detected. Your taxi will wobble.",
+   "seconds": 3.72
+  },
+  "en/d0_intro_5": {
+   "text": "Solar Forge. It gets hot, stay cool, pilot.",
+   "seconds": 3.78
+  },
+  "en/d0_intro_6": {
+   "text": "Tidal Orbit. Up and down are a matter of opinion.",
+   "seconds": 4.04
+  },
+  "en/d0_intro_7": {
+   "text": "Transit Hub. Heavy traffic, be polite.",
+   "seconds": 3.64
+  },
+  "en/d0_intro_8": {
+   "text": "Shadow Ring. Radio silence is not an option, check in.",
+   "seconds": 5.16
+  },
+  "en/d0_intro_9": {
+   "text": "Singularity Edge. Almost there, Taxi seven.",
+   "seconds": 4.64
+  },
+  "en/d0_g1": {
+   "text": "Good work, Taxi seven. Keep going.",
+   "seconds": 2.44
+  },
+  "en/d0_g2": {
+   "text": "The next passenger is already waiting.",
+   "seconds": 2.04
+  },
+  "en/d0_g3": {
+   "text": "Fuel stations report shifting prices.",
+   "seconds": 2.84
+  },
+  "en/d0_g4": {
+   "text": "Odo still owes me a coffee.",
+   "seconds": 2.36
+  },
+  "en/d0_g5": {
+   "text": "Dispatch is listening. Fly clean.",
+   "seconds": 3.4
+  },
+  "en/d0_g6": {
+   "text": "Remember the bonus for clean landings.",
+   "seconds": 2.44
+  },
+  "en/d0_g7": {
+   "text": "No stress, but the clock is ticking.",
+   "seconds": 3.08
+  },
+  "en/d0_g8": {
+   "text": "Taxi seven, you are my favorite pilot.",
+   "seconds": 4.04
+  },
+  "en/d0_g9": {
+   "text": "Call in if you need a hand.",
+   "seconds": 1.56
+  },
+  "en/d0_g10": {
+   "text": "A passenger asked about you.",
+   "seconds": 2.28
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
@@ -436,6 +692,14 @@
    "instruct": "Ein älterer Mann mit tiefer, warmer, leicht rauer Stimme, gelassen und gutmütig. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.",
    "seed": 404
   },
+  "de/t0": {
+   "instruct": "Ein älterer Tankwart mit tiefer, rauer, gutmütig-grantiger Stimme, spricht mit kräftiger Betonung. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 505
+  },
+  "de/d0": {
+   "instruct": "Eine Disponentin Mitte vierzig mit ruhiger, souveräner, leicht ironischer Stimme und klarer Aussprache, wie über Funk. Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 606
+  },
   "en/f0": {
    "instruct": "A young woman with a clear, warm, cheerful voice, medium pitch, upbeat and friendly, a little playful. Native English speaker with a neutral accent.",
    "seed": 101
@@ -451,6 +715,14 @@
   "en/m1": {
    "instruct": "A middle-aged man with a deep, warm, slightly gravelly voice, easygoing and good-humored delivery. Native English speaker with a neutral accent.",
    "seed": 404
+  },
+  "en/t0": {
+   "instruct": "An older gas station attendant with a deep, rough, good-naturedly grumpy voice, speaking with strong emphasis. Native English speaker with a neutral accent.",
+   "seed": 505
+  },
+  "en/d0": {
+   "instruct": "A dispatcher woman in her forties with a calm, composed, slightly ironic voice and clear diction, as over a radio. Native English speaker with a neutral accent.",
+   "seed": 606
   }
  }
 }

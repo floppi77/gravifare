@@ -2,7 +2,8 @@ extends Node2D
 ## Taxi-Darstellung: Rumpf-Sprite, Fahrwerk, Düsenflammen, Beschädigung.
 
 var sim: TaxiSim
-var tex: Texture2D = preload("res://assets/art/taxi.png")
+var tex: Texture2D = Cosmetics.paint_texture()
+var sticker: Texture2D = Cosmetics.sticker_texture()
 var t := 0.0
 var flame_main := 0.0
 var flame_down := 0.0
@@ -179,6 +180,8 @@ func _draw() -> void:
 	if flash > 0.0:
 		mod = Color(1, 0.4 + 0.6 * (1.0 - flash), 0.4 + 0.6 * (1.0 - flash))
 	draw_texture_rect(tex, Rect2(-16, -10, 32, 20), false, mod)
+	if sticker != null:
+		draw_texture_rect(sticker, Rect2(-13.0, -4.2, 8.0, 8.0), false, mod)
 	# Schadenanzeige: Funken/Rauch
 	if hurt > 0.45 and int(t * 8.0) % 2 == 0:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))

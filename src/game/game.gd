@@ -7,6 +7,10 @@ var run := Run.new()
 var paused := false
 var gear_on := false
 var restart_timer := 0.0
+var cam_off := Vector2.ZERO
+var shake := 0.0
+var near_cd := 0.0
+var slowmo_left := 0.0
 var completion_saved := false
 const TV := preload("res://src/game/transition_view.gd")
 var trans_t := -1.0              # Zeitachse des Levelwechsels (siehe transition_view.gd), < 0 = inaktiv
@@ -111,6 +115,8 @@ func load_level(path: String) -> void:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
+	Music.play_theme("s%d" % clampi(lvl.sector, 1, 9))
+	Music.duck(0.0)
 	gear_on = run.sim.gear_cmd
 	world_tiles.setup(run)
 	props.setup(run)
@@ -130,10 +136,10 @@ func load_level(path: String) -> void:
 
 func _setup_camera() -> void:
 	var sz := run.level.pixel_size()
-	cam.limit_left = 0
-	cam.limit_top = 0
-	cam.limit_right = int(sz.x)
-	cam.limit_bottom = int(sz.y)
+	cam.limit_left = -100000
+	cam.limit_top = -100000
+	cam.limit_right = 100000
+	cam.limit_bottom = 100000     # Begrenzung übernimmt _cam_target(); Offset (Vorausblick/Wackeln) darf kurz darüber
 	cam.position_smoothing_enabled = false
 	cam.global_position = _cam_target()
 	cam.reset_physics_interpolation()
@@ -151,7 +157,10 @@ var pause_menu: Control
 func _set_paused(on: bool) -> void:
 	paused = on
 	hud.paused = on
+	Music.duck(-8.0 if on else 0.0)
 	Sfx.set_thrust(0.0, 0.0)
+	Haptics.stop()
+	_end_slowmo()
 	if on:
 		pause_menu = PauseMenu.new()
 		pause_menu.game = self
@@ -216,12 +225,19 @@ func _physics_process(_delta: float) -> void:
 	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0 and int(run.sim.time * 120.0) % 120 == 0:
 		Sfx.play("warn", -6.0)
 	taxi.sync_state()
+	if run.result == Run.Result.RUNNING:
+		Haptics.thrust(taxi.flame_main + absf(taxi.flame_side) * 0.5)
+		_check_near_miss()
+		_music_tick()
 	for e in run.log:
 		_on_event(e)
 	cam.global_position = _cam_target()
+	_cam_feel()
 	if run.result == Run.Result.COMPLETE and not completion_saved:
 		completion_saved = true
-		Save.complete_level(Flow.current_level, run.sim.time, run.money)
+		Save.note_max("best_streak", run.best_streak)
+		Save.complete_level(Flow.current_level, run.sim.time, run.money, run.earned)
+		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() != "":
 			_begin_transition()
@@ -248,11 +264,107 @@ func _lose_life() -> void:
 	for e in run.log:
 		_on_event(e)
 
+## Kamera-Gefühl: leichter Vorausblick in Flugrichtung, Wackeln bei Treffern. Bei „Weniger Bewegung“ aus.
+func _cam_feel() -> void:
+	if Settings.values.reduce_motion or trans_t >= 0.0:
+		cam.offset = Vector2.ZERO
+		return
+	cam_off = cam_off.lerp((run.sim.vel * 0.03).limit_length(4.0), 0.06)
+	shake = maxf(0.0, shake - 0.05)
+	cam.offset = cam_off + Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake
+
+## Musik-Schichten: B (Bewegung) mit Fahrgast an Bord/offenem Tor/Tempo, C (Spannung) bei wenig Sprit, Schaden, Beinahe-Treffer.
+var _music_ticks := 0
+func _music_tick() -> void:
+	_music_ticks += 1
+	if _music_ticks % 30 != 0:
+		return
+	var s := run.sim
+	var drive := run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF or run.exit_open or s.vel.length() > 70.0
+	var danger := s.fuel < 25.0 or s.hull < 45.0 or near_cd > 3.0 or run.pump_boom_t >= 0.0
+	Music.set_layers(drive, danger)
+
+func _add_shake(amp: float) -> void:
+	if not Settings.values.reduce_motion:
+		shake = maxf(shake, amp)
+
+## Beinahe-Treffer: schnell an einer Wand vorbei (≤ 4 px Abstand, kein Kontakt) löst eine kurze Zeitlupe aus.
+func _check_near_miss() -> void:
+	near_cd = maxf(0.0, near_cd - Tuning.TICK)
+	var s := run.sim
+	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < 110.0 or Settings.values.reduce_motion or trans_t >= 0.0:
+		return
+	var lv := run.level
+	if lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(4, 4)) and not lv.box_hits_solid(s.pos, Tuning.HULL_HALF):
+		near_cd = 5.0
+		slowmo_left = 0.5
+		Engine.time_scale = 0.4
+		AudioServer.playback_speed_scale = 0.85
+		Sfx.play("near_miss", -2.0)
+		Haptics.pulse(0.2, 0.2, 0.1)
+		hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
+
+## Neu freigeschaltete Lackierungen/Aufkleber melden (Toast + Ton).
+func _check_unlocks() -> void:
+	var lang := TranslationServer.get_locale().substr(0, 2)
+	for it in Cosmetics.check_unlocks():
+		hud.flash_message(tr("MSG_UNLOCK") % it.name.get(lang, it.id), 4.0)
+		Sfx.play("exit", -4.0)
+
+var voice_cd := 0.0
+var attendant_cd := 0.0
+## Fahrgast an Bord kommentiert die Landung: weich = „Wow, sanft!“, hart = „Aua!“ (höchstens alle 8 s).
+func _passenger_reaction(e: Dictionary) -> void:
+	if run.actor == null or run.phase != Run.Phase.CARRYING or Time.get_ticks_msec() / 1000.0 < voice_cd:
+		return
+	var key := ""
+	if float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX:
+		key = "soft"
+	elif float(e.vy) > 38.0:
+		key = "hard"
+	if key == "":
+		return
+	voice_cd = Time.get_ticks_msec() / 1000.0 + 8.0
+	Sfx.play_voice(run.actor.voice_key(), key)
+	hud.subtitle(run.actor.pname, Sfx.line_text("passenger_extra", key))
+
+## Tankwart: schimpft bei Berührungen der Säule, kommentiert Preiswechsel (höchstens alle 14 s).
+func _attendant(key: String, cooldown := 0.0) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	if cooldown > 0.0:
+		if now < attendant_cd:
+			return
+		attendant_cd = now + cooldown
+	Sfx.play_voice("t0", key)
+	hud.subtitle(tr("SPK_ATTENDANT"), Sfx.line_text("t0", key), 2.4)
+
+func _end_slowmo() -> void:
+	slowmo_left = 0.0
+	Engine.time_scale = 1.0
+	AudioServer.playback_speed_scale = 1.0
+
+func _exit_tree() -> void:
+	_end_slowmo()
+	Haptics.stop()
+
 func _on_event(e: Dictionary) -> void:
 	match e.type:
+		"perfect":
+			hud.flash_message(tr("MSG_PERFECT") % e.streak, 1.4)
+			Sfx.play("perfect", -4.0)
+			Haptics.pulse(0.1, 0.25, 0.1)
+			Save.count_event("perfect_landings")
+			Save.note_max("best_streak", int(e.streak))
+			_check_unlocks()
+		"streak_lost":
+			hud.flash_message(tr("MSG_STREAK_LOST"), 1.2)
 		"landed":
+			_passenger_reaction(e)
 			Sfx.play("land", -4.0)
 			taxi.burst_puff(0.6)
+			Haptics.pulse(0.15, clampf(float(e.vy) / 48.0, 0.0, 1.0) * 0.8, 0.12)
+			if float(e.vy) > 35.0:
+				_add_shake(1.2)
 		"liftoff": taxi.burst_puff(1.0)
 		"call":
 			Sfx.play_voice(e.voice, "call")
@@ -263,6 +375,10 @@ func _on_event(e: Dictionary) -> void:
 			hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else tr("VOICE_DEST") % e.dest, 2.8)
 		"delivered":
 			var msg := tr("MSG_DELIVERED2") % [int(e.pay), e.factor]
+			if int(e.get("combo", 0)) > 0:
+				msg += "  ★%d" % int(e.combo)
+			Save.count_event("deliveries")
+			_check_unlocks()
 			if e.penalty > 0.005:
 				msg += "  " + tr("MSG_HARD") % int(round(e.penalty * 100.0))
 			hud.flash_message(msg, 3.0)
@@ -270,19 +386,31 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
 		"squashed":
+			Haptics.pulse(0.3, 0.1, 0.15)
+			Save.count_event("squashes")
 			Sfx.play_voice(e.voice, "angry")
 			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 			Sfx.play("hit", -8.0)
 		"price_changed":
+			if run.sim.fuel < 70.0:
+				_attendant("price_up" if e.up else "price_down", 14.0)
 			Sfx.play("price_tick", -6.0)
 			props.pump_flash = 1.0
 			hud.price_flash = 1.0
 			hud.flash_message(tr("MSG_PRICE") % e.price, 2.0)
 		"pump_touched":
+			_attendant("pump_hit_%d" % clampi(int(e.stage), 1, 3))
+			Haptics.pulse(0.6, 0.6, 0.25)
+			_add_shake(1.5)
+			Save.count_event("pump_hits")
 			Sfx.play("pump_hit")
 			taxi.burst_sparks()
 			hud.flash_message(tr("MSG_PUMP_HIT") % [e.stage, e.price], 2.8)
 		"pump_exploded":
+			Haptics.pulse(1.0, 1.0, 0.7)
+			_add_shake(5.0)
+			Save.count_event("pump_explosions")
+			_check_unlocks()
 			Sfx.play("pump_boom")
 			fx.pump_explode(e.rect)
 			hud.flash_message(tr("MSG_PUMP_BOOM"), 3.5)
@@ -299,10 +427,16 @@ func _on_event(e: Dictionary) -> void:
 			hud.flash_message(tr("MSG_EXIT_OPEN"))
 			Sfx.play("exit")
 		"damage":
+			Haptics.pulse(0.6, 0.9, 0.2)
+			_add_shake(clampf(float(e.amount) / 25.0, 0.6, 4.0))
 			taxi.flash = 1.0
 			taxi.burst_sparks()
 			Sfx.play("hit")
-		"destroyed": Sfx.play("crash")
+		"destroyed":
+			Sfx.play("crash")
+			Save.count_event("crashes")
+			Haptics.pulse(1.0, 1.0, 0.6)
+			_add_shake(5.0)
 		"bad_landing":
 			match e.reason:
 				"gear": hud.flash_message(tr("MSG_BAD_GEAR"))
@@ -312,16 +446,41 @@ func _on_event(e: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Levelwechsel
 func _process(delta: float) -> void:
+	if slowmo_left > 0.0:
+		slowmo_left -= delta / maxf(Engine.time_scale, 0.05)
+		if slowmo_left <= 0.0:
+			_end_slowmo()
 	if trans_t < 0.0:
 		return
 	trans_t += delta
 	trans.t = trans_t
+	if not radio_played and trans_t >= 2.15 and trans_t < TV.T_IN:
+		radio_played = true
+		_play_radio()
 	if not arriving and trans_t >= TV.T_IN:
 		_begin_arrival()
 	if trans_t >= TV.T_END:
 		trans_t = TV.T_END
 		_arrival_tick()          # Aufsetzen abschließen (Staub, Geräusch, Ruf, Aussteigen), bevor die Sequenz endet
 		_end_transition()
+
+var radio_played := false
+
+## Funkspruch der Zentrale während der Weltraumfahrt: Sektor-Intro beim ersten Level eines Sektors, sonst eine
+## allgemeine Zeile (reproduzierbar aus der Levelnummer).
+func _play_radio() -> void:
+	var nl := LevelData.load_file(Flow.level_path(next_id))
+	var key := "intro_%d" % clampi(nl.sector, 1, 9) if nl.index == 1 else "g%d" % ((nl.number * 7) % 10 + 1)
+	var txt := Sfx.line_text("d0", key)
+	if txt == "":
+		return
+	Sfx.play_voice("d0", key)
+	var length := Sfx.voice_player.stream.get_length() if Sfx.voice_player.stream != null else 3.0
+	trans.radio_speaker = tr("SPK_DISPATCH")
+	trans.radio_text = txt
+	trans.radio_t0 = trans_t
+	trans.radio_len = length
+	hud.subtitle(tr("SPK_DISPATCH"), txt, length + 0.6)        # läuft unter dem Overlay weiter und erscheint beim Einblenden
 
 func _begin_transition() -> void:
 	next_id = Flow.next_level_id()
@@ -338,6 +497,8 @@ func _begin_transition() -> void:
 	trans.skip_hint = tr("TRANS_SKIP")
 	arriving = false
 	trans_t = 0.0
+	radio_played = false
+	Music.duck(-13.0)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--trans-t="):      # Dev: Zeitachse an beliebiger Stelle starten (Screenshots)
 			trans_t = float(a.substr(10))
@@ -413,6 +574,7 @@ func _release_carried() -> void:
 	run.leavers.append(a)
 
 func _end_transition() -> void:
+	Music.duck(0.0)
 	props.door_override = -1.0
 	trans_t = -1.0
 	trans.t = -1.0

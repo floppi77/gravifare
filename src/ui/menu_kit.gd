@@ -32,6 +32,7 @@ static func button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.custom_minimum_size = Vector2(160, 20)
+	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.focus_mode = Control.FOCUS_ALL
 	b.pressed.connect(func():
 		Sfx.play("ui_ok")
@@ -117,6 +118,8 @@ static func title(text: String, size := 16) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", Color("#ffe14a"))
+	if size >= 20:
+		l.add_theme_font_override("font", Fonts.title)          # große Überschriften in der Pixel-Schrift
 	return l
 
 ## Optionsliste; wird von Haupt- und Pausenmenü benutzt. `back` kehrt zur vorherigen Seite zurück.
@@ -129,6 +132,9 @@ static func options_panel(back: Callable, rebuild: Callable = Callable()) -> VBo
 	v.add_child(slider_row(v.tr("OPT_SFX"), Settings.values.sfx, func(x): Settings.set_value("sfx", x)))
 	v.add_child(slider_row(v.tr("OPT_VOICE"), Settings.values.voice, func(x): Settings.set_value("voice", x)))
 	v.add_child(slider_row(v.tr("OPT_DEADZONE"), Settings.values.deadzone, func(x): Settings.set_value("deadzone", clampf(x, 0.05, 0.9))))
+	v.add_child(slider_row(v.tr("OPT_VIBRATION"), Settings.values.vibration, func(x):
+		Settings.set_value("vibration", x)
+		Haptics.pulse(0.4, 0.6, 0.15)))
 	var gear := button("", func(): pass)
 	var refresh := func():
 		gear.text = v.tr("OPT_GEAR") + ": " + v.tr("OPT_GEAR_TOGGLE" if Settings.values.gear_toggle else "OPT_GEAR_HOLD")

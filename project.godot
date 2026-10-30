@@ -22,9 +22,13 @@ textures/canvas_textures/default_texture_filter=0
 
 [autoload]
 
+Fonts="*res://src/core/fonts.gd"
 Controls="*res://src/core/controls.gd"
 Loc="*res://src/core/loc.gd"
 Sfx="*res://src/core/sfx.gd"
 Settings="*res://src/core/settings.gd"
+Haptics="*res://src/core/haptics.gd"
+Music="*res://src/core/music.gd"
 Save="*res://src/core/save.gd"
+Cosmetics="*res://src/core/cosmetics.gd"
 Flow="*res://src/core/flow.gd"

@@ -1,0 +1,151 @@
+{
+ "lines": [
+  [
+   "title",
+   "GRAVIFARE"
+  ],
+  [
+   "sub",
+   {
+    "de": "Ein schwereloses Taxi-Abenteuer",
+    "en": "A weightless taxi adventure"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "Spielidee & Auftrag",
+    "en": "Concept & direction"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "Der Auftraggeber – Ideen, Tests, Geschmack",
+    "en": "The client – ideas, playtests, taste"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "Entwicklung",
+    "en": "Development"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "Programmierung, Pixel-Art, Level, Sounddesign",
+    "en": "Programming, pixel art, levels, sound design"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "erzeugt mit Claude Code (Anthropic)",
+    "en": "created with Claude Code (Anthropic)"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "Engine",
+    "en": "Engine"
+   }
+  ],
+  [
+   "line",
+   "Godot Engine 4 – MIT-Lizenz – godotengine.org"
+  ],
+  [
+   "head",
+   {
+    "de": "Schriften",
+    "en": "Fonts"
+   }
+  ],
+  [
+   "line",
+   "Jersey 10 – The Soft Type Project Authors"
+  ],
+  [
+   "line",
+   "Oxanium – The Oxanium Project Authors"
+  ],
+  [
+   "line",
+   "Nunito – The Nunito Project Authors"
+  ],
+  [
+   "line",
+   {
+    "de": "alle unter der SIL Open Font License 1.1",
+    "en": "all under the SIL Open Font License 1.1"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "Stimmen",
+    "en": "Voices"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "Fiktive Stimmen, offline synthetisiert mit Qwen3-TTS",
+    "en": "Fictional voices, synthesized offline with Qwen3-TTS"
+   }
+  ],
+  [
+   "line",
+   "Alibaba / Qwen – Apache-2.0"
+  ],
+  [
+   "head",
+   {
+    "de": "Musik & Klänge",
+    "en": "Music & sound"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "Komplett synthetisch erzeugt, eigene Kompositionen",
+    "en": "Entirely synthesized, original compositions"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "Werkzeuge",
+    "en": "Tools"
+   }
+  ],
+  [
+   "line",
+   "Python · NumPy · SciPy · Pillow · FFmpeg · faster-whisper"
+  ],
+  [
+   "head",
+   {
+    "de": "Dank",
+    "en": "Thanks"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "allen Fahrgästen, die sich nicht auf den Kopf landen ließen",
+    "en": "to all passengers who survived being landed on"
+   }
+  ],
+  [
+   "sub",
+   {
+    "de": "Danke fürs Spielen!",
+    "en": "Thanks for playing!"
+   }
+  ]
+ ]
+}

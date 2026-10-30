@@ -13,9 +13,14 @@ var t := -1.0
 var title_sector := ""
 var title_level := ""
 var info := ""
+var radio_speaker := ""
+var radio_text := ""
+var radio_t0 := 2.15
+var radio_len := 3.0
 var skip_hint := ""
 var space_bg: Texture2D = preload("res://assets/art/space_bg.png")
-var taxi_tex: Texture2D = preload("res://assets/art/taxi.png")
+var taxi_tex: Texture2D = Cosmetics.paint_texture()
+var sticker_tex: Texture2D = Cosmetics.sticker_texture()
 var planets: Array[Texture2D] = [preload("res://assets/art/planet_1.png"), preload("res://assets/art/planet_2.png"), preload("res://assets/art/planet_3.png")]
 ## [Startzeit, y, Größe (Einheiten), Planet, Geschwindigkeit]
 const PLANET_SCHEDULE := [[0.6, 72.0, 128.0, 0, 62.0], [2.7, 250.0, 192.0, 1, 95.0], [4.3, 118.0, 64.0, 2, 80.0]]
@@ -104,16 +109,26 @@ func _draw_taxi(a: float) -> void:
 		var lx := -34.0 - len - float(i) * 26.0 - fmod(t * 90.0, 26.0)
 		draw_rect(Rect2(lx, -7.0 + i * 3.4, 14.0 + i * 4.0, 0.67), Color(0.7, 0.85, 1.0, a * 0.35))
 	draw_texture_rect(taxi_tex, Rect2(-32, -20, 64, 40), false, Color(1, 1, 1, a))
+	if sticker_tex != null:
+		draw_texture_rect(sticker_tex, Rect2(-26.0, -8.4, 16.0, 16.0), false, Color(1, 1, 1, a))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
+func _draw_radio() -> void:
+	var ra := smooth((t - radio_t0) / 0.35) * (1.0 - smooth((t - minf(radio_t0 + radio_len, 5.5)) / 0.35))
+	if ra > 0.003 and radio_text != "":
+		var col := Color(0.55, 0.95, 0.9, ra)
+		draw_string(Fonts.ui, Vector2(0, 252), "[ %s ]" % radio_speaker, HORIZONTAL_ALIGNMENT_CENTER, 640, 8, Color(0.4, 0.8, 0.75, ra * 0.9))
+		draw_string(Fonts.ui, Vector2(0, 264), radio_text, HORIZONTAL_ALIGNMENT_CENTER, 640, 11, col)
+
 func _draw_titles(a: float) -> void:
+	_draw_radio()
 	var ta := smooth((t - 2.9) / 0.6) * (1.0 - smooth((t - 5.35) / 0.4))
 	if ta > 0.003:
-		var font := ThemeDB.fallback_font
+		var font := Fonts.hud
 		var cx := 320.0
 		draw_string(font, Vector2(0, 286), title_sector, HORIZONTAL_ALIGNMENT_CENTER, 640, 11, Color(0.65, 0.78, 1.0, ta))
-		draw_string(font, Vector2(0, 308), title_level, HORIZONTAL_ALIGNMENT_CENTER, 640, 20, Color(1.0, 0.88, 0.3, ta))
+		draw_string(Fonts.title, Vector2(0, 308), title_level, HORIZONTAL_ALIGNMENT_CENTER, 640, 30, Color(1.0, 0.88, 0.3, ta))
 		if info != "":
 			draw_string(font, Vector2(0, 326), info, HORIZONTAL_ALIGNMENT_CENTER, 640, 10, Color(0.8, 0.85, 1.0, ta * 0.9))
 	if t > 0.8 and t < T_IN:
-		draw_string(ThemeDB.fallback_font, Vector2(0, 350), skip_hint, HORIZONTAL_ALIGNMENT_RIGHT, 632, 8, Color(0.7, 0.75, 0.95, a * 0.6))
+		draw_string(Fonts.hud, Vector2(0, 350), skip_hint, HORIZONTAL_ALIGNMENT_RIGHT, 632, 8, Color(0.7, 0.75, 0.95, a * 0.6))

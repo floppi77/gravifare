@@ -6,7 +6,7 @@ var values := {
 	"music": 0.8, "sfx": 0.9, "voice": 1.0,
 	"language": "",
 	"gear_toggle": true, "deadzone": 0.2,
-	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true,
+	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true, "vibration": 1.0,
 }
 
 func _ready() -> void:
@@ -22,7 +22,7 @@ func load_settings() -> void:
 		var v = cf.get_value("settings", k, values[k])
 		if typeof(v) == typeof(values[k]):
 			values[k] = v
-	for k in ["music", "sfx", "voice", "deadzone"]:
+	for k in ["music", "sfx", "voice", "deadzone", "vibration"]:
 		values[k] = clampf(values[k], 0.0, 1.0)
 
 func save_settings() -> void:

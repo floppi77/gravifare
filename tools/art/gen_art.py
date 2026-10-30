@@ -443,6 +443,77 @@ def background():
         for x in range(0, W, 120): nd.rectangle([x, y - 40, x + 6, y + 8], fill=hexc("#0e1230"))
     near.save(OUT + "bg_s1_near.png")
 
+# ------------------------------------------------------------------ Lackierungen und Aufkleber (Kosmetik, Garage)
+def _rgb2hsv(a):
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    mx, mn = a.max(-1), a.min(-1); d = mx - mn
+    h = np.zeros_like(mx)
+    m = d > 1e-6
+    rc = (mx == r) & m; gc = (mx == g) & m & ~rc; bc = (mx == b) & m & ~rc & ~gc
+    h[rc] = ((g - b)[rc] / d[rc]) % 6; h[gc] = (b - r)[gc] / d[gc] + 2; h[bc] = (r - g)[bc] / d[bc] + 4
+    s_ = np.where(mx > 1e-6, d / np.maximum(mx, 1e-6), 0)
+    return h / 6.0, s_, mx
+def _hsv2rgb(h, s_, v):
+    i = np.floor(h * 6).astype(int) % 6; f = h * 6 - np.floor(h * 6)
+    p_, q, t_ = v * (1 - s_), v * (1 - f * s_), v * (1 - (1 - f) * s_)
+    out = np.zeros(h.shape + (3,))
+    for k, (r, g, b) in enumerate([(v, t_, p_), (q, v, p_), (p_, v, t_), (p_, q, v), (t_, p_, v), (v, p_, q)]):
+        mk = i == k; out[mk, 0], out[mk, 1], out[mk, 2] = r[mk], g[mk], b[mk]
+    return out
+
+def taxi_skins():
+    base = np.array(Image.open(OUT + "taxi.png").convert("RGBA")).astype(float)
+    rgb = base[..., :3] / 255.0
+    h, s_, v = _rgb2hsv(rgb)
+    body = (base[..., 3] > 0) & (h > 0.04) & (h < 0.18) & (s_ > 0.4) & (v > 0.35)   # gelb/orange Karosserie
+    def make(name, hue, smul=1.0, vmul=1.0):
+        hh = np.where(body, (hue / 360.0 + (h - 0.12) * 0.5) % 1.0, h)
+        ss = np.where(body, np.clip(s_ * smul, 0, 1), s_); vv = np.where(body, np.clip(v * vmul, 0, 1), v)
+        out = base.copy(); out[..., :3] = _hsv2rgb(hh, ss, vv) * 255.0
+        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "taxi_%s.png" % name)
+        return out
+    for name, hue, sm, vm in (("neon", 318, 1.0, 1.0), ("mint", 150, 0.9, 1.0), ("night", 225, 0.9, 0.78),
+                              ("sunset", 8, 1.0, 1.0), ("candy", 178, 0.85, 1.05), ("gold", 46, 0.7, 1.12)):
+        make(name, hue, sm, vm)
+    # Wespe: dunkle Karosserie mit gelben Streifen
+    out = make("wasp", 235, 0.35, 0.28)
+    yy, xx = np.mgrid[0:base.shape[0], 0:base.shape[1]]
+    stripes = body & ((xx // 6) % 2 == 0)
+    out[stripes, :3] = base[stripes, :3]
+    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "taxi_wasp.png")
+    Image.open(OUT + "taxi.png").save(OUT + "taxi_std.png")
+
+def stickers():
+    def icon(draw_fn, name):
+        im = Image.new("RGBA", (36, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(im); draw_fn(d)
+        add_outline(im, thick=1).save(OUT + "sticker_%s.png" % name)
+    import math
+    def star(d):
+        pts = []
+        for i in range(10):
+            r = 15 if i % 2 == 0 else 6.5; a = -math.pi / 2 + i * math.pi / 5
+            pts.append((18 + r * math.cos(a), 19 + r * math.sin(a)))
+        d.polygon(pts, fill=hexc("#ffe14a")); d.polygon([(18, 8), (21, 15), (16, 15)], fill=hexc("#fff6b0"))
+    def bolt(d):
+        d.polygon([(21, 3), (9, 20), (17, 20), (13, 33), (27, 14), (19, 14)], fill=hexc("#35e0d2")); d.polygon([(21, 3), (16, 11), (20, 11)], fill=hexc("#bffcf6"))
+    def heart(d):
+        d.ellipse([4, 8, 19, 23], fill=hexc("#ff4d6d")); d.ellipse([17, 8, 32, 23], fill=hexc("#ff4d6d"))
+        d.polygon([(5, 19), (31, 19), (18, 33)], fill=hexc("#ff4d6d")); d.ellipse([8, 11, 13, 15], fill=hexc("#ffb0c0"))
+    def flame(d):
+        d.polygon([(18, 3), (28, 16), (27, 28), (18, 34), (9, 28), (8, 16), (14, 20)], fill=hexc("#ff8a2e"))
+        d.polygon([(18, 14), (23, 24), (22, 30), (18, 32), (14, 30), (13, 24)], fill=hexc("#ffe14a"))
+    def boom(d):
+        pts = []
+        for i in range(16):
+            r = 16 if i % 2 == 0 else 8; a = i * math.pi / 8
+            pts.append((18 + r * math.cos(a), 18 + r * math.sin(a)))
+        d.polygon(pts, fill=hexc("#ff7a30")); d.ellipse([10, 10, 26, 26], fill=hexc("#ffd37a")); d.ellipse([14, 14, 22, 22], fill=hexc("#fff6d0"))
+    def crown(d):
+        d.polygon([(4, 28), (4, 10), (12, 18), (18, 6), (24, 18), (32, 10), (32, 28)], fill=hexc("#ffcb3d"))
+        d.rectangle([4, 27, 32, 31], fill=hexc("#e08a1e")); d.ellipse([16, 18, 20, 22], fill=hexc("#ff4d6d"))
+    for fn, nm in ((star, "star"), (bolt, "bolt"), (heart, "heart"), (flame, "flame"), (boom, "boom"), (crown, "crown")):
+        icon(fn, nm)
+
 # ------------------------------------------------------------------ Zapfsäule (16x32 Einheiten = 48x96 px; Kopf getrennt: 16x12 = 48x36 px)
 def pump():
     steel, steel_d, steel_h = hexc("#6f7fa8"), hexc("#3a4575"), hexc("#b8c4f0")
@@ -573,6 +644,6 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "background", "space", "flags", "pump"):
+    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "taxi_skins", "stickers", "background", "space", "flags", "pump"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

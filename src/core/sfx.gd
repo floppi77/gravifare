@@ -2,7 +2,7 @@ extends Node
 ## Autoload "Sfx": Audiobusse (Master/Music/SFX/Voice) mit getrennten Lautstärken, Einmal-Effekte
 ## und die Schub-Schleifen. Fehlende Dateien werden übersprungen (Spiel läuft stumm weiter).
 
-const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "transit", "ui_move", "ui_ok", "pump_hit", "pump_boom", "price_tick"]
+const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "transit", "ui_move", "ui_ok", "pump_hit", "pump_boom", "price_tick", "near_miss", "perfect"]
 var streams := {}
 var thrust_player: AudioStreamPlayer
 var side_player: AudioStreamPlayer
@@ -87,8 +87,10 @@ func play_voice(voice: String, line: String) -> bool:
 	var path := "res://assets/audio/voice/%s/%s_%s.ogg" % [lang, voice, line]
 	if not ResourceLoader.exists(path):
 		return false
-	voice_player.stream = load(path)
+	var stream: AudioStream = load(path)
+	voice_player.stream = stream
 	voice_player.play()
+	Music.duck_timed(-6.0, stream.get_length() + 0.25)     # Musik leiser, solange gesprochen wird
 	return true
 
 ## Langer Einzelklang (Levelwechsel-Flug); stop_long() bricht ihn z. B. beim Überspringen ab.
@@ -105,3 +107,14 @@ func stop_long(fade := 0.35) -> void:
 		var tw := create_tween()
 		tw.tween_property(long_player, "volume_db", -60.0, fade)
 		tw.tween_callback(long_player.stop)
+
+var _lines := {}
+
+## Untertiteltext einer Sondersprechzeile (Tankwart t0, Zentrale d0, Passagier-Extras) aus data/voice_lines.json.
+func line_text(group: String, key: String) -> String:
+	if _lines.is_empty():
+		var f := FileAccess.open("res://data/voice_lines.json", FileAccess.READ)
+		var d = JSON.parse_string(f.get_as_text()) if f != null else null
+		_lines = d if typeof(d) == TYPE_DICTIONARY else {"_": 1}
+	var lang := TranslationServer.get_locale().substr(0, 2)
+	return String(_lines.get(group, {}).get(lang, {}).get(key, ""))

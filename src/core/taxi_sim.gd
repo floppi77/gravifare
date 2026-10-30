@@ -149,6 +149,8 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 	var pad_l := level.pad_at_foot(Vector2(pos.x - Tuning.FOOT_X, fy))
 	var pad_r := level.pad_at_foot(Vector2(pos.x + Tuning.FOOT_X, fy))
 	var speed_y := vel.y
+	var speed_x := absf(vel.x)
+	var tilt_in := absf(tilt)
 	var on_pad: bool = hit_l and hit_r and not pad_l.is_empty() and not pad_r.is_empty() and pad_l.id == pad_r.id
 	var ok := gear_extended() and on_pad and speed_y <= Tuning.LAND_VY \
 		and absf(vel.x) <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
@@ -159,7 +161,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		tilt = 0.0
 		state = State.LANDED
 		landed_pad = pad_l
-		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y})
+		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y, "vx": speed_x, "tilt": tilt_in})
 	else:
 		var reason := "pos" if not on_pad else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > Tuning.LAND_TILT else "speed"))
 		events.append({"type": "bad_landing", "reason": reason})

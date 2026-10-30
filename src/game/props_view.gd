@@ -10,6 +10,7 @@ const LEAF_W := 86.0 / 3.0
 var level: LevelData
 var run: Run
 var pass_tex: Texture2D = preload("res://assets/art/passengers.png")
+var taxi_tex: Texture2D = Cosmetics.paint_texture()
 var shelter_tex: Texture2D = preload("res://assets/art/shelter.png")
 var pump_base_tex: Texture2D = preload("res://assets/art/pump_base.png")
 var pump_head_tex: Texture2D = preload("res://assets/art/pump_head.png")
@@ -40,13 +41,14 @@ func _draw() -> void:
 	if level == null:
 		return
 	_draw_pads()
+	_draw_reflections()
 	_draw_pumps()
 	_draw_gate()
 	_draw_actors()
 	_draw_taxi_shadow()
 
 func _draw_pads() -> void:
-	var font := ThemeDB.fallback_font
+	var font := Fonts.hud
 	var target := run.target_pad()
 	for id in level.pads:
 		var p: Dictionary = level.pads[id]
@@ -118,7 +120,7 @@ func _draw_gate() -> void:
 	var lamp := Color("#5dff9a") if open else (Color("#ff4d6d") if blink else Color("#7a2438"))
 	for x in [r.position.x + 2.0, r.end.x - 4.0]:
 		draw_rect(Rect2(x, r.position.y + r.size.y * 0.5 - 2, 2, 4), lamp)
-	var font := ThemeDB.fallback_font
+	var font := Fonts.hud
 	var cxm := r.get_center().x
 	var sy := r.position.y - 13.0
 	draw_rect(Rect2(cxm - 22, sy, 44, 10), Color("#0c0f24"))
@@ -153,7 +155,7 @@ func _draw_actor(a: PassengerActor) -> void:
 		var label := "#!" if a.angry else "!"
 		draw_rect(Rect2(bx - 4, by - 3, 8, 8), Color("#0c0f24"))
 		draw_rect(Rect2(bx - 4 + PX * 2, by - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), bubble)
-		draw_string(ThemeDB.fallback_font, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
+		draw_string(Fonts.hud, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
 
 func _draw_actors() -> void:
 	for l in run.leavers:
@@ -201,14 +203,14 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	var col := Color("#5dff9a") if factor > 1.05 else (Color("#ffe14a") if factor > 0.8 else Color("#ff8a5a"))
 	col.a = a.fade
 	var txt := "¢%d" % int(round(value))
-	var font := ThemeDB.fallback_font
+	var font := Fonts.hud
 	draw_rect(Rect2(pos.x - 8.0, pos.y - 21.0, 16.0, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
 	draw_string(font, Vector2(pos.x - 8.0, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, 16, 7, col)
 
 ## Zapfsäule mit Preisanzeige. Der Kopf knickt mit jeder Berührung weiter ab (Stufe 1–3); nach der dritten explodiert
 ## die Station (Effekte in fx.gd) und bleibt als verkohlte Säule stehen.
 func _draw_pumps() -> void:
-	var font := ThemeDB.fallback_font
+	var font := Fonts.hud
 	for pm in level.pumps:
 		var r: Rect2 = pm.rect
 		var top := r.end.y - 32.0
@@ -244,3 +246,27 @@ func _draw_pumps() -> void:
 				var ry := fmod(absf(cos(float(k * 5 + i * 11))) * 6.0, 6.0)
 				if (k + i) % 3 != 0:
 					draw_rect(Rect2(pivot.x - 4.5 + rx, pivot.y - 9.0 + ry, 0.9, 0.9), Color("#ffd37a"))
+
+## Reflexionen auf den Pads: ein Glanzstreifen läuft über die Fläche, und das Taxi spiegelt sich im Metall, wenn es
+## darüber schwebt (nur die unterste Kante, wird mit der Höhe blasser). Bei „Weniger Bewegung“ aus.
+func _draw_reflections() -> void:
+	if Settings.values.reduce_motion:
+		return
+	var s := run.sim
+	for id in level.pads:
+		var p: Dictionary = level.pads[id]
+		var surf: float = p.row * T
+		var w: float = p.x1 - p.x0
+		var gx: float = p.x0 + fmod(t * 22.0 + float(String(id).unicode_at(0)) * 17.0, w + 30.0) - 15.0
+		var x0 := clampf(gx, p.x0, p.x1)
+		var x1 := clampf(gx + 12.0, p.x0, p.x1)
+		if x1 > x0:
+			draw_rect(Rect2(x0, surf + 0.4, x1 - x0, 1.2), Color(1, 1, 1, 0.26))
+		if s.state != TaxiSim.State.DESTROYED and s.pos.x > p.x0 and s.pos.x < p.x1:
+			var bottom := s.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN * s.gear
+			var h := surf - bottom
+			if h > -1.5 and h < 46.0:
+				var a := 0.34 * (1.0 - clampf(h, 0.0, 46.0) / 46.0)
+				draw_set_transform(Vector2(s.pos.x, 2.0 * surf - s.pos.y), -s.tilt, Vector2(Tuning.TAXI_SCALE, -Tuning.TAXI_SCALE))
+				draw_texture_rect_region(taxi_tex, Rect2(-16, -1, 32, 11), Rect2(0, 27, 96, 33), Color(0.7, 0.92, 1.0, a))
+				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

@@ -31,6 +31,9 @@ var job_times: Array = []   # Dauer je zugestelltem Auftrag
 var pen_pick := 0.0         # Abzug durch harte Landung beim Abholen
 var pen_drop := 0.0         # Abzug durch harte Landung am Ziel
 var last_vy := 0.0
+var streak := 0               # perfekte Landungen in Folge
+var best_streak := 0
+var perfect_count := 0
 var log: Array = []         # Ereignisse des letzten Ticks: {type, ...}
 var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
 var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in den Unterstand
@@ -71,6 +74,9 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	pen_pick = 0.0
 	pen_drop = 0.0
 	last_vy = 0.0
+	streak = 0
+	best_streak = 0
+	perfect_count = 0
 	leavers.clear()
 	carried = {}
 	spawn_timer = 0.0
@@ -128,7 +134,7 @@ func prospect() -> float:
 	var j := current_job()
 	if j.is_empty():
 		return 0.0
-	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j))
+	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j)) * combo_mult(streak)
 
 func par_of(job: Dictionary) -> float:
 	return float(job.get("par", job.get("time_limit", 60)))
@@ -149,6 +155,9 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		log.append(e)
 		if e.type == "landed":
 			last_vy = e.vy
+			_evaluate_landing(e)
+		elif e.type == "bad_landing":
+			_break_streak()
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
@@ -208,6 +217,24 @@ func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 		return current_id
 	var h := absi(("%s:%d:%d" % [level.id, job_index, attempt]).hash())
 	return cands[h % cands.size()]
+
+## Perfekte Landung = weich (≤ 22 px/s), kaum seitlich (≤ 12 px/s), waagerecht (≤ 4°). Serie bis +30 % Fahrpreis.
+func _evaluate_landing(e: Dictionary) -> void:
+	if float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
+		streak += 1
+		perfect_count += 1
+		best_streak = maxi(best_streak, streak)
+		log.append({"type": "perfect", "streak": streak})
+	else:
+		_break_streak()
+
+func _break_streak() -> void:
+	if streak >= 2:
+		log.append({"type": "streak_lost", "streak": streak})
+	streak = 0
+
+func combo_mult(combo: int) -> float:
+	return 1.0 + Tuning.COMBO_STEP * float(mini(combo, Tuning.COMBO_MAX))
 
 func _finish_level() -> void:
 	var job := current_job()
@@ -321,7 +348,7 @@ func _service_pad(dt: float) -> void:
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
 	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "base": base_clock,
-		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "job": job_index, "name": String(job.get("passenger", ""))}
+		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "combo": streak, "job": job_index, "name": String(job.get("passenger", ""))}
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
 func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
@@ -335,7 +362,7 @@ func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
 	earned += pay
 	delivered += 1
 	job_times.append(total_time)
-	log.append({"type": "delivered", "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "pay": pay, "voice": l.voice_key(), "name": l.pname})
+	log.append({"type": "delivered", "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname})
 	l.pay_info = {}
 
 ## Beim Levelende noch laufende Fahrgäste gelten als angekommen (Rest-Gehzeit wird eingerechnet).
@@ -371,6 +398,7 @@ func respawn_after_crash() -> void:
 	sim.fuel = fuel_keep
 	result = Result.RUNNING
 	last_vy = 0.0
+	streak = 0
 	if lost:
 		log.append({"type": "passenger_lost", "name": actor.pname, "pad": String(current_job().get("from", ""))})
 		actor = null

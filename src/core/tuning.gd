@@ -86,6 +86,11 @@ const PAY_MAX := 1.6             # Faktor bei sofortiger Zustellung
 const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
 const PAY_SLOPE := 0.6           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
 const LAND_PENALTY_MAX := 0.30
+# Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis
+const PERFECT_VX := 12.0
+const PERFECT_TILT := 0.07
+const COMBO_STEP := 0.05          # +5 % je Serienstufe
+const COMBO_MAX := 6              # höchstens +30 %
 const WALK_TIME_WEIGHT := 2.5    # Gehzeit zum Häuschen zählt 2,5-fach (nahes Landen lohnt spürbar)
 # Streckenzuschlag: lange/schwierige Fahrten zahlen bis zu +60 % (Länge, enger Korridor, kleines Ziel-Landefenster)
 const DIST_BONUS_LEN := 0.30

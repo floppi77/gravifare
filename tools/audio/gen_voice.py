@@ -27,6 +27,12 @@ VOICES = {  # Sprache -> Stimme -> (Beschreibung in der Sprache der Zeile, Seed)
         "m1": ("A middle-aged man with a deep, warm, slightly gravelly voice, easygoing and good-humored delivery. Native English speaker with a neutral accent.", 404),
     },
 }
+SPECIAL = json.load(open("data/voice_lines.json"))          # gemeinsame Quelle für Generator und Spiel-Untertitel
+PASSENGER_VOICES = ["f0", "f1", "m0", "m1"]
+VOICES["de"]["t0"] = ("Ein älterer Tankwart mit tiefer, rauer, gutmütig-grantiger Stimme, spricht mit kräftiger Betonung. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.", 505)
+VOICES["en"]["t0"] = ("An older gas station attendant with a deep, rough, good-naturedly grumpy voice, speaking with strong emphasis. Native English speaker with a neutral accent.", 505)
+VOICES["de"]["d0"] = ("Eine Disponentin Mitte vierzig mit ruhiger, souveräner, leicht ironischer Stimme und klarer Aussprache, wie über Funk. Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache.", 606)
+VOICES["en"]["d0"] = ("A dispatcher woman in her forties with a calm, composed, slightly ironic voice and clear diction, as over a radio. Native English speaker with a neutral accent.", 606)
 NUM_DE = ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun"]
 NUM_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 LINES = {
@@ -76,6 +82,19 @@ def clip_ok(x, sr, text, lang):
     sim = difflib.SequenceMatcher(None, "".join(got), "".join(want)).ratio()
     return sim >= 0.88 and len(got) <= len(want), " ".join(got), sim
 
+def radio(x, sr):
+    """Funk-Effekt für die Disponentin: Bandpass 300–3400 Hz, leichte Sättigung, Rauschbett, Squelch-Klicks."""
+    from scipy import signal
+    sos = signal.butter(4, [300, 3400], btype="bandpass", fs=sr, output="sos")
+    y = signal.sosfilt(sos, x.astype(np.float64))
+    y = np.tanh(y * 2.4) / np.tanh(2.4)
+    rng = np.random.default_rng(3)
+    noise = signal.sosfilt(sos, rng.standard_normal(len(y))) * 0.012
+    y = y + noise
+    n = int(0.035 * sr)
+    burst = signal.sosfilt(sos, rng.standard_normal(n)) * np.linspace(1, 0, n) * 0.06
+    return np.concatenate([burst, y, burst[: int(n * 0.8)] * 1.2]).astype(np.float32)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default=""); ap.add_argument("--lang", default=""); ap.add_argument("--force", action="store_true")
@@ -92,7 +111,10 @@ def main():
         os.makedirs(f"{OUT}/{lang}", exist_ok=True)
         for vk, (instruct, seed) in VOICES[lang].items():
             if a.only and a.only != vk: continue
-            for key, text in cfg["lines"].items():
+            lines = dict(cfg["lines"]); lines.update(SPECIAL["passenger_extra"][lang]) if vk in PASSENGER_VOICES else None
+            if vk not in PASSENGER_VOICES:
+                lines = SPECIAL.get(vk, {}).get(lang, {})
+            for key, text in lines.items():
                 dst = f"{OUT}/{lang}/{vk}_{key}.ogg"
                 if a.clip and f"{lang}/{vk}_{key}" not in a.clip: continue
                 if os.path.exists(dst) and not a.force and not a.clip: continue
@@ -107,6 +129,8 @@ def main():
                     print(f"   Versuch {attempt + 1}: {'ok' if ok else 'verworfen'} ({got!r}, {sim:.2f})", flush=True)
                     if ok:
                         break
+                if vk == "d0":
+                    x = radio(x, sr)
                 x = x / max(1e-6, np.abs(x).max()) * 0.85
                 tmp = dst[:-4] + ".wav"
                 sf.write(tmp, x, sr)

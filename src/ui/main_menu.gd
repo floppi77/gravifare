@@ -4,6 +4,9 @@ extends Control
 var box: VBoxContainer
 
 func _ready() -> void:
+	Music.play_theme("menu")
+	Music.set_layers(true, false)
+	Music.duck(0.0)
 	theme = MenuKit.make_theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var backdrop := Control.new()
@@ -39,7 +42,9 @@ func _next_open_level() -> String:
 
 func show_main(focus_lang := "") -> void:
 	_clear()
-	box.add_child(MenuKit.title("GRAVIFARE", 28))
+	var mt := Control.new()
+	mt.set_script(load("res://src/ui/menu_title.gd"))
+	box.add_child(mt)
 	box.add_child(MenuKit.title(tr("TITLE_SUB"), 10))
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 10)
@@ -48,7 +53,9 @@ func show_main(focus_lang := "") -> void:
 	var id := _next_open_level()
 	box.add_child(MenuKit.button(tr("MENU_CONTINUE") if any_done else tr("MENU_PLAY"), func(): Flow.start_campaign(id)))
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
+	box.add_child(MenuKit.button(tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")))
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), show_options))
+	box.add_child(MenuKit.button(tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")))
 	box.add_child(MenuKit.button(tr("MENU_QUIT"), func(): get_tree().quit()))
 	# Sprachwahl: zwei Flaggen ohne Text unter dem Menü
 	var gap := Control.new()
@@ -56,6 +63,23 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(gap)
 	box.add_child(MenuKit.flag_row(func(code): show_main(code)))
 	_focus_first(focus_lang)
+	_slide_in()
+
+## Menüeinträge gleiten nacheinander von links ein (nur beim ersten Aufbau, nicht bei „Weniger Bewegung“).
+func _slide_in() -> void:
+	if Settings.values.reduce_motion or _slid:
+		return
+	_slid = true
+	var i := 0
+	for c in box.get_children():
+		if c is Button:
+			c.modulate.a = 0.0
+			var tw := create_tween()
+			tw.tween_interval(0.12 + i * 0.07)
+			tw.tween_property(c, "modulate:a", 1.0, 0.25)
+			i += 1
+
+var _slid := false
 
 func show_levels() -> void:
 	_clear()

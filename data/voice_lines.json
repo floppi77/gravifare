@@ -1,0 +1,72 @@
+{
+ "passenger_extra": {
+  "de": {
+   "soft": "Wow, sanft!",
+   "hard": "Aua!"
+  },
+  "en": {
+   "soft": "Wow, smooth!",
+   "hard": "Ouch!"
+  }
+ },
+ "t0": {
+  "de": {
+   "pump_hit_1": "Vorsicht mit meiner Säule!",
+   "pump_hit_2": "Hey! Lass das!",
+   "pump_hit_3": "Nein! Meine Tankstelle!",
+   "price_up": "Die Preise steigen!",
+   "price_down": "Preise runter! Kommt tanken!"
+  },
+  "en": {
+   "pump_hit_1": "Careful with my pump!",
+   "pump_hit_2": "Hey! Knock it off!",
+   "pump_hit_3": "No! My station!",
+   "price_up": "Prices are going up!",
+   "price_down": "Prices down! Come fill up!"
+  }
+ },
+ "d0": {
+  "de": {
+   "intro_1": "Zentrale an Taxi sieben: Willkommen im Sternenhafen!",
+   "intro_2": "Neon-Schluchten voraus. Eng, hell und voller Verkehr.",
+   "intro_3": "Schrottgürtel. Achte auf die Trümmer, Taxi sieben.",
+   "intro_4": "Magnetfeld erkannt. Dein Taxi wird zappeln.",
+   "intro_5": "Solarschmiede. Es wird heiß, bleib cool, Pilot.",
+   "intro_6": "Gezeitenorbit. Oben und unten sind Ansichtssache.",
+   "intro_7": "Transitknoten. Viel Verkehr, bleib höflich.",
+   "intro_8": "Schattenring. Funkstille ist keine Option, melde dich.",
+   "intro_9": "Singularitätsrand. Fast geschafft, Taxi sieben.",
+   "g1": "Gute Arbeit, Taxi sieben. Weiter geht's.",
+   "g2": "Der nächste Fahrgast wartet schon.",
+   "g3": "Die Tankstellen melden schwankende Preise.",
+   "g4": "Odo schuldet mir noch einen Kaffee.",
+   "g5": "Die Zentrale hört mit. Fliege sauber.",
+   "g6": "Denk an den Bonus für saubere Landungen.",
+   "g7": "Kein Stress, aber die Uhr tickt.",
+   "g8": "Taxi sieben, du bist mein Lieblingspilot.",
+   "g9": "Melde dich, wenn du Hilfe brauchst.",
+   "g10": "Ein Fahrgast hat nach dir gefragt."
+  },
+  "en": {
+   "intro_1": "Dispatch to Taxi seven: welcome to Star Harbor!",
+   "intro_2": "Neon Canyons ahead. Tight, bright and busy.",
+   "intro_3": "Scrap Belt. Watch the debris, Taxi seven.",
+   "intro_4": "Magnetic field detected. Your taxi will wobble.",
+   "intro_5": "Solar Forge. It gets hot, stay cool, pilot.",
+   "intro_6": "Tidal Orbit. Up and down are a matter of opinion.",
+   "intro_7": "Transit Hub. Heavy traffic, be polite.",
+   "intro_8": "Shadow Ring. Radio silence is not an option, check in.",
+   "intro_9": "Singularity Edge. Almost there, Taxi seven.",
+   "g1": "Good work, Taxi seven. Keep going.",
+   "g2": "The next passenger is already waiting.",
+   "g3": "Fuel stations report shifting prices.",
+   "g4": "Odo still owes me a coffee.",
+   "g5": "Dispatch is listening. Fly clean.",
+   "g6": "Remember the bonus for clean landings.",
+   "g7": "No stress, but the clock is ticking.",
+   "g8": "Taxi seven, you are my favorite pilot.",
+   "g9": "Call in if you need a hand.",
+   "g10": "A passenger asked about you."
+  }
+ }
+}

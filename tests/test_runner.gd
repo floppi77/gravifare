@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -272,7 +272,8 @@ func _collect_keys(dir: String, out: Dictionary) -> void:
 		if f.ends_with(".gd"):
 			var text := FileAccess.get_file_as_string(dir + "/" + f)
 			for m in rx.search_all(text):
-				out[m.get_string(1)] = true
+				if not m.get_string(1).ends_with("_"):          # dynamisch zusammengesetzte Schlüssel (Präfix) überspringen
+					out[m.get_string(1)] = true
 
 func _test_i18n_complete() -> void:
 	var de := _read_json("res://data/i18n/de.json")
@@ -771,3 +772,124 @@ func _test_pump_level_rules() -> void:
 		check(ok_pump, "%s: Tankpad hat eine 2 Tiles hohe Zapfsäule am Padende" % lvl.id)
 		check(pad.land_window >= 28.0, "%s: freies Landefenster am Tankpad ≥ 28 px (%.0f px)" % [lvl.id, pad.land_window])
 		check(lvl.fuel_price_min >= 0.2 and lvl.fuel_price_max <= 1.2 and lvl.fuel_price_min < lvl.fuel_price_max - 0.2, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])
+
+func _test_streak_bonus() -> void:
+	var r := Run.new()
+	r.start(_lvl())
+	r.log.clear()
+	for i in 3:
+		r._evaluate_landing({"vy": 12.0, "vx": 4.0, "tilt": 0.02})
+	check(r.streak == 3 and r.best_streak == 3 and r.perfect_count == 3, "Drei perfekte Landungen in Folge = Serie 3")
+	r._evaluate_landing({"vy": 30.0, "vx": 4.0, "tilt": 0.02})
+	check(r.streak == 0 and r.best_streak == 3 and r.log.any(func(e): return e.type == "streak_lost"), "Harte Landung (30 px/s) unterbricht die Serie")
+	r._evaluate_landing({"vy": 10.0, "vx": 20.0, "tilt": 0.02})
+	check(r.streak == 0, "Zu seitlich (20 px/s) ist nicht perfekt")
+	r._evaluate_landing({"vy": 10.0, "vx": 3.0, "tilt": 0.12})
+	check(r.streak == 0, "Zu schräg (7°) ist nicht perfekt")
+	# Bonus: +5 % je Stufe, gedeckelt bei +30 %
+	var info := {"fare": 100.0, "par": 20.0, "base": 0.0, "penalty": 0.0, "combo": 0}
+	var a := PassengerActor.new()
+	a.pay_info = info.duplicate()
+	var p0 := a.pay_for(0.0)
+	a.pay_info["combo"] = 4
+	var p4 := a.pay_for(0.0)
+	a.pay_info["combo"] = 50
+	var pmax := a.pay_for(0.0)
+	check(absf(p4 / p0 - 1.20) < 0.001 and absf(pmax / p0 - 1.30) < 0.001, "Serie 4 = +20 %%, Obergrenze +30 %% (%.2f / %.2f)" % [p4 / p0, pmax / p0])
+	# Bad-Landing/Absturz setzen zurück
+	r.streak = 4
+	r.log.clear()
+	r.sim.events = [{"type": "bad_landing", "reason": "speed"}]
+	r._break_streak()
+	check(r.streak == 0, "Misslungene Landung beendet die Serie")
+	r.streak = 5
+	r.sim.hull = 0.0
+	r.sim.state = TaxiSim.State.DESTROYED
+	r.respawn_after_crash()
+	check(r.streak == 0, "Absturz beendet die Serie")
+	# Sim liefert Geschwindigkeit/Neigung im Landeereignis
+	var s2 := TaxiSim.new()
+	var lvl := _lvl()
+	s2.setup(lvl)
+	s2.state = TaxiSim.State.FLYING
+	s2.landed_pad = {}
+	var pad: Dictionary = lvl.pads["2"]
+	s2.pos = Vector2(pad.land_mid, pad.row * Tuning.TILE - 30.0)
+	s2.vel = Vector2(3.0, 12.0)
+	s2.gear = 1.0
+	var ev: Dictionary = {}
+	for i in 900:
+		s2.step(Vector2(0, -0.58), true)
+		for e in s2.events:
+			if e.type == "landed":
+				ev = e
+		if not ev.is_empty():
+			break
+	check(not ev.is_empty() and ev.has("vx") and ev.has("tilt"), "Landeereignis enthält Seitengeschwindigkeit und Neigung")
+
+func _test_music_assets() -> void:
+	var themes := ["menu", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"]
+	var ok_all := true
+	var lens_ok := true
+	for th in themes:
+		var lens: Array = []
+		for st in ["A", "B", "C"]:
+			var path := "res://assets/audio/music/%s_%s.ogg" % [th, st]
+			if not ResourceLoader.exists(path):
+				ok_all = false
+				continue
+			var stream: AudioStream = load(path)
+			lens.append(stream.get_length())
+		if lens.size() == 3:
+			if absf(lens[0] - lens[1]) > 0.06 or absf(lens[0] - lens[2]) > 0.06 or lens[0] < 15.0:
+				lens_ok = false
+	check(ok_all, "Alle 10 Musikthemen haben drei Schichten (A/B/C)")
+	check(lens_ok, "Schichten eines Themas sind gleich lang (synchron loopbar, ≥ 15 s)")
+
+func _test_cosmetics_data() -> void:
+	var f := FileAccess.open("res://data/cosmetics.json", FileAccess.READ)
+	var d = JSON.parse_string(f.get_as_text())
+	var items: Array = d.items
+	var tex_ok := true
+	var names_ok := true
+	var unlock_ok := true
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var ids := {}
+	var free_paint := false
+	for it in items:
+		ids[it.id] = true
+		if not ResourceLoader.exists("res://assets/art/%s_%s.png" % ["taxi" if it.kind == "paint" else "sticker", it.id]) and it.id != "none":
+			tex_ok = false
+		if String(it.name.get("de", "")) == "" or String(it.name.get("en", "")) == "":
+			names_ok = false
+		if it.unlock == null:
+			if it.kind == "paint":
+				free_paint = true
+		else:
+			var key := "COSM_REQ_" + String(it.unlock.stat).to_upper()
+			if not de.has(key) or not en.has(key) or not Cosmetics_STATS.has(it.unlock.stat) or int(it.unlock.min) < 1:
+				unlock_ok = false
+	check(ids.size() == items.size(), "Kosmetik-IDs sind eindeutig (%d Einträge)" % items.size())
+	check(tex_ok, "Zu jeder Lackierung/jedem Aufkleber gibt es eine Grafik")
+	check(names_ok, "Alle Kosmetik-Namen sind zweisprachig")
+	check(unlock_ok and free_paint, "Freischaltbedingungen haben gültige Statistik und Übersetzung; ein Standardtaxi ist frei")
+
+const Cosmetics_STATS := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions"]
+
+func _test_voice_lines_complete() -> void:
+	var f := FileAccess.open("res://data/voice_lines.json", FileAccess.READ)
+	var d = JSON.parse_string(f.get_as_text())
+	var missing: Array = []
+	var total := 0
+	for group in d:
+		for lang in d[group]:
+			for key in d[group][lang]:
+				if String(d[group][lang][key]).strip_edges() == "":
+					missing.append("%s/%s/%s (Text leer)" % [group, lang, key])
+				var voices: Array = ["f0", "f1", "m0", "m1"] if group == "passenger_extra" else [group]
+				for v in voices:
+					total += 1
+					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, key]):
+						missing.append("%s/%s_%s" % [lang, v, key])
+	check(missing.is_empty() and total > 50, "Alle %d Sondersprachzeilen (Tankwart, Zentrale, Passagier-Reaktionen) haben Text und Clip %s" % [total, str(missing.slice(0, 4))])
