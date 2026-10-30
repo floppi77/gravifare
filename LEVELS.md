@@ -16,6 +16,19 @@ Status: **22 von 99 Leveln vorhanden** (Sektor 1 und 2 komplett, S1-01 bis S2-11
 | 89–99 (Sektor 9) | **9** | 9 | Finale |
 Mehr als **9 Passagierpads** sind nicht geplant (Pads sind Ziffern 1–9; das Tankpad „F“ und die Lebens-Station „L“ zählen nicht mit). **Lebens-Station** (`L`, kleine Plattform, alle 5 Level: 5, 10, 15, 20 … 95): Landen mit ≥ ¢1000 kauft nach 1,2 s ein Leben, höchstens 5.
 
+## Geplante Hindernisse und Neuerungen je Sektor (Stand: Planung, nur Sektor 1–2 gebaut)
+| Sektor | Neue Hindernisse / Mechaniken | Passagierpads | Weitere Neuerungen (schrittweise) |
+|---|---|---|---|
+| 1 Sternenhafen (1–11) | Dornen, Engstellen, Schächte, Tanken | 3–4 | Zusatzfahrgäste ab 5 |
+| 2 Neon-Schluchten (12–22) | **bewegliche Tore** (Wandschleusen, Falltüren) | 4 | Lebens-Station alle 5 Level |
+| 3 Schrottgürtel (23–33) | driftende Trümmer (Schaden bei Berührung), **bewegliche Plattformen** (Pads auf Schienen/Pendel) | **5** (ab 23) | Zufallsereignis „Meteoritenschauer“, Fahrgasttyp **zerbrechlich** (Schaden an Bord = Auftrag verloren) |
+| 4 Magnetfeld (34–44) | **anziehende/abstoßende Feldzonen** (zeitweise schaltend), magnetische Träger | **6** (ab 34) | **zweite Tankstation**, Reparaturplattform, Fahrgasttyp **VIP** (höherer Preis, kurze Geduld) |
+| 5 Solarschmiede (45–55) | **Hitzezonen** (Schaden je Sekunde), **Plasmastrahlen im Takt**, Sonnenwind | **7** (ab 45) | Fahrgasttyp **Gruppe** (2–3 Personen, mehr Platz nötig), Tank-Sonderangebote |
+| 6 Gezeitenorbit (56–66) | **wechselnde Schwerkraft** (Zonen/Takt, auch Umkehr), **Strömungen** (Windfelder) | 7 | Fahrgasttyp **Notfall** (knappes Zeitlimit, hoher Preis), Zufallsereignis „Funkstörung“ |
+| 7 Transitknoten (67–77) | **Verkehr** (Fremdfahrzeuge auf festen Routen), Mehrfach-Schleusen, Weichen/Förderbänder | **8** (ab 67) | Zufallsereignis „Preissturz/-anstieg“ an der Tankstelle |
+| 8 Schattenring (78–88) | **Sichtbehinderung** (Nebel, Dunkelzonen), Radar-/Sensoranzeige, Suchscheinwerfer-Drohnen | 8 | alle Fahrgasttypen gemischt |
+| 9 Singularitätsrand (89–99) | **alle Systeme** kombiniert plus Gravitationsbrunnen (Sog wächst), Finale in Level 99 | **9** (ab 89) | Tagesherausforderung (ganz am Ende, außerhalb der 99 Level) |
+
 ## Schwierigkeitsmetrik (`src/core/level_metrics.gd`, Test erzwingt: nicht fallend von Level 1 bis 99)
 Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·Gefahren + 5·Mechaniken (Enge und Landefenster 0..1; Streckenlänge bis 2, Aufträge bis 1,5, Gefahren bis 3, Mechaniken bis 12 – nach oben offen, damit die Rangfolge bis Level 99 nicht an eine Obergrenze stößt; „Mechaniken“ = im Level-JSON unter `mechanics` deklarierte Neuerungen wie `spikes`; kleineres Landefenster = schwerer). Enge = engster Flugkorridor der Bot-Route (Sicherheitsrand in px, kleiner = schwerer). Bericht: `godot --headless -s tools/level_report.gd`.
 

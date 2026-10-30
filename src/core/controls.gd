@@ -1,6 +1,6 @@
 extends Node
 ## Autoload "Controls": Eingabeaktionen mit Standardbelegung (Tastatur + Gamepad), frei belegbar und persistent
-## (user://controls.cfg). Belegbar: Schub (4 Richtungen), Fahrwerk, Neustart. Pause bleibt fest auf Esc/Start, Menüs
+## (user://controls.cfg). Belegbar: Schub (4 Richtungen), Fahrwerk, Fahrgast rauswerfen (E / Y), Neustart (R / Back). Pause bleibt fest auf Esc/Start, Menüs
 ## (ui_*) fest auf Pfeile/Stick/A/B/Enter – so kann man sich nie aussperren. Doppelte Belegungen werden getauscht.
 
 const ACTIONS := {
@@ -9,10 +9,11 @@ const ACTIONS := {
 	"thrust_up":    {"keys": [KEY_W, KEY_UP],    "axis": [JOY_AXIS_LEFT_Y, -1.0], "btn": [JOY_BUTTON_DPAD_UP]},
 	"thrust_down":  {"keys": [KEY_S, KEY_DOWN],  "axis": [JOY_AXIS_LEFT_Y, 1.0],  "btn": [JOY_BUTTON_DPAD_DOWN]},
 	"gear":         {"keys": [KEY_SPACE],        "btn": [JOY_BUTTON_A]},
-	"restart":      {"keys": [KEY_R],            "btn": [JOY_BUTTON_Y]},
+	"eject":        {"keys": [KEY_E],            "btn": [JOY_BUTTON_Y]},
+	"restart":      {"keys": [KEY_R],            "btn": [JOY_BUTTON_BACK]},
 	"pause":        {"keys": [KEY_ESCAPE],       "btn": [JOY_BUTTON_START]},
 }
-const REMAPPABLE := ["thrust_up", "thrust_left", "thrust_down", "thrust_right", "gear", "restart"]
+const REMAPPABLE := ["thrust_up", "thrust_left", "thrust_down", "thrust_right", "gear", "eject", "restart"]
 const PAD_NAMES := ["A", "B", "X", "Y", "Back", "Guide", "Start", "L3", "R3", "LB", "RB", "D↑", "D↓", "D←", "D→", "Misc"]
 
 var path := "user://controls.cfg"
@@ -212,6 +213,22 @@ func load_bindings() -> void:
 			InputMap.action_erase_events(a)
 			for e in evs:
 				InputMap.action_add_event(a, e)
+	# Migration: Y gehörte früher dem Neustart. Fehlt „eject“ in der Datei, bekommt der Neustart statt Y die Back-Taste.
+	if cf.get_value("bindings", "eject", null) == null:
+		var fixed: Array = []
+		var changed := false
+		for e in InputMap.action_get_events("restart"):
+			if e is InputEventJoypadButton and e.button_index == JOY_BUTTON_Y:
+				var jb := InputEventJoypadButton.new()
+				jb.button_index = JOY_BUTTON_BACK
+				fixed.append(jb)
+				changed = true
+			else:
+				fixed.append(e)
+		if changed:
+			InputMap.action_erase_events("restart")
+			for e in fixed:
+				InputMap.action_add_event("restart", e)
 
 # ------------------------------------------------------------------ Hinweistext für das HUD
 func thrust_label(device: String) -> String:
@@ -232,4 +249,4 @@ func hint_text(device: String) -> String:
 	if kind == "pad" and thrust[0].begins_with("Stick") and thrust[1].begins_with("Stick"):
 		th = "Stick"
 	var key := "HUD_HINT_KB" if kind == "kb" else "HUD_HINT_PAD_DYN"
-	return tr(key) % [th, slot_label("gear", kind, 0), slot_label("restart", kind, 0)]
+	return tr(key) % [th, slot_label("gear", kind, 0), slot_label("eject", kind, 0), slot_label("restart", kind, 0)]

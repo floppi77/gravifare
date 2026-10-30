@@ -7,8 +7,8 @@
  "HUD_VY": "V↓",
  "HUD_VX": "V↔",
  "HUD_TILT": "NEI",
- "HUD_HINT_PAD": "WASD/Pfeile Schub · Leertaste Fahrwerk · R Neustart · Esc Pause",
- "HUD_HINT_PAD_PAD": "Stick/Steuerkreuz Schub · A Fahrwerk · Y Neustart · Start Pause",
+ "HUD_HINT_PAD": "WASD/Pfeile Schub · Leertaste Fahrwerk · E Rauswerfen · R Neustart · Esc Pause",
+ "HUD_HINT_PAD_PAD": "Stick/Steuerkreuz Schub · A Fahrwerk · Y Rauswerfen · Back Neustart · Start Pause",
  "HUD_CRASHED": "TAXI VERLOREN",
  "HUD_RESTART": "R / Y drücken für neuen Versuch",
  "HUD_COMPLETE": "LEVEL GESCHAFFT",
@@ -105,8 +105,8 @@
  "COSM_REQ_PUMP_EXPLOSIONS": "Eine Tankstelle sprengen",
  "SPK_ATTENDANT": "Tankwart",
  "SPK_DISPATCH": "Zentrale",
- "HUD_HINT_KB": "%s Schub · %s Fahrwerk · %s Neustart · Esc Pause",
- "HUD_HINT_PAD_DYN": "%s Schub · %s Fahrwerk · %s Neustart · Start Pause",
+ "HUD_HINT_KB": "%s Schub · %s Fahrwerk · %s Rauswerfen · %s Neustart · Esc Pause",
+ "HUD_HINT_PAD_DYN": "%s Schub · %s Fahrwerk · %s Rauswerfen · %s Neustart · Start Pause",
  "OPT_CAT_AUDIO": "Ton",
  "OPT_CAT_CONTROLS": "Steuerung",
  "OPT_CAT_DISPLAY": "Anzeige",
@@ -189,5 +189,9 @@
  "HUD_MAIN_WAITING": "★ Pflicht offen: %s → Pad %s",
  "MSG_LIFE_BOUGHT": "Leben gekauft! Jetzt %d Leben (−¢%d)",
  "MSG_LIFE_FULL": "Du hast schon die maximalen 5 Leben",
- "MSG_LIFE_POOR": "Ein Leben kostet ¢%d – zu wenig Credits"
+ "MSG_LIFE_POOR": "Ein Leben kostet ¢%d – zu wenig Credits",
+ "ACT_EJECT": "Fahrgast rauswerfen",
+ "MSG_EJECTED": "%s rausgeworfen!",
+ "VOICE_SCREAM": "Aaaaaah!",
+ "VOICE_SCREAM_SHORT": "AAAH!"
 }

@@ -47,6 +47,9 @@ func add(v: Vector2, gear: bool) -> void:
 func mark_respawn() -> void:
 	events.append([ticks, "respawn"])
 
+func mark_eject() -> void:
+	events.append([ticks, "eject"])
+
 func finish(res: Dictionary) -> void:
 	result = res
 
@@ -69,7 +72,10 @@ static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
 		var v := Vector2(float(run_entry[1]) / 127.0, float(run_entry[2]) / 127.0)
 		for k in int(run_entry[0]):
 			while ei < evs.size() and int(evs[ei][0]) == tick:
-				r.respawn_after_crash()
+				if String(evs[ei][1]) == "eject":
+					r.eject()
+				else:
+					r.respawn_after_crash()
 				ei += 1
 			r.step(v, int(run_entry[3]) == 1)
 			tick += 1

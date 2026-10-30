@@ -7,8 +7,8 @@
  "HUD_VY": "V↓",
  "HUD_VX": "V↔",
  "HUD_TILT": "TLT",
- "HUD_HINT_PAD": "WASD/Arrows thrust · Space gear · R restart · Esc pause",
- "HUD_HINT_PAD_PAD": "Stick/D-pad thrust · A gear · Y restart · Start pause",
+ "HUD_HINT_PAD": "WASD/arrows thrust · Space gear · E eject · R restart · Esc pause",
+ "HUD_HINT_PAD_PAD": "Stick/D-pad thrust · A gear · Y eject · Back restart · Start pause",
  "HUD_CRASHED": "TAXI LOST",
  "HUD_RESTART": "Press R / Y to retry",
  "HUD_COMPLETE": "LEVEL COMPLETE",
@@ -105,8 +105,8 @@
  "COSM_REQ_PUMP_EXPLOSIONS": "Blow up a fuel station",
  "SPK_ATTENDANT": "Attendant",
  "SPK_DISPATCH": "Dispatch",
- "HUD_HINT_KB": "%s thrust · %s gear · %s restart · Esc pause",
- "HUD_HINT_PAD_DYN": "%s thrust · %s gear · %s restart · Start pause",
+ "HUD_HINT_KB": "%s thrust · %s gear · %s eject · %s restart · Esc pause",
+ "HUD_HINT_PAD_DYN": "%s thrust · %s gear · %s eject · %s restart · Start pause",
  "OPT_CAT_AUDIO": "Audio",
  "OPT_CAT_CONTROLS": "Controls",
  "OPT_CAT_DISPLAY": "Display",
@@ -189,5 +189,9 @@
  "HUD_MAIN_WAITING": "★ Required fare open: %s → pad %s",
  "MSG_LIFE_BOUGHT": "Life bought! Now %d lives (−¢%d)",
  "MSG_LIFE_FULL": "You already have the maximum of 5 lives",
- "MSG_LIFE_POOR": "A life costs ¢%d – not enough credits"
+ "MSG_LIFE_POOR": "A life costs ¢%d – not enough credits",
+ "ACT_EJECT": "Eject passenger",
+ "MSG_EJECTED": "%s thrown out!",
+ "VOICE_SCREAM": "Aaaaaah!",
+ "VOICE_SCREAM_SHORT": "AAAH!"
 }

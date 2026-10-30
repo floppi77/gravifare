@@ -392,3 +392,7 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 - Tor schließt auf dem Taxi: Schaden und Rauswurf. Leerer Tank: Leben verloren, neues Taxi (voller Tank). Zusatzfahrgäste kollidieren und verschwinden.
 - Obergrenzen Pflichtfahrgäste/Passagierpads je Levelnummer (siehe LEVELS.md), höchstens 9 Pads. Lebens-Station „L“ alle 5 Level (¢1000, max. 5 Leben).
 - Pflicht- und Zusatzfahrgäste klar unterscheidbar (Stern, Rahmen, Farbe, Zeilenpräfix).
+
+## O) Nachträge Runde 12
+- **Fahrgast rauswerfen** (E / Gamepad Y, Neustart nun R / Back): Fahrgast fällt, schreit, stirbt beim Aufprall, kein Geld; Pflichtauftrag gilt als verpasst. Schrei-Sounds `scream_f`/`scream_m` und `splat` (synthetisiert).
+- Geplante Hindernisse je Sektor: siehe LEVELS.md.

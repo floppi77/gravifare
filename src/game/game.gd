@@ -204,6 +204,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept"):
 			Flow.to_menu()
+	elif event.is_action_pressed("eject"):
+		if run.result == Run.Result.RUNNING and trans_t < 0.0:
+			replay.mark_eject()
+			if not run.eject():
+				replay.events.pop_back()          # nichts passiert: auch nicht aufzeichnen
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("restart"):
 		if run.result == Run.Result.FAILED:
 			_lose_life()
@@ -473,6 +479,20 @@ func _on_event(e: Dictionary) -> void:
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
 		"job_missed":
 			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
+		"ejected":
+			hud.flash_message(tr("MSG_EJECTED") % e.name, 2.4)
+			if e.lethal:
+				Sfx.play("scream_f" if String(e.voice).begins_with("f") else "scream_m")
+				hud.subtitle(e.name, tr("VOICE_SCREAM"), 1.6)
+			else:
+				Sfx.play_voice(e.voice, "angry")
+				hud.subtitle(e.name, tr("VOICE_ANGRY"), 1.8)
+			Save.count_event("ejected")
+			Haptics.pulse(0.2, 0.3, 0.15)
+		"splat":
+			Sfx.play("splat")
+			_add_shake(2.0)
+			Haptics.pulse(0.5, 0.7, 0.25)
 		"life_bought":
 			Flow.lives = int(e.lives)
 			hud.flash_message(tr("MSG_LIFE_BOUGHT") % [int(e.lives), int(e.price)], 3.0)

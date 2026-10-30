@@ -4,10 +4,11 @@ extends RefCounted
 ## Taxi, steigt ein; beim Ankunftspad steigt er aus, läuft zum Unterstand und verschwindet dort.
 ## Reine Daten (kein Node) – Darstellung und Tests lesen nur Zustand und Position.
 
-enum S { EMERGING, WAITING, TO_TAXI, ABOARD, EXITING, RETURNING, GONE }
+enum S { EMERGING, WAITING, TO_TAXI, ABOARD, EXITING, RETURNING, GONE, FALLING, DEAD }
 
 const SPEED := 38.0          # Welteinheiten/s
 const ENTER_PAUSE := 0.15
+const FALL_G := 380.0        # Fallbeschleunigung des rausgeworfenen Fahrgasts (px/s²)
 
 var state := S.WAITING
 var x := 0.0
@@ -32,6 +33,11 @@ var angry := false            # vom Taxi erschreckt: flüchtet schimpfend in den
 var speed_mul := 1.0
 var events: Array = []
 var _pause := 0.0
+var fall_y := 0.0
+var fall_vy := 0.0
+var fall_vx := 0.0
+var ground_y := 0.0
+var dead_t := 0.0
 
 func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 	pad = p
@@ -123,7 +129,36 @@ func wave() -> void:
 	wave_t = 1.4
 
 func world_pos() -> Vector2:
+	if state == S.FALLING or state == S.DEAD:
+		return Vector2(x, fall_y)
 	return Vector2(x, surface_y)
+
+## Aus dem fliegenden Taxi geworfen: fällt bis zum Boden und stirbt beim Aufprall (kein Geld).
+func start_fall(px: float, py: float, vel: Vector2, ground: float) -> void:
+	x = px
+	fall_y = py
+	fall_vy = maxf(vel.y, 0.0) * 0.5
+	fall_vx = vel.x * 0.6
+	ground_y = ground
+	state = S.FALLING
+	fade = 1.0
+	pay_info = {}
+	wave_t = 0.0
+	dead_t = 0.0
+
+## Vom stehenden Taxi (oder aus geringer Höhe) hinausgeworfen: überlebt, schimpft und läuft in den Unterstand (kein Geld).
+func kicked_out(taxi_x: float, pad_d: Dictionary) -> void:
+	pad = pad_d
+	surface_y = pad_d.row * Tuning.TILE
+	x = taxi_x
+	angry = true
+	state = S.EXITING
+	target_x = float(pad_d.get("door_x", pad_d.center))
+	speed_mul = 1.9
+	fade = 1.0
+	wave_t = 0.0
+	pay_info = {}
+	_home_reported = true
 
 func step(dt: float) -> void:
 	events.clear()
@@ -145,6 +180,21 @@ func step(dt: float) -> void:
 		S.RETURNING:
 			if _walk(dt):
 				state = S.WAITING
+		S.FALLING:
+			fall_vy += FALL_G * dt
+			fall_y += fall_vy * dt
+			x += fall_vx * dt
+			fall_vx *= maxf(0.0, 1.0 - 0.4 * dt)
+			if fall_y >= ground_y:
+				fall_y = ground_y
+				state = S.DEAD
+				events.append({"type": "splat", "x": x, "y": fall_y})
+		S.DEAD:
+			dead_t += dt
+			if dead_t > 2.0:
+				fade = maxf(0.0, fade - dt * 1.5)
+				if fade <= 0.0:
+					state = S.GONE
 		S.EXITING:
 			exit_time += dt
 			if _walk(dt):

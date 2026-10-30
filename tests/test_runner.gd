@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -741,6 +741,94 @@ func _test_life_station() -> void:
 				denied = true
 	check(denied and r.lives == Tuning.MAX_LIVES and r.money == 5000.0, "Mehr als 5 Leben gibt es nicht (nichts abgebucht)")
 	check(not lvl.is_passenger_pad("L") and lvl.is_passenger_pad("1") and not lvl.is_passenger_pad("F"), "Lebens-Station zählt nicht als Passagierpad")
+
+func _board_main(r: Run, lvl: LevelData) -> Dictionary:
+	var job: Dictionary = r.current_job()
+	_land_on(r, String(job.from))
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	return job
+
+func _test_eject() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	check(not r.eject(), "Ohne Fahrgast an Bord passiert beim Rauswerfen nichts")
+	r.money = 200.0
+	var job := _board_main(r, lvl)
+	check(r.phase == Run.Phase.CARRYING, "Fahrgast an Bord")
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.pos = Vector2(300.0, 80.0)
+	r.sim.vel = Vector2(20, 0)
+	var lethal := false
+	check(r.eject(), "Rauswerfen im Flug funktioniert")
+	for e in r.log:
+		if e.type == "ejected":
+			lethal = e.lethal
+	check(lethal and r.actor == null and r.job_index == 1 and r.missed == 1 and r.ejected == 1, "Pflichtauftrag gilt als verpasst, Fahrgast fällt")
+	var splat := false
+	var fell: PassengerActor = r.leavers[r.leavers.size() - 1]
+	var money_before := r.money
+	for i in int(6.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), false)
+		for e in r.log:
+			if e.type == "splat":
+				splat = true
+	check(splat and fell.state != PassengerActor.S.FALLING and r.delivered == 0 and r.money <= money_before + 0.001, "Er stirbt beim Aufprall und bringt kein Geld (¢%d)" % int(r.money))
+	check(not r.medals().clean, "Rausgeworfen: keine Sauber-Medaille")
+	# aus dem Stand: überlebt, schimpft, läuft weg
+	var r2 := Run.new()
+	r2.extras_enabled = false
+	r2.start(lvl)
+	_board_main(r2, lvl)
+	check(r2.eject(), "Rauswerfen am Boden")
+	var surv: PassengerActor = r2.leavers[r2.leavers.size() - 1]
+	check(surv.state == PassengerActor.S.EXITING and surv.angry and surv.pay_info.is_empty(), "Am Boden überlebt er, schimpft und läuft weg – ohne Geld")
+	# Zusatzfahrgast
+	var l5 := LevelData.load_file("res://data/levels/s1_05.json")
+	var r3 := Run.new()
+	r3.start(l5)
+	r3.extra_timer = 0.0
+	for i in 90:
+		r3.step(Vector2(0, -1), true)
+	for i in int(2.0 / Tuning.TICK):
+		r3.step(Vector2(0, -0.39), false)
+	var ex: Dictionary = r3.extras[0]
+	_land_on(r3, String(ex.job.from))
+	for i in int(3.0 / Tuning.TICK):
+		r3.step(Vector2.ZERO, true)
+	check(int(ex.state) == Run.ES.CARRY, "Zusatzfahrgast an Bord")
+	var fee_before := r3.missed_fees
+	r3.sim.state = TaxiSim.State.FLYING
+	r3.sim.landed_pad = {}
+	r3.sim.pos = Vector2(300.0, 80.0)
+	check(r3.eject() and r3.extras.is_empty() and r3.missed == 0 and r3.missed_fees == fee_before, "Zusatzfahrgast rauswerfen: weg, keine Verpasst-Gebühr")
+	# Standard-Tasten
+	var ctl := load("res://src/core/controls.gd")
+	var cfg: Dictionary = ctl.ACTIONS
+	check(cfg.eject.keys.has(KEY_E) and cfg.eject.btn.has(JOY_BUTTON_Y) and cfg.restart.btn.has(JOY_BUTTON_BACK) and not cfg.restart.btn.has(JOY_BUTTON_Y), "Rauswerfen: E / Y; Neustart: R / Back")
+	# Replay mit Rauswurf
+	var rr := Run.new()
+	rr.extras_enabled = false
+	rr.start(lvl)
+	var rep := Replay.new()
+	rep.begin(lvl.id, -1, -1.0, 0.0, {}, false)
+	var jb: Dictionary = rr.current_job()
+	_land_on(rr, String(jb.from))
+	for i in 240:
+		rep.add(Vector2.ZERO, true)
+		rr.step(Vector2.ZERO, true)
+	rr.sim.state = TaxiSim.State.FLYING
+	rr.sim.landed_pad = {}
+	rr.sim.pos = Vector2(300.0, 80.0)
+	rep.mark_eject()
+	rr.eject()
+	for i in 600:
+		rep.add(Vector2(0, -0.39), false)
+		rr.step(Vector2(0, -0.39), false)
+	check(rr.ejected == 1 and rep.events.size() == 1 and String(rep.events[0][1]) == "eject", "Rauswurf wird im Replay als Ereignis aufgezeichnet")
 
 func _test_crash_balance() -> void:
 	var results := {}

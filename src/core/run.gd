@@ -71,6 +71,7 @@ var life_note := false
 var refuel_tick := false          # in diesem Tick wurde getankt: Spritpreis bleibt dann unverändert
 var missed := 0                   # Pflichtfahrgäste, die nicht befördert wurden (Geduld abgelaufen)
 var missed_fees := 0.0
+var ejected := 0                  # rausgeworfene Fahrgäste (Sauber-Medaille entfällt)
 var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
@@ -123,6 +124,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	fuel_dead_t = 0.0
 	fuel_fail = false
 	missed = 0
+	ejected = 0
 	missed_fees = 0.0
 	repair_cost = 0.0
 	taxi_fees = 0.0
@@ -366,11 +368,15 @@ func _miss_job() -> void:
 	old.squash()
 	leavers.append(old)
 	actor = null
+	_lose_job(old.pname)
+
+## Gemeinsame Buchhaltung für einen nicht beförderten Pflichtauftrag (verpasst oder rausgeworfen).
+func _lose_job(pname: String) -> void:
 	var fee := minf(snappedf(float(level.jobs[job_index].get("fare", 50)) * Tuning.MISSED_FEE_FACTOR, 1.0), money)
 	money -= fee
 	missed += 1
 	missed_fees += fee
-	log.append({"type": "job_missed", "name": old.pname, "fee": fee})
+	log.append({"type": "job_missed", "name": pname, "fee": fee})
 	job_index += 1
 	job_clock = 0.0
 	respawn_keep_clock = false
@@ -386,6 +392,44 @@ func _miss_job() -> void:
 	else:
 		spawn_timer = flow_rng.randf_range(Tuning.NEXT_SPAWN_MIN, Tuning.NEXT_SPAWN_MAX)
 		spawn_wait = false
+
+## Fahrgast aus dem Taxi werfen (Taste E / Y): Er fällt, schreit und stirbt beim Aufprall – kein Geld. Aus dem
+## Stand oder geringer Höhe überlebt er, schimpft und läuft weg. Ein Pflichtauftrag gilt danach als verpasst.
+func eject() -> bool:
+	if result != Result.RUNNING or sim.state == TaxiSim.State.DESTROYED:
+		return false
+	var a := aboard_actor()
+	if a == null:
+		return false
+	var ex := extra_of(a)
+	var foot_y := sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN * sim.gear
+	var ground := _ground_below(sim.pos.x, foot_y)
+	var height := ground - foot_y
+	var lethal := height >= Tuning.EJECT_LETHAL_HEIGHT and sim.state != TaxiSim.State.LANDED
+	a.pay_info = {}
+	ejected += 1
+	log.append({"type": "ejected", "voice": a.voice_key(), "name": a.pname, "lethal": lethal})
+	if lethal:
+		a.start_fall(sim.pos.x, sim.pos.y + 4.0, sim.vel, ground)
+	else:
+		var pad: Dictionary = sim.landed_pad if not sim.landed_pad.is_empty() else a.pad
+		a.kicked_out(sim.pos.x, pad)
+	leavers.append(a)
+	if not ex.is_empty():
+		extras.erase(ex)
+	else:
+		actor = null
+		_lose_job(a.pname)
+	return true
+
+## Oberkante des ersten festen Felds unter (x, y).
+func _ground_below(x: float, y: float) -> float:
+	var yy := y
+	while yy < level.pixel_size().y:
+		if level.is_solid_at(Vector2(x, yy)):
+			return floorf(yy / Tuning.TILE) * Tuning.TILE
+		yy += 2.0
+	return level.pixel_size().y
 
 func _squash_actor() -> void:
 	var job: Dictionary = jobs[job_index]
@@ -493,6 +537,8 @@ func _step_actors(dt: float) -> void:
 		for e in l.events:
 			if e.type == "arrived_home":
 				_pay_leaver(l, 0.0)
+			elif e.type == "splat":
+				log.append({"type": "splat", "x": e.x, "y": e.y})
 	leavers = leavers.filter(func(l): return l.state != PassengerActor.S.GONE)
 
 func _service_pad(dt: float) -> void:
@@ -723,7 +769,7 @@ func money_target() -> float:
 func medals() -> Dictionary:
 	return {
 		"time": level_time <= time_target(),
-		"clean": respawns == 0 and squashes == 0 and pump_touches == 0 and damage_taken <= 10.0,
+		"clean": respawns == 0 and squashes == 0 and ejected == 0 and pump_touches == 0 and damage_taken <= 10.0,
 		"pro": earned >= money_target() * 1.1 and best_streak >= 2,
 	}
 

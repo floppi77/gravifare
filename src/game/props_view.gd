@@ -175,6 +175,9 @@ func _draw_actor(a: PassengerActor) -> void:
 	if not a.is_visible():
 		return
 	var pos := a.world_pos()
+	if a.state == PassengerActor.S.FALLING or a.state == PassengerActor.S.DEAD:
+		_draw_falling(a, pos)
+		return
 	var is_extra := not run.extra_of(a).is_empty()
 	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8) if is_extra else Color(1, 1, 1, a.fade)       # Zusatzfahrgäste wirken blasser/bläulich
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
@@ -227,6 +230,22 @@ func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool)
 		draw_rect(Rect2(bx - 1.0, by + 0.2, 2, 3.0), g)
 	else:
 		draw_string(Fonts.hud, Vector2(bx - 5.0, by + 3.2), dest, HORIZONTAL_ALIGNMENT_CENTER, 10, 9, Color(ink.r, ink.g, ink.b, fade))
+
+## Rausgeworfener Fahrgast: dreht sich im Fall und schreit („AAAH!“), nach dem Aufprall liegt er platt am Boden.
+func _draw_falling(a: PassengerActor, pos: Vector2) -> void:
+	var frame := 2 + int(a.age * 10.0) % 2
+	var rot := a.age * 9.0 if a.state == PassengerActor.S.FALLING else PI * 0.5
+	var col := Color(1, 1, 1, a.fade) if a.state == PassengerActor.S.FALLING else Color(0.8, 0.7, 0.7, a.fade)
+	var cy := pos.y - Tuning.PASS_H * 0.5 if a.state == PassengerActor.S.FALLING else pos.y - 2.5
+	draw_set_transform(Vector2(pos.x, cy), rot, Vector2.ONE)
+	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, -Tuning.PASS_H * 0.5, Tuning.PASS_W, Tuning.PASS_H), Rect2(frame * 24, a.look * 36, 24, 36), col)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if a.state == PassengerActor.S.FALLING:
+		var shake := sin(t * 40.0) * 0.6
+		draw_string(Fonts.hud, Vector2(pos.x - 14.0 + shake, pos.y - 16.0), tr("VOICE_SCREAM_SHORT"), HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color(1.0, 0.35, 0.4, a.fade))
+	else:
+		draw_rect(Rect2(pos.x - 6.0, pos.y - 1.2, 12.0, 1.6), Color(0.55, 0.1, 0.16, 0.85 * a.fade))
+		draw_rect(Rect2(pos.x - 3.0, pos.y - 2.4, 6.0, 1.2), Color(0.7, 0.14, 0.2, 0.8 * a.fade))
 
 func _draw_actors() -> void:
 	for l in run.leavers:

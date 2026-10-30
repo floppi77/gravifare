@@ -52,6 +52,7 @@ const CRASH_SPEED := 150.0       # Aufprall ab hier: Taxi sofort zerstört
 const SPIKE_DAMAGE := 30.0       # Dornen: fester Zusatzschaden je Berührung, unabhängig vom Tempo
 const DOOR_CRUSH_DAMAGE := 30.0   # Tor schließt auf dem Taxi: Schaden und Rauswurf zur nächsten Seite
 const DOOR_EJECT_SPEED := 70.0
+const EJECT_LETHAL_HEIGHT := 24.0 # Fallhöhe (px) ab der ein rausgeworfener Fahrgast stirbt
 const OUT_OF_FUEL_TIME := 3.0     # Sekunden mit leerem Tank (außer an einer funktionierenden Zapfsäule), dann Taxi verloren
 const SPIKE_COOLDOWN := 0.5      # Sekunden, in denen dieselbe Berührung nicht erneut zählt
 const DAMAGE_EXP := 1.3          # Schaden = 100 * ((v-40)/(150-40))^1.3 (ab 40 px/s Schaden, schnell steigend)

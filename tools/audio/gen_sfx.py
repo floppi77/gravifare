@@ -220,7 +220,25 @@ def perfect():
     x = np.concatenate([np.sin(2 * np.pi * f * t(0.12)) * 0.22 * env(int(0.12 * SR), 0.004, 0.08) for f in (784, 988, 1319)])
     save("perfect", x)
 
+def scream(name, f0, f1, vib=7.0):
+    """Schrei eines fallenden Fahrgasts: abwärts gleitender, vibrierender Ton mit Formanten und Atemrauschen."""
+    d = 1.5; tt = t(d)
+    f = np.interp(tt, [0, 0.12, d], [f0 * 0.8, f0, f1]) * (1 + 0.035 * np.sin(2 * np.pi * vib * tt))
+    ph = np.cumsum(f) / SR
+    x = (2 * (ph % 1.0) - 1) * 0.6 + np.sin(2 * np.pi * ph * 2) * 0.3
+    x = sos(x, "bandpass", [f0 * 1.2, f0 * 4.5], 2) * 3.0 + sos(rng.standard_normal(len(tt)), "bandpass", [1500, 4500], 2) * 0.10
+    x *= np.minimum(1.0, tt / 0.04) * np.clip((d - tt) / 0.25, 0, 1)
+    save(name, np.tanh(x * 1.1) * 0.7)
+def scream_f(): scream("scream_f", 780.0, 360.0)
+def scream_m(): scream("scream_m", 430.0, 190.0, 6.0)
+def splat():
+    """Dumpfer Aufprall mit nassem Klatschen."""
+    d = 0.5; tt = t(d)
+    x = np.sin(2 * np.pi * (95 - 55 * tt / d) * tt) * np.exp(-tt * 14) * 1.1 + lp(rng.standard_normal(len(tt)), 0.18) * np.exp(-tt * 22) * 0.9
+    x += sos(rng.standard_normal(len(tt)), "bandpass", [600, 2400], 2) * np.exp(-tt * 40) * 0.5
+    save("splat", np.tanh(x) * 0.9)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat): f()
     print(sorted(os.listdir(OUT)))
