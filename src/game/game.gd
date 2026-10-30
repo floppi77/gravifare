@@ -120,6 +120,7 @@ func load_level(path: String) -> void:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
+	run.lives = Flow.lives
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
 	Music.play_theme(Music.theme_for_level(lvl.number))
@@ -287,6 +288,7 @@ func _lose_life() -> void:
 		return
 	replay.mark_respawn()
 	run.respawn_after_crash()
+	run.lives = Flow.lives
 	gear_on = run.sim.gear_cmd
 	restart_timer = 0.0
 	taxi.sync_state()
@@ -471,6 +473,16 @@ func _on_event(e: Dictionary) -> void:
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
 		"job_missed":
 			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
+		"life_bought":
+			Flow.lives = int(e.lives)
+			hud.flash_message(tr("MSG_LIFE_BOUGHT") % [int(e.lives), int(e.price)], 3.0)
+			Sfx.play("coin")
+			Haptics.pulse(0.3, 0.4, 0.2)
+		"life_denied":
+			hud.flash_message(tr("MSG_LIFE_FULL") if e.full else tr("MSG_LIFE_POOR") % int(e.price), 2.6)
+		"out_of_fuel":
+			hud.flash_message(tr("MSG_OUT_OF_FUEL"), 2.5)
+			Haptics.pulse(0.5, 0.5, 0.3)
 		"extra_appeared":
 			hud.flash_message(tr("MSG_EXTRA_NEW") % [e.name, e.pad], 2.6)
 			Sfx.play("board", -10.0)

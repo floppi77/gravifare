@@ -180,5 +180,14 @@
  "RES_CONTINUE": "Enter / A: Weiter zum nächsten Level",
  "RES_TO_MENU": "Enter / A: Zurück zum Menü",
  "RES_SCORE": "Punkte %d  (Bestwert %d)",
- "STAT_SCORE": "Gesamtpunkte"
+ "STAT_SCORE": "Gesamtpunkte",
+ "HUD_OUT_OF_FUEL": "TANK LEER – TAXI VERLOREN",
+ "HUD_NO_FUEL": "TANK LEER! %.0f s",
+ "MSG_OUT_OF_FUEL": "Tank leer! Lande an einer Zapfsäule oder verliere das Taxi",
+ "HUD_TAG_MAIN": "★ PFLICHT",
+ "HUD_TAG_EXTRA": "ZUSATZ",
+ "HUD_MAIN_WAITING": "★ Pflicht offen: %s → Pad %s",
+ "MSG_LIFE_BOUGHT": "Leben gekauft! Jetzt %d Leben (−¢%d)",
+ "MSG_LIFE_FULL": "Du hast schon die maximalen 5 Leben",
+ "MSG_LIFE_POOR": "Ein Leben kostet ¢%d – zu wenig Credits"
 }

@@ -387,3 +387,8 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 - Ergebnisansicht nach dem Level bleibt, bis bestätigt wird (Enter/A). Wimpelzahlen kleiner. Replay-Fundament, Punkte.
 - **Bewegliche Tore** (Zeichen a–e, `doors` im JSON), Sektor 2 „Neon-Schluchten“ (Level 12–22).
 - Mindest-Fahrpreis: profitabel bis 25 % Zufriedenheit. Preise ruhen beim Tanken und bei defekter Zapfsäule. Neues Taxi = voller Tank. Der nächste Fahrgast erscheint nie auf dem Pad, auf dem das Taxi steht (Bot wartet schwebend).
+
+## N) Nachträge Runde 11
+- Tor schließt auf dem Taxi: Schaden und Rauswurf. Leerer Tank: Leben verloren, neues Taxi (voller Tank). Zusatzfahrgäste kollidieren und verschwinden.
+- Obergrenzen Pflichtfahrgäste/Passagierpads je Levelnummer (siehe LEVELS.md), höchstens 9 Pads. Lebens-Station „L“ alle 5 Level (¢1000, max. 5 Leben).
+- Pflicht- und Zusatzfahrgäste klar unterscheidbar (Stern, Rahmen, Farbe, Zeilenpräfix).

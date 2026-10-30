@@ -52,6 +52,7 @@ g.rect("#", 14, 12, 25, 19); g.pad("F", 15, 21, 11); g.rect("P", 15, 9, 15, 10) 
 g.rect("3", 9, 19, 13, 19)                                   # Pad 3 am Grund Schacht 1
 g.rect("2", 26, 19, 30, 19)                                  # Pad 2 am Grund Schacht 2
 g.rect("#", 31, 9, 38, 19); g.pad("4", 32, 37, 8)            # Block rechts, Pad 4 oben
+g.rect("L", 22, 11, 25, 11)                                  # Lebens-Station (kleine Plattform neben dem Tankpad, alle 5 Level)
 g.gate()
 g.put("S", 4, 8)
 make("S1-05", 5, "Doppelschacht", "Twin Shafts", g, [
@@ -150,7 +151,8 @@ g.rect("#", 1, 7, 7, 8); g.pad("4", 2, 6, 6); g.rect("^", 1, 9, 7, 9)     # Abla
 g.rect("#", 12, 10, 16, 19); g.pad("2", 12, 16, 9)           # Turm mit Pad 2
 g.rect("#", 28, 8, 32, 19); g.pad("F", 28, 32, 7); g.rect("P", 28, 5, 28, 6)   # Tankturm
 g.rect("#", 34, 14, 38, 19); g.pad("3", 34, 38, 13)
-g.rect("^", 19, 19, 25, 19)                                  # Dornenfeld zwischen den Türmen
+g.rect("^", 17, 19, 20, 19); g.rect("^", 25, 19, 27, 19)     # Dornenfelder zwischen den Türmen
+g.rect("#", 21, 14, 24, 19); g.rect("L", 21, 13, 24, 13)      # Lebens-Station auf einem Sockel zwischen den Türmen
 g.gate()
 g.put("S", 5, 18)
 make("S1-10", 10, "Tanknot", "Running Dry", g, [

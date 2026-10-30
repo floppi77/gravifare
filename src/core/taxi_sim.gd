@@ -34,7 +34,6 @@ func setup(lvl: LevelData) -> void:
 	time = 0.0
 	spike_cd = 0.0
 	lvl.clock = 0.0
-	lvl.hold = Rect2()
 	events.clear()
 	# Steht unter dem Startpunkt ein Pad, beginnt das Taxi sicher gelandet.
 	for dy in range(0, 3):
@@ -49,6 +48,40 @@ func setup(lvl: LevelData) -> void:
 			break
 
 ## Wirksame Düsenstärken und Dämpfung: gleiten vom Reisemodus (Fahrwerk drin) zum Feinmodus (draußen).
+## Tor schließt auf dem Taxi: Schaden, und das Taxi wird zur nächstgelegenen freien Seite hinausgeschleudert.
+func _door_crush() -> void:
+	if not level.has_doors() or state == State.DESTROYED:
+		return
+	var half := Vector2(Tuning.HULL_HALF.x, Tuning.HULL_HALF.y + Tuning.GEAR_LEN * gear * 0.5)
+	var off := Vector2(0, Tuning.GEAR_LEN * gear * 0.5)
+	if not level.hits_closed_door(pos + off, half):
+		return
+	var best_d := 999
+	var best_dir := Vector2.ZERO
+	for dir in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1), Vector2(0, 1)]:
+		for d in range(1, 49):
+			var p: Vector2 = pos + dir * float(d)
+			if not level.box_hits_solid(p + off, half):
+				if d < best_d:
+					best_d = d
+					best_dir = dir
+				break
+	if best_dir == Vector2.ZERO:
+		best_dir = Vector2(0, -1)
+		best_d = 12
+	pos += best_dir * float(best_d + 1)
+	vel = best_dir * Tuning.DOOR_EJECT_SPEED
+	tilt = 0.0
+	if state == State.LANDED:
+		state = State.FLYING
+		landed_pad = {}
+	hull -= Tuning.DOOR_CRUSH_DAMAGE
+	events.append({"type": "damage", "amount": Tuning.DOOR_CRUSH_DAMAGE, "speed": 0.0, "crush": true})
+	if hull <= 0.0:
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed"})
+
 func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear)
 func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear)
 func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear)
@@ -77,7 +110,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	time += dt
 	spike_cd = maxf(0.0, spike_cd - dt)
 	level.clock = time
-	level.hold = Rect2(pos.x - Tuning.HULL_HALF.x, pos.y - Tuning.HULL_HALF.y, Tuning.HULL_HALF.x * 2.0, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * gear)
+	_door_crush()
 	gear_cmd = gear_request
 	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / Tuning.GEAR_TIME)
 

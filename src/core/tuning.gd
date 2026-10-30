@@ -50,6 +50,9 @@ const HULL_MAX := 100.0
 const IMPACT_SAFE := 40.0        # Aufprall darunter: kein Schaden
 const CRASH_SPEED := 150.0       # Aufprall ab hier: Taxi sofort zerstört
 const SPIKE_DAMAGE := 30.0       # Dornen: fester Zusatzschaden je Berührung, unabhängig vom Tempo
+const DOOR_CRUSH_DAMAGE := 30.0   # Tor schließt auf dem Taxi: Schaden und Rauswurf zur nächsten Seite
+const DOOR_EJECT_SPEED := 70.0
+const OUT_OF_FUEL_TIME := 3.0     # Sekunden mit leerem Tank (außer an einer funktionierenden Zapfsäule), dann Taxi verloren
 const SPIKE_COOLDOWN := 0.5      # Sekunden, in denen dieselbe Berührung nicht erneut zählt
 const DAMAGE_EXP := 1.3          # Schaden = 100 * ((v-40)/(150-40))^1.3 (ab 40 px/s Schaden, schnell steigend)
 const BOUNCE := 0.35
@@ -89,7 +92,23 @@ static func fare_scale(level_no: int) -> float:
 const SAT_FLOOR := 0.25
 const FUEL_PER_PX := 0.040           # Treibstoffeinheiten je px Flugstrecke inkl. Anflug-Umwege (am Autopiloten kalibriert, der eher mehr verbraucht als ein guter Pilot)
 const PICKUP_FACTOR := 1.6           # Anflug zum Fahrgast zählt zur Fahrt dazu (Mehrfaches der Fahrstrecke)
-const PROFIT_MARGIN := 1.15
+const PROFIT_MARGIN := 1.25
+
+## Obergrenzen je Levelnummer: Pflichtfahrgäste (Aufträge) und Passagierpads. Pads: Zeichen 1–9, daher höchstens 9.
+static func max_jobs(level_no: int) -> int:
+	if level_no <= 3: return 3
+	if level_no <= 33: return 6
+	if level_no <= 55: return 7
+	if level_no <= 77: return 8
+	return 9
+
+static func max_pads(level_no: int) -> int:
+	if level_no <= 22: return 4
+	if level_no <= 33: return 5
+	if level_no <= 44: return 6
+	if level_no <= 66: return 7
+	if level_no <= 88: return 8
+	return 9
 
 static func satisfaction_factor(sat: float) -> float:
 	return PAY_MIN + sat * (PAY_MAX - PAY_MIN)
@@ -125,6 +144,9 @@ const EXIT_COUNTDOWN := 0.0
 
 # Kampagne: Leben, Sprit-Übernahme
 const START_LIVES := 5
+const MAX_LIVES := 5             # mehr als 5 Leben gibt es nie (auch nicht gekauft)
+const LIFE_PRICE := 1000.0       # Lebens-Station: ein Leben für 1000 Credits
+const LIFE_BUY_TIME := 1.2       # Sekunden Landezeit bis zum Kauf
 const MIN_START_FUEL := 35.0     # Mindestvorrat zu Levelbeginn (nie Sackgasse durch leeren Tank)
 
 # Bezahlung: je schneller vom Erscheinen des Fahrgasts bis zum Ziel, desto mehr Credits

@@ -54,6 +54,8 @@ func _draw() -> void:
 	var fuel_frac := s.fuel / Tuning.FUEL_MAX
 	var low := fuel_frac < 0.25
 	var blink := int(Time.get_ticks_msec() / 250) % 2 == 0
+	if run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING and blink:
+		draw_string(font, Vector2(0, size.y * 0.30), tr("HUD_NO_FUEL") % maxf(0.0, Tuning.OUT_OF_FUEL_TIME - run.fuel_dead_t), HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color("#ff4d6d"))
 	_bar(8, 8, 90, 9, fuel_frac, Color("#ff4d6d") if (low and blink) else Color("#ffb02e"), tr("HUD_FUEL"))
 	_bar(8, 20, 90, 9, s.hull / Tuning.HULL_MAX, Color("#5dff9a") if s.hull > 35.0 else Color("#ff4d6d"), tr("HUD_HULL"))
 	if run.level.pads.has("F"):
@@ -83,23 +85,28 @@ func _draw() -> void:
 	var txt := ""
 	var ex_aboard := run._extra_aboard()
 	if not ex_aboard.is_empty():
-		txt = tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()]
+		txt = tr("HUD_TAG_EXTRA") + "  " + tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()]
 	elif job.is_empty():
 		txt = tr("HUD_GO_EXIT") if run.exit_open else ""
 	else:
 		var who: String = job.get("passenger", "?")
 		if run.phase == Run.Phase.CARRYING and run.is_exit_job(job):
-			txt = tr("HUD_TO_EXIT") % who
+			txt = tr("HUD_TAG_MAIN") + "  " + tr("HUD_TO_EXIT") % who
 		elif run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF:
-			txt = tr("HUD_DELIVER") % [who, run.target_pad()]
+			txt = tr("HUD_TAG_MAIN") + "  " + tr("HUD_DELIVER") % [who, run.target_pad()]
 		elif run.actor != null:
-			txt = tr("HUD_PICKUP") % [who, run.target_pad()]
+			txt = tr("HUD_TAG_MAIN") + "  " + tr("HUD_PICKUP") % [who, run.target_pad()]
 		else:
 			txt = tr("HUD_WAIT_CALL")
+	if not ex_aboard.is_empty() and not job.is_empty():     # Erinnerung an die Pflicht, solange ein Zusatzfahrgast mitfährt
+		var rem := tr("HUD_MAIN_WAITING") % [job.get("passenger", "?"), job.get("to", "") if run.phase == Run.Phase.CARRYING else job.get("from", "")]
+		draw_rect(Rect2(size.x * 0.5 - 130, size.y - 64, 260, 12), Color(0.05, 0.06, 0.15, 0.8))
+		draw_rect(Rect2(size.x * 0.5 - 130, size.y - 64, 260, 12), Color("#c9a227"), false, 0.67)
+		draw_string(font, Vector2(size.x * 0.5 - 130, size.y - 55), rem, HORIZONTAL_ALIGNMENT_CENTER, 260, 8, Color("#ffd24a"))
 	if txt != "":
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color(0.05, 0.06, 0.15, 0.8))
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color("#3a4580"), false, 0.67)
-		draw_string(font, Vector2(size.x * 0.5 - 170, size.y - 19), txt, HORIZONTAL_ALIGNMENT_CENTER, 340, 10, Color("#ffe14a"))
+		draw_string(font, Vector2(size.x * 0.5 - 170, size.y - 19), txt, HORIZONTAL_ALIGNMENT_CENTER, 340, 10, Color("#6fe8f0") if not ex_aboard.is_empty() else Color("#ffe14a"))
 		if not ex_aboard.is_empty() and run.result == Run.Result.RUNNING:
 			var fe := run.extra_factor(ex_aboard)
 			var fce := Color("#5dff9a") if fe > 1.05 else (Color("#ffe14a") if fe > 0.8 else Color("#ff8a5a"))
@@ -150,7 +157,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(0, size.y * 0.42 + 20), tr("HUD_RUN_CREDITS") + ": ¢ %d" % int(run.money), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 40), tr("HUD_GAME_OVER_HINT"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.FAILED:
-		draw_string(font, Vector2(0, size.y * 0.45), tr("HUD_CRASHED"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#ff4d6d"))
+		draw_string(font, Vector2(0, size.y * 0.45), tr("HUD_OUT_OF_FUEL") if run.fuel_fail else tr("HUD_CRASHED"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#ff4d6d"))
 		draw_string(font, Vector2(0, size.y * 0.45 + 16), tr("HUD_LAST_LIFE") if Flow.lives <= 1 else tr("HUD_LIFE_LOST") % (Flow.lives - 1), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.COMPLETE and result.is_empty():
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#5dff9a"))

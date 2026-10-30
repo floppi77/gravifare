@@ -63,6 +63,11 @@ var extra_earned := 0.0
 var flow_rng := RandomNumberGenerator.new()
 var main_wait := 0.0               # Wartezeit des aktuellen Auftrags-Fahrgasts
 var main_patience := 60.0
+var fuel_dead_t := 0.0             # Sekunden mit leerem Tank (Taxi geht nach OUT_OF_FUEL_TIME verloren)
+var fuel_fail := false             # das Taxi wurde wegen leeren Tanks verloren
+var lives := Tuning.START_LIVES     # Spiegel von Flow.lives (das Spiel hält sie synchron); Kauf an der Lebens-Station
+var life_timer := 0.0
+var life_note := false
 var refuel_tick := false          # in diesem Tick wurde getankt: Spritpreis bleibt dann unverändert
 var missed := 0                   # Pflichtfahrgäste, die nicht befördert wurden (Geduld abgelaufen)
 var missed_fees := 0.0
@@ -115,6 +120,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	extra_earned = 0.0
 	taxi_damage = 0.0
 	pen_ride = 0.0
+	fuel_dead_t = 0.0
+	fuel_fail = false
 	missed = 0
 	missed_fees = 0.0
 	repair_cost = 0.0
@@ -183,7 +190,7 @@ func _aboard_dest() -> String:
 func _check_wrong_pad(pad_id: String) -> void:
 	var a := aboard_actor()
 	var dest := _aboard_dest()
-	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel or pad_id == String(a.pad.id):
+	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel or level.pads[pad_id].life or pad_id == String(a.pad.id):
 		return              # Zielpad, Tankpad und das Abholpad (Nachsetzen nach dem Abheben) sind nie „falsch“
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.WRONG_PAD_PEN)
 	log.append({"type": "wrong_pad", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.WRONG_PAD_PEN * 100.0))})
@@ -284,6 +291,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			damage_taken += float(e.amount)
 			taxi_damage += float(e.amount)
 			_ride_hit(e)
+	_check_fuel(dt)
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
@@ -295,20 +303,60 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	_check_pump(dt)
 	_check_squash()
 	_service_pad(dt)
+	_service_life(dt)
 	if exit_open and sim.in_exit(level.exit_cells):
 		_finish_level()
+
+## Lebens-Station („L“-Pad, alle 5 Level): Landen mit genug Credits kauft nach kurzer Zeit ein Leben (höchstens 5).
+func _service_life(dt: float) -> void:
+	if sim.state != TaxiSim.State.LANDED or not bool(sim.landed_pad.get("life", false)):
+		life_timer = 0.0
+		life_note = false
+		return
+	if lives >= Tuning.MAX_LIVES or money < Tuning.LIFE_PRICE:
+		if not life_note:
+			life_note = true
+			log.append({"type": "life_denied", "full": lives >= Tuning.MAX_LIVES, "price": Tuning.LIFE_PRICE})
+		return
+	life_timer += dt
+	if life_timer >= Tuning.LIFE_BUY_TIME:
+		life_timer = 0.0
+		money -= Tuning.LIFE_PRICE
+		lives += 1
+		log.append({"type": "life_bought", "lives": lives, "price": Tuning.LIFE_PRICE})
+
+## Leerer Tank: Nach OUT_OF_FUEL_TIME Sekunden ist das Taxi verloren (Leben −1, neues Taxi mit vollem Tank) – es sei denn,
+## es steht an einer funktionierenden Zapfsäule (dort tankt es notfalls kostenlos).
+func _check_fuel(dt: float) -> void:
+	if sim.fuel > 0.0 or sim.state == TaxiSim.State.DESTROYED:
+		fuel_dead_t = 0.0
+		return
+	var refuelable: bool = sim.state == TaxiSim.State.LANDED and bool(sim.landed_pad.get("fuel", false)) and not station_down()
+	if refuelable:
+		fuel_dead_t = 0.0
+		return
+	if fuel_dead_t == 0.0:
+		log.append({"type": "out_of_fuel"})
+	fuel_dead_t += dt
+	if fuel_dead_t >= Tuning.OUT_OF_FUEL_TIME:
+		fuel_fail = true
+		sim.hull = 0.0
+		sim.state = TaxiSim.State.DESTROYED
+		log.append({"type": "destroyed", "fuel": true})
 
 ## Taxi trifft einen wartenden Fahrgast (Kopf/Seite): Fahrgast schimpft und flieht, an seiner Stelle erscheint –
 ## nach kurzer Pause und an einem anderen Pad – ein neuer Fahrgast für denselben Auftrag. Die Zeit läuft weiter,
 ## der Umweg kostet Sprit. Steigendes Taxi (Abheben) zählt nicht.
 func _check_squash() -> void:
-	if actor == null or sim.state != TaxiSim.State.FLYING or not actor.can_be_hit():
-		return
-	if sim.vel.y < -12.0:
-		return
-	var body := Rect2(sim.pos.x - Tuning.HULL_HALF.x, sim.pos.y - Tuning.HULL_HALF.y, Tuning.HULL_HALF.x * 2.0, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * sim.gear)
-	if body.intersects(actor.hit_rect()):
+	if actor != null and _taxi_hits(actor):
 		_squash_actor()
+
+## Taxi (Kopf/Seite, nicht beim Abheben) trifft einen ruhenden Fahrgast.
+func _taxi_hits(a: PassengerActor) -> bool:
+	if sim.state != TaxiSim.State.FLYING or not a.can_be_hit() or sim.vel.y < -12.0:
+		return false
+	var body := Rect2(sim.pos.x - Tuning.HULL_HALF.x, sim.pos.y - Tuning.HULL_HALF.y, Tuning.HULL_HALF.x * 2.0, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * sim.gear)
+	return body.intersects(a.hit_rect())
 
 ## Pflichtfahrgast hat zu lange gewartet: Er geht ohne Ersatz, der Auftrag gilt als verpasst (Abzug); nach dem letzten
 ## Pflichtfahrgast – befördert oder nicht – öffnet das Tor.
@@ -365,7 +413,7 @@ func _squash_actor() -> void:
 func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 	var cands: Array = []
 	for id in level.pads:
-		if level.pads[id].fuel or id == current_id or id == String(job.get("to", "")):
+		if not level.is_passenger_pad(id) or id == current_id or id == String(job.get("to", "")):
 			continue
 		cands.append(id)
 	cands.sort()
@@ -574,6 +622,8 @@ func respawn_after_crash() -> void:
 			_finish_extra_drop(ex)
 	var lost: bool = actor != null and phase == Phase.CARRYING
 	respawns += 1
+	fuel_dead_t = 0.0
+	fuel_fail = false
 	var fee := minf(Tuning.replacement_fee(level.number), money)
 	if fee > 0.0:
 		money -= fee
@@ -712,7 +762,7 @@ func extra_factor(e: Dictionary) -> float:
 func _spawn_extra() -> void:
 	var cands: Array = []
 	for id in level.pads:
-		if level.pads[id].fuel:
+		if not level.is_passenger_pad(id):
 			continue
 		if actor != null and String(actor.pad.id) == id:
 			continue
@@ -730,7 +780,7 @@ func _spawn_extra() -> void:
 	var from_id: String = cands[flow_rng.randi() % cands.size()]
 	var dests: Array = []
 	for id in level.pads:
-		if not level.pads[id].fuel and id != from_id:
+		if level.is_passenger_pad(id) and id != from_id:
 			dests.append(id)
 	dests.sort()
 	if dests.is_empty():
@@ -792,6 +842,13 @@ func _step_extras(dt: float) -> void:
 					a.wave()
 					a.call_cd = CALL_COOLDOWN
 					log.append({"type": "call", "voice": a.voice_key(), "name": a.pname})
+				if _taxi_hits(a):                       # Taxi trifft den wartenden Zusatzfahrgast: er schimpft und ist weg
+					a.squash()
+					squashes += 1
+					leavers.append(a)
+					extras.erase(e)
+					log.append({"type": "squashed", "voice": a.voice_key(), "name": a.pname})
+					continue
 				if e.patience <= 0.0 and a.can_be_hit():
 					a.squash()
 					extras_missed += 1

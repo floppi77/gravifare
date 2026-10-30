@@ -56,7 +56,7 @@ func _draw_pads() -> void:
 		var cxm: float = p.center
 		var y: float = p.row * T
 		var is_target: bool = id == target
-		var col := Color("#35e0d2") if not p.fuel else Color("#ffa530")
+		var col := Color("#ff6aa0") if p.life else (Color("#35e0d2") if not p.fuel else Color("#ffa530"))
 		# Wartebereich-Unterstand, Pfosten mit Signalbaken nur am freien Ende
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
@@ -66,7 +66,7 @@ func _draw_pads() -> void:
 		var poles: Array = [p.x0 + 2.0, p.x1 - 3.0]
 		if shelter.size.x > 0.0:
 			poles = [p.x1 - 3.0] if p.side < 0 else [p.x0 + 2.0]
-		var label: String = tr("PAD_FUEL") if p.fuel else id
+		var label: String = tr("PAD_FUEL") if p.fuel else ("L" if p.life else id)
 		for x in poles:
 			draw_rect(Rect2(x, y - 18, 1, 18), Color("#0c0f24"))
 			draw_rect(Rect2(x + PX, y - 18, PX * 2, 18), Color("#4a5596"))
@@ -82,6 +82,8 @@ func _draw_pads() -> void:
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
 			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
 			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
+		if p.life:
+			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.LIFE_PRICE)
 		if is_target:
 			var pulse := 0.5 + 0.5 * sin(t * 6.0)
 			var c2 := Color("#ffe14a")
@@ -173,14 +175,15 @@ func _draw_actor(a: PassengerActor) -> void:
 	if not a.is_visible():
 		return
 	var pos := a.world_pos()
-	var col := Color(1, 1, 1, a.fade)
+	var is_extra := not run.extra_of(a).is_empty()
+	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8) if is_extra else Color(1, 1, 1, a.fade)       # Zusatzfahrgäste wirken blasser/bläulich
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
 	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	_draw_amount(a, pos)
 	var dest := run.dest_of(a)
 	if a.wave_t <= 0.0 and not a.angry and dest != "" and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
-		_draw_dest_bubble(pos, dest, a.fade)
+		_draw_dest_bubble(pos, dest, a.fade, run.extra_of(a).is_empty())
 	if a.wave_t > 0.0 or a.angry:
 		var bx := pos.x + 4.0
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
@@ -190,14 +193,34 @@ func _draw_actor(a: PassengerActor) -> void:
 		draw_rect(Rect2(bx - 4 + PX * 2, by - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), bubble)
 		draw_string(Fonts.hud, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
 
+## Kleiner goldener Stern über wartenden Pflichtfahrgästen.
+func _gold_star(c: Vector2, r: float, fade: float) -> void:
+	var pts := PackedVector2Array()
+	for i in 10:
+		var rad := r if i % 2 == 0 else r * 0.45
+		var an := -PI * 0.5 + i * PI / 5.0
+		pts.append(c + Vector2(cos(an), sin(an)) * rad)
+	draw_colored_polygon(pts, Color(1.0, 0.82, 0.2, fade))
+
+## Lebens-Station: Herz und Preis über der Plattform (grau, wenn voll oder zu wenig Credits).
+func _draw_life_sign(cx: float, y: float, full: bool, can_pay: bool) -> void:
+	var ok := not full and can_pay
+	var hc := Color("#ff6aa0") if ok else Color("#7a5a70")
+	var hy := y - 30.0 - (1.2 * sin(t * 3.0) if ok else 0.0)
+	draw_circle(Vector2(cx - 2.2, hy), 2.6, hc)
+	draw_circle(Vector2(cx + 2.2, hy), 2.6, hc)
+	draw_colored_polygon(PackedVector2Array([Vector2(cx - 4.7, hy + 0.9), Vector2(cx + 4.7, hy + 0.9), Vector2(cx, hy + 6.4)]), hc)
+	draw_string(Fonts.hud, Vector2(cx - 14.0, hy + 15.0), "¢%d" % int(Tuning.LIFE_PRICE) if not full else "MAX", HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color("#ffe14a") if ok else Color("#8a7a80"))
+
 ## Sprechblase mit der Zielplattform (Zahl) bzw. Pfeil nach oben für den Ausgang, nachdem das „!“ verklungen ist.
-func _draw_dest_bubble(pos: Vector2, dest: String, fade: float) -> void:
+func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool) -> void:
 	var bx := pos.x + 17.0
 	var by := pos.y - 17.0 - 0.6 * sin(t * 3.0)
 	var ink := Color("#0c0f24")
 	draw_colored_polygon(PackedVector2Array([Vector2(bx - 5.5, by + 3.0), Vector2(bx - 3.0, by + 4.0), Vector2(bx - 8.0, by + 8.5)]), Color(ink.r, ink.g, ink.b, fade))
-	draw_rect(Rect2(bx - 5.0, by - 5.0, 10, 10), Color(ink.r, ink.g, ink.b, fade))
-	draw_rect(Rect2(bx - 5.0 + PX * 2, by - 5.0 + PX * 2, 10 - PX * 4, 10 - PX * 4), Color(0.92, 0.95, 1.0, fade))
+	var edge_c := Color(1.0, 0.82, 0.2, fade) if mandatory else Color(0.3, 0.85, 0.95, fade)
+	draw_rect(Rect2(bx - 5.0, by - 5.0, 10, 10), edge_c)
+	draw_rect(Rect2(bx - 5.0 + PX * 2, by - 5.0 + PX * 2, 10 - PX * 4, 10 - PX * 4), Color(1.0, 0.97, 0.8, fade) if mandatory else Color(0.9, 0.97, 1.0, fade))
 	if dest == "exit":
 		var g := Color(0.1, 0.55, 0.3, fade)
 		draw_colored_polygon(PackedVector2Array([Vector2(bx, by - 3.2), Vector2(bx + 3.0, by + 0.2), Vector2(bx - 3.0, by + 0.2)]), g)
@@ -263,7 +286,11 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	var txt := "¢%d" % int(round(value))
 	var font := Fonts.hud
 	var tw := maxf(16.0, font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x + 4.0)     # Betrag nie abschneiden
+	var mand := run.extra_of(a).is_empty() and a == run.actor
 	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
+	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(1.0, 0.82, 0.2, a.fade) if mand else Color(0.3, 0.85, 0.95, 0.7 * a.fade), false, 0.7)
+	if mand and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
+		_gold_star(Vector2(pos.x, pos.y - 28.0 - sin(t * 4.0) * 1.0), 3.6, a.fade)
 	draw_string(font, Vector2(pos.x - tw * 0.5, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, tw, 7, col)
 
 ## Zapfsäule mit Preisanzeige. Der Kopf knickt mit jeder Berührung weiter ab (Stufe 1–3); nach der dritten explodiert

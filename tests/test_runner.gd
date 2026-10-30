@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -148,7 +148,7 @@ func _test_level_rules() -> void:
 		check(min_w >= 4, "%s: alle Pads mindestens 4 Tiles breit (min %d)" % [lvl.id, min_w])
 		var ids: Array = []
 		for id in lvl.pads:
-			if not lvl.pads[id].fuel:
+			if lvl.is_passenger_pad(id):
 				ids.append(int(id))
 		ids.sort()
 		var contiguous := true
@@ -604,16 +604,21 @@ func _test_doors() -> void:
 		if s.pos.x > 11.0 * Tuning.TILE:
 			crossed = true
 	check(crossed, "Offenes Tor ist passierbar")
-	# Tor schließt nie auf dem Taxi
+	# Tor schließt auf dem Taxi: Schaden und Rauswurf zur nächsten Seite
 	var s2 := TaxiSim.new()
 	s2.setup(lv)
 	s2.state = TaxiSim.State.FLYING
 	s2.pos = Vector2(10.0 * Tuning.TILE + 8.0, 80.0)
 	s2.vel = Vector2.ZERO
-	s2.time = 5.9                      # Tor schließt gleich (Zeit 6 → offen bis 3, geschlossen 3–6 im Takt: hier gerade geschlossen)
-	for i in 60:
+	s2.time = 5.95                     # Tor ist offen und schließt bei t = 6
+	var crushed := false
+	for i in 20:
 		s2.step(Vector2(0, -0.39), false)
-	check(s2.state != TaxiSim.State.DESTROYED and absf(s2.pos.x - (10.0 * Tuning.TILE + 8.0)) < 1.0, "Tor schließt nicht auf dem Taxi (kein Einklemmen)")
+		for e in s2.events:
+			if e.type == "damage" and e.get("crush", false):
+				crushed = true
+	check(crushed and s2.hull <= 100.0 - Tuning.DOOR_CRUSH_DAMAGE + 0.01, "Tor schließt auf dem Taxi: Schaden (%.0f Hülle)" % s2.hull)
+	check(absf(s2.pos.x - (10.0 * Tuning.TILE + 8.0)) >= 14.0 and s2.state != TaxiSim.State.DESTROYED and not lv.box_hits_solid(s2.pos, Tuning.HULL_HALF), "…und wird zur nächsten Seite hinausgeschleudert (x=%.0f)" % s2.pos.x)
 	# Planung ignoriert Tore (Bot wartet davor)
 	var p := Pathing.plan(lv, Vector2(60, 80), Vector2(260, 80), 4.0)
 	check(not p.is_empty(), "Wegplanung behandelt bewegliche Tore als passierbar")
@@ -633,6 +638,109 @@ func _test_broken_pump_prices() -> void:
 			if e.type == "price_changed":
 				changed = true
 	check(not changed and r.price_base == p0, "Bei defekter Zapfsäule ändert sich der Spritpreis nicht mehr")
+
+func _test_out_of_fuel() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	for i in 90:
+		r.step(Vector2(0, -1), true)
+	r.sim.fuel = 0.0
+	var warned := false
+	for i in int((Tuning.OUT_OF_FUEL_TIME + 1.0) / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+		for e in r.log:
+			if e.type == "out_of_fuel":
+				warned = true
+		if r.result == Run.Result.FAILED:
+			break
+	check(warned and r.result == Run.Result.FAILED and r.fuel_fail, "Leerer Tank: Warnung, nach %.0f s ist das Taxi verloren" % Tuning.OUT_OF_FUEL_TIME)
+	r.respawn_after_crash()
+	check(r.sim.fuel >= Tuning.FUEL_MAX - 0.01 and r.result == Run.Result.RUNNING, "Neues Taxi mit vollem Tank, Level läuft weiter")
+	# an der Zapfsäule: kein Verlust (tankt notfalls kostenlos)
+	var r2 := Run.new()
+	r2.extras_enabled = false
+	r2.start(lvl)
+	_land_on(r2, "F")
+	r2.sim.fuel = 0.0
+	for i in int(4.0 / Tuning.TICK):
+		r2.step(Vector2.ZERO, true)
+	check(r2.result == Run.Result.RUNNING and r2.sim.fuel > 0.0, "Leer an der Zapfsäule: wird kostenlos aufgetankt, kein Verlust")
+
+func _test_extra_squash() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
+	var r := Run.new()
+	r.start(lvl)
+	r.extra_timer = 0.0
+	for i in 90:
+		r.step(Vector2(0, -1), true)
+	for i in int(2.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), false)
+	check(r.extras.size() == 1, "Zusatzfahrgast wartet")
+	var ex: Dictionary = r.extras[0]
+	var a: PassengerActor = ex.actor
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.vel = Vector2(0, 20)
+	r.sim.pos = Vector2(a.x, a.surface_y - 8.0)
+	var squashed := false
+	for i in 6:
+		r.step(Vector2(0, -0.39), false)
+		for e in r.log:
+			if e.type == "squashed":
+				squashed = true
+	check(squashed and r.extras.is_empty() and a.angry, "Auch Zusatzfahrgäste werden vom Taxi getroffen: schimpfen und verschwinden")
+
+func _test_level_caps() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var n_pads := 0
+		for id in lvl.pads:
+			if lvl.is_passenger_pad(id):
+				n_pads += 1
+		check(lvl.jobs.size() <= Tuning.max_jobs(lvl.number), "%s: %d Pflichtfahrgäste (Obergrenze %d)" % [lvl.id, lvl.jobs.size(), Tuning.max_jobs(lvl.number)])
+		check(n_pads <= Tuning.max_pads(lvl.number), "%s: %d Passagierpads (Obergrenze %d)" % [lvl.id, n_pads, Tuning.max_pads(lvl.number)])
+
+func _test_life_station() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		if lv.number % 5 == 0:
+			check(lv.pads.has("L") and lv.pads["L"].land_window >= 28.0, "%s (Level %d): Lebens-Station vorhanden (alle 5 Level)" % [lv.id, lv.number])
+	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	r.lives = 3
+	r.money = 1500.0
+	_land_on(r, "L")
+	var bought := false
+	for i in int(2.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+		for e in r.log:
+			if e.type == "life_bought":
+				bought = true
+	check(bought and r.lives == 4 and absf(r.money - 500.0) < 0.01, "Lebens-Station: ein Leben für ¢%d (jetzt %d Leben, ¢%d)" % [int(Tuning.LIFE_PRICE), r.lives, int(r.money)])
+	r.money = 5000.0
+	r.lives = Tuning.MAX_LIVES
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.step(Vector2(0, -1), true)
+	_land_on(r, "L")
+	var denied := false
+	for i in int(2.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+		for e in r.log:
+			if e.type == "life_denied":
+				denied = true
+	check(denied and r.lives == Tuning.MAX_LIVES and r.money == 5000.0, "Mehr als 5 Leben gibt es nicht (nichts abgebucht)")
+	check(not lvl.is_passenger_pad("L") and lvl.is_passenger_pad("1") and not lvl.is_passenger_pad("F"), "Lebens-Station zählt nicht als Passagierpad")
 
 func _test_crash_balance() -> void:
 	var results := {}
@@ -864,7 +972,7 @@ func _test_landing_window_rules() -> void:
 		var widths: Array = []
 		for id in lvl.pads:
 			var p: Dictionary = lvl.pads[id]
-			if p.fuel:
+			if not lvl.is_passenger_pad(id):
 				continue
 			min_w = minf(min_w, p.land_window)
 			widths.append(int((p.x1 - p.x0) / Tuning.TILE))

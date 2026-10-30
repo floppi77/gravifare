@@ -4,6 +4,18 @@ Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N; jedes Pad hat Platz für
 
 Status: **22 von 99 Leveln vorhanden** (Sektor 1 und 2 komplett, S1-01 bis S2-11). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle). Übersichtsbilder: `docs/levels/`.
 
+## Obergrenzen und Plattform-Stufen (Tests: `_test_level_caps`, `_test_life_station`)
+| Level | Passagierpads (max.) | Pflichtfahrgäste (max.) | Anmerkung |
+|---|---|---|---|
+| 1–3 | 3–4 | 3 | Einstieg |
+| 4–22 (Sektor 1–2) | **4** | 6 | Sektor 2: bewegliche Tore |
+| 23–33 (Sektor 3) | **5** | 6 | |
+| 34–44 (Sektor 4) | **6** | 7 | |
+| 45–66 (Sektor 5–6) | **7** | 7 (ab 56: 8) | |
+| 67–88 (Sektor 7–8) | **8** | 8 (ab 78: 9) | |
+| 89–99 (Sektor 9) | **9** | 9 | Finale |
+Mehr als **9 Passagierpads** sind nicht geplant (Pads sind Ziffern 1–9; das Tankpad „F“ und die Lebens-Station „L“ zählen nicht mit). **Lebens-Station** (`L`, kleine Plattform, alle 5 Level: 5, 10, 15, 20 … 95): Landen mit ≥ ¢1000 kauft nach 1,2 s ein Leben, höchstens 5.
+
 ## Schwierigkeitsmetrik (`src/core/level_metrics.gd`, Test erzwingt: nicht fallend von Level 1 bis 99)
 Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·Gefahren + 5·Mechaniken (Enge und Landefenster 0..1; Streckenlänge bis 2, Aufträge bis 1,5, Gefahren bis 3, Mechaniken bis 12 – nach oben offen, damit die Rangfolge bis Level 99 nicht an eine Obergrenze stößt; „Mechaniken“ = im Level-JSON unter `mechanics` deklarierte Neuerungen wie `spikes`; kleineres Landefenster = schwerer). Enge = engster Flugkorridor der Bot-Route (Sicherheitsrand in px, kleiner = schwerer). Bericht: `godot --headless -s tools/level_report.gd`.
 
@@ -34,13 +46,13 @@ Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·G
 | S1-10 | Tanknot (Tankturm hoch oben) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→1, Mika 2→Ausgang | 1: 7, 2–4: 5 | 91.6 | 20 px | 4390 px | 34 px | bestanden (142 s, Tank 55 %) | **offen** |
 | S1-11 | **Meisterprüfung** (Bunker, 2-Tiles-Tunnel, Dornen, Tankturm) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→2, Mika 3→Ausgang | 1: 6, 2–4: 5 | 97.4 | 8 px | 4374 px | 34 px | bestanden (118 s, Tank 67 %) | **offen** |
 | S2-01 | Schluchteingang (spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→Ausgang | 100.3 | 12 px | 5294 px | 34 px | bestanden (142 s, Tank 48 %) | **offen** |
-| S2-02 | Neonallee (spikes) | Mika 3→4, Odo 2→3, Lena 4→2, Jonas 1→3, Ines 2→4, Ben 3→1, Nora 4→Ausgang | 107.1 | 24 px | 7807 px | 34 px | bestanden (220 s, Tank 23 %) | **offen** |
-| S2-03 | Erste Schleuse (doors, spikes) | Mika 3→1, Odo 2→4, Lena 1→3, Jonas 4→2, Ines 3→4, Ben 2→1, Nora 4→3, Tarek 1→2, Mika 3→Ausgang | 109.8 | 20 px | 5532 px | 34 px | bestanden (207 s, Tank 55 %) | **offen** |
-| S2-04 | Zwillingsschleuse (doors, spikes, chicane) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 4→3, Nora 2→4, Tarek 1→Ausgang | 109.9 | 20 px | 5138 px | 34 px | bestanden (240 s, Tank 21 %) | **offen** |
-| S2-05 | Schleusenkammer (doors) | Mika 3→2, Odo 4→3, Lena 1→4, Jonas 2→3, Ines 4→1, Ben 3→Ausgang | 110.7 | 8 px | 6525 px | 34 px | bestanden (191 s, Tank 68 %) | **offen** |
-| S2-06 | Rushhour (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→1, Nora 2→4, Tarek 1→Ausgang | 112.5 | 20 px | 6340 px | 34 px | bestanden (267 s, Tank 42 %) | **offen** |
-| S2-07 | Fallgitter (doors, spikes) | Mika 2→4, Odo 3→1, Lena 4→3, Jonas 1→2, Ines 3→4, Ben 2→1, Nora 4→Ausgang | 114.9 | 16 px | 6792 px | 34 px | bestanden (219 s, Tank 56 %) | **offen** |
-| S2-08 | Doppelschleuse (doors) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 4→1, Ben 3→4, Nora 2→3, Tarek 4→Ausgang | 119.1 | 8 px | 7011 px | 34 px | bestanden (229 s, Tank 28 %) | **offen** |
-| S2-09 | Neonlabyrinth (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 4→3, Nora 1→4, Tarek 2→Ausgang | 119.2 | 8 px | 6021 px | 34 px | bestanden (259 s, Tank 60 %) | **offen** |
-| S2-10 | Glasfassade (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→4, Nora 2→Ausgang | 123.0 | 12 px | 7452 px | 34 px | bestanden (318 s, Tank 21 %) | **offen** |
-| S2-11 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→1, Nora 2→4, Tarek 1→Ausgang | 126.6 | 8 px | 7594 px | 34 px | bestanden (294 s, Tank 61 %) | **offen** |
+| S2-02 | Neonallee (spikes) | Mika 3→4, Odo 2→3, Lena 4→2, Jonas 1→3, Ines 2→4, Ben 1→Ausgang | 101.0 | 24 px | 6005 px | 34 px | bestanden (189 s, Tank 47 %) | **offen** |
+| S2-03 | Erste Schleuse (doors, spikes) | Mika 3→1, Odo 2→4, Lena 1→3, Jonas 4→2, Ines 3→4, Ben 3→Ausgang | 101.6 | 20 px | 3627 px | 34 px | bestanden (141 s, Tank 57 %) | **offen** |
+| S2-04 | Zwillingsschleuse (doors, spikes, chicane) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 2→Ausgang | 102.6 | 20 px | 3689 px | 34 px | bestanden (185 s, Tank 68 %) | **offen** |
+| S2-05 | Rushhour (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 103.6 | 20 px | 4811 px | 34 px | bestanden (195 s, Tank 26 %) | **offen** |
+| S2-06 | Doppelschleuse (doors) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 4→1, Ben 4→Ausgang | 103.9 | 8 px | 5564 px | 34 px | bestanden (173 s, Tank 68 %) | **offen** |
+| S2-07 | Fallgitter (doors, spikes) | Mika 2→4, Odo 3→1, Lena 4→3, Jonas 1→2, Ines 3→4, Ben 1→Ausgang | 105.1 | 16 px | 5767 px | 34 px | bestanden (179 s, Tank 30 %) | **offen** |
+| S2-08 | Neonlabyrinth (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 2→Ausgang | 105.1 | 8 px | 4122 px | 34 px | bestanden (201 s, Tank 24 %) | **offen** |
+| S2-09 | Schleusenkammer (doors) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 1→4, Jonas 2→3, Ines 4→1, Ben 3→Ausgang | 110.7 | 8 px | 6525 px | 34 px | bestanden (191 s, Tank 68 %) | **offen** |
+| S2-10 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 112.3 | 8 px | 5687 px | 34 px | bestanden (238 s, Tank 48 %) | **offen** |
+| S2-11 | Glasfassade (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 113.2 | 12 px | 5980 px | 34 px | bestanden (234 s, Tank 47 %) | **offen** |

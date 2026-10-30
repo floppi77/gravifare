@@ -134,3 +134,12 @@ Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung fes
 - **Mindest-Fahrpreis** (`Run.min_fare`): Jeder Auftrag zahlt mindestens so viel, dass er bei **25 % Zufriedenheit** (Zeitfaktor 0,66) noch Gewinn nach geschätztem Spritverbrauch (Strecke × 1,6 Anflug × `FUEL_PER_PX`, mittlerer Spritpreis des Levels, +15 %) abwirft. Test: Autopilot-Sprit ≤ Einnahmen bei 25 % je Level.
 - **Preise ruhen**, solange getankt wird und **sobald die Zapfsäule defekt ist**. **Neues Taxi** (nach Totalschaden) startet immer mit **vollem Tank**.
 - **Betrag über dem Fahrgast** wird nie abgeschnitten (Breite folgt dem Text); der mitfahrende Zusatzfahrgast zeigt Faktor und Preis in der unteren Leiste.
+
+## Runde 11: Verluste, Obergrenzen, Lebens-Station, Pflicht gegen Zusatz
+- **Tor schließt auf dem Taxi**: 30 Hülle Schaden, das Taxi wird zur nächsten freien Seite hinausgeschleudert (70 px/s). Der Bot rechnet früheste/späteste Ankunft und Durchflugzeit ein und kommt unbeschadet durch.
+- **Leerer Tank** (außer auf einer funktionierenden Zapfsäule): Warnung „TANK LEER! 3 s“, danach ist das Taxi verloren – Leben −1, neues Taxi mit vollem Tank, das Level läuft weiter.
+- **Zusatzfahrgäste** werden bei Berührung durch das Taxi wie Pflichtfahrgäste getroffen: sie schimpfen und verschwinden (zählt als „Fahrgast getroffen“, kein Ersatz).
+- **Obergrenzen** `Tuning.max_jobs` / `Tuning.max_pads` (siehe LEVELS.md); Sektor 2 hat höchstens 6 Pflichtfahrgäste.
+- **Lebens-Station** „L“: ¢1000 pro Leben, höchstens 5 Leben, alle 5 Level eine kleine Plattform (rosa Wimpel mit Herz und Preis; grau, wenn voll oder zu wenig Credits).
+- **Pflicht gegen Zusatz**: Pflichtfahrgäste tragen einen goldenen Stern, goldenen Betragsrahmen und gelbe Zielblase; die Zeile unten beginnt mit „★ PFLICHT“. Zusatzfahrgäste sind bläulich-blass mit cyanfarbenem Rahmen und weißer Zielblase (Zeile „ZUSATZ“). Fährt ein Zusatzfahrgast mit, erinnert eine goldene Zeile an den offenen Pflichtfahrgast.
+- **Schwierigkeits-Feinabstimmung Sektor 2**: Dornenbänder an der Decke (Zeile 1) heben die gemessene Schwierigkeit; die Metrik zählt sie als Gefahren.

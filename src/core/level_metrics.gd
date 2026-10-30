@@ -100,7 +100,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 			route_len += Pathing.path_length(leg[0], Pathing.plan(lvl, leg[0], leg[1], minf(clearance, 8.0)))
 	var min_pad := 1e9
 	for id in lvl.pads:
-		if not lvl.pads[id].fuel:
+		if lvl.is_passenger_pad(id):
 			min_pad = minf(min_pad, lvl.pads[id].land_window)
 	var hazards := 0
 	for row in lvl.rows:

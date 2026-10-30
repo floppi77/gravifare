@@ -101,7 +101,7 @@ func _build_occluders() -> void:
 
 func _opaque(cx: int, cy: int) -> bool:
 	var c := level.cell(cx, cy)
-	return c == "#" or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F"
+	return c == "#" or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L"
 
 func _occluder(r: Rect2) -> LightOccluder2D:
 	var o := LightOccluder2D.new()
@@ -113,7 +113,7 @@ func _occluder(r: Rect2) -> LightOccluder2D:
 func _build_lights() -> void:
 	for id in level.pads:
 		var p: Dictionary = level.pads[id]
-		var col := Color("#ffa530") if p.fuel else Color("#35e0d2")
+		var col := Color("#ff6aa0") if p.life else (Color("#ffa530") if p.fuel else Color("#35e0d2"))
 		var l := make_light(col, 90.0, 2.3)
 		l.position = Vector2(p.center, p.row * T - 6.0)
 		add_child(l)
@@ -184,7 +184,7 @@ func _process(delta: float) -> void:
 	var target := run.marker_pad()
 	for id in pad_lights:
 		var l: PointLight2D = pad_lights[id]
-		var base_col := Color("#ffa530") if level.pads[id].fuel else Color("#35e0d2")
+		var base_col := Color("#ff6aa0") if level.pads[id].life else (Color("#ffa530") if level.pads[id].fuel else Color("#35e0d2"))
 		if id == target:
 			l.color = base_col.lerp(Color("#ffe14a"), 0.6)
 			l.energy = 3.0 + 0.8 * sin(_t * 6.0)

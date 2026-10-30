@@ -98,7 +98,7 @@ func _draw_world() -> void:
 						draw_rect(Rect2(x, y + T - d - PX * 2, T, PX * 2), ao)
 			elif c == "^":
 				_spike_tile(cx, cy)
-			elif c == "F":
+			elif c == "F" or c == "L":
 				_tile(5, cx, cy)
 			elif c >= "1" and c <= "9":
 				_tile(4, cx, cy)

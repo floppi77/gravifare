@@ -1,7 +1,7 @@
 class_name LevelData
 extends RefCounted
 ## Rastergestützte Leveldaten, geladen aus data/levels/*.json.
-## Zeichen: '#' Fels, '1'-'9' Landepad, 'F' Tankpad, 'S' Start, 'E' Ausgang, '^' Dornen.
+## Zeichen: '#' Fels, '1'-'9' Landepad, 'F' Tankpad, 'L' Lebens-Station, 'S' Start, 'E' Ausgang, '^' Dornen.
 
 const SOLID := "#"
 
@@ -27,11 +27,10 @@ var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
 var raw := {}
 ## Bewegliche Tore (Zeichen "a".."e" im Raster, Parameter im JSON unter "doors"): öffnen und schließen im festen Takt.
-## Geschlossen sind sie fest wie Fels – außer das Taxi steht gerade im Tor (dann schließt es nicht auf dem Taxi).
+## Geschlossen sind sie fest wie Fels. Schließt ein Tor, während das Taxi darin ist, nimmt es Schaden und wird zur nächsten Seite hinausgeschleudert (TaxiSim).
 const DOOR_CHARS := "abcde"
 var doors := {}                  # Zeichen -> {cells: Array[Vector2i], period, open, phase}
 var clock := 0.0                 # Simulationszeit (setzt TaxiSim), bestimmt den Torzustand
-var hold := Rect2()              # Taxi-Rechteck (setzt TaxiSim)
 var doors_ignore := false        # Planung/Zeichnen: Tore gelten als offen
 var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 
@@ -83,12 +82,12 @@ func _scan() -> void:
 				spawn = Vector2(x * Tuning.TILE + Tuning.TILE * 0.5, y * Tuning.TILE + Tuning.TILE * 0.5)
 			elif c == "E":
 				exit_cells.append(Vector2i(x, y))
-			elif (c >= "1" and c <= "9") or c == "F":
+			elif (c >= "1" and c <= "9") or c == "F" or c == "L":
 				var x1 := x
 				while x1 + 1 < row.length() and row[x1 + 1] == c:
 					x1 += 1
 				pads[c] = {"id": c, "x0": x * Tuning.TILE, "x1": (x1 + 1) * Tuning.TILE, "row": y,
-					"center": (x * Tuning.TILE + (x1 + 1) * Tuning.TILE) * 0.5, "fuel": c == "F"}
+					"center": (x * Tuning.TILE + (x1 + 1) * Tuning.TILE) * 0.5, "fuel": c == "F", "life": c == "L"}
 				x = x1
 			x += 1
 
@@ -127,6 +126,16 @@ func _plan_shelters() -> void:
 		var p: Dictionary = pads[id]
 		var lo: float = p.x0 + Tuning.FOOT_X
 		var hi: float = p.x1 - Tuning.FOOT_X
+		if p.life:                       # Lebens-Station: kleine Plattform ohne Wartebereich
+			p["side"] = 0
+			p["shelter"] = Rect2()
+			p["door_x"] = p.center
+			p["wait_x"] = p.center
+			p["land_lo"] = lo
+			p["land_hi"] = hi
+			p["land_window"] = maxf(hi - lo, 0.0)
+			p["land_mid"] = (lo + hi) * 0.5
+			continue
 		if p.fuel:
 			for pm in pumps:
 				if pm.pad == id:
@@ -193,6 +202,10 @@ func _scan_doors(params: Dictionary) -> void:
 					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0))}
 				doors[c].cells.append(Vector2i(x, y))
 
+## Passagierpad (weder Tank- noch Lebens-Station).
+func is_passenger_pad(id: String) -> bool:
+	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false)
+
 func has_doors() -> bool:
 	return not doors.is_empty()
 
@@ -234,9 +247,7 @@ func door_time_to_close(ch: String, t: float) -> float:
 	return maxf(0.0, float(d.open) - m) if m < float(d.open) else 0.0
 
 func _door_cell_closed(cx: int, cy: int, c: String) -> bool:
-	if doors_ignore or door_is_open(c, clock):
-		return false
-	return not hold.intersects(Rect2(cx * Tuning.TILE, cy * Tuning.TILE, Tuning.TILE, Tuning.TILE))
+	return not (doors_ignore or door_is_open(c, clock))
 
 func hits_closed_door(center: Vector2, half: Vector2) -> bool:
 	if doors.is_empty():
@@ -256,7 +267,7 @@ func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
 	if c != "" and DOOR_CHARS.contains(c):
 		return _door_cell_closed(cx, cy, c)
-	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or (c == "E" and not exit_open)
+	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))
@@ -288,7 +299,7 @@ func pad_at_foot(p: Vector2) -> Dictionary:
 	var cx := floori(p.x / Tuning.TILE)
 	var cy := floori(p.y / Tuning.TILE)
 	var c := cell(cx, cy)
-	if (c >= "1" and c <= "9") or c == "F":
+	if (c >= "1" and c <= "9") or c == "F" or c == "L":
 		var pad: Dictionary = pads.get(c, {})
 		if not pad.is_empty() and pad.row == cy:
 			return pad

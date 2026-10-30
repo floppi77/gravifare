@@ -180,5 +180,14 @@
  "RES_CONTINUE": "Enter / A: continue to the next level",
  "RES_TO_MENU": "Enter / A: back to the menu",
  "RES_SCORE": "Score %d  (best %d)",
- "STAT_SCORE": "Total score"
+ "STAT_SCORE": "Total score",
+ "HUD_OUT_OF_FUEL": "OUT OF FUEL – TAXI LOST",
+ "HUD_NO_FUEL": "OUT OF FUEL! %.0f s",
+ "MSG_OUT_OF_FUEL": "Out of fuel! Land at a pump or lose the taxi",
+ "HUD_TAG_MAIN": "★ REQUIRED",
+ "HUD_TAG_EXTRA": "EXTRA",
+ "HUD_MAIN_WAITING": "★ Required fare open: %s → pad %s",
+ "MSG_LIFE_BOUGHT": "Life bought! Now %d lives (−¢%d)",
+ "MSG_LIFE_FULL": "You already have the maximum of 5 lives",
+ "MSG_LIFE_POOR": "A life costs ¢%d – not enough credits"
 }

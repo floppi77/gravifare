@@ -12,12 +12,27 @@ def job(frm, to, fare, name, gender):
     return {"from": frm, "to": to, "fare": fare, "par": 40, "passenger": name, "gender": gender}
 
 
-FINAL = {"S2-01": "S2-01", "S2-02": "S2-02", "S2-06": "S2-03", "S2-11": "S2-04", "S2-03": "S2-05", "S2-10": "S2-06",
-         "S2-05": "S2-07", "S2-04": "S2-08", "S2-07": "S2-09", "S2-09": "S2-10", "S2-08": "S2-11"}   # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
+# Zusätzliche Dornenbänder an der Decke (Zeile 1) je Entwurfsschlüssel: echte Gefahr nahe der Decke, hebt die gemessene Schwierigkeit
+BOOST = {"S2-02": 7, "S2-06": 28, "S2-11": 17, "S2-10": 14, "S2-07": 9}
+
+
+def boost_spikes(g, n):
+    placed = 0
+    for x in list(range(2, 15)) + list(range(37, 24, -1)):
+        if placed >= n:
+            break
+        if g.g[1][x] == "." and g.g[2][x] == ".":
+            g.g[1][x] = "^"
+            placed += 1
+
+
+FINAL = {"S2-01": "S2-01", "S2-02": "S2-02", "S2-06": "S2-03", "S2-11": "S2-04", "S2-10": "S2-05", "S2-04": "S2-06",
+         "S2-05": "S2-07", "S2-07": "S2-08", "S2-03": "S2-09", "S2-08": "S2-10", "S2-09": "S2-11"}   # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
 
 
 def make(ident, idx, de, en, g, jobs, **extra):
     fid = FINAL.get(ident, ident)
+    boost_spikes(g, BOOST.get(ident, 0))
     for j, p in zip(jobs, PARS.get(fid, [])):
         j["par"] = p
     fn = write(fid, 2, int(fid[-2:]), de, en, g, jobs, **extra)
@@ -32,6 +47,13 @@ NAMES = [("Mika", "f"), ("Odo", "m"), ("Lena", "f"), ("Jonas", "m"), ("Ines", "f
 def jobs_of(seq, base=120):
     """seq: Liste (von, nach); Namen reihum, Fahrpreis steigt mit der Zahl der Aufträge."""
     out = []
+    if len(seq) > 6:                       # Obergrenze Pflichtfahrgäste (Tuning.max_jobs): 5 normale + Ausgangs-Fahrgast
+        last = seq[-1]
+        seq = list(seq[:5])
+        pads = sorted({p for pair in seq for p in pair if p != "exit"})
+        prev_to = seq[-1][1]
+        frm = last[0] if last[0] != prev_to else next(p for p in pads if p != prev_to)
+        seq.append((frm, "exit"))
     for i, (a, b) in enumerate(seq):
         n, gnd = NAMES[i % len(NAMES)]
         out.append(job(a, b, base + 10 * i, n, gnd))
@@ -76,6 +98,7 @@ g.rect("#", 12, 1, 15, 9)
 g.rect("#", 28, 1, 29, 19); g.rect("a", 28, 15, 29, 18)
 g.pad("3", 31, 37, 19)
 g.rect("#", 33, 10, 38, 11); g.pad("4", 33, 37, 9)
+g.rect("#", 24, 6, 27, 7); g.rect("L", 24, 5, 27, 5)             # Lebens-Station
 g.gate()
 g.put("S", 5, 18)
 make("S2-03", 3, "Schleusenkammer", "Lock Chamber", g,
@@ -217,6 +240,7 @@ g.pad("1", 14, 20, 19)
 g.pad("4", 31, 37, 19)
 g.rect("#", 33, 1, 38, 6); g.rect("^", 33, 7, 38, 7)
 g.rect("^", 3, 14, 6, 14)
+g.rect("L", 3, 19, 6, 19)                                    # Lebens-Station am Boden links
 g.gate()
 g.put("S", 17, 18)
 make("S2-11", 11, "Zwillingsschleuse", "Twin Gates", g,
