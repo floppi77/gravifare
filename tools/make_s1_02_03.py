@@ -5,13 +5,13 @@ from levelkit import Grid, write
 # ---- S1-02: drei Ebenen, Säule in der Mitte, Tankpad; großzügige Anflüge
 g = Grid()
 g.rect("#", 1, 20, 38, 20)                                   # Boden
-g.rect("#", 2, 19, 9, 19); g.rect("1", 3, 18, 8, 18)         # Startpad 1
-g.rect("#", 2, 18, 2, 18); g.rect("#", 9, 18, 9, 18)
+g.rect("#", 2, 19, 10, 19); g.rect("1", 3, 18, 9, 18)         # Startpad 1 (7 Tiles)
+g.rect("#", 2, 18, 2, 18); g.rect("#", 10, 18, 10, 18)
 g.rect("#", 1, 9, 8, 11); g.rect("3", 2, 8, 7, 8)            # hohes Regal links mit Pad 3
 g.rect("#", 14, 1, 17, 5)                                    # hängender Block (Lücke zum Regal 80 px)
 g.rect("#", 13, 19, 20, 19); g.rect("F", 14, 18, 19, 18)     # Tankpad
 g.rect("#", 23, 9, 25, 19)                                   # Säule aus dem Boden
-g.rect("#", 30, 13, 38, 19); g.rect("2", 31, 12, 37, 12)     # Pad 2 rechts erhöht (7 Tiles)
+g.rect("#", 30, 13, 38, 19); g.rect("2", 32, 12, 36, 12)     # Pad 2 rechts erhöht (5 Tiles)
 g.gate()
 g.put("S", 6, 17)
 write("S1-02", 1, 2, "Tankstopp", "Fuel Stop", g,
@@ -28,8 +28,8 @@ g.rect("F", 15, 9, 18, 9)                                    # Tankpad auf dem B
 g.rect(".", 19, 9, 23, 19)                                   # Schacht, 5 Tiles breit
 g.rect("3", 19, 19, 23, 19)                                  # Pad 3 am Schachtgrund (Zeile 19)
 g.rect("#", 18, 19, 18, 19); g.rect("#", 24, 19, 24, 19)
-g.rect("#", 1, 19, 9, 19); g.rect("1", 2, 18, 8, 18)         # Startpad 1
-g.rect("#", 9, 18, 9, 18)
+g.rect("#", 1, 19, 9, 19); g.rect("1", 2, 18, 7, 18)         # Startpad 1 (6 Tiles)
+g.rect("#", 8, 18, 8, 18)
 g.rect("#", 32, 17, 38, 19); g.rect("2", 33, 16, 37, 16)     # Pad 2 rechts (5 Tiles)
 g.gate()
 g.put("S", 5, 17)

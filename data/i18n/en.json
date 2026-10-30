@@ -74,5 +74,7 @@
  "HUD_RUN_CREDITS": "Run credits",
  "VOICE_EXIT": "To the exit, please!",
  "HUD_FACTOR": "×%.2f",
- "HUD_COMPLETE_EARNED": "Earned: ¢ %d"
+ "HUD_COMPLETE_EARNED": "Earned: ¢ %d",
+ "VOICE_ANGRY": "Hey, idiot!",
+ "MSG_SQUASH": "Passenger furious! New passenger at pad %s"
 }

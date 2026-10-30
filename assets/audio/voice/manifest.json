@@ -383,6 +383,38 @@
   "en/m1_dest_exit": {
    "text": "To the exit, please!",
    "seconds": 1.54
+  },
+  "de/f0_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.58
+  },
+  "de/f1_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.58
+  },
+  "de/m0_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.17
+  },
+  "de/m1_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.59
+  },
+  "en/f0_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.63
+  },
+  "en/f1_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.26
+  },
+  "en/m0_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 0.94
+  },
+  "en/m1_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.18
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

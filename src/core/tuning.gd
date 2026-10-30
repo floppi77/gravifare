@@ -24,9 +24,18 @@ const GEAR_DRAG := 1.1
 const GEAR_MAX_SPEED := 90.0
 
 # Hülle
-const HULL_HALF := Vector2(10, 5)
-const FOOT_X := 8.0
-const GEAR_LEN := 5.0
+const TAXI_SCALE := 0.8           # Taxi 20 % kleiner als im ersten Entwurf (mehr Platz auf den Pads)
+const HULL_HALF := Vector2(8, 4)
+const FOOT_X := 6.4
+const GEAR_LEN := 4.0
+
+# Fahrgäste (85 % der ursprünglichen Größe, passend zum kleineren Taxi)
+const PASS_SCALE := 0.85
+const PASS_W := 6.8
+const PASS_H := 10.2
+const PASS_HALF_W := 3.0
+const PASS_CLEAR := 2.0           # Sicherheitsabstand Taxi–Fahrgast bei der Landefenster-Berechnung
+const MIN_LAND_WINDOW := 28.0     # Mindestbreite (px) des freien Landebereichs je Passagierpad
 const GEAR_TIME := 0.22
 
 # Landefenster (fair, im HUD sichtbar)

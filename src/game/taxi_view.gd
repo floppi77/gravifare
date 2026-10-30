@@ -21,9 +21,11 @@ var sparks: CPUParticles2D
 var smoke: CPUParticles2D
 
 func _ready() -> void:
+	scale = Vector2.ONE * Tuning.TAXI_SCALE            # Zeichencode bleibt in Entwurfsmaßen
 	var Fx := preload("res://src/game/fx.gd")
 	light = Fx.make_light(Color("#ffe2b0"), 130.0, 2.6, true)
 	light.position = Vector2(0, 2)
+	light.texture_scale /= Tuning.TAXI_SCALE            # Lichtradius unabhängig von der Taxi-Skalierung
 	add_child(light)
 	exhaust = Fx.make_particles(48, 0.34, Vector2(55, 100), 1.5, Color(1, 0.85, 0.4, 0.95), Color(1, 0.3, 0.1, 0.0))
 	exhaust.position = Vector2(0, 8.8)
@@ -148,11 +150,11 @@ func _draw() -> void:
 	# Fahrwerk
 	var g := sim.gear
 	if g > 0.02:
-		var gl := Tuning.GEAR_LEN * g
+		var gl := Tuning.GEAR_LEN / Tuning.TAXI_SCALE * g
 		var steel := Color("#c9cfee")
 		for sx in [-1.0, 1.0]:
-			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X, 5 + gl), steel, 0.7)
-			draw_rect(Rect2(sx * Tuning.FOOT_X - 2, 5 + gl, 4, 0.7), steel)
+			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE, 5 + gl), steel, 0.7)
+			draw_rect(Rect2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE - 2, 5 + gl, 4, 0.7), steel)
 		if sim.gear_extended():
 			var ok := sim.landing_margin()
 			var lamp := Color("#5dff9a") if ok > 0.0 else Color("#ff4d6d")

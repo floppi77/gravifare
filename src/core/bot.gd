@@ -92,7 +92,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		var foot_y := sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN
 		var dist_down: float = pad.row * Tuning.TILE - foot_y
 		gear = true
-		var ex: float = float(pad.center) - sim.pos.x
+		var ex: float = float(pad.get("land_mid", pad.center)) - sim.pos.x
 		v_des.x = clampf(ex * 3.0, -14.0, 14.0)
 		var vy := 22.0
 		if dist_down < 14.0:

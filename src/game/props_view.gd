@@ -138,14 +138,16 @@ func _draw_actor(a: PassengerActor) -> void:
 	var pos := a.world_pos()
 	var col := Color(1, 1, 1, a.fade)
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
-	draw_texture_rect_region(pass_tex, Rect2(-4, pos.y - 12, 8, 12), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
+	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	if a.wave_t > 0.0:
-		var bx := pos.x + 5.0
-		var by := pos.y - 22.0 - sin(t * 8.0)
-		draw_rect(Rect2(bx - 3, by - 3, 6, 8), Color("#0c0f24"))
-		draw_rect(Rect2(bx - 3 + PX * 2, by - 3 + PX * 2, 6 - PX * 4, 8 - PX * 4), Color("#ffe14a"))
-		draw_string(ThemeDB.fallback_font, Vector2(bx - 3, by + 4), "!", HORIZONTAL_ALIGNMENT_CENTER, 6, 9, Color("#0c0f24"))
+	if a.wave_t > 0.0 or a.angry:
+		var bx := pos.x + 4.0
+		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
+		var bubble := Color("#ff4d6d") if a.angry else Color("#ffe14a")
+		var label := "#!" if a.angry else "!"
+		draw_rect(Rect2(bx - 4, by - 3, 8, 8), Color("#0c0f24"))
+		draw_rect(Rect2(bx - 4 + PX * 2, by - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), bubble)
+		draw_string(ThemeDB.fallback_font, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
 
 func _draw_actors() -> void:
 	for l in run.leavers:
@@ -168,7 +170,7 @@ func _draw_taxi_shadow() -> void:
 	if gy < 0.0:
 		return
 	var h := clampf((gy - (s.pos.y + 10.0)) / 80.0, 0.0, 1.0)
-	var w := lerpf(26.0, 12.0, h)
+	var w := lerpf(21.0, 10.0, h)
 	var a := lerpf(0.5, 0.08, h)
 	var cx := s.pos.x
 	for i in 3:

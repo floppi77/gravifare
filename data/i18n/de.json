@@ -74,5 +74,7 @@
  "HUD_RUN_CREDITS": "Credits im Lauf",
  "VOICE_EXIT": "Zum Ausgang, bitte!",
  "HUD_FACTOR": "×%.2f",
- "HUD_COMPLETE_EARNED": "Verdient: ¢ %d"
+ "HUD_COMPLETE_EARNED": "Verdient: ¢ %d",
+ "VOICE_ANGRY": "Hey, Idiot!",
+ "MSG_SQUASH": "Fahrgast verärgert! Neuer Fahrgast an Pad %s"
 }

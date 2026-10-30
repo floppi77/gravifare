@@ -50,6 +50,11 @@ Nach dem Tor: altes Level blendet in 2 s in den Weltraum aus, 3,6 s Flugsequenz 
 - **Fahrgast-Spawn**: nie auf dem Pad, auf dem das Taxi steht (Levelregel + Laufzeitschutz).
 - **Absturz-Balance**: Aufprall bis 70 px/s harmlos, darüber Schaden = 100·((v−70)/100)^1,6, ab 170 px/s sofort zerstört. Mit ausgefahrenem Fahrwerk (Feinmodus) ist die Geschwindigkeit auf 90 px/s begrenzt – Sturzflüge gehen nur mit eingefahrenem Fahrwerk.
 
+## Größen, Landefenster, Fahrgast-Kollision
+- **Taxi 20 % kleiner** (`Tuning.TAXI_SCALE = 0.8`: Hülle 16×8, Füße ±6,4, Fahrwerk 4), Fahrgäste und Unterstände auf 85 %. Das Taxi-Node wird skaliert, der Zeichencode bleibt in Entwurfsmaßen; die Physik nutzt die kleineren Kollisionsmaße.
+- **Pads sind unterschiedlich groß** (5–8 Tiles). Das **freie Landefenster** je Passagierpad (`land_window`) = Bereich, in dem die Füße auf dem Pad stehen und der Abstand zum wartenden Fahrgast (Hülle + Fahrgast + 2 px) gewahrt ist. Je kleiner das Fenster, desto schwerer; Pflicht: ≥ 28 px (≈ 5-Tiles-Pad mit Unterstand). Autopilot und Bot-Hover nutzen die Fenstermitte (`land_mid`).
+- **Fahrgast-Kollision**: Berührt das Taxi (Hülle oder ausgefahrene Füße) einen wartenden/auftauchenden Fahrgast (nicht beim Aufsteigen, nicht beim Einsteigen), schimpft er („Hey, Idiot!“, Untertitel, Ärger-Blase) und flieht schnell in den Unterstand. Für denselben Auftrag erscheint nach 2,4 s ein **anderer Fahrgast an einem anderen Passagierpad** (deterministisch je Level/Auftrag/Versuch; nicht Zielpad, nicht der Vorfall-Pad). Anzahl der Fahrgäste je Level bleibt gleich; die Auftragszeit läuft weiter (Zeitfaktor sinkt), der Umweg kostet Sprit.
+
 ## Optik (Finesse und Räumlichkeit)
 Normal-Maps auf den Tiles (aus der Helligkeit der Platten abgeleitet, Stärke 3) lassen Nieten, Paneele und Lüftungen auf Taxi- und Pad-Licht reagieren; Lichthöhe ~55 % des Radius. Kontaktschatten des Taxis, Schlagschatten/AO an den Tiles, Vignette (Shader), Bloom (WorldEnvironment-Glow, Schwelle 0,92), Dunstbänder zwischen den Skyline-Ebenen. **Kein HDR-2D** (verfälscht die Farbwiedergabe und macht das Bild zu dunkel) und keine globale Farbkorrektur. Umgebungslicht `CanvasModulate` (0,86 / 0,90 / 1,0).
 

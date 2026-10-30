@@ -76,10 +76,10 @@ static func path_length(from: Vector2, pts: Array[Vector2]) -> float:
 ## Schwebepunkt über einem Pad (höchstens 56 px, bei niedriger Decke tiefer).
 static func hover_point(level: LevelData, pad: Dictionary, margin: float) -> Vector2:
 	for h in [56.0, 48.0, 40.0, 32.0]:
-		var p := Vector2(pad.center, pad.row * Tuning.TILE - h)
+		var p := Vector2(float(pad.get("land_mid", pad.center)), pad.row * Tuning.TILE - h)
 		if free_at(level, p, margin):
 			return p
-	return Vector2(pad.center, pad.row * Tuning.TILE - 32.0)
+	return Vector2(float(pad.get("land_mid", pad.center)), pad.row * Tuning.TILE - 32.0)
 
 static func exit_goal(level: LevelData) -> Vector2:
 	return level.exit_rect().get_center()

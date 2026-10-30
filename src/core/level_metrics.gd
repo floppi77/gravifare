@@ -7,7 +7,7 @@ extends RefCounted
 ##              Route (Start, alle Abholungen/Ziele, Ausgang) noch planbar ist. Kleiner = schwerer.
 ##   route_len  Streckenlänge der Route bei kleinem Rand (px)
 ##   jobs       Anzahl Aufträge (inkl. Ausgangs-Fahrgast)
-##   min_pad_w  schmalstes Pad (px)
+##   min_window kleinstes freies Landefenster eines Passagierpads (px): Padbreite minus Unterstand/Fahrgast-Abstand
 ##   hazards    Anzahl gefährlicher Elemente (Dornen; später bewegte Gefahren)
 ## score = 40·eng + 25·Länge + 15·Aufträge + 10·Pad + 10·Gefahren (jeweils auf 0..1 normiert)
 
@@ -50,7 +50,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var min_pad := 1e9
 	for id in lvl.pads:
 		if not lvl.pads[id].fuel:
-			min_pad = minf(min_pad, lvl.pads[id].x1 - lvl.pads[id].x0)
+			min_pad = minf(min_pad, lvl.pads[id].land_window)
 	var hazards := 0
 	for row in lvl.rows:
 		hazards += String(row).count("^")
@@ -58,10 +58,10 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var eng := clampf((MAX_MARGIN - clearance) / (MAX_MARGIN - STEP), 0.0, 1.0)
 	var length := clampf(route_len / 3500.0, 0.0, 1.0)
 	var jobs := clampf(float(lvl.jobs.size()) / 6.0, 0.0, 1.0)
-	var padn := clampf((112.0 - min_pad) / 48.0, 0.0, 1.0)
+	var padn := clampf((84.0 - min_pad) / 50.0, 0.0, 1.0)
 	var hz := clampf(float(hazards) / 20.0, 0.0, 1.0)
 	return {
-		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_pad_w": min_pad, "hazards": hazards,
+		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
 		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz,
 		"solvable": clearance > 0.0,
 	}

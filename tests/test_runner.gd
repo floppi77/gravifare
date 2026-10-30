@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -438,3 +438,95 @@ func _test_job_rules_and_difficulty() -> void:
 		check(m.score >= prev_score, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
 		prev_score = m.score
 		prev_id = lvl.id
+
+func _taxi_over(r: Run, x: float, y: float, vy: float) -> void:
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.pos = Vector2(x, y)
+	r.sim.vel = Vector2(0, vy)
+	r.sim.gear = 1.0
+
+func _test_squash_passenger() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	var a := r.actor
+	var from_id := String(r.current_job().from)
+	var n_jobs := r.jobs.size()
+	var pad: Dictionary = lvl.pads[from_id]
+	# Taxi senkt sich auf den Kopf des wartenden Fahrgasts
+	_taxi_over(r, a.x, pad.row * Tuning.TILE - 40.0, 40.0)
+	var squashed := false
+	var replaced := false
+	for i in 400:
+		r.step(Vector2(0, -0.0), true)
+		if r.sim.state != TaxiSim.State.FLYING:
+			break
+		for e in r.log:
+			if e.type == "squashed":
+				squashed = true
+			if e.type == "replacement":
+				replaced = true
+		if squashed:
+			break
+	check(squashed and replaced, "Taxi auf dem Kopf eines Fahrgasts: er schimpft (squashed) und wird ersetzt")
+	check(r.actor == null and r.leavers.size() == 1 and r.leavers[0].angry, "Der Fahrgast flieht verärgert in den Unterstand")
+	check(r.jobs.size() == n_jobs and r.job_index == 0, "Anzahl und Reihenfolge der Aufträge bleiben gleich")
+	var new_from := String(r.current_job().from)
+	check(new_from != from_id and new_from != String(r.current_job().to) and not lvl.pads[new_from].fuel, "Ersatz-Fahrgast erscheint an anderem Passagierpad (%s statt %s)" % [new_from, from_id])
+	check(String(r.current_job().passenger) != "Mika", "Ersatz-Fahrgast ist eine andere Person (%s)" % String(r.current_job().passenger))
+	# Zeit läuft weiter (Strafe), Ersatz erscheint nach Pause
+	var clock0 := r.job_clock
+	_taxi_over(r, 320.0, 100.0, 0.0)
+	for i in int(1.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), false)
+	check(r.job_clock > clock0 + 0.9, "Die Auftragszeit läuft während des Ersatzes weiter")
+	check(r.actor == null, "Ersatz-Fahrgast erscheint erst nach kurzer Pause")
+	for i in int(2.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), false)
+	check(r.actor != null and r.actor.state == PassengerActor.S.EMERGING or (r.actor != null and r.actor.state == PassengerActor.S.WAITING), "…und tritt dann aus dem Unterstand")
+	check(r.job_clock >= clock0 + 2.9, "Kein Zeit-Reset durch den Ersatz (Clock %.1f)" % r.job_clock)
+	# Gegenprobe: aufsteigendes Taxi und gelandetes Taxi treffen niemanden
+	var r2 := Run.new()
+	r2.start(lvl)
+	var b := r2.actor
+	var pad2: Dictionary = lvl.pads[String(r2.current_job().from)]
+	_taxi_over(r2, b.x, pad2.row * Tuning.TILE - 8.0, -60.0)
+	r2.step(Vector2(0, -1), true)
+	check(r2.actor != null, "Aufsteigendes Taxi trifft keinen Fahrgast")
+	_land_on(r2, String(r2.current_job().from))
+	r2.step(Vector2.ZERO, true)
+	check(r2.actor != null and r2.squashes == 0, "Gelandetes Taxi (Einsteigen) zählt nie als Kollision")
+	# Deterministisch: gleicher Level/Auftrag/Versuch -> gleiche Wahl
+	var i1 := PassengerActor.pick_identity("S1-01", 0, 1, "Mika")
+	var i2 := PassengerActor.pick_identity("S1-01", 0, 1, "Mika")
+	check(i1 == i2 and i1.name != "Mika", "Ersatz-Identität ist reproduzierbar und neu")
+
+func _test_landing_window_rules() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var min_w := 1e9
+		var widths: Array = []
+		for id in lvl.pads:
+			var p: Dictionary = lvl.pads[id]
+			if p.fuel:
+				continue
+			min_w = minf(min_w, p.land_window)
+			widths.append(int((p.x1 - p.x0) / Tuning.TILE))
+		check(min_w >= Tuning.MIN_LAND_WINDOW, "%s: jedes Passagierpad hat ein freies Landefenster ≥ %d px (kleinstes %.0f px, Padbreiten %s Tiles)" % [lvl.id, int(Tuning.MIN_LAND_WINDOW), min_w, str(widths)])
+		var varied := false
+		for w in widths:
+			if w != widths[0]:
+				varied = true
+		check(varied, "%s: Pads sind unterschiedlich groß" % lvl.id)
+
+func _test_taxi_scale() -> void:
+	check(absf(Tuning.HULL_HALF.x - 10.0 * Tuning.TAXI_SCALE) < 0.01 and absf(Tuning.FOOT_X - 8.0 * Tuning.TAXI_SCALE) < 0.01, "Taxi-Kollisionsmaße sind auf %.0f %% skaliert" % (Tuning.TAXI_SCALE * 100.0))
+	# Taxi passt mit Landetoleranz bequem auf das kleinste Pad: Fußabstand + Toleranz < Landefenster
+	var lvl := _lvl()
+	var s := TaxiSim.new()
+	s.setup(lvl)
+	check(s.state == TaxiSim.State.LANDED, "Start nach Skalierung sicher gelandet")

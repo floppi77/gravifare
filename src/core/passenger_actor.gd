@@ -25,6 +25,8 @@ var age := 0.0
 var wave_t := 0.0
 var call_cd := 0.0
 var fade := 1.0               # 0..1 beim Auftauchen/Verschwinden
+var angry := false            # vom Taxi erschreckt: flüchtet schimpfend in den Unterstand
+var speed_mul := 1.0
 var events: Array = []
 var _pause := 0.0
 
@@ -44,6 +46,20 @@ func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 		fade = 0.0
 	target_x = p.wait_x
 
+const NAMES_F := ["Mika", "Ines", "Lena", "Nora", "Pia", "Yuki"]
+const NAMES_M := ["Odo", "Jonas", "Ben", "Tarek", "Finn", "Leo"]
+
+## Deterministische neue Identität (Ersatz-Fahrgast): gleicher Level/Auftrag/Versuch ergibt immer dieselbe Person.
+static func pick_identity(level_id: String, job_index: int, attempt: int, old_name: String) -> Dictionary:
+	var h := absi(("%s:%d:%d" % [level_id, job_index, attempt]).hash())
+	var gender := "f" if h % 2 == 0 else "m"
+	var names: Array = NAMES_F if gender == "f" else NAMES_M
+	var name: String = names[(h / 2) % names.size()]
+	if name == old_name:
+		name = names[((h / 2) + 1) % names.size()]
+	var looks: Array = [0, 3] if gender == "f" else [1, 2]
+	return {"name": name, "gender": gender, "look": looks[(h / 7) % 2]}
+
 static func _default_look(g: String, index: int) -> int:
 	var f := [0, 3]
 	var m := [1, 2]
@@ -52,6 +68,22 @@ static func _default_look(g: String, index: int) -> int:
 func voice_key() -> String:
 	## Zwei Stimmen je Geschlecht (f0/f1, m0/m1), fest an die Figur gebunden.
 	return {0: "f0", 3: "f1", 1: "m0", 2: "m1"}.get(look, "f0" if gender == "f" else "m0")
+
+## Körper des Fahrgasts (für Kollision mit dem Taxi); nur ruhende/auftauchende Fahrgäste sind „treffbar“.
+func hit_rect() -> Rect2:
+	return Rect2(x - Tuning.PASS_HALF_W, surface_y - Tuning.PASS_H, Tuning.PASS_HALF_W * 2.0, Tuning.PASS_H)
+
+func can_be_hit() -> bool:
+	return state == S.WAITING or state == S.EMERGING
+
+## Taxi kommt ihm auf den Kopf: schimpft und flüchtet in den Unterstand (wird dort unsichtbar).
+func squash() -> void:
+	angry = true
+	state = S.EXITING
+	target_x = pad.door_x
+	speed_mul = 1.9
+	fade = 1.0
+	wave_t = 0.0
 
 func is_visible() -> bool:
 	return state != S.ABOARD and state != S.GONE
@@ -120,7 +152,7 @@ func _walk(dt: float) -> bool:
 		x = target_x
 		return true
 	facing = signf(d)
-	var step_len := minf(absf(d), SPEED * dt)
+	var step_len := minf(absf(d), SPEED * speed_mul * dt)
 	x += facing * step_len
 	walked += step_len
 	return absf(target_x - x) <= 0.5

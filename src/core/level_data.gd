@@ -71,15 +71,24 @@ func _scan() -> void:
 				x = x1
 			x += 1
 
-const SHELTER_W := 24.0
-const SHELTER_H := 20.0
+const SHELTER_W := 20.4
+const SHELTER_H := 17.0
 
 func _plan_shelters() -> void:
 	## Jedes Passagierpad bekommt einen Wartebereich: Unterstand an einem Ende (links bevorzugt),
 	## davor der Wartepunkt. Nur wenn darüber 2 Tiles frei sind; sonst side = 0 (Validator meldet das).
+	## Zusätzlich das freie Landefenster: Bereich, in dem das Taxi (Füße auf dem Pad, Abstand zum
+	## wartenden Fahrgast) landen kann – daran bemisst sich die Padgröße/Schwierigkeit.
+	var half := Tuning.HULL_HALF.x + Tuning.PASS_HALF_W + Tuning.PASS_CLEAR
 	for id in pads:
 		var p: Dictionary = pads[id]
+		var lo: float = p.x0 + Tuning.FOOT_X
+		var hi: float = p.x1 - Tuning.FOOT_X
 		if p.fuel:
+			p["land_lo"] = lo
+			p["land_hi"] = hi
+			p["land_window"] = hi - lo
+			p["land_mid"] = (lo + hi) * 0.5
 			continue
 		var side := 0
 		for cand in [-1, 1]:
@@ -98,11 +107,25 @@ func _plan_shelters() -> void:
 			p["door_x"] = p.center
 			p["wait_x"] = p.center
 			p["shelter"] = Rect2()
+			var left_w: float = (p.center - half) - lo
+			var right_w: float = hi - (p.center + half)
+			if left_w >= right_w:
+				hi = p.center - half
+			else:
+				lo = p.center + half
 		else:
 			var xs: float = p.x0 if side < 0 else p.x1 - SHELTER_W
 			p["shelter"] = Rect2(xs, surf - SHELTER_H, SHELTER_W, SHELTER_H)
 			p["door_x"] = xs + SHELTER_W * 0.5
-			p["wait_x"] = p.door_x + (SHELTER_W * 0.5 + 8.0) * (1.0 if side < 0 else -1.0)
+			p["wait_x"] = p.door_x + (SHELTER_W * 0.5 + 6.0) * (1.0 if side < 0 else -1.0)
+			if side < 0:
+				lo = maxf(lo, p.wait_x + half)
+			else:
+				hi = minf(hi, p.wait_x - half)
+		p["land_lo"] = lo
+		p["land_hi"] = hi
+		p["land_window"] = maxf(hi - lo, 0.0)
+		p["land_mid"] = (lo + hi) * 0.5
 
 func cell(cx: int, cy: int) -> String:
 	if cy < 0 or cx < 0 or cx >= width or cy >= height:

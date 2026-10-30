@@ -47,6 +47,17 @@ func _ready() -> void:
 			gear_on = false
 			run.sim.state = TaxiSim.State.FLYING
 			run.sim.landed_pad = {}
+	if OS.get_cmdline_user_args().has("--debug-squash") and run.actor != null:    # Dev: Taxi senkt sich auf den wartenden Fahrgast
+		var sp: Dictionary = run.actor.pad
+		run.sim.state = TaxiSim.State.FLYING
+		run.sim.landed_pad = {}
+		run.sim.gear = 1.0
+		run.sim.pos = Vector2(run.actor.x, sp.row * Tuning.TILE - 46.0)
+		run.sim.vel = Vector2(0, 30)
+		gear_on = true
+		debug_input = Vector2(0, 0)
+		taxi.sync_state()
+		taxi.reset_physics_interpolation()
 	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
@@ -244,6 +255,12 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play("coin")
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+		"squashed":
+			Sfx.play_voice(e.voice, "angry")
+			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
+			Sfx.play("hit", -8.0)
+		"replacement":
+			hud.flash_message(tr("MSG_SQUASH") % e.pad, 3.0)
 		"carried_thanks":
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)

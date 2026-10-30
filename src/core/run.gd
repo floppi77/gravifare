@@ -12,8 +12,10 @@ const STEP_OUT_TIME := 0.5
 const NEXT_SPAWN_DELAY := 1.2
 const CALL_RANGE := 150.0
 const CALL_COOLDOWN := 12.0
+const SQUASH_RESPAWN_DELAY := 2.4
 
 var level: LevelData
+var jobs: Array = []        # Arbeitskopie der Aufträge (Ersatz-Fahrgäste ändern Pad/Person, nie die Leveldaten)
 var sim := TaxiSim.new()
 var job_index := 0
 var phase := Phase.WAITING
@@ -34,9 +36,12 @@ var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in 
 var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
 var spawn_timer := 0.0
 var spawn_wait := false
+var respawn_keep_clock := false   # Ersatz-Fahrgast: Zeit läuft für den Auftrag weiter (Strafe durch Verzögerung)
+var squashes := 0
 
 func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
 	level = lvl
+	jobs = lvl.jobs.duplicate(true)
 	sim.setup(lvl)
 	if fuel_in >= 0.0:
 		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
@@ -49,7 +54,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
 	earned = 0.0
 	delivered = 0
 	result = Result.RUNNING
-	exit_open = lvl.jobs.is_empty()
+	exit_open = jobs.is_empty()
 	lvl.exit_open = exit_open
 	job_clock = 0.0
 	job_times.clear()
@@ -60,6 +65,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
 	carried = {}
 	spawn_timer = 0.0
 	spawn_wait = false
+	respawn_keep_clock = false
+	squashes = 0
 	actor = null
 	_spawn_actor(true)
 
@@ -70,10 +77,12 @@ func _spawn_actor(instant: bool) -> void:
 		return
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
-	job_clock = 0.0
+	if not respawn_keep_clock:
+		job_clock = 0.0
+	respawn_keep_clock = false
 
 func current_job() -> Dictionary:
-	return level.jobs[job_index] if job_index < level.jobs.size() else {}
+	return jobs[job_index] if job_index < jobs.size() else {}
 
 func is_exit_job(job: Dictionary) -> bool:
 	return String(job.get("to", "")) == "exit"
@@ -108,12 +117,60 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
-	if actor != null:
+	if actor != null or respawn_keep_clock:
 		job_clock += dt
 	_step_actors(dt)
+	_check_squash()
 	_service_pad(dt)
 	if exit_open and sim.in_exit(level.exit_cells):
 		_finish_level()
+
+## Taxi trifft einen wartenden Fahrgast (Kopf/Seite): Fahrgast schimpft und flieht, an seiner Stelle erscheint –
+## nach kurzer Pause und an einem anderen Pad – ein neuer Fahrgast für denselben Auftrag. Die Zeit läuft weiter,
+## der Umweg kostet Sprit. Steigendes Taxi (Abheben) zählt nicht.
+func _check_squash() -> void:
+	if actor == null or sim.state != TaxiSim.State.FLYING or not actor.can_be_hit():
+		return
+	if sim.vel.y < -12.0:
+		return
+	var body := Rect2(sim.pos.x - Tuning.HULL_HALF.x, sim.pos.y - Tuning.HULL_HALF.y, Tuning.HULL_HALF.x * 2.0, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * sim.gear)
+	if body.intersects(actor.hit_rect()):
+		_squash_actor()
+
+func _squash_actor() -> void:
+	var job: Dictionary = jobs[job_index]
+	var old := actor
+	log.append({"type": "squashed", "voice": old.voice_key(), "name": old.pname})
+	old.squash()
+	leavers.append(old)
+	actor = null
+	squashes += 1
+	var n := int(job.get("squashed", 0)) + 1
+	job["squashed"] = n
+	var new_pad := _pick_new_pad(job, String(old.pad.id), n)
+	var ident := PassengerActor.pick_identity(level.id, job_index, n, String(job.get("passenger", "")))
+	job["from"] = new_pad
+	job["passenger"] = ident.name
+	job["gender"] = ident.gender
+	job["look"] = ident.look
+	spawn_timer = SQUASH_RESPAWN_DELAY
+	spawn_wait = false
+	respawn_keep_clock = true
+	phase = Phase.WAITING
+	log.append({"type": "replacement", "pad": new_pad, "name": ident.name})
+
+## Anderes Passagierpad als das des Vorfalls und das Zielpad; deterministisch je Level/Auftrag/Versuch.
+func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
+	var cands: Array = []
+	for id in level.pads:
+		if level.pads[id].fuel or id == current_id or id == String(job.get("to", "")):
+			continue
+		cands.append(id)
+	cands.sort()
+	if cands.is_empty():
+		return current_id
+	var h := absi(("%s:%d:%d" % [level.id, job_index, attempt]).hash())
+	return cands[h % cands.size()]
 
 func _finish_level() -> void:
 	var job := current_job()
@@ -233,7 +290,7 @@ func _deliver(job: Dictionary) -> void:
 	pen_drop = 0.0
 	phase = Phase.WAITING
 	phase_timer = 0.0
-	if job_index >= level.jobs.size():
+	if job_index >= jobs.size():
 		exit_open = true
 		level.exit_open = true
 		log.append({"type": "exit_open"})
