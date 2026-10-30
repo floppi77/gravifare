@@ -36,8 +36,8 @@ func _draw() -> void:
 		var gl := Tuning.GEAR_LEN * g
 		var steel := Color("#c9cfee")
 		for sx in [-1.0, 1.0]:
-			draw_line(Vector2(sx * 5.0, 6), Vector2(sx * Tuning.FOOT_X, 5 + gl), steel, 1.0)
-			draw_rect(Rect2(sx * Tuning.FOOT_X - 2, 5 + gl, 4, 1), steel)
+			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X, 5 + gl), steel, 0.7)
+			draw_rect(Rect2(sx * Tuning.FOOT_X - 2, 5 + gl, 4, 0.7), steel)
 		if sim.gear_extended():
 			var ok := sim.landing_margin()
 			var lamp := Color("#5dff9a") if ok > 0.0 else Color("#ff4d6d")
@@ -46,8 +46,8 @@ func _draw() -> void:
 	var flick := 0.6 + 0.4 * sin(t * 60.0)
 	if flame_main > 0.0:
 		var h := 4.0 + 8.0 * flame_main * flick
-		draw_colored_polygon(PackedVector2Array([Vector2(-3, 6), Vector2(3, 6), Vector2(0, 6 + h)]), Color("#ff8a2e"))
-		draw_colored_polygon(PackedVector2Array([Vector2(-1.5, 6), Vector2(1.5, 6), Vector2(0, 6 + h * 0.6)]), Color("#fff0a0"))
+		draw_colored_polygon(PackedVector2Array([Vector2(-3, 8.5), Vector2(3, 8.5), Vector2(0, 8.5 + h)]), Color("#ff8a2e"))
+		draw_colored_polygon(PackedVector2Array([Vector2(-1.5, 8.5), Vector2(1.5, 8.5), Vector2(0, 8.5 + h * 0.6)]), Color("#fff0a0"))
 	if flame_down > 0.0:
 		var h2 := 3.0 + 4.0 * flick
 		for sx in [-1.0, 1.0]:
@@ -55,13 +55,13 @@ func _draw() -> void:
 	if absf(flame_side) > 0.05:
 		var s := -signf(flame_side)
 		var w := 3.0 + 6.0 * absf(flame_side) * flick
-		var x0 := s * 15.0
+		var x0 := s * 15.5
 		draw_colored_polygon(PackedVector2Array([Vector2(x0, -1), Vector2(x0, 1), Vector2(x0 + s * w, 0)]), Color("#8fd8ff"))
 	# Rumpf
 	var mod := Color.WHITE
 	if flash > 0.0:
 		mod = Color(1, 0.4 + 0.6 * (1.0 - flash), 0.4 + 0.6 * (1.0 - flash))
-	draw_texture(tex, Vector2(-16, -10), mod)
+	draw_texture_rect(tex, Rect2(-16, -10, 32, 20), false, mod)
 	# Schadenanzeige: Funken/Rauch
 	if hurt > 0.45 and int(t * 8.0) % 2 == 0:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))

@@ -12,7 +12,7 @@ g.rect("#", 13, 19, 20, 19); g.rect("F", 14, 18, 19, 18)  # Tankpad
 g.rect("#", 24, 11, 27, 19)               # mittlere Säule
 g.rect("#", 30, 15, 37, 19); g.rect("2", 31, 14, 36, 14)  # Pad 2 rechts
 g.rect("#", 29, 6, 38, 8)                 # Deckenplatte rechts
-g.rect("E", 32, 10, 37, 11)               # Ausgang
+g.gate()
 g.put("S", 4, 17)
 w = write("S1-02", 1, 2, "Tankstopp", "Fuel Stop", g,
           [{"from": "1", "to": "2", "fare": 45, "time_limit": 50, "passenger": "Mika"},
@@ -25,15 +25,14 @@ print(w); g.show()
 g = Grid()
 g.rect("#", 1, 20, 38, 20)                # Boden
 g.rect("#", 14, 6, 27, 19)                # Block
-g.rect(".", 18, 6, 22, 19)                # Schacht 5 breit (Hälfte der Weite für fairen Anflug)
+g.rect(".", 18, 6, 22, 19)                # Schacht 5 Tiles breit (fairer Anflug)
 g.rect(".", 18, 6, 22, 19)
 g.rect("5", 18, 19, 22, 19)               # Pad am Schachtgrund (Zeile 19)
 g.rect("#", 17, 19, 17, 19); g.rect("#", 23, 19, 23, 19)
 g.rect("#", 1, 19, 8, 19); g.rect("1", 2, 18, 7, 18)
 g.rect("#", 31, 17, 38, 19); g.rect("2", 32, 16, 37, 16)
 g.rect("#", 29, 19, 30, 19)
-g.rect("#", 1, 1, 12, 2)
-g.rect("E", 2, 4, 6, 5)
+g.gate()
 g.put("S", 4, 17)
 w = write("S1-03", 1, 3, "Der Schornstein", "The Chimney", g,
           [{"from": "1", "to": "5", "fare": 60, "time_limit": 60, "passenger": "Ines"},

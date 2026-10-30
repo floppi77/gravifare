@@ -22,6 +22,12 @@ class Grid:
                 self.rect("#", x0, y, x1, y); y += 1
         return self
     def put(self, c, x, y): self.g[y][x] = c; return self
+    def gate(self):
+        """Ausgangstor mittig oben: 4x2 Tiles in der Decke, links/rechts Fels. Verbindliche Platzierung."""
+        cx = self.w // 2
+        self.rect("#", cx - 4, 1, cx + 3, 2)
+        self.rect("E", cx - 2, 1, cx + 1, 2)
+        return self
     def rows(self): return ["".join(r) for r in self.g]
     def show(self): print("\n".join(self.rows()))
 

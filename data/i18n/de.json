@@ -43,5 +43,7 @@
  "OPT_REDUCE": "Weniger Bewegung",
  "ON": "an",
  "OFF": "aus",
- "TITLE_SUB": "Eine schwerelose Fahrt"
+ "TITLE_SUB": "Eine schwerelose Fahrt",
+ "EXIT_SIGN": "AUSGANG",
+ "EXIT_LOCKED": "GESPERRT"
 }

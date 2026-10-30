@@ -5,4 +5,4 @@
 | Fahrwerk (Umschalten, Halten optional) | Leertaste | A |
 | Neustart | R | Y |
 | Pause / Zurück | Esc | Start |
-Analoger Stick dosiert den Schub stufenlos. Frei belegbar und Menüs: geplant (M3), noch nicht umgesetzt. Hinweise folgen der zuletzt benutzten Eingabe.
+Menüs: Steuerkreuz/Stick navigieren, A bestätigt, B/Esc geht zurück, Start/Esc öffnet und schließt die Pause. Analoger Stick dosiert den Schub stufenlos. Frei belegbar und Menüs: geplant (M3), noch nicht umgesetzt. Hinweise folgen der zuletzt benutzten Eingabe.

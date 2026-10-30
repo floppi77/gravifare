@@ -1,5 +1,7 @@
 # LEVELS – Leveldesign-Matrix
 
+Verbindlich: Das Ausgangstor liegt in jedem Level mittig oben und öffnet erst nach allen Fahrten.
+
 Status: **3 von 99 Leveln vorhanden** (S1-01 bis S1-03). Kontaktbogen-Bilder: `docs/levels/`. Die Zeilen der übrigen Level werden beim Bau des jeweiligen Sektors ausgefüllt; keine Platzhalter-Level.
 
 | Sektor | Level | Schwerpunkt | Status |

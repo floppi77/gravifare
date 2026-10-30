@@ -43,5 +43,7 @@
  "OPT_REDUCE": "Reduced motion",
  "ON": "on",
  "OFF": "off",
- "TITLE_SUB": "A gravity-defying fare"
+ "TITLE_SUB": "A gravity-defying fare",
+ "EXIT_SIGN": "EXIT",
+ "EXIT_LOCKED": "LOCKED"
 }

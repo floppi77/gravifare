@@ -36,6 +36,12 @@ func _ready() -> void:
 			jb.button_index = b
 			InputMap.action_add_event(a, jb)
 
+	# Godot 4.7 liefert für ui_accept/ui_cancel keine Gamepad-Standardtasten: A bestätigt, B bricht ab.
+	for pair in [["ui_accept", JOY_BUTTON_A], ["ui_cancel", JOY_BUTTON_B]]:
+		var jb := InputEventJoypadButton.new()
+		jb.button_index = pair[1]
+		InputMap.action_add_event(pair[0], jb)
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and event.axis <= JOY_AXIS_RIGHT_Y and absf(event.axis_value) > 0.5):
 		last_device = "gamepad"

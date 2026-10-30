@@ -17,6 +17,7 @@ var jobs: Array = []
 var pads := {}               # id -> {id, x0, x1, row, center, fuel}
 var spawn := Vector2.ZERO
 var exit_cells: Array = []
+var exit_open := false      # Laufzeitzustand; geschlossenes Tor ist fest
 var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
 var raw := {}
@@ -77,7 +78,7 @@ func cell(cx: int, cy: int) -> String:
 
 func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
-	return c == SOLID or c == "^" or (c >= "1" and c <= "9") or c == "F"
+	return c == SOLID or c == "^" or (c >= "1" and c <= "9") or c == "F" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))
@@ -103,6 +104,18 @@ func pad_at_foot(p: Vector2) -> Dictionary:
 		if not pad.is_empty() and pad.row == cy:
 			return pad
 	return {}
+
+func exit_rect() -> Rect2:
+	## Tor als Rechteck in Pixeln (leer, wenn das Level keins hat).
+	if exit_cells.is_empty():
+		return Rect2()
+	var x0 := 1 << 30
+	var y0 := 1 << 30
+	var x1 := -1
+	var y1 := -1
+	for c in exit_cells:
+		x0 = mini(x0, c.x); y0 = mini(y0, c.y); x1 = maxi(x1, c.x); y1 = maxi(y1, c.y)
+	return Rect2(x0 * Tuning.TILE, y0 * Tuning.TILE, (x1 - x0 + 1) * Tuning.TILE, (y1 - y0 + 1) * Tuning.TILE)
 
 func pixel_size() -> Vector2:
 	return Vector2(width * Tuning.TILE, height * Tuning.TILE)

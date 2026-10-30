@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -33,7 +33,7 @@ func _test_gravity_fall() -> void:
 	var s := TaxiSim.new()
 	s.setup(_lvl())
 	s.state = TaxiSim.State.FLYING
-	s.pos = Vector2(200, 100)
+	s.pos = Vector2(400, 100)
 	s.vel = Vector2.ZERO
 	for i in 120:
 		s.step(Vector2.ZERO, false)
@@ -45,7 +45,7 @@ func _test_hover() -> void:
 	var s := TaxiSim.new()
 	s.setup(_lvl())
 	s.state = TaxiSim.State.FLYING
-	s.pos = Vector2(200, 100)
+	s.pos = Vector2(400, 100)
 	s.vel = Vector2.ZERO
 	var fuel0 := s.fuel
 	for i in 240:
@@ -112,3 +112,28 @@ func _test_bot_solves_levels() -> void:
 		var lvl := LevelData.load_file("res://data/levels/" + f)
 		var r := Bot.fly_level(lvl)
 		check(r.complete and r.hull > 90.0, "Autopilot löst %s (%.0f s, Hülle %.0f%%, %s)" % [lvl.id, r.time, r.hull, r.reason])
+
+func _test_level_rules() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var r := lvl.exit_rect()
+		check(r.size.x > 0 and absf(r.get_center().x - lvl.width * Tuning.TILE * 0.5) < 1.0 and r.position.y <= Tuning.TILE * 2.0,
+			"%s: Ausgang mittig oben" % lvl.id)
+		var min_w := 99
+		for id in lvl.pads:
+			min_w = mini(min_w, int((lvl.pads[id].x1 - lvl.pads[id].x0) / Tuning.TILE))
+		check(min_w >= 4, "%s: alle Pads mindestens 4 Tiles breit (min %d)" % [lvl.id, min_w])
+		check(lvl.spawn != Vector2.ZERO, "%s: Startpunkt vorhanden" % lvl.id)
+
+func _test_gate_blocks_until_open() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	var rect := lvl.exit_rect()
+	check(lvl.box_hits_solid(rect.get_center(), Tuning.HULL_HALF), "Geschlossenes Tor ist fest")
+	r.exit_open = true
+	lvl.exit_open = true
+	check(not lvl.box_hits_solid(rect.get_center(), Tuning.HULL_HALF), "Offenes Tor ist passierbar")

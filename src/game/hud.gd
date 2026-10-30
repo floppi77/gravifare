@@ -45,7 +45,10 @@ func _draw() -> void:
 			txt = tr("HUD_DELIVER") % [who, run.target_pad()]
 		else:
 			txt = tr("HUD_PICKUP") % [who, run.target_pad()]
-	draw_string(font, Vector2(size.x * 0.5 - 150, 14), txt, HORIZONTAL_ALIGNMENT_CENTER, 300, 10, Color("#ffe14a"))
+	if txt != "":
+		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color(0.05, 0.06, 0.15, 0.8))
+		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color("#3a4580"), false, 0.67)
+		draw_string(font, Vector2(size.x * 0.5 - 170, size.y - 19), txt, HORIZONTAL_ALIGNMENT_CENTER, 340, 10, Color("#ffe14a"))
 	var done := "%d/%d" % [run.delivered, run.level.jobs.size()]
 	draw_string(font, Vector2(size.x - 70, 14), done, HORIZONTAL_ALIGNMENT_RIGHT, 62, 10, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung
@@ -61,12 +64,13 @@ func _draw() -> void:
 		var lim: float = rows[i][2]
 		var ratio: float = clampf(v / lim, 0.0, 2.0)
 		var col := Color("#5dff9a") if ratio <= 0.7 else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
-		draw_rect(Rect2(gx, gy + i * 8, 66, 6), Color("#10142b"))
+		draw_rect(Rect2(gx - 0.67, gy + i * 8 - 0.67, 67.3, 7.3), Color("#0c0f24"))
+		draw_rect(Rect2(gx, gy + i * 8, 66, 6), Color("#2a3266"))
 		draw_rect(Rect2(gx + 1, gy + i * 8 + 1, 64.0 * minf(ratio / 2.0, 1.0), 4), col)
-		draw_rect(Rect2(gx + 32, gy + i * 8, 1, 6), Color.WHITE)
+		draw_rect(Rect2(gx + 32, gy + i * 8 - 1, 1, 8), Color.WHITE)
 		draw_string(font, Vector2(gx - 14, gy + i * 8 + 6), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color("#a9b8ff"))
 	var hint := tr("HUD_HINT_PAD") if Controls.last_device == "keyboard" else tr("HUD_HINT_PAD_PAD")
-	draw_string(font, Vector2(8, size.y - 8), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#8a93c9"))
+	draw_string(font, Vector2(8, size.y - 5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#8a93c9"))
 	if message_t > 0.0:
 		draw_string(font, Vector2(0, size.y * 0.35), message, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color.WHITE)
 	if run.result == Run.Result.FAILED:

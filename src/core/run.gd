@@ -30,6 +30,7 @@ func start(lvl: LevelData) -> void:
 	soft_landings = 0
 	result = Result.RUNNING
 	exit_open = lvl.jobs.is_empty()
+	lvl.exit_open = exit_open
 	job_time = 0.0
 
 func current_job() -> Dictionary:
@@ -114,4 +115,5 @@ func _deliver(job: Dictionary) -> void:
 	phase_timer = 0.0
 	if job_index >= level.jobs.size():
 		exit_open = true
+		level.exit_open = true
 		log.append({"type": "exit_open"})

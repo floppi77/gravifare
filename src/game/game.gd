@@ -22,6 +22,10 @@ func _ready() -> void:
 		Flow.current_level = "s1_01"
 	level_path = Flow.level_path(Flow.current_level)
 	load_level(level_path)
+	if OS.get_cmdline_user_args().has("--debug-open-exit"):
+		run.exit_open = true
+		run.level.exit_open = true
+		world_tiles.door = 1.0
 
 func load_level(path: String) -> void:
 	var lvl := LevelData.load_file(path)

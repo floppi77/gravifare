@@ -43,6 +43,10 @@ var _frame := 0
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
+		if a == "--dump-input":
+			for act in ["ui_accept", "ui_cancel", "ui_up", "ui_down", "gear", "pause"]:
+				print(act, " -> ", InputMap.action_get_events(act).map(func(e): return e.as_text()))
+			get_tree().quit.call_deferred()
 		if a.begins_with("--shot="):
 			_shot = a.substr(7)
 		elif a.begins_with("--frames="):
