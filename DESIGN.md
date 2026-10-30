@@ -74,7 +74,7 @@ Nach dem Tor: altes Level blendet in 2 s in den Weltraum aus, 3,6 s Flugsequenz 
 
 ## Abschluss Vertical Slice (M2)
 - **Optionen** als Kategorien: Ton (Musik/Effekte/Stimmen/Untertitel), Steuerung (Belegung, Deadzone, Vibration, Fahrwerk Umschalten/Halten), Anzeige (Vollbild, V-Sync, **FPS-Limit** 30/60/120/144/240/unbegrenzt, FPS-Anzeige, Weniger Bewegung), Spiel (Sprache, Tutorial-Hinweise).
-- **Medaillen je Level** (dauerhaft, über Läufe vereint): ⏱ Zeit (≤ 1,2 × Summe der Richtzeiten + 10 s) · ♥ Sauber (kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Schaden) · ★ Meister (≥ 110 % des Einkommensziels und Serie ≥ 2). Anzeige nach dem Level (Zeit gegen Ziel/Bestzeit, Medaillen), in der Levelauswahl (●●○) und in der **Statistik** (Hauptmenü).
+- **Medaillen je Level** (dauerhaft, über Läufe vereint): ⏱ Zeit (≤ 1,2 × Summe der Richtzeiten + 10 s) · ♥ Sauber (kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Schaden) · ★ Meister (≥ 110 % des Einkommensziels und Serie ≥ 2). Anzeige nach dem Level (Zeit gegen Ziel/Bestzeit, drei Sterne), in der Levelauswahl (★★☆, drei Sterne je Level) und in der **Statistik** (Hauptmenü).
 - **Tutorial-Hinweise** (Level 1 und bei Bedarf): Schub, Fahrwerk, Landeampel, Fahrgast/Zeit, Tankstelle, Tor – je einmal pro Profil, 7 s sichtbar, in den Optionen abschaltbar.
 - Die Kamera nutzt den Physik-Takt (`CAMERA2D_PROCESS_PHYSICS`); die Simulation läuft in festen 120-Hz-Ticks mit Rendering-Interpolation (framerate-unabhängig, bis 240 Hz und darüber).
 

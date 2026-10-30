@@ -95,7 +95,7 @@ func show_levels() -> void:
 		b.custom_minimum_size = Vector2(36, 20)
 		if Save.is_completed(ids[i]):
 			var mm := Save.medals_of(ids[i])
-			b.text += " " + ("●" if mm.time else "○") + ("●" if mm.clean else "○") + ("●" if mm.pro else "○")
+			b.text += " " + ("★" if mm.time else "☆") + ("★" if mm.clean else "☆") + ("★" if mm.pro else "☆")
 			b.custom_minimum_size = Vector2(62, 20)
 		b.disabled = not Save.is_unlocked(ids, i)
 		b.tooltip_text = lvl.names.get(TranslationServer.get_locale().substr(0, 2), lvl.id) if lvl else ids[i]

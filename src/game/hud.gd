@@ -158,6 +158,19 @@ func _draw_result() -> void:
 		var x := size.x * 0.5 - 150.0 + i * 100.0
 		var got: bool = m[items[i][0]]
 		var col := Color("#ffd24a") if got else Color("#5a628f")
-		draw_circle(Vector2(x + 6, y + 14), 5.0, col)
-		draw_circle(Vector2(x + 6, y + 14), 2.4, Color("#10142b") if not got else Color("#fff3b0"))
+		_star(Vector2(x + 6, y + 14), 6.5, col, got)
 		draw_string(font, Vector2(x + 16, y + 17), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 9, col)
+
+## Fünfzackiger Stern (Level-Abschluss-Medaille): gefüllt in Gold, wenn erreicht, sonst nur als dunkle Silhouette.
+func _star(c: Vector2, r: float, col: Color, filled: bool) -> void:
+	var pts := PackedVector2Array()
+	for i in 10:
+		var rad := r if i % 2 == 0 else r * 0.42
+		var a := -PI * 0.5 + i * PI / 5.0
+		pts.append(c + Vector2(cos(a), sin(a)) * rad)
+	if filled:
+		draw_colored_polygon(pts, col)
+		draw_polyline(pts + PackedVector2Array([pts[0]]), Color("#fff3b0"), 0.7)
+	else:
+		draw_colored_polygon(pts, Color(col.r, col.g, col.b, 0.35))
+		draw_polyline(pts + PackedVector2Array([pts[0]]), col, 0.7)
