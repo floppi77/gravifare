@@ -38,6 +38,7 @@ var fall_vy := 0.0
 var fall_vx := 0.0
 var ground_y := 0.0
 var dead_t := 0.0
+var shattered := false        # zerbrechlicher Fahrgast zersprungen (Scherbenanimation statt Blutfleck)
 
 func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 	pad = p
@@ -159,6 +160,16 @@ func kicked_out(taxi_x: float, pad_d: Dictionary) -> void:
 	wave_t = 0.0
 	pay_info = {}
 	_home_reported = true
+
+## Zerbrechlich und verletzt: bleibt kurz benommen am Ort des Unglücks und verblasst (kein Geld).
+func vanish_hurt(px: float, py: float) -> void:
+	x = px
+	fall_y = py
+	state = S.DEAD
+	shattered = true
+	dead_t = 1.6
+	fade = 1.0
+	pay_info = {}
 
 func step(dt: float) -> void:
 	events.clear()

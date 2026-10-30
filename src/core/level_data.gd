@@ -34,7 +34,9 @@ var clock := 0.0                 # Simulationszeit (setzt TaxiSim), bestimmt den
 var doors_ignore := false        # Planung/Zeichnen: Tore gelten als offen
 var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 ## Bewegliche Hindernisse und Plattformen (Sektor 3): JSON "movers": kind "debris" (Trümmer, Schaden), "slider" (großer
-## Block, quetscht wie ein Tor) oder "pad" (Landeplattform auf waagerechter Schiene). Bewegung nach der Simulationszeit.
+## Block, quetscht wie ein Tor), "pad" (Landeplattform auf waagerechter Schiene) oder "meteor" (Meteoritenschauer: fällt
+## je Periode einmal von (x, y) um (dx, dy) Felder in "fall" Sekunden und ist sonst unsichtbar; "warn" Sekunden vorher
+## blinkt seine Bahn). Bewegung nach der Simulationszeit.
 var movers: Array = []
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 
@@ -212,6 +214,12 @@ func _scan_doors(params: Dictionary) -> void:
 func is_passenger_pad(id: String) -> bool:
 	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false)
 
+func has_meteors() -> bool:
+	for m in movers:
+		if m.kind == "meteor":
+			return true
+	return false
+
 func has_movers() -> bool:
 	return not movers.is_empty()
 
@@ -221,7 +229,12 @@ func _scan_movers(list: Array) -> void:
 		var m := {"kind": kind, "w": float(d.get("w", 2)) * Tuning.TILE, "h": float(d.get("h", 1)) * Tuning.TILE,
 			"x": float(d.x) * Tuning.TILE, "y": float(d.y) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
 			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
-			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", ""))}
+			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", "")),
+			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0))}
+		if kind == "meteor":
+			m["w"] = float(d.get("w", 1)) * Tuning.TILE
+			m["h"] = float(d.get("h", 1)) * Tuning.TILE
+			m["period"] = maxf(float(d.get("period", 20.0)), m.fall + 1.0)
 		if kind == "pad":
 			var id: String = m.pad
 			m["h"] = 2.0 * Tuning.TILE
@@ -238,7 +251,35 @@ func _mover_offset(m: Dictionary, t: float) -> Vector2:
 	var s := sin(ph)
 	return Vector2(float(m.ax) * s, float(m.ay) * s)
 
+const OFFSCREEN := -1000.0
+
+## Meteor: Fortschritt 0..1 des laufenden Falls, -1 zwischen den Fällen.
+func meteor_progress(m: Dictionary, t: float) -> float:
+	var c := fposmod(t + float(m.phase), float(m.period))
+	return c / float(m.fall) if c < float(m.fall) else -1.0
+
+## Meteor: Sekunden bis zum nächsten Fall (0, solange er fällt).
+func meteor_eta(m: Dictionary, t: float) -> float:
+	var c := fposmod(t + float(m.phase), float(m.period))
+	return 0.0 if c < float(m.fall) else float(m.period) - c
+
+## Bot: Liegt die Box in der Bahn eines Meteors, der gerade fällt oder innerhalb von `horizon` Sekunden fällt? Gibt ihn zurück (sonst {}).
+func meteor_threat(box: Rect2, t0: float, horizon: float) -> Dictionary:
+	for m in movers:
+		if m.kind != "meteor" or meteor_eta(m, t0) > horizon:
+			continue
+		var x0 := minf(float(m.x), float(m.x) + float(m.ax))
+		var x1 := maxf(float(m.x), float(m.x) + float(m.ax)) + float(m.w)
+		if Rect2(x0, float(m.y), x1 - x0, float(m.ay) + float(m.h)).intersects(box):
+			return m
+	return {}
+
 func _mover_rect(m: Dictionary, t: float) -> Rect2:
+	if m.kind == "meteor":
+		var k := meteor_progress(m, t)
+		if k < 0.0:
+			return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
+		return Rect2(float(m.x) + float(m.ax) * k, float(m.y) + float(m.ay) * k, float(m.w), float(m.h))
 	var off := _mover_offset(m, t)
 	return Rect2(float(m.x) + off.x, float(m.y) + off.y, float(m.w), float(m.h))
 
@@ -256,6 +297,8 @@ func update_movers(t: float, reset := false) -> void:
 		var old: Rect2 = m.rect
 		var r := _mover_rect(m, t)
 		m.vel = Vector2.ZERO if reset else (r.position - old.position) / Tuning.TICK
+		if m.kind == "meteor":
+			m.vel = Vector2(float(m.ax), float(m.ay)) / float(m.fall) if (not reset and r.position.x > OFFSCREEN) else Vector2.ZERO
 		m.rect = r
 		if m.kind == "pad":
 			var p: Dictionary = pads[m.pad]

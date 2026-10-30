@@ -20,6 +20,7 @@ var time := 0.0
 var events: Array = []
 var spike_cd := 0.0
 var mover_cd := 0.0
+var meteor_cd := 0.0
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -35,6 +36,7 @@ func setup(lvl: LevelData) -> void:
 	time = 0.0
 	spike_cd = 0.0
 	mover_cd = 0.0
+	meteor_cd = 0.0
 	lvl.clock = 0.0
 	lvl.update_movers(0.0, true)
 	events.clear()
@@ -89,7 +91,7 @@ func _door_crush() -> void:
 func _mover_damage(kind: String) -> void:
 	if mover_cd > 0.0 or state == State.DESTROYED:
 		return
-	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else Tuning.PADSLAB_DAMAGE)
+	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else Tuning.PADSLAB_DAMAGE))
 	mover_cd = Tuning.MOVER_COOLDOWN
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "mover": kind})
@@ -97,6 +99,19 @@ func _mover_damage(kind: String) -> void:
 		hull = 0.0
 		state = State.DESTROYED
 		events.append({"type": "destroyed"})
+
+## Meteoritenschauer: kurz bevor ein Meteorit fällt, einmal Alarm melden (danach mindestens 6 s Ruhe).
+func _meteor_alert(dt: float) -> void:
+	meteor_cd = maxf(0.0, meteor_cd - dt)
+	if meteor_cd > 0.0:
+		return
+	for m in level.movers:
+		if m.kind == "meteor":
+			var eta := level.meteor_eta(m, time)
+			if eta > 0.0 and eta <= float(m.warn):
+				meteor_cd = 6.0
+				events.append({"type": "meteor_warn"})
+				return
 
 ## Taxi stößt (durch eigene Bewegung) an einen Mover.
 func _movers_touch(center: Vector2) -> void:
@@ -123,7 +138,7 @@ func _mover_push() -> void:
 			if o[0] < best[0] - 0.001:
 				best = o
 		pos += (best[1] as Vector2) * (float(best[0]) + 0.6)
-		vel = (m.vel as Vector2) + (best[1] as Vector2) * 30.0
+		vel = (m.vel as Vector2) * (0.3 if m.kind == "meteor" else 1.0) + (best[1] as Vector2) * 30.0      # Meteoriten streifen nur
 		if state == State.LANDED:
 			state = State.FLYING
 			landed_pad = {}
@@ -160,6 +175,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	level.clock = time
 	mover_cd = maxf(0.0, mover_cd - dt)
 	level.update_movers(time)
+	_meteor_alert(dt)
 	_door_crush()
 	_mover_push()
 	gear_cmd = gear_request

@@ -1,31 +1,27 @@
-# Hintergrundbilder – Vorgaben für externe Erstellung
+# Hintergrundbilder
 
-**Anzahl:** 9 Sektoren × 3 Ebenen = **27 Bilder** (Sektor 1 liegt vor; für Sektor 2–9 stehen 24 selbst erzeugte Platzhalter in `assets/art/`, die du ersetzen kannst).
+**Stand:** Jeder Sektor hat ein ganzes Hintergrundbild `assets/art/bg_sN.png` (1920 × 1080, PNG, deckend). Die Bilder wurden extern erstellt (Pixel-Art-Look) und werden im Spiel auf 1,06-fach vergrößert, leicht mit der Kamera verschoben (Parallax 5 %) und je Sektor abgedunkelt, damit Plattformen, Fahrgäste und Hindernisse lesbar bleiben.
 
-| Datei | Ebene | Format | Inhalt |
+| Sektor | Datei | Motiv (Quelldatei) | Abdunklung |
 |---|---|---|---|
-| `bg_sN_far.png` | fern | **1920 × 1080**, PNG, **deckend** (kein Alpha) | Himmel, Nebel, Sterne, großes Fernobjekt (Planet, Sonne, Schwarzes Loch …) |
-| `bg_sN_mid.png` | mittel | **1920 × 1080**, PNG, **mit Alpha** | Silhouetten im unteren Drittel (Gebäude, Gerüste, Trümmer …), sonst transparent |
-| `bg_sN_near.png` | nah | **1920 × 1080**, PNG, **mit Alpha** | größere, dunklere Silhouetten ganz unten (Rohre, Masten, Wracks …), sonst transparent |
+| 1 Sternenhafen | `bg_s1.png` | Orbitale Metropole (01) | 30 % |
+| 2 Neon-Schluchten | `bg_s2.png` | Amethysttiefen (09) | 46 % |
+| 3 Schrottgürtel | `bg_s3.png` | Vergessene Maschinenwelt (08) | 30 % |
+| 4 Magnetfeld | `bg_s4.png` | Polarlichtmond (03) | 30 % |
+| 5 Solarschmiede | `bg_s5.png` | Vulkanmond (06) | 22 % |
+| 6 Gezeitenorbit | `bg_s6.png` | Versunkene Tiefseestadt (05) | 22 % |
+| 7 Transitknoten | `bg_s7.png` | Goldene Wolkenstadt (07) | 58 % |
+| 8 Schattenring | `bg_s8.png` | Leuchtender Urwald (04) | 30 % |
+| 9 Singularitätsrand | `bg_s9.png` | Rand der Singularität (10) | 12 % |
+| (Reserve) | `bg_menu.png` | Bernsteinwüste (02), noch nicht verwendet | – |
 
-`N` = 1…9 (Sektor). Zielordner: `assets/art/` (gleiche Dateinamen überschreiben die Platzhalter, danach einmal `godot --headless --import`).
+Die Zuordnung steht (Dateinamen) in dieser Tabelle, die Abdunklung in `DIM` in `src/game/backdrop.gd`. Zum Tauschen einfach die Datei überschreiben und einmal `godot --headless --import` ausführen. Dev-Flag `--bg=N` zeigt den Hintergrund eines anderen Sektors.
 
-## Technische Hinweise
-- Das Spiel rechnet logisch in **640 × 360** und skaliert ganzzahlig auf 1080p (Faktor 3). Die Bilder haben deshalb **1920 × 1080 = 3 × 640 × 360**. Wer 4K-Schärfe will, kann auch **3840 × 2160** liefern (gleiches Seitenverhältnis, wird einfach skaliert).
-- **Pixel-Art-Look** passt am besten (harte Kanten, keine Weichzeichnung, begrenzte Palette, leichtes Dithering); im Spiel wird ohne Glättung skaliert.
-- `mid` und `near` werden nebeneinander gekachelt (Versatz ±640 logische Pixel): **linker und rechter Rand müssen nahtlos aneinanderpassen**. `far` wird einmal gezeichnet und muss nicht kacheln.
-- Parallax ist gering (mittlere Ebene 8 %, nahe Ebene 18 % der Kamerabewegung); die Level füllen den Bildschirm, die Kamera bewegt sich nur leicht.
-- **Lesbarkeit des Spiels geht vor:** Plattformen, Hindernisse und Fahrgäste liegen im Bereich **y ≈ 5 % … 95 %** und werden in Cyan/Orange/Gelb/Rosa gezeichnet. Hintergründe bitte eher **dunkel bis mittel**, Kontrast in der Bildmitte niedrig, helle Akzente nur sparsam; keine feinen hellen Muster in Cyan/Orange/Gelb direkt hinter dem Spielfeld.
-- Der obere Rand (16 px logisch = 48 px im Bild) und der untere Rand (ca. 24 px logisch = 72 px im Bild) sind HUD-Streifen; dort darf nichts Wichtiges liegen.
-- Dateigröße: `far` gern bis ~1 MB, `mid`/`near` meist deutlich kleiner.
+Fehlt `bg_sN.png`, greift der alte Dreiebenen-Aufbau `bg_sN_far/mid/near.png` (nur Sektor 1 hat ihn noch; das Hauptmenü nutzt ihn).
 
-## Stimmungen je Sektor
-1. **Sternenhafen** – Raumhafenstadt bei Nacht, Ringplanet (vorhanden)
-2. **Neon-Schluchten** – Neonstadt, magenta/cyan, Gitterhorizont
-3. **Schrottgürtel** – Asteroiden- und Schrottfeld, bräunlich, Gasriese
-4. **Magnetfeld** – Polarlicht-Bänder, Feldlinien, blau/grün
-5. **Solarschmiede** – glühende Sonne, Schmelz- und Schmiedeanlagen, orange/rot
-6. **Gezeitenorbit** – Wasserwelt mit Mond, Orbitringe, blau
-7. **Transitknoten** – Raumstation, Verkehrsbahnen aus Licht, graublau
-8. **Schattenring** – dunkler Planet mit Schattenring, Sensormasten, fast schwarz/violett
-9. **Singularitätsrand** – Schwarzes Loch mit Akkretionsscheibe, Gravitationslinsen, sehr dunkel
+Das Logo liegt als `assets/art/logo.png` (zugeschnitten, RGBA) und ersetzt im Hauptmenü die Textüberschrift.
+
+## Hinweise für neue Bilder
+- 16:9, 1920 × 1080 (oder 3840 × 2160), harte Pixelkanten, keine Weichzeichnung.
+- Lesbarkeit geht vor: Plattformen/Fahrgäste werden in Cyan/Orange/Gelb/Rosa gezeichnet; sehr helle Bilder brauchen eine höhere Abdunklung.
+- Oberer (16 px logisch) und unterer Rand (ca. 24 px logisch) sind HUD-Streifen.

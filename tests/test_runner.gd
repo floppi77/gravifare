@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -749,6 +749,59 @@ func _board_main(r: Run, lvl: LevelData) -> Dictionary:
 	for i in 240:
 		r.step(Vector2.ZERO, true)
 	return job
+
+func _test_fragile_and_meteors() -> void:
+	# Zerbrechlicher Fahrgast: jede Beschädigung an Bord beendet die Fahrt, der Auftrag gilt als verpasst
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	r.jobs[0]["fragile"] = true
+	_board_main(r, lvl)
+	check(r.phase == Run.Phase.CARRYING and r.actor != null, "Zerbrechlicher Fahrgast sitzt im Taxi")
+	r._ride_hit({"amount": 5.0})
+	check(r.actor == null and r.missed == 1 and r.pen_ride == 0.0, "Beschädigung an Bord: zerbrechlicher Fahrgast weg, Auftrag verpasst")
+	check(r.log.any(func(e): return e.type == "fragile_broke") and r.log.any(func(e): return e.type == "job_missed"), "Ereignisse fragile_broke und job_missed werden gemeldet")
+	var r2 := Run.new()
+	r2.extras_enabled = false
+	r2.start(lvl)
+	_board_main(r2, lvl)
+	r2._ride_hit({"amount": 5.0})
+	check(r2.actor != null and r2.pen_ride > 0.0 and r2.missed == 0, "Normaler Fahrgast: Beschädigung kostet nur Fahrpreis")
+	# Meteoritenschauer: nur während des Falls sichtbar und gefährlich, Warnung vorher
+	var rows: Array = []
+	for y in 22:
+		var row := ""
+		for x in 30:
+			row += "#" if (y == 0 or y == 21 or x == 0 or x == 29) else "."
+		rows.append(row)
+	var lv := LevelData.from_dict({"id": "T-MET", "sector": 3, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
+		"movers": [{"kind": "meteor", "x": 10, "y": 1, "w": 1, "h": 1, "dx": 0, "dy": 12, "fall": 2.0, "warn": 2.0, "period": 10.0, "phase": 0.0}]})
+	check(lv.has_meteors() and lv.movers.size() == 1, "Meteor wird erkannt")
+	var m: Dictionary = lv.movers[0]
+	lv.update_movers(1.0)
+	check(absf(m.rect.position.y - (1.0 * Tuning.TILE + 6.0 * Tuning.TILE)) < 0.5, "Meteor fällt linear (Halbzeit = halbe Strecke)")
+	lv.update_movers(5.0)
+	check(m.rect.position.x < -500.0 and lv.meteor_eta(m, 5.0) == 5.0, "Zwischen den Fällen ist der Meteor unsichtbar (eta 5 s)")
+	var lane := Rect2(10.0 * Tuning.TILE, 8.0 * Tuning.TILE, 16.0, 16.0)
+	check(lv.meteor_threat(lane, 8.5, 2.2).is_empty() == false and lv.meteor_threat(lane, 5.0, 2.2).is_empty(), "Bahn gilt erst kurz vor dem Fall als bedroht")
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(10.5 * Tuning.TILE, 6.0 * Tuning.TILE)
+	var warned := false
+	var hit := false
+	for i in int(12.0 / Tuning.TICK):
+		s.step(Vector2(0, -0.39), false)
+		for e in s.events:
+			if e.type == "meteor_warn":
+				warned = true
+			if e.type == "damage" and e.get("mover", "") == "meteor":
+				hit = true
+		if s.state == TaxiSim.State.DESTROYED:
+			break
+	check(warned, "Meteoritenschauer meldet vorher eine Warnung")
+	check(hit and s.hull < 100.0, "Meteoriten-Treffer: Schaden (%.0f Hülle)" % s.hull)
 
 func _test_eject() -> void:
 	var lvl := _lvl()

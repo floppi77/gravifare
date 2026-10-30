@@ -194,5 +194,7 @@
  "MSG_EJECTED": "%s rausgeworfen!",
  "VOICE_SCREAM": "Aaaaaah!",
  "VOICE_SCREAM_SHORT": "AAAH!",
+ "MSG_FRAGILE_BROKE": "Zerbrechlich! %s ist verletzt – Auftrag verloren",
+ "MSG_METEOR_WARN": "Meteoritenschauer!",
  "HUD_TAG_FRAGILE": "◇ ZERBRECHLICH"
 }

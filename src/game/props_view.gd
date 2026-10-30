@@ -127,6 +127,9 @@ func _draw_movers() -> void:
 		var r: Rect2 = m.rect
 		if level.movers_ignore and m.kind != "pad":
 			continue                         # beim Einflug ausgeblendet
+		if m.kind == "meteor":
+			_draw_meteor(m)
+			continue
 		if m.kind == "pad":
 			# Schiene über den ganzen Fahrweg
 			var rail_y := r.end.y + 1.0
@@ -153,6 +156,34 @@ func _draw_movers() -> void:
 					draw_rect(Rect2(r.position.x + i * 6.0, r.end.y - 3.0, 6.0, 3.0), warn)
 		else:
 			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
+
+## Meteorit: vor dem Fall blinkt seine Bahn als Warnstreifen, im Fall zieht er einen Feuerschweif hinter sich her.
+func _draw_meteor(m: Dictionary) -> void:
+	var eta := level.meteor_eta(m, level.clock)
+	var a0 := Vector2(float(m.x) + float(m.w) * 0.5, float(m.y) + float(m.h) * 0.5)
+	var a1 := a0 + Vector2(float(m.ax), float(m.ay))
+	if eta > 0.0 and eta <= float(m.warn):
+		var blink := 0.35 + 0.35 * (0.5 + 0.5 * sin(t * 14.0))
+		var k := 1.0 - eta / float(m.warn)
+		for i in 10:
+			var f := float(i) / 9.0
+			var p := a0.lerp(a1, f)
+			draw_rect(Rect2(p.x - 1.0, p.y - 1.0, 2.0, 2.0), Color(1.0, 0.35, 0.25, blink * (0.4 + 0.6 * k)))
+		draw_colored_polygon(PackedVector2Array([a0 + Vector2(-3, -2), a0 + Vector2(3, -2), a0 + Vector2(0, 5)]), Color(1.0, 0.4, 0.3, blink + 0.2))
+		return
+	var r: Rect2 = m.rect
+	if r.position.x < LevelData.OFFSCREEN * 0.5:
+		return
+	var dir := (a1 - a0).normalized()
+	var c := r.get_center()
+	for i in 6:
+		var f := float(i + 1) / 6.0
+		var p := c - dir * f * 22.0
+		var sz := (1.0 - f) * float(m.w) * 0.55 + 1.0
+		draw_rect(Rect2(p.x - sz * 0.5, p.y - sz * 0.5, sz, sz), Color(1.0, 0.55 - f * 0.3, 0.12, 0.85 - f * 0.7))
+	draw_rect(Rect2(r.position.x + 1.0, r.position.y + 1.0, r.size.x - 2.0, r.size.y - 2.0), Color("#5a4b52"))
+	draw_rect(Rect2(r.position.x + 3.0, r.position.y + 3.0, r.size.x - 6.0, r.size.y - 6.0), Color("#8a7480"))
+	draw_rect(r, Color("#ff8a2e"), false, 1.0)
 
 func _draw_gate() -> void:
 	if level.exit_cells.is_empty():
@@ -270,6 +301,15 @@ func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool)
 
 ## Rausgeworfener Fahrgast: dreht sich im Fall und schreit („AAAH!“), nach dem Aufprall liegt er platt am Boden.
 func _draw_falling(a: PassengerActor, pos: Vector2) -> void:
+	if a.shattered:
+		for i in 9:
+			var ang := float(i) / 9.0 * TAU + 0.4
+			var d := 1.6 + float(i % 3) * 0.4
+			var life := clampf(a.fade, 0.0, 1.0)
+			var spread := 4.0 + float(i % 3) * 3.0 + (a.dead_t - 1.6) * 40.0
+			var c := Vector2(pos.x + cos(ang) * spread, pos.y - 8.0 + sin(ang) * spread * 0.7 + (a.dead_t - 1.6) * 20.0)
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -d), c + Vector2(d * 0.7, 0), c + Vector2(0, d), c + Vector2(-d * 0.7, 0)]), Color(0.6, 0.95, 1.0, life * 0.85))
+		return
 	var frame := 2 + int(a.age * 10.0) % 2
 	var rot := a.age * 9.0 if a.state == PassengerActor.S.FALLING else PI * 0.5
 	var col := Color(1, 1, 1, a.fade) if a.state == PassengerActor.S.FALLING else Color(0.8, 0.7, 0.7, a.fade)

@@ -1,11 +1,19 @@
 extends Control
-## Parallax-Hintergrund je Sektor (bg_sN_far/mid/near.png). Drei Ebenen, Offsets ganzzahlig gerundet.
+## Hintergrund je Sektor. Bevorzugt ein ganzes Bild bg_sN.png (1920×1080, leicht vergrößert mit schwachem Parallax und
+## abgedunkelt, damit Plattformen und Fahrgäste lesbar bleiben); fehlt es, greift der Dreiebenen-Aufbau bg_sN_far/mid/near.png.
+
+## Abdunklung je Sektor (0 = Originalbild, 1 = schwarz): helle Bilder brauchen mehr, damit Cyan/Orange/Gelb lesbar bleibt.
+const DIM := {1: 0.30, 2: 0.46, 3: 0.30, 4: 0.30, 5: 0.22, 6: 0.22, 7: 0.58, 8: 0.30, 9: 0.12}
+const ZOOM := 1.06             # Bild etwas größer als der Schirm, damit der Parallax keine Ränder zeigt
+const PARALLAX := 0.05
 
 var far: Texture2D = preload("res://assets/art/bg_s1_far.png")
 var mid: Texture2D = preload("res://assets/art/bg_s1_mid.png")
 var near: Texture2D = preload("res://assets/art/bg_s1_near.png")
 var cam_ref: Camera2D
 var lvl: LevelData
+var full_img: Texture2D
+var dim := 0.3
 
 func setup(l: LevelData) -> void:
 	lvl = l
@@ -13,6 +21,9 @@ func setup(l: LevelData) -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--bg="):         # Dev: Hintergrund eines anderen Sektors ansehen
 			n = int(a.substr(5))
+	var fp := "res://assets/art/bg_s%d.png" % n
+	full_img = load(fp) if ResourceLoader.exists(fp) else null
+	dim = float(DIM.get(n, 0.3))
 	far = _tex(n, "far")
 	mid = _tex(n, "mid")
 	near = _tex(n, "near")
@@ -28,11 +39,19 @@ func _process(_d: float) -> void:
 
 func _draw() -> void:
 	var full := Rect2(0, 0, 640, 360)
-	draw_texture_rect(far, full, false)
 	var cam := get_viewport().get_camera_2d()
 	var off := Vector2.ZERO
 	if cam != null and lvl != null:
 		off = cam.get_screen_center_position() - Vector2(320, 180)
+	if full_img != null:
+		var w := 640.0 * ZOOM
+		var h := 360.0 * ZOOM
+		var x := -(w - 640.0) * 0.5 - roundf(off.x * PARALLAX * 3.0) / 3.0
+		var y := -(h - 360.0) * 0.5 - roundf(off.y * PARALLAX * 3.0) / 3.0
+		draw_texture_rect(full_img, Rect2(x, y, w, h), false)
+		draw_rect(full, Color(0.02, 0.03, 0.09, dim))
+		return
+	draw_texture_rect(far, full, false)
 	_layer(mid, off, 0.08, 0.86)
 	_haze(off)
 	_layer(near, off, 0.18, 1.0)

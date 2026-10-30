@@ -43,7 +43,7 @@
    "from": "1",
    "to": "5",
    "fare": 130,
-   "par": 40,
+   "par": 39,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "4",
    "to": "2",
    "fare": 140,
-   "par": 35,
+   "par": 34,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -59,7 +59,7 @@
    "from": "1",
    "to": "2",
    "fare": 150,
-   "par": 56,
+   "par": 55,
    "passenger": "Jonas",
    "gender": "m"
   },

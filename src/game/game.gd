@@ -477,6 +477,16 @@ func _on_event(e: Dictionary) -> void:
 				voice_cd = Time.get_ticks_msec() / 1000.0 + 2.5
 				Sfx.play_voice(e.voice, "bumpy")
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
+		"meteor_warn":
+			hud.flash_message(tr("MSG_METEOR_WARN"), 2.4)
+			Sfx.play("warn", -4.0)
+			Haptics.pulse(0.15, 0.2, 0.2)
+		"fragile_broke":
+			hud.flash_message(tr("MSG_FRAGILE_BROKE") % e.name, 3.0)
+			Sfx.play_voice(e.voice, "angry")
+			Sfx.play("hit", -6.0)
+			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
+			Haptics.pulse(0.3, 0.3, 0.15)
 		"job_missed":
 			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
 		"ejected":

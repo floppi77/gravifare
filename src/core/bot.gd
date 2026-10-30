@@ -88,7 +88,8 @@ func decide() -> Array:
 func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	var sim := run.sim
 	if path.is_empty() and not landing:
-		return [Vector2(0, -0.2), false]
+		goal_key = ""                       # beim nächsten Tick neu planen; bis dahin schweben statt abstürzen
+		return [_accel_to_input(-sim.vel / 0.3 + sim.vel * sim.drag()), false]
 	var gear := false
 	# nächsten Wegpunkt per Sichtlinie wählen
 	while path.size() > 1 and (sim.pos.distance_to(path[0]) < 10.0 or Pathing.line_free(level, sim.pos, path[1], MARGIN)):
@@ -146,6 +147,19 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	if level.has_movers():
 		# Trümmer/Schieber: Bahn des Taxis (Anfahrt auf die Wunschgeschwindigkeit) gegen die vorhergesagten Hindernisse prüfen
 		# und bei drohendem Treffer schweben und warten
+		# Meteoritenschauer: aus der Fallbahn herausfliegen, solange sie warnt oder fällt; nicht hineinfliegen
+		if sim.state == TaxiSim.State.FLYING and level.has_meteors():
+			var mh := Tuning.HULL_HALF + Vector2(10, 10)
+			var th := level.meteor_threat(Rect2(sim.pos - mh, mh * 2.0), level.clock, 2.2)
+			if not th.is_empty():
+				var dir := 1.0 if sim.pos.x >= float(th.x) + float(th.w) * 0.5 else -1.0
+				if level.box_hits_solid(sim.pos + Vector2(dir * 28.0, 0.0), Tuning.HULL_HALF + Vector2(2, 2)):
+					dir = -dir
+				v_des = Vector2(dir * 70.0, 0.0)
+			elif v_des != Vector2.ZERO:
+				var ahead := sim.pos + v_des.normalized() * 26.0
+				if not level.meteor_threat(Rect2(ahead - mh, mh * 2.0), level.clock, 2.2).is_empty():
+					v_des = Vector2.ZERO
 		var mhalf := Tuning.HULL_HALF + Vector2(6, 6)
 		if v_des != Vector2.ZERO and level.movers_collide_traj(sim.pos, sim.vel, v_des, mhalf, level.clock, 1.0):
 			v_des = Vector2.ZERO
@@ -155,7 +169,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 			var near_c := Vector2.ZERO
 			var near_d := 1e9
 			for m in level.movers:
-				if m.kind == "pad":
+				if m.kind == "pad" or (m.rect as Rect2).position.x < LevelData.OFFSCREEN * 0.5:
 					continue
 				var dd: float = ((m.rect as Rect2).get_center() - sim.pos).length()
 				if dd < near_d:

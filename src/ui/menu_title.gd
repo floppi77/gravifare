@@ -4,9 +4,11 @@ extends Control
 var text := "GRAVIFARE"
 var font_size := 50
 var t := 0.0
+var logo: Texture2D = load("res://assets/art/logo.png") if ResourceLoader.exists("res://assets/art/logo.png") else null
+const LOGO_W := 160.0
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(300, font_size + 12)
+	custom_minimum_size = Vector2(300, (LOGO_W * float(logo.get_height()) / float(logo.get_width()) + 4.0) if logo != null else font_size + 12)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _process(delta: float) -> void:
@@ -14,6 +16,13 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if logo != null:
+		var h := LOGO_W * float(logo.get_height()) / float(logo.get_width())
+		var bob := roundf(sin(t * 1.4) * 1.5)
+		var r := Rect2(roundf((size.x - LOGO_W) * 0.5), 2.0 + bob, LOGO_W, h)
+		draw_texture_rect(logo, Rect2(r.position + Vector2(2, 3), r.size), false, Color(0, 0, 0, 0.45))     # Schatten
+		draw_texture_rect(logo, r, false)
+		return
 	var f: Font = Fonts.title
 	var total := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 	var x0 := (size.x - total) * 0.5

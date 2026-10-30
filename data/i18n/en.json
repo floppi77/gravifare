@@ -194,5 +194,7 @@
  "MSG_EJECTED": "%s thrown out!",
  "VOICE_SCREAM": "Aaaaaah!",
  "VOICE_SCREAM_SHORT": "AAAH!",
+ "MSG_FRAGILE_BROKE": "Fragile! %s is hurt – job lost",
+ "MSG_METEOR_WARN": "Meteor shower!",
  "HUD_TAG_FRAGILE": "◇ FRAGILE"
 }

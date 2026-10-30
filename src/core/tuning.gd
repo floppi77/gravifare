@@ -56,6 +56,7 @@ const EJECT_LETHAL_HEIGHT := 24.0 # Fallhöhe (px) ab der ein rausgeworfener Fah
 const DEBRIS_DAMAGE := 15.0       # Trümmer (bewegliche Brocken): Schaden je Berührung
 const SLIDER_DAMAGE := 30.0       # Schieber (große bewegliche Blöcke): Quetschung wie beim Tor
 const PADSLAB_DAMAGE := 8.0       # seitliches Anstoßen an eine fahrende Landeplattform
+const METEOR_DAMAGE := 20.0       # Meteorit: Schaden je Treffer
 const MOVER_COOLDOWN := 0.6
 const OUT_OF_FUEL_TIME := 3.0     # Sekunden mit leerem Tank (außer an einer funktionierenden Zapfsäule), dann Taxi verloren
 const SPIKE_COOLDOWN := 0.5      # Sekunden, in denen dieselbe Berührung nicht erneut zählt

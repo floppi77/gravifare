@@ -50,16 +50,17 @@
   {
    "from": "2",
    "to": "1",
-   "fare": 140,
+   "fare": 175,
    "par": 25,
    "passenger": "Lena",
-   "gender": "f"
+   "gender": "f",
+   "fragile": true
   },
   {
    "from": "4",
    "to": "1",
    "fare": 150,
-   "par": 47,
+   "par": 54,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -116,11 +117,52 @@
    "period": 7.9,
    "phase": 3.0,
    "shape": "line"
+  },
+  {
+   "kind": "meteor",
+   "x": 9,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "dx": 0,
+   "dy": 18,
+   "fall": 1.6,
+   "warn": 2.0,
+   "period": 20.0,
+   "phase": 9.0
+  },
+  {
+   "kind": "meteor",
+   "x": 23,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "dx": 0,
+   "dy": 18,
+   "fall": 1.6,
+   "warn": 2.0,
+   "period": 20.0,
+   "phase": 8.1
+  },
+  {
+   "kind": "meteor",
+   "x": 29,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "dx": 0,
+   "dy": 18,
+   "fall": 1.6,
+   "warn": 2.0,
+   "period": 20.0,
+   "phase": 7.2
   }
  ],
  "mechanics": [
   "debris",
   "chicane",
-  "spikes"
+  "spikes",
+  "fragile",
+  "meteors"
  ]
 }

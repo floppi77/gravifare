@@ -202,8 +202,20 @@ func _ride_hit(e: Dictionary) -> void:
 	var a := aboard_actor()
 	if a == null or e.get("fatal", false):
 		return
+	if actor == a and bool(current_job().get("fragile", false)):
+		_fragile_break(a)           # zerbrechlicher Fahrgast: jede Beschädigung beendet die Fahrt
+		return
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
+
+## Zerbrechlicher Fahrgast verletzt: verlässt das Taxi, der Auftrag gilt als verpasst (wie ein verpasster Pflichtfahrgast).
+func _fragile_break(a: PassengerActor) -> void:
+	a.pay_info = {}
+	log.append({"type": "fragile_broke", "voice": a.voice_key(), "name": a.pname})
+	a.vanish_hurt(sim.pos.x, sim.pos.y)
+	leavers.append(a)
+	actor = null
+	_lose_job(a.pname)
 
 ## Mindest-Grundpreis eines Auftrags: bei 25 % Zufriedenheit (Zeitfaktor ≈ 0,66) deckt er mit Streckenzuschlag den
 ## geschätzten Sprit für Anflug und Fahrt plus 15 % Gewinn. Auf 5 aufgerundet.
