@@ -184,6 +184,8 @@ func _process(delta: float) -> void:
 	var target := run.marker_pad()
 	for id in pad_lights:
 		var l: PointLight2D = pad_lights[id]
+		if level.pads[id].get("moving", false):
+			l.position.x = level.pads[id].center
 		var base_col := Color("#ff6aa0") if level.pads[id].life else (Color("#ffa530") if level.pads[id].fuel else Color("#35e0d2"))
 		if id == target:
 			l.color = base_col.lerp(Color("#ffe14a"), 0.6)

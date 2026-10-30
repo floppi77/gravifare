@@ -215,7 +215,8 @@ func min_fare(lvl: LevelData, job: Dictionary) -> float:
 		return 0.0
 	var avg_price := (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
 	var length := LevelMetrics.leg_length(lvl, String(job.from), to_id)
-	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price
+	var wait := 1.0 + (0.3 if lvl.has_movers() else 0.0) + (0.15 if lvl.has_doors() else 0.0)     # Warten vor Hindernissen kostet Sprit
+	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price * wait
 	var mult := LevelMetrics.leg_mult(lvl, String(job.from), to_id)
 	return ceilf(cost * Tuning.PROFIT_MARGIN / (Tuning.satisfaction_factor(Tuning.SAT_FLOOR) * mult) / 5.0) * 5.0
 
@@ -505,7 +506,26 @@ func _finish_level() -> void:
 	result = Result.COMPLETE
 	log.append({"type": "level_complete"})
 
+## Fahrgäste auf einer fahrenden Plattform bewegen sich mit ihr (Position und Laufziel).
+func _shift_with_pads() -> void:
+	if not level.has_movers():
+		return
+	var all: Array = leavers.duplicate()
+	if actor != null:
+		all.append(actor)
+	for e in extras:
+		all.append(e.actor)
+	for a in all:
+		var p: Dictionary = a.dest if (a.state == PassengerActor.S.EXITING and not a.dest.is_empty()) else a.pad
+		if p.is_empty() or not p.get("moving", false):
+			continue
+		var dx := float(p.get("dx_step", 0.0))
+		if dx != 0.0:
+			a.x += dx
+			a.target_x += dx
+
 func _step_actors(dt: float) -> void:
+	_shift_with_pads()
 	if spawn_timer > 0.0:
 		spawn_timer -= dt
 		if spawn_timer <= 0.0:

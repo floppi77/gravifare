@@ -5,10 +5,13 @@ extends RefCounted
 
 static func free_at(level: LevelData, p: Vector2, margin: float) -> bool:
 	var prev := level.doors_ignore
+	var prev_m := level.movers_ignore
 	level.doors_ignore = true            # Planung: bewegliche Tore gelten als offen (der Bot wartet vor geschlossenen)
+	level.movers_ignore = true           # … Trümmer/Schieber/Plattformen werden reaktiv umflogen
 	var hit := level.box_hits_solid(p, Tuning.HULL_HALF + Vector2(margin, margin))
 	level.doors_ignore = prev
-	return not hit
+	level.movers_ignore = prev_m
+	return not hit and not level.pad_sweeps_hit(p, Tuning.HULL_HALF + Vector2(margin, margin))
 
 static func line_free(level: LevelData, a: Vector2, b: Vector2, margin: float) -> bool:
 	var n := int(ceil(a.distance_to(b) / 3.0))

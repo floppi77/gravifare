@@ -184,7 +184,9 @@ func load_bindings() -> void:
 	if cf.load(path) != OK:
 		return
 	for a in REMAPPABLE:
-		var arr = cf.get_value("bindings", a, null)
+		if not cf.has_section_key("bindings", a):
+			continue
+		var arr = cf.get_value("bindings", a)
 		if typeof(arr) != TYPE_ARRAY:
 			continue
 		var evs: Array = []
@@ -214,7 +216,7 @@ func load_bindings() -> void:
 			for e in evs:
 				InputMap.action_add_event(a, e)
 	# Migration: Y gehörte früher dem Neustart. Fehlt „eject“ in der Datei, bekommt der Neustart statt Y die Back-Taste.
-	if cf.get_value("bindings", "eject", null) == null:
+	if not cf.has_section_key("bindings", "eject"):
 		var fixed: Array = []
 		var changed := false
 		for e in InputMap.action_get_events("restart"):

@@ -45,6 +45,7 @@ func _draw() -> void:
 	_draw_pumps()
 	_draw_gate()
 	_draw_doors()
+	_draw_movers()
 	_draw_actors()
 	_draw_taxi_shadow()
 
@@ -116,6 +117,42 @@ func _draw_doors() -> void:
 					draw_rect(Rect2(r.position.x + 1.0, yy, T - 2.0, 1.8), Color("#ffc23a") if i % 2 == 0 else Color("#0c0f24"))
 				draw_rect(r.grow(-0.4), Color("#7f8fe0"), false, 0.8)
 				draw_rect(Rect2(r.position.x + T * 0.5 - 1.0, r.position.y + T * 0.5 - 1.0, 2.0, 2.0), Color("#ff4d6d") if int(t * 3.0) % 2 == 0 else Color("#7a2438"))
+
+## Bewegliche Hindernisse: Trümmer (zerklüfteter Brocken mit orangem Warnrand), Schieber (Block mit Warnstreifen) und
+## fahrende Landeplattformen (Platte auf Schiene mit leuchtender Landefläche; der Unterstand fährt mit).
+func _draw_movers() -> void:
+	if level == null or not level.has_movers():
+		return
+	for m in level.movers:
+		var r: Rect2 = m.rect
+		if level.movers_ignore and m.kind != "pad":
+			continue                         # beim Einflug ausgeblendet
+		if m.kind == "pad":
+			# Schiene über den ganzen Fahrweg
+			var rail_y := r.end.y + 1.0
+			draw_rect(Rect2(float(m.x) - float(m.ax), rail_y, float(m.w) + 2.0 * float(m.ax), 1.5), Color("#2a3266"))
+			draw_rect(r, Color("#161c45"))
+			draw_rect(Rect2(r.position.x, r.position.y + 3.0, r.size.x, r.size.y - 3.0), Color("#2a3266"))
+			draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 3.0), Color("#35e0d2"))
+			for i in int(r.size.x / 16.0):
+				draw_rect(Rect2(r.position.x + 3.0 + i * 16.0, r.position.y + 9.0, 10.0, 2.0), Color("#0c0f24"))
+			draw_rect(r, Color("#7f8fe0"), false, 0.8)
+			continue
+		var col := Color("#3b3f5e") if m.kind == "debris" else Color("#232a52")
+		draw_rect(r, col)
+		draw_rect(Rect2(r.position.x + 1.5, r.position.y + 1.5, r.size.x - 3.0, r.size.y - 3.0), col.lightened(0.12))
+		# Nieten und Kratzer
+		for i in int(maxf(r.size.x / 8.0, 1.0)):
+			draw_rect(Rect2(r.position.x + 2.0 + i * 8.0, r.position.y + 2.5 + float((i * 5) % 3), 1.5, 1.5), Color("#0c0f24"))
+		var warn := Color("#ffb02e") if m.kind == "debris" else Color("#ffc23a")
+		draw_rect(r, warn, false, 1.0)
+		if m.kind == "slider":
+			var n := int(r.size.x / 6.0)
+			for i in n:
+				if i % 2 == 0:
+					draw_rect(Rect2(r.position.x + i * 6.0, r.end.y - 3.0, 6.0, 3.0), warn)
+		else:
+			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
 
 func _draw_gate() -> void:
 	if level.exit_cells.is_empty():

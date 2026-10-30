@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -369,6 +369,7 @@ func _test_arrival_path() -> void:
 		var path := Pathing.arrival_path(lvl, s.pos)
 		lvl.exit_open = true
 		lvl.doors_forced_open = true          # Einflug: Tore stehen offen
+		lvl.movers_ignore = true              # … und Trümmer sind ausgeblendet (Pads: Fahrweg wird umflogen)
 		var hits := 0
 		for i in range(3, 201):
 			var p := Pathing.sample_path(path, float(i) / 200.0)
@@ -831,6 +832,68 @@ func _test_eject() -> void:
 		rep.add(Vector2(0, -0.39), false)
 		rr.step(Vector2(0, -0.39), false)
 	check(rr.ejected == 1 and rep.events.size() == 1 and String(rep.events[0][1]) == "eject", "Rauswurf wird im Replay als Ereignis aufgezeichnet")
+
+func _mover_level() -> LevelData:
+	var rows: Array = []
+	for y in 16:
+		var row := ""
+		for x in 30:
+			row += "#" if (y == 0 or y == 15 or x == 0 or x == 29) else "."
+		rows.append(row)
+	return LevelData.from_dict({"id": "T-MV", "sector": 3, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
+		"movers": [{"kind": "debris", "x": 10, "y": 6, "w": 2, "h": 1, "dx": 4, "dy": 0, "period": 8.0},
+			{"kind": "pad", "pad": "1", "x": 18, "y": 12, "w": 6, "dx": 2, "period": 8.0}]})
+
+func _test_movers() -> void:
+	var lv := _mover_level()
+	check(lv.movers.size() == 2 and lv.pads.has("1") and lv.pads["1"].moving, "Mover werden erkannt (Trümmer + fahrendes Pad)")
+	lv.update_movers(0.0, true)
+	var r0: Rect2 = lv.movers[0].rect
+	lv.update_movers(2.0)
+	var r1: Rect2 = lv.movers[0].rect
+	check(absf(r1.position.x - (r0.position.x + 4.0 * Tuning.TILE)) < 0.5, "Trümmer bewegen sich nach der Simulationszeit (Amplitude 4 Tiles bei t = Viertelperiode)")
+	# Pad fährt mit seinen Daten (Landefenster, Wartepunkt)
+	var p: Dictionary = lv.pads["1"]
+	check(absf(float(p.x0) - (18.0 * Tuning.TILE + 2.0 * Tuning.TILE)) < 0.5 and absf(float(p.land_mid) - (float(p.base.land_mid) + 2.0 * Tuning.TILE)) < 0.5, "Fahrendes Pad verschiebt Fläche, Landefenster und Unterstand")
+	# Trümmer-Treffer: Schaden und Rückstoß
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(10.0 * Tuning.TILE - 14.0, 6.0 * Tuning.TILE + 8.0)
+	s.vel = Vector2(40, 0)
+	var dmg := false
+	for i in int(2.0 / Tuning.TICK):
+		s.step(Vector2(0.5, -0.39), false)
+		for e in s.events:
+			if e.type == "damage" and e.get("mover", "") == "debris":
+				dmg = true
+	check(dmg and s.hull < 100.0, "Berührung mit Trümmern: Schaden (%.0f Hülle)" % s.hull)
+	# Landen auf der fahrenden Plattform: das Taxi fährt mit
+	var s2 := TaxiSim.new()
+	s2.setup(lv)
+	s2.state = TaxiSim.State.FLYING
+	var pad: Dictionary = lv.pads["1"]
+	s2.pos = Vector2(float(pad.land_mid), pad.row * Tuning.TILE - 30.0)
+	s2.vel = Vector2.ZERO
+	s2.gear = 1.0
+	s2.gear_cmd = true
+	var landed := false
+	for i in int(6.0 / Tuning.TICK):
+		s2.step(Vector2(0, 0.25), true)
+		if s2.state == TaxiSim.State.LANDED:
+			landed = true
+			break
+	check(landed and s2.landed_pad.id == "1", "Landung auf der fahrenden Plattform gelingt (relative Geschwindigkeit zählt)")
+	var x0 := s2.pos.x
+	var d0 := float(pad.dx)
+	for i in int(3.0 / Tuning.TICK):
+		s2.step(Vector2.ZERO, true)
+	check(s2.state == TaxiSim.State.LANDED and absf((s2.pos.x - x0) - (float(pad.dx) - d0)) < 0.6 and absf(float(pad.dx) - d0) > 4.0, "Das gelandete Taxi fährt mit der Plattform (%.0f px)" % (s2.pos.x - x0))
+	# Fahrgast wartet auf der fahrenden Plattform und fährt mit
+	var a := PassengerActor.new()
+	a.setup({"passenger": "T", "gender": "f"}, pad, 0, true)
+	var r := Run.new()
+	r.start(lv)
 
 func _test_crash_balance() -> void:
 	var results := {}

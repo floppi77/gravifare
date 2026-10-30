@@ -33,6 +33,10 @@ var doors := {}                  # Zeichen -> {cells: Array[Vector2i], period, o
 var clock := 0.0                 # Simulationszeit (setzt TaxiSim), bestimmt den Torzustand
 var doors_ignore := false        # Planung/Zeichnen: Tore gelten als offen
 var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
+## Bewegliche Hindernisse und Plattformen (Sektor 3): JSON "movers": kind "debris" (Trümmer, Schaden), "slider" (großer
+## Block, quetscht wie ein Tor) oder "pad" (Landeplattform auf waagerechter Schiene). Bewegung nach der Simulationszeit.
+var movers: Array = []
+var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 
 static func load_file(path: String) -> LevelData:
 	var f := FileAccess.open(path, FileAccess.READ)
@@ -69,7 +73,9 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.price_every = Vector2(float(ev[0]), float(ev[1]))
 	l._scan()
 	l._scan_doors(d.get("doors", {}))
+	l._scan_movers(d.get("movers", []))
 	l._plan_shelters()
+	l._finish_moving_pads()
 	return l
 
 func _scan() -> void:
@@ -206,6 +212,106 @@ func _scan_doors(params: Dictionary) -> void:
 func is_passenger_pad(id: String) -> bool:
 	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false)
 
+func has_movers() -> bool:
+	return not movers.is_empty()
+
+func _scan_movers(list: Array) -> void:
+	for d in list:
+		var kind := String(d.get("kind", "debris"))
+		var m := {"kind": kind, "w": float(d.get("w", 2)) * Tuning.TILE, "h": float(d.get("h", 1)) * Tuning.TILE,
+			"x": float(d.x) * Tuning.TILE, "y": float(d.y) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
+			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
+			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", ""))}
+		if kind == "pad":
+			var id: String = m.pad
+			m["h"] = 2.0 * Tuning.TILE
+			m["ay"] = 0.0
+			pads[id] = {"id": id, "x0": m.x, "x1": m.x + m.w, "row": int(d.y), "center": m.x + m.w * 0.5, "fuel": false, "life": false, "moving": true, "dx": 0.0, "dx_step": 0.0}
+		m["rect"] = _mover_rect(m, 0.0)
+		m["vel"] = Vector2.ZERO
+		movers.append(m)
+
+func _mover_offset(m: Dictionary, t: float) -> Vector2:
+	var ph := TAU * (t + float(m.phase)) / float(m.period)
+	if m.shape == "circle":
+		return Vector2(float(m.ax) * cos(ph), float(m.ay) * sin(ph))
+	var s := sin(ph)
+	return Vector2(float(m.ax) * s, float(m.ay) * s)
+
+func _mover_rect(m: Dictionary, t: float) -> Rect2:
+	var off := _mover_offset(m, t)
+	return Rect2(float(m.x) + off.x, float(m.y) + off.y, float(m.w), float(m.h))
+
+## Merkt die Grundgeometrie der fahrenden Pads (nach Planung der Unterstände).
+func _finish_moving_pads() -> void:
+	for m in movers:
+		if m.kind == "pad":
+			var p: Dictionary = pads[m.pad]
+			p["base"] = {"x0": p.x0, "x1": p.x1, "center": p.center, "land_lo": p.get("land_lo", p.x0), "land_hi": p.get("land_hi", p.x1),
+				"land_mid": p.get("land_mid", p.center), "shelter": p.get("shelter", Rect2()), "door_x": p.get("door_x", p.center), "wait_x": p.get("wait_x", p.center)}
+
+## Setzt alle Mover auf die Zeit t (Simulationszeit); `reset` verwirft die Geschwindigkeit (Neustart).
+func update_movers(t: float, reset := false) -> void:
+	for m in movers:
+		var old: Rect2 = m.rect
+		var r := _mover_rect(m, t)
+		m.vel = Vector2.ZERO if reset else (r.position - old.position) / Tuning.TICK
+		m.rect = r
+		if m.kind == "pad":
+			var p: Dictionary = pads[m.pad]
+			var b: Dictionary = p.base
+			var dx := r.position.x - float(m.x)
+			p["dx_step"] = 0.0 if reset else dx - float(p.dx)
+			p["dx"] = dx
+			p["x0"] = b.x0 + dx
+			p["x1"] = b.x1 + dx
+			p["center"] = b.center + dx
+			p["land_lo"] = b.land_lo + dx
+			p["land_hi"] = b.land_hi + dx
+			p["land_mid"] = b.land_mid + dx
+			p["door_x"] = b.door_x + dx
+			p["wait_x"] = b.wait_x + dx
+			var sh: Rect2 = b.shelter
+			p["shelter"] = Rect2(sh.position.x + dx, sh.position.y, sh.size.x, sh.size.y) if sh.size.x > 0.0 else sh
+
+func movers_hit_box(center: Vector2, half: Vector2) -> bool:
+	if movers.is_empty() or movers_ignore:
+		return false
+	var box := Rect2(center - half, half * 2.0)
+	for m in movers:
+		if m.rect.intersects(box):
+			return true
+	return false
+
+## Planung: fahrende Pads belegen ihren gesamten Fahrweg (Platte + Schiene) als feste Fläche.
+func pad_sweeps_hit(center: Vector2, half: Vector2) -> bool:
+	var box := Rect2(center - half, half * 2.0)
+	for m in movers:
+		if m.kind == "pad" and Rect2(float(m.x) - float(m.ax), float(m.y), float(m.w) + 2.0 * float(m.ax), float(m.h)).intersects(box):
+			return true
+	return false
+
+func movers_at_box(center: Vector2, half: Vector2) -> Array:
+	var out: Array = []
+	if movers_ignore:
+		return out
+	var box := Rect2(center - half, half * 2.0)
+	for m in movers:
+		if m.rect.intersects(box):
+			out.append(m)
+	return out
+
+## Bot: Berührt ein Hindernis (Trümmer/Schieber, keine Pads) die Box irgendwann im Zeitfenster [t0, t0 + length]?
+func movers_block(center: Vector2, half: Vector2, t0: float, length: float) -> bool:
+	var box := Rect2(center - half, half * 2.0)
+	var t := t0
+	while t <= t0 + length:
+		for m in movers:
+			if m.kind != "pad" and _mover_rect(m, t).intersects(box):
+				return true
+		t += 0.15
+	return false
+
 func has_doors() -> bool:
 	return not doors.is_empty()
 
@@ -270,9 +376,15 @@ func is_solid_cell(cx: int, cy: int) -> bool:
 	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
+	if not movers.is_empty() and not movers_ignore:
+		for m in movers:
+			if m.rect.has_point(p):
+				return true
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))
 
 func box_hits_solid(center: Vector2, half: Vector2) -> bool:
+	if movers_hit_box(center, half):
+		return true
 	var x0 := floori((center.x - half.x) / Tuning.TILE)
 	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
 	var y0 := floori((center.y - half.y) / Tuning.TILE)
@@ -296,6 +408,11 @@ func box_hits_char(center: Vector2, half: Vector2, ch: String) -> bool:
 
 func pad_at_foot(p: Vector2) -> Dictionary:
 	## Pad, dessen Oberfläche den Punkt enthält (nur oberste Pad-Zeile).
+	for m in movers:
+		if m.kind == "pad":
+			var r: Rect2 = m.rect
+			if p.x >= r.position.x and p.x <= r.end.x and p.y >= r.position.y - 0.5 and p.y <= r.position.y + 10.0:
+				return pads[m.pad]
 	var cx := floori(p.x / Tuning.TILE)
 	var cy := floori(p.y / Tuning.TILE)
 	var c := cell(cx, cy)

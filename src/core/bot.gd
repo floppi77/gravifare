@@ -8,7 +8,7 @@ const MARGIN := 7.0                # zusätzlicher Sicherheitsabstand um die Hü
 const V_MAX := 85.0
 const LOOKAHEAD_V := 55.0
 const REFUEL_BELOW := 14.0
-const REFUEL_BELOW_DOORS := 20.0        # Warten vor Toren kostet Sprit: früher tanken
+const REFUEL_BELOW_DOORS := 22.0        # Warten vor Toren kostet Sprit: früher tanken
 const REFUEL_GOAL := 70.0
 
 var run: Run
@@ -18,6 +18,7 @@ var goal_key := ""
 var landing := false
 var stuck_timer := 0.0
 var waiting_spawn := false
+var was_blocked := false        # zuletzt wegen Tor/Hindernis geschwebt: danach vom aktuellen Ort neu planen
 var last_pos := Vector2.ZERO
 var fail_reason := ""
 
@@ -44,13 +45,17 @@ func _accel_to_input(a_des: Vector2) -> Vector2:
 func decide() -> Array:
 	var sim := run.sim
 	var tgt_pad_id := run.target_pad()
-	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < (REFUEL_BELOW_DOORS if level.has_doors() else REFUEL_BELOW) and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
+	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < (REFUEL_BELOW_DOORS if (level.has_doors() or level.has_movers()) else REFUEL_BELOW) and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
 	if refuel_trip:
 		tgt_pad_id = "F"
 	var heading_exit := tgt_pad_id == "" and run.exit_open
 	# Der nächste Fahrgast erscheint nie auf dem Pad, auf dem das Taxi steht: bis er da ist, nur anfliegen und schweben.
 	waiting_spawn = run.phase == Run.Phase.WAITING and run.actor == null and not run.current_job().is_empty() and not refuel_trip
 	var key := "exit" if heading_exit else ("pad" + tgt_pad_id + ":" + str(run.phase) + ":" + str(run.job_index))
+	if not heading_exit and not landing and level.pads.has(tgt_pad_id) and level.pads[tgt_pad_id].get("moving", false):
+		key += ":" + str(int(level.clock / 1.5))          # fahrende Plattform: Anflug regelmäßig neu planen (nicht im Landeanflug)
+	elif landing and goal_key.begins_with("pad") and level.pads.has(tgt_pad_id) and level.pads[tgt_pad_id].get("moving", false):
+		key = goal_key                                     # im Landeanflug den Schlüssel beibehalten
 	if sim.state == TaxiSim.State.LANDED:
 		var pad_id: String = sim.landed_pad.id
 		var boarding := run.phase == Run.Phase.BOARDING or run.phase == Run.Phase.DROPOFF
@@ -92,19 +97,26 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	var last := path.size() <= 1
 	var d := wp - sim.pos
 	var v_des := Vector2.ZERO
-	if not heading_exit and not waiting_spawn and (landing or (last and d.length() < 14.0 and absf(sim.vel.x) < 12.0)):
+	var near_moving := false
+	if not heading_exit and not waiting_spawn and level.pads.has(tgt_pad_id) and level.pads[tgt_pad_id].get("moving", false):
+		var mp: Dictionary = level.pads[tgt_pad_id]      # fahrendes Pad: Landeanflug, sobald das Taxi über der Plattform schwebt
+		var mvx := float(mp.get("dx_step", 0.0)) / Tuning.TICK
+		var above: float = mp.row * Tuning.TILE - (sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN)
+		near_moving = absf(float(mp.land_mid) - sim.pos.x) < 18.0 and above > 0.0 and above < 80.0 and absf(sim.vel.x - mvx) < 14.0
+	if not heading_exit and not waiting_spawn and (landing or near_moving or (last and d.length() < 14.0 and absf(sim.vel.x) < 12.0)):
 		landing = true
 		var pad: Dictionary = level.pads[tgt_pad_id]
 		var foot_y := sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN
 		var dist_down: float = pad.row * Tuning.TILE - foot_y
 		gear = true
 		var ex: float = float(pad.get("land_mid", pad.center)) - sim.pos.x
-		v_des.x = clampf(ex * 3.0, -14.0, 14.0)
+		var pad_vx := float(pad.get("dx_step", 0.0)) / Tuning.TICK          # fahrende Plattform: Tempo als Vorsteuerung
+		v_des.x = pad_vx + clampf(ex * 3.0, -14.0, 14.0)
 		var vy := 22.0
 		if dist_down < 14.0:
 			vy = 15.0
 		v_des.y = vy if absf(ex) < 5.0 else 0.0
-		if absf(ex) > 12.0:
+		if absf(ex) > 12.0 + absf(pad_vx):
 			landing = false
 			goal_key = ""
 	else:
@@ -117,6 +129,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		v_des = d.normalized() * spd if dist > 0.5 else Vector2.ZERO
 		if heading_exit and last and dist < 6.0:
 			v_des = Vector2.ZERO
+	var v_des_before := v_des
 	if level.has_doors() and v_des != Vector2.ZERO:
 		# Tore voraus: nur hineinfliegen, wenn sie bei Ankunft offen sind und lange genug offen bleiben (sonst schweben).
 		var dir := v_des.normalized()
@@ -128,8 +141,41 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 				if inside.has(ch):
 					continue
 				# Frühestmögliche Ankunft (Höchsttempo) bis späteste Ankunft (aktuelles Tempo) + Durchflugzeit muss offen sein
-				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 1.3):
+				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
+	if level.has_movers():
+		# Trümmer/Schieber voraus: im Zeitfenster der Ankunft nicht in ihren Weg fliegen (schweben und warten)
+		if v_des != Vector2.ZERO:
+			var mdir := v_des.normalized()
+			var mspd := maxf(sim.vel.length(), 25.0)
+			for dist: float in [14.0, 14.0 + mspd * 0.5, 14.0 + mspd * 1.0]:
+				var mprobe: Vector2 = sim.pos + mdir * dist
+				if level.movers_block(mprobe, Tuning.HULL_HALF + Vector2(6, 6), level.clock + dist / V_MAX - 0.15, maxf(dist / mspd - dist / V_MAX, 0.0) + 0.8):
+					v_des = Vector2.ZERO
+		# Ein Hindernis kommt auf das Taxi zu: ausweichen (vom Hindernis weg)
+		if sim.state == TaxiSim.State.FLYING:
+			for m in level.movers:
+				if m.kind == "pad":
+					continue
+				var soon: Rect2 = level._mover_rect(m, level.clock + 0.5)
+				if soon.grow(6.0).has_point(sim.pos) or (m.rect as Rect2).grow(6.0).has_point(sim.pos):
+					var away: Vector2 = (sim.pos - (m.rect as Rect2).get_center()).normalized()
+					var chosen := Vector2.ZERO
+					for ang: float in [0.0, 0.7, -0.7, 1.4, -1.4]:         # Ausweichrichtung, die nicht in eine Wand führt
+						var cand: Vector2 = away.rotated(ang)
+						var prev_ig := level.movers_ignore
+						level.movers_ignore = true
+						var blocked := level.box_hits_solid(sim.pos + cand * 26.0, Tuning.HULL_HALF + Vector2(4, 4))
+						level.movers_ignore = prev_ig
+						if not blocked:
+							chosen = cand
+							break
+					v_des = chosen * 40.0
+					break
+	var blocked_now := v_des_before != Vector2.ZERO and v_des == Vector2.ZERO
+	if was_blocked and not blocked_now and v_des != Vector2.ZERO:
+		goal_key = ""                       # nach dem Warten (Absinken, Drift) neu planen
+	was_blocked = blocked_now or (was_blocked and v_des == Vector2.ZERO)
 	var a_des := (v_des - sim.vel) / 0.30 + sim.vel * sim.drag()
 	return [_accel_to_input(a_des), gear]
 
@@ -166,7 +212,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 			else:
 				stuck_pos = r.sim.pos
 				stuck_ticks = 0
-			if stuck_ticks > (2400 if lvl.has_doors() else 600):     # vor Toren darf er bis zu 20 s warten
+			if stuck_ticks > (2400 if (lvl.has_doors() or lvl.has_movers()) else 600):     # vor Toren darf er bis zu 20 s warten
 				reason = "festgefahren bei " + str(r.sim.pos)
 				break
 		if r.sim.fuel <= 0.0 and r.sim.state == TaxiSim.State.FLYING:

@@ -19,6 +19,7 @@ var thrust_in := Vector2.ZERO  # zuletzt angewandte Eingabe (für Effekte)
 var time := 0.0
 var events: Array = []
 var spike_cd := 0.0
+var mover_cd := 0.0
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -33,7 +34,9 @@ func setup(lvl: LevelData) -> void:
 	landed_pad = {}
 	time = 0.0
 	spike_cd = 0.0
+	mover_cd = 0.0
 	lvl.clock = 0.0
+	lvl.update_movers(0.0, true)
 	events.clear()
 	# Steht unter dem Startpunkt ein Pad, beginnt das Taxi sicher gelandet.
 	for dy in range(0, 3):
@@ -82,6 +85,51 @@ func _door_crush() -> void:
 		state = State.DESTROYED
 		events.append({"type": "destroyed"})
 
+## Schaden durch bewegliche Hindernisse (mit kurzer Sperre gegen Mehrfachzählung).
+func _mover_damage(kind: String) -> void:
+	if mover_cd > 0.0 or state == State.DESTROYED:
+		return
+	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else Tuning.PADSLAB_DAMAGE)
+	mover_cd = Tuning.MOVER_COOLDOWN
+	hull -= dmg
+	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "mover": kind})
+	if hull <= 0.0:
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed"})
+
+## Taxi stößt (durch eigene Bewegung) an einen Mover.
+func _movers_touch(center: Vector2) -> void:
+	for m in level.movers_at_box(center, Tuning.HULL_HALF + Vector2(0.6, 0.6)):
+		if m.kind != "pad":
+			_mover_damage(m.kind)
+		else:
+			_mover_damage("pad")
+		break
+
+## Ein Mover fährt in das Taxi: es wird zur Seite mit der kleinsten Überlappung hinausgeschoben (Schaden).
+func _mover_push() -> void:
+	if level.movers.is_empty() or state == State.DESTROYED:
+		return
+	var box := Rect2(pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0)
+	for m in level.movers:
+		var r: Rect2 = m.rect
+		if not r.intersects(box):
+			continue
+		var opts := [[box.end.x - r.position.x, Vector2(-1, 0)], [r.end.x - box.position.x, Vector2(1, 0)],
+			[box.end.y - r.position.y, Vector2(0, -1)], [r.end.y - box.position.y, Vector2(0, 1)]]
+		var best: Array = opts[0]
+		for o in opts:
+			if o[0] < best[0] - 0.001:
+				best = o
+		pos += (best[1] as Vector2) * (float(best[0]) + 0.6)
+		vel = (m.vel as Vector2) + (best[1] as Vector2) * 30.0
+		if state == State.LANDED:
+			state = State.FLYING
+			landed_pad = {}
+		_mover_damage(m.kind)
+		return
+
 func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear)
 func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear)
 func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear)
@@ -110,7 +158,10 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	time += dt
 	spike_cd = maxf(0.0, spike_cd - dt)
 	level.clock = time
+	mover_cd = maxf(0.0, mover_cd - dt)
+	level.update_movers(time)
 	_door_crush()
+	_mover_push()
 	gear_cmd = gear_request
 	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / Tuning.GEAR_TIME)
 
@@ -124,11 +175,13 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if state == State.LANDED:
 		# Abheben nur mit Schub nach oben; sonst bleibt das Taxi sicher stehen.
 		if up > 0.0:
+			vel.x = float(landed_pad.get("dx_step", 0.0)) / dt        # fährt die Plattform, startet das Taxi mit ihrem Tempo
 			state = State.FLYING
 			landed_pad = {}
 			events.append({"type": "liftoff"})
 		else:
 			vel = Vector2.ZERO
+			pos.x += float(landed_pad.get("dx_step", 0.0))               # fahrende Plattform nimmt das Taxi mit
 			tilt = move_toward(tilt, 0.0, dt * 2.0)
 			return
 
@@ -154,6 +207,7 @@ func _move_axis_x(dt: float) -> void:
 	if level.box_hits_solid(Vector2(nx, pos.y), Tuning.HULL_HALF):
 		_impact(absf(vel.x))
 		_spikes(Vector2(nx, pos.y))
+		_movers_touch(Vector2(nx, pos.y))
 		vel.x = -vel.x * Tuning.BOUNCE
 		# an Kante heranschieben
 		var dir := signf(vel.x) * -1.0
@@ -169,6 +223,7 @@ func _move_axis_y(dt: float) -> void:
 	if level.box_hits_solid(Vector2(pos.x, ny), Tuning.HULL_HALF):
 		_impact(absf(vel.y))
 		_spikes(Vector2(pos.x, ny))
+		_movers_touch(Vector2(pos.x, ny))
 		var dir := -signf(vel.y)
 		var moved := 0.0
 		while not level.box_hits_solid(Vector2(pos.x, pos.y - dir * 0.25), Tuning.HULL_HALF) and moved < 8.0:
@@ -191,11 +246,12 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 	var pad_l := level.pad_at_foot(Vector2(pos.x - Tuning.FOOT_X, fy))
 	var pad_r := level.pad_at_foot(Vector2(pos.x + Tuning.FOOT_X, fy))
 	var speed_y := vel.y
-	var speed_x := absf(vel.x)
+	var pad_vx := float(pad_l.get("dx_step", 0.0)) / Tuning.TICK if not pad_l.is_empty() else 0.0
+	var speed_x := absf(vel.x - pad_vx)
 	var tilt_in := absf(tilt)
 	var on_pad: bool = hit_l and hit_r and not pad_l.is_empty() and not pad_r.is_empty() and pad_l.id == pad_r.id
 	var ok := gear_extended() and on_pad and speed_y <= Tuning.LAND_VY \
-		and absf(vel.x) <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
+		and speed_x <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
 	if ok:
 		var surf_y: float = pad_l.row * Tuning.TILE
 		pos.y = surf_y - glen - Tuning.HULL_HALF.y

@@ -2,7 +2,7 @@
 
 Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N; jedes Pad hat Platz für einen Wartebereich-Unterstand (2 Tiles Luft über einem Padende); das Ausgangstor liegt mittig oben und öffnet erst, wenn der **Ausgangs-Fahrgast** (letzter Auftrag, `to: "exit"`) an Bord ist; jeder Auftrag hat einen eigenen Fahrgast; der erste Fahrgast wartet nicht auf dem Startpad, und jeder Fahrgast beginnt an einem anderen Pad, als der vorherige endete; unter dem Torblock bleiben mindestens 96 px Durchflug. Das Tankpad (`F`) braucht eine 2 Tiles hohe Zapfsäule (`P`) am Padende und ein freies Landefenster ≥ 28 px; Preisbereich je Level optional (`fuel`). Jedes Level muss der Bot **ab dem Mindest-Sprit (35 %)** lösen. **Pads sind unterschiedlich groß** (5 bis 8 Tiles; je kleiner, desto schwieriger), aber jedes Passagierpad hat ein **freies Landefenster** neben dem Wartebereich, mindestens 34 px in Level 1–3, **sinkend bis 20 px in Level 99** (`Tuning.min_land_window`, Test) – späte Level dürfen deutlich kleinere Plattformen haben. Die Grenze gilt je Pad: **Größere Pads im selben Level sind erlaubt, unterschiedlich große Pads innerhalb eines Levels dürfen gemischt auftreten.**
 
-Status: **22 von 99 Leveln vorhanden** (Sektor 1 und 2 komplett, S1-01 bis S2-11). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle). Übersichtsbilder: `docs/levels/`.
+Status: **33 von 99 Leveln vorhanden** (Sektor 1–3 komplett, S1-01 bis S3-11). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle). Übersichtsbilder: `docs/levels/`.
 
 ## Obergrenzen und Plattform-Stufen (Tests: `_test_level_caps`, `_test_life_station`)
 | Level | Passagierpads (max.) | Pflichtfahrgäste (max.) | Anmerkung |
@@ -36,7 +36,7 @@ Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·G
 |---|---|---|---|
 | 1 Sternenhafen | 01–11 | Schub, Trägheit, Landung, Tanken, Engstellen, Dornen, Meisterprüfung | 01–11 gebaut |
 | 2 Neon-Schluchten | 12–22 | Schächte, Engstellen, **bewegliche Tore** (Schleusen, Falltüren) | 12–22 gebaut |
-| 3 Schrottgürtel | 23–33 | Trümmer, bewegliche Plattformen | offen |
+| 3 Schrottgürtel | 23–33 | **Trümmer** (bewegliche Brocken), **fahrende Landeplattformen** auf Schienen; fünf Passagierpads | 23–33 gebaut |
 | 4 Magnetfeld | 34–44 | anziehende/abstoßende Zonen | offen |
 | 5 Solarschmiede | 45–55 | Hitzezonen, Strahlen, Takt | offen |
 | 6 Gezeitenorbit | 56–66 | wechselnde Schwerkraft, Strömungen | offen |
@@ -69,3 +69,14 @@ Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·G
 | S2-09 | Schleusenkammer (doors) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 1→4, Jonas 2→3, Ines 4→1, Ben 3→Ausgang | 110.7 | 8 px | 6525 px | 34 px | bestanden (191 s, Tank 68 %) | **offen** |
 | S2-10 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 112.3 | 8 px | 5687 px | 34 px | bestanden (238 s, Tank 48 %) | **offen** |
 | S2-11 | Glasfassade (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 113.2 | 12 px | 5980 px | 34 px | bestanden (234 s, Tank 47 %) | **offen** |
+| S3-01 | Schrottplatz (debris, chicane, spikes) | Mika 2→5, Odo 4→1, Lena 3→5, Jonas 4→3, Ines 2→1, Ben 5→Ausgang | 113.4 | 12 px | 3908 px | 34 px | bestanden (155 s, Tank 41 %) | **offen** |
+| S3-02 | Kranbahn (debris, chicane, spikes) | Mika 3→4, Odo 1→5, Lena 4→2, Jonas 1→2, Ines 1→5, Ben 3→Ausgang | 114.3 | 12 px | 3897 px | 34 px | bestanden (193 s, Tank 32 %) | **offen** |
+| S3-03 | Trümmerfeld (debris, chicane, spikes) + Lebens-Station | Mika 2→1, Odo 2→4, Lena 2→4, Jonas 3→2, Ines 1→3, Ben 5→Ausgang | 115.4 | 12 px | 4041 px | 34 px | bestanden (138 s, Tank 32 %) | **offen** |
+| S3-04 | Fließband (debris, moving_pads, chicane, spikes) | Mika 3→2, Odo 4→5, Lena 1→2, Jonas 5→3, Ines 2→3, Ben 5→Ausgang | 116.4 | 12 px | 3702 px | 34 px | bestanden (127 s, Tank 41 %) | **offen** |
+| S3-05 | Pendelhalle (debris, chicane, spikes) | Mika 4→3, Odo 1→5, Lena 2→1, Jonas 3→1, Ines 4→5, Ben 2→Ausgang | 116.7 | 12 px | 4437 px | 34 px | bestanden (158 s, Tank 37 %) | **offen** |
+| S3-06 | Schrottlawine (debris, chicane, spikes) | Mika 3→1, Odo 4→1, Lena 5→4, Jonas 5→4, Ines 2→1, Ben 5→Ausgang | 116.7 | 12 px | 4443 px | 34 px | bestanden (161 s, Tank 33 %) | **offen** |
+| S3-07 | Altmetall (debris, moving_pads, chicane, spikes) | Mika 3→4, Odo 5→2, Lena 3→1, Jonas 2→3, Ines 2→3, Ben 5→Ausgang | 117.7 | 12 px | 3524 px | 34 px | bestanden (156 s, Tank 39 %) | **offen** |
+| S3-08 | Doppelfähre (debris, moving_pads, chicane, spikes) + Lebens-Station | Mika 2→5, Odo 3→1, Lena 2→3, Jonas 5→3, Ines 4→1, Ben 4→Ausgang | 118.5 | 12 px | 3918 px | 34 px | bestanden (169 s, Tank 24 %) | **offen** |
+| S3-09 | Schrottpresse (debris, chicane, spikes) | Mika 4→2, Odo 5→1, Lena 2→1, Jonas 4→1, Ines 3→1, Ben 2→Ausgang | 119.3 | 12 px | 4515 px | 34 px | bestanden (207 s, Tank 60 %) | **offen** |
+| S3-10 | Wrackgasse (debris, chicane, spikes) | Mika 5→3, Odo 4→2, Lena 3→1, Jonas 4→5, Ines 1→4, Ben 1→Ausgang | 119.3 | 12 px | 4729 px | 34 px | bestanden (153 s, Tank 39 %) | **offen** |
+| S3-11 | Gürtelwächter (debris, moving_pads, chicane, spikes) | Mika 5→4, Odo 5→2, Lena 3→5, Jonas 2→1, Ines 5→3, Ben 2→Ausgang | 122.8 | 12 px | 4317 px | 34 px | bestanden (172 s, Tank 26 %) | **offen** |

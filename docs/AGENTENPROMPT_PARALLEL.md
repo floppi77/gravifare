@@ -396,3 +396,7 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 ## O) Nachträge Runde 12
 - **Fahrgast rauswerfen** (E / Gamepad Y, Neustart nun R / Back): Fahrgast fällt, schreit, stirbt beim Aufprall, kein Geld; Pflichtauftrag gilt als verpasst. Schrei-Sounds `scream_f`/`scream_m` und `splat` (synthetisiert).
 - Geplante Hindernisse je Sektor: siehe LEVELS.md.
+
+## P) Nachträge Runde 13
+- Sektor 3 „Schrottgürtel“ (Level 23–33): **Trümmer** (bewegliche Brocken, Schaden 15) und **fahrende Landeplattformen** (Schiene, ≈ 13 px/s), fünf Passagierpads, Lebens-Stationen in Level 25 und 30. Der Bot weicht Trümmern aus und folgt fahrenden Pads. Details: DESIGN.md.
+- Der Schrei beim Rauswerfen ging verloren, weil Ereignisse außerhalb von `Run.step()` vor dem Auslesen gelöscht wurden – jetzt gepuffert (`pending_log`).
