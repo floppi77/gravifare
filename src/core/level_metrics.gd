@@ -9,7 +9,10 @@ extends RefCounted
 ##   jobs       Anzahl Aufträge (inkl. Ausgangs-Fahrgast)
 ##   min_window kleinstes freies Landefenster eines Passagierpads (px): Padbreite minus Unterstand/Fahrgast-Abstand
 ##   hazards    Anzahl gefährlicher Elemente (Dornen; später bewegte Gefahren)
-## score = 40·eng + 25·Länge + 15·Aufträge + 10·Pad + 10·Gefahren (jeweils auf 0..1 normiert)
+##   mechanics  im Level-JSON deklarierte Spielmechaniken (z. B. "spikes", "pump"); jede zählt als Neuigkeit
+## score = 40·eng + 25·Länge + 15·Aufträge + 10·Pad + 10·Gefahren + 5·Mechaniken. Länge, Aufträge, Gefahren und
+## Mechaniken sind nach oben offen (Länge bis 2, Aufträge bis 1,5, Gefahren bis 3, Mechaniken bis 12), damit
+## die Rangfolge bis Level 99 nicht an eine Obergrenze von 100 stößt.
 
 const MAX_MARGIN := 48.0
 const STEP := 4.0
@@ -85,13 +88,14 @@ static func analyze(lvl: LevelData) -> Dictionary:
 		hazards += String(row).count("^")
 	lvl.exit_open = was_open
 	var eng := clampf((MAX_MARGIN - clearance) / (MAX_MARGIN - STEP), 0.0, 1.0)
-	var length := clampf(route_len / 3500.0, 0.0, 1.0)
-	var jobs := clampf(float(lvl.jobs.size()) / 6.0, 0.0, 1.0)
+	var length := clampf(route_len / 3500.0, 0.0, 2.0)
+	var jobs := clampf(float(lvl.jobs.size()) / 6.0, 0.0, 1.5)
 	var padn := clampf((84.0 - min_pad) / 64.0, 0.0, 1.0)
-	var hz := clampf(float(hazards) / 20.0, 0.0, 1.0)
+	var hz := clampf(float(hazards) / 20.0, 0.0, 3.0)
+	var features := clampf(float((lvl.raw.get("mechanics", []) as Array).size()), 0.0, 12.0)
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
-		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz,
+		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features,
 		"solvable": clearance > 0.0,
 	}
 

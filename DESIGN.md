@@ -104,3 +104,7 @@ Animierter Hintergrund (`src/ui/menu_backdrop.gd`): ziehender Nebel, funkelnde S
 ## Plan Vertical Slice (M2)
 Erledigt: Physik, Fahrwerk, Pads, Aufträge, Tanken, HUD, Level S1-01, Autopilot-Test.
 Offen: Gamepad-/Eingabetest am echten Gerät, Menü, Pause mit Optionen, Fonts, Audio (Schub, Landung, Warnung), Spielgefühl-Feintuning durch Probespielen, Level S1-02 bis 03 als Gegenprobe der Levelpipeline.
+
+
+## Dornen
+Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung festen Zusatzschaden (`Tuning.SPIKE_DAMAGE` = 30 Hülle, unabhängig vom Tempo; 0,5 s Sperre gegen Mehrfachzählung). Sie zählen in der Schwierigkeitsmetrik als Gefahr. Erstes Auftreten: S1-08.

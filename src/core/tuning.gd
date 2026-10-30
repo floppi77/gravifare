@@ -49,6 +49,8 @@ const LAND_SOFT_VY := 22.0       # unter diesem Wert gilt die Landung als "weich
 const HULL_MAX := 100.0
 const IMPACT_SAFE := 70.0        # Aufprall darunter: kein Schaden
 const CRASH_SPEED := 170.0       # Aufprall ab hier: Taxi sofort zerstört
+const SPIKE_DAMAGE := 30.0       # Dornen: fester Zusatzschaden je Berührung, unabhängig vom Tempo
+const SPIKE_COOLDOWN := 0.5      # Sekunden, in denen dieselbe Berührung nicht erneut zählt
 const DAMAGE_EXP := 1.6          # Schaden = 100 * ((v-70)/(170-70))^1.6 (leichte Stöße harmlos, schwere teuer)
 const BOUNCE := 0.35
 

@@ -18,6 +18,7 @@ var landed_pad := {}
 var thrust_in := Vector2.ZERO  # zuletzt angewandte Eingabe (für Effekte)
 var time := 0.0
 var events: Array = []
+var spike_cd := 0.0
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -31,6 +32,7 @@ func setup(lvl: LevelData) -> void:
 	state = State.FLYING
 	landed_pad = {}
 	time = 0.0
+	spike_cd = 0.0
 	events.clear()
 	# Steht unter dem Startpunkt ein Pad, beginnt das Taxi sicher gelandet.
 	for dy in range(0, 3):
@@ -71,6 +73,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if state == State.DESTROYED:
 		return
 	time += dt
+	spike_cd = maxf(0.0, spike_cd - dt)
 	gear_cmd = gear_request
 	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / Tuning.GEAR_TIME)
 
@@ -113,6 +116,7 @@ func _move_axis_x(dt: float) -> void:
 	var nx := pos.x + vel.x * dt
 	if level.box_hits_solid(Vector2(nx, pos.y), Tuning.HULL_HALF):
 		_impact(absf(vel.x))
+		_spikes(Vector2(nx, pos.y))
 		vel.x = -vel.x * Tuning.BOUNCE
 		# an Kante heranschieben
 		var dir := signf(vel.x) * -1.0
@@ -127,6 +131,7 @@ func _move_axis_y(dt: float) -> void:
 	# Hülle
 	if level.box_hits_solid(Vector2(pos.x, ny), Tuning.HULL_HALF):
 		_impact(absf(vel.y))
+		_spikes(Vector2(pos.x, ny))
 		var dir := -signf(vel.y)
 		var moved := 0.0
 		while not level.box_hits_solid(Vector2(pos.x, pos.y - dir * 0.25), Tuning.HULL_HALF) and moved < 8.0:
@@ -190,6 +195,22 @@ func _impact(speed: float) -> void:
 	var dmg := Tuning.HULL_MAX * pow(k, Tuning.DAMAGE_EXP)
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": speed})
+	if hull <= 0.0:
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed"})
+
+## Dornen: fester Zusatzschaden je Berührung (nicht tempoabhängig), mit kurzer Sperre gegen Mehrfachzählung.
+func _spikes(box_center: Vector2) -> void:
+	if state != State.DESTROYED and level.box_hits_char(box_center, Tuning.HULL_HALF, "^"):
+		_spike_hit()
+
+func _spike_hit() -> void:
+	if spike_cd > 0.0 or state == State.DESTROYED:
+		return
+	spike_cd = Tuning.SPIKE_COOLDOWN
+	hull -= Tuning.SPIKE_DAMAGE
+	events.append({"type": "damage", "amount": Tuning.SPIKE_DAMAGE, "speed": 0.0, "spike": true})
 	if hull <= 0.0:
 		hull = 0.0
 		state = State.DESTROYED

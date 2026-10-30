@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -297,6 +297,39 @@ func _test_i18n_complete() -> void:
 		if f.ends_with(".json"):
 			var lvl := LevelData.load_file("res://data/levels/" + f)
 			check(String(lvl.names.get("de", "")) != "" and String(lvl.names.get("en", "")) != "", "%s hat deutschen und englischen Namen" % lvl.id)
+
+func _test_spikes() -> void:
+	var l := _lvl()
+	var rows: Array = []
+	for y in l.rows.size():
+		rows.append(String(l.rows[y]))
+	# Dornenreihe im offenen Bereich (links oben im freien Raum von S1-01 prüfen wir die Mechanik direkt)
+	var d := {"id": "T-SP", "sector": 1, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": []}
+	var spike_row: String = rows[10]
+	var sp_x := -1
+	for x in range(2, spike_row.length() - 2):
+		if rows[8][x] == "." and rows[9][x] == "." and rows[10][x] == "." and rows[11][x] == ".":
+			sp_x = x
+			break
+	check(sp_x > 0, "Testfläche für Dornen gefunden")
+	var r2: Array = rows.duplicate()
+	r2[10] = String(rows[10]).substr(0, sp_x - 1) + "^^^" + String(rows[10]).substr(sp_x + 2)
+	d["map"] = r2
+	var lv := LevelData.from_dict(d)
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.pos = Vector2(sp_x * Tuning.TILE + 8.0, 8.0 * Tuning.TILE)
+	s.vel = Vector2(0, 30)
+	s.state = TaxiSim.State.FLYING
+	var hits := 0
+	for i in 240:
+		s.step(Vector2.ZERO, false)
+		for e in s.events:
+			if e.type == "damage" and e.get("spike", false):
+				hits += 1
+	check(hits >= 1, "Dornen: Berührung löst Dornenschaden aus (%d Treffer)" % hits)
+	check(s.hull <= 100.0 - Tuning.SPIKE_DAMAGE + 0.01, "Dornen: fester Schaden auch bei langsamer Berührung (%.0f Hülle)" % s.hull)
+	check(s.hull > 0.0 or s.state == TaxiSim.State.DESTROYED, "Dornen: Hülle fällt nicht unter 0, ohne zerstört zu sein")
 
 func _test_crash_balance() -> void:
 	var results := {}
