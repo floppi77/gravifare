@@ -140,6 +140,9 @@ func _draw_actor(a: PassengerActor) -> void:
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
 	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if a.state == PassengerActor.S.EXITING and not a.pay_info.is_empty() and not a.angry:
+		# Auszahlung wird erst im Häuschen gutgeschrieben: voraussichtlicher Betrag über dem Kopf
+		draw_string(ThemeDB.fallback_font, Vector2(pos.x - 10.0, pos.y - 13.0), "¢%d" % int(round(a.pay_for(a.remaining_walk()))), HORIZONTAL_ALIGNMENT_CENTER, 20, 7, Color(1.0, 0.88, 0.3, a.fade))
 	if a.wave_t > 0.0 or a.angry:
 		var bx := pos.x + 4.0
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))

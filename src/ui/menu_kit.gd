@@ -96,6 +96,21 @@ static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callabl
 	b.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
 	return b
 
+## Sprachwahl: zwei Flaggen ohne Text (Haupt- und Pausenmenü). `on_select(code)` wird mit "de"/"en" aufgerufen.
+static func flag_row(on_select: Callable) -> HBoxContainer:
+	var flags := HBoxContainer.new()
+	flags.alignment = BoxContainer.ALIGNMENT_CENTER
+	flags.add_theme_constant_override("separation", 10)
+	var cur := TranslationServer.get_locale().substr(0, 2)
+	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch"], ["en", "res://assets/art/flag_en.png", "English"]]:
+		var code: String = entry[0]
+		var fb := flag_button(load(entry[1]), cur == code, entry[2], func():
+			Settings.set_value("language", code)
+			on_select.call(code))
+		fb.set_meta("lang", code)
+		flags.add_child(fb)
+	return flags
+
 static func title(text: String, size := 16) -> Label:
 	var l := Label.new()
 	l.text = text

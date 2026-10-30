@@ -35,7 +35,8 @@ const PASS_W := 6.8
 const PASS_H := 10.2
 const PASS_HALF_W := 3.0
 const PASS_CLEAR := 2.0           # Sicherheitsabstand Taxi–Fahrgast bei der Landefenster-Berechnung
-const MIN_LAND_WINDOW := 28.0     # Mindestbreite (px) des freien Landebereichs je Passagierpad
+const LAND_WINDOW_EARLY := 34.0   # Mindestbreite (px) des freien Landebereichs je Passagierpad in Level 1–3
+const LAND_WINDOW_FLOOR := 20.0   # …sinkt bis Level 99 auf diesen Wert (kleine Pads sind in späten Leveln gewollt)
 const GEAR_TIME := 0.22
 
 # Landefenster (fair, im HUD sichtbar)
@@ -80,3 +81,9 @@ static func time_factor(t: float, par: float) -> float:
 
 static func landing_penalty(vy: float) -> float:
 	return clampf((vy - LAND_SOFT_VY) / (LAND_VY - LAND_SOFT_VY), 0.0, 1.0) * LAND_PENALTY_MAX
+
+## Kleinstes erlaubtes Landefenster für ein Level: konstant für Level 1–3, danach linear fallend bis Level 99.
+static func min_land_window(level_no: int) -> float:
+	if level_no <= 3:
+		return LAND_WINDOW_EARLY
+	return lerpf(LAND_WINDOW_EARLY, LAND_WINDOW_FLOOR, clampf(float(level_no - 3) / 96.0, 0.0, 1.0))

@@ -26,6 +26,7 @@ var delivered := 0
 var result := Result.RUNNING
 var exit_open := false
 var job_clock := 0.0        # Sekunden seit Erscheinen des aktuellen Fahrgasts (bestimmt den Fahrpreis)
+var dropoff_clock := 0.0    # Fahrtzeit im Moment des Aussteigens; danach zählt die Gehzeit zum Häuschen
 var job_times: Array = []   # Dauer je zugestelltem Auftrag
 var pen_pick := 0.0         # Abzug durch harte Landung beim Abholen
 var pen_drop := 0.0         # Abzug durch harte Landung am Ziel
@@ -175,15 +176,11 @@ func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 func _finish_level() -> void:
 	var job := current_job()
 	if not job.is_empty() and is_exit_job(job) and phase == Phase.CARRYING and actor != null:
-		var p := _payout(job)
-		money += p.pay
-		earned += p.pay
-		delivered += 1
-		job_times.append(job_clock)
-		carried = {"name": actor.pname, "look": actor.look, "gender": actor.gender}
-		log.append({"type": "delivered", "exit": true, "job": job_index, "fare": p.fare, "factor": p.factor, "penalty": p.penalty, "pay": p.pay, "voice": actor.voice_key(), "name": actor.pname})
+		# Einkommen erst, wenn der Fahrgast im nächsten Level sein Häuschen erreicht; die Zahlungsinfo fährt mit
+		carried = {"name": actor.pname, "look": actor.look, "gender": actor.gender, "pay_info": _make_pay_info(job, job_clock, pen_pick)}
 		job_index += 1
 		actor = null
+	_settle_pending()
 	result = Result.COMPLETE
 	log.append({"type": "level_complete"})
 
@@ -202,6 +199,8 @@ func _step_actors(dt: float) -> void:
 	if actor != null:
 		actor.step(dt)
 		for e in actor.events:
+			if e.type == "arrived_home":          # sehr kurzer Weg: schon vor Ende der Aussteige-Phase im Häuschen
+				_pay_leaver(actor, 0.0)
 			if e.type == "arrived_wait":
 				actor.wave()
 				actor.call_cd = CALL_COOLDOWN
@@ -214,6 +213,9 @@ func _step_actors(dt: float) -> void:
 			log.append({"type": "call", "voice": actor.voice_key(), "name": actor.pname})
 	for l in leavers:
 		l.step(dt)
+		for e in l.events:
+			if e.type == "arrived_home":
+				_pay_leaver(l, 0.0)
 	leavers = leavers.filter(func(l): return l.state != PassengerActor.S.GONE)
 
 func _service_pad(dt: float) -> void:
@@ -224,10 +226,14 @@ func _service_pad(dt: float) -> void:
 			if actor != null:
 				actor.abort_board()
 		elif phase == Phase.DROPOFF:
-			phase = Phase.CARRYING
-			phase_timer = 0.0
-			if actor != null:
+			if actor != null and not actor.pay_info.is_empty():
+				# Taxi hebt ab, bevor der Fahrgast im Häuschen ist: er bleibt an Bord, keine Auszahlung
+				phase = Phase.CARRYING
+				phase_timer = 0.0
+				actor.pay_info = {}
 				actor.cancel_exit()
+			elif actor != null:
+				_deliver(current_job())          # schon bezahlt (Ankunft im Häuschen): Auftrag abschließen
 		return
 	var pad: Dictionary = sim.landed_pad
 	# Tanken
@@ -264,25 +270,42 @@ func _service_pad(dt: float) -> void:
 				phase = Phase.DROPOFF
 				phase_timer = 0.0
 				pen_drop = Tuning.landing_penalty(last_vy)
+				dropoff_clock = job_clock
+				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
 				actor.step_out(sim.pos.x, level.pads[String(job.to)])
 		Phase.DROPOFF:
 			phase_timer += dt
 			if phase_timer >= STEP_OUT_TIME:
 				_deliver(job)
 
-func _payout(job: Dictionary) -> Dictionary:
-	var fare := float(job.get("fare", 50))
-	var factor := Tuning.time_factor(job_clock, par_of(job))
-	var penalty := 1.0 - (1.0 - pen_pick) * (1.0 - pen_drop)
-	return {"fare": fare, "factor": factor, "penalty": penalty, "pay": fare * factor * (1.0 - penalty), "time": job_clock}
+func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
+	return {"fare": float(job.get("fare", 50)), "par": par_of(job), "base": base_clock,
+		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "job": job_index, "name": String(job.get("passenger", ""))}
+
+## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
+func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
+	if l.pay_info.is_empty():
+		return
+	var pay := l.pay_for(extra_time)
+	var factor := l.factor_for(extra_time)
+	var pen := float(l.pay_info.penalty)
+	var total_time := float(l.pay_info.base) + l.exit_time + extra_time
+	money += pay
+	earned += pay
+	delivered += 1
+	job_times.append(total_time)
+	log.append({"type": "delivered", "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "pay": pay, "voice": l.voice_key(), "name": l.pname})
+	l.pay_info = {}
+
+## Beim Levelende noch laufende Fahrgäste gelten als angekommen (Rest-Gehzeit wird eingerechnet).
+func _settle_pending() -> void:
+	for l in leavers:
+		if not l.pay_info.is_empty() and not l.angry:
+			_pay_leaver(l, l.remaining_walk())
 
 func _deliver(job: Dictionary) -> void:
-	var p := _payout(job)
-	money += p.pay
-	earned += p.pay
-	delivered += 1
-	job_times.append(job_clock)
-	log.append({"type": "delivered", "job": job_index, "fare": p.fare, "factor": p.factor, "penalty": p.penalty, "pay": p.pay, "voice": actor.voice_key(), "name": actor.pname})
+	## Aussteigen abgeschlossen: Auftrag ist erledigt, der Fahrgast läuft zum Häuschen. Bezahlt wird erst dort.
+	log.append({"type": "dropped", "job": job_index, "name": actor.pname})
 	leavers.append(actor)
 	actor = null
 	job_index += 1
@@ -296,3 +319,29 @@ func _deliver(job: Dictionary) -> void:
 		log.append({"type": "exit_open"})
 	else:
 		spawn_timer = NEXT_SPAWN_DELAY
+
+## Taxi zerstört (Leben verloren): Das Level läuft weiter, nichts wird neu gestartet. Der Fahrgast an Bord ist verloren
+## (kein Geld) und wartet – derselbe Fahrgast – erneut an seinem Abholpad. Erledigtes bleibt erledigt. Neues Taxi
+## am Startpad mit Mindest-Sprit (35 %) bzw. dem Rest-Sprit, falls mehr.
+func respawn_after_crash() -> void:
+	var fuel_keep := clampf(maxf(sim.fuel, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
+	var lost: bool = actor != null and (phase == Phase.CARRYING or phase == Phase.DROPOFF)
+	sim.setup(level)
+	sim.fuel = fuel_keep
+	result = Result.RUNNING
+	last_vy = 0.0
+	if lost:
+		log.append({"type": "passenger_lost", "name": actor.pname, "pad": String(current_job().get("from", ""))})
+		actor = null
+		pen_pick = 0.0
+		pen_drop = 0.0
+		job_clock = 0.0
+		respawn_keep_clock = false
+		spawn_timer = SQUASH_RESPAWN_DELAY
+		spawn_wait = false
+	elif actor != null and phase == Phase.BOARDING:
+		actor.abort_board()
+	phase = Phase.WAITING
+	phase_timer = 0.0
+	exit_open = job_index >= jobs.size()
+	level.exit_open = exit_open

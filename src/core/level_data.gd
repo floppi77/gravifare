@@ -8,6 +8,7 @@ const SOLID := "#"
 var id := ""
 var sector := 1
 var index := 1
+var number := 1                # Kampagnennummer 1..99
 var names := {}
 var rows: Array = []
 var width := 0
@@ -39,6 +40,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.id = d.get("id", "")
 	l.sector = int(d.get("sector", 1))
 	l.index = int(d.get("index", 1))
+	l.number = (l.sector - 1) * 11 + l.index
 	l.names = d.get("name", {})
 	l.rows = d.get("map", [])
 	l.height = l.rows.size()

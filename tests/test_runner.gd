@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -235,17 +235,15 @@ func _test_no_respawn_after_delivery() -> void:
 	for i in 60000:
 		var cmd := bot.decide()
 		r.step(cmd[0], cmd[1])
-		if r.delivered == 1 and not checked:
+		if r.job_index == 1 and not checked:
 			checked = true
-			check(r.leavers.size() == 1 and r.leavers[0].pname == first_name, "Abgelieferter Fahrgast geht in den Wartebereich (leavers)")
+			check(r.leavers.size() == 1 and r.leavers[0].pname == first_name, "Abgesetzter Fahrgast läuft zum Häuschen (leavers)")
 			check(r.actor == null or r.actor.pname != first_name, "Abgelieferter Fahrgast spawnt nicht erneut")
+			check(r.money == 0.0 and r.delivered == 0, "Noch kein Einkommen, solange er unterwegs zum Häuschen ist")
 		if r.result != Run.Result.RUNNING:
 			break
 	check(r.result == Run.Result.COMPLETE, "Level mit Fahrgast-Akteuren abgeschlossen")
-	for i in 600:
-		r.step(Vector2.ZERO, false)
-	# nach Levelende laufen keine Fahrgäste mehr: Run bleibt stehen, daher nur Zustand prüfen
-	check(r.leavers.size() <= 1, "Höchstens ein Fahrgast noch unterwegs (%d)" % r.leavers.size())
+	check(r.delivered >= 1 and r.money > 0.0, "Einkommen wurde bei Ankunft im Häuschen gutgeschrieben (%.0f)" % r.money)
 
 func _test_transition_timeline() -> void:
 	var tv = load("res://src/game/transition_view.gd").new()
@@ -376,7 +374,21 @@ func _test_exit_passenger() -> void:
 	var money0 := r.money
 	r.step(Vector2.ZERO, false)
 	check(r.result == Run.Result.COMPLETE, "Flug mit Fahrgast durchs Tor beendet das Level")
-	check(r.money > money0 and not r.carried.is_empty(), "Fahrpreis wird gezahlt, Fahrgast fährt ins nächste Level mit (%s)" % str(r.carried.get("name", "")))
+	check(r.money == money0 and not r.carried.is_empty() and not r.carried.pay_info.is_empty(), "Am Tor noch kein Geld: Fahrgast (%s) fährt mit Zahlungsinfo ins nächste Level" % str(r.carried.get("name", "")))
+	# Im nächsten Level: er steigt aus, läuft zum Häuschen, erst dort wird bezahlt
+	var nxt := Run.new()
+	nxt.start(lvl)
+	var a := PassengerActor.new()
+	a.setup({"passenger": r.carried.name, "gender": r.carried.gender, "look": r.carried.look}, nxt.sim.landed_pad, 0, true)
+	a.pay_info = r.carried.pay_info
+	a.step_out(nxt.sim.pos.x, nxt.sim.landed_pad)
+	nxt.leavers.append(a)
+	var paid_at := -1.0
+	for i in 800:
+		nxt.step(Vector2.ZERO, true)
+		if nxt.money > 0.0 and paid_at < 0.0:
+			paid_at = nxt.sim.time
+	check(paid_at > 0.2 and nxt.delivered == 1, "Ausgangs-Fahrgast wird erst bei Ankunft im Häuschen bezahlt (nach %.1f s, ¢%d)" % [paid_at, int(nxt.money)])
 
 func _test_spawn_not_on_taxi_pad() -> void:
 	# Nachfolge-Fahrgast darf nicht erscheinen, solange das Taxi auf seinem Pad steht
@@ -516,7 +528,7 @@ func _test_landing_window_rules() -> void:
 				continue
 			min_w = minf(min_w, p.land_window)
 			widths.append(int((p.x1 - p.x0) / Tuning.TILE))
-		check(min_w >= Tuning.MIN_LAND_WINDOW, "%s: jedes Passagierpad hat ein freies Landefenster ≥ %d px (kleinstes %.0f px, Padbreiten %s Tiles)" % [lvl.id, int(Tuning.MIN_LAND_WINDOW), min_w, str(widths)])
+		check(min_w >= Tuning.min_land_window(lvl.number) - 0.01, "%s (Level %d): jedes Passagierpad hat ein freies Landefenster ≥ %.0f px (kleinstes %.0f px, Padbreiten %s Tiles)" % [lvl.id, lvl.number, Tuning.min_land_window(lvl.number), min_w, str(widths)])
 		var varied := false
 		for w in widths:
 			if w != widths[0]:
@@ -530,3 +542,74 @@ func _test_taxi_scale() -> void:
 	var s := TaxiSim.new()
 	s.setup(lvl)
 	check(s.state == TaxiSim.State.LANDED, "Start nach Skalierung sicher gelandet")
+
+## Gleicher Auftrag, gleiche Fahrtzeit: nah am Häuschen gelandet bringt mehr als weit weg (kürzere Gehzeit).
+func _dropoff_pay(land_dx: float) -> float:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	var job: Dictionary = r.current_job()
+	var to_pad: Dictionary = lvl.pads[String(job.to)]
+	# Fahrgast sitzt bereits im Taxi, Fahrtzeit steht fest
+	_land_on(r, String(job.from))
+	for i in 400:
+		r.step(Vector2.ZERO, true)
+		if r.phase == Run.Phase.CARRYING:
+			break
+	r.job_clock = 20.0
+	_land_on(r, String(job.to))
+	r.sim.pos.x = float(to_pad.door_x) + land_dx
+	r.sim.vel = Vector2.ZERO
+	r.last_vy = 0.0
+	var money0 := r.money
+	for i in 900:
+		r.step(Vector2.ZERO, true)
+	return r.money - money0
+
+func _test_pay_at_shelter_rewards_close_landing() -> void:
+	var near := _dropoff_pay(14.0)
+	var far := _dropoff_pay(64.0)
+	check(near > 0.0 and far > 0.0, "Beide Zustellungen werden bezahlt (nah ¢%.1f, weit ¢%.1f)" % [near, far])
+	check(near > far, "Näher am Häuschen landen bringt mehr Einkommen (%.1f > %.1f)" % [near, far])
+
+func _test_crash_continues_level() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	# Erster Auftrag erledigt, zweiter (Ausgangs-Fahrgast) an Bord
+	r.job_index = lvl.jobs.size() - 1
+	r.money = 55.0
+	r.delivered = lvl.jobs.size() - 1
+	r._spawn_actor(true)
+	var last: Dictionary = lvl.jobs[lvl.jobs.size() - 1]
+	var lost_name := String(last.passenger)
+	_land_on(r, String(last.from))
+	for i in 600:
+		r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.CARRYING and r.exit_open, "Ausgangs-Fahrgast an Bord, Tor offen")
+	var fuel_before := r.sim.fuel
+	# Absturz
+	r.sim.hull = 0.0
+	r.sim.state = TaxiSim.State.DESTROYED
+	r.step(Vector2.ZERO, true)
+	check(r.result == Run.Result.FAILED, "Absturz = Taxi verloren")
+	r.respawn_after_crash()
+	check(r.result == Run.Result.RUNNING and r.sim.state == TaxiSim.State.LANDED and r.sim.hull == Tuning.HULL_MAX, "Neues Taxi, Level läuft weiter")
+	check(r.job_index == lvl.jobs.size() - 1 and r.delivered == lvl.jobs.size() - 1 and r.money == 55.0, "Erledigtes bleibt erledigt, kein Geld für den verlorenen Fahrgast")
+	check(not r.exit_open and not lvl.exit_open, "Tor schließt sich wieder, bis der Fahrgast erneut an Bord ist")
+	check(r.sim.fuel >= Tuning.MIN_START_FUEL and r.sim.fuel >= minf(fuel_before, 100.0) - 0.01, "Sprit: mindestens Mindest-Sprit, Rest bleibt erhalten (%.0f)" % r.sim.fuel)
+	check(r.actor == null and String(r.current_job().passenger) == lost_name and String(r.current_job().from) == String(last.from), "Derselbe Fahrgast (%s) wartet wieder an seinem Abholpad %s" % [lost_name, String(last.from)])
+	for i in 60:
+		r.step(Vector2(0, -1), true)                      # abheben (Startpad = Abholpad: Spawn ist bis dahin blockiert)
+	for i in int(4.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), false)
+	check(r.actor != null and r.actor.pname == lost_name, "Er tritt wieder aus dem Unterstand (verschwunden nur im Spiel, nicht im Auftrag)")
+
+func _test_min_window_ramp() -> void:
+	check(Tuning.min_land_window(1) == Tuning.LAND_WINDOW_EARLY and Tuning.min_land_window(3) == Tuning.LAND_WINDOW_EARLY, "Level 1–3: Mindest-Landefenster %.0f px" % Tuning.LAND_WINDOW_EARLY)
+	check(Tuning.min_land_window(50) < Tuning.min_land_window(10) and Tuning.min_land_window(99) == Tuning.LAND_WINDOW_FLOOR, "Mindest-Landefenster sinkt bis Level 99 auf %.0f px" % Tuning.LAND_WINDOW_FLOOR)
+	var mono := true
+	for n in range(2, 100):
+		if Tuning.min_land_window(n) > Tuning.min_land_window(n - 1) + 0.0001:
+			mono = false
+	check(mono, "Mindest-Landefenster steigt nie von Level zu Level")

@@ -76,5 +76,6 @@
  "HUD_FACTOR": "×%.2f",
  "HUD_COMPLETE_EARNED": "Verdient: ¢ %d",
  "VOICE_ANGRY": "Hey, Idiot!",
- "MSG_SQUASH": "Fahrgast verärgert! Neuer Fahrgast an Pad %s"
+ "MSG_SQUASH": "Fahrgast verärgert! Neuer Fahrgast an Pad %s",
+ "MSG_LOST": "Fahrgast verloren – %s wartet wieder an Pad %s"
 }

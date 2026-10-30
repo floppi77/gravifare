@@ -25,6 +25,9 @@ var age := 0.0
 var wave_t := 0.0
 var call_cd := 0.0
 var fade := 1.0               # 0..1 beim Auftauchen/Verschwinden
+var pay_info: Dictionary = {}   # offene Auszahlung: {fare, par, base, penalty}; wird bei Ankunft im Häuschen fällig
+var exit_time := 0.0          # Gehzeit seit dem Aussteigen (zählt zur Fahrzeit)
+var _home_reported := false
 var angry := false            # vom Taxi erschreckt: flüchtet schimpfend in den Unterstand
 var speed_mul := 1.0
 var events: Array = []
@@ -102,6 +105,8 @@ func abort_board() -> void:
 		target_x = pad.wait_x
 
 func step_out(taxi_x: float, dest_pad: Dictionary) -> void:
+	exit_time = 0.0
+	_home_reported = false
 	dest = dest_pad
 	surface_y = dest_pad.row * Tuning.TILE
 	x = taxi_x
@@ -112,6 +117,7 @@ func step_out(taxi_x: float, dest_pad: Dictionary) -> void:
 func cancel_exit() -> void:
 	if state == S.EXITING:
 		state = S.ABOARD
+		_home_reported = false
 
 func wave() -> void:
 	wave_t = 1.4
@@ -140,7 +146,11 @@ func step(dt: float) -> void:
 			if _walk(dt):
 				state = S.WAITING
 		S.EXITING:
+			exit_time += dt
 			if _walk(dt):
+				if not _home_reported:
+					_home_reported = true
+					events.append({"type": "arrived_home"})
 				fade = maxf(0.0, fade - dt * 5.0)
 				if fade <= 0.0:
 					state = S.GONE
@@ -156,3 +166,17 @@ func _walk(dt: float) -> bool:
 	x += facing * step_len
 	walked += step_len
 	return absf(target_x - x) <= 0.5
+
+## Fällige bzw. voraussichtliche Auszahlung: Fahrtzeit = Zeit bis zum Aussteigen + Gehzeit zum Häuschen.
+func pay_for(extra_time := 0.0) -> float:
+	if pay_info.is_empty():
+		return 0.0
+	var t := float(pay_info.base) + exit_time + extra_time
+	return float(pay_info.fare) * Tuning.time_factor(t, float(pay_info.par)) * (1.0 - float(pay_info.penalty))
+
+func factor_for(extra_time := 0.0) -> float:
+	return Tuning.time_factor(float(pay_info.base) + exit_time + extra_time, float(pay_info.par)) if not pay_info.is_empty() else 1.0
+
+## Restliche Gehzeit bis zur Haustür (Sekunden).
+func remaining_walk() -> float:
+	return absf(target_x - x) / (SPEED * speed_mul)

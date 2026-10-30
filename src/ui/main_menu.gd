@@ -54,18 +54,7 @@ func show_main(focus_lang := "") -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
 	box.add_child(gap)
-	var flags := HBoxContainer.new()
-	flags.alignment = BoxContainer.ALIGNMENT_CENTER
-	flags.add_theme_constant_override("separation", 10)
-	var cur := TranslationServer.get_locale().substr(0, 2)
-	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch"], ["en", "res://assets/art/flag_en.png", "English"]]:
-		var code: String = entry[0]
-		var fb := MenuKit.flag_button(load(entry[1]), cur == code, entry[2], func():
-			Settings.set_value("language", code)
-			show_main(code))
-		fb.set_meta("lang", code)
-		flags.add_child(fb)
-	box.add_child(flags)
+	box.add_child(MenuKit.flag_row(func(code): show_main(code)))
 	_focus_first(focus_lang)
 
 func show_levels() -> void:

@@ -226,13 +226,22 @@ func _physics_process(_delta: float) -> void:
 			_lose_life()
 
 func _lose_life() -> void:
-	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over, sonst Level neu mit dem Sprit/den Credits von Levelbeginn.
+	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
+	## Der Fahrgast an Bord ist verloren und wartet erneut an seinem Abholpad, neues Taxi am Startpad.
 	Flow.lives -= 1
 	if Flow.lives <= 0:
 		Flow.lives = 0
 		hud.game_over = true
 		return
-	load_level(level_path)
+	run.respawn_after_crash()
+	gear_on = run.sim.gear_cmd
+	restart_timer = 0.0
+	taxi.sync_state()
+	taxi.reset_physics_interpolation()
+	cam.global_position = _cam_target()
+	cam.reset_physics_interpolation()
+	for e in run.log:
+		_on_event(e)
 
 func _on_event(e: Dictionary) -> void:
 	match e.type:
@@ -259,6 +268,8 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play_voice(e.voice, "angry")
 			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 			Sfx.play("hit", -8.0)
+		"passenger_lost":
+			hud.flash_message(tr("MSG_LOST") % [e.name, e.pad], 3.5)
 		"replacement":
 			hud.flash_message(tr("MSG_SQUASH") % e.pad, 3.0)
 		"carried_thanks":
@@ -377,9 +388,9 @@ func _release_carried() -> void:
 		return
 	var a := PassengerActor.new()
 	a.setup({"passenger": c.name, "gender": c.gender, "look": c.look}, run.sim.landed_pad, 0, true)
+	a.pay_info = c.get("pay_info", {})            # Bezahlt wird, wenn er sein Häuschen erreicht
 	a.step_out(run.sim.pos.x, run.sim.landed_pad)
 	run.leavers.append(a)
-	_on_event({"type": "carried_thanks", "voice": a.voice_key(), "name": a.pname})
 
 func _end_transition() -> void:
 	props.door_override = -1.0

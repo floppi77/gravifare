@@ -58,7 +58,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var eng := clampf((MAX_MARGIN - clearance) / (MAX_MARGIN - STEP), 0.0, 1.0)
 	var length := clampf(route_len / 3500.0, 0.0, 1.0)
 	var jobs := clampf(float(lvl.jobs.size()) / 6.0, 0.0, 1.0)
-	var padn := clampf((84.0 - min_pad) / 50.0, 0.0, 1.0)
+	var padn := clampf((84.0 - min_pad) / 64.0, 0.0, 1.0)
 	var hz := clampf(float(hazards) / 20.0, 0.0, 1.0)
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,

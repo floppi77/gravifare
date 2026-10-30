@@ -24,13 +24,14 @@ func _clear() -> void:
 		box.remove_child(c)
 		c.queue_free()
 
-func _focus_first() -> void:
+func _focus_first(lang := "") -> void:
 	await get_tree().process_frame
 	for c in box.find_children("*", "Button", true, false):
-		c.grab_focus()
-		return
+		if lang == "" or c.get_meta("lang", "") == lang:
+			c.grab_focus()
+			return
 
-func show_main() -> void:
+func show_main(focus_lang := "") -> void:
 	in_sub = false
 	_clear()
 	box.add_child(MenuKit.title(tr("HUD_PAUSED")))
@@ -44,7 +45,11 @@ func show_main() -> void:
 		box.add_child(MenuKit.options_panel(show_main, _reopen_options))
 		_focus_first()))
 	box.add_child(MenuKit.button(tr("MENU_TO_MENU"), func(): Flow.to_menu()))
-	_focus_first()
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 8)
+	box.add_child(gap)
+	box.add_child(MenuKit.flag_row(func(code): show_main(code)))      # Sprachwahl auch im Spiel
+	_focus_first(focus_lang)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not event.is_action_pressed("pause"):
