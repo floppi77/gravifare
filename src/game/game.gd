@@ -191,8 +191,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif paused:
 		return
-	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE:
-		Flow.to_menu()          # nur das letzte Level erreicht diesen Pfad; sonst übernimmt die Levelwechsel-Sequenz
+	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
+		if Flow.next_level_id() != "":
+			_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
+		else:
+			Flow.to_menu()          # letztes Level: zurück ins Menü
+		get_viewport().set_input_as_handled()
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept"):
 			Flow.to_menu()
@@ -245,14 +249,16 @@ func _physics_process(_delta: float) -> void:
 		Save.note_max("best_streak", run.best_streak)
 		var prev_best := Save.best_time(Flow.current_level)
 		var med := run.medals()
-		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees}
+		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
+		hud.result_age = 0.0
+		hud.next_exists = Flow.next_level_id() != ""
 		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med)
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
-		if Flow.next_level_id() != "":
-			_begin_transition()
-		else:
+		if Flow.next_level_id() == "":
 			Save.clear_campaign()
+		elif autopilot != null:
+			_begin_transition()                  # Autopilot-Läufe (Dev) laufen ohne Bestätigung weiter
 	if run.result == Run.Result.FAILED and not hud.game_over:
 		restart_timer += Tuning.TICK
 		if restart_timer > 1.2:

@@ -173,5 +173,10 @@
  "MSG_RIDE_DAMAGE": "Unsanfte Fahrt! Fahrpreis −%d %%",
  "VOICE_WRONG_PAD": "Das ist die falsche Plattform!",
  "VOICE_BUMPY": "Fahr doch vorsichtiger!",
- "MSG_JOB_MISSED": "%s verpasst: −¢%d"
+ "MSG_JOB_MISSED": "%s verpasst: −¢%d",
+ "RES_EARNED": "Einnahmen ¢%d  (Aufträge %d/%d, Zusatzfahrten %d)",
+ "RES_DEDUCT": "Abzüge: Reparatur −¢%d · Ersatztaxis −¢%d · Verpasst −¢%d",
+ "RES_NET": "Ergebnis ¢%+d   Kontostand ¢%d",
+ "RES_CONTINUE": "Enter / A: Weiter zum nächsten Level",
+ "RES_TO_MENU": "Enter / A: Zurück zum Menü"
 }

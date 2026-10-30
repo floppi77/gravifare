@@ -80,7 +80,7 @@ func _draw_pads() -> void:
 			draw_colored_polygon(tri, fc)
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
 			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
-			draw_string(font, Vector2(tx, top + 9.6), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 10, Color("#0c0f24"))
+			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
 		if is_target:
 			var pulse := 0.5 + 0.5 * sin(t * 6.0)
 			var c2 := Color("#ffe14a")

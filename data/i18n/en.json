@@ -173,5 +173,10 @@
  "MSG_RIDE_DAMAGE": "Bumpy ride! Fare −%d%%",
  "VOICE_WRONG_PAD": "That's the wrong platform!",
  "VOICE_BUMPY": "Careful, please!",
- "MSG_JOB_MISSED": "%s missed: −¢%d"
+ "MSG_JOB_MISSED": "%s missed: −¢%d",
+ "RES_EARNED": "Earnings ¢%d  (jobs %d/%d, extra fares %d)",
+ "RES_DEDUCT": "Deductions: repairs −¢%d · replacement taxis −¢%d · missed −¢%d",
+ "RES_NET": "Result ¢%+d   Balance ¢%d",
+ "RES_CONTINUE": "Enter / A: continue to the next level",
+ "RES_TO_MENU": "Enter / A: back to the menu"
 }

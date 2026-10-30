@@ -13,6 +13,8 @@ var price_flash := 0.0
 var hint_text := ""
 var hint_t := 0.0
 var result := {}
+var result_age := 0.0            # Sekunden seit Anzeige der Ergebnisansicht
+var next_exists := true
 var taxi_icon: Texture2D = Cosmetics.paint_texture()
 var font: Font = Fonts.hud
 
@@ -33,6 +35,8 @@ func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
 func _process(delta: float) -> void:
 	message_t = maxf(0.0, message_t - delta)
 	price_flash = maxf(0.0, price_flash - delta * 1.6)
+	if not result.is_empty():
+		result_age += delta
 	hint_t = maxf(0.0, hint_t - delta)
 	sub_t = maxf(0.0, sub_t - delta)
 	queue_redraw()
@@ -144,9 +148,8 @@ func _draw() -> void:
 	elif run.result == Run.Result.FAILED:
 		draw_string(font, Vector2(0, size.y * 0.45), tr("HUD_CRASHED"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#ff4d6d"))
 		draw_string(font, Vector2(0, size.y * 0.45 + 16), tr("HUD_LAST_LIFE") if Flow.lives <= 1 else tr("HUD_LIFE_LOST") % (Flow.lives - 1), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
-	elif run.result == Run.Result.COMPLETE:
+	elif run.result == Run.Result.COMPLETE and result.is_empty():
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#5dff9a"))
-		draw_string(font, Vector2(0, size.y * 0.42 + 16), tr("HUD_COMPLETE_EARNED") % int(run.earned), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 	if hint_t > 0.0 and hint_text != "":
 		var hw := minf(Fonts.ui.get_string_size(hint_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 16.0, size.x - 40.0)
 		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
@@ -158,22 +161,34 @@ func _draw() -> void:
 	if paused:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
 
-## Ergebnisblock nach dem Level: Zeit gegen Ziel/Bestzeit und die drei Medaillen.
+## Ergebnisansicht nach dem Level: bleibt stehen, bis der Spieler bestätigt (Enter/A).
 func _draw_result() -> void:
 	var m: Dictionary = result.medals
-	var y := size.y * 0.42 + 36.0
+	var pw := 420.0
+	var ph := 150.0
+	var px := size.x * 0.5 - pw * 0.5
+	var py := 62.0
+	draw_rect(Rect2(px - 1, py - 1, pw + 2, ph + 2), Color("#0c0f24"))
+	draw_rect(Rect2(px, py, pw, ph), Color(0.06, 0.08, 0.2, 0.93))
+	draw_rect(Rect2(px, py, pw, ph), Color("#3a4580"), false, 0.8)
+	var ui := Fonts.ui
+	draw_string(font, Vector2(px, py + 17), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, pw, 14, Color("#5dff9a"))
 	var t_line := tr("RES_TIME") % [int(result.time), int(result.target)]
 	if float(result.best) > 0.0:
 		t_line += "   " + (tr("RES_NEW_BEST") if float(result.time) < float(result.best) else tr("RES_BEST") % int(result.best))
-	draw_string(font, Vector2(0, y), t_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#c9cfee"))
-	draw_string(font, Vector2(0, y - 12), tr("RES_COSTS") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("missed_fees", 0.0)), int(result.get("net", 0.0))], HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#ff9a7a"))
+	draw_string(ui, Vector2(px + 14, py + 36), t_line, HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#c9cfee"))
+	draw_string(ui, Vector2(px + 14, py + 51), tr("RES_EARNED") % [int(result.earned), int(result.get("delivered", 0)), int(result.get("jobs", 0)), int(result.get("extras", 0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#ffe14a"))
+	draw_string(ui, Vector2(px + 14, py + 66), tr("RES_DEDUCT") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("missed_fees", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#ff9a7a"))
+	var net := float(result.get("net", 0.0))
+	draw_string(ui, Vector2(px + 14, py + 84), tr("RES_NET") % [int(net), int(result.get("balance", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 11, Color("#5dff9a") if net >= 0.0 else Color("#ff6a4a"))
 	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
 	for i in items.size():
-		var x := size.x * 0.5 - 150.0 + i * 100.0
+		var x := px + 14.0 + i * 130.0
 		var got: bool = m[items[i][0]]
 		var col := Color("#ffd24a") if got else Color("#5a628f")
-		_star(Vector2(x + 6, y + 14), 6.5, col, got)
-		draw_string(font, Vector2(x + 16, y + 17), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 9, col)
+		_star(Vector2(x + 7, py + 108), 7.0, col, got)
+		draw_string(ui, Vector2(x + 19, py + 112), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, col)
+	draw_string(ui, Vector2(px, py + ph - 12), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#a9b8ff"))
 
 ## Fünfzackiger Stern (Level-Abschluss-Medaille): gefüllt in Gold, wenn erreicht, sonst nur als dunkle Silhouette.
 func _star(c: Vector2, r: float, col: Color, filled: bool) -> void:
