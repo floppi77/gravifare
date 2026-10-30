@@ -44,6 +44,13 @@ func setup(lvl: LevelData) -> void:
 			landed_pad = pad
 			break
 
+## Wirksame Düsenstärken und Dämpfung: gleiten vom Reisemodus (Fahrwerk drin) zum Feinmodus (draußen).
+func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear)
+func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear)
+func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear)
+func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, gear)
+func max_speed() -> float: return lerpf(Tuning.MAX_SPEED, Tuning.GEAR_MAX_SPEED, gear)
+
 func gear_extended() -> bool:
 	return gear >= 0.99
 
@@ -86,15 +93,15 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			return
 
 	var acc := Vector2(0.0, level.gravity)
-	acc.y -= Tuning.THRUST_UP * up
-	acc.y += Tuning.THRUST_DOWN * down
-	acc.x += Tuning.THRUST_SIDE * side
+	acc.y -= up_power() * up
+	acc.y += down_power() * down
+	acc.x += side_power() * side
 	fuel = maxf(0.0, fuel - dt * (Tuning.BURN_UP * up + Tuning.BURN_DOWN * down + Tuning.BURN_SIDE * absf(side)))
 
 	vel += acc * dt
-	vel *= maxf(0.0, 1.0 - Tuning.DRAG * dt)
-	if vel.length() > Tuning.MAX_SPEED:
-		vel = vel.normalized() * Tuning.MAX_SPEED
+	vel *= maxf(0.0, 1.0 - drag() * dt)
+	if vel.length() > max_speed():
+		vel = vel.normalized() * max_speed()
 
 	var target_tilt := side * Tuning.TILT_MAX
 	tilt = lerpf(tilt, target_tilt, minf(1.0, Tuning.TILT_RATE * dt))

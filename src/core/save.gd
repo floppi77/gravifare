@@ -3,9 +3,14 @@ extends Node
 ## bei defekter Datei wird sie als .bad gesichert und ein leerer Stand verwendet.
 
 const PATH := "user://save.json"
+## Dev-/Testläufe (Autopilot, Debug-Flags) dürfen den echten Speicherstand nie verändern.
+var dev_session := false
 var data := {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "delivered": 0}}
 
 func _ready() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit"] or a.begins_with("--debug-input="):
+			dev_session = true
 	load_save()
 
 func load_save() -> void:
@@ -20,6 +25,8 @@ func load_save() -> void:
 		push_warning("Speicherstand defekt – gesichert als save.json.bad")
 
 func write() -> void:
+	if dev_session:
+		return
 	var tmp := PATH + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:

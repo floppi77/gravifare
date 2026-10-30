@@ -8,10 +8,14 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := TextureRect.new()
 	bg.texture = load("res://assets/art/bg_s1_far.png")
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg.stretch_mode = TextureRect.STRETCH_SCALE
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	var near := TextureRect.new()
 	near.texture = load("res://assets/art/bg_s1_near.png")
+	near.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	near.stretch_mode = TextureRect.STRETCH_SCALE
 	near.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(near)
 	box = VBoxContainer.new()
@@ -28,11 +32,12 @@ func _clear() -> void:
 		box.remove_child(c)
 		c.queue_free()
 
-func _focus_first() -> void:
+func _focus_first(lang := "") -> void:
 	await get_tree().process_frame
 	for c in box.find_children("*", "Button", true, false):
-		c.grab_focus()
-		return
+		if lang == "" or c.get_meta("lang", "") == lang:
+			c.grab_focus()
+			return
 
 func _next_open_level() -> String:
 	var ids := Flow.level_ids()
@@ -41,7 +46,7 @@ func _next_open_level() -> String:
 			return id
 	return ids[0] if not ids.is_empty() else ""
 
-func show_main() -> void:
+func show_main(focus_lang := "") -> void:
 	_clear()
 	box.add_child(MenuKit.title("GRAVIFARE", 28))
 	box.add_child(MenuKit.title(tr("TITLE_SUB"), 10))
@@ -54,7 +59,23 @@ func show_main() -> void:
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), show_options))
 	box.add_child(MenuKit.button(tr("MENU_QUIT"), func(): get_tree().quit()))
-	_focus_first()
+	# Sprachwahl: zwei Flaggen ohne Text unter dem Menü
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 8)
+	box.add_child(gap)
+	var flags := HBoxContainer.new()
+	flags.alignment = BoxContainer.ALIGNMENT_CENTER
+	flags.add_theme_constant_override("separation", 10)
+	var cur := TranslationServer.get_locale().substr(0, 2)
+	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch"], ["en", "res://assets/art/flag_en.png", "English"]]:
+		var code: String = entry[0]
+		var fb := MenuKit.flag_button(load(entry[1]), cur == code, entry[2], func():
+			Settings.set_value("language", code)
+			show_main(code))
+		fb.set_meta("lang", code)
+		flags.add_child(fb)
+	box.add_child(flags)
+	_focus_first(focus_lang)
 
 func show_levels() -> void:
 	_clear()
@@ -77,7 +98,7 @@ func show_levels() -> void:
 
 func show_options() -> void:
 	_clear()
-	box.add_child(MenuKit.options_panel(show_main))
+	box.add_child(MenuKit.options_panel(show_main, show_options))
 	_focus_first()
 
 func _unhandled_input(event: InputEvent) -> void:

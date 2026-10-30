@@ -175,29 +175,114 @@ def taxi():
     d.arc([8, 14, 87, 46], 20, 160, fill=shade(ydd, 0.75), width=1)
     img.save(OUT + "taxi.png")
 
-# ------------------------------------------------------------------ Fahrgäste (24x36 je Figur)
+# ------------------------------------------------------------------ Fahrgäste (24x36 je Frame)
+# Sheet: 4 Figuren (Zeilen) x 10 Frames: 0-1 Idle, 2-3 Winken, 4-9 Laufzyklus (blickt nach rechts)
+LOOKS = [  # Haut, Kleidung, Haar, Highlight, weiblich?
+    ("#f2c29b", "#d9467f", "#3a2a52", "#ffd0e8", True),
+    ("#a8714f", "#3fb68b", "#1c1c30", "#b9ffe0", False),
+    ("#e9b58c", "#e8a33a", "#552a1c", "#fff0b0", False),
+    ("#8fd0c8", "#7a6bd8", "#22223d", "#d9d2ff", True),
+]
+PANTS, SHOE = hexc("#43529c"), hexc("#10142b")
+
+def person(i, pose, k=0):
+    """pose: 'idle' (k=0/1), 'wave' (k=0/1), 'walk' (k=0..5)."""
+    skin, cloth, hair, hi, fem = LOOKS[i]
+    sk, cl, hr = hexc(skin), hexc(cloth), hexc(hair)
+    f = Image.new("RGBA", (24, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(f)
+    if pose == "walk":
+        ph = k / 6.0 * 2 * np.pi
+        bob = int(round(abs(np.sin(ph)) * 1.2))
+        sw = np.sin(ph)
+        hx = 12
+        top = 14 + bob
+        # hintere Gliedmaßen zuerst (dunkler)
+        def limb(x0, y0, ang, ln, col, w):
+            x1, y1 = x0 + np.sin(ang) * ln, y0 + np.cos(ang) * ln
+            d.line([x0, y0, x1, y1], fill=col, width=w)
+            return int(x1), int(y1)
+        back_leg = limb(hx, 27 + bob, -sw * 0.65, 9, shade(PANTS, 0.75), 4)
+        back_arm = limb(hx, top + 2, sw * 0.6, 9, shade(cl, 0.75), 3)
+        d.rectangle([back_leg[0] - 1, back_leg[1] - 1, back_leg[0] + 3, back_leg[1] + 1], fill=SHOE)
+        # Torso (Seitenansicht)
+        d.rounded_rectangle([hx - 4, top, hx + 4, 28 + bob], radius=3, fill=cl)
+        d.rectangle([hx - 4, 23 + bob, hx + 4, 28 + bob], fill=shade(cl, 0.82))
+        if fem: d.polygon([(hx - 5, 27 + bob), (hx + 5, 27 + bob), (hx + 6, 30 + bob), (hx - 6, 30 + bob)], fill=shade(cl, 0.9))
+        front_leg = limb(hx, 27 + bob, sw * 0.65, 9, PANTS, 4)
+        d.rectangle([front_leg[0] - 1, front_leg[1] - 1, front_leg[0] + 4, front_leg[1] + 1], fill=SHOE)
+        # Kopf im Profil, Blick nach rechts
+        d.ellipse([hx - 4, 2 + bob, hx + 5, 13 + bob], fill=sk)
+        d.rectangle([hx + 3, 7 + bob, hx + 5, 8 + bob], fill=shade(sk, 0.85))      # Nase
+        d.point((hx + 3, 6 + bob), fill=SHOE)
+        d.pieslice([hx - 5, 0 + bob, hx + 5, 11 + bob], 180, 360, fill=hr)
+        d.rectangle([hx - 5, 4 + bob, hx - 3, (14 if fem else 9) + bob], fill=hr)
+        if i == 3: d.ellipse([hx - 7, 0 + bob, hx - 3, 4 + bob], fill=hr)
+        front_arm = limb(hx, top + 2, -sw * 0.6, 9, cl, 3)
+        d.rectangle([front_arm[0] - 1, front_arm[1] - 1, front_arm[0] + 1, front_arm[1] + 1], fill=sk)
+        if i == 1: d.rectangle([front_arm[0] - 2, front_arm[1] + 1, front_arm[0] + 3, front_arm[1] + 7], fill=hexc("#6a4a2a"))
+    else:
+        yoff = 1 if (pose == "idle" and k == 1) else 0
+        d.rounded_rectangle([6, 14 + yoff, 17, 28], radius=3, fill=cl)
+        d.rectangle([6, 22, 17, 28], fill=shade(cl, 0.82)); d.line([7, 15 + yoff, 16, 15 + yoff], fill=hexc(hi))
+        if fem: d.polygon([(5, 27), (18, 27), (20, 31), (3, 31)], fill=shade(cl, 0.9))
+        d.rectangle([8, 28, 11, 35], fill=PANTS); d.rectangle([12, 28, 15, 35], fill=PANTS)
+        d.rectangle([7, 34, 11, 35], fill=SHOE); d.rectangle([12, 34, 16, 35], fill=SHOE)
+        if pose == "wave":
+            up = 0 if k == 0 else 2
+            d.rectangle([3, 15, 5, 25], fill=cl); d.rectangle([3, 25, 5, 27], fill=sk)          # linker Arm unten
+            d.polygon([(18, 16), (21 + up, 6), (24 if up else 23, 6), (20, 17)], fill=cl)       # rechter Arm hoch
+            d.rectangle([20 + up, 3, 23 + up, 6], fill=sk)
+        else:
+            d.rectangle([3, 15, 5, 25], fill=cl); d.rectangle([18, 15, 20, 25], fill=cl)
+            d.rectangle([3, 25, 5, 27], fill=sk); d.rectangle([18, 25, 20, 27], fill=sk)
+        d.ellipse([6, 2 + yoff, 17, 14 + yoff], fill=sk)
+        d.pieslice([5, 0 + yoff, 18, 12 + yoff], 180, 360, fill=hr); d.rectangle([5, 5 + yoff, 7, (13 if fem else 9) + yoff], fill=hr)
+        if fem: d.rectangle([16, 5 + yoff, 18, 13 + yoff], fill=hr)
+        if i == 3: d.ellipse([9, -1 + yoff, 14, 3 + yoff], fill=hr)
+        blink = pose == "idle" and k == 1
+        if blink:
+            d.line([9, 8 + yoff, 10, 8 + yoff], fill=OUTLINE); d.line([13, 8 + yoff, 14, 8 + yoff], fill=OUTLINE)
+        else:
+            d.rectangle([9, 8 + yoff, 10, 9 + yoff], fill=OUTLINE); d.rectangle([13, 8 + yoff, 14, 9 + yoff], fill=OUTLINE)
+        d.line([10, 12 + yoff, 13, 12 + yoff], fill=shade(sk, 0.7))
+        if pose == "wave": d.rectangle([11, 11 + yoff, 12, 11 + yoff], fill=hexc("#7a2a3a"))
+        if i == 1 and pose != "wave": d.rectangle([19, 25, 23, 32], fill=hexc("#6a4a2a")); d.rectangle([19, 25, 23, 26], fill=hexc("#a07a3a"))
+    return add_outline(f)
+
 def passengers():
-    looks = [("#f2c29b", "#d9467f", "#3a2a52", "#ffd0e8"), ("#a8714f", "#3fb68b", "#1c1c30", "#b9ffe0"),
-             ("#e9b58c", "#e8a33a", "#552a1c", "#fff0b0"), ("#8fd0c8", "#7a6bd8", "#22223d", "#d9d2ff")]
-    img = Image.new("RGBA", (24 * 4, 36), (0, 0, 0, 0))
-    for i, (skin, cloth, hair, hi) in enumerate(looks):
-        f = Image.new("RGBA", (24, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(f)
-        sk, cl, hr = hexc(skin), hexc(cloth), hexc(hair)
-        d.rounded_rectangle([6, 14, 17, 28], radius=3, fill=cl)             # Torso
-        d.rectangle([6, 22, 17, 28], fill=shade(cl, 0.8)); d.line([7, 15, 16, 15], fill=hexc(hi))
-        d.rectangle([3, 15, 5, 25], fill=cl); d.rectangle([18, 15, 20, 25], fill=cl)   # Arme
-        d.rectangle([3, 25, 5, 27], fill=sk); d.rectangle([18, 25, 20, 27], fill=sk)
-        d.rectangle([8, 28, 11, 35], fill=hexc("#2a2e57")); d.rectangle([12, 28, 15, 35], fill=hexc("#2a2e57"))
-        d.rectangle([7, 34, 11, 35], fill=OUTLINE); d.rectangle([12, 34, 16, 35], fill=OUTLINE)
-        d.ellipse([6, 2, 17, 14], fill=sk)                                  # Kopf
-        d.pieslice([5, 0, 18, 12], 180, 360, fill=hr); d.rectangle([5, 5, 7, 9], fill=hr)
-        d.rectangle([9, 8, 10, 9], fill=OUTLINE); d.rectangle([13, 8, 14, 9], fill=OUTLINE)
-        d.line([10, 12, 13, 12], fill=shade(sk, 0.7))
-        if i == 1: d.rectangle([19, 24, 23, 31], fill=hexc("#6a4a2a")); d.rectangle([19, 24, 23, 25], fill=hexc("#a07a3a"))  # Koffer
-        if i == 3: d.polygon([(5, 2), (2, -0), (8, 1)], fill=hr)
-        f = add_outline(f)
-        img.alpha_composite(f, (i * 24, 0))
+    frames = [("idle", 0), ("idle", 1), ("wave", 0), ("wave", 1)] + [("walk", k) for k in range(6)]
+    img = Image.new("RGBA", (24 * len(frames), 36 * len(LOOKS)), (0, 0, 0, 0))
+    for i in range(len(LOOKS)):
+        for j, (pose, k) in enumerate(frames):
+            img.alpha_composite(person(i, pose, k), (j * 24, i * 36))
     img.save(OUT + "passengers.png")
+
+# ------------------------------------------------------------------ Wartebereich-Unterstand (24x20 Einheiten = 72x60 px)
+def shelter():
+    W, H = 72, 60
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
+    wall, wall_d, glass = hexc("#2a3466"), hexc("#1a2048"), hexc("#7ef0ee", 70)
+    d.rectangle([3, 12, W - 4, H - 1], fill=wall)                                 # Rückwand
+    vgrad(d, (3, 12, W - 4, H - 1), hexc("#34407e")[:3], hexc("#1b2250")[:3])
+    for x in range(8, W - 6, 9): d.line([x, 14, x, H - 2], fill=wall_d)           # Paneelfugen
+    # beleuchtete Tür in der Mitte
+    d.rectangle([27, 22, 44, H - 1], fill=OUTLINE)
+    d.rectangle([29, 24, 42, H - 1], fill=hexc("#ffe9a8")); vgrad(d, (29, 24, 42, H - 1), hexc("#fff6d0")[:3], hexc("#ffb85a")[:3])
+    d.rectangle([29, 24, 42, 27], fill=hexc("#7a5a2a"))
+    # Bank links und rechts der Tür
+    for bx in (6, 48):
+        d.rectangle([bx, 44, bx + 17, 47], fill=hexc("#c9871f")); d.rectangle([bx, 47, bx + 17, 48], fill=hexc("#7a4a12"))
+        d.rectangle([bx + 2, 48, bx + 3, 56], fill=OUTLINE); d.rectangle([bx + 14, 48, bx + 15, 56], fill=OUTLINE)
+    # Dach mit Leuchtkante
+    d.polygon([(0, 14), (6, 4), (W - 7, 4), (W - 1, 14)], fill=hexc("#4a5596"))
+    d.polygon([(2, 14), (7, 6), (W - 8, 6), (W - 3, 14)], fill=hexc("#6a78c4"))
+    d.rectangle([0, 14, W - 1, 17], fill=hexc("#232a5a")); d.rectangle([2, 17, W - 3, 18], fill=hexc("#35e0d2"))
+    # Piktogramm-Schild
+    d.rectangle([30, 9, 41, 13], fill=OUTLINE); d.rectangle([31, 10, 40, 12], fill=hexc("#ffcb3d"))
+    # Glasscheibe (leicht durchsichtig)
+    for gx in (5, 49): d.rectangle([gx, 20, gx + 17, 42], fill=glass)
+    img = add_outline(img)
+    img.save(OUT + "shelter.png")
 
 # ------------------------------------------------------------------ Ausgangstor
 GW, GH = 192, 96          # 4x2 Tiles
@@ -335,8 +420,96 @@ def background():
         for x in range(0, W, 120): nd.rectangle([x, y - 40, x + 6, y + 8], fill=hexc("#0e1230"))
     near.save(OUT + "bg_s1_near.png")
 
+# ------------------------------------------------------------------ Flaggen (120x80 = 40x26,7 Einheiten, Sprachwahl im Hauptmenü)
+def flags():
+    W, H = 120, 80
+    def finish(im, name):
+        # leichte Wellenschattierung + Rand mit abgerundeten Ecken
+        a = np.array(im).astype(float)
+        for x in range(W):
+            k = 1.0 + 0.07 * np.sin(x / W * 2 * np.pi * 1.5)
+            a[:, x, :3] *= k
+        im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+        mask = Image.new("L", (W, H), 0); ImageDraw.Draw(mask).rounded_rectangle([0, 0, W - 1, H - 1], radius=6, fill=255)
+        out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.paste(im, (0, 0), mask)
+        d = ImageDraw.Draw(out); d.rounded_rectangle([0, 0, W - 1, H - 1], radius=6, outline=hexc("#0c0f24"), width=2)
+        d.line([6, 2, W - 7, 2], fill=(255, 255, 255, 90))
+        out.save(OUT + name)
+    # Deutschland
+    de = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(de)
+    d.rectangle([0, 0, W, 27], fill=hexc("#111111")); d.rectangle([0, 27, W, 53], fill=hexc("#dd0000")); d.rectangle([0, 54, W, H], fill=hexc("#ffce00"))
+    finish(de, "flag_de.png")
+    # Union Jack (volle Fläche)
+    def union_jack():
+        im = Image.new("RGBA", (W, H), hexc("#012169")); d = ImageDraw.Draw(im)
+        d.line([0, 0, W, H], fill=hexc("#ffffff"), width=13); d.line([0, H, W, 0], fill=hexc("#ffffff"), width=13)
+        d.line([0, 0, W, H], fill=hexc("#c8102e"), width=5); d.line([0, H, W, 0], fill=hexc("#c8102e"), width=5)
+        d.rectangle([0, H // 2 - 9, W, H // 2 + 9], fill=hexc("#ffffff")); d.rectangle([W // 2 - 9, 0, W // 2 + 9, H], fill=hexc("#ffffff"))
+        d.rectangle([0, H // 2 - 5, W, H // 2 + 5], fill=hexc("#c8102e")); d.rectangle([W // 2 - 5, 0, W // 2 + 5, H], fill=hexc("#c8102e"))
+        return im
+    def stars_and_stripes():
+        im = Image.new("RGBA", (W, H), hexc("#ffffff")); d = ImageDraw.Draw(im)
+        for i in range(13):
+            if i % 2 == 0:
+                d.rectangle([0, int(i * H / 13), W, int((i + 1) * H / 13) - 1], fill=hexc("#b22234"))
+        # Sternenfeld (vereinfacht) unten rechts, damit es in der sichtbaren Hälfte liegt
+        d.rectangle([W - 54, H - 40, W, H], fill=hexc("#3c3b6e"))
+        for r in range(4):
+            for c in range(5):
+                cx, cy = W - 48 + c * 10 + (5 if r % 2 else 0), H - 34 + r * 9
+                d.rectangle([cx, cy, cx + 2, cy + 2], fill=hexc("#ffffff"))
+        return im
+    uk, us = union_jack(), stars_and_stripes()
+    yy, xx = np.mgrid[0:H, 0:W]
+    upper_left = (xx / W + yy / H) < 1.0
+    en = Image.fromarray(np.where(upper_left[:, :, None], np.array(uk), np.array(us)).astype(np.uint8))
+    d = ImageDraw.Draw(en); d.line([W, 0, 0, H], fill=hexc("#0c0f24"), width=2)
+    finish(en, "flag_en.png")
+
+# ------------------------------------------------------------------ Weltraum-Zwischensequenz
+def space():
+    W, H = 1920, 1080
+    yy = np.linspace(0, 1, H)[:, None]
+    top, bot = np.array([5, 6, 22]), np.array([30, 18, 70])
+    base = top[None, None, :] + (bot - top)[None, None, :] * (yy ** 1.2)[:, :, None]
+    base = np.repeat(base, W, axis=1)
+    n1 = fbm(W, H, 31); n2 = fbm(W, H, 37)
+    base += (np.clip((n1 - 0.42) * 2.4, 0, 1))[:, :, None] * np.array([85, 30, 110])[None, None, :] * 0.8
+    base += (np.clip((n2 - 0.5) * 2.6, 0, 1))[:, :, None] * np.array([10, 85, 95])[None, None, :] * 0.55
+    thr = np.tile(BAYER, (H // 4 + 1, W // 4 + 1))[:H, :W]
+    q = np.floor(base / (255 / 24.0) + thr[:, :, None]) * (255 / 24.0)
+    Image.fromarray(np.clip(q, 0, 255).astype(np.uint8)).convert("RGBA").save(OUT + "space_bg.png")
+    def planet(name, light_dir, pal_a, pal_b, bands, ring, seed):
+        S = 192; r = 78
+        yy2, xx2 = np.mgrid[0:S, 0:S]
+        cx = cy = S / 2
+        dist = np.sqrt((xx2 - cx) ** 2 + (yy2 - cy) ** 2)
+        inside = dist <= r
+        light = np.clip(((xx2 - cx) * light_dir[0] + (yy2 - cy) * light_dir[1]) / r * 0.5 + 0.55, 0, 1)
+        band = np.sin((yy2 - cy) / bands + fbm(S, S, seed, 4) * 5) * 0.5 + 0.5
+        col = np.array(pal_a)[None, None, :] * (1 - band[:, :, None] * 0.5) + np.array(pal_b)[None, None, :] * band[:, :, None] * 0.5
+        col = col * (0.22 + 0.9 * light[:, :, None])
+        th = np.tile(BAYER, (S // 4 + 1, S // 4 + 1))[:S, :S]
+        col = np.floor(col / 16.0 + th[:, :, None]) * 16.0
+        im = Image.new("RGBA", (S, S), (0, 0, 0, 0)); ar = np.array(im)
+        ar[inside, :3] = np.clip(col, 0, 255).astype(np.uint8)[inside]; ar[inside, 3] = 255
+        im = Image.fromarray(ar); d = ImageDraw.Draw(im)
+        # Kantenaufhellung (Atmosphäre)
+        rim = Image.new("RGBA", (S, S), (0, 0, 0, 0)); rd = ImageDraw.Draw(rim)
+        rd.ellipse([cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1], outline=hexc("#bfe8ff", 90), width=2)
+        im.alpha_composite(rim)
+        if ring:
+            rg = Image.new("RGBA", (S, S), (0, 0, 0, 0)); gd = ImageDraw.Draw(rg)
+            for k, c in enumerate((hexc("#e8d9b0", 200), hexc("#b89a70", 170))):
+                gd.ellipse([8 - k * 3, cy - 14 - k * 2, S - 8 + k * 3, cy + 14 + k * 2], outline=c, width=3)
+            im.alpha_composite(rg)
+        im.save(OUT + name)
+    planet("planet_1.png", (-0.6, -0.5), (90, 180, 210), (40, 90, 150), 9.0, True, 41)
+    planet("planet_2.png", (0.6, -0.4), (120, 170, 90), (150, 110, 70), 7.0, False, 43)
+    planet("planet_3.png", (-0.5, 0.5), (230, 120, 110), (140, 50, 90), 12.0, False, 47)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "taxi", "passengers", "gate", "background"):
+    for f in ("tiles", "taxi", "passengers", "shelter", "gate", "background", "space", "flags"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

@@ -15,6 +15,14 @@ const MAX_SPEED := 240.0
 const TILT_MAX := 0.24           # rad bei vollem Seitenschub (~14°)
 const TILT_RATE := 9.0           # Glättung der Neigung pro Sekunde
 
+# Fahrwerk ausgefahren = Feinmanöver: schwächere Düsen, starke Dämpfung, niedrigere Höchstgeschwindigkeit.
+# Eingefahren = schnelle Navigation (Werte oben). Der Übergang folgt der Fahrwerksanimation.
+const GEAR_THRUST_UP := 150.0
+const GEAR_THRUST_DOWN := 80.0
+const GEAR_THRUST_SIDE := 68.0
+const GEAR_DRAG := 1.1
+const GEAR_MAX_SPEED := 90.0
+
 # Hülle
 const HULL_HALF := Vector2(10, 5)
 const FOOT_X := 8.0

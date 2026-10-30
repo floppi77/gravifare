@@ -15,9 +15,9 @@ g.rect("#", 29, 6, 38, 8)                 # Deckenplatte rechts
 g.gate()
 g.put("S", 4, 17)
 w = write("S1-02", 1, 2, "Tankstopp", "Fuel Stop", g,
-          [{"from": "1", "to": "2", "fare": 45, "time_limit": 50, "passenger": "Mika"},
-           {"from": "2", "to": "3", "fare": 55, "time_limit": 55, "passenger": "Odo"},
-           {"from": "3", "to": "1", "fare": 55, "time_limit": 55, "passenger": "Odo"}],
+          [{"from": "1", "to": "2", "fare": 45, "time_limit": 50, "passenger": "Mika", "gender": "f"},
+           {"from": "2", "to": "3", "fare": 55, "time_limit": 55, "passenger": "Odo", "gender": "m"},
+           {"from": "3", "to": "1", "fare": 55, "time_limit": 55, "passenger": "Lena", "gender": "f"}],
           start_fuel=45, par_time=110)
 print(w); g.show()
 
@@ -27,7 +27,7 @@ g.rect("#", 1, 20, 38, 20)                # Boden
 g.rect("#", 14, 6, 27, 19)                # Block
 g.rect(".", 18, 6, 22, 19)                # Schacht 5 Tiles breit (fairer Anflug)
 g.rect(".", 18, 6, 22, 19)
-g.rect("5", 18, 19, 22, 19)               # Pad am Schachtgrund (Zeile 19)
+g.rect("3", 18, 19, 22, 19)               # Pad 3 am Schachtgrund (Zeile 19)
 g.rect("#", 17, 19, 17, 19); g.rect("#", 23, 19, 23, 19)
 g.rect("#", 1, 19, 8, 19); g.rect("1", 2, 18, 7, 18)
 g.rect("#", 31, 17, 38, 19); g.rect("2", 32, 16, 37, 16)
@@ -35,7 +35,7 @@ g.rect("#", 29, 19, 30, 19)
 g.gate()
 g.put("S", 4, 17)
 w = write("S1-03", 1, 3, "Der Schornstein", "The Chimney", g,
-          [{"from": "1", "to": "5", "fare": 60, "time_limit": 60, "passenger": "Ines"},
-           {"from": "5", "to": "2", "fare": 70, "time_limit": 60, "passenger": "Ines"}],
+          [{"from": "1", "to": "3", "fare": 60, "time_limit": 60, "passenger": "Ines", "gender": "f"},
+           {"from": "3", "to": "2", "fare": 70, "time_limit": 60, "passenger": "Jonas", "gender": "m"}],
           par_time=100)
 print(w); g.show()

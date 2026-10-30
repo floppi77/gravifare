@@ -1,6 +1,6 @@
 # LEVELS – Leveldesign-Matrix
 
-Verbindlich: Das Ausgangstor liegt in jedem Level mittig oben und öffnet erst nach allen Fahrten.
+Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N (kein Überspringen); jedes Pad hat Platz für einen Wartebereich-Unterstand (2 Tiles Luft über einem Padende); jeder Auftrag hat einen eigenen Fahrgast. Das Ausgangstor liegt in jedem Level mittig oben und öffnet erst nach allen Fahrten.
 
 Status: **3 von 99 Leveln vorhanden** (S1-01 bis S1-03). Kontaktbogen-Bilder: `docs/levels/`. Die Zeilen der übrigen Level werden beim Bau des jeweiligen Sektors ausgefüllt; keine Platzhalter-Level.
 
@@ -19,6 +19,6 @@ Status: **3 von 99 Leveln vorhanden** (S1-01 bis S1-03). Kontaktbogen-Bilder: `d
 ## Einzelzeilen
 | ID | Name | Neue Mechanik | Fahrgäste | Gefahren | Tank | Erwartete Schwierigkeit | Teststatus Bot | Spielerische Abnahme |
 |---|---|---|---|---|---|---|---|---|
-| S1-01 | Erster Flug | Schub, Landen, Tanken, Ausgang | 2 Fahrten | keine (Hängepfeiler) | 1 | sehr leicht | bestanden (27 s, Hülle 100 %) | **offen** |
-| S1-02 | Tankstopp | Tankpad nötig (Start 45 %), mehrere Ebenen | 3 Fahrten | Säule, hängender Block | 1 | leicht | bestanden (44 s, Hülle 100 %) | **offen** |
-| S1-03 | Der Schornstein | Anflug in 5 Tiles breiten Schacht | 2 Fahrten | Schacht | 1 | leicht–mittel | bestanden (29 s, Hülle 100 %) | **offen** |
+| S1-01 | Erster Flug | Schub, Landen, Tanken, Ausgang | 2 Fahrten (Mika, Odo) | keine (Hängepfeiler) | 1 | sehr leicht | bestanden (27 s, Hülle 100 %) | **offen** |
+| S1-02 | Tankstopp | Tankpad nötig (Start 45 %), mehrere Ebenen | 3 Fahrten (Mika, Odo, Lena) | Säule, hängender Block | 1 | leicht | bestanden (44 s, Hülle 100 %) | **offen** |
+| S1-03 | Der Schornstein | Anflug in 5 Tiles breiten Schacht (Pad 3) | 2 Fahrten (Ines, Jonas) | Schacht | 1 | leicht–mittel | bestanden (29 s, Hülle 100 %) | **offen** |

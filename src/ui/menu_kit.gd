@@ -57,6 +57,36 @@ static func slider_row(label: String, value: float, on_change: Callable) -> HBox
 	row.add_child(s)
 	return row
 
+## Flaggenknopf für die Sprachwahl (kein Text). Gewählte Sprache: goldener Rahmen; Fokus: weißer Rahmen.
+static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.icon = tex
+	b.expand_icon = true
+	b.add_theme_constant_override("icon_max_width", 40)
+	b.custom_minimum_size = Vector2(52, 36)
+	b.tooltip_text = tip
+	b.focus_mode = Control.FOCUS_ALL
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color("#10142b")
+	normal.border_color = Color("#ffe14a") if selected else Color("#3a4580")
+	normal.set_border_width_all(2)
+	normal.set_content_margin_all(4)
+	var focus := normal.duplicate() as StyleBoxFlat
+	focus.border_color = Color.WHITE
+	focus.set_border_width_all(3)
+	for st in ["normal", "disabled"]:
+		b.add_theme_stylebox_override(st, normal)
+	for st in ["hover", "focus", "pressed"]:
+		b.add_theme_stylebox_override(st, focus)
+	b.add_theme_color_override("icon_normal_color", Color(1, 1, 1, 1.0 if selected else 0.62))
+	for c in ["icon_hover_color", "icon_focus_color", "icon_pressed_color"]:
+		b.add_theme_color_override(c, Color.WHITE)
+	b.pressed.connect(func():
+		Sfx.play("ui_ok")
+		cb.call())
+	b.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
+	return b
+
 static func title(text: String, size := 16) -> Label:
 	var l := Label.new()
 	l.text = text
@@ -66,7 +96,7 @@ static func title(text: String, size := 16) -> Label:
 	return l
 
 ## Optionsliste; wird von Haupt- und Pausenmenü benutzt. `back` kehrt zur vorherigen Seite zurück.
-static func options_panel(back: Callable) -> VBoxContainer:
+static func options_panel(back: Callable, rebuild: Callable = Callable()) -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	v.add_theme_constant_override("separation", 4)
@@ -91,7 +121,9 @@ static func options_panel(back: Callable) -> VBoxContainer:
 	lang.pressed.connect(func():
 		var cur: String = TranslationServer.get_locale().substr(0, 2)
 		Settings.set_value("language", "en" if cur == "de" else "de")
-		lrefresh.call())
+		lrefresh.call()
+		if rebuild.is_valid():
+			rebuild.call())      # Menü neu aufbauen, damit alle Texte die neue Sprache zeigen
 	v.add_child(lang)
 	var fs := button("", func(): pass)
 	var frefresh := func():
@@ -109,5 +141,13 @@ static func options_panel(back: Callable) -> VBoxContainer:
 		Settings.set_value("reduce_motion", not Settings.values.reduce_motion)
 		rrefresh.call())
 	v.add_child(rm)
+	var sub := button("", func(): pass)
+	var srefresh := func():
+		sub.text = v.tr("OPT_SUBTITLES") + ": " + v.tr("ON" if Settings.values.subtitles else "OFF")
+	srefresh.call()
+	sub.pressed.connect(func():
+		Settings.set_value("subtitles", not Settings.values.subtitles)
+		srefresh.call())
+	v.add_child(sub)
 	v.add_child(button(v.tr("MENU_BACK"), back))
 	return v

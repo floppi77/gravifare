@@ -49,6 +49,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.par_time = float(d.get("par_time", 90.0))
 	l.start_fuel = float(d.get("start_fuel", Tuning.FUEL_MAX))
 	l._scan()
+	l._plan_shelters()
 	return l
 
 func _scan() -> void:
@@ -69,6 +70,39 @@ func _scan() -> void:
 					"center": (x * Tuning.TILE + (x1 + 1) * Tuning.TILE) * 0.5, "fuel": c == "F"}
 				x = x1
 			x += 1
+
+const SHELTER_W := 24.0
+const SHELTER_H := 20.0
+
+func _plan_shelters() -> void:
+	## Jedes Passagierpad bekommt einen Wartebereich: Unterstand an einem Ende (links bevorzugt),
+	## davor der Wartepunkt. Nur wenn darüber 2 Tiles frei sind; sonst side = 0 (Validator meldet das).
+	for id in pads:
+		var p: Dictionary = pads[id]
+		if p.fuel:
+			continue
+		var side := 0
+		for cand in [-1, 1]:
+			var xs: float = p.x0 if cand < 0 else p.x1 - SHELTER_W
+			var free := true
+			for cx in range(floori(xs / Tuning.TILE), floori((xs + SHELTER_W - 0.01) / Tuning.TILE) + 1):
+				for cy in [p.row - 1, p.row - 2]:
+					if is_solid_cell(cx, cy):
+						free = false
+			if free:
+				side = cand
+				break
+		p["side"] = side
+		var surf: float = p.row * Tuning.TILE
+		if side == 0:
+			p["door_x"] = p.center
+			p["wait_x"] = p.center
+			p["shelter"] = Rect2()
+		else:
+			var xs: float = p.x0 if side < 0 else p.x1 - SHELTER_W
+			p["shelter"] = Rect2(xs, surf - SHELTER_H, SHELTER_W, SHELTER_H)
+			p["door_x"] = xs + SHELTER_W * 0.5
+			p["wait_x"] = p.door_x + (SHELTER_W * 0.5 + 8.0) * (1.0 if side < 0 else -1.0)
 
 func cell(cx: int, cy: int) -> String:
 	if cy < 0 or cx < 0 or cx >= width or cy >= height:

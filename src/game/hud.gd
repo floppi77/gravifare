@@ -4,6 +4,9 @@ extends Control
 var run: Run
 var message := ""
 var message_t := 0.0
+var sub_speaker := ""
+var sub_text := ""
+var sub_t := 0.0
 var paused := false
 var font: Font = ThemeDB.fallback_font
 
@@ -14,8 +17,16 @@ func flash_message(text: String, seconds := 2.0) -> void:
 	message = text
 	message_t = seconds
 
+func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
+	if not Settings.values.subtitles:
+		return
+	sub_speaker = speaker
+	sub_text = text
+	sub_t = seconds
+
 func _process(delta: float) -> void:
 	message_t = maxf(0.0, message_t - delta)
+	sub_t = maxf(0.0, sub_t - delta)
 	queue_redraw()
 
 func _bar(x: float, y: float, w: float, h: float, frac: float, col: Color, label: String) -> void:
@@ -69,6 +80,12 @@ func _draw() -> void:
 		draw_rect(Rect2(gx + 1, gy + i * 8 + 1, 64.0 * minf(ratio / 2.0, 1.0), 4), col)
 		draw_rect(Rect2(gx + 32, gy + i * 8 - 1, 1, 8), Color.WHITE)
 		draw_string(font, Vector2(gx - 14, gy + i * 8 + 6), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color("#a9b8ff"))
+	if sub_t > 0.0:
+		var line := "%s: %s" % [sub_speaker, sub_text]
+		var w := font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x + 14.0
+		var a := clampf(sub_t / 0.4, 0.0, 1.0)
+		draw_rect(Rect2(size.x * 0.5 - w * 0.5, size.y - 52, w, 16), Color(0.05, 0.06, 0.15, 0.85 * a))
+		draw_string(font, Vector2(size.x * 0.5 - w * 0.5 + 7, size.y - 40.5), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(1, 1, 1, a))
 	var hint := tr("HUD_HINT_PAD") if Controls.last_device == "keyboard" else tr("HUD_HINT_PAD_PAD")
 	draw_string(font, Vector2(8, size.y - 5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#8a93c9"))
 	if message_t > 0.0:

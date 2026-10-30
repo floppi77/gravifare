@@ -101,13 +101,14 @@ func _hover_point(pad: Dictionary) -> Vector2:
 
 func _accel_to_input(a_des: Vector2) -> Vector2:
 	# a_des: gewünschte Beschleunigung (px/s²). Rückgabe: Eingabevektor.
-	var x := clampf(a_des.x / Tuning.THRUST_SIDE, -1.0, 1.0)
+	var sim := run.sim
+	var x := clampf(a_des.x / sim.side_power(), -1.0, 1.0)
 	var net_y := a_des.y - level.gravity   # benötigte Schubbeschleunigung (negativ = hoch)
 	var y := 0.0
 	if net_y < 0.0:
-		y = clampf(net_y / Tuning.THRUST_UP, -1.0, 0.0)
+		y = clampf(net_y / sim.up_power(), -1.0, 0.0)
 	else:
-		y = clampf(net_y / Tuning.THRUST_DOWN, 0.0, 1.0)
+		y = clampf(net_y / sim.down_power(), 0.0, 1.0)
 	return Vector2(x, y)
 
 ## Liefert [input, gear] für diesen Tick.
@@ -183,7 +184,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		v_des = d.normalized() * spd if dist > 0.5 else Vector2.ZERO
 		if heading_exit and last and dist < 6.0:
 			v_des = Vector2.ZERO
-	var a_des := (v_des - sim.vel) / 0.30 - sim.vel * Tuning.DRAG * -1.0
+	var a_des := (v_des - sim.vel) / 0.30 + sim.vel * sim.drag()
 	return [_accel_to_input(a_des), gear]
 
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.

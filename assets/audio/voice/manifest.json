@@ -1,0 +1,392 @@
+{
+ "clips": {
+  "de/f0_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.02
+  },
+  "de/f0_thanks": {
+   "text": "Danke!",
+   "seconds": 0.62
+  },
+  "de/f0_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.74
+  },
+  "de/f0_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.34
+  },
+  "de/f0_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.58
+  },
+  "de/f0_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.58
+  },
+  "de/f0_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.66
+  },
+  "de/f0_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.58
+  },
+  "de/f0_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.34
+  },
+  "de/f0_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 2.06
+  },
+  "de/f0_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 2.06
+  },
+  "de/f1_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.02
+  },
+  "de/f1_thanks": {
+   "text": "Danke!",
+   "seconds": 0.7
+  },
+  "de/f1_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 2.14
+  },
+  "de/f1_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.82
+  },
+  "de/f1_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 2.14
+  },
+  "de/f1_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.58
+  },
+  "de/f1_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 2.54
+  },
+  "de/f1_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 2.94
+  },
+  "de/f1_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 2.34
+  },
+  "de/f1_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 2.54
+  },
+  "de/f1_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.79
+  },
+  "de/m0_call": {
+   "text": "Hey Taxi!",
+   "seconds": 0.94
+  },
+  "de/m0_thanks": {
+   "text": "Danke!",
+   "seconds": 0.78
+  },
+  "de/m0_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.66
+  },
+  "de/m0_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.42
+  },
+  "de/m0_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.18
+  },
+  "de/m0_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.42
+  },
+  "de/m0_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 2.06
+  },
+  "de/m0_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.58
+  },
+  "de/m0_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.66
+  },
+  "de/m0_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.5
+  },
+  "de/m0_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.5
+  },
+  "de/m1_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.5
+  },
+  "de/m1_thanks": {
+   "text": "Danke!",
+   "seconds": 0.84
+  },
+  "de/m1_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 2.0
+  },
+  "de/m1_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.7
+  },
+  "de/m1_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.29
+  },
+  "de/m1_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.63
+  },
+  "de/m1_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.81
+  },
+  "de/m1_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.98
+  },
+  "de/m1_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 2.09
+  },
+  "de/m1_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 2.16
+  },
+  "de/m1_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 2.23
+  },
+  "en/f0_call": {
+   "text": "Hey Taxi!",
+   "seconds": 0.94
+  },
+  "en/f0_thanks": {
+   "text": "Thanks!",
+   "seconds": 1.58
+  },
+  "en/f0_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.26
+  },
+  "en/f0_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.26
+  },
+  "en/f0_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.42
+  },
+  "en/f0_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.34
+  },
+  "en/f0_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.5
+  },
+  "en/f0_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.34
+  },
+  "en/f0_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.58
+  },
+  "en/f0_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.26
+  },
+  "en/f0_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.26
+  },
+  "en/f1_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.02
+  },
+  "en/f1_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.7
+  },
+  "en/f1_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.34
+  },
+  "en/f1_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.26
+  },
+  "en/f1_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.5
+  },
+  "en/f1_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.82
+  },
+  "en/f1_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.5
+  },
+  "en/f1_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.34
+  },
+  "en/f1_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.34
+  },
+  "en/f1_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.66
+  },
+  "en/f1_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.26
+  },
+  "en/m0_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.02
+  },
+  "en/m0_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.78
+  },
+  "en/m0_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.18
+  },
+  "en/m0_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.26
+  },
+  "en/m0_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.66
+  },
+  "en/m0_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.42
+  },
+  "en/m0_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.5
+  },
+  "en/m0_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.58
+  },
+  "en/m0_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.58
+  },
+  "en/m0_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.1
+  },
+  "en/m0_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.34
+  },
+  "en/m1_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.2
+  },
+  "en/m1_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.72
+  },
+  "en/m1_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.36
+  },
+  "en/m1_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.52
+  },
+  "en/m1_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 2.09
+  },
+  "en/m1_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.79
+  },
+  "en/m1_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 2.32
+  },
+  "en/m1_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.68
+  },
+  "en/m1_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.64
+  },
+  "en/m1_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.88
+  },
+  "en/m1_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.98
+  }
+ },
+ "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+ "license": "Apache-2.0",
+ "voices": {
+  "de/f0": {
+   "instruct": "Eine junge Frau mit klarer, warmer, fröhlicher Stimme, mittlere Tonlage, locker und freundlich. Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 101
+  },
+  "de/f1": {
+   "instruct": "Eine Frau Mitte dreißig mit etwas tieferer, ruhiger, selbstsicherer Stimme, trocken-humorvoll. Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 202
+  },
+  "de/m0": {
+   "instruct": "Ein Mann Mitte dreißig mit tiefer, ruhiger, warmer Baritonstimme, entspannt und freundlich. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 303
+  },
+  "de/m1": {
+   "instruct": "Ein älterer Mann mit tiefer, warmer, leicht rauer Stimme, gelassen und gutmütig. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 404
+  },
+  "en/f0": {
+   "instruct": "A young woman with a clear, warm, cheerful voice, medium pitch, upbeat and friendly, a little playful. Native English speaker with a neutral accent.",
+   "seed": 101
+  },
+  "en/f1": {
+   "instruct": "A woman in her thirties with a slightly lower, calm and confident voice, relaxed and dry-humored delivery. Native English speaker with a neutral accent.",
+   "seed": 202
+  },
+  "en/m0": {
+   "instruct": "A man in his mid-thirties with a deep, calm, warm baritone voice, relaxed and friendly, casual delivery. Native English speaker with a neutral accent.",
+   "seed": 303
+  },
+  "en/m1": {
+   "instruct": "A middle-aged man with a deep, warm, slightly gravelly voice, easygoing and good-humored delivery. Native English speaker with a neutral accent.",
+   "seed": 404
+  }
+ }
+}

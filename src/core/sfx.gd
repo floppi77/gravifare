@@ -2,11 +2,13 @@ extends Node
 ## Autoload "Sfx": Audiobusse (Master/Music/SFX/Voice) mit getrennten Lautstärken, Einmal-Effekte
 ## und die Schub-Schleifen. Fehlende Dateien werden übersprungen (Spiel läuft stumm weiter).
 
-const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "ui_move", "ui_ok"]
+const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "transit", "ui_move", "ui_ok"]
 var streams := {}
 var thrust_player: AudioStreamPlayer
 var side_player: AudioStreamPlayer
 var pool: Array[AudioStreamPlayer] = []
+var voice_player: AudioStreamPlayer
+var long_player: AudioStreamPlayer
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -22,6 +24,12 @@ func _ready() -> void:
 			streams[n] = s
 	thrust_player = _loop_player("thrust")
 	side_player = _loop_player("side")
+	long_player = AudioStreamPlayer.new()
+	long_player.bus = "SFX"
+	add_child(long_player)
+	voice_player = AudioStreamPlayer.new()
+	voice_player.bus = "Voice"
+	add_child(voice_player)
 	for i in 8:
 		var p := AudioStreamPlayer.new()
 		p.bus = "SFX"
@@ -71,3 +79,29 @@ func set_volume(bus: String, linear: float) -> void:
 	if i >= 0:
 		AudioServer.set_bus_volume_db(i, linear_to_db(clampf(linear, 0.0001, 1.0)))
 		AudioServer.set_bus_mute(i, linear <= 0.001)
+
+## Fahrgast-Sprachzeile abspielen (Datei: voice/<sprache>/<stimme>_<zeile>.ogg). Fehlt sie, bleibt es beim
+## Untertitel – das Spiel funktioniert vollständig ohne Sprachdateien.
+func play_voice(voice: String, line: String) -> bool:
+	var lang := TranslationServer.get_locale().substr(0, 2)
+	var path := "res://assets/audio/voice/%s/%s_%s.ogg" % [lang, voice, line]
+	if not ResourceLoader.exists(path):
+		return false
+	voice_player.stream = load(path)
+	voice_player.play()
+	return true
+
+## Langer Einzelklang (Levelwechsel-Flug); stop_long() bricht ihn z. B. beim Überspringen ab.
+func play_long(name: String, volume_db := 0.0) -> void:
+	var s: AudioStream = streams.get(name)
+	if s == null:
+		return
+	long_player.stream = s
+	long_player.volume_db = volume_db
+	long_player.play()
+
+func stop_long(fade := 0.35) -> void:
+	if long_player.playing:
+		var tw := create_tween()
+		tw.tween_property(long_player, "volume_db", -60.0, fade)
+		tw.tween_callback(long_player.stop)

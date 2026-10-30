@@ -36,21 +36,24 @@
    "to": "2",
    "fare": 45,
    "time_limit": 50,
-   "passenger": "Mika"
+   "passenger": "Mika",
+   "gender": "f"
   },
   {
    "from": "2",
    "to": "3",
    "fare": 55,
    "time_limit": 55,
-   "passenger": "Odo"
+   "passenger": "Odo",
+   "gender": "m"
   },
   {
    "from": "3",
    "to": "1",
    "fare": 55,
    "time_limit": 55,
-   "passenger": "Odo"
+   "passenger": "Lena",
+   "gender": "f"
   }
  ],
  "start_fuel": 45,

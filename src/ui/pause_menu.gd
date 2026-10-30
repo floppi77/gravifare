@@ -41,7 +41,7 @@ func show_main() -> void:
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), func():
 		_clear()
 		in_sub = true
-		box.add_child(MenuKit.options_panel(show_main))
+		box.add_child(MenuKit.options_panel(show_main, _reopen_options))
 		_focus_first()))
 	box.add_child(MenuKit.button(tr("MENU_TO_MENU"), func(): Flow.to_menu()))
 	_focus_first()
@@ -53,3 +53,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			show_main()
 		else:
 			game._set_paused(false)
+
+func _reopen_options() -> void:
+	_clear()
+	in_sub = true
+	box.add_child(MenuKit.options_panel(show_main, _reopen_options))
+	_focus_first()

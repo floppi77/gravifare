@@ -15,9 +15,11 @@ def t(d): return np.arange(int(SR * d)) / SR
 def env(n, a=0.005, r=0.1):
     e = np.ones(n); na, nr = int(a * SR), int(r * SR)
     e[:na] = np.linspace(0, 1, na); e[-nr:] = np.linspace(1, 0, nr); return e
-def lp(x, k):  # einfacher Tiefpass
-    y = np.zeros_like(x); a = 0
-    for i, v in enumerate(x): a += k * (v - a); y[i] = a
+def lp(x, k):  # einfacher Tiefpass; k darf ein Array (zeitveränderlich) sein
+    y = np.zeros_like(x); a = 0.0
+    ka = np.broadcast_to(np.asarray(k, dtype=float), x.shape)
+    for i in range(len(x)):
+        a += ka[i] * (x[i] - a); y[i] = a
     return y
 
 def thrust_loop():
@@ -63,6 +65,36 @@ def board():
 def exit_open():
     x = np.concatenate([np.sin(2 * np.pi * f * t(0.1)) * 0.35 * env(int(0.1 * SR), 0.005, 0.05) for f in (523, 659, 784, 1047)])
     save("exit", x)
+def transit():
+    """8 s Weltraumflug, passend zur Levelwechsel-Sequenz (0-2 s Ausblenden, 2-5,6 s Flug, 5,6-8 s Anflug).
+    Eigene Synthese: ansteigendes Antriebsbrummen, Vorbeiflug-Whooshes mit Doppler, Funkeln, abfallender Sweep."""
+    d = 8.0; tt = t(d); n = len(tt)
+    # Antriebsfrequenz: steigt 0-2 s, hält, fällt zum Anflug
+    f = np.interp(tt, [0, 2.0, 5.6, 8.0], [55, 138, 142, 80])
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    drone = (np.sin(ph) + 0.5 * np.sin(2 * ph) + 0.28 * np.sign(np.sin(ph * 0.5))) * 0.22
+    amp = np.interp(tt, [0, 1.6, 2.4, 5.6, 7.4, 8.0], [0, 0.7, 1.0, 1.0, 0.55, 0])
+    sweep_f = np.interp(tt, [0, 2.0], [180, 2200])           # Aufstiegs-Sweep beim Ausblenden
+    sw = np.sin(2 * np.pi * np.cumsum(sweep_f) / SR) * 0.12 * np.interp(tt, [0, 0.3, 1.8, 2.2], [0, 1, 0.8, 0])
+    noise = rng.standard_normal(n)
+    air = lp(noise, 0.06) * 0.5 * np.interp(tt, [0, 1.5, 2.2, 5.4, 6.4], [0, 0.6, 0.35, 0.35, 0])
+    whoosh = np.zeros(n)
+    for t0, w in ((2.6, 0.9), (3.9, 1.1), (5.0, 0.8)):      # Planeten ziehen vorbei
+        env_ = np.exp(-((tt - t0) / (w * 0.35)) ** 2)
+        shifted = lp(noise, 0.035 + 0.25 * np.clip((tt - t0) / w + 0.5, 0, 1) ** 2)
+        whoosh += shifted * env_ * 1.3
+    notes = [523, 659, 784, 988, 784, 659]                   # leises Funkeln
+    spark = np.zeros(n)
+    for i, fr in enumerate(notes):
+        s0 = int((2.4 + i * 0.55) * SR); ln = int(0.5 * SR)
+        if s0 + ln < n:
+            x = np.arange(ln) / SR
+            spark[s0:s0 + ln] += np.sin(2 * np.pi * fr * x) * np.exp(-x * 6) * 0.07
+    down = np.sin(2 * np.pi * np.cumsum(np.interp(tt, [5.6, 8.0], [900, 120])) / SR) * 0.07 * np.interp(tt, [5.5, 5.9, 7.2, 8.0], [0, 1, 0.5, 0])
+    x = drone * amp + sw + air + whoosh * 0.55 + spark + down
+    x = np.tanh(x * 1.2) * 0.85
+    save("transit", x)
+
 def ui_move():
     tt = t(0.04); save("ui_move", np.sign(np.sin(2 * np.pi * 700 * tt)) * 0.15 * env(len(tt), 0.002, 0.02))
 def ui_ok():
@@ -70,5 +102,5 @@ def ui_ok():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, ui_move, ui_ok): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok): f()
     print(sorted(os.listdir(OUT)))

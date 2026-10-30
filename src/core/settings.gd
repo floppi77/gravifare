@@ -6,7 +6,7 @@ var values := {
 	"music": 0.8, "sfx": 0.9, "voice": 1.0,
 	"language": "",
 	"gear_toggle": true, "deadzone": 0.2,
-	"fullscreen": false, "vsync": true, "reduce_motion": false,
+	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true,
 }
 
 func _ready() -> void:

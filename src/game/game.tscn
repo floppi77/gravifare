@@ -5,6 +5,9 @@
 [ext_resource type="Script" path="res://src/game/taxi_view.gd" id="3"]
 [ext_resource type="Script" path="res://src/game/hud.gd" id="4"]
 [ext_resource type="Script" path="res://src/game/backdrop.gd" id="5"]
+[ext_resource type="Script" path="res://src/game/props_view.gd" id="6"]
+[ext_resource type="Script" path="res://src/game/fx.gd" id="7"]
+[ext_resource type="Script" path="res://src/game/transition_view.gd" id="8"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -25,8 +28,17 @@ script = ExtResource("5")
 [node name="Tiles" type="Node2D" parent="World"]
 script = ExtResource("2")
 
+[node name="Fx" type="Node2D" parent="World"]
+script = ExtResource("7")
+
+[node name="Props" type="Node2D" parent="World"]
+script = ExtResource("6")
+
 [node name="Taxi" type="Node2D" parent="World"]
 script = ExtResource("3")
+
+[node name="Ambient" type="CanvasModulate" parent="."]
+color = Color(0.66, 0.7, 0.88, 1)
 
 [node name="Camera" type="Camera2D" parent="."]
 
@@ -40,3 +52,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("4")
+
+[node name="Trans" type="CanvasLayer" parent="."]
+layer = 40
+
+[node name="Root" type="Control" parent="Trans"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("8")

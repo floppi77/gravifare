@@ -9,8 +9,8 @@ g.rect("#", 27, 15, 37, 19); g.rect("2", 29, 14, 34, 14)  # Plattform rechts mit
 g.rect("#", 13, 19, 17, 19); g.rect("F", 13, 18, 17, 18)  # Tankpad am Boden
 g.rect("#", 9, 1, 11, 7)                   # hängender Pfeiler links der Mitte
 g.gate()
-g.put("S", 4, 17)
+g.put("S", 5, 17)
 write("S1-01", 1, 1, "Erster Flug", "First Flight", g,
-      [{"from": "1", "to": "2", "fare": 40, "time_limit": 45, "passenger": "Mika"},
-       {"from": "2", "to": "1", "fare": 40, "time_limit": 45, "passenger": "Mika"}], par_time=80)
+      [{"from": "1", "to": "2", "fare": 40, "time_limit": 45, "passenger": "Mika", "gender": "f"},
+       {"from": "2", "to": "1", "fare": 40, "time_limit": 45, "passenger": "Odo", "gender": "m"}], par_time=80)
 g.show()
