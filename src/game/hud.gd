@@ -100,7 +100,11 @@ func _draw() -> void:
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color(0.05, 0.06, 0.15, 0.8))
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color("#3a4580"), false, 0.67)
 		draw_string(font, Vector2(size.x * 0.5 - 170, size.y - 19), txt, HORIZONTAL_ALIGNMENT_CENTER, 340, 10, Color("#ffe14a"))
-		if ex_aboard.is_empty() and run.actor != null and run.result == Run.Result.RUNNING:
+		if not ex_aboard.is_empty() and run.result == Run.Result.RUNNING:
+			var fe := run.extra_factor(ex_aboard)
+			var fce := Color("#5dff9a") if fe > 1.05 else (Color("#ffe14a") if fe > 0.8 else Color("#ff8a5a"))
+			draw_string(font, Vector2(size.x * 0.5 + 40, size.y - 19), (tr("HUD_FACTOR") % fe) + "  ¢%d" % int(round(run.extra_prospect(ex_aboard))), HORIZONTAL_ALIGNMENT_RIGHT, 126, 10, fce)
+		elif run.actor != null and run.result == Run.Result.RUNNING:
 			var f := run.live_factor()
 			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
 			draw_string(font, Vector2(size.x * 0.5 + 40, size.y - 19), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 126, 10, fc)

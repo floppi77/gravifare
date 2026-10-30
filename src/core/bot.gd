@@ -8,6 +8,7 @@ const MARGIN := 7.0                # zusätzlicher Sicherheitsabstand um die Hü
 const V_MAX := 85.0
 const LOOKAHEAD_V := 55.0
 const REFUEL_BELOW := 14.0
+const REFUEL_BELOW_DOORS := 20.0        # Warten vor Toren kostet Sprit: früher tanken
 const REFUEL_GOAL := 70.0
 
 var run: Run
@@ -16,6 +17,7 @@ var path: Array[Vector2] = []
 var goal_key := ""
 var landing := false
 var stuck_timer := 0.0
+var waiting_spawn := false
 var last_pos := Vector2.ZERO
 var fail_reason := ""
 
@@ -42,10 +44,12 @@ func _accel_to_input(a_des: Vector2) -> Vector2:
 func decide() -> Array:
 	var sim := run.sim
 	var tgt_pad_id := run.target_pad()
-	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < REFUEL_BELOW and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
+	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < (REFUEL_BELOW_DOORS if level.has_doors() else REFUEL_BELOW) and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
 	if refuel_trip:
 		tgt_pad_id = "F"
 	var heading_exit := tgt_pad_id == "" and run.exit_open
+	# Der nächste Fahrgast erscheint nie auf dem Pad, auf dem das Taxi steht: bis er da ist, nur anfliegen und schweben.
+	waiting_spawn = run.phase == Run.Phase.WAITING and run.actor == null and not run.current_job().is_empty() and not refuel_trip
 	var key := "exit" if heading_exit else ("pad" + tgt_pad_id + ":" + str(run.phase) + ":" + str(run.job_index))
 	if sim.state == TaxiSim.State.LANDED:
 		var pad_id: String = sim.landed_pad.id
@@ -53,6 +57,8 @@ func decide() -> Array:
 		var can_refuel: bool = not run.station_down() and (sim.fuel < Tuning.EMERGENCY_FUEL or run.money > 5.0)
 		var refuelling: bool = pad_id == "F" and sim.fuel < REFUEL_GOAL and can_refuel
 		var serving: bool = pad_id == run.target_pad() and (run.phase == Run.Phase.WAITING or run.phase == Run.Phase.CARRYING)
+		if waiting_spawn and pad_id == tgt_pad_id:
+			return [Vector2(0, -1), true]           # abheben, damit der Fahrgast erscheinen kann
 		if boarding or refuelling or (serving and not refuel_trip):
 			return [Vector2.ZERO, true]
 		landing = false
@@ -86,7 +92,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	var last := path.size() <= 1
 	var d := wp - sim.pos
 	var v_des := Vector2.ZERO
-	if not heading_exit and (landing or (last and d.length() < 14.0 and absf(sim.vel.x) < 12.0)):
+	if not heading_exit and not waiting_spawn and (landing or (last and d.length() < 14.0 and absf(sim.vel.x) < 12.0)):
 		landing = true
 		var pad: Dictionary = level.pads[tgt_pad_id]
 		var foot_y := sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN
@@ -111,6 +117,19 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		v_des = d.normalized() * spd if dist > 0.5 else Vector2.ZERO
 		if heading_exit and last and dist < 6.0:
 			v_des = Vector2.ZERO
+	if level.has_doors() and v_des != Vector2.ZERO:
+		# Tore voraus: nur hineinfliegen, wenn sie bei Ankunft offen sind und lange genug offen bleiben (sonst schweben).
+		var dir := v_des.normalized()
+		var spd := maxf(sim.vel.length(), 25.0)
+		var inside: Array = level.door_chars_in_box(sim.pos, Tuning.HULL_HALF)     # im Tor: Tor bleibt offen
+		for dist: float in [14.0, 14.0 + spd * 0.5, 14.0 + spd * 1.0]:
+			var probe: Vector2 = sim.pos + dir * dist
+			for ch in level.door_chars_in_box(probe, Tuning.HULL_HALF + Vector2(5, 5)):
+				if inside.has(ch):
+					continue
+				# Frühestmögliche Ankunft (Höchsttempo) bis späteste Ankunft (aktuelles Tempo) + Durchflugzeit muss offen sein
+				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 1.3):
+					v_des = Vector2.ZERO
 	var a_des := (v_des - sim.vel) / 0.30 + sim.vel * sim.drag()
 	return [_accel_to_input(a_des), gear]
 
@@ -129,12 +148,16 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 	var stuck_ticks := 0
 	var reason := ""
 	var min_fuel := r.sim.fuel
+	var burned := 0.0
+	var fuel_prev := r.sim.fuel
 	for i in ticks:
 		var cmd := bot.decide()
 		var inp: Vector2 = Replay.quantize(cmd[0])
 		if rep != null:
 			rep.add(inp, cmd[1])
 		r.step(inp, cmd[1])
+		burned += maxf(0.0, fuel_prev - r.sim.fuel)
+		fuel_prev = r.sim.fuel
 		if r.result != Run.Result.RUNNING:
 			break
 		if r.sim.state == TaxiSim.State.FLYING:
@@ -143,7 +166,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 			else:
 				stuck_pos = r.sim.pos
 				stuck_ticks = 0
-			if stuck_ticks > 600:
+			if stuck_ticks > (2400 if lvl.has_doors() else 600):     # vor Toren darf er bis zu 20 s warten
 				reason = "festgefahren bei " + str(r.sim.pos)
 				break
 		if r.sim.fuel <= 0.0 and r.sim.state == TaxiSim.State.FLYING:
@@ -152,7 +175,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 	var out := {
 		"complete": r.result == Run.Result.COMPLETE,
 		"failed": r.result == Run.Result.FAILED,
-		"time": r.sim.time, "fuel_left": r.sim.fuel, "hull": r.sim.hull,
+		"time": r.sim.time, "fuel_left": r.sim.fuel, "fuel_burned": burned, "hull": r.sim.hull,
 		"delivered": r.delivered, "jobs": lvl.jobs.size(), "money": r.money, "job_times": r.job_times,
 		"reason": reason if reason != "" else bot.fail_reason,
 	}

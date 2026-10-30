@@ -26,6 +26,14 @@ var exit_open := false      # Laufzeitzustand; geschlossenes Tor ist fest
 var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
 var raw := {}
+## Bewegliche Tore (Zeichen "a".."e" im Raster, Parameter im JSON unter "doors"): öffnen und schließen im festen Takt.
+## Geschlossen sind sie fest wie Fels – außer das Taxi steht gerade im Tor (dann schließt es nicht auf dem Taxi).
+const DOOR_CHARS := "abcde"
+var doors := {}                  # Zeichen -> {cells: Array[Vector2i], period, open, phase}
+var clock := 0.0                 # Simulationszeit (setzt TaxiSim), bestimmt den Torzustand
+var hold := Rect2()              # Taxi-Rechteck (setzt TaxiSim)
+var doors_ignore := false        # Planung/Zeichnen: Tore gelten als offen
+var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 
 static func load_file(path: String) -> LevelData:
 	var f := FileAccess.open(path, FileAccess.READ)
@@ -61,6 +69,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	var ev: Array = fc.get("every", [Tuning.PRICE_EVERY_MIN, Tuning.PRICE_EVERY_MAX])
 	l.price_every = Vector2(float(ev[0]), float(ev[1]))
 	l._scan()
+	l._scan_doors(d.get("doors", {}))
 	l._plan_shelters()
 	return l
 
@@ -173,8 +182,80 @@ func cell(cx: int, cy: int) -> String:
 	var row: String = rows[cy]
 	return row[cx] if cx < row.length() else SOLID
 
+func _scan_doors(params: Dictionary) -> void:
+	for y in height:
+		var row: String = rows[y]
+		for x in row.length():
+			var c := row[x]
+			if DOOR_CHARS.contains(c):
+				if not doors.has(c):
+					var p: Dictionary = params.get(c, {})
+					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0))}
+				doors[c].cells.append(Vector2i(x, y))
+
+func has_doors() -> bool:
+	return not doors.is_empty()
+
+func door_is_open(ch: String, t: float) -> bool:
+	var d: Dictionary = doors.get(ch, {})
+	return doors_forced_open or d.is_empty() or fposmod(t + float(d.phase), float(d.period)) < float(d.open)
+
+## Ist das Tor im gesamten Zeitfenster [t0, t0 + length] offen? (Bot: erst losfliegen, wenn die Passage reicht.)
+func door_open_window(ch: String, t0: float, length: float) -> bool:
+	var t := t0
+	while t <= t0 + length:
+		if not door_is_open(ch, t):
+			return false
+		t += 0.1
+	return door_is_open(ch, t0 + length)
+
+## Torzeichen aller Torzellen, die die Box berührt (ohne Rücksicht auf den aktuellen Zustand).
+func door_chars_in_box(center: Vector2, half: Vector2) -> Array:
+	var out: Array = []
+	if doors.is_empty():
+		return out
+	var x0 := floori((center.x - half.x) / Tuning.TILE)
+	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
+	var y0 := floori((center.y - half.y) / Tuning.TILE)
+	var y1 := floori((center.y + half.y - 0.001) / Tuning.TILE)
+	for cy in range(y0, y1 + 1):
+		for cx in range(x0, x1 + 1):
+			var c := cell(cx, cy)
+			if c != "" and DOOR_CHARS.contains(c) and not out.has(c):
+				out.append(c)
+	return out
+
+## Sekunden bis zum Schließen (0, wenn geschlossen) bzw. -1, wenn das Tor dauerhaft offen ist.
+func door_time_to_close(ch: String, t: float) -> float:
+	var d: Dictionary = doors.get(ch, {})
+	if d.is_empty():
+		return -1.0
+	var m := fposmod(t + float(d.phase), float(d.period))
+	return maxf(0.0, float(d.open) - m) if m < float(d.open) else 0.0
+
+func _door_cell_closed(cx: int, cy: int, c: String) -> bool:
+	if doors_ignore or door_is_open(c, clock):
+		return false
+	return not hold.intersects(Rect2(cx * Tuning.TILE, cy * Tuning.TILE, Tuning.TILE, Tuning.TILE))
+
+func hits_closed_door(center: Vector2, half: Vector2) -> bool:
+	if doors.is_empty():
+		return false
+	var x0 := floori((center.x - half.x) / Tuning.TILE)
+	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
+	var y0 := floori((center.y - half.y) / Tuning.TILE)
+	var y1 := floori((center.y + half.y - 0.001) / Tuning.TILE)
+	for cy in range(y0, y1 + 1):
+		for cx in range(x0, x1 + 1):
+			var c := cell(cx, cy)
+			if DOOR_CHARS.contains(c) and c != "" and not door_is_open(c, clock):
+				return true
+	return false
+
 func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
+	if c != "" and DOOR_CHARS.contains(c):
+		return _door_cell_closed(cx, cy, c)
 	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:

@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_broken_pump_prices", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -124,7 +124,14 @@ func _test_bot_solves_levels() -> void:
 			continue
 		var lvl := LevelData.load_file("res://data/levels/" + f)
 		var r := Bot.fly_level(lvl, 600.0, Tuning.MIN_START_FUEL)
-		check(r.complete and r.hull > 90.0, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.reason])
+		var rr := Run.new()
+		rr.start(lvl)
+		var inc := 0.0
+		for j in rr.jobs:
+			inc += float(j.fare) * rr.job_mult(j) * Tuning.satisfaction_factor(Tuning.SAT_FLOOR)
+		var cost: float = float(r.fuel_burned) * (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
+		check(inc >= cost, "%s: Fahrpreise bei 25 %% Zufriedenheit (¢%d) decken den Sprit des Autopiloten (¢%d)" % [lvl.id, int(inc), int(cost)])
+		check(r.complete and r.hull > 90.0 and r.delivered >= r.jobs - 1, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.delivered, r.jobs, r.reason])
 
 func _test_level_rules() -> void:
 	var dir := DirAccess.open("res://data/levels")
@@ -361,6 +368,7 @@ func _test_arrival_path() -> void:
 		s.setup(lvl)
 		var path := Pathing.arrival_path(lvl, s.pos)
 		lvl.exit_open = true
+		lvl.doors_forced_open = true          # Einflug: Tore stehen offen
 		var hits := 0
 		for i in range(3, 201):
 			var p := Pathing.sample_path(path, float(i) / 200.0)
@@ -567,6 +575,64 @@ func _test_replay() -> void:
 		r.step(Vector2.ZERO, true)
 	var d2 := rep.to_dict()
 	check(d2.events.size() == 1 and d2.ticks == 60, "Respawn wird als Ereignis aufgezeichnet")
+
+func _door_level() -> LevelData:
+	var rows: Array = []
+	for y in 12:
+		var row := ""
+		for x in 20:
+			row += "#" if (y == 0 or y == 11 or x == 0 or x == 19) else ("a" if x == 10 else ".")
+		rows.append(row)
+	return LevelData.from_dict({"id": "T-DOOR", "sector": 2, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
+		"doors": {"a": {"period": 6.0, "open": 3.0, "phase": 3.0}}})
+
+func _test_doors() -> void:
+	var lv := _door_level()
+	check(lv.has_doors() and lv.doors["a"].cells.size() == 10, "Torzellen werden erkannt (%d)" % lv.doors["a"].cells.size())
+	check(not lv.door_is_open("a", 0.0) and lv.door_is_open("a", 3.5) and not lv.door_is_open("a", 6.5) and lv.door_is_open("a", 9.5), "Tor öffnet und schließt im festen Takt")
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(120.0, 80.0)
+	s.vel = Vector2.ZERO
+	for i in int(2.5 / Tuning.TICK):
+		s.step(Vector2(1, -0.39), false)
+	check(s.pos.x < 10.0 * Tuning.TILE and s.time < 3.0, "Geschlossenes Tor ist fest (x=%.0f)" % s.pos.x)
+	var crossed := false
+	for i in int(2.4 / Tuning.TICK):
+		s.step(Vector2(1, -0.39), false)
+		if s.pos.x > 11.0 * Tuning.TILE:
+			crossed = true
+	check(crossed, "Offenes Tor ist passierbar")
+	# Tor schließt nie auf dem Taxi
+	var s2 := TaxiSim.new()
+	s2.setup(lv)
+	s2.state = TaxiSim.State.FLYING
+	s2.pos = Vector2(10.0 * Tuning.TILE + 8.0, 80.0)
+	s2.vel = Vector2.ZERO
+	s2.time = 5.9                      # Tor schließt gleich (Zeit 6 → offen bis 3, geschlossen 3–6 im Takt: hier gerade geschlossen)
+	for i in 60:
+		s2.step(Vector2(0, -0.39), false)
+	check(s2.state != TaxiSim.State.DESTROYED and absf(s2.pos.x - (10.0 * Tuning.TILE + 8.0)) < 1.0, "Tor schließt nicht auf dem Taxi (kein Einklemmen)")
+	# Planung ignoriert Tore (Bot wartet davor)
+	var p := Pathing.plan(lv, Vector2(60, 80), Vector2(260, 80), 4.0)
+	check(not p.is_empty(), "Wegplanung behandelt bewegliche Tore als passierbar")
+
+func _test_broken_pump_prices() -> void:
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(_lvl())
+	r.pump_touches = Tuning.PUMP_TOUCHES_TO_BREAK
+	r.pump_broken = true
+	var p0 := r.price_base
+	r.price_next_t = 0.0
+	var changed := false
+	for i in int(5.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, false)
+		for e in r.log:
+			if e.type == "price_changed":
+				changed = true
+	check(not changed and r.price_base == p0, "Bei defekter Zapfsäule ändert sich der Spritpreis nicht mehr")
 
 func _test_crash_balance() -> void:
 	var results := {}
@@ -868,7 +934,7 @@ func _test_crash_continues_level() -> void:
 	check(r.result == Run.Result.RUNNING and r.sim.state == TaxiSim.State.LANDED and r.sim.hull == Tuning.HULL_MAX, "Neues Taxi, Level läuft weiter")
 	check(r.job_index == lvl.jobs.size() - 1 and r.delivered == lvl.jobs.size() - 1 and absf(r.money - maxf(0.0, 55.0 - Tuning.replacement_fee(lvl.number))) < 0.01, "Erledigtes bleibt erledigt, kein Geld für den verlorenen Fahrgast (Ersatztaxi kostet)")
 	check(not r.exit_open and not lvl.exit_open, "Tor schließt sich wieder, bis der Fahrgast erneut an Bord ist")
-	check(r.sim.fuel >= Tuning.MIN_START_FUEL and r.sim.fuel >= minf(fuel_before, 100.0) - 0.01, "Sprit: mindestens Mindest-Sprit, Rest bleibt erhalten (%.0f)" % r.sim.fuel)
+	check(r.sim.fuel >= Tuning.FUEL_MAX - 0.01, "Neues Taxi startet mit vollem Tank (%.0f)" % r.sim.fuel)
 	check(r.actor == null and String(r.current_job().passenger) == lost_name and String(r.current_job().from) == String(last.from), "Derselbe Fahrgast (%s) wartet wieder an seinem Abholpad %s" % [lost_name, String(last.from)])
 	for i in 60:
 		r.step(Vector2(0, -1), true)                      # abheben (Startpad = Abholpad: Spawn ist bis dahin blockiert)
@@ -1252,7 +1318,7 @@ func _test_medals() -> void:
 	r.start(lvl)
 	var sum_par := 0.0
 	var money_t := 0.0
-	for j in lvl.jobs:
+	for j in r.jobs:                         # Arbeitskopie: Fahrpreise wie im Spiel (Skalierung und Mindestpreis)
 		sum_par += float(j.par)
 		if String(j.to) != "exit":
 			money_t += float(j.fare) * r.job_mult(j)

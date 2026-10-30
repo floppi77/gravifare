@@ -4,7 +4,11 @@ extends RefCounted
 ## Hülle, danach Sichtlinien-Glättung. `margin` = zusätzlicher Abstand zu Wänden in Pixeln.
 
 static func free_at(level: LevelData, p: Vector2, margin: float) -> bool:
-	return not level.box_hits_solid(p, Tuning.HULL_HALF + Vector2(margin, margin))
+	var prev := level.doors_ignore
+	level.doors_ignore = true            # Planung: bewegliche Tore gelten als offen (der Bot wartet vor geschlossenen)
+	var hit := level.box_hits_solid(p, Tuning.HULL_HALF + Vector2(margin, margin))
+	level.doors_ignore = prev
+	return not hit
 
 static func line_free(level: LevelData, a: Vector2, b: Vector2, margin: float) -> bool:
 	var n := int(ceil(a.distance_to(b) / 3.0))
@@ -119,7 +123,7 @@ static func arrival_path(level: LevelData, landing: Vector2) -> PackedVector2Arr
 	for i in range(2, smooth.size() - 1):     # ab dem Anflugpunkt: Hülle darf nirgends anstoßen
 		var n := int(ceil(smooth[i].distance_to(smooth[i + 1]) / 3.0))
 		for k in range(n + 1):
-			if level.box_hits_solid(smooth[i].lerp(smooth[i + 1], float(k) / maxf(n, 1)), Tuning.HULL_HALF):
+			if not free_at(level, smooth[i].lerp(smooth[i + 1], float(k) / maxf(n, 1)), 0.0):
 				ok = false
 	level.exit_open = was_open
 	return smooth if ok else raw

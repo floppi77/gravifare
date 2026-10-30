@@ -608,6 +608,7 @@ func _begin_arrival() -> void:
 	Flow.current_level = next_id
 	level_path = Flow.level_path(next_id)
 	load_level(level_path)
+	run.level.doors_forced_open = true      # beim Einflug stehen bewegliche Tore offen
 	arrive_end = run.sim.pos
 	arrive_path = Pathing.arrival_path(run.level, arrive_end)
 	arrive_start = arrive_path[0]
@@ -656,6 +657,7 @@ func _release_carried() -> void:
 	run.release_carried(c)
 
 func _end_transition() -> void:
+	run.level.doors_forced_open = false
 	Music.duck(0.0)
 	props.door_override = -1.0
 	trans_t = -1.0

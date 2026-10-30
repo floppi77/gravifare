@@ -84,6 +84,16 @@ const EXTRA_FARE_FACTOR := 1.0       # Zusatzfahrgäste zahlen nach dem unskalie
 static func fare_scale(level_no: int) -> float:
 	return 1.0 if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
 
+# Mindest-Fahrpreis: Bei guter Flugweise bleibt jeder Fahrgast bis hinunter zu 25 % Zufriedenheit profitabel.
+# Zufriedenheit = Zeitfaktor normiert zwischen PAY_MIN (0 %) und PAY_MAX (100 %); der Spritverbrauch wird aus der Strecke geschätzt.
+const SAT_FLOOR := 0.25
+const FUEL_PER_PX := 0.040           # Treibstoffeinheiten je px Flugstrecke inkl. Anflug-Umwege (am Autopiloten kalibriert, der eher mehr verbraucht als ein guter Pilot)
+const PICKUP_FACTOR := 1.6           # Anflug zum Fahrgast zählt zur Fahrt dazu (Mehrfaches der Fahrstrecke)
+const PROFIT_MARGIN := 1.15
+
+static func satisfaction_factor(sat: float) -> float:
+	return PAY_MIN + sat * (PAY_MAX - PAY_MIN)
+
 # Kosten: Reparatur der Hülle am Levelende, Ersatztaxi nach Totalschaden (Credits)
 const REPAIR_COST := 2.0          # je verlorenem Hüllenpunkt des überlebenden Taxis
 const REPLACE_BASE := 80.0        # Ersatztaxi nach Zerstörung

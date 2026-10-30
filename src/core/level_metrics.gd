@@ -46,6 +46,25 @@ static func leg_mult(lvl: LevelData, from_id: String, to_id: String) -> float:
 	return mult
 
 
+## Geplante Flugstrecke (px) einer Fahrt von Pad `from_id` nach Pad `to_id` bzw. "exit" (Planung mit Sicherheitsrand 8 px).
+static func leg_length(lvl: LevelData, from_id: String, to_id: String) -> float:
+	var key := "len:%s:%s>%s" % [lvl.id, from_id, to_id]
+	if _leg_cache.has(key):
+		return _leg_cache[key]
+	var was_open := lvl.exit_open
+	lvl.exit_open = true
+	var a := Pathing.hover_point(lvl, lvl.pads[from_id], 8.0)
+	var b: Vector2 = Pathing.gate_approach(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
+	var length := a.distance_to(b)
+	for m in [16.0, 8.0, 4.0]:
+		var path := Pathing.plan(lvl, a, b, m)
+		if not path.is_empty():
+			length = Pathing.path_length(a, path)
+			break
+	lvl.exit_open = was_open
+	_leg_cache[key] = length
+	return length
+
 static func analyze(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open
 	lvl.exit_open = true         # Tor für die Planung passierbar

@@ -77,6 +77,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	var fscale := Tuning.fare_scale(lvl.number)
 	for j in jobs:
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
+		j["fare"] = maxf(float(j.fare), min_fare(lvl, j))
 	sim.setup(lvl)
 	if fuel_in >= 0.0:
 		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
@@ -140,7 +141,7 @@ func _spawn_actor(instant: bool) -> void:
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
 	main_wait = 0.0
-	main_patience = flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX)
+	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), par_of(job) * 1.5)      # lange Wege: mehr Geduld
 	if not respawn_keep_clock:
 		job_clock = 0.0
 	respawn_keep_clock = false
@@ -193,6 +194,20 @@ func _ride_hit(e: Dictionary) -> void:
 		return
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
+
+## Mindest-Grundpreis eines Auftrags: bei 25 % Zufriedenheit (Zeitfaktor ≈ 0,66) deckt er mit Streckenzuschlag den
+## geschätzten Sprit für Anflug und Fahrt plus 15 % Gewinn. Auf 5 aufgerundet.
+func min_fare(lvl: LevelData, job: Dictionary) -> float:
+	if not lvl.pads.has(String(job.get("from", ""))):
+		return 0.0
+	var to_id := String(job.get("to", ""))
+	if to_id != "exit" and not lvl.pads.has(to_id):
+		return 0.0
+	var avg_price := (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
+	var length := LevelMetrics.leg_length(lvl, String(job.from), to_id)
+	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price
+	var mult := LevelMetrics.leg_mult(lvl, String(job.from), to_id)
+	return ceilf(cost * Tuning.PROFIT_MARGIN / (Tuning.satisfaction_factor(Tuning.SAT_FLOOR) * mult) / 5.0) * 5.0
 
 ## Ausgangs-Fahrgast des Vorlevels steigt auf der Startplattform aus und geht zum Unterstand (Zahlung bei Ankunft).
 func release_carried(c: Dictionary) -> void:
@@ -548,7 +563,7 @@ func _deliver(job: Dictionary) -> void:
 ## (kein Geld) und wartet – derselbe Fahrgast – erneut an seinem Abholpad. Erledigtes bleibt erledigt. Neues Taxi
 ## am Startpad mit Mindest-Sprit (35 %) bzw. dem Rest-Sprit, falls mehr.
 func respawn_after_crash() -> void:
-	var fuel_keep := clampf(maxf(sim.fuel, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
+	var fuel_keep := Tuning.FUEL_MAX        # ein neues Taxi startet immer mit vollem Tank
 	if actor != null and phase == Phase.DROPOFF:
 		_deliver(current_job())             # schon ausgestiegen: bleibt abgeliefert, läuft zum Häuschen
 	for ex in extras.duplicate():
@@ -608,7 +623,7 @@ func _roll_price(old: float) -> float:
 
 func _update_prices(dt: float) -> void:
 	level_time += dt
-	if refuel_tick:                       # während des Tankens ändert sich der Preis nie: Wechsel wird verschoben
+	if refuel_tick or station_down():     # beim Tanken und bei defekter Station ändert sich der Preis nie (Wechsel wird verschoben)
 		price_next_t += dt
 		return
 	if level_time >= price_next_t:
@@ -740,6 +755,8 @@ func _spawn_extra() -> void:
 			fare_n += 1
 	var base_fare := maxf(35.0, snappedf(fare_sum / maxf(float(fare_n), 1.0) * 0.7 * Tuning.EXTRA_FARE_FACTOR, 5.0))
 	var dist: float = absf(float(level.pads[from_id].center) - float(level.pads[to_id].center)) + absf(float(level.pads[from_id].row) - float(level.pads[to_id].row)) * Tuning.TILE
+	var probe := {"from": from_id, "to": to_id}
+	base_fare = maxf(base_fare, min_fare(level, probe))
 	var job := {"from": from_id, "to": to_id, "fare": base_fare, "par": snappedf(14.0 + dist / 38.0, 1.0),
 		"passenger": ident.name, "gender": ident.gender, "look": ident.look}
 	var a := PassengerActor.new()

@@ -44,6 +44,7 @@ func _draw() -> void:
 	_draw_reflections()
 	_draw_pumps()
 	_draw_gate()
+	_draw_doors()
 	_draw_actors()
 	_draw_taxi_shadow()
 
@@ -90,6 +91,29 @@ func _draw_pads() -> void:
 			var tri := PackedVector2Array([Vector2(cxm - 5, ay), Vector2(cxm + 5, ay), Vector2(cxm, ay + 7)])
 			draw_colored_polygon(tri, Color("#ffe14a"))
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
+
+## Bewegliche Tore (Schleusen): geschlossen = Schott mit Warnstreifen und roter Lampe, offen = grüner Rahmen,
+## kurz vor dem Schließen blinkt der Rahmen gelb.
+func _draw_doors() -> void:
+	if level == null or not level.has_doors():
+		return
+	for ch in level.doors:
+		var d: Dictionary = level.doors[ch]
+		var open := level.door_is_open(ch, level.clock)
+		var ttc := level.door_time_to_close(ch, level.clock)
+		var warn := open and ttc > 0.0 and ttc < 1.3 and int(t * 8.0) % 2 == 0
+		for c in d.cells:
+			var r := Rect2(c.x * T, c.y * T, T, T)
+			if open:
+				var rc := Color("#ffd24a") if warn else Color(0.36, 1.0, 0.6, 0.55)
+				draw_rect(r.grow(-0.6), rc, false, 0.8)
+			else:
+				draw_rect(r, Color("#161c45"))
+				for i in 4:
+					var yy := r.position.y + 1.5 + i * 3.8
+					draw_rect(Rect2(r.position.x + 1.0, yy, T - 2.0, 1.8), Color("#ffc23a") if i % 2 == 0 else Color("#0c0f24"))
+				draw_rect(r.grow(-0.4), Color("#7f8fe0"), false, 0.8)
+				draw_rect(Rect2(r.position.x + T * 0.5 - 1.0, r.position.y + T * 0.5 - 1.0, 2.0, 2.0), Color("#ff4d6d") if int(t * 3.0) % 2 == 0 else Color("#7a2438"))
 
 func _draw_gate() -> void:
 	if level.exit_cells.is_empty():
@@ -168,7 +192,7 @@ func _draw_actor(a: PassengerActor) -> void:
 
 ## Sprechblase mit der Zielplattform (Zahl) bzw. Pfeil nach oben für den Ausgang, nachdem das „!“ verklungen ist.
 func _draw_dest_bubble(pos: Vector2, dest: String, fade: float) -> void:
-	var bx := pos.x + 11.0
+	var bx := pos.x + 17.0
 	var by := pos.y - 17.0 - 0.6 * sin(t * 3.0)
 	var ink := Color("#0c0f24")
 	draw_colored_polygon(PackedVector2Array([Vector2(bx - 5.5, by + 3.0), Vector2(bx - 3.0, by + 4.0), Vector2(bx - 8.0, by + 8.5)]), Color(ink.r, ink.g, ink.b, fade))
@@ -238,8 +262,9 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	col.a = a.fade
 	var txt := "¢%d" % int(round(value))
 	var font := Fonts.hud
-	draw_rect(Rect2(pos.x - 8.0, pos.y - 21.0, 16.0, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
-	draw_string(font, Vector2(pos.x - 8.0, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, 16, 7, col)
+	var tw := maxf(16.0, font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x + 4.0)     # Betrag nie abschneiden
+	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
+	draw_string(font, Vector2(pos.x - tw * 0.5, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, tw, 7, col)
 
 ## Zapfsäule mit Preisanzeige. Der Kopf knickt mit jeder Berührung weiter ab (Stufe 1–3); nach der dritten explodiert
 ## die Station (Effekte in fx.gd) und bleibt als verkohlte Säule stehen.

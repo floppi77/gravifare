@@ -382,3 +382,8 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 ## L) Nachträge nach der neunten Testrunde
 - Verpasster Pflichtfahrgast: kein Ersatz, Abzug, Tor öffnet nach dem letzten Pflichtfahrgast. Falsche-Plattform-Regel: Abholpad nie falsch; Ausgangs-Fahrgast meckert.
 - Menü: „Fortsetzen“ (gespeicherter Feldzug) und „Neues Spiel“. Wimpel mit Plattformzahl statt Laterne; Sprechblase mit Zielplattform nach dem „!“.
+
+## M) Nachträge Runde 10
+- Ergebnisansicht nach dem Level bleibt, bis bestätigt wird (Enter/A). Wimpelzahlen kleiner. Replay-Fundament, Punkte.
+- **Bewegliche Tore** (Zeichen a–e, `doors` im JSON), Sektor 2 „Neon-Schluchten“ (Level 12–22).
+- Mindest-Fahrpreis: profitabel bis 25 % Zufriedenheit. Preise ruhen beim Tanken und bei defekter Zapfsäule. Neues Taxi = voller Tank. Der nächste Fahrgast erscheint nie auf dem Pad, auf dem das Taxi steht (Bot wartet schwebend).

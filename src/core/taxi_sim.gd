@@ -33,6 +33,8 @@ func setup(lvl: LevelData) -> void:
 	landed_pad = {}
 	time = 0.0
 	spike_cd = 0.0
+	lvl.clock = 0.0
+	lvl.hold = Rect2()
 	events.clear()
 	# Steht unter dem Startpunkt ein Pad, beginnt das Taxi sicher gelandet.
 	for dy in range(0, 3):
@@ -74,6 +76,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		return
 	time += dt
 	spike_cd = maxf(0.0, spike_cd - dt)
+	level.clock = time
+	level.hold = Rect2(pos.x - Tuning.HULL_HALF.x, pos.y - Tuning.HULL_HALF.y, Tuning.HULL_HALF.x * 2.0, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * gear)
 	gear_cmd = gear_request
 	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / Tuning.GEAR_TIME)
 

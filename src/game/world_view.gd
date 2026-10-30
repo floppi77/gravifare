@@ -58,6 +58,11 @@ func _deep(cx: int, cy: int) -> bool:
 func _draw() -> void:
 	if level == null:
 		return
+	level.doors_ignore = true        # Tore werden dynamisch in props_view gezeichnet; hier gelten sie als offen
+	_draw_world()
+	level.doors_ignore = false
+
+func _draw_world() -> void:
 	var edge := Color("#7f8fe0")
 	var edge_hi := Color("#c4d0ff")
 	var shadow := Color("#0c0f24")
