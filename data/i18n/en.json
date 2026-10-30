@@ -161,5 +161,11 @@
  "KEY_LEFT": "←",
  "KEY_RIGHT": "→",
  "KEY_ENTER": "Enter",
- "KEY_ESCAPE": "Esc"
+ "KEY_ESCAPE": "Esc",
+ "RES_COSTS": "Repairs −¢%d   Replacement taxis −¢%d   Net ¢%d",
+ "MSG_TAXI_FEE": "Replacement taxi: −¢%d",
+ "VOICE_BORED": "Too slow, I'm out of here!",
+ "MSG_EXTRA_NEW": "Radio call: %s waits at platform %s",
+ "MSG_EXTRA_LEFT": "%s waited too long and left",
+ "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds"
 }

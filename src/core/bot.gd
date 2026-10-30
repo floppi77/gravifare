@@ -117,6 +117,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.
 static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0) -> Dictionary:
 	var r := Run.new()
+	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional
 	r.start(lvl, fuel_in)
 	var bot := Bot.new(r)
 	var ticks := int(max_seconds / Tuning.TICK)

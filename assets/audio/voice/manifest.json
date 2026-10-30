@@ -671,6 +671,38 @@
   "en/d0_g10": {
    "text": "A passenger asked about you.",
    "seconds": 2.28
+  },
+  "de/f0_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 1.98
+  },
+  "de/f1_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.94
+  },
+  "de/m0_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 1.74
+  },
+  "de/m1_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.8
+  },
+  "en/f0_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.04
+  },
+  "en/f1_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.82
+  },
+  "en/m0_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.9
+  },
+  "en/m1_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.62
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

@@ -60,13 +60,14 @@ const BURN_UP := 1.6
 const BURN_SIDE := 0.7
 const BURN_DOWN := 0.8
 const REFUEL_RATE := 25.0
-const FUEL_PRICE := 0.6          # Credits je Einheit (Richtwert; echte Preise: siehe Spritpreis-Zufall)
+const FUEL_PRICE := 3.0          # Credits je Einheit (Richtwert; echte Preise: siehe Spritpreis-Zufall)
 # Spritpreise: je Level zufällig in festem Bereich ("nie zu billig, nie zu teuer"), Wechsel in zufälligen Abständen
-const FUEL_PRICE_MIN := 0.40
-const FUEL_PRICE_MAX := 0.90
+const FUEL_PRICE_MIN := 2.00      # Level 1; höhere Level: × price_scale()
+const FUEL_PRICE_MAX := 4.20
 const PRICE_EVERY_MIN := 20.0     # Sekunden Levelzeit zwischen zwei Preiswechseln (zufällig im Bereich)
 const PRICE_EVERY_MAX := 45.0
-const PRICE_MIN_STEP := 0.12      # jeder Wechsel ändert den Preis merklich
+const PRICE_MIN_STEP := 0.5       # jeder Wechsel ändert den Preis merklich
+const PRICE_PER_LEVEL := 0.03     # Spritpreise steigen je Level um 3 % (Level 99 ≈ 3,9-fach)
 # Zapfsäule: Berührung steigert den Preis sofort; 3 Berührungen = Explosion, Station defekt
 const PRICE_TOUCH_SURCHARGE := 0.25
 const PRICE_HARD_CAP := 1.6       # Obergrenze (× Maximalpreis) auch bei Berührungen
@@ -74,6 +75,29 @@ const PUMP_TOUCHES_TO_BREAK := 3
 const PUMP_TOUCH_COOLDOWN := 1.2
 const PUMP_BOOM_DELAY := 0.7
 const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
+
+# Kosten: Reparatur der Hülle am Levelende, Ersatztaxi nach Totalschaden (Credits)
+const REPAIR_COST := 2.0          # je verlorenem Hüllenpunkt des überlebenden Taxis
+const REPLACE_BASE := 80.0        # Ersatztaxi nach Zerstörung
+const REPLACE_PER_LEVEL := 2.0    # … plus je Levelnummer
+
+# Zusatzfahrgäste (Funkrufe): ab Level 5 erscheinen weitere Fahrgäste, auch während das Taxi jemanden fährt.
+# Das Taxi hat einen Sitz. Wer zu lange wartet, schimpft und geht.
+const EXTRA_FROM_LEVEL := 5
+const EXTRA_FIRST_MIN := 6.0         # Sekunden bis zum ersten Zusatzfahrgast
+const EXTRA_FIRST_MAX := 11.0
+const EXTRA_EVERY_MIN := 9.0         # Abstand zwischen zwei Zusatzfahrgästen
+const EXTRA_EVERY_MAX := 18.0
+const EXTRA_PATIENCE_MIN := 42.0     # Geduld in Sekunden
+const EXTRA_PATIENCE_MAX := 70.0
+const NEXT_SPAWN_MIN := 2.5          # Pause nach dem Absetzen, bis der nächste Auftrags-Fahrgast erscheint
+const NEXT_SPAWN_MAX := 6.0
+
+## Wie viele Zusatzfahrgäste gleichzeitig warten dürfen (0 = noch keine).
+static func extra_slots(level_no: int) -> int:
+	if level_no < EXTRA_FROM_LEVEL:
+		return 0
+	return 1 if level_no < 11 else (2 if level_no < 31 else 3)
 
 # Auftragsablauf
 const BOARD_TIME := 0.9
@@ -111,3 +135,9 @@ static func min_land_window(level_no: int) -> float:
 	if level_no <= 3:
 		return LAND_WINDOW_EARLY
 	return lerpf(LAND_WINDOW_EARLY, LAND_WINDOW_FLOOR, clampf(float(level_no - 3) / 96.0, 0.0, 1.0))
+
+static func price_scale(level_no: int) -> float:
+	return 1.0 + PRICE_PER_LEVEL * float(maxi(level_no - 1, 0))
+
+static func replacement_fee(level_no: int) -> float:
+	return REPLACE_BASE + REPLACE_PER_LEVEL * float(level_no)

@@ -13,6 +13,7 @@ var near_cd := 0.0
 var slowmo_left := 0.0
 var completion_saved := false
 const TV := preload("res://src/game/transition_view.gd")
+var arrive_path := PackedVector2Array()   # hindernisfreier Einflug-Pfad (Pathing.arrival_path)
 var trans_t := -1.0              # Zeitachse des Levelwechsels (siehe transition_view.gd), < 0 = inaktiv
 var next_id := ""
 var arriving := false
@@ -71,7 +72,10 @@ func _ready() -> void:
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
 	if OS.get_cmdline_user_args().has("--autopilot"):
+		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
 		autopilot = Bot.new(run)
+	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
+		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--debug-complete"):
 		run.exit_open = true
 		run.level.exit_open = true
@@ -126,6 +130,7 @@ func load_level(path: String) -> void:
 	taxi.reset_physics_interpolation()
 	hud.bind(run)
 	if autopilot != null:
+		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
 		autopilot = Bot.new(run)
 	hud.paused = false
 	paused = false
@@ -240,7 +245,7 @@ func _physics_process(_delta: float) -> void:
 		Save.note_max("best_streak", run.best_streak)
 		var prev_best := Save.best_time(Flow.current_level)
 		var med := run.medals()
-		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned}
+		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "net": run.earned - run.repair_cost - run.taxi_fees}
 		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med)
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
@@ -432,6 +437,17 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play_voice(e.voice, "angry")
 			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 			Sfx.play("hit", -8.0)
+		"extra_appeared":
+			hud.flash_message(tr("MSG_EXTRA_NEW") % [e.name, e.pad], 2.6)
+			Sfx.play("board", -10.0)
+		"extra_left":
+			hud.flash_message(tr("MSG_EXTRA_LEFT") % e.name, 2.6)
+			if not Sfx.play_voice(e.voice, "bored"):
+				Sfx.play_voice(e.voice, "angry")
+			hud.subtitle(e.name, tr("VOICE_BORED"), 2.2)
+		"cost":
+			if e.what == "taxi":
+				hud.flash_message(tr("MSG_TAXI_FEE") % int(e.amount), 2.5)
 		"price_changed":
 			if run.sim.fuel < 70.0:
 				_attendant("price_up" if e.up else "price_down", 14.0)
@@ -558,14 +574,11 @@ func _begin_arrival() -> void:
 	level_path = Flow.level_path(next_id)
 	load_level(level_path)
 	arrive_end = run.sim.pos
-	arrive_start = run.level.exit_rect().get_center() + Vector2(0, 4)
+	arrive_path = Pathing.arrival_path(run.level, arrive_end)
+	arrive_start = arrive_path[0]
 	arrive_prev = arrive_start
 	_arrival_tick()
 	taxi.reset_physics_interpolation()
-
-static func _bezier(p0: Vector2, c1: Vector2, c2: Vector2, p3: Vector2, e: float) -> Vector2:
-	var q := 1.0 - e
-	return p0 * (q * q * q) + c1 * (3.0 * q * q * e) + c2 * (3.0 * q * e * e) + p3 * (e * e * e)
 
 func _arrival_tick() -> void:
 	if not arriving or arrive_done:
@@ -590,9 +603,7 @@ func _arrival_tick() -> void:
 			_on_event({"type": "call", "voice": run.actor.voice_key(), "name": run.actor.pname})
 		return
 	var e := TV.smooth(u * 1.04)
-	var c1 := arrive_start + Vector2(0, 95)
-	var c2 := arrive_end + Vector2(0, -75)
-	var pos := _bezier(arrive_start, c1, c2, arrive_end, e)
+	var pos := Pathing.sample_path(arrive_path, e)
 	var vel := (pos - arrive_prev) / Tuning.TICK
 	arrive_prev = pos
 	s.pos = pos

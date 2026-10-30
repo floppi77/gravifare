@@ -2,11 +2,13 @@
  "passenger_extra": {
   "de": {
    "soft": "Wow, sanft!",
-   "hard": "Aua!"
+   "hard": "Aua!",
+   "bored": "Das dauert mir zu lange, tschüss!"
   },
   "en": {
    "soft": "Wow, smooth!",
-   "hard": "Ouch!"
+   "hard": "Ouch!",
+   "bored": "Too slow, I'm out of here!"
   }
  },
  "t0": {

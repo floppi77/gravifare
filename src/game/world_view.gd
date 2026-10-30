@@ -30,6 +30,24 @@ func _hash(x: int, y: int) -> int:
 func _tile(idx: int, cx: int, cy: int) -> void:
 	draw_texture_rect_region(tiles_tex, Rect2(cx * T, cy * T, T, T), Rect2(idx * 48, 0, 48, 48))
 
+## Dornen zeigen von der tragenden Fläche weg: Fels darunter = nach oben, darüber = nach unten, seitlich = zur Seite.
+func _spike_tile(cx: int, cy: int) -> void:
+	var rot := 0.0
+	if _base(cx, cy + 1):
+		rot = 0.0
+	elif _base(cx, cy - 1):
+		rot = PI
+	elif _base(cx - 1, cy):
+		rot = PI * 0.5
+	elif _base(cx + 1, cy):
+		rot = -PI * 0.5
+	draw_set_transform(Vector2((cx + 0.5) * T, (cy + 0.5) * T), rot)
+	draw_texture_rect_region(tiles_tex, Rect2(-T * 0.5, -T * 0.5, T, T), Rect2(6 * 48, 0, 48, 48))
+	draw_set_transform(Vector2.ZERO, 0.0)
+
+func _base(cx: int, cy: int) -> bool:
+	return level.is_solid_cell(cx, cy) and level.cell(cx, cy) != "^"
+
 func _deep(cx: int, cy: int) -> bool:
 	for dy in range(-1, 2):
 		for dx in range(-1, 2):
@@ -74,7 +92,7 @@ func _draw() -> void:
 					if not level.is_solid_cell(cx, cy + 1):
 						draw_rect(Rect2(x, y + T - d - PX * 2, T, PX * 2), ao)
 			elif c == "^":
-				_tile(6, cx, cy)
+				_spike_tile(cx, cy)
 			elif c == "F":
 				_tile(5, cx, cy)
 			elif c >= "1" and c <= "9":

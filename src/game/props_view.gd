@@ -160,6 +160,8 @@ func _draw_actor(a: PassengerActor) -> void:
 func _draw_actors() -> void:
 	for l in run.leavers:
 		_draw_actor(l)
+	for ex in run.extras:
+		_draw_actor(ex.actor)
 	if run.actor != null:
 		_draw_actor(run.actor)
 
@@ -195,6 +197,14 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	if a == run.actor and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING or a.state == PassengerActor.S.TO_TAXI or a.state == PassengerActor.S.RETURNING):
 		value = run.prospect()
 		factor = run.live_factor()
+	var ex := run.extra_of(a)
+	if not ex.is_empty() and a.state != PassengerActor.S.EXITING:
+		value = run.extra_prospect(ex)
+		factor = run.extra_factor(ex)
+		if int(ex.state) == Run.ES.WAIT:                     # Geduld: schrumpfender Balken unter dem Betrag
+			var frac := clampf(float(ex.patience) / float(ex.patience_max), 0.0, 1.0)
+			draw_rect(Rect2(pos.x - 8.0, pos.y - 13.6, 16.0, 1.4), Color(0.04, 0.05, 0.14, 0.8 * a.fade))
+			draw_rect(Rect2(pos.x - 8.0, pos.y - 13.6, 16.0 * frac, 1.4), Color("#5dff9a").lerp(Color("#ff4d6d"), 1.0 - frac))
 	elif a.state == PassengerActor.S.EXITING and not a.pay_info.is_empty():
 		value = a.pay_for(0.0)
 		factor = a.factor_for(0.0)

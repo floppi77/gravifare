@@ -161,5 +161,11 @@
  "KEY_LEFT": "←",
  "KEY_RIGHT": "→",
  "KEY_ENTER": "Eingabe",
- "KEY_ESCAPE": "Esc"
+ "KEY_ESCAPE": "Esc",
+ "RES_COSTS": "Reparatur −¢%d   Ersatztaxis −¢%d   Netto ¢%d",
+ "MSG_TAXI_FEE": "Ersatztaxi: −¢%d",
+ "VOICE_BORED": "Das dauert mir zu lange, tschüss!",
+ "MSG_EXTRA_NEW": "Funkruf: %s wartet an Plattform %s",
+ "MSG_EXTRA_LEFT": "%s hat zu lange gewartet und ist gegangen",
+ "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds"
 }

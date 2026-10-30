@@ -88,3 +88,51 @@ static func exit_goal(level: LevelData) -> Vector2:
 static func gate_approach(level: LevelData) -> Vector2:
 	var r := level.exit_rect()
 	return Vector2(r.get_center().x, r.end.y + 60.0)
+
+## Einflug-Pfad für den Levelwechsel: aus dem Tor in der Decke, frei von Hindernissen, bis auf die Startplattform.
+## Rückgabe: Polylinie (Chaikin-geglättet, sofern die Glättung frei bleibt). `landing` = Landeposition des Taxis.
+static func arrival_path(level: LevelData, landing: Vector2) -> PackedVector2Array:
+	var was_open := level.exit_open
+	level.exit_open = true
+	var start := level.exit_rect().get_center() + Vector2(0, 4)
+	var pad := level.pad_at_foot(Vector2(landing.x, landing.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN + 2.0))
+	var hover := Vector2(landing.x, landing.y - 32.0) if pad.is_empty() else hover_point(level, pad, 8.0)
+	var pts: Array[Vector2] = [start, gate_approach(level)]
+	for m in [10.0, 8.0, 6.0, 4.0, 2.0]:
+		var p := plan(level, pts[1], hover, m)
+		if not p.is_empty():
+			pts.append_array(p)
+			break
+	if pts.size() == 2:
+		pts.append(hover)
+	pts.append(landing)
+	var raw := PackedVector2Array(pts)
+	var smooth := raw
+	for it in 2:
+		var nxt := PackedVector2Array([smooth[0]])
+		for i in range(smooth.size() - 1):
+			nxt.append(smooth[i].lerp(smooth[i + 1], 0.25))
+			nxt.append(smooth[i].lerp(smooth[i + 1], 0.75))
+		nxt.append(smooth[smooth.size() - 1])
+		smooth = nxt
+	var ok := true
+	for i in range(2, smooth.size() - 1):     # ab dem Anflugpunkt: Hülle darf nirgends anstoßen
+		var n := int(ceil(smooth[i].distance_to(smooth[i + 1]) / 3.0))
+		for k in range(n + 1):
+			if level.box_hits_solid(smooth[i].lerp(smooth[i + 1], float(k) / maxf(n, 1)), Tuning.HULL_HALF):
+				ok = false
+	level.exit_open = was_open
+	return smooth if ok else raw
+
+## Punkt bei Anteil `e` (0..1) der Gesamtlänge der Polylinie.
+static func sample_path(path: PackedVector2Array, e: float) -> Vector2:
+	var total := 0.0
+	for i in range(path.size() - 1):
+		total += path[i].distance_to(path[i + 1])
+	var want := clampf(e, 0.0, 1.0) * total
+	for i in range(path.size() - 1):
+		var d := path[i].distance_to(path[i + 1])
+		if want <= d or i == path.size() - 2:
+			return path[i].lerp(path[i + 1], clampf(want / maxf(d, 0.0001), 0.0, 1.0))
+		want -= d
+	return path[path.size() - 1]

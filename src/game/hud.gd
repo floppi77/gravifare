@@ -69,13 +69,18 @@ func _draw() -> void:
 	# Leben als kleine Taxi-Symbole
 	for i in Flow.lives:
 		draw_texture_rect(taxi_icon, Rect2(8 + i * 17, 47, 15, 9.4), false)
+	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
+	draw_string(font, Vector2(size.x * 0.5 + 44, 13), "%d/99  %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_LEFT, 200, 9, Color("#c4d0ff"))
 	if run.streak >= 1:
 		var stars := mini(run.streak, Tuning.COMBO_MAX)
 		draw_string(font, Vector2(8, 66), "★".repeat(stars) + "  " + tr("HUD_STREAK") % [run.streak, int(round(Tuning.COMBO_STEP * stars * 100.0))], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#ffe14a"))
 	# Auftrag
 	var job := run.current_job()
 	var txt := ""
-	if job.is_empty():
+	var ex_aboard := run._extra_aboard()
+	if not ex_aboard.is_empty():
+		txt = tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()]
+	elif job.is_empty():
 		txt = tr("HUD_GO_EXIT") if run.exit_open else ""
 	else:
 		var who: String = job.get("passenger", "?")
@@ -89,10 +94,16 @@ func _draw() -> void:
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color(0.05, 0.06, 0.15, 0.8))
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color("#3a4580"), false, 0.67)
 		draw_string(font, Vector2(size.x * 0.5 - 170, size.y - 19), txt, HORIZONTAL_ALIGNMENT_CENTER, 340, 10, Color("#ffe14a"))
-		if run.actor != null and run.result == Run.Result.RUNNING:
+		if ex_aboard.is_empty() and run.actor != null and run.result == Run.Result.RUNNING:
 			var f := run.live_factor()
 			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
 			draw_string(font, Vector2(size.x * 0.5 + 40, size.y - 19), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 126, 10, fc)
+	var ey := 25.0
+	for ex in run.extras:
+		if int(ex.state) == Run.ES.WAIT:
+			var ec := Color("#c9cfee") if float(ex.patience) > 12.0 else Color("#ff8a5a")
+			draw_string(font, Vector2(size.x * 0.5 + 44, ey), tr("HUD_EXTRA") % [ex.actor.pname, ex.job.from, ex.job.to, int(round(run.extra_prospect(ex))), int(ceil(ex.patience))], HORIZONTAL_ALIGNMENT_LEFT, 220, 8, ec)
+			ey += 10.0
 	var done := "%d/%d" % [run.delivered, run.level.jobs.size()]
 	draw_string(font, Vector2(size.x - 70, 14), done, HORIZONTAL_ALIGNMENT_RIGHT, 62, 10, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung
@@ -153,6 +164,7 @@ func _draw_result() -> void:
 	if float(result.best) > 0.0:
 		t_line += "   " + (tr("RES_NEW_BEST") if float(result.time) < float(result.best) else tr("RES_BEST") % int(result.best))
 	draw_string(font, Vector2(0, y), t_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#c9cfee"))
+	draw_string(font, Vector2(0, y - 12), tr("RES_COSTS") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("net", 0.0))], HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#ff9a7a"))
 	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
 	for i in items.size():
 		var x := size.x * 0.5 - 150.0 + i * 100.0

@@ -108,3 +108,9 @@ Offen: Gamepad-/Eingabetest am echten Gerät, Menü, Pause mit Optionen, Fonts, 
 
 ## Dornen
 Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung festen Zusatzschaden (`Tuning.SPIKE_DAMAGE` = 30 Hülle, unabhängig vom Tempo; 0,5 s Sperre gegen Mehrfachzählung). Sie zählen in der Schwierigkeitsmetrik als Gefahr. Erstes Auftreten: S1-08.
+
+## Zusatzfahrgäste und Ökonomie (siebte Runde)
+- **Zusatzfahrgäste** (`Run.extras`, ab Level 5, Anzahl je Level in `Tuning.extra_slots`): erscheinen in zufälligen Abständen (9–18 s) an einem freien Passagierpad mit zufälligem Ziel, auch während das Taxi jemanden fährt. Das Taxi hat einen Sitz: Solange ein Zusatzfahrgast an Bord ist, steigt der Auftrags-Fahrgast nicht ein (und umgekehrt). Geduld 42–70 s; danach schimpft der Fahrgast („bored“-Sprachzeile) und geht. Bezahlung wie beim Auftrags-Fahrgast (Zeitfaktor, Streckenzuschlag, Serie), aber nicht Teil des Levelziels; zählt für die Einkommens-Medaille.
+- **Pause nach dem Absetzen**: Der nächste Auftrags-Fahrgast erscheint nach zufälligen 2,5–6 s (nicht sofort, nicht ewig).
+- **Kosten**: Sprit 2,0–4,2 ¢/Einheit × (1 + 0,03·(Level−1)); Reparatur 2 ¢ je verlorenem Hüllenpunkt am Levelende; Ersatztaxi 80 ¢ + 2 ¢·Level je Totalschaden. Credits fallen nie unter 0; unter 35 % Tank bleibt das Tanken kostenlos (keine Sackgasse).
+- **Backlog**: eigenes Taskleistensymbol (M6).

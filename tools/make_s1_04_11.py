@@ -130,7 +130,7 @@ g.rect("#", 12, 11, 17, 19); g.pad("2", 12, 16, 10)
 g.rect("#", 21, 14, 31, 19); g.pad("3", 21, 25, 13); g.pad("F", 27, 31, 13); g.rect("P", 31, 11, 31, 12)
 g.rect("#", 33, 10, 38, 19); g.pad("4", 33, 37, 9)
 g.rect("#", 24, 1, 26, 9)                                    # Zapfen über Pad 3
-g.rect("^", 10, 2, 12, 2); g.rect("^", 27, 2, 29, 2)         # Dornenbänder unter der Decke
+g.rect("^", 10, 1, 12, 1); g.rect("^", 27, 1, 29, 1)         # Dornenbänder an der Decke
 g.gate()
 g.put("S", 4, 13)
 make("S1-09", 9, "Nadelspitzen", "Needle Points", g, [

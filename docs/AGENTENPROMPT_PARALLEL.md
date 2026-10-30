@@ -361,3 +361,13 @@ Später, Level für Level: Fahrgasttypen (VIP, zerbrechlich, Gruppe, Notfall), T
 
 ## I) M2-Abschluss (sechste Runde)
 Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Gamepad, Tausch bei Konflikten, persistent, robust gegen defekte Dateien; Pause/Menünavigation fest), Optionen in Kategorien mit **V-Sync, FPS-Limit und FPS-Anzeige**, **drei Medaillen je Level** (Zeit, Sauber, Meister) mit Bestzeiten, **Statistik-Seite**, **überspringbare Tutorial-Hinweise**, Tests für Speicherstand-/Einstellungs-Robustheit. Kamera auf den Physik-Takt stellen (sonst Warnung bei Physik-Interpolation).
+
+## J) Nachträge nach dem Anspielen von Sektor 1 (siebte Runde)
+- **Medaillen sind Sterne** (HUD-Ergebnisblock, Levelauswahl ★/☆).
+- **Dornen** (`^`) sind nur an Flächen erlaubt (Test) und zeigen von der tragenden Fläche weg (Boden = hoch, Decke = runter, Wand = seitlich); sie machen festen Schaden (30 Hülle, 0,5 s Sperre).
+- **Einflug beim Levelwechsel** folgt einem hindernisfreien Pfad (`Pathing.arrival_path`, Test je Level); nie quer durch Fels.
+- **Fahrgast nach dem Aussteigen** geht auch bei sofortigem Abflug zum Häuschen und wird dort bezahlt (nie zurück ins Taxi).
+- **Ökonomie**: Spritpreise ~4× höher und +3 % je Level; Reparatur (2 ¢ je verlorenem Hüllenpunkt, am Levelende) und Ersatztaxi nach Totalschaden (80 ¢ + 2 ¢ je Levelnummer). Credits sind gedeckelt bei 0.
+- **Zusatzfahrgäste ab Level 5** („Funkruf“): erscheinen zusätzlich, auch während das Taxi jemanden fährt (ein Sitz), mit Geduld (42–70 s, Balken über dem Betrag); wer zu lange wartet, schimpft und geht. Gleichzeitig wartend: 1 (L5–10), 2 (L11–30), 3 (ab L31). Optional, zählen nicht zum Levelziel. Pause nach dem Absetzen eines Auftrags-Fahrgasts: zufällig 2,5–6 s.
+- **HUD** zeigt „Nr/99 Levelname“.
+- **Offen (M6)**: eigenes Taskleistensymbol (Fenster-/Projektsymbol).

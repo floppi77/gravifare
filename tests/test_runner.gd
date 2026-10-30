@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -331,6 +331,138 @@ func _test_spikes() -> void:
 	check(s.hull <= 100.0 - Tuning.SPIKE_DAMAGE + 0.01, "Dornen: fester Schaden auch bei langsamer Berührung (%.0f Hülle)" % s.hull)
 	check(s.hull > 0.0 or s.state == TaxiSim.State.DESTROYED, "Dornen: Hülle fällt nicht unter 0, ohne zerstört zu sein")
 
+func _test_spikes_attached() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var loose := 0
+		for cy in lvl.height:
+			for cx in lvl.width:
+				if lvl.cell(cx, cy) != "^":
+					continue
+				var held := false
+				for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+					var c := lvl.cell(cx + d.x, cy + d.y)
+					if c != "^" and lvl.is_solid_cell(cx + d.x, cy + d.y):
+						held = true
+				if not held:
+					loose += 1
+		check(loose == 0, "%s: Dornen sitzen alle an einer Fläche (%d frei schwebend)" % [lvl.id, loose])
+
+func _test_arrival_path() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var s := TaxiSim.new()
+		s.setup(lvl)
+		var path := Pathing.arrival_path(lvl, s.pos)
+		lvl.exit_open = true
+		var hits := 0
+		for i in range(3, 201):
+			var p := Pathing.sample_path(path, float(i) / 200.0)
+			if p.y > lvl.exit_rect().end.y and lvl.box_hits_solid(p, Tuning.HULL_HALF):
+				hits += 1
+		lvl.exit_open = false
+		check(hits == 0, "%s: Einflug aus dem Tor zur Startplattform ist hindernisfrei (%d Treffer)" % [lvl.id, hits])
+		check(path[path.size() - 1].distance_to(s.pos) < 1.0, "%s: Einflug endet auf der Startposition" % lvl.id)
+
+func _test_dropoff_liftoff() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	var job: Dictionary = r.current_job()
+	_land_on(r, String(job.from))
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.CARRYING, "Fahrgast ist an Bord (Phase CARRYING)")
+	_land_on(r, String(job.to))
+	for i in 6:
+		r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.DROPOFF, "Aussteigen beginnt")
+	r.sim.state = TaxiSim.State.FLYING        # sofort wieder abheben
+	r.sim.landed_pad = {}
+	for i in 4:
+		r.step(Vector2(0, -1), true)
+	check(r.phase == Run.Phase.WAITING and r.job_index == 1, "Nach sofortigem Abflug ist der Auftrag abgeschlossen (nicht mehr an Bord)")
+	check(r.leavers.size() == 1 and r.leavers[0].state != PassengerActor.S.ABOARD, "Fahrgast läuft zum Häuschen statt zurück ins Taxi")
+	for i in int(20.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), true)
+	check(r.delivered == 1 and r.money > 0.0, "Auszahlung folgt, sobald er sein Häuschen erreicht (¢%d)" % int(r.money))
+
+func _test_extras() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
+	var r := Run.new()
+	r.start(lvl)
+	check(r.extras_active() and Tuning.extra_slots(5) == 1 and Tuning.extra_slots(4) == 0, "Zusatzfahrgäste ab Level 5")
+	var l4 := LevelData.load_file("res://data/levels/s1_04.json")
+	var r4 := Run.new()
+	r4.start(l4)
+	r4.extra_timer = 0.0
+	r4.step(Vector2.ZERO, false)
+	check(r4.extras.is_empty(), "Vor Level 5 erscheinen keine Zusatzfahrgäste")
+	r.extra_timer = 0.0
+	r.step(Vector2.ZERO, false)
+	check(r.extras.size() == 1, "Zusatzfahrgast erscheint, auch während ein Auftrags-Fahrgast wartet")
+	var ex: Dictionary = r.extras[0]
+	check(String(ex.job.from) != String(r.actor.pad.id) and String(ex.job.to) != String(ex.job.from), "Anderes Pad als der Auftrags-Fahrgast, anderes Ziel als Start")
+	r.extra_timer = 0.0
+	r.step(Vector2.ZERO, false)
+	check(r.extras.size() == 1, "Höchstens %d gleichzeitig wartende Zusatzfahrgäste" % Tuning.extra_slots(5))
+	# Aufnehmen und Ausliefern
+	for i in int(2.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, false)
+	_land_on(r, String(ex.job.from))
+	for i in int(3.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+	check(int(ex.state) == Run.ES.CARRY and r.extra_busy(), "Zusatzfahrgast steigt ein, das Taxi hat nur einen Sitz")
+	check(r.target_pad() == String(ex.job.to), "Zielpad zeigt auf das Ziel des Zusatzfahrgasts")
+	var before_phase := r.phase
+	check(before_phase == Run.Phase.WAITING, "Auftragskette unberührt")
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.step(Vector2(0, -1), true)
+	_land_on(r, String(ex.job.to))
+	for i in int(1.0 / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+	check(r.extras.is_empty() and r.leavers.size() >= 1, "Ausgestiegen: läuft zum Häuschen")
+	var m0 := r.money
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	for i in int(20.0 / Tuning.TICK):
+		r.step(Vector2(0, -0.39), true)
+	check(r.extras_delivered == 1 and r.money > m0 and r.delivered == 0, "Bezahlt im Häuschen, zählt nicht als Auftrag des Levels (¢%d)" % int(r.money - m0))
+	# Geduld
+	var r2 := Run.new()
+	r2.start(lvl)
+	r2.extra_timer = 0.0
+	r2.step(Vector2.ZERO, false)
+	r2.extras[0].patience = 0.02
+	var left := false
+	for i in 20:
+		r2.step(Vector2.ZERO, false)
+		for e in r2.log:
+			if e.type == "extra_left":
+				left = true
+	check(left and r2.extras.is_empty() and r2.extras_missed == 1, "Zu lange gewartet: Fahrgast schimpft und geht")
+	# Absturz verliert Fahrgast an Bord
+	var r3 := Run.new()
+	r3.start(lvl)
+	r3.extra_timer = 0.0
+	r3.step(Vector2.ZERO, false)
+	var e3: Dictionary = r3.extras[0]
+	for i in int(2.0 / Tuning.TICK):
+		r3.step(Vector2.ZERO, false)
+	_land_on(r3, String(e3.job.from))
+	for i in int(3.0 / Tuning.TICK):
+		r3.step(Vector2.ZERO, true)
+	r3.respawn_after_crash()
+	check(r3.extras.is_empty(), "Absturz: Zusatzfahrgast an Bord ist verloren")
+
 func _test_crash_balance() -> void:
 	var results := {}
 	for v in [60.0, 80.0, 100.0, 130.0, 160.0, 169.0, 171.0, 240.0]:
@@ -629,7 +761,7 @@ func _test_crash_continues_level() -> void:
 	check(r.result == Run.Result.FAILED, "Absturz = Taxi verloren")
 	r.respawn_after_crash()
 	check(r.result == Run.Result.RUNNING and r.sim.state == TaxiSim.State.LANDED and r.sim.hull == Tuning.HULL_MAX, "Neues Taxi, Level läuft weiter")
-	check(r.job_index == lvl.jobs.size() - 1 and r.delivered == lvl.jobs.size() - 1 and r.money == 55.0, "Erledigtes bleibt erledigt, kein Geld für den verlorenen Fahrgast")
+	check(r.job_index == lvl.jobs.size() - 1 and r.delivered == lvl.jobs.size() - 1 and absf(r.money - maxf(0.0, 55.0 - Tuning.replacement_fee(lvl.number))) < 0.01, "Erledigtes bleibt erledigt, kein Geld für den verlorenen Fahrgast (Ersatztaxi kostet)")
 	check(not r.exit_open and not lvl.exit_open, "Tor schließt sich wieder, bis der Fahrgast erneut an Bord ist")
 	check(r.sim.fuel >= Tuning.MIN_START_FUEL and r.sim.fuel >= minf(fuel_before, 100.0) - 0.01, "Sprit: mindestens Mindest-Sprit, Rest bleibt erhalten (%.0f)" % r.sim.fuel)
 	check(r.actor == null and String(r.current_job().passenger) == lost_name and String(r.current_job().from) == String(last.from), "Derselbe Fahrgast (%s) wartet wieder an seinem Abholpad %s" % [lost_name, String(last.from)])
@@ -804,7 +936,7 @@ func _test_pump_level_rules() -> void:
 				ok_pump = true
 		check(ok_pump, "%s: Tankpad hat eine 2 Tiles hohe Zapfsäule am Padende" % lvl.id)
 		check(pad.land_window >= 28.0, "%s: freies Landefenster am Tankpad ≥ 28 px (%.0f px)" % [lvl.id, pad.land_window])
-		check(lvl.fuel_price_min >= 0.2 and lvl.fuel_price_max <= 1.2 and lvl.fuel_price_min < lvl.fuel_price_max - 0.2, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])
+		check(lvl.fuel_price_min >= 1.0 and lvl.fuel_price_max <= 14.0 and lvl.fuel_price_min < lvl.fuel_price_max - 0.8, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])
 
 func _test_streak_bonus() -> void:
 	var r := Run.new()
