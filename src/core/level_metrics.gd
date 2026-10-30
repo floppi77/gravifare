@@ -13,6 +13,35 @@ extends RefCounted
 
 const MAX_MARGIN := 48.0
 const STEP := 4.0
+static var _leg_cache := {}
+
+## Streckenzuschlag für eine Fahrt von Pad `from_id` nach Pad `to_id` (oder "exit"): 1,0 … 1,6.
+## Länge der Flugroute, engster Korridor entlang der Route und Größe des Ziel-Landefensters (alles aus dem Layout).
+static func leg_mult(lvl: LevelData, from_id: String, to_id: String) -> float:
+	var key := "%s:%s>%s" % [lvl.id, from_id, to_id]
+	if _leg_cache.has(key):
+		return _leg_cache[key]
+	var was_open := lvl.exit_open
+	lvl.exit_open = true
+	var a := Pathing.hover_point(lvl, lvl.pads[from_id], 8.0)
+	var b: Vector2 = Pathing.gate_approach(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
+	var clearance := 8.0
+	var length := a.distance_to(b)
+	for m in [40.0, 32.0, 24.0, 16.0, 8.0]:
+		var path := Pathing.plan(lvl, a, b, m)
+		if not path.is_empty():
+			clearance = m
+			length = Pathing.path_length(a, path)
+			break
+	var win_n := 0.0
+	if to_id != "exit":
+		win_n = clampf((84.0 - float(lvl.pads[to_id].land_window)) / 64.0, 0.0, 1.0)
+	var mult := 1.0 + Tuning.DIST_BONUS_LEN * clampf(length / 900.0, 0.0, 1.0) \
+		+ Tuning.DIST_BONUS_NARROW * clampf((40.0 - clearance) / 32.0, 0.0, 1.0) + Tuning.DIST_BONUS_WINDOW * win_n
+	lvl.exit_open = was_open
+	_leg_cache[key] = mult
+	return mult
+
 
 static func analyze(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open

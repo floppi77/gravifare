@@ -9,6 +9,7 @@ var lives := Tuning.START_LIVES
 var entry_fuel := Tuning.FUEL_MAX       # Sprit bei Levelbeginn (auch Wiederholung nach Verlust)
 var entry_credits := 0.0
 var carry_passenger := {}               # Fahrgast, der ins nächste Level mitfährt
+var run_seed := 0                       # Zufalls-Seed des Laufs (Spritpreise): je Lauf neu, je Level/Neustart reproduzierbar
 
 func level_ids() -> Array:
 	var ids: Array = []
@@ -30,6 +31,7 @@ func start_campaign(id: String) -> void:
 	entry_fuel = Tuning.FUEL_MAX
 	entry_credits = 0.0
 	carry_passenger = {}
+	run_seed = randi() % 1000000
 	start_level(id)
 
 func start_level(id: String) -> void:
@@ -60,6 +62,8 @@ func _ready() -> void:
 			for act in ["ui_accept", "ui_cancel", "ui_up", "ui_down", "gear", "pause"]:
 				print(act, " -> ", InputMap.action_get_events(act).map(func(e): return e.as_text()))
 			get_tree().quit.call_deferred()
+		if a.begins_with("--seed="):          # Dev: Zufalls-Seed fest vorgeben
+			run_seed = int(a.substr(7))
 		if a.begins_with("--lives="):         # Dev: Anzahl Leben für diesen Lauf
 			lives = int(a.substr(8))
 		if a.begins_with("--lang="):          # Dev: Sprache für diesen Lauf setzen (nicht gespeichert)

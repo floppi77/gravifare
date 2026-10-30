@@ -9,7 +9,8 @@ g.rect("#", 28, 19, 37, 19); g.rect("2", 29, 18, 36, 18)    # Pad 2 rechts unten
 g.rect("#", 28, 18, 28, 18); g.rect("#", 37, 18, 37, 18)
 g.rect("#", 23, 11, 31, 12); g.rect("3", 24, 10, 30, 10)    # Pad 3 auf schwebender Insel (7 Tiles)
 g.rect("#", 23, 10, 23, 10); g.rect("#", 31, 10, 31, 10)
-g.rect("#", 13, 19, 20, 19); g.rect("F", 14, 18, 19, 18)    # Tankpad
+g.rect("#", 13, 19, 20, 19); g.rect("F", 14, 18, 19, 18)    # Tankpad (6 Tiles)
+g.rect("P", 14, 16, 14, 17)                                  # Zapfsäule am linken Padende
 g.gate()
 g.put("S", 7, 17)
 write("S1-01", 1, 1, "Erster Flug", "First Flight", g,

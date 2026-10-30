@@ -58,7 +58,19 @@ const BURN_UP := 1.6
 const BURN_SIDE := 0.7
 const BURN_DOWN := 0.8
 const REFUEL_RATE := 25.0
-const FUEL_PRICE := 0.6          # Credits je Einheit
+const FUEL_PRICE := 0.6          # Credits je Einheit (Richtwert; echte Preise: siehe Spritpreis-Zufall)
+# Spritpreise: je Level zufällig in festem Bereich ("nie zu billig, nie zu teuer"), Wechsel in zufälligen Abständen
+const FUEL_PRICE_MIN := 0.40
+const FUEL_PRICE_MAX := 0.90
+const PRICE_EVERY_MIN := 20.0     # Sekunden Levelzeit zwischen zwei Preiswechseln (zufällig im Bereich)
+const PRICE_EVERY_MAX := 45.0
+const PRICE_MIN_STEP := 0.12      # jeder Wechsel ändert den Preis merklich
+# Zapfsäule: Berührung steigert den Preis sofort; 3 Berührungen = Explosion, Station defekt
+const PRICE_TOUCH_SURCHARGE := 0.25
+const PRICE_HARD_CAP := 1.6       # Obergrenze (× Maximalpreis) auch bei Berührungen
+const PUMP_TOUCHES_TO_BREAK := 3
+const PUMP_TOUCH_COOLDOWN := 1.2
+const PUMP_BOOM_DELAY := 0.7
 const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
 
 # Auftragsablauf
@@ -73,7 +85,12 @@ const MIN_START_FUEL := 35.0     # Mindestvorrat zu Levelbeginn (nie Sackgasse d
 const PAY_MAX := 1.6             # Faktor bei sofortiger Zustellung
 const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
 const PAY_SLOPE := 0.6           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
-const LAND_PENALTY_MAX := 0.30   # max. Abzug je harter Landung (Sinkrate = Limit)
+const LAND_PENALTY_MAX := 0.30
+const WALK_TIME_WEIGHT := 2.5    # Gehzeit zum Häuschen zählt 2,5-fach (nahes Landen lohnt spürbar)
+# Streckenzuschlag: lange/schwierige Fahrten zahlen bis zu +60 % (Länge, enger Korridor, kleines Ziel-Landefenster)
+const DIST_BONUS_LEN := 0.30
+const DIST_BONUS_NARROW := 0.20
+const DIST_BONUS_WINDOW := 0.10   # max. Abzug je harter Landung (Sinkrate = Limit)
 
 static func time_factor(t: float, par: float) -> float:
 	var ratio := t / maxf(par, 1.0)

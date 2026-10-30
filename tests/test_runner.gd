@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -613,3 +613,161 @@ func _test_min_window_ramp() -> void:
 		if Tuning.min_land_window(n) > Tuning.min_land_window(n - 1) + 0.0001:
 			mono = false
 	check(mono, "Mindest-Landefenster steigt nie von Level zu Level")
+
+func _test_distance_bonus() -> void:
+	var l1 := LevelData.load_file("res://data/levels/s1_01.json")
+	var l2 := LevelData.load_file("res://data/levels/s1_02.json")
+	var l3 := LevelData.load_file("res://data/levels/s1_03.json")
+	var short_easy := LevelMetrics.leg_mult(l1, "2", "3")          # kurze, offene Strecke, großes Ziel
+	var long_hard := LevelMetrics.leg_mult(l2, "3", "2")           # quer durchs Level, kleineres Ziel
+	var shaft := LevelMetrics.leg_mult(l3, "2", "3")               # Schacht, kleines Landefenster
+	check(short_easy >= 1.0 and long_hard <= 1.6 and shaft <= 1.6, "Streckenzuschlag liegt in 1,0…1,6 (%.2f / %.2f / %.2f)" % [short_easy, long_hard, shaft])
+	check(long_hard > short_easy, "Längere Strecke zahlt mehr (%.2f > %.2f)" % [long_hard, short_easy])
+	check(shaft > short_easy, "Schwierigerer Weg (Schacht, kleines Ziel) zahlt mehr (%.2f > %.2f)" % [shaft, short_easy])
+	var r := Run.new()
+	r.start(l2)
+	var j: Dictionary = r.current_job()
+	var info := r._make_pay_info(j, 0.0, 0.0)
+	check(absf(float(info.fare) - float(j.fare) * r.job_mult(j)) < 0.001, "Fahrpreis = Fare × Streckenzuschlag")
+
+func _test_amount_ticks_down() -> void:
+	var r := Run.new()
+	r.start(_lvl())
+	var v0 := r.prospect()
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	var v1 := r.prospect()
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	var v2 := r.prospect()
+	check(v0 > v1 and v1 > v2, "Angezeigter Betrag tickt über dem wartenden Fahrgast herunter (%.1f > %.1f > %.1f)" % [v0, v1, v2])
+	# Nach dem Aussteigen läuft er bis zum Häuschen weiter herunter
+	var a := PassengerActor.new()
+	a.setup({"passenger": "X", "gender": "f"}, r.level.pads["3"], 0, true)
+	a.pay_info = {"fare": 60.0, "par": 20.0, "base": 10.0, "penalty": 0.0}
+	a.step_out(a.pad.wait_x + 40.0, r.level.pads["3"])
+	var p0 := a.pay_for(0.0)
+	for i in 60:
+		a.step(Tuning.TICK)
+	var p1 := a.pay_for(0.0)
+	for i in 60:
+		a.step(Tuning.TICK)
+	check(p0 > p1 and p1 > a.pay_for(0.0), "Auf dem Weg zum Häuschen tickt der Betrag weiter herunter (%.2f > %.2f)" % [p0, p1])
+
+func _price_series(seed: int, seconds: float) -> Array:
+	var r := Run.new()
+	r.start(_lvl(), -1.0, 0.0, seed)
+	var changes: Array = [[0.0, r.price_base]]
+	var prev := r.price_base
+	for i in int(seconds / Tuning.TICK):
+		r._update_prices(Tuning.TICK)
+		if r.price_base != prev:
+			changes.append([r.level_time, r.price_base])
+			prev = r.price_base
+	return changes
+
+func _test_fuel_prices() -> void:
+	var lvl := _lvl()
+	var all_in_range := true
+	var interval_ok := true
+	var step_ok := true
+	var min_changes := 1000
+	for seed in [1, 2, 3, 42]:
+		var ser := _price_series(seed, 1500.0)
+		min_changes = mini(min_changes, ser.size())
+		for i in ser.size():
+			var price: float = ser[i][1]
+			if price < lvl.fuel_price_min - 0.001 or price > lvl.fuel_price_max + 0.001:
+				all_in_range = false
+			if i >= 2:
+				var dt: float = ser[i][0] - ser[i - 1][0]
+				if dt < lvl.price_every.x - 0.05 or dt > lvl.price_every.y + 0.05:
+					interval_ok = false
+			if i >= 1 and absf(float(ser[i][1]) - float(ser[i - 1][1])) < Tuning.PRICE_MIN_STEP - 0.001:
+				step_ok = false
+	check(all_in_range, "Spritpreis bleibt immer im Bereich %.2f–%.2f (nie zu billig, nie zu teuer)" % [lvl.fuel_price_min, lvl.fuel_price_max])
+	check(interval_ok, "Preiswechsel in zufälligen Abständen zwischen %.0f und %.0f s" % [lvl.price_every.x, lvl.price_every.y])
+	check(step_ok, "Jeder Preiswechsel ist deutlich spürbar (≥ %.2f)" % Tuning.PRICE_MIN_STEP)
+	check(min_changes >= 20, "Der Preis wechselt im Level mehrfach (mind. %d Wechsel in 1500 s)" % min_changes)
+	var a := _price_series(7, 400.0)
+	var b := _price_series(7, 400.0)
+	var c := _price_series(8, 400.0)
+	check(str(a) == str(b), "Preisverlauf ist reproduzierbar (gleicher Seed = gleiche Preise)")
+	check(str(a) != str(c), "Anderer Seed = anderer Preisverlauf")
+	var r := Run.new()
+	r.start(lvl, -1.0, 0.0, 5)
+	var p0 := r.fuel_price()
+	r.pump_touches = 3
+	check(r.fuel_price() <= lvl.fuel_price_max * Tuning.PRICE_HARD_CAP + 0.001 and r.fuel_price() > p0, "Berührungen erhöhen den Preis, gedeckelt bei %.2f" % (lvl.fuel_price_max * Tuning.PRICE_HARD_CAP))
+
+func _test_pump_touch_and_explosion() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl, 80.0, 100.0, 11)
+	check(lvl.pumps.size() == 1 and lvl.pumps[0].pad == "F", "Level hat eine Zapfsäule am Tankpad")
+	var rect: Rect2 = lvl.pumps[0].rect
+	var base0 := r.price_base
+	var price0 := r.fuel_price()
+	# Taxi berührt die Säule (fliegend, direkt daneben)
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.vel = Vector2.ZERO
+	r.sim.pos = Vector2(rect.end.x + Tuning.HULL_HALF.x + 0.5, rect.get_center().y)
+	r.log.clear()
+	r._check_pump(Tuning.TICK)
+	check(r.pump_touches == 1 and r.log.any(func(e): return e.type == "pump_touched" and e.stage == 1), "Berührung zählt (Stufe 1)")
+	check(r.fuel_price() >= price0 * 1.2, "Berührung steigert den Spritpreis sofort (%.2f → %.2f)" % [price0, r.fuel_price()])
+	r.log.clear()
+	r._check_pump(Tuning.TICK)
+	check(r.pump_touches == 1, "Dauerkontakt zählt nicht mehrfach (Abklingzeit %.1f s)" % Tuning.PUMP_TOUCH_COOLDOWN)
+	for i in int(1.3 / Tuning.TICK):
+		r._check_pump(Tuning.TICK)
+	check(r.pump_touches == 2 and not r.station_down(), "Nach der Abklingzeit zählt die zweite Berührung (Stufe 2), Station noch in Betrieb")
+	for i in int(1.3 / Tuning.TICK):
+		r._check_pump(Tuning.TICK)
+	check(r.pump_touches == 3 and r.station_down() and not r.pump_broken, "Dritte Berührung: Station sofort außer Betrieb, Explosion folgt")
+	var exploded := false
+	for i in int(1.0 / Tuning.TICK):
+		r.log.clear()
+		r._check_pump(Tuning.TICK)
+		if r.log.any(func(e): return e.type == "pump_exploded"):
+			exploded = true
+	check(exploded and r.pump_broken, "Nach kurzer Verzögerung explodiert die Tankstelle und ist defekt")
+	# Defekte Station gibt keinen Sprit mehr
+	_land_on(r, "F")
+	r.sim.fuel = 20.0
+	r.money = 100.0
+	var warned := false
+	for i in 240:
+		r.log.clear()
+		r._service_pad(Tuning.TICK)
+		if r.log.any(func(e): return e.type == "pump_out"):
+			warned = true
+	check(r.sim.fuel == 20.0 and r.money == 100.0 and warned, "Defekte Station tankt nicht mehr (auch nicht kostenlos) und meldet „außer Betrieb“")
+	# Intakte Station tankt gegen Credits zum aktuellen Preis
+	var r2 := Run.new()
+	r2.start(lvl, 80.0, 100.0, 11)
+	_land_on(r2, "F")
+	r2.sim.fuel = 60.0
+	var money_before := r2.money
+	for i in 240:
+		r2._service_pad(Tuning.TICK)
+	var gained := r2.sim.fuel - 60.0
+	check(gained > 5.0 and absf((money_before - r2.money) - gained * r2.fuel_price()) < 0.05, "Tanken kostet Menge × aktueller Preis (%.1f Einheiten für ¢%.2f)" % [gained, money_before - r2.money])
+
+func _test_pump_level_rules() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		if not lvl.pads.has("F"):
+			continue
+		var pad: Dictionary = lvl.pads["F"]
+		var ok_pump := false
+		for pm in lvl.pumps:
+			if pm.pad == "F" and pm.side != 0 and pm.rect.size.y >= Tuning.TILE * 2.0 - 0.1:
+				ok_pump = true
+		check(ok_pump, "%s: Tankpad hat eine 2 Tiles hohe Zapfsäule am Padende" % lvl.id)
+		check(pad.land_window >= 28.0, "%s: freies Landefenster am Tankpad ≥ 28 px (%.0f px)" % [lvl.id, pad.land_window])
+		check(lvl.fuel_price_min >= 0.2 and lvl.fuel_price_max <= 1.2 and lvl.fuel_price_min < lvl.fuel_price_max - 0.2, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])

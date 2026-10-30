@@ -9,6 +9,7 @@ var sub_text := ""
 var sub_t := 0.0
 var paused := false
 var game_over := false
+var price_flash := 0.0
 var taxi_icon: Texture2D = preload("res://assets/art/taxi.png")
 var font: Font = ThemeDB.fallback_font
 
@@ -28,6 +29,7 @@ func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
 
 func _process(delta: float) -> void:
 	message_t = maxf(0.0, message_t - delta)
+	price_flash = maxf(0.0, price_flash - delta * 1.6)
 	sub_t = maxf(0.0, sub_t - delta)
 	queue_redraw()
 
@@ -46,6 +48,19 @@ func _draw() -> void:
 	var blink := int(Time.get_ticks_msec() / 250) % 2 == 0
 	_bar(8, 8, 90, 9, fuel_frac, Color("#ff4d6d") if (low and blink) else Color("#ffb02e"), tr("HUD_FUEL"))
 	_bar(8, 20, 90, 9, s.hull / Tuning.HULL_MAX, Color("#5dff9a") if s.hull > 35.0 else Color("#ff4d6d"), tr("HUD_HULL"))
+	if run.level.pads.has("F"):
+		# Spritpreis (springt in zufälligen Abständen, steigt bei Berührung der Zapfsäule)
+		var pf := run.fuel_price()
+		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
+		var n := (pf - run.level.fuel_price_min) / span
+		var pcol := Color("#5dff9a") if n < 0.34 else (Color("#ffe14a") if n < 0.67 else Color("#ff6a4a"))
+		var ptxt := tr("HUD_PRICE") % pf
+		if run.station_down():
+			ptxt = tr("HUD_PUMP_DEAD")
+			pcol = Color("#ff4d6d")
+		if price_flash > 0.0:
+			pcol = pcol.lerp(Color.WHITE, price_flash)
+		draw_string(font, Vector2(102, 16), ptxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, pcol)
 	draw_string(font, Vector2(8, 42), "¢ %d" % int(run.money), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#ffe14a"))
 	# Leben als kleine Taxi-Symbole
 	for i in Flow.lives:
@@ -70,7 +85,7 @@ func _draw() -> void:
 		if run.actor != null and run.result == Run.Result.RUNNING:
 			var f := run.live_factor()
 			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
-			draw_string(font, Vector2(size.x * 0.5 + 100, size.y - 19), tr("HUD_FACTOR") % f, HORIZONTAL_ALIGNMENT_RIGHT, 66, 10, fc)
+			draw_string(font, Vector2(size.x * 0.5 + 40, size.y - 19), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 126, 10, fc)
 	var done := "%d/%d" % [run.delivered, run.level.jobs.size()]
 	draw_string(font, Vector2(size.x - 70, 14), done, HORIZONTAL_ALIGNMENT_RIGHT, 62, 10, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung

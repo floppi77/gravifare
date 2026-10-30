@@ -9,7 +9,7 @@ var data := {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
-		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives"] or a.begins_with("--debug-input=") or a.begins_with("--lives="):
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives"] or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed="):
 			dev_session = true
 	load_save()
 

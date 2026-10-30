@@ -77,5 +77,11 @@
  "HUD_COMPLETE_EARNED": "Earned: ¢ %d",
  "VOICE_ANGRY": "Hey, idiot!",
  "MSG_SQUASH": "Passenger furious! New passenger at pad %s",
- "MSG_LOST": "Passenger lost – %s waits again at pad %s"
+ "MSG_LOST": "Passenger lost – %s waits again at pad %s",
+ "HUD_PRICE": "Fuel ¢%.2f",
+ "HUD_PUMP_DEAD": "Station down",
+ "MSG_PRICE": "Fuel price now ¢%.2f",
+ "MSG_PUMP_HIT": "Pump hit! Damage %d/3 – price ¢%.2f",
+ "MSG_PUMP_BOOM": "Fuel station destroyed!",
+ "MSG_PUMP_OUT": "Fuel station out of order"
 }

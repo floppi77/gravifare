@@ -42,7 +42,7 @@ func _accel_to_input(a_des: Vector2) -> Vector2:
 func decide() -> Array:
 	var sim := run.sim
 	var tgt_pad_id := run.target_pad()
-	var refuel_trip := level.pads.has("F") and sim.fuel < REFUEL_BELOW and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
+	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < REFUEL_BELOW and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
 	if refuel_trip:
 		tgt_pad_id = "F"
 	var heading_exit := tgt_pad_id == "" and run.exit_open
@@ -50,7 +50,7 @@ func decide() -> Array:
 	if sim.state == TaxiSim.State.LANDED:
 		var pad_id: String = sim.landed_pad.id
 		var boarding := run.phase == Run.Phase.BOARDING or run.phase == Run.Phase.DROPOFF
-		var can_refuel: bool = sim.fuel < Tuning.EMERGENCY_FUEL or run.money > 5.0
+		var can_refuel: bool = not run.station_down() and (sim.fuel < Tuning.EMERGENCY_FUEL or run.money > 5.0)
 		var refuelling: bool = pad_id == "F" and sim.fuel < REFUEL_GOAL and can_refuel
 		var serving: bool = pad_id == run.target_pad() and (run.phase == Run.Phase.WAITING or run.phase == Run.Phase.CARRYING)
 		if boarding or refuelling or (serving and not refuel_trip):

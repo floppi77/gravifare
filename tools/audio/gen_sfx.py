@@ -190,7 +190,26 @@ def ui_move():
 def ui_ok():
     tt = t(0.09); save("ui_ok", np.sin(2 * np.pi * 1000 * tt) * 0.3 * env(len(tt), 0.002, 0.04))
 
+def pump_hit():
+    """Metallisches Scheppern beim Rammen der Zapfsäule."""
+    d = 0.55; tt = t(d)
+    x = sum(np.sin(2 * np.pi * f * tt) * np.exp(-tt * k) * a for f, k, a in ((220, 7, 0.5), (353, 9, 0.35), (611, 12, 0.25), (1090, 16, 0.15)))
+    x += lp(rng.standard_normal(len(tt)), 0.5) * np.exp(-tt * 40) * 0.6
+    save("pump_hit", x * 0.8)
+def pump_boom():
+    """Explosion der Tankstelle: Boom, Knistern, aufsteigendes Zischen."""
+    d = 1.6; tt = t(d)
+    boom = np.sin(2 * np.pi * (48 + 90 * np.exp(-tt * 7)) * tt) * np.exp(-tt * 2.6)
+    burst = lp(rng.standard_normal(len(tt)), 0.4) * np.exp(-tt * 5.5) * 0.9
+    crackle = (rng.random(len(tt)) > 0.992) * rng.standard_normal(len(tt)) * np.exp(-tt * 2.2) * 0.9
+    hiss = lp(rng.standard_normal(len(tt)), 0.08) * np.exp(-((tt - 0.5) / 0.4) ** 2) * 0.25
+    save("pump_boom", np.tanh((boom + burst + crackle + hiss) * 1.2) * 0.9)
+def price_tick():
+    """Kurzes zweistufiges Signal bei Preiswechsel."""
+    x = np.concatenate([np.sin(2 * np.pi * f * t(0.06)) * 0.3 * env(int(0.06 * SR), 0.002, 0.03) for f in (880, 660)])
+    save("price_tick", x)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick): f()
     print(sorted(os.listdir(OUT)))

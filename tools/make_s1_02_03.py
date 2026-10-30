@@ -10,6 +10,7 @@ g.rect("#", 2, 18, 2, 18); g.rect("#", 10, 18, 10, 18)
 g.rect("#", 1, 9, 8, 11); g.rect("3", 2, 8, 7, 8)            # hohes Regal links mit Pad 3
 g.rect("#", 14, 1, 17, 5)                                    # hängender Block (Lücke zum Regal 80 px)
 g.rect("#", 13, 19, 20, 19); g.rect("F", 14, 18, 19, 18)     # Tankpad
+g.rect("P", 19, 16, 19, 17)                                   # Zapfsäule am rechten Padende
 g.rect("#", 23, 9, 25, 19)                                   # Säule aus dem Boden
 g.rect("#", 30, 13, 38, 19); g.rect("2", 32, 12, 36, 12)     # Pad 2 rechts erhöht (5 Tiles)
 g.gate()
@@ -23,8 +24,9 @@ g.show()
 # ---- S1-03: 5 Tiles breiter Schacht mit Pad 3 am Grund; Tankpad auf dem Block; breite Flugwege (7 Tiles links)
 g = Grid()
 g.rect("#", 1, 20, 38, 20)                                   # Boden
-g.rect("#", 15, 9, 28, 19)                                   # Block (Oberkante Zeile 9: 96 px Durchflug unter dem Torblock)
-g.rect("F", 15, 9, 18, 9)                                    # Tankpad auf dem Block (links vom Schacht)
+g.rect("#", 14, 9, 28, 19)                                   # Block (Oberkante Zeile 9: 96 px Durchflug unter dem Torblock)
+g.rect("F", 14, 9, 18, 9)                                    # Tankpad auf dem Block (5 Tiles, links vom Schacht)
+g.rect("P", 14, 7, 14, 8)                                    # Zapfsäule am linken Padende
 g.rect(".", 19, 9, 23, 19)                                   # Schacht, 5 Tiles breit
 g.rect("3", 19, 19, 23, 19)                                  # Pad 3 am Schachtgrund (Zeile 19)
 g.rect("#", 18, 19, 18, 19); g.rect("#", 24, 19, 24, 19)

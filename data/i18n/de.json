@@ -77,5 +77,11 @@
  "HUD_COMPLETE_EARNED": "Verdient: ¢ %d",
  "VOICE_ANGRY": "Hey, Idiot!",
  "MSG_SQUASH": "Fahrgast verärgert! Neuer Fahrgast an Pad %s",
- "MSG_LOST": "Fahrgast verloren – %s wartet wieder an Pad %s"
+ "MSG_LOST": "Fahrgast verloren – %s wartet wieder an Pad %s",
+ "HUD_PRICE": "Sprit ¢%.2f",
+ "HUD_PUMP_DEAD": "Tankstelle defekt",
+ "MSG_PRICE": "Spritpreis jetzt ¢%.2f",
+ "MSG_PUMP_HIT": "Zapfsäule getroffen! Schaden %d/3 – Preis ¢%.2f",
+ "MSG_PUMP_BOOM": "Tankstelle explodiert!",
+ "MSG_PUMP_OUT": "Tankstelle außer Betrieb"
 }

@@ -443,6 +443,46 @@ def background():
         for x in range(0, W, 120): nd.rectangle([x, y - 40, x + 6, y + 8], fill=hexc("#0e1230"))
     near.save(OUT + "bg_s1_near.png")
 
+# ------------------------------------------------------------------ Zapfsäule (16x32 Einheiten = 48x96 px; Kopf getrennt: 16x12 = 48x36 px)
+def pump():
+    steel, steel_d, steel_h = hexc("#6f7fa8"), hexc("#3a4575"), hexc("#b8c4f0")
+    amber, amber_d = hexc("#ffa530"), hexc("#b8631a")
+    # Säulenkörper
+    base = Image.new("RGBA", (48, 96), (0, 0, 0, 0)); d = ImageDraw.Draw(base)
+    d.rectangle([12, 30, 35, 90], fill=steel)
+    vgrad(d, (12, 30, 35, 90), steel_h[:3], steel_d[:3])
+    d.rectangle([12, 30, 14, 90], fill=steel_h)                  # Glanzkante links
+    d.rectangle([33, 30, 35, 90], fill=steel_d)
+    for k in range(-24, 24, 12):                                  # Warnband oben
+        d.polygon([(12 + k, 34), (18 + k, 34), (30 + k, 46), (24 + k, 46)], fill=amber)
+    d.rectangle([12, 34, 35, 34], fill=OUTLINE); d.rectangle([12, 46, 35, 46], fill=OUTLINE)
+    # Tropfen-Emblem
+    d.polygon([(23, 54), (28, 64), (28, 68), (23, 72), (18, 68), (18, 64)], fill=amber)
+    d.polygon([(23, 54), (28, 64), (23, 66)], fill=hexc("#ffdc8a"))
+    d.rectangle([20, 62, 22, 66], fill=hexc("#fff0c0"))
+    # Schlauch und Halterung rechts
+    d.rectangle([35, 52, 44, 74], fill=steel_d)
+    d.rectangle([37, 54, 42, 72], fill=OUTLINE)
+    d.arc([36, 62, 52, 90], 270, 90, fill=hexc("#232a5a"), width=3)
+    d.rectangle([38, 74, 43, 84], fill=hexc("#2a2e57")); d.rectangle([39, 82, 42, 88], fill=amber_d)
+    # Sockel
+    d.rectangle([5, 88, 42, 95], fill=hexc("#4a5596")); d.rectangle([5, 88, 42, 89], fill=steel_h)
+    for x in (8, 22, 36):
+        d.rectangle([x, 91, x + 2, 93], fill=hexc("#8d9be8"))
+    for y in (38, 76):
+        d.rectangle([14, y, 16, y + 2], fill=hexc("#8d9be8")); d.rectangle([31, y, 33, y + 2], fill=hexc("#8d9be8"))
+    add_outline(base).save(OUT + "pump_base.png")
+    # Kopf mit Preisanzeige (Pivot unten Mitte)
+    head = Image.new("RGBA", (48, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(head)
+    d.rounded_rectangle([2, 6, 45, 33], radius=5, fill=steel)
+    vgrad(d, (4, 8, 43, 31), steel_h[:3], steel_d[:3])
+    d.rounded_rectangle([7, 11, 40, 27], radius=3, fill=hexc("#06140f"))
+    d.rounded_rectangle([7, 11, 40, 27], radius=3, outline=hexc("#35e0d2"), width=1)
+    d.rectangle([20, 1, 27, 6], fill=hexc("#ff4d6d")); d.rectangle([21, 2, 26, 4], fill=hexc("#ffb0c0"))
+    d.rectangle([4, 28, 6, 30], fill=hexc("#8d9be8")); d.rectangle([41, 28, 43, 30], fill=hexc("#8d9be8"))
+    d.rectangle([17, 32, 30, 35], fill=steel_d)
+    add_outline(head).save(OUT + "pump_head.png")
+
 # ------------------------------------------------------------------ Flaggen (120x80 = 40x26,7 Einheiten, Sprachwahl im Hauptmenü)
 def flags():
     W, H = 120, 80
@@ -533,6 +573,6 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "background", "space", "flags"):
+    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "background", "space", "flags", "pump"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

@@ -11,6 +11,9 @@ var level: LevelData
 var run: Run
 var pass_tex: Texture2D = preload("res://assets/art/passengers.png")
 var shelter_tex: Texture2D = preload("res://assets/art/shelter.png")
+var pump_base_tex: Texture2D = preload("res://assets/art/pump_base.png")
+var pump_head_tex: Texture2D = preload("res://assets/art/pump_head.png")
+var pump_flash := 0.0                 # kurzes Aufblitzen der Preisanzeige bei Preiswechsel
 var gate_frame: Texture2D = preload("res://assets/art/gate_frame.png")
 var leaf_l: Texture2D = preload("res://assets/art/gate_leaf_l.png")
 var leaf_r: Texture2D = preload("res://assets/art/gate_leaf_r.png")
@@ -26,6 +29,7 @@ func setup(r: Run) -> void:
 
 func _process(delta: float) -> void:
 	t += delta
+	pump_flash = maxf(0.0, pump_flash - delta * 2.5)
 	if door_override >= 0.0:
 		door = door_override
 	elif run != null:
@@ -36,6 +40,7 @@ func _draw() -> void:
 	if level == null:
 		return
 	_draw_pads()
+	_draw_pumps()
 	_draw_gate()
 	_draw_actors()
 	_draw_taxi_shadow()
@@ -140,9 +145,7 @@ func _draw_actor(a: PassengerActor) -> void:
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
 	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	if a.state == PassengerActor.S.EXITING and not a.pay_info.is_empty() and not a.angry:
-		# Auszahlung wird erst im Häuschen gutgeschrieben: voraussichtlicher Betrag über dem Kopf
-		draw_string(ThemeDB.fallback_font, Vector2(pos.x - 10.0, pos.y - 13.0), "¢%d" % int(round(a.pay_for(a.remaining_walk()))), HORIZONTAL_ALIGNMENT_CENTER, 20, 7, Color(1.0, 0.88, 0.3, a.fade))
+	_draw_amount(a, pos)
 	if a.wave_t > 0.0 or a.angry:
 		var bx := pos.x + 4.0
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
@@ -179,3 +182,65 @@ func _draw_taxi_shadow() -> void:
 	for i in 3:
 		var f := 1.0 - i * 0.28
 		draw_rect(Rect2(cx - w * f * 0.5, gy - 1.3 + i * 0.45, w * f, 1.2), Color(0.02, 0.02, 0.09, a * (0.5 + i * 0.25)))
+
+## Betrag dauerhaft über dem Fahrgast: von seinem Erscheinen bis zum Einsteigen und vom Aussteigen bis zum Häuschen.
+## Er tickt mit der Zeit herunter (Zeitfaktor); beim Aussteigen zählt die Gehzeit mehrfach.
+func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
+	if a.angry:
+		return
+	var value := -1.0
+	var factor := 1.0
+	if a == run.actor and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING or a.state == PassengerActor.S.TO_TAXI or a.state == PassengerActor.S.RETURNING):
+		value = run.prospect()
+		factor = run.live_factor()
+	elif a.state == PassengerActor.S.EXITING and not a.pay_info.is_empty():
+		value = a.pay_for(0.0)
+		factor = a.factor_for(0.0)
+	if value < 0.0:
+		return
+	var col := Color("#5dff9a") if factor > 1.05 else (Color("#ffe14a") if factor > 0.8 else Color("#ff8a5a"))
+	col.a = a.fade
+	var txt := "¢%d" % int(round(value))
+	var font := ThemeDB.fallback_font
+	draw_rect(Rect2(pos.x - 8.0, pos.y - 21.0, 16.0, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
+	draw_string(font, Vector2(pos.x - 8.0, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, 16, 7, col)
+
+## Zapfsäule mit Preisanzeige. Der Kopf knickt mit jeder Berührung weiter ab (Stufe 1–3); nach der dritten explodiert
+## die Station (Effekte in fx.gd) und bleibt als verkohlte Säule stehen.
+func _draw_pumps() -> void:
+	var font := ThemeDB.fallback_font
+	for pm in level.pumps:
+		var r: Rect2 = pm.rect
+		var top := r.end.y - 32.0
+		var broken := run.pump_broken
+		var stage := mini(run.pump_touches, 3)
+		draw_texture_rect(pump_base_tex, Rect2(r.position.x, top, 16, 32), false, Color(0.32, 0.27, 0.27) if broken else Color.WHITE)
+		if broken:
+			return
+		var rots := [0.0, 0.2, 0.55, 1.2]
+		var drops := [Vector2(0, 0), Vector2(0.3, 0.2), Vector2(0.9, 1.0), Vector2(2.2, 2.6)]
+		var pivot: Vector2 = Vector2(r.position.x + 8.0, top + 11.3) + drops[stage]
+		var flick := 1.0 if stage < 2 else (0.55 + 0.45 * absf(sin(t * 23.0)))
+		draw_set_transform(pivot, rots[stage], Vector2.ONE)
+		draw_texture_rect(pump_head_tex, Rect2(-8, -11.3, 16, 12), false, Color(1, 1, 1, 1))
+		# Anzeige: Preis (farbig nach Preisniveau) bzw. Fehlermeldung bei Stufe 3
+		var pf := run.fuel_price()
+		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
+		var lvl_n := (pf - run.level.fuel_price_min) / span
+		var col := Color("#5dff9a") if lvl_n < 0.34 else (Color("#ffe14a") if lvl_n < 0.67 else Color("#ff6a4a"))
+		var txt := "%.2f" % pf
+		if stage >= 3:
+			txt = "ERR"
+			col = Color("#ff4d6d")
+		col.a = flick
+		draw_string(font, Vector2(-8, -4.1), txt, HORIZONTAL_ALIGNMENT_CENTER, 16, 6, col)
+		if pump_flash > 0.0:
+			draw_rect(Rect2(-5.0, -8.0, 10.0, 5.2), Color(1, 1, 1, pump_flash * 0.55))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		if stage >= 2:      # Funken am beschädigten Kopf
+			var k := int(t * 18.0)
+			for i in 3:
+				var rx := fmod(absf(sin(float(k * 7 + i * 13))) * 9.0, 9.0)
+				var ry := fmod(absf(cos(float(k * 5 + i * 11))) * 6.0, 6.0)
+				if (k + i) % 3 != 0:
+					draw_rect(Rect2(pivot.x - 4.5 + rx, pivot.y - 9.0 + ry, 0.9, 0.9), Color("#ffd37a"))

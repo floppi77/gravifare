@@ -171,11 +171,11 @@ func _walk(dt: float) -> bool:
 func pay_for(extra_time := 0.0) -> float:
 	if pay_info.is_empty():
 		return 0.0
-	var t := float(pay_info.base) + exit_time + extra_time
+	var t := float(pay_info.base) + (exit_time + extra_time) * Tuning.WALK_TIME_WEIGHT
 	return float(pay_info.fare) * Tuning.time_factor(t, float(pay_info.par)) * (1.0 - float(pay_info.penalty))
 
 func factor_for(extra_time := 0.0) -> float:
-	return Tuning.time_factor(float(pay_info.base) + exit_time + extra_time, float(pay_info.par)) if not pay_info.is_empty() else 1.0
+	return Tuning.time_factor(float(pay_info.base) + (exit_time + extra_time) * Tuning.WALK_TIME_WEIGHT, float(pay_info.par)) if not pay_info.is_empty() else 1.0
 
 ## Restliche Gehzeit bis zur Haustür (Sekunden).
 func remaining_walk() -> float:

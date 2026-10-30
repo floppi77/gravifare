@@ -10,6 +10,8 @@ var level: LevelData
 var pad_lights := {}
 var gate_light: PointLight2D
 var gate_occluder: LightOccluder2D
+var wreck_light: PointLight2D
+var wreck_smoke: CPUParticles2D
 
 static func light_texture() -> GradientTexture2D:
 	if _tex == null:
@@ -72,6 +74,8 @@ func setup(r: Run) -> void:
 	for c in get_children():
 		c.queue_free()
 	pad_lights.clear()
+	wreck_light = null
+	wreck_smoke = null
 	_build_occluders()
 	_build_lights()
 	if not Settings.values.reduce_motion:
@@ -82,7 +86,7 @@ func _build_occluders() -> void:
 	for cy in level.height:
 		var cx := 0
 		while cx < level.width:
-			if level.cell(cx, cy) == "#" or level.cell(cx, cy) == "^" or (level.cell(cx, cy) >= "1" and level.cell(cx, cy) <= "9") or level.cell(cx, cy) == "F":
+			if _opaque(cx, cy):
 				var x1 := cx
 				while x1 + 1 < level.width and _opaque(x1 + 1, cy):
 					x1 += 1
@@ -97,7 +101,7 @@ func _build_occluders() -> void:
 
 func _opaque(cx: int, cy: int) -> bool:
 	var c := level.cell(cx, cy)
-	return c == "#" or c == "^" or (c >= "1" and c <= "9") or c == "F"
+	return c == "#" or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F"
 
 func _occluder(r: Rect2) -> LightOccluder2D:
 	var o := LightOccluder2D.new()
@@ -123,6 +127,42 @@ func _build_lights() -> void:
 		gate_light = make_light(Color("#ff4d6d"), 90.0, 0.5)
 		gate_light.position = level.exit_rect().get_center() + Vector2(0, 10)
 		add_child(gate_light)
+
+## Explosion der Tankstelle: Feuerball, Funkenregen, Druckwellenlicht; danach Schwelbrand mit Rauch (bleibt bis Levelneustart).
+func pump_explode(rect: Rect2) -> void:
+	var c := rect.position + Vector2(rect.size.x * 0.5, 6.0)
+	var fire := make_particles(26, 0.8, Vector2(25, 80), 2.6, Color(1.0, 0.8, 0.3, 0.95), Color(0.9, 0.2, 0.05, 0.0))
+	fire.position = c
+	fire.direction = Vector2(0, -1)
+	fire.spread = 70.0
+	fire.one_shot = true
+	fire.explosiveness = 1.0
+	fire.emitting = true
+	add_child(fire)
+	var sparks := make_particles(44, 1.1, Vector2(70, 210), 1.1, Color(1, 0.95, 0.6, 1), Color(1, 0.35, 0.1, 0.0))
+	sparks.position = c
+	sparks.direction = Vector2(0, -1)
+	sparks.spread = 110.0
+	sparks.gravity = Vector2(0, 220)
+	sparks.one_shot = true
+	sparks.explosiveness = 1.0
+	sparks.emitting = true
+	add_child(sparks)
+	var flash := make_light(Color("#ffc070"), 150.0, 5.0)
+	flash.position = c
+	add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "energy", 0.0, 0.7)
+	tw.tween_callback(flash.queue_free)
+	wreck_smoke = make_particles(18, 2.2, Vector2(6, 14), 2.4, Color(0.3, 0.3, 0.34, 0.7), Color(0.1, 0.1, 0.13, 0.0), false)
+	wreck_smoke.position = c + Vector2(0, -4)
+	wreck_smoke.direction = Vector2(0.15, -1)
+	wreck_smoke.spread = 22.0
+	wreck_smoke.emitting = true
+	add_child(wreck_smoke)
+	wreck_light = make_light(Color("#ff7a30"), 40.0, 1.0)
+	wreck_light.position = c
+	add_child(wreck_light)
 
 func _build_motes() -> void:
 	var motes := make_particles(46, 9.0, Vector2(2, 7), 1.0, Color(0.8, 0.85, 1.0, 0.35), Color(0.8, 0.85, 1.0, 0.0), true)
@@ -160,3 +200,9 @@ func _process(delta: float) -> void:
 			gate_light.energy = 0.8 + (0.5 if int(_t * 3.0) % 2 == 0 else 0.0)
 	if gate_occluder != null:
 		gate_occluder.visible = not run.exit_open
+	if wreck_light != null and is_instance_valid(wreck_light):
+		wreck_light.energy = 0.7 + 0.5 * sin(_t * 9.0) * sin(_t * 3.7)
+	if run.pump_broken and pad_lights.has("F"):
+		var fl: PointLight2D = pad_lights["F"]
+		fl.color = Color("#ff4d2a")
+		fl.energy = 0.5 + 0.4 * absf(sin(_t * 5.0))

@@ -58,6 +58,11 @@ func _ready() -> void:
 		debug_input = Vector2(0, 0)
 		taxi.sync_state()
 		taxi.reset_physics_interpolation()
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--debug-pump="):          # Dev: Zapfsäule auf Schadensstufe N setzen (3 = Explosion)
+			run.pump_touches = int(a.substr(13))
+			if run.pump_touches >= 3:
+				run.pump_boom_t = 0.05
 	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
@@ -105,7 +110,7 @@ func load_level(path: String) -> void:
 	if lvl == null:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
-	run.start(lvl, Flow.entry_fuel, Flow.entry_credits)
+	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
 	gear_on = run.sim.gear_cmd
 	world_tiles.setup(run)
 	props.setup(run)
@@ -268,6 +273,21 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play_voice(e.voice, "angry")
 			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 			Sfx.play("hit", -8.0)
+		"price_changed":
+			Sfx.play("price_tick", -6.0)
+			props.pump_flash = 1.0
+			hud.price_flash = 1.0
+			hud.flash_message(tr("MSG_PRICE") % e.price, 2.0)
+		"pump_touched":
+			Sfx.play("pump_hit")
+			taxi.burst_sparks()
+			hud.flash_message(tr("MSG_PUMP_HIT") % [e.stage, e.price], 2.8)
+		"pump_exploded":
+			Sfx.play("pump_boom")
+			fx.pump_explode(e.rect)
+			hud.flash_message(tr("MSG_PUMP_BOOM"), 3.5)
+		"pump_out":
+			hud.flash_message(tr("MSG_PUMP_OUT"), 2.5)
 		"passenger_lost":
 			hud.flash_message(tr("MSG_LOST") % [e.name, e.pad], 3.5)
 		"replacement":

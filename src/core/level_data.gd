@@ -18,6 +18,10 @@ var jobs: Array = []
 var pads := {}               # id -> {id, x0, x1, row, center, fuel}
 var spawn := Vector2.ZERO
 var exit_cells: Array = []
+var pumps: Array = []            # Zapfsäulen (Zeichen "P", 1×2 Tiles, fest): {rect: Rect2, pad: id, side: -1/0/1}
+var fuel_price_min := Tuning.FUEL_PRICE_MIN
+var fuel_price_max := Tuning.FUEL_PRICE_MAX
+var price_every := Vector2(Tuning.PRICE_EVERY_MIN, Tuning.PRICE_EVERY_MAX)
 var exit_open := false      # Laufzeitzustand; geschlossenes Tor ist fest
 var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
@@ -50,6 +54,11 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.jobs = d.get("jobs", [])
 	l.par_time = float(d.get("par_time", 90.0))
 	l.start_fuel = float(d.get("start_fuel", Tuning.FUEL_MAX))
+	var fc: Dictionary = d.get("fuel", {})
+	l.fuel_price_min = float(fc.get("min", Tuning.FUEL_PRICE_MIN))
+	l.fuel_price_max = float(fc.get("max", Tuning.FUEL_PRICE_MAX))
+	var ev: Array = fc.get("every", [Tuning.PRICE_EVERY_MIN, Tuning.PRICE_EVERY_MAX])
+	l.price_every = Vector2(float(ev[0]), float(ev[1]))
 	l._scan()
 	l._plan_shelters()
 	return l
@@ -76,7 +85,29 @@ func _scan() -> void:
 const SHELTER_W := 20.4
 const SHELTER_H := 17.0
 
+func _collect_pumps() -> void:
+	## Zusammenhängende "P"-Zellen je Spalte = eine Zapfsäule; sie steht auf dem Tankpad (Pad-Ende).
+	for x in width:
+		var y := 0
+		while y < height:
+			if cell(x, y) == "P":
+				var y1 := y
+				while y1 + 1 < height and cell(x, y1 + 1) == "P":
+					y1 += 1
+				pumps.append({"rect": Rect2(x * Tuning.TILE, y * Tuning.TILE, Tuning.TILE, (y1 - y + 1) * Tuning.TILE), "pad": "", "side": 0})
+				y = y1 + 1
+			else:
+				y += 1
+	for pm in pumps:
+		var r: Rect2 = pm.rect
+		for id in pads:
+			var pd: Dictionary = pads[id]
+			if pd.fuel and absf(pd.row * Tuning.TILE - r.end.y) < 0.5 and r.position.x >= pd.x0 - 0.5 and r.end.x <= pd.x1 + 0.5:
+				pm["pad"] = id
+				pm["side"] = -1 if absf(r.position.x - pd.x0) < 0.5 else (1 if absf(r.end.x - pd.x1) < 0.5 else 0)
+
 func _plan_shelters() -> void:
+	_collect_pumps()
 	## Jedes Passagierpad bekommt einen Wartebereich: Unterstand an einem Ende (links bevorzugt),
 	## davor der Wartepunkt. Nur wenn darüber 2 Tiles frei sind; sonst side = 0 (Validator meldet das).
 	## Zusätzlich das freie Landefenster: Bereich, in dem das Taxi (Füße auf dem Pad, Abstand zum
@@ -87,6 +118,12 @@ func _plan_shelters() -> void:
 		var lo: float = p.x0 + Tuning.FOOT_X
 		var hi: float = p.x1 - Tuning.FOOT_X
 		if p.fuel:
+			for pm in pumps:
+				if pm.pad == id:
+					if pm.side < 0:
+						lo = maxf(lo, pm.rect.end.x + Tuning.HULL_HALF.x + 2.0)
+					elif pm.side > 0:
+						hi = minf(hi, pm.rect.position.x - Tuning.HULL_HALF.x - 2.0)
 			p["land_lo"] = lo
 			p["land_hi"] = hi
 			p["land_window"] = hi - lo
@@ -137,7 +174,7 @@ func cell(cx: int, cy: int) -> String:
 
 func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
-	return c == SOLID or c == "^" or (c >= "1" and c <= "9") or c == "F" or (c == "E" and not exit_open)
+	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))

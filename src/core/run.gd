@@ -37,10 +37,19 @@ var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in 
 var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
 var spawn_timer := 0.0
 var spawn_wait := false
+var level_time := 0.0              # Levelzeit (läuft auch nach Verlust eines Lebens weiter) – Takt der Preiswechsel
+var price_rng := RandomNumberGenerator.new()
+var price_base := Tuning.FUEL_PRICE
+var price_next_t := 0.0
+var pump_touches := 0
+var pump_cd := 0.0
+var pump_boom_t := -1.0
+var pump_broken := false           # Station explodiert (bleibt bis zum Neustart des Levels defekt)
+var pump_warned := false
 var respawn_keep_clock := false   # Ersatz-Fahrgast: Zeit läuft für den Auftrag weiter (Strafe durch Verzögerung)
 var squashes := 0
 
-func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
+func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> void:
 	level = lvl
 	jobs = lvl.jobs.duplicate(true)
 	sim.setup(lvl)
@@ -68,6 +77,15 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
 	spawn_wait = false
 	respawn_keep_clock = false
 	squashes = 0
+	level_time = 0.0
+	pump_touches = 0
+	pump_cd = 0.0
+	pump_boom_t = -1.0
+	pump_broken = false
+	pump_warned = false
+	price_rng.seed = seed if seed >= 0 else absi(lvl.id.hash())      # reproduzierbar je Lauf/Level
+	price_base = snappedf(price_rng.randf_range(lvl.fuel_price_min, lvl.fuel_price_max), 0.01)
+	price_next_t = price_rng.randf_range(lvl.price_every.x, lvl.price_every.y)
 	actor = null
 	_spawn_actor(true)
 
@@ -96,6 +114,22 @@ func target_pad() -> String:
 		return "" if is_exit_job(j) else String(j.to)
 	return String(j.from)
 
+## Streckenzuschlag des Auftrags (länger/schwieriger = mehr Geld), aus dem Layout berechnet und zwischengespeichert.
+func job_mult(job: Dictionary) -> float:
+	if job.is_empty() or not level.pads.has(String(job.get("from", ""))):
+		return 1.0
+	var to_id := String(job.get("to", ""))
+	if to_id != "exit" and not level.pads.has(to_id):
+		return 1.0
+	return LevelMetrics.leg_mult(level, String(job.from), to_id)
+
+## Voraussichtlicher Fahrpreis des laufenden Auftrags jetzt (ohne Landeabzug): tickt mit der Zeit herunter.
+func prospect() -> float:
+	var j := current_job()
+	if j.is_empty():
+		return 0.0
+	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j))
+
 func par_of(job: Dictionary) -> float:
 	return float(job.get("par", job.get("time_limit", 60)))
 
@@ -121,6 +155,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if actor != null or respawn_keep_clock:
 		job_clock += dt
 	_step_actors(dt)
+	_update_prices(dt)
+	_check_pump(dt)
 	_check_squash()
 	_service_pad(dt)
 	if exit_open and sim.in_exit(level.exit_cells):
@@ -220,6 +256,7 @@ func _step_actors(dt: float) -> void:
 
 func _service_pad(dt: float) -> void:
 	if sim.state != TaxiSim.State.LANDED:
+		pump_warned = false
 		if phase == Phase.BOARDING:
 			phase = Phase.WAITING
 			phase_timer = 0.0
@@ -236,11 +273,15 @@ func _service_pad(dt: float) -> void:
 				_deliver(current_job())          # schon bezahlt (Ankunft im Häuschen): Auftrag abschließen
 		return
 	var pad: Dictionary = sim.landed_pad
-	# Tanken
-	if pad.fuel and sim.fuel < Tuning.FUEL_MAX:
+	# Tanken (nicht an einer explodierten/defekten Station)
+	if pad.fuel and pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK:
+		if not pump_warned:
+			pump_warned = true
+			log.append({"type": "pump_out"})
+	elif pad.fuel and sim.fuel < Tuning.FUEL_MAX:
 		var want := minf(Tuning.REFUEL_RATE * dt, Tuning.FUEL_MAX - sim.fuel)
 		var free := sim.fuel < Tuning.EMERGENCY_FUEL
-		var cost := want * Tuning.FUEL_PRICE
+		var cost := want * fuel_price()
 		if free:
 			sim.refuel(want)
 		elif money >= cost:
@@ -279,7 +320,7 @@ func _service_pad(dt: float) -> void:
 				_deliver(job)
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
-	return {"fare": float(job.get("fare", 50)), "par": par_of(job), "base": base_clock,
+	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "base": base_clock,
 		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "job": job_index, "name": String(job.get("passenger", ""))}
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
@@ -345,3 +386,49 @@ func respawn_after_crash() -> void:
 	phase_timer = 0.0
 	exit_open = job_index >= jobs.size()
 	level.exit_open = exit_open
+
+# ---------------------------------------------------------------- Spritpreis und Zapfsäule
+## Aktueller Preis je Einheit: zufälliger Basispreis im Levelbereich (wechselt in zufälligen Abständen, sprunghaft),
+## dazu +25 % je Berührung der Zapfsäule, gedeckelt (1,6 × Maximalpreis).
+func fuel_price() -> float:
+	var touches := mini(pump_touches, Tuning.PUMP_TOUCHES_TO_BREAK)
+	return minf(price_base * (1.0 + Tuning.PRICE_TOUCH_SURCHARGE * float(touches)), level.fuel_price_max * Tuning.PRICE_HARD_CAP)
+
+func station_down() -> bool:
+	return pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK
+
+func _roll_price(old: float) -> float:
+	var p := old
+	for i in 8:
+		p = snappedf(price_rng.randf_range(level.fuel_price_min, level.fuel_price_max), 0.01)
+		if absf(p - old) >= Tuning.PRICE_MIN_STEP:
+			break
+	return p
+
+func _update_prices(dt: float) -> void:
+	level_time += dt
+	if level_time >= price_next_t:
+		var old := price_base
+		price_base = _roll_price(old)
+		price_next_t = level_time + price_rng.randf_range(level.price_every.x, level.price_every.y)
+		if level.pads.has("F"):
+			log.append({"type": "price_changed", "price": fuel_price(), "up": price_base > old})
+
+func _check_pump(dt: float) -> void:
+	pump_cd = maxf(0.0, pump_cd - dt)
+	if pump_boom_t >= 0.0:
+		pump_boom_t -= dt
+		if pump_boom_t < 0.0:
+			pump_broken = true
+			log.append({"type": "pump_exploded", "rect": level.pumps[0].rect if not level.pumps.is_empty() else Rect2()})
+	if level.pumps.is_empty() or pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK or pump_cd > 0.0 or sim.state == TaxiSim.State.DESTROYED:
+		return
+	var body := Rect2(sim.pos.x - Tuning.HULL_HALF.x - 1.2, sim.pos.y - Tuning.HULL_HALF.y - 1.2, Tuning.HULL_HALF.x * 2.0 + 2.4, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * sim.gear + 2.4)
+	for pm in level.pumps:
+		if body.intersects(pm.rect):
+			pump_touches += 1
+			pump_cd = Tuning.PUMP_TOUCH_COOLDOWN
+			log.append({"type": "pump_touched", "stage": pump_touches, "price": fuel_price()})
+			if pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK:
+				pump_boom_t = Tuning.PUMP_BOOM_DELAY
+			return
