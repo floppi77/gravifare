@@ -63,5 +63,16 @@
  "SECTOR_7": "Transitknoten",
  "SECTOR_8": "Schattenring",
  "SECTOR_9": "Singularitätsrand",
- "PAD_FUEL": "T"
+ "PAD_FUEL": "T",
+ "MSG_DELIVERED2": "Zugestellt! +%d  (Zeit ×%.2f)",
+ "MSG_HARD": "Harte Landung −%d %%",
+ "HUD_TO_EXIT": "%s durch den Ausgang bringen!",
+ "HUD_LIFE_LOST": "Taxi verloren! Noch %d Leben",
+ "HUD_LAST_LIFE": "Letztes Leben!",
+ "HUD_GAME_OVER": "GAME OVER",
+ "HUD_GAME_OVER_HINT": "A / Enter: Hauptmenü",
+ "HUD_RUN_CREDITS": "Credits im Lauf",
+ "VOICE_EXIT": "Zum Ausgang, bitte!",
+ "HUD_FACTOR": "×%.2f",
+ "HUD_COMPLETE_EARNED": "Verdient: ¢ %d"
 }

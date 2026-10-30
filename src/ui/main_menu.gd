@@ -55,7 +55,7 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(spacer)
 	var any_done: bool = not Save.data.completed.is_empty()
 	var id := _next_open_level()
-	box.add_child(MenuKit.button(tr("MENU_CONTINUE") if any_done else tr("MENU_PLAY"), func(): Flow.start_level(id)))
+	box.add_child(MenuKit.button(tr("MENU_CONTINUE") if any_done else tr("MENU_PLAY"), func(): Flow.start_campaign(id)))
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), show_options))
 	box.add_child(MenuKit.button(tr("MENU_QUIT"), func(): get_tree().quit()))
@@ -86,7 +86,7 @@ func show_levels() -> void:
 	box.add_child(grid)
 	for i in ids.size():
 		var lvl := LevelData.load_file(Flow.level_path(ids[i]))
-		var b := MenuKit.button("%02d" % (i + 1), func(): Flow.start_level(ids[i]))
+		var b := MenuKit.button("%02d" % (i + 1), func(): Flow.start_campaign(ids[i]))
 		b.custom_minimum_size = Vector2(36, 20)
 		if Save.is_completed(ids[i]):
 			b.text += " ✔"

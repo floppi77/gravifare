@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -93,13 +93,26 @@ func _test_crash() -> void:
 			if e.type == "bad_landing":
 				bad = true
 	check(bad, "Zu schnelle Landung wird als bad_landing erkannt")
-	check(s.hull < 100.0, "Aufprall verursacht Schaden (%.1f)" % s.hull)
+	check(s.hull < 100.0 and s.state != TaxiSim.State.DESTROYED, "Zu harte Landung mit Fahrwerk (Feinmodus, max. 90 px/s): Schaden, aber nicht zerstört (%.1f)" % s.hull)
+	# Ohne Fahrwerk im Sturzflug auf den Boden: sofort zerstört
+	var d := TaxiSim.new()
+	d.setup(l)
+	d.state = TaxiSim.State.FLYING
+	d.landed_pad = {}
+	d.gear = 0.0                      # Setup startet auf dem Pad mit ausgefahrenem Fahrwerk
+	d.gear_cmd = false
+	d.pos = Vector2(pad.center, pad.row * Tuning.TILE - 110)
+	d.vel = Vector2(0, 235)
+	for i in 120:
+		d.step(Vector2.ZERO, false)
+	check(d.state == TaxiSim.State.DESTROYED, "Sturz mit ~230 px/s ohne Fahrwerk zerstört das Taxi sofort")
 
 func _test_full_run() -> void:
 	var r := Run.new()
 	r.start(_lvl())
-	check(r.sim.state == TaxiSim.State.LANDED, "Start gelandet auf Startpad")
-	check(r.target_pad() == "1", "Erster Fahrgast wartet auf Pad 1")
+	check(r.sim.state == TaxiSim.State.LANDED and r.sim.landed_pad.id == "1", "Start gelandet auf Startpad 1")
+	check(r.target_pad() == "2", "Erster Fahrgast wartet auf Pad 2 (nicht dort, wo das Taxi steht)")
+	_land_on(r, "2")
 	for i in 240:
 		r.step(Vector2.ZERO, true)
 	check(r.phase == Run.Phase.CARRYING, "Fahrgast an Bord nach Einsteigezeit")
@@ -110,8 +123,8 @@ func _test_bot_solves_levels() -> void:
 		if not f.ends_with(".json"):
 			continue
 		var lvl := LevelData.load_file("res://data/levels/" + f)
-		var r := Bot.fly_level(lvl)
-		check(r.complete and r.hull > 90.0, "Autopilot löst %s (%.0f s, Hülle %.0f%%, %s)" % [lvl.id, r.time, r.hull, r.reason])
+		var r := Bot.fly_level(lvl, 600.0, Tuning.MIN_START_FUEL)
+		check(r.complete and r.hull > 90.0, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.reason])
 
 func _test_level_rules() -> void:
 	var dir := DirAccess.open("res://data/levels")
@@ -167,12 +180,23 @@ func _test_gear_flight_mode() -> void:
 		a.pos.x = 320; b.pos.x = 320
 	check(absf(b.vel.x) < absf(a.vel.x) * 0.5, "Seitengeschwindigkeit nach 1 s: Fahrwerk %.0f < eingefahren %.0f" % [absf(b.vel.x), absf(a.vel.x)])
 
+## Setzt das Taxi (Test-Hilfe) sicher gelandet auf ein Pad, ohne es zu fliegen.
+func _land_on(r: Run, id: String) -> void:
+	var pad: Dictionary = r.level.pads[id]
+	r.sim.pos = Vector2(pad.center + 6.0, pad.row * Tuning.TILE - Tuning.GEAR_LEN - Tuning.HULL_HALF.y)
+	r.sim.vel = Vector2.ZERO
+	r.sim.gear = 1.0
+	r.sim.gear_cmd = true
+	r.sim.state = TaxiSim.State.LANDED
+	r.sim.landed_pad = pad
+
 func _test_passenger_walk_and_board() -> void:
 	var r := Run.new()
 	r.start(_lvl())
 	var a: PassengerActor = r.actor
 	check(a != null and a.state == PassengerActor.S.WAITING, "Fahrgast wartet beim Start im Wartebereich")
-	var pad: Dictionary = _lvl().pads["1"]
+	var pad: Dictionary = _lvl().pads["2"]
+	_land_on(r, "2")
 	check(a.x == pad.wait_x and pad.shelter.size.x > 0.0, "Wartepunkt liegt im Wartebereich des Pads (Unterstand vorhanden)")
 	var boarded_at := -1.0
 	var saw_walking := false
@@ -191,6 +215,7 @@ func _test_passenger_walk_and_board() -> void:
 func _test_passenger_abort() -> void:
 	var r := Run.new()
 	r.start(_lvl())
+	_land_on(r, "2")
 	r.step(Vector2.ZERO, true)                     # Fahrgast beginnt zu laufen
 	check(r.phase == Run.Phase.BOARDING, "Boarding beginnt nach Landung")
 	for i in 12:
@@ -198,7 +223,7 @@ func _test_passenger_abort() -> void:
 	check(r.phase == Run.Phase.WAITING, "Abheben bricht das Einsteigen ab")
 	for i in 300:
 		r.step(Vector2(0, -0.39), false)
-	check(r.actor.state == PassengerActor.S.WAITING and absf(r.actor.x - _lvl().pads["1"].wait_x) < 1.0, "Fahrgast kehrt in den Wartebereich zurück")
+	check(r.actor.state == PassengerActor.S.WAITING and absf(r.actor.x - _lvl().pads["2"].wait_x) < 1.0, "Fahrgast kehrt in den Wartebereich zurück")
 
 func _test_no_respawn_after_delivery() -> void:
 	var lvl := _lvl()
@@ -273,3 +298,143 @@ func _test_i18n_complete() -> void:
 		if f.ends_with(".json"):
 			var lvl := LevelData.load_file("res://data/levels/" + f)
 			check(String(lvl.names.get("de", "")) != "" and String(lvl.names.get("en", "")) != "", "%s hat deutschen und englischen Namen" % lvl.id)
+
+func _test_crash_balance() -> void:
+	var results := {}
+	for v in [60.0, 80.0, 100.0, 130.0, 160.0, 169.0, 171.0, 240.0]:
+		var s := TaxiSim.new()
+		s.setup(_lvl())
+		s._impact(v)
+		results[v] = s
+	check(results[60.0].hull == 100.0, "Aufprall 60 px/s: kein Schaden")
+	check(results[80.0].hull > 95.0 and results[80.0].hull < 100.0, "Aufprall 80 px/s: leichter Schaden (%.1f Hülle)" % results[80.0].hull)
+	var prev := 101.0
+	var mono := true
+	for v in [80.0, 100.0, 130.0, 160.0, 169.0]:
+		if results[v].hull >= prev:
+			mono = false
+		prev = results[v].hull
+	check(mono, "Schaden steigt mit der Geschwindigkeit streng an")
+	check(results[130.0].hull < 70.0 and results[130.0].state != TaxiSim.State.DESTROYED, "130 px/s: schwerer Schaden, aber nicht zerstört (%.0f)" % results[130.0].hull)
+	check(results[169.0].hull > 0.0 or results[169.0].state == TaxiSim.State.DESTROYED, "169 px/s: knapp unter der Sofortgrenze")
+	check(results[171.0].state == TaxiSim.State.DESTROYED and results[171.0].events.any(func(e): return e.type == "destroyed" and e.get("instant", false)), "171 px/s: sofort zerstört")
+	check(results[240.0].state == TaxiSim.State.DESTROYED, "240 px/s (Höchstgeschwindigkeit): sofort zerstört")
+
+func _test_payout_and_penalty() -> void:
+	check(absf(Tuning.time_factor(0.0, 30.0) - Tuning.PAY_MAX) < 0.001, "Sofort zugestellt: Höchstfaktor %.2f" % Tuning.PAY_MAX)
+	check(absf(Tuning.time_factor(30.0, 30.0) - 1.0) < 0.001, "Bei Richtzeit genau Faktor 1,0")
+	check(Tuning.time_factor(15.0, 30.0) > Tuning.time_factor(30.0, 30.0) and Tuning.time_factor(30.0, 30.0) > Tuning.time_factor(60.0, 30.0), "Je länger die Fahrt, desto weniger Credits")
+	check(absf(Tuning.time_factor(1000.0, 30.0) - Tuning.PAY_MIN) < 0.001, "Sehr lange Fahrt: Untergrenze %.2f (nie null/negativ)" % Tuning.PAY_MIN)
+	check(Tuning.landing_penalty(Tuning.LAND_SOFT_VY) == 0.0 and Tuning.landing_penalty(10.0) == 0.0, "Weiche Landung: kein Abzug")
+	check(absf(Tuning.landing_penalty(Tuning.LAND_VY) - Tuning.LAND_PENALTY_MAX) < 0.001, "Landung am Limit: maximaler Abzug")
+	check(Tuning.landing_penalty(35.0) > 0.0 and Tuning.landing_penalty(35.0) < Tuning.LAND_PENALTY_MAX, "Harte Landung dazwischen: anteiliger Abzug")
+	# Durchgespielter Auftrag: schnell + weich vs. langsam + hart
+	var fast := _simulate_job_payout(0.0, 18.0)
+	var slow := _simulate_job_payout(Tuning.LAND_VY, 60.0)
+	check(fast > slow, "Schnell+weich (%.0f) bringt mehr als langsam+hart (%.0f)" % [fast, slow])
+
+func _simulate_job_payout(landing_vy: float, seconds: float) -> float:
+	var r := Run.new()
+	r.start(_lvl())
+	_land_on(r, "2")
+	r.last_vy = landing_vy
+	var money0 := r.money
+	for i in int(seconds / Tuning.TICK):
+		r.step(Vector2.ZERO, true)
+		if r.phase == Run.Phase.CARRYING:
+			break
+	# Ziel: Pad 3 (Insel); direkt dorthin versetzen und aussteigen lassen
+	r.job_clock = seconds
+	_land_on(r, "3")
+	r.last_vy = landing_vy
+	for i in 400:
+		r.step(Vector2.ZERO, true)
+	return r.money - money0
+
+func _test_exit_passenger() -> void:
+	var lvl := _lvl()
+	var last: Dictionary = lvl.jobs[lvl.jobs.size() - 1]
+	check(String(last.to) == "exit", "Letzter Auftrag bringt einen Fahrgast zum Ausgang")
+	var r := Run.new()
+	r.start(lvl)
+	r.job_index = lvl.jobs.size() - 1
+	r._spawn_actor(true)
+	check(not r.exit_open, "Tor ist zu, solange der Ausgangs-Fahrgast nicht an Bord ist")
+	_land_on(r, String(last.from))
+	var opened := false
+	for i in 600:
+		r.step(Vector2.ZERO, true)
+		for e in r.log:
+			if e.type == "exit_open":
+				opened = true
+	check(opened and r.exit_open and r.phase == Run.Phase.CARRYING, "Tor öffnet, sobald der Fahrgast an Bord ist")
+	check(r.target_pad() == "", "Ziel des Ausgangs-Fahrgasts ist kein Pad")
+	# durchs Tor fliegen
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.pos = lvl.exit_rect().get_center()
+	var money0 := r.money
+	r.step(Vector2.ZERO, false)
+	check(r.result == Run.Result.COMPLETE, "Flug mit Fahrgast durchs Tor beendet das Level")
+	check(r.money > money0 and not r.carried.is_empty(), "Fahrpreis wird gezahlt, Fahrgast fährt ins nächste Level mit (%s)" % str(r.carried.get("name", "")))
+
+func _test_spawn_not_on_taxi_pad() -> void:
+	# Nachfolge-Fahrgast darf nicht erscheinen, solange das Taxi auf seinem Pad steht
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	r.job_index = 0
+	r.actor = null
+	var next_from := String(lvl.jobs[1].from)
+	r.job_index = 1
+	r.spawn_timer = 0.01
+	_land_on(r, next_from)
+	for i in 600:
+		r.step(Vector2.ZERO, true)
+	check(r.actor == null, "Fahrgast erscheint nicht auf dem Pad, auf dem das Taxi steht")
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	r.sim.pos = Vector2(320, 100)
+	for i in 10:
+		r.step(Vector2(0, -0.39), false)
+	check(r.actor != null, "…aber sobald das Taxi weg ist")
+
+func _test_job_rules_and_difficulty() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	var files: Array = []
+	for f in dir.get_files():
+		if f.ends_with(".json"):
+			files.append(f)
+	files.sort()
+	var prev_score := -1.0
+	var prev_id := ""
+	for f in files:
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var start_pad := ""
+		for dy in range(0, 3):
+			var pad := lvl.pad_at_foot(Vector2(lvl.spawn.x, lvl.spawn.y + dy * Tuning.TILE))
+			if not pad.is_empty():
+				start_pad = pad.id
+				break
+		check(not lvl.jobs.is_empty() and String(lvl.jobs[lvl.jobs.size() - 1].to) == "exit", "%s: letzter Auftrag = Ausgangs-Fahrgast" % lvl.id)
+		var ok_first: bool = String(lvl.jobs[0].from) != start_pad
+		check(ok_first, "%s: erster Fahrgast wartet nicht auf dem Startpad %s" % [lvl.id, start_pad])
+		var chain_ok := true
+		var exit_only_last := true
+		for i in lvl.jobs.size():
+			var j: Dictionary = lvl.jobs[i]
+			if i > 0 and String(j.from) == String(lvl.jobs[i - 1].to):
+				chain_ok = false
+			if String(j.from) == String(j.to):
+				chain_ok = false
+			if i < lvl.jobs.size() - 1 and String(j.to) == "exit":
+				exit_only_last = false
+			if not lvl.pads.has(String(j.from)) or (String(j.to) != "exit" and not lvl.pads.has(String(j.to))):
+				chain_ok = false
+		check(chain_ok, "%s: jeder Fahrgast beginnt an einem anderen Pad als der vorherige endete" % lvl.id)
+		check(exit_only_last, "%s: nur der letzte Auftrag führt zum Ausgang" % lvl.id)
+		var m := LevelMetrics.analyze(lvl)
+		check(m.solvable, "%s: Route planbar (Korridor %.0f px)" % [lvl.id, m.clearance])
+		check(m.score >= prev_score, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
+		prev_score = m.score
+		prev_id = lvl.id

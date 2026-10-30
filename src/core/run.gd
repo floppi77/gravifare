@@ -1,7 +1,9 @@
 class_name Run
 extends RefCounted
-## Auftragslogik, Geld und Levelabschluss um eine TaxiSim herum. Rein datenbasiert und testbar.
+## Auftragslogik, Credits und Levelabschluss um eine TaxiSim herum. Rein datenbasiert und testbar.
 ## Fahrgäste sind PassengerActor-Objekte; Ein-/Aussteigen dauert so lange, wie sie laufen.
+## Der letzte Auftrag eines Levels ist der Ausgangs-Fahrgast ("to": "exit"): Das Tor öffnet, sobald er an
+## Bord ist; er wird durch das Tor ins nächste Level gebracht.
 
 enum Phase { WAITING, BOARDING, CARRYING, DROPOFF }
 enum Result { RUNNING, COMPLETE, FAILED }
@@ -16,33 +18,48 @@ var sim := TaxiSim.new()
 var job_index := 0
 var phase := Phase.WAITING
 var phase_timer := 0.0
-var money := 0.0
+var money := 0.0            # Credits des Laufs (werden von Level zu Level übernommen)
+var earned := 0.0           # in diesem Level verdient
 var delivered := 0
-var soft_landings := 0
 var result := Result.RUNNING
 var exit_open := false
-var job_time := 0.0        # Zeit seit Annahme der Fahrt (für Trinkgeld)
-var last_message := ""
+var job_clock := 0.0        # Sekunden seit Erscheinen des aktuellen Fahrgasts (bestimmt den Fahrpreis)
+var job_times: Array = []   # Dauer je zugestelltem Auftrag
+var pen_pick := 0.0         # Abzug durch harte Landung beim Abholen
+var pen_drop := 0.0         # Abzug durch harte Landung am Ziel
+var last_vy := 0.0
 var log: Array = []         # Ereignisse des letzten Ticks: {type, ...}
 var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
 var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in den Unterstand
+var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
 var spawn_timer := 0.0
+var spawn_wait := false
 
-func start(lvl: LevelData) -> void:
+func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0) -> void:
 	level = lvl
 	sim.setup(lvl)
+	if fuel_in >= 0.0:
+		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
+	else:
+		sim.fuel = Tuning.FUEL_MAX
 	job_index = 0
 	phase = Phase.WAITING
 	phase_timer = 0.0
-	money = 0.0
+	money = credits_in
+	earned = 0.0
 	delivered = 0
-	soft_landings = 0
 	result = Result.RUNNING
 	exit_open = lvl.jobs.is_empty()
 	lvl.exit_open = exit_open
-	job_time = 0.0
+	job_clock = 0.0
+	job_times.clear()
+	pen_pick = 0.0
+	pen_drop = 0.0
+	last_vy = 0.0
 	leavers.clear()
+	carried = {}
 	spawn_timer = 0.0
+	spawn_wait = false
 	actor = null
 	_spawn_actor(true)
 
@@ -53,17 +70,29 @@ func _spawn_actor(instant: bool) -> void:
 		return
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
-	if instant:
-		actor.call_cd = 0.0
+	job_clock = 0.0
 
 func current_job() -> Dictionary:
 	return level.jobs[job_index] if job_index < level.jobs.size() else {}
+
+func is_exit_job(job: Dictionary) -> bool:
+	return String(job.get("to", "")) == "exit"
 
 func target_pad() -> String:
 	var j := current_job()
 	if j.is_empty():
 		return ""
-	return String(j.to) if phase == Phase.CARRYING or phase == Phase.DROPOFF else String(j.from)
+	if phase == Phase.CARRYING or phase == Phase.DROPOFF:
+		return "" if is_exit_job(j) else String(j.to)
+	return String(j.from)
+
+func par_of(job: Dictionary) -> float:
+	return float(job.get("par", job.get("time_limit", 60)))
+
+## Aktueller Zeitfaktor des laufenden Auftrags (für die HUD-Anzeige).
+func live_factor() -> float:
+	var j := current_job()
+	return Tuning.time_factor(job_clock, par_of(j)) if not j.is_empty() and actor != null else 1.0
 
 func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	log.clear()
@@ -74,21 +103,44 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	sim.step(input, gear_request, dt)
 	for e in sim.events:
 		log.append(e)
+		if e.type == "landed":
+			last_vy = e.vy
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
-	if phase == Phase.CARRYING:
-		job_time += dt
+	if actor != null:
+		job_clock += dt
 	_step_actors(dt)
 	_service_pad(dt)
 	if exit_open and sim.in_exit(level.exit_cells):
-		result = Result.COMPLETE
-		log.append({"type": "level_complete"})
+		_finish_level()
+
+func _finish_level() -> void:
+	var job := current_job()
+	if not job.is_empty() and is_exit_job(job) and phase == Phase.CARRYING and actor != null:
+		var p := _payout(job)
+		money += p.pay
+		earned += p.pay
+		delivered += 1
+		job_times.append(job_clock)
+		carried = {"name": actor.pname, "look": actor.look, "gender": actor.gender}
+		log.append({"type": "delivered", "exit": true, "job": job_index, "fare": p.fare, "factor": p.factor, "penalty": p.penalty, "pay": p.pay, "voice": actor.voice_key(), "name": actor.pname})
+		job_index += 1
+		actor = null
+	result = Result.COMPLETE
+	log.append({"type": "level_complete"})
 
 func _step_actors(dt: float) -> void:
 	if spawn_timer > 0.0:
 		spawn_timer -= dt
 		if spawn_timer <= 0.0:
+			spawn_wait = true
+	if spawn_wait:
+		# Neue Fahrgäste erscheinen nie auf dem Pad, auf dem das Taxi gerade steht
+		var nj := current_job()
+		var blocked: bool = sim.state == TaxiSim.State.LANDED and not nj.is_empty() and sim.landed_pad.id == String(nj.from)
+		if not blocked:
+			spawn_wait = false
 			_spawn_actor(false)
 	if actor != null:
 		actor.step(dt)
@@ -140,31 +192,45 @@ func _service_pad(dt: float) -> void:
 				actor.board(sim.pos.x)
 				phase = Phase.BOARDING
 				phase_timer = 0.0
+				pen_pick = Tuning.landing_penalty(last_vy)
 		Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
 				phase = Phase.CARRYING
-				job_time = 0.0
-				log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": String(job.to)})
+				var dest := "exit" if is_exit_job(job) else String(job.to)
+				log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest})
+				if is_exit_job(job):
+					exit_open = true
+					level.exit_open = true
+					log.append({"type": "exit_open"})
 		Phase.CARRYING:
-			if pad.id == String(job.to):
+			if not is_exit_job(job) and pad.id == String(job.to):
 				phase = Phase.DROPOFF
 				phase_timer = 0.0
+				pen_drop = Tuning.landing_penalty(last_vy)
 				actor.step_out(sim.pos.x, level.pads[String(job.to)])
 		Phase.DROPOFF:
 			phase_timer += dt
 			if phase_timer >= STEP_OUT_TIME:
 				_deliver(job)
 
-func _deliver(job: Dictionary) -> void:
+func _payout(job: Dictionary) -> Dictionary:
 	var fare := float(job.get("fare", 50))
-	var limit := float(job.get("time_limit", 60))
-	var tip := fare * 0.5 * clampf(1.0 - job_time / limit, 0.0, 1.0)
-	money += fare + tip
+	var factor := Tuning.time_factor(job_clock, par_of(job))
+	var penalty := 1.0 - (1.0 - pen_pick) * (1.0 - pen_drop)
+	return {"fare": fare, "factor": factor, "penalty": penalty, "pay": fare * factor * (1.0 - penalty), "time": job_clock}
+
+func _deliver(job: Dictionary) -> void:
+	var p := _payout(job)
+	money += p.pay
+	earned += p.pay
 	delivered += 1
-	log.append({"type": "delivered", "job": job_index, "fare": fare, "tip": tip, "voice": actor.voice_key(), "name": actor.pname})
+	job_times.append(job_clock)
+	log.append({"type": "delivered", "job": job_index, "fare": p.fare, "factor": p.factor, "penalty": p.penalty, "pay": p.pay, "voice": actor.voice_key(), "name": actor.pname})
 	leavers.append(actor)
 	actor = null
 	job_index += 1
+	pen_pick = 0.0
+	pen_drop = 0.0
 	phase = Phase.WAITING
 	phase_timer = 0.0
 	if job_index >= level.jobs.size():

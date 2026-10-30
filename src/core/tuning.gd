@@ -38,7 +38,8 @@ const LAND_SOFT_VY := 22.0       # unter diesem Wert gilt die Landung als "weich
 # Schaden
 const HULL_MAX := 100.0
 const IMPACT_SAFE := 70.0        # Aufprall darunter: kein Schaden
-const IMPACT_DAMAGE := 0.45      # Schaden je px/s darüber
+const CRASH_SPEED := 170.0       # Aufprall ab hier: Taxi sofort zerstört
+const DAMAGE_EXP := 1.6          # Schaden = 100 * ((v-70)/(170-70))^1.6 (leichte Stöße harmlos, schwere teuer)
 const BOUNCE := 0.35
 
 # Treibstoff (0..100)
@@ -53,3 +54,20 @@ const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
 # Auftragsablauf
 const BOARD_TIME := 0.9
 const EXIT_COUNTDOWN := 0.0
+
+# Kampagne: Leben, Sprit-Übernahme
+const START_LIVES := 5
+const MIN_START_FUEL := 35.0     # Mindestvorrat zu Levelbeginn (nie Sackgasse durch leeren Tank)
+
+# Bezahlung: je schneller vom Erscheinen des Fahrgasts bis zum Ziel, desto mehr Credits
+const PAY_MAX := 1.6             # Faktor bei sofortiger Zustellung
+const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
+const PAY_SLOPE := 0.6           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
+const LAND_PENALTY_MAX := 0.30   # max. Abzug je harter Landung (Sinkrate = Limit)
+
+static func time_factor(t: float, par: float) -> float:
+	var ratio := t / maxf(par, 1.0)
+	return clampf(1.0 + (1.0 - ratio) * PAY_SLOPE, PAY_MIN, PAY_MAX)
+
+static func landing_penalty(vy: float) -> float:
+	return clampf((vy - LAND_SOFT_VY) / (LAND_VY - LAND_SOFT_VY), 0.0, 1.0) * LAND_PENALTY_MAX

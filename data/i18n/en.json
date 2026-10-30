@@ -63,5 +63,16 @@
  "SECTOR_7": "Transit Hub",
  "SECTOR_8": "Shadow Ring",
  "SECTOR_9": "Singularity Edge",
- "PAD_FUEL": "F"
+ "PAD_FUEL": "F",
+ "MSG_DELIVERED2": "Delivered! +%d  (time ×%.2f)",
+ "MSG_HARD": "Hard landing −%d%%",
+ "HUD_TO_EXIT": "Take %s through the exit!",
+ "HUD_LIFE_LOST": "Taxi lost! %d lives left",
+ "HUD_LAST_LIFE": "Last life!",
+ "HUD_GAME_OVER": "GAME OVER",
+ "HUD_GAME_OVER_HINT": "A / Enter: main menu",
+ "HUD_RUN_CREDITS": "Run credits",
+ "VOICE_EXIT": "To the exit, please!",
+ "HUD_FACTOR": "×%.2f",
+ "HUD_COMPLETE_EARNED": "Earned: ¢ %d"
 }

@@ -64,7 +64,7 @@ func load_level(path: String) -> void:
 	if lvl == null:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
-	run.start(lvl)
+	run.start(lvl, Flow.entry_fuel, Flow.entry_credits)
 	gear_on = run.sim.gear_cmd
 	world_tiles.setup(run)
 	props.setup(run)
@@ -132,8 +132,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE:
 		Flow.to_menu()          # nur das letzte Level erreicht diesen Pfad; sonst übernimmt die Levelwechsel-Sequenz
+	elif hud.game_over:
+		if event.is_action_pressed("ui_accept"):
+			Flow.to_menu()
 	elif event.is_action_pressed("restart"):
-		load_level(level_path)
+		if run.result == Run.Result.FAILED:
+			_lose_life()
+		else:
+			load_level(level_path)
 	elif event.is_action_pressed("gear") and not paused and Controls.gear_toggle:
 		gear_on = not gear_on
 
@@ -173,10 +179,19 @@ func _physics_process(_delta: float) -> void:
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() != "":
 			_begin_transition()
-	if run.result == Run.Result.FAILED:
+	if run.result == Run.Result.FAILED and not hud.game_over:
 		restart_timer += Tuning.TICK
 		if restart_timer > 1.2:
-			load_level(level_path)
+			_lose_life()
+
+func _lose_life() -> void:
+	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over, sonst Level neu mit dem Sprit/den Credits von Levelbeginn.
+	Flow.lives -= 1
+	if Flow.lives <= 0:
+		Flow.lives = 0
+		hud.game_over = true
+		return
+	load_level(level_path)
 
 func _on_event(e: Dictionary) -> void:
 	match e.type:
@@ -190,10 +205,16 @@ func _on_event(e: Dictionary) -> void:
 		"boarded":
 			Sfx.play("board", -6.0)
 			Sfx.play_voice(e.voice, "dest_" + e.dest)
-			hud.subtitle(e.name, tr("VOICE_DEST") % e.dest, 2.8)
+			hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else tr("VOICE_DEST") % e.dest, 2.8)
 		"delivered":
-			hud.flash_message(tr("MSG_DELIVERED") % int(e.fare + e.tip))
+			var msg := tr("MSG_DELIVERED2") % [int(e.pay), e.factor]
+			if e.penalty > 0.005:
+				msg += "  " + tr("MSG_HARD") % int(round(e.penalty * 100.0))
+			hud.flash_message(msg, 3.0)
 			Sfx.play("coin")
+			Sfx.play_voice(e.voice, "thanks")
+			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+		"carried_thanks":
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
 		"exit_open":
@@ -224,6 +245,9 @@ func _process(delta: float) -> void:
 
 func _begin_transition() -> void:
 	next_id = Flow.next_level_id()
+	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)     # Sprit und Credits laufen mit
+	Flow.entry_credits = run.money
+	Flow.carry_passenger = run.carried
 	var nl := LevelData.load_file(Flow.level_path(next_id))
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	trans.title_sector = tr("TRANS_SECTOR") % [nl.sector, tr("SECTOR_%d" % nl.sector)]
@@ -274,6 +298,7 @@ func _arrival_tick() -> void:
 		Sfx.play("land", -4.0)
 		Sfx.set_thrust(0.0, 0.0)
 		arrive_done = true
+		_release_carried()
 		if run.actor != null and run.actor.state == PassengerActor.S.WAITING:
 			run.actor.wave()
 			_on_event({"type": "call", "voice": run.actor.voice_key(), "name": run.actor.pname})
@@ -292,6 +317,18 @@ func _arrival_tick() -> void:
 	props.door_override = TV.smooth(u / 0.25) * (1.0 - TV.smooth((u - 0.5) / 0.3))
 	taxi.sync_state()
 	Sfx.set_thrust(taxi.flame_main * 0.7, absf(taxi.flame_side))
+
+func _release_carried() -> void:
+	## Der Ausgangs-Fahrgast des letzten Levels steigt auf der Startplattform aus und geht in den Unterstand.
+	var c: Dictionary = Flow.carry_passenger
+	Flow.carry_passenger = {}
+	if c.is_empty() or run.sim.landed_pad.is_empty():
+		return
+	var a := PassengerActor.new()
+	a.setup({"passenger": c.name, "gender": c.gender, "look": c.look}, run.sim.landed_pad, 0, true)
+	a.step_out(run.sim.pos.x, run.sim.landed_pad)
+	run.leavers.append(a)
+	_on_event({"type": "carried_thanks", "voice": a.voice_key(), "name": a.pname})
 
 func _end_transition() -> void:
 	props.door_override = -1.0

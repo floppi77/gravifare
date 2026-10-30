@@ -4,6 +4,11 @@ extends Node
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
+# Kampagnenzustand eines Laufs (5 Leben für alle Level; Sprit und Credits laufen von Level zu Level mit)
+var lives := Tuning.START_LIVES
+var entry_fuel := Tuning.FUEL_MAX       # Sprit bei Levelbeginn (auch Wiederholung nach Verlust)
+var entry_credits := 0.0
+var carry_passenger := {}               # Fahrgast, der ins nächste Level mitfährt
 
 func level_ids() -> Array:
 	var ids: Array = []
@@ -18,6 +23,14 @@ func level_ids() -> Array:
 
 func level_path(id: String) -> String:
 	return "res://data/levels/%s.json" % id
+
+## Neuer Lauf: volle Leben, voller Tank, keine Credits – ab dem gewählten Level.
+func start_campaign(id: String) -> void:
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	start_level(id)
 
 func start_level(id: String) -> void:
 	current_level = id

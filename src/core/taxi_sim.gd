@@ -174,9 +174,18 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		vel.x *= 0.6
 
 func _impact(speed: float) -> void:
+	## Balance: bis 70 px/s harmlos; danach Hüllenschaden, der mit der Geschwindigkeit überproportional
+	## steigt; ab 170 px/s ist das Taxi sofort zerstört.
 	if speed <= Tuning.IMPACT_SAFE:
 		return
-	var dmg := (speed - Tuning.IMPACT_SAFE) * Tuning.IMPACT_DAMAGE
+	if speed >= Tuning.CRASH_SPEED:
+		events.append({"type": "damage", "amount": hull, "speed": speed, "fatal": true})
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed", "instant": true})
+		return
+	var k := (speed - Tuning.IMPACT_SAFE) / (Tuning.CRASH_SPEED - Tuning.IMPACT_SAFE)
+	var dmg := Tuning.HULL_MAX * pow(k, Tuning.DAMAGE_EXP)
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": speed})
 	if hull <= 0.0:

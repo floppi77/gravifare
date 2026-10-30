@@ -351,6 +351,38 @@
   "en/m1_dest_9": {
    "text": "Platform nine, please!",
    "seconds": 1.98
+  },
+  "de/f0_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.42
+  },
+  "de/f1_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.9
+  },
+  "de/m0_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.66
+  },
+  "de/m1_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.51
+  },
+  "en/f0_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.26
+  },
+  "en/f1_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.66
+  },
+  "en/m0_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.42
+  },
+  "en/m1_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.54
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
