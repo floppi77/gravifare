@@ -1,0 +1,13 @@
+{
+ "HUD_FUEL": "TANK", "HUD_HULL": "HÜLLE",
+ "HUD_PICKUP": "%s abholen an Pad %s", "HUD_DELIVER": "%s zu Pad %s bringen",
+ "HUD_GO_EXIT": "Alle Fahrten erledigt – ab zum AUSGANG!",
+ "HUD_VY": "V↓", "HUD_VX": "V↔", "HUD_TILT": "NEI",
+ "HUD_HINT_PAD": "WASD/Pfeile Schub · Leertaste Fahrwerk · R Neustart · Esc Pause",
+ "HUD_HINT_PAD_PAD": "Stick/Steuerkreuz Schub · A Fahrwerk · Y Neustart · Start Pause",
+ "HUD_CRASHED": "TAXI VERLOREN", "HUD_RESTART": "R / Y drücken für neuen Versuch",
+ "HUD_COMPLETE": "LEVEL GESCHAFFT", "HUD_PAUSED": "PAUSE",
+ "MSG_BOARDED": "Einsteigen!", "MSG_DELIVERED": "Zugestellt! +%d", "MSG_EXIT_OPEN": "Ausgang offen!",
+ "MSG_BAD_GEAR": "Fahrwerk vor der Landung ausfahren!", "MSG_BAD_POS": "Ganz auf dem Pad landen!",
+ "MSG_BAD_SPEED": "Zu schnell!", "MSG_BAD_TILT": "Vor dem Aufsetzen ausgleichen!"
+}

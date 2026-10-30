@@ -1,0 +1,13 @@
+{
+ "HUD_FUEL": "FUEL", "HUD_HULL": "HULL",
+ "HUD_PICKUP": "Pick up %s at pad %s", "HUD_DELIVER": "Take %s to pad %s",
+ "HUD_GO_EXIT": "All rides done – fly to the EXIT!",
+ "HUD_VY": "V↓", "HUD_VX": "V↔", "HUD_TILT": "TLT",
+ "HUD_HINT_PAD": "WASD/Arrows thrust · Space gear · R restart · Esc pause",
+ "HUD_HINT_PAD_PAD": "Stick/D-pad thrust · A gear · Y restart · Start pause",
+ "HUD_CRASHED": "TAXI LOST", "HUD_RESTART": "Press R / Y to retry",
+ "HUD_COMPLETE": "LEVEL COMPLETE", "HUD_PAUSED": "PAUSED",
+ "MSG_BOARDED": "Hop in!", "MSG_DELIVERED": "Delivered! +%d", "MSG_EXIT_OPEN": "Exit open!",
+ "MSG_BAD_GEAR": "Gear out before landing!", "MSG_BAD_POS": "Land fully on a pad!",
+ "MSG_BAD_SPEED": "Too fast!", "MSG_BAD_TILT": "Level out before touching down!"
+}

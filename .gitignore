@@ -1,0 +1,14 @@
+# Godot
+.godot/
+*.translation
+export_presets.cfg.local
+# Exporte und Builds
+build/
+exports/
+*.tmp
+# Lokale Konfiguration und Entwicklungsartefakte
+.env
+*.log
+__pycache__/
+.venv/
+scratch/
