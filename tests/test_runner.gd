@@ -515,7 +515,10 @@ func _test_squash_passenger() -> void:
 	check(i1 == i2 and i1.name != "Mika", "Ersatz-Identität ist reproduzierbar und neu")
 
 func _test_landing_window_rules() -> void:
+	## Die Untergrenze gilt je Pad (Level 1–3: 34 px, bis Level 99 sinkend auf 20 px). Größere Pads im selben Level sind
+	## jederzeit erlaubt; verschieden große Pads innerhalb eines Levels sind ausdrücklich zulässig, aber nicht vorgeschrieben.
 	var dir := DirAccess.open("res://data/levels")
+	var all_widths := {}
 	for f in dir.get_files():
 		if not f.ends_with(".json"):
 			continue
@@ -528,12 +531,9 @@ func _test_landing_window_rules() -> void:
 				continue
 			min_w = minf(min_w, p.land_window)
 			widths.append(int((p.x1 - p.x0) / Tuning.TILE))
+			all_widths[widths[widths.size() - 1]] = true
 		check(min_w >= Tuning.min_land_window(lvl.number) - 0.01, "%s (Level %d): jedes Passagierpad hat ein freies Landefenster ≥ %.0f px (kleinstes %.0f px, Padbreiten %s Tiles)" % [lvl.id, lvl.number, Tuning.min_land_window(lvl.number), min_w, str(widths)])
-		var varied := false
-		for w in widths:
-			if w != widths[0]:
-				varied = true
-		check(varied, "%s: Pads sind unterschiedlich groß" % lvl.id)
+	check(all_widths.size() >= 3, "In der Kampagne kommen verschiedene Padgrößen vor (%s Tiles)" % str(all_widths.keys()))
 
 func _test_taxi_scale() -> void:
 	check(absf(Tuning.HULL_HALF.x - 10.0 * Tuning.TAXI_SCALE) < 0.01 and absf(Tuning.FOOT_X - 8.0 * Tuning.TAXI_SCALE) < 0.01, "Taxi-Kollisionsmaße sind auf %.0f %% skaliert" % (Tuning.TAXI_SCALE * 100.0))
