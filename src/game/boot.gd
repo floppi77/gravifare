@@ -1,5 +1,10 @@
 extends Node
-## Einstiegspunkt: wechselt in die Spielszene (später: Hauptmenü).
+## Einstiegspunkt: Hauptmenü, oder direkt ein Level mit --level=<id> (Entwicklung/Screenshots).
 
 func _ready() -> void:
-	get_tree().change_scene_to_file.call_deferred("res://src/game/game.tscn")
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--level="):
+			Flow.current_level = a.substr(8)
+			get_tree().change_scene_to_file.call_deferred(Flow.GAME)
+			return
+	get_tree().change_scene_to_file.call_deferred(Flow.MENU)

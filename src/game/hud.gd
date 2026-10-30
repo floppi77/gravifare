@@ -77,4 +77,3 @@ func _draw() -> void:
 		draw_string(font, Vector2(0, size.y * 0.42 + 16), "¢ %d" % int(run.money), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 	if paused:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
-		draw_string(font, Vector2(0, size.y * 0.45), tr("HUD_PAUSED"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color.WHITE)

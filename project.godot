@@ -24,3 +24,7 @@ textures/canvas_textures/default_texture_filter=0
 
 Controls="*res://src/core/controls.gd"
 Loc="*res://src/core/loc.gd"
+Sfx="*res://src/core/sfx.gd"
+Settings="*res://src/core/settings.gd"
+Save="*res://src/core/save.gd"
+Flow="*res://src/core/flow.gd"

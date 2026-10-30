@@ -37,7 +37,7 @@ func _ready() -> void:
 			InputMap.action_add_event(a, jb)
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5):
+	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and event.axis <= JOY_AXIS_RIGHT_Y and absf(event.axis_value) > 0.5):
 		last_device = "gamepad"
 	elif event is InputEventKey and event.pressed:
 		last_device = "keyboard"
