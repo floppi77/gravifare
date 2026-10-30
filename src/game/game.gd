@@ -271,6 +271,8 @@ func _process(delta: float) -> void:
 	if not arriving and trans_t >= TV.T_IN:
 		_begin_arrival()
 	if trans_t >= TV.T_END:
+		trans_t = TV.T_END
+		_arrival_tick()          # Aufsetzen abschließen (Staub, Geräusch, Ruf, Aussteigen), bevor die Sequenz endet
 		_end_transition()
 
 func _begin_transition() -> void:
@@ -278,6 +280,8 @@ func _begin_transition() -> void:
 	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)     # Sprit und Credits laufen mit
 	Flow.entry_credits = run.money
 	Flow.carry_passenger = run.carried
+	if OS.get_cmdline_user_args().has("--debug-carry") and Flow.carry_passenger.is_empty():     # Dev: Ausgangs-Fahrgast simulieren
+		Flow.carry_passenger = {"name": "Odo", "look": 2, "gender": "m"}
 	var nl := LevelData.load_file(Flow.level_path(next_id))
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	trans.title_sector = tr("TRANS_SECTOR") % [nl.sector, tr("SECTOR_%d" % nl.sector)]
