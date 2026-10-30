@@ -20,8 +20,8 @@
  "MSG_BAD_POS": "Ganz auf dem Pad landen!",
  "MSG_BAD_SPEED": "Zu schnell!",
  "MSG_BAD_TILT": "Vor dem Aufsetzen ausgleichen!",
- "MENU_PLAY": "Spielen",
- "MENU_CONTINUE": "Weiter",
+ "MENU_PLAY": "Neues Spiel",
+ "MENU_CONTINUE": "Fortsetzen",
  "MENU_LEVELS": "Levelauswahl",
  "MENU_OPTIONS": "Optionen",
  "MENU_QUIT": "Spiel beenden",
@@ -162,7 +162,7 @@
  "KEY_RIGHT": "→",
  "KEY_ENTER": "Eingabe",
  "KEY_ESCAPE": "Esc",
- "RES_COSTS": "Reparatur −¢%d   Ersatztaxis −¢%d   Netto ¢%d",
+ "RES_COSTS": "Reparatur −¢%d   Ersatztaxis −¢%d   Verpasst −¢%d   Netto ¢%d",
  "MSG_TAXI_FEE": "Ersatztaxi: −¢%d",
  "VOICE_BORED": "Das dauert mir zu lange, tschüss!",
  "MSG_EXTRA_NEW": "Funkruf: %s wartet an Plattform %s",
@@ -172,5 +172,6 @@
  "MSG_WRONG_PAD": "Falsche Plattform! Fahrpreis −%d %%",
  "MSG_RIDE_DAMAGE": "Unsanfte Fahrt! Fahrpreis −%d %%",
  "VOICE_WRONG_PAD": "Das ist die falsche Plattform!",
- "VOICE_BUMPY": "Fahr doch vorsichtiger!"
+ "VOICE_BUMPY": "Fahr doch vorsichtiger!",
+ "MSG_JOB_MISSED": "%s verpasst: −¢%d"
 }

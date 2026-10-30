@@ -51,7 +51,14 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(spacer)
 	var any_done: bool = not Save.data.completed.is_empty()
 	var id := _next_open_level()
-	box.add_child(MenuKit.button(tr("MENU_CONTINUE") if any_done else tr("MENU_PLAY"), func(): Flow.start_campaign(id)))
+	var ids := Flow.level_ids()
+	if any_done or not Save.campaign().is_empty():
+		box.add_child(MenuKit.button(tr("MENU_CONTINUE"), func():
+			if not Flow.resume_campaign():
+				Flow.start_campaign(id)))
+	box.add_child(MenuKit.button(tr("MENU_PLAY"), func():
+		Save.clear_campaign()
+		Flow.start_campaign(ids[0] if not ids.is_empty() else id)))
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
 	box.add_child(MenuKit.button(tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")))
 	box.add_child(MenuKit.button(tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")))

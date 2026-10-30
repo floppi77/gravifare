@@ -5,7 +5,7 @@ extends Node
 var path := "user://save.json"
 ## Dev-/Testläufe (Autopilot, Debug-Flags) dürfen den echten Speicherstand nie verändern.
 var dev_session := false
-var data := {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none", "challenge": false}}
+var data := {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none", "challenge": false}, "campaign": {}}
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
@@ -24,6 +24,8 @@ func load_save() -> void:
 			data["stats"] = {}
 		if not data.has("unlocked"):
 			data["unlocked"] = []
+		if not (data.get("campaign") is Dictionary):
+			data["campaign"] = {}
 		if not data.has("cosmetics"):
 			data["cosmetics"] = {"paint": "std", "sticker": "none", "challenge": false}
 	else:
@@ -41,6 +43,20 @@ func write() -> void:
 	f.store_string(JSON.stringify(data, "\t"))
 	f.close()
 	DirAccess.rename_absolute(tmp, path)
+
+## Laufender Feldzug (für „Fortsetzen“): nächstes Level, Leben, Credits, Sprit, Seed, mitfahrender Fahrgast.
+func campaign() -> Dictionary:
+	var c = data.get("campaign", {})
+	return c if c is Dictionary and c.has("level") else {}
+
+func set_campaign(c: Dictionary) -> void:
+	data["campaign"] = c
+	write()
+
+func clear_campaign() -> void:
+	if not data.get("campaign", {}).is_empty():
+		data["campaign"] = {}
+		write()
 
 func is_completed(id: String) -> bool:
 	return data.completed.has(id)

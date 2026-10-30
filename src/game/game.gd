@@ -245,12 +245,14 @@ func _physics_process(_delta: float) -> void:
 		Save.note_max("best_streak", run.best_streak)
 		var prev_best := Save.best_time(Flow.current_level)
 		var med := run.medals()
-		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "net": run.earned - run.repair_cost - run.taxi_fees}
+		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees}
 		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med)
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() != "":
 			_begin_transition()
+		else:
+			Save.clear_campaign()
 	if run.result == Run.Result.FAILED and not hud.game_over:
 		restart_timer += Tuning.TICK
 		if restart_timer > 1.2:
@@ -263,6 +265,7 @@ func _lose_life() -> void:
 	if Flow.lives <= 0:
 		Flow.lives = 0
 		hud.game_over = true
+		Save.clear_campaign()
 		return
 	run.respawn_after_crash()
 	gear_on = run.sim.gear_cmd
@@ -447,6 +450,8 @@ func _on_event(e: Dictionary) -> void:
 				voice_cd = Time.get_ticks_msec() / 1000.0 + 2.5
 				Sfx.play_voice(e.voice, "bumpy")
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
+		"job_missed":
+			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
 		"extra_appeared":
 			hud.flash_message(tr("MSG_EXTRA_NEW") % [e.name, e.pad], 2.6)
 			Sfx.play("board", -10.0)
@@ -556,6 +561,7 @@ func _begin_transition() -> void:
 	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)     # Sprit und Credits laufen mit
 	Flow.entry_credits = run.money
 	Flow.carry_passenger = run.carried
+	Save.set_campaign({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried})
 	if OS.get_cmdline_user_args().has("--debug-carry") and Flow.carry_passenger.is_empty():     # Dev: Ausgangs-Fahrgast simulieren
 		Flow.carry_passenger = {"name": "Odo", "look": 2, "gender": "m"}
 	var nl := LevelData.load_file(Flow.level_path(next_id))

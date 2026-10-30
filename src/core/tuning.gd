@@ -125,6 +125,7 @@ const LAND_PENALTY_MAX := 0.30
 const WRONG_PAD_PEN := 0.15      # Fahrpreisabzug je Landung an falscher Plattform mit Fahrgast an Bord
 const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast an Bord
 const RIDE_PEN_MAX := 0.5
+const MISSED_FEE_FACTOR := 0.35   # Abzug für einen verpassten Pflichtfahrgast: Anteil des (unskalierten) Fahrpreises
 # Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis
 const PERFECT_VX := 12.0
 const PERFECT_TILT := 0.07

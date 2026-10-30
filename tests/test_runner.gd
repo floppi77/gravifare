@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -462,6 +462,81 @@ func _test_extras() -> void:
 		r3.step(Vector2.ZERO, true)
 	r3.respawn_after_crash()
 	check(r3.extras.is_empty(), "Absturz: Zusatzfahrgast an Bord ist verloren")
+
+func _test_missed_job() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	r.money = 100.0
+	var left := false
+	for i in 90:
+		r.step(Vector2(0, -1), true)                      # abheben: auf dem Startpad erscheint sonst kein Fahrgast
+	for i in int(30.0 / Tuning.TICK):
+		if r.actor != null and r.actor.state == PassengerActor.S.WAITING:
+			r.main_patience = 0.0
+		r.step(Vector2(0, -0.39), false)
+		for e in r.log:
+			if e.type == "extra_left":
+				left = true
+		if r.exit_open:
+			break
+	check(left and r.missed == lvl.jobs.size(), "Wartet ein Pflichtfahrgast zu lange, geht er (verpasst: %d/%d)" % [r.missed, lvl.jobs.size()])
+	check(r.delivered == 0 and r.actor == null, "Kein Ersatzfahrgast erscheint")
+	check(r.exit_open and lvl.exit_open, "Nach dem letzten Pflichtfahrgast ist der Ausgang frei, auch wenn niemand befördert wurde")
+	check(r.missed_fees > 0.0 and r.money < 100.0, "Jeder verpasste Fahrgast kostet Credits (−¢%d)" % int(r.missed_fees))
+
+func _test_wrong_pad_rules() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl)
+	var job: Dictionary = r.current_job()
+	_land_on(r, String(job.from))
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.CARRYING, "Fahrgast an Bord")
+	r._check_wrong_pad(String(job.from))
+	check(r.pen_ride == 0.0, "Nachsetzen auf dem Abholpad ist keine falsche Plattform")
+	var other := "1" if String(job.from) != "1" and String(job.to) != "1" else "2"
+	for id in ["1", "2", "3"]:
+		if id != String(job.from) and id != String(job.to):
+			other = id
+	r.log.clear()
+	r._check_wrong_pad(other)
+	check(absf(r.pen_ride - Tuning.WRONG_PAD_PEN) < 0.001 and r.log.any(func(e): return e.type == "wrong_pad"), "Landung an falscher Plattform: Fahrgast meckert, Fahrpreis sinkt")
+	# Ausgangs-Fahrgast
+	var r2 := Run.new()
+	r2.extras_enabled = false
+	r2.start(lvl)
+	r2.job_index = lvl.jobs.size() - 1
+	r2._spawn_actor(true)
+	var ej: Dictionary = r2.current_job()
+	_land_on(r2, String(ej.from))
+	for i in 240:
+		r2.step(Vector2.ZERO, true)
+	check(r2.phase == Run.Phase.CARRYING and r2.is_exit_job(ej), "Ausgangs-Fahrgast an Bord")
+	var other2 := "2" if String(ej.from) != "2" else "3"
+	r2.log.clear()
+	r2._check_wrong_pad(other2)
+	check(r2.log.any(func(e): return e.type == "wrong_pad"), "Ausgangs-Fahrgast meckert, wenn er woanders abgesetzt wird")
+
+func _test_campaign_save() -> void:
+	var sv: Node = load("res://src/core/save.gd").new()
+	sv.path = "user://test_save_campaign.json"
+	_rm(sv.path)
+	sv.set_campaign({"level": "s1_05", "lives": 3, "fuel": 60.0, "credits": 420.0, "seed": 123, "carry": {}})
+	var sv2: Node = load("res://src/core/save.gd").new()
+	sv2.path = sv.path
+	sv2.load_save()
+	var c: Dictionary = sv2.campaign()
+	check(c.get("level", "") == "s1_05" and int(c.get("lives", 0)) == 3 and float(c.get("credits", 0)) == 420.0, "Feldzug (Level, Leben, Credits) wird gespeichert und geladen")
+	sv2.clear_campaign()
+	var sv3: Node = load("res://src/core/save.gd").new()
+	sv3.path = sv.path
+	sv3.load_save()
+	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht den gespeicherten Feldzug")
+	_rm(sv.path)
 
 func _test_crash_balance() -> void:
 	var results := {}

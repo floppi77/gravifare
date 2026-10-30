@@ -166,7 +166,7 @@ func _draw_result() -> void:
 	if float(result.best) > 0.0:
 		t_line += "   " + (tr("RES_NEW_BEST") if float(result.time) < float(result.best) else tr("RES_BEST") % int(result.best))
 	draw_string(font, Vector2(0, y), t_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#c9cfee"))
-	draw_string(font, Vector2(0, y - 12), tr("RES_COSTS") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("net", 0.0))], HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#ff9a7a"))
+	draw_string(font, Vector2(0, y - 12), tr("RES_COSTS") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("missed_fees", 0.0)), int(result.get("net", 0.0))], HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#ff9a7a"))
 	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
 	for i in items.size():
 		var x := size.x * 0.5 - 150.0 + i * 100.0

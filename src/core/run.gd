@@ -64,6 +64,8 @@ var flow_rng := RandomNumberGenerator.new()
 var main_wait := 0.0               # Wartezeit des aktuellen Auftrags-Fahrgasts
 var main_patience := 60.0
 var refuel_tick := false          # in diesem Tick wurde getankt: Spritpreis bleibt dann unverändert
+var missed := 0                   # Pflichtfahrgäste, die nicht befördert wurden (Geduld abgelaufen)
+var missed_fees := 0.0
 var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
@@ -112,6 +114,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	extra_earned = 0.0
 	taxi_damage = 0.0
 	pen_ride = 0.0
+	missed = 0
+	missed_fees = 0.0
 	repair_cost = 0.0
 	taxi_fees = 0.0
 	level_time = 0.0
@@ -172,14 +176,14 @@ func _aboard_dest() -> String:
 	if not ex.is_empty():
 		return String(ex.job.to)
 	var j := current_job()
-	return "" if j.is_empty() or is_exit_job(j) else String(j.to)
+	return "" if j.is_empty() else String(j.to)       # "exit" für den Ausgangs-Fahrgast: jede Landung ist falsch
 
 ## Landung an einer falschen Plattform mit Fahrgast an Bord: Fahrgast meckert, Fahrpreis sinkt eine Stufe.
 func _check_wrong_pad(pad_id: String) -> void:
 	var a := aboard_actor()
 	var dest := _aboard_dest()
-	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel:
-		return
+	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel or pad_id == String(a.pad.id):
+		return              # Zielpad, Tankpad und das Abholpad (Nachsetzen nach dem Abheben) sind nie „falsch“
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.WRONG_PAD_PEN)
 	log.append({"type": "wrong_pad", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.WRONG_PAD_PEN * 100.0))})
 
@@ -189,6 +193,15 @@ func _ride_hit(e: Dictionary) -> void:
 		return
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
+
+## Zielplattform eines wartenden Fahrgasts ("1".."9" oder "exit"), "" wenn unbekannt.
+func dest_of(a: PassengerActor) -> String:
+	var ex := extra_of(a)
+	if not ex.is_empty():
+		return String(ex.job.to)
+	if a == actor and not current_job().is_empty():
+		return String(current_job().to)
+	return ""
 
 ## Pad, auf das Pfeil und Leuchtfeuer zeigen: erst, wenn der Fahrgast tatsächlich erscheint (nicht schon nach dem Absetzen).
 func marker_pad() -> String:
@@ -265,14 +278,40 @@ func _check_squash() -> void:
 	if body.intersects(actor.hit_rect()):
 		_squash_actor()
 
-func _squash_actor(bored := false) -> void:
+## Pflichtfahrgast hat zu lange gewartet: Er geht ohne Ersatz, der Auftrag gilt als verpasst (Abzug); nach dem letzten
+## Pflichtfahrgast – befördert oder nicht – öffnet das Tor.
+func _miss_job() -> void:
+	var old := actor
+	log.append({"type": "extra_left", "voice": old.voice_key(), "name": old.pname})
+	old.squash()
+	leavers.append(old)
+	actor = null
+	var fee := minf(snappedf(float(level.jobs[job_index].get("fare", 50)) * Tuning.MISSED_FEE_FACTOR, 1.0), money)
+	money -= fee
+	missed += 1
+	missed_fees += fee
+	log.append({"type": "job_missed", "name": old.pname, "fee": fee})
+	job_index += 1
+	job_clock = 0.0
+	respawn_keep_clock = false
+	pen_pick = 0.0
+	pen_drop = 0.0
+	pen_ride = 0.0
+	phase = Phase.WAITING
+	phase_timer = 0.0
+	if job_index >= jobs.size():
+		exit_open = true
+		level.exit_open = true
+		log.append({"type": "exit_open"})
+	else:
+		spawn_timer = flow_rng.randf_range(Tuning.NEXT_SPAWN_MIN, Tuning.NEXT_SPAWN_MAX)
+		spawn_wait = false
+
+func _squash_actor() -> void:
 	var job: Dictionary = jobs[job_index]
 	var old := actor
-	if bored:
-		log.append({"type": "extra_left", "voice": old.voice_key(), "name": old.pname})
-	else:
-		log.append({"type": "squashed", "voice": old.voice_key(), "name": old.pname})
-		squashes += 1
+	log.append({"type": "squashed", "voice": old.voice_key(), "name": old.pname})
+	squashes += 1
 	old.squash()
 	leavers.append(old)
 	actor = null
@@ -354,7 +393,7 @@ func _step_actors(dt: float) -> void:
 		if actor.state == PassengerActor.S.WAITING and phase == Phase.WAITING:
 			main_wait += dt
 			if main_wait >= main_patience and actor.can_be_hit():
-				_squash_actor(true)
+				_miss_job()
 				return
 		for e in actor.events:
 			if e.type == "arrived_home":          # sehr kurzer Weg: schon vor Ende der Aussteige-Phase im Häuschen

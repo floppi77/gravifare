@@ -61,20 +61,26 @@ func _draw_pads() -> void:
 		if shelter.size.x > 0.0:
 			draw_texture_rect(shelter_tex, shelter, false)
 			var rx := shelter.get_center().x
-			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col if (int(t * 3.0) % 2 == 0 or is_target) else col.darkened(0.6))
+			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
 		var poles: Array = [p.x0 + 2.0, p.x1 - 3.0]
 		if shelter.size.x > 0.0:
 			poles = [p.x1 - 3.0] if p.side < 0 else [p.x0 + 2.0]
+		var label: String = tr("PAD_FUEL") if p.fuel else id
 		for x in poles:
-			draw_rect(Rect2(x, y - 14, 1, 14), Color("#0c0f24"))
-			draw_rect(Rect2(x + PX, y - 14, PX * 2, 14), Color("#4a5596"))
-			var on := int(t * 3.0 + x) % 2 == 0 or is_target
-			draw_rect(Rect2(x - PX, y - 16, 1 + PX * 2, 2), col if on else col.darkened(0.6))
-		# Nummernschild
-		var lw := 14.0
-		draw_rect(Rect2(cxm - lw / 2.0, y - 15, lw, 11), Color("#0c0f24"))
-		draw_rect(Rect2(cxm - lw / 2.0 + PX * 2, y - 15 + PX * 2, lw - PX * 4, 11 - PX * 4), col.darkened(0.6))
-		draw_string(font, Vector2(cxm - lw / 2.0, y - 6.2), tr("PAD_FUEL") if p.fuel else id, HORIZONTAL_ALIGNMENT_CENTER, lw, 9, col.lightened(0.6))
+			draw_rect(Rect2(x, y - 18, 1, 18), Color("#0c0f24"))
+			draw_rect(Rect2(x + PX, y - 18, PX * 2, 18), Color("#4a5596"))
+			# Dreieckiger Wimpel mit der Plattformzahl, weht leicht und zeigt zur Padmitte
+			var dir := 1.0 if x < cxm else -1.0
+			var top := y - 19.0
+			var tip := Vector2(x + 0.5 + dir * 19.0, top + 6.5 + sin(t * 3.0 + x) * 0.9)
+			var tri := PackedVector2Array([Vector2(x + 0.5, top), Vector2(x + 0.5, top + 13.0), tip])
+			var fc := col.darkened(0.1)
+			if is_target:
+				fc = Color("#ffe14a").lerp(col, 0.5 - 0.5 * sin(t * 6.0))
+			draw_colored_polygon(tri, fc)
+			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
+			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
+			draw_string(font, Vector2(tx, top + 9.6), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 10, Color("#0c0f24"))
 		if is_target:
 			var pulse := 0.5 + 0.5 * sin(t * 6.0)
 			var c2 := Color("#ffe14a")
@@ -148,6 +154,9 @@ func _draw_actor(a: PassengerActor) -> void:
 	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	_draw_amount(a, pos)
+	var dest := run.dest_of(a)
+	if a.wave_t <= 0.0 and not a.angry and dest != "" and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
+		_draw_dest_bubble(pos, dest, a.fade)
 	if a.wave_t > 0.0 or a.angry:
 		var bx := pos.x + 4.0
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
@@ -156,6 +165,21 @@ func _draw_actor(a: PassengerActor) -> void:
 		draw_rect(Rect2(bx - 4, by - 3, 8, 8), Color("#0c0f24"))
 		draw_rect(Rect2(bx - 4 + PX * 2, by - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), bubble)
 		draw_string(Fonts.hud, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
+
+## Sprechblase mit der Zielplattform (Zahl) bzw. Pfeil nach oben für den Ausgang, nachdem das „!“ verklungen ist.
+func _draw_dest_bubble(pos: Vector2, dest: String, fade: float) -> void:
+	var bx := pos.x + 11.0
+	var by := pos.y - 17.0 - 0.6 * sin(t * 3.0)
+	var ink := Color("#0c0f24")
+	draw_colored_polygon(PackedVector2Array([Vector2(bx - 5.5, by + 3.0), Vector2(bx - 3.0, by + 4.0), Vector2(bx - 8.0, by + 8.5)]), Color(ink.r, ink.g, ink.b, fade))
+	draw_rect(Rect2(bx - 5.0, by - 5.0, 10, 10), Color(ink.r, ink.g, ink.b, fade))
+	draw_rect(Rect2(bx - 5.0 + PX * 2, by - 5.0 + PX * 2, 10 - PX * 4, 10 - PX * 4), Color(0.92, 0.95, 1.0, fade))
+	if dest == "exit":
+		var g := Color(0.1, 0.55, 0.3, fade)
+		draw_colored_polygon(PackedVector2Array([Vector2(bx, by - 3.2), Vector2(bx + 3.0, by + 0.2), Vector2(bx - 3.0, by + 0.2)]), g)
+		draw_rect(Rect2(bx - 1.0, by + 0.2, 2, 3.0), g)
+	else:
+		draw_string(Fonts.hud, Vector2(bx - 5.0, by + 3.2), dest, HORIZONTAL_ALIGNMENT_CENTER, 10, 9, Color(ink.r, ink.g, ink.b, fade))
 
 func _draw_actors() -> void:
 	for l in run.leavers:

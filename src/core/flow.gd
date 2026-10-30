@@ -34,6 +34,19 @@ func start_campaign(id: String) -> void:
 	run_seed = randi() % 1000000
 	start_level(id)
 
+## Gespeicherten Feldzug fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keiner vorhanden ist.
+func resume_campaign() -> bool:
+	var c := Save.campaign()
+	if c.is_empty() or not level_ids().has(String(c.level)):
+		return false
+	lives = clampi(int(c.get("lives", Tuning.START_LIVES)), 1, Tuning.START_LIVES)
+	entry_fuel = clampf(float(c.get("fuel", Tuning.FUEL_MAX)), Tuning.MIN_START_FUEL, Tuning.FUEL_MAX)
+	entry_credits = maxf(0.0, float(c.get("credits", 0.0)))
+	carry_passenger = c.get("carry", {}) if c.get("carry", {}) is Dictionary else {}
+	run_seed = int(c.get("seed", 0))
+	start_level(String(c.level))
+	return true
+
 func start_level(id: String) -> void:
 	current_level = id
 	get_tree().paused = false

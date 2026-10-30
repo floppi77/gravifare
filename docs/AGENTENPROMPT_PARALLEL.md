@@ -378,3 +378,7 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 - Geduld kürzer (Zusatzfahrgäste 20–34 s, Auftrags-Fahrgäste 45–70 s). Schaden früher und stärker: harmlos bis 40 px/s, Sofortzerstörung ab 150 px/s, Exponent 1,3.
 - Belohnungen: Auftrags-Fahrpreise ab Level 5 auf 22 %; Zusatzfahrgäste nötig, um im Plus zu bleiben. Spritpreise nicht mehr anfassen.
 - **Musik im C64-SID-Klang** (Pulswellen mit PWM, Dreieck, Rauschen, Arpeggien), 32 Takte je Thema, **Themenwechsel alle 5 Level** (21 Themen: Menü + t00..t19), erzeugt mit `tools/audio/gen_music_sid.py`.
+
+## L) Nachträge nach der neunten Testrunde
+- Verpasster Pflichtfahrgast: kein Ersatz, Abzug, Tor öffnet nach dem letzten Pflichtfahrgast. Falsche-Plattform-Regel: Abholpad nie falsch; Ausgangs-Fahrgast meckert.
+- Menü: „Fortsetzen“ (gespeicherter Feldzug) und „Neues Spiel“. Wimpel mit Plattformzahl statt Laterne; Sprechblase mit Zielplattform nach dem „!“.
