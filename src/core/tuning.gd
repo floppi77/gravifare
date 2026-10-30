@@ -47,11 +47,11 @@ const LAND_SOFT_VY := 22.0       # unter diesem Wert gilt die Landung als "weich
 
 # Schaden
 const HULL_MAX := 100.0
-const IMPACT_SAFE := 70.0        # Aufprall darunter: kein Schaden
-const CRASH_SPEED := 170.0       # Aufprall ab hier: Taxi sofort zerstört
+const IMPACT_SAFE := 40.0        # Aufprall darunter: kein Schaden
+const CRASH_SPEED := 150.0       # Aufprall ab hier: Taxi sofort zerstört
 const SPIKE_DAMAGE := 30.0       # Dornen: fester Zusatzschaden je Berührung, unabhängig vom Tempo
 const SPIKE_COOLDOWN := 0.5      # Sekunden, in denen dieselbe Berührung nicht erneut zählt
-const DAMAGE_EXP := 1.6          # Schaden = 100 * ((v-70)/(170-70))^1.6 (leichte Stöße harmlos, schwere teuer)
+const DAMAGE_EXP := 1.3          # Schaden = 100 * ((v-40)/(150-40))^1.3 (ab 40 px/s Schaden, schnell steigend)
 const BOUNCE := 0.35
 
 # Treibstoff (0..100)
@@ -76,6 +76,14 @@ const PUMP_TOUCH_COOLDOWN := 1.2
 const PUMP_BOOM_DELAY := 0.7
 const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
 
+# Belohnungen: Auftrags-Fahrpreise sinken ab Level 5 (Zusatzfahrgäste werden nötig, um im Plus zu bleiben)
+const FARE_SCALE_LATE := 0.22
+const FARE_SCALE_FROM := 5
+const EXTRA_FARE_FACTOR := 1.0       # Zusatzfahrgäste zahlen nach dem unskalierten Durchschnitt der Auftragspreise
+
+static func fare_scale(level_no: int) -> float:
+	return 1.0 if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
+
 # Kosten: Reparatur der Hülle am Levelende, Ersatztaxi nach Totalschaden (Credits)
 const REPAIR_COST := 2.0          # je verlorenem Hüllenpunkt des überlebenden Taxis
 const REPLACE_BASE := 80.0        # Ersatztaxi nach Zerstörung
@@ -88,8 +96,10 @@ const EXTRA_FIRST_MIN := 6.0         # Sekunden bis zum ersten Zusatzfahrgast
 const EXTRA_FIRST_MAX := 11.0
 const EXTRA_EVERY_MIN := 9.0         # Abstand zwischen zwei Zusatzfahrgästen
 const EXTRA_EVERY_MAX := 18.0
-const EXTRA_PATIENCE_MIN := 42.0     # Geduld in Sekunden
-const EXTRA_PATIENCE_MAX := 70.0
+const EXTRA_PATIENCE_MIN := 20.0     # Geduld in Sekunden
+const EXTRA_PATIENCE_MAX := 34.0
+const MAIN_PATIENCE_MIN := 45.0      # Auftrags-Fahrgäste warten länger, gehen aber auch (Ersatz-Fahrgast erscheint)
+const MAIN_PATIENCE_MAX := 70.0
 const NEXT_SPAWN_MIN := 2.5          # Pause nach dem Absetzen, bis der nächste Auftrags-Fahrgast erscheint
 const NEXT_SPAWN_MAX := 6.0
 
@@ -112,6 +122,9 @@ const PAY_MAX := 1.6             # Faktor bei sofortiger Zustellung
 const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
 const PAY_SLOPE := 0.6           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
 const LAND_PENALTY_MAX := 0.30
+const WRONG_PAD_PEN := 0.15      # Fahrpreisabzug je Landung an falscher Plattform mit Fahrgast an Bord
+const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast an Bord
+const RIDE_PEN_MAX := 0.5
 # Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis
 const PERFECT_VX := 12.0
 const PERFECT_TILT := 0.07

@@ -119,7 +119,7 @@ func load_level(path: String) -> void:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
-	Music.play_theme("s%d" % clampi(lvl.sector, 1, 9))
+	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
 	gear_on = run.sim.gear_cmd
 	world_tiles.setup(run)
@@ -437,6 +437,16 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play_voice(e.voice, "angry")
 			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 			Sfx.play("hit", -8.0)
+		"wrong_pad":
+			hud.flash_message(tr("MSG_WRONG_PAD") % e.pct, 2.4)
+			Sfx.play_voice(e.voice, "wrong_pad")
+			hud.subtitle(e.name, tr("VOICE_WRONG_PAD"), 2.2)
+		"ride_damage":
+			hud.flash_message(tr("MSG_RIDE_DAMAGE") % e.pct, 2.2)
+			if Time.get_ticks_msec() / 1000.0 >= voice_cd:
+				voice_cd = Time.get_ticks_msec() / 1000.0 + 2.5
+				Sfx.play_voice(e.voice, "bumpy")
+				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
 		"extra_appeared":
 			hud.flash_message(tr("MSG_EXTRA_NEW") % [e.name, e.pad], 2.6)
 			Sfx.play("board", -10.0)

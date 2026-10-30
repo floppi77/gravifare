@@ -61,6 +61,10 @@ var extras_delivered := 0
 var extras_missed := 0
 var extra_earned := 0.0
 var flow_rng := RandomNumberGenerator.new()
+var main_wait := 0.0               # Wartezeit des aktuellen Auftrags-Fahrgasts
+var main_patience := 60.0
+var refuel_tick := false          # in diesem Tick wurde getankt: Spritpreis bleibt dann unverändert
+var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
 var taxi_fees := 0.0              # Ersatztaxis in diesem Level
@@ -68,6 +72,9 @@ var taxi_fees := 0.0              # Ersatztaxis in diesem Level
 func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> void:
 	level = lvl
 	jobs = lvl.jobs.duplicate(true)
+	var fscale := Tuning.fare_scale(lvl.number)
+	for j in jobs:
+		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
 	sim.setup(lvl)
 	if fuel_in >= 0.0:
 		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
@@ -104,6 +111,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	extras_missed = 0
 	extra_earned = 0.0
 	taxi_damage = 0.0
+	pen_ride = 0.0
 	repair_cost = 0.0
 	taxi_fees = 0.0
 	level_time = 0.0
@@ -127,6 +135,8 @@ func _spawn_actor(instant: bool) -> void:
 		return
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
+	main_wait = 0.0
+	main_patience = flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX)
 	if not respawn_keep_clock:
 		job_clock = 0.0
 	respawn_keep_clock = false
@@ -147,6 +157,44 @@ func target_pad() -> String:
 	if phase == Phase.CARRYING or phase == Phase.DROPOFF:
 		return "" if is_exit_job(j) else String(j.to)
 	return String(j.from)
+
+## Fahrgast, der gerade im Taxi sitzt (Auftrags- oder Zusatzfahrgast), sonst null.
+func aboard_actor() -> PassengerActor:
+	var ex := _extra_aboard()
+	if not ex.is_empty() and int(ex.state) == ES.CARRY:
+		return ex.actor
+	if actor != null and phase == Phase.CARRYING:
+		return actor
+	return null
+
+func _aboard_dest() -> String:
+	var ex := _extra_aboard()
+	if not ex.is_empty():
+		return String(ex.job.to)
+	var j := current_job()
+	return "" if j.is_empty() or is_exit_job(j) else String(j.to)
+
+## Landung an einer falschen Plattform mit Fahrgast an Bord: Fahrgast meckert, Fahrpreis sinkt eine Stufe.
+func _check_wrong_pad(pad_id: String) -> void:
+	var a := aboard_actor()
+	var dest := _aboard_dest()
+	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel:
+		return
+	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.WRONG_PAD_PEN)
+	log.append({"type": "wrong_pad", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.WRONG_PAD_PEN * 100.0))})
+
+func _ride_hit(e: Dictionary) -> void:
+	var a := aboard_actor()
+	if a == null or e.get("fatal", false):
+		return
+	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
+	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
+
+## Pad, auf das Pfeil und Leuchtfeuer zeigen: erst, wenn der Fahrgast tatsächlich erscheint (nicht schon nach dem Absetzen).
+func marker_pad() -> String:
+	if _extra_aboard().is_empty() and phase == Phase.WAITING and actor == null:
+		return ""
+	return target_pad()
 
 ## Streckenzuschlag des Auftrags (länger/schwieriger = mehr Geld), aus dem Layout berechnet und zwischengespeichert.
 func job_mult(job: Dictionary) -> float:
@@ -184,11 +232,13 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		if e.type == "landed":
 			last_vy = e.vy
 			_evaluate_landing(e)
+			_check_wrong_pad(String(e.pad))
 		elif e.type == "bad_landing":
 			_break_streak()
 		elif e.type == "damage":
 			damage_taken += float(e.amount)
 			taxi_damage += float(e.amount)
+			_ride_hit(e)
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
@@ -215,14 +265,17 @@ func _check_squash() -> void:
 	if body.intersects(actor.hit_rect()):
 		_squash_actor()
 
-func _squash_actor() -> void:
+func _squash_actor(bored := false) -> void:
 	var job: Dictionary = jobs[job_index]
 	var old := actor
-	log.append({"type": "squashed", "voice": old.voice_key(), "name": old.pname})
+	if bored:
+		log.append({"type": "extra_left", "voice": old.voice_key(), "name": old.pname})
+	else:
+		log.append({"type": "squashed", "voice": old.voice_key(), "name": old.pname})
+		squashes += 1
 	old.squash()
 	leavers.append(old)
 	actor = null
-	squashes += 1
 	var n := int(job.get("squashed", 0)) + 1
 	job["squashed"] = n
 	var new_pad := _pick_new_pad(job, String(old.pad.id), n)
@@ -298,6 +351,11 @@ func _step_actors(dt: float) -> void:
 			_spawn_actor(false)
 	if actor != null:
 		actor.step(dt)
+		if actor.state == PassengerActor.S.WAITING and phase == Phase.WAITING:
+			main_wait += dt
+			if main_wait >= main_patience and actor.can_be_hit():
+				_squash_actor(true)
+				return
 		for e in actor.events:
 			if e.type == "arrived_home":          # sehr kurzer Weg: schon vor Ende der Aussteige-Phase im Häuschen
 				_pay_leaver(actor, 0.0)
@@ -319,6 +377,7 @@ func _step_actors(dt: float) -> void:
 	leavers = leavers.filter(func(l): return l.state != PassengerActor.S.GONE)
 
 func _service_pad(dt: float) -> void:
+	refuel_tick = false
 	_service_extras()
 	if sim.state != TaxiSim.State.LANDED:
 		pump_warned = false
@@ -343,9 +402,11 @@ func _service_pad(dt: float) -> void:
 		var cost := want * fuel_price()
 		if free:
 			sim.refuel(want)
+			refuel_tick = true
 		elif money >= cost:
 			money -= cost
 			sim.refuel(want)
+			refuel_tick = true
 	var job := current_job()
 	if job.is_empty():
 		return
@@ -356,6 +417,7 @@ func _service_pad(dt: float) -> void:
 				phase = Phase.BOARDING
 				phase_timer = 0.0
 				pen_pick = Tuning.landing_penalty(last_vy)
+				pen_ride = 0.0
 		Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
 				phase = Phase.CARRYING
@@ -380,7 +442,7 @@ func _service_pad(dt: float) -> void:
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
 	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "base": base_clock,
-		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "combo": streak, "job": job_index, "name": String(job.get("passenger", ""))}
+		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff) * (1.0 - pen_ride), "combo": streak, "job": job_index, "name": String(job.get("passenger", ""))}
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
 func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
@@ -416,6 +478,7 @@ func _deliver(job: Dictionary) -> void:
 	job_index += 1
 	pen_pick = 0.0
 	pen_drop = 0.0
+	pen_ride = 0.0
 	phase = Phase.WAITING
 	phase_timer = 0.0
 	if job_index >= jobs.size():
@@ -452,6 +515,7 @@ func respawn_after_crash() -> void:
 	last_vy = 0.0
 	streak = 0
 	if lost:
+		pen_ride = 0.0
 		log.append({"type": "passenger_lost", "name": actor.pname, "pad": String(current_job().get("from", ""))})
 		actor = null
 		pen_pick = 0.0
@@ -488,6 +552,9 @@ func _roll_price(old: float) -> float:
 
 func _update_prices(dt: float) -> void:
 	level_time += dt
+	if refuel_tick:                       # während des Tankens ändert sich der Preis nie: Wechsel wird verschoben
+		price_next_t += dt
+		return
 	if level_time >= price_next_t:
 		var old := price_base
 		price_base = _roll_price(old)
@@ -611,11 +678,11 @@ func _spawn_extra() -> void:
 		ident = PassengerActor.pick_identity(level.id, 100 + extra_count + k * 31, extra_count + k, "")
 	var fare_sum := 0.0
 	var fare_n := 0
-	for j in jobs:
+	for j in level.jobs:
 		if not is_exit_job(j):
 			fare_sum += float(j.get("fare", 50))
 			fare_n += 1
-	var base_fare := maxf(35.0, snappedf(fare_sum / maxf(float(fare_n), 1.0) * 0.7, 5.0))
+	var base_fare := maxf(35.0, snappedf(fare_sum / maxf(float(fare_n), 1.0) * 0.7 * Tuning.EXTRA_FARE_FACTOR, 5.0))
 	var dist: float = absf(float(level.pads[from_id].center) - float(level.pads[to_id].center)) + absf(float(level.pads[from_id].row) - float(level.pads[to_id].row)) * Tuning.TILE
 	var job := {"from": from_id, "to": to_id, "fare": base_fare, "par": snappedf(14.0 + dist / 38.0, 1.0),
 		"passenger": ident.name, "gender": ident.gender, "look": ident.look}
@@ -713,3 +780,4 @@ func _service_extras() -> void:
 		w.actor.board(sim.pos.x)
 		w.state = ES.BOARD
 		w.pen_pick = Tuning.landing_penalty(last_vy)
+		pen_ride = 0.0

@@ -1,5 +1,5 @@
 extends Node
-## Autoload "Music": Themen (menu, s1..s9) aus drei synchronen Schichten (A Basis, B Bewegung, C Spannung) über
+## Autoload "Music": Themen (menu, t00..t19; ein Thema je 5 Level, C64-SID-Klang) aus drei synchronen Schichten (A Basis, B Bewegung, C Spannung) über
 ## AudioStreamSynchronized, nahtlos geloopt. Schichten blenden weich ein/aus; Ducking für Sequenzen, Pause, Sprache.
 ## Fehlen Dateien, bleibt es still (Spiel läuft weiter).
 
@@ -16,6 +16,10 @@ func _ready() -> void:
 	player = AudioStreamPlayer.new()
 	player.bus = "Music"
 	add_child(player)
+
+## Thema für eine Levelnummer (1..99): wechselt alle 5 Level (t00 = Level 1–5 … t19 = Level 96–99).
+static func theme_for_level(level_no: int) -> String:
+	return "t%02d" % clampi((level_no - 1) / 5, 0, 19)
 
 func play_theme(theme: String) -> void:
 	if theme == current and player.playing:

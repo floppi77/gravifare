@@ -181,7 +181,7 @@ func _process(delta: float) -> void:
 	if run == null:
 		return
 	_t += delta
-	var target := run.target_pad()
+	var target := run.marker_pad()
 	for id in pad_lights:
 		var l: PointLight2D = pad_lights[id]
 		var base_col := Color("#ffa530") if level.pads[id].fuel else Color("#35e0d2")

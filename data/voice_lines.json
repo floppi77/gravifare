@@ -3,12 +3,16 @@
   "de": {
    "soft": "Wow, sanft!",
    "hard": "Aua!",
-   "bored": "Das dauert mir zu lange, tschüss!"
+   "bored": "Das dauert mir zu lange, tschüss!",
+   "wrong_pad": "Das ist die falsche Plattform!",
+   "bumpy": "Fahr doch vorsichtiger!"
   },
   "en": {
    "soft": "Wow, smooth!",
    "hard": "Ouch!",
-   "bored": "Too slow, I'm out of here!"
+   "bored": "Too slow, I'm out of here!",
+   "wrong_pad": "That's the wrong platform!",
+   "bumpy": "Careful, please!"
   }
  },
  "t0": {

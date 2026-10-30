@@ -703,6 +703,70 @@
   "en/m1_bored": {
    "text": "Too slow, I'm out of here!",
    "seconds": 1.62
+  },
+  "de/f0_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.66
+  },
+  "de/f0_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.46
+  },
+  "de/f1_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.62
+  },
+  "de/f1_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 2.54
+  },
+  "de/m0_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.14
+  },
+  "de/m0_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 2.1
+  },
+  "de/m1_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.3
+  },
+  "de/m1_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.93
+  },
+  "en/f0_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.42
+  },
+  "en/f0_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.02
+  },
+  "en/f1_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.54
+  },
+  "en/f1_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.82
+  },
+  "en/m0_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.66
+  },
+  "en/m0_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.18
+  },
+  "en/m1_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.72
+  },
+  "en/m1_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.38
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

@@ -371,3 +371,10 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 - **Zusatzfahrgäste ab Level 5** („Funkruf“): erscheinen zusätzlich, auch während das Taxi jemanden fährt (ein Sitz), mit Geduld (42–70 s, Balken über dem Betrag); wer zu lange wartet, schimpft und geht. Gleichzeitig wartend: 1 (L5–10), 2 (L11–30), 3 (ab L31). Optional, zählen nicht zum Levelziel. Pause nach dem Absetzen eines Auftrags-Fahrgasts: zufällig 2,5–6 s.
 - **HUD** zeigt „Nr/99 Levelname“.
 - **Offen (M6)**: eigenes Taskleistensymbol (Fenster-/Projektsymbol).
+
+## K) Nachträge nach der achten Testrunde
+- Pfeil und Auftragszeile für den nächsten Fahrgast erst, wenn er erscheint. Falsche Plattform und Schaden mit Fahrgast an Bord: Fahrgast meckert (Sprachzeilen `wrong_pad`, `bumpy`), Fahrpreis sinkt (−15 % bzw. −8 %, max. −50 %).
+- Spritpreis bleibt beim Tanken stehen; Tankpads in unterschiedlichen Größen, später schwerer erreichbar.
+- Geduld kürzer (Zusatzfahrgäste 20–34 s, Auftrags-Fahrgäste 45–70 s). Schaden früher und stärker: harmlos bis 40 px/s, Sofortzerstörung ab 150 px/s, Exponent 1,3.
+- Belohnungen: Auftrags-Fahrpreise ab Level 5 auf 22 %; Zusatzfahrgäste nötig, um im Plus zu bleiben. Spritpreise nicht mehr anfassen.
+- **Musik im C64-SID-Klang** (Pulswellen mit PWM, Dreieck, Rauschen, Arpeggien), 32 Takte je Thema, **Themenwechsel alle 5 Level** (21 Themen: Menü + t00..t19), erzeugt mit `tools/audio/gen_music_sid.py`.

@@ -50,7 +50,7 @@ Nach dem Tor: altes Level blendet in 2 s in den Weltraum aus, 3,6 s Flugsequenz 
 - **Ausgangs-Fahrgast**: letzter Auftrag jedes Levels; das Tor öffnet, sobald er an Bord ist; er steigt im nächsten Level auf der Startplattform aus und wird **erst dort, bei Ankunft in seinem Häuschen, bezahlt** (die Zahlungsinfo fährt mit).
 - **Absturz setzt das Level nicht zurück**: Zerstörtes Taxi = −1 Leben, aber Erledigtes bleibt erledigt. Der Fahrgast an Bord ist verloren (kein Geld) und **derselbe Fahrgast** wartet erneut an seinem Abholpad; das Tor schließt sich wieder, bis er eingesammelt ist. Neues Taxi am Startpad mit Rest-Sprit, mindestens 35 %. Nur der freiwillige Neustart (R/Menü) startet das Level komplett neu.
 - **Fahrgast-Spawn**: nie auf dem Pad, auf dem das Taxi steht (Levelregel + Laufzeitschutz).
-- **Absturz-Balance**: Aufprall bis 70 px/s harmlos, darüber Schaden = 100·((v−70)/100)^1,6, ab 170 px/s sofort zerstört. Mit ausgefahrenem Fahrwerk (Feinmodus) ist die Geschwindigkeit auf 90 px/s begrenzt – Sturzflüge gehen nur mit eingefahrenem Fahrwerk.
+- **Absturz-Balance**: Aufprall bis 40 px/s harmlos, darüber Schaden = 100·((v−40)/110)^1,3 (60 px/s ≈ 11 %, 100 px/s ≈ 46 %), ab 150 px/s sofort zerstört. Mit ausgefahrenem Fahrwerk (Feinmodus) ist die Geschwindigkeit auf 90 px/s begrenzt – Sturzflüge gehen nur mit eingefahrenem Fahrwerk.
 
 ## Fahrpreis-Anzeige und Streckenzuschlag
 - Der Betrag steht **dauerhaft über dem Fahrgast**: vom Erscheinen bis zum Einsteigen (tickt mit dem Zeitfaktor herunter) und vom Aussteigen bis zum Häuschen (tickt weiter, die Gehzeit zählt **2,5-fach**). Im HUD steht Zeitfaktor und aktueller Betrag („×1,50  ¢63“).
@@ -70,7 +70,7 @@ Nach dem Tor: altes Level blendet in 2 s in den Weltraum aus, 3,6 s Flugsequenz 
 - **Schriften** (alle OFL): Jersey 10 (Titel), Oxanium (HUD/Menüs), Nunito (Untertitel/Fließtext); `Fonts`-Autoload mit Rückfall auf die Standardschrift.
 - **Menü-Politur**: schimmernder Titel, gleitende Menüeinträge, Credits-Abspann mit scrollendem Text.
 - **Mehr Sprache**: Fahrgast an Bord kommentiert Landungen („Wow, sanft!“ / „Aua!“), **Tankwart** (eigene Stimme) schimpft bei Berührungen der Säule (3 Stufen) und kommentiert Preiswechsel, die **Zentrale** (Funkfilter) meldet sich in der Weltraumsequenz (Sektor-Intro beim ersten Level eines Sektors, sonst allgemeine Zeilen als dezente Story). Texte stehen in `data/voice_lines.json` (Quelle für Generator und Untertitel).
-- **Musik**: 10 Themen (Menü + je Sektor), je 3 synchrone Schichten über `AudioStreamSynchronized`: A Basis (Pad + Bass), B Bewegung (Arpeggio/Lead; bei Fahrgast an Bord, offenem Tor oder Tempo), C Spannung (Drums/Riser; bei wenig Sprit, Schaden, Beinahe-Treffer). Ducking in Sequenzen, Pause und während Sprache. Eigene Synthese, 12 Takte, nahtlos loopbar.
+- **Musik** (C64-SID-Klang): 21 Themen (Menü + t00..t19, **ein Thema je 5 Level**), je 3 synchrone Schichten über `AudioStreamSynchronized`: A Basis (Bass + schnelles Akkord-Arpeggio), B Bewegung (Melodie mit PWM/Vibrato und SID-Echo + Gegenstimme; bei Fahrgast an Bord, offenem Tor oder Tempo), C Spannung (Dreieck-/Rauschen-Schlagzeug; bei wenig Sprit, Schaden, Beinahe-Treffer). Ducking in Sequenzen, Pause und während Sprache. Eigene Synthese (`tools/audio/gen_music_sid.py`: Pulswellen mit PWM, Dreieck, Säge, Rauschen), **32 Takte** (A, A-Variation, B, A mit Schluss, ~55–77 s), mono, nahtlos loopbar.
 
 ## Abschluss Vertical Slice (M2)
 - **Optionen** als Kategorien: Ton (Musik/Effekte/Stimmen/Untertitel), Steuerung (Belegung, Deadzone, Vibration, Fahrwerk Umschalten/Halten), Anzeige (Vollbild, V-Sync, **FPS-Limit** 30/60/120/144/240/unbegrenzt, FPS-Anzeige, Weniger Bewegung), Spiel (Sprache, Tutorial-Hinweise).
@@ -114,3 +114,11 @@ Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung fes
 - **Pause nach dem Absetzen**: Der nächste Auftrags-Fahrgast erscheint nach zufälligen 2,5–6 s (nicht sofort, nicht ewig).
 - **Kosten**: Sprit 2,0–4,2 ¢/Einheit × (1 + 0,03·(Level−1)); Reparatur 2 ¢ je verlorenem Hüllenpunkt am Levelende; Ersatztaxi 80 ¢ + 2 ¢·Level je Totalschaden. Credits fallen nie unter 0; unter 35 % Tank bleibt das Tanken kostenlos (keine Sackgasse).
 - **Backlog**: eigenes Taskleistensymbol (M6).
+
+## Rückmeldungen Runde 8: Abzüge, Geduld, Belohnungen
+- **Pfeil/Leuchtfeuer und Auftragszeile** erscheinen erst, wenn der Fahrgast tatsächlich da ist (`Run.marker_pad`); bis dahin „Warte auf den nächsten Fahrgast …“.
+- **Falsche Plattform** (Landung mit Fahrgast an Bord an einem anderen Passagierpad als dem Ziel): der Fahrgast meckert (Sprachzeile, Untertitel), Fahrpreis −15 % je Landung. **Schaden mit Fahrgast an Bord**: −8 % je Treffer, er meckert. Beide Abzüge (`Run.pen_ride`, höchstens −50 %) wirken wie die Landeabzüge auf die Auszahlung; Tanken am Tankpad zählt nicht als falsche Plattform.
+- **Spritpreis ist beim Tanken eingefroren**: Während Sprit fließt, wird ein fälliger Preiswechsel verschoben.
+- **Tankpads** haben unterschiedliche Größen (5–8 Tiles, Test: mindestens vier verschiedene Breiten); in späteren Leveln liegen sie schwerer zugänglich (Zapfen darüber in S1-11; weitere Ausbaustufen mit den Sektoren). Untergrenze des freien Landefensters bleibt 28 px.
+- **Geduld**: Zusatzfahrgäste 20–34 s, Auftrags-Fahrgäste 45–70 s; danach schimpfen sie und gehen (Auftrags-Fahrgast wird durch Ersatz an anderem Pad ersetzt, zählt nicht als „Fahrgast getroffen“).
+- **Belohnungen**: Auftrags-Fahrpreise werden ab Level 5 auf 22 % gesenkt (`Tuning.fare_scale`, Level-Daten unverändert), Zusatzfahrgäste zahlen nach dem unskalierten Durchschnitt – ohne Zusatzfahrten bleibt man ab Level 5 etwa auf null, mit ihnen im Plus. Spritpreise unverändert.

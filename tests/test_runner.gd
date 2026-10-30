@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -465,23 +465,23 @@ func _test_extras() -> void:
 
 func _test_crash_balance() -> void:
 	var results := {}
-	for v in [60.0, 80.0, 100.0, 130.0, 160.0, 169.0, 171.0, 240.0]:
+	for v in [35.0, 60.0, 80.0, 100.0, 130.0, 149.0, 151.0, 240.0]:
 		var s := TaxiSim.new()
 		s.setup(_lvl())
 		s._impact(v)
 		results[v] = s
-	check(results[60.0].hull == 100.0, "Aufprall 60 px/s: kein Schaden")
-	check(results[80.0].hull > 95.0 and results[80.0].hull < 100.0, "Aufprall 80 px/s: leichter Schaden (%.1f Hülle)" % results[80.0].hull)
+	check(results[35.0].hull == 100.0, "Aufprall 35 px/s: kein Schaden")
+	check(results[60.0].hull > 80.0 and results[60.0].hull < 100.0, "Aufprall 60 px/s: bereits spürbarer Schaden (%.1f Hülle)" % results[60.0].hull)
 	var prev := 101.0
 	var mono := true
-	for v in [80.0, 100.0, 130.0, 160.0, 169.0]:
+	for v in [60.0, 80.0, 100.0, 130.0, 149.0]:
 		if results[v].hull >= prev:
 			mono = false
 		prev = results[v].hull
 	check(mono, "Schaden steigt mit der Geschwindigkeit streng an")
-	check(results[130.0].hull < 70.0 and results[130.0].state != TaxiSim.State.DESTROYED, "130 px/s: schwerer Schaden, aber nicht zerstört (%.0f)" % results[130.0].hull)
-	check(results[169.0].hull > 0.0 or results[169.0].state == TaxiSim.State.DESTROYED, "169 px/s: knapp unter der Sofortgrenze")
-	check(results[171.0].state == TaxiSim.State.DESTROYED and results[171.0].events.any(func(e): return e.type == "destroyed" and e.get("instant", false)), "171 px/s: sofort zerstört")
+	check(results[100.0].hull < 60.0 and results[130.0].hull < 40.0 and results[130.0].state != TaxiSim.State.DESTROYED, "100 px/s: über 40 %% Schaden, 130 px/s: schwer, nicht zerstört (%.0f / %.0f)" % [results[100.0].hull, results[130.0].hull])
+	check(results[149.0].hull > 0.0 or results[149.0].state == TaxiSim.State.DESTROYED, "149 px/s: knapp unter der Sofortgrenze")
+	check(results[151.0].state == TaxiSim.State.DESTROYED and results[151.0].events.any(func(e): return e.type == "destroyed" and e.get("instant", false)), "151 px/s: sofort zerstört")
 	check(results[240.0].state == TaxiSim.State.DESTROYED, "240 px/s (Höchstgeschwindigkeit): sofort zerstört")
 
 func _test_payout_and_penalty() -> void:
@@ -921,6 +921,17 @@ func _test_pump_touch_and_explosion() -> void:
 	var gained := r2.sim.fuel - 60.0
 	check(gained > 5.0 and absf((money_before - r2.money) - gained * r2.fuel_price()) < 0.05, "Tanken kostet Menge × aktueller Preis (%.1f Einheiten für ¢%.2f)" % [gained, money_before - r2.money])
 
+func _test_fuel_pad_variety() -> void:
+	var widths := {}
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		if lvl.pads.has("F"):
+			widths[int((lvl.pads["F"].x1 - lvl.pads["F"].x0) / Tuning.TILE)] = true
+	check(widths.size() >= 4, "Tankpads sind unterschiedlich groß (%s Tiles)" % str(widths.keys()))
+
 func _test_pump_level_rules() -> void:
 	var dir := DirAccess.open("res://data/levels")
 	for f in dir.get_files():
@@ -993,7 +1004,9 @@ func _test_streak_bonus() -> void:
 	check(not ev.is_empty() and ev.has("vx") and ev.has("tilt"), "Landeereignis enthält Seitengeschwindigkeit und Neigung")
 
 func _test_music_assets() -> void:
-	var themes := ["menu", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"]
+	var themes := ["menu"]
+	for i in 20:
+		themes.append("t%02d" % i)
 	var ok_all := true
 	var lens_ok := true
 	for th in themes:
@@ -1006,10 +1019,12 @@ func _test_music_assets() -> void:
 			var stream: AudioStream = load(path)
 			lens.append(stream.get_length())
 		if lens.size() == 3:
-			if absf(lens[0] - lens[1]) > 0.06 or absf(lens[0] - lens[2]) > 0.06 or lens[0] < 15.0:
+			if absf(lens[0] - lens[1]) > 0.06 or absf(lens[0] - lens[2]) > 0.06 or lens[0] < 45.0:
 				lens_ok = false
-	check(ok_all, "Alle 10 Musikthemen haben drei Schichten (A/B/C)")
-	check(lens_ok, "Schichten eines Themas sind gleich lang (synchron loopbar, ≥ 15 s)")
+	check(ok_all, "Alle 21 Musikthemen (Menü + 20 Level-Themen) haben drei Schichten (A/B/C)")
+	var mus = load("res://src/core/music.gd")
+	check(mus.theme_for_level(1) == "t00" and mus.theme_for_level(5) == "t00" and mus.theme_for_level(6) == "t01" and mus.theme_for_level(99) == "t19", "Thema wechselt alle 5 Level")
+	check(lens_ok, "Schichten eines Themas sind gleich lang (synchron loopbar, ≥ 45 s)")
 
 func _test_cosmetics_data() -> void:
 	var f := FileAccess.open("res://data/cosmetics.json", FileAccess.READ)

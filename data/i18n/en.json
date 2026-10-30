@@ -167,5 +167,10 @@
  "VOICE_BORED": "Too slow, I'm out of here!",
  "MSG_EXTRA_NEW": "Radio call: %s waits at platform %s",
  "MSG_EXTRA_LEFT": "%s waited too long and left",
- "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds"
+ "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds",
+ "HUD_WAIT_CALL": "Waiting for the next passenger …",
+ "MSG_WRONG_PAD": "Wrong platform! Fare −%d%%",
+ "MSG_RIDE_DAMAGE": "Bumpy ride! Fare −%d%%",
+ "VOICE_WRONG_PAD": "That's the wrong platform!",
+ "VOICE_BUMPY": "Careful, please!"
 }

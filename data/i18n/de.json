@@ -167,5 +167,10 @@
  "VOICE_BORED": "Das dauert mir zu lange, tschüss!",
  "MSG_EXTRA_NEW": "Funkruf: %s wartet an Plattform %s",
  "MSG_EXTRA_LEFT": "%s hat zu lange gewartet und ist gegangen",
- "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds"
+ "HUD_EXTRA": "%s  %s→%s  ¢%d  %ds",
+ "HUD_WAIT_CALL": "Warte auf den nächsten Fahrgast …",
+ "MSG_WRONG_PAD": "Falsche Plattform! Fahrpreis −%d %%",
+ "MSG_RIDE_DAMAGE": "Unsanfte Fahrt! Fahrpreis −%d %%",
+ "VOICE_WRONG_PAD": "Das ist die falsche Plattform!",
+ "VOICE_BUMPY": "Fahr doch vorsichtiger!"
 }

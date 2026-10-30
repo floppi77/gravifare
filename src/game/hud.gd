@@ -88,8 +88,10 @@ func _draw() -> void:
 			txt = tr("HUD_TO_EXIT") % who
 		elif run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF:
 			txt = tr("HUD_DELIVER") % [who, run.target_pad()]
-		else:
+		elif run.actor != null:
 			txt = tr("HUD_PICKUP") % [who, run.target_pad()]
+		else:
+			txt = tr("HUD_WAIT_CALL")
 	if txt != "":
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color(0.05, 0.06, 0.15, 0.8))
 		draw_rect(Rect2(size.x * 0.5 - 170, size.y - 30, 340, 15), Color("#3a4580"), false, 0.67)

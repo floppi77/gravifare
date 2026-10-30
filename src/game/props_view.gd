@@ -49,7 +49,7 @@ func _draw() -> void:
 
 func _draw_pads() -> void:
 	var font := Fonts.hud
-	var target := run.target_pad()
+	var target := run.marker_pad()
 	for id in level.pads:
 		var p: Dictionary = level.pads[id]
 		var cxm: float = p.center

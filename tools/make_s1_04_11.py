@@ -30,7 +30,7 @@ g = Grid()
 g.rect("#", 1, 20, 38, 20)
 g.pad("1", 2, 8, 19)                                         # Startpad unten links
 g.rect("#", 12, 16, 19, 19); g.pad("2", 13, 17, 15)          # Absatz 1 (5 Tiles)
-g.rect("P", 20, 17, 20, 18); g.pad("F", 20, 25, 19)          # Tankpad am Boden (Zapfsäule am linken Ende)
+g.rect("P", 20, 17, 20, 18); g.pad("F", 20, 27, 19)          # Tankpad am Boden, 8 Tiles (Zapfsäule am linken Ende)
 g.rect("#", 28, 12, 33, 19); g.pad("3", 28, 32, 11)          # Absatz 2 (5 Tiles)
 g.rect("#", 1, 9, 9, 10); g.pad("4", 2, 6, 8)                # Ablage oben links (5 Tiles)
 g.rect("#", 25, 1, 28, 7)                                    # hängender Zapfen: Engstelle über Pad 3
@@ -48,7 +48,7 @@ make("S1-04", 4, "Terrassen", "Terraces", g, [
 g = Grid()
 g.rect("#", 1, 20, 38, 20)
 g.rect("#", 1, 10, 8, 19); g.pad("1", 2, 7, 9)               # Block links, Startpad oben
-g.rect("#", 14, 12, 25, 19); g.pad("F", 15, 20, 11); g.rect("P", 15, 9, 15, 10)
+g.rect("#", 14, 12, 25, 19); g.pad("F", 15, 21, 11); g.rect("P", 15, 9, 15, 10)      # Tankpad 7 Tiles
 g.rect("3", 9, 19, 13, 19)                                   # Pad 3 am Grund Schacht 1
 g.rect("2", 26, 19, 30, 19)                                  # Pad 2 am Grund Schacht 2
 g.rect("#", 31, 9, 38, 19); g.pad("4", 32, 37, 8)            # Block rechts, Pad 4 oben
@@ -65,8 +65,8 @@ make("S1-05", 5, "Doppelschacht", "Twin Shafts", g, [
 # ---- S1-06 Tankwart: Tankpad auf Mittelsäule; Querfahrten fressen Sprit, Tanken wird Pflicht
 g = Grid()
 g.rect("#", 1, 20, 38, 20)
-g.rect("#", 16, 12, 23, 19); g.pad("F", 17, 22, 11)          # Mittelsäule mit Tankpad
-g.rect("P", 17, 9, 17, 10)
+g.rect("#", 16, 12, 23, 19); g.pad("F", 16, 23, 11)          # Mittelsäule mit Tankpad, 8 Tiles
+g.rect("P", 16, 9, 16, 10)
 g.rect("#", 28, 9, 38, 10); g.pad("4", 32, 37, 8)            # Überhang rechts oben mit Pad 4
 g.pad("1", 30, 36, 19)                                       # Startpad unten rechts, unter dem Überhang
 g.rect("#", 1, 12, 8, 19); g.pad("2", 2, 7, 11)              # Block links mit Pad 2
@@ -85,7 +85,7 @@ make("S1-06", 6, "Tankwart", "Fuel Master", g, [
 g = Grid()
 g.rect("#", 1, 20, 38, 20)
 g.pad("1", 2, 8, 19)
-g.rect("#", 1, 12, 9, 13); g.pad("F", 3, 8, 11); g.rect("P", 3, 9, 3, 10)   # Tankablage links
+g.rect("#", 1, 12, 9, 13); g.pad("F", 3, 7, 11); g.rect("P", 3, 9, 3, 10)   # Tankablage links, 5 Tiles
 g.rect("#", 1, 6, 9, 7); g.pad("4", 2, 8, 5)                # Ablage oben links
 g.rect("#", 13, 14, 16, 19); g.rect("^", 13, 13, 16, 13)    # Dornenpfeiler
 g.rect("#", 19, 17, 26, 19); g.pad("2", 20, 25, 16)
@@ -170,6 +170,7 @@ g.rect("#", 9, 14, 13, 19)                                   # Tunnelboden: Tunn
 g.pad("1", 2, 7, 19)
 g.rect("#", 14, 15, 19, 19); g.pad("2", 14, 18, 14)          # Pad 2 bündig am Tunnelausgang
 g.rect("#", 22, 15, 27, 19); g.pad("F", 22, 26, 14); g.rect("P", 22, 12, 22, 13)
+g.rect("#", 23, 1, 25, 8)                                    # Zapfen über dem Tankpad: schwer zugänglich
 g.rect("#", 30, 8, 38, 9); g.pad("3", 31, 36, 7)             # Ablage rechts oben
 g.pad("4", 31, 37, 19)                                       # Pad 4 unten rechts unter der Ablage
 g.rect("^", 28, 19, 29, 19)                                  # Dornen vor Pad 4
