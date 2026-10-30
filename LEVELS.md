@@ -1,10 +1,10 @@
 # LEVELS – Leveldesign-Matrix
 
-Status: **1 von 99 Leveln vorhanden.** Die Zeilen der übrigen Level werden beim Bau des jeweiligen Sektors ausgefüllt; keine Platzhalter-Level.
+Status: **3 von 99 Leveln vorhanden** (S1-01 bis S1-03). Kontaktbogen-Bilder: `docs/levels/`. Die Zeilen der übrigen Level werden beim Bau des jeweiligen Sektors ausgefüllt; keine Platzhalter-Level.
 
 | Sektor | Level | Schwerpunkt | Status |
 |---|---|---|---|
-| 1 Sternenhafen | 01–11 | Schub, Trägheit, Landung, Tanken, engere Wege | 01 gebaut |
+| 1 Sternenhafen | 01–11 | Schub, Trägheit, Landung, Tanken, engere Wege | 01–03 gebaut |
 | 2 Neon-Schluchten | 12–22 | Schächte, Engstellen, bewegliche Tore | offen |
 | 3 Schrottgürtel | 23–33 | Trümmer, bewegliche Plattformen | offen |
 | 4 Magnetfeld | 34–44 | anziehende/abstoßende Zonen | offen |
@@ -18,3 +18,5 @@ Status: **1 von 99 Leveln vorhanden.** Die Zeilen der übrigen Level werden beim
 | ID | Name | Neue Mechanik | Fahrgäste | Gefahren | Tank | Erwartete Schwierigkeit | Teststatus Bot | Spielerische Abnahme |
 |---|---|---|---|---|---|---|---|---|
 | S1-01 | Erster Flug | Schub, Landen, Tanken, Ausgang | 2 Fahrten | keine (Hängepfeiler) | 1 | sehr leicht | bestanden (27 s, Hülle 100 %) | **offen** |
+| S1-02 | Tankstopp | Tankpad nötig (Start 45 %), mehrere Ebenen | 3 Fahrten | Säule, hängender Block | 1 | leicht | bestanden (44 s, Hülle 100 %) | **offen** |
+| S1-03 | Der Schornstein | Anflug in 5 Tiles breiten Schacht | 2 Fahrten | Schacht | 1 | leicht–mittel | bestanden (29 s, Hülle 100 %) | **offen** |

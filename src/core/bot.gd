@@ -7,6 +7,8 @@ extends RefCounted
 const MARGIN := 7.0                # zusätzlicher Sicherheitsabstand um die Hülle (px)
 const V_MAX := 85.0
 const LOOKAHEAD_V := 55.0
+const REFUEL_BELOW := 30.0
+const REFUEL_GOAL := 70.0
 
 var run: Run
 var level: LevelData
@@ -112,16 +114,18 @@ func _accel_to_input(a_des: Vector2) -> Vector2:
 func decide() -> Array:
 	var sim := run.sim
 	var tgt_pad_id := run.target_pad()
+	var refuel_trip := level.pads.has("F") and sim.fuel < REFUEL_BELOW and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
+	if refuel_trip:
+		tgt_pad_id = "F"
 	var heading_exit := tgt_pad_id == "" and run.exit_open
 	var key := "exit" if heading_exit else ("pad" + tgt_pad_id + ":" + str(run.phase) + ":" + str(run.job_index))
 	if sim.state == TaxiSim.State.LANDED:
-		# Stehen bleiben, solange Ein-/Aussteigen läuft oder noch getankt werden soll
-		var on_target: bool = sim.landed_pad.id == tgt_pad_id
+		var pad_id: String = sim.landed_pad.id
 		var boarding := run.phase == Run.Phase.BOARDING or run.phase == Run.Phase.DROPOFF
-		if boarding or (on_target and (run.phase == Run.Phase.WAITING or run.phase == Run.Phase.CARRYING)):
-			return [Vector2.ZERO, true]
-		var want_fuel: bool = sim.landed_pad.fuel and sim.fuel < 60.0 and run.money > 5.0
-		if want_fuel:
+		var can_refuel: bool = sim.fuel < Tuning.EMERGENCY_FUEL or run.money > 5.0
+		var refuelling: bool = pad_id == "F" and sim.fuel < REFUEL_GOAL and can_refuel
+		var serving: bool = pad_id == run.target_pad() and (run.phase == Run.Phase.WAITING or run.phase == Run.Phase.CARRYING)
+		if boarding or refuelling or (serving and not refuel_trip):
 			return [Vector2.ZERO, true]
 		landing = false
 		goal_key = ""   # neu planen
