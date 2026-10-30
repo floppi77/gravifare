@@ -2,7 +2,7 @@ extends Node
 ## Autoload "Save": Kampagnenfortschritt in user://save.json. Atomar geschrieben (tmp + rename),
 ## bei defekter Datei wird sie als .bad gesichert und ein leerer Stand verwendet.
 
-const PATH := "user://save.json"
+var path := "user://save.json"
 ## Dev-/Testläufe (Autopilot, Debug-Flags) dürfen den echten Speicherstand nie verändern.
 var dev_session := false
 var data := {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none", "challenge": false}}
@@ -14,9 +14,9 @@ func _ready() -> void:
 	load_save()
 
 func load_save() -> void:
-	if not FileAccess.file_exists(PATH):
+	if not FileAccess.file_exists(path):
 		return
-	var f := FileAccess.open(PATH, FileAccess.READ)
+	var f := FileAccess.open(path, FileAccess.READ)
 	var parsed = JSON.parse_string(f.get_as_text()) if f != null else null
 	if typeof(parsed) == TYPE_DICTIONARY and parsed.get("completed") is Dictionary:
 		data = parsed
@@ -27,28 +27,41 @@ func load_save() -> void:
 		if not data.has("cosmetics"):
 			data["cosmetics"] = {"paint": "std", "sticker": "none", "challenge": false}
 	else:
-		DirAccess.rename_absolute(PATH, PATH + ".bad")
+		DirAccess.rename_absolute(path, path + ".bad")
 		push_warning("Speicherstand defekt – gesichert als save.json.bad")
 
 func write() -> void:
 	if dev_session:
 		return
-	var tmp := PATH + ".tmp"
+	var tmp := path + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		push_warning("Speicherstand nicht schreibbar")
 		return
 	f.store_string(JSON.stringify(data, "\t"))
 	f.close()
-	DirAccess.rename_absolute(tmp, PATH)
+	DirAccess.rename_absolute(tmp, path)
 
 func is_completed(id: String) -> bool:
 	return data.completed.has(id)
 
-func complete_level(id: String, time: float, money: float, earned := 0.0) -> void:
+func best_time(id: String) -> float:
+	return float(data.completed.get(id, {}).get("time", -1.0)) if data.completed.has(id) else -1.0
+
+func medals_of(id: String) -> Dictionary:
+	return data.completed.get(id, {}).get("medals", {"time": false, "clean": false, "pro": false})
+
+func add_playtime(seconds: float) -> void:
+	data.stats["play_seconds"] = float(data.stats.get("play_seconds", 0.0)) + seconds
+
+func complete_level(id: String, time: float, money: float, earned := 0.0, medals := {}) -> void:
 	var prev: Dictionary = data.completed.get(id, {})
 	var best_time: float = minf(prev.get("time", 1e9), time)
-	data.completed[id] = {"time": best_time, "money": maxf(prev.get("money", 0.0), money)}
+	var old_m: Dictionary = prev.get("medals", {})
+	var merged := {"time": bool(old_m.get("time", false)) or bool(medals.get("time", false)),
+		"clean": bool(old_m.get("clean", false)) or bool(medals.get("clean", false)),
+		"pro": bool(old_m.get("pro", false)) or bool(medals.get("pro", false))}
+	data.completed[id] = {"time": best_time, "money": maxf(prev.get("money", 0.0), money), "medals": merged}
 	data.stats["credits_total"] = int(data.stats.get("credits_total", 0)) + int(earned)
 	write()
 

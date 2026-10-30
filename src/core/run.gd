@@ -32,6 +32,8 @@ var pen_pick := 0.0         # Abzug durch harte Landung beim Abholen
 var pen_drop := 0.0         # Abzug durch harte Landung am Ziel
 var last_vy := 0.0
 var streak := 0               # perfekte Landungen in Folge
+var damage_taken := 0.0       # Hüllenschaden im Level (für die Medaille „Sauber“)
+var respawns := 0             # verlorene Leben im Level
 var best_streak := 0
 var perfect_count := 0
 var log: Array = []         # Ereignisse des letzten Ticks: {type, ...}
@@ -77,6 +79,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	streak = 0
 	best_streak = 0
 	perfect_count = 0
+	damage_taken = 0.0
+	respawns = 0
 	leavers.clear()
 	carried = {}
 	spawn_timer = 0.0
@@ -158,6 +162,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			_evaluate_landing(e)
 		elif e.type == "bad_landing":
 			_break_streak()
+		elif e.type == "damage":
+			damage_taken += float(e.amount)
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
@@ -394,6 +400,7 @@ func _deliver(job: Dictionary) -> void:
 func respawn_after_crash() -> void:
 	var fuel_keep := clampf(maxf(sim.fuel, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
 	var lost: bool = actor != null and (phase == Phase.CARRYING or phase == Phase.DROPOFF)
+	respawns += 1
 	sim.setup(level)
 	sim.fuel = fuel_keep
 	result = Result.RUNNING
@@ -460,3 +467,28 @@ func _check_pump(dt: float) -> void:
 			if pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK:
 				pump_boom_t = Tuning.PUMP_BOOM_DELAY
 			return
+
+# ---------------------------------------------------------------- Medaillen (je Level, dauerhaft gespeichert)
+## Zielwerte: Zeit = 1,2 × Summe der Richtzeiten + 10 s; Einkommen = Summe der Fahrpreise (mit Streckenzuschlag) der
+## normalen Aufträge (ohne Ausgangs-Fahrgast, der erst im nächsten Level bezahlt wird).
+func time_target() -> float:
+	var sum_par := 0.0
+	for j in jobs:
+		sum_par += par_of(j)
+	return sum_par * 1.2 + 10.0
+
+func money_target() -> float:
+	var sum := 0.0
+	for j in jobs:
+		if not is_exit_job(j):
+			sum += float(j.get("fare", 50)) * job_mult(j)
+	return sum
+
+## ⏱ Zeit: im Zeitziel · ♥ Sauber: kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Hüllenschaden ·
+## ★ Meister: ≥ 110 % des Einkommensziels und mindestens Serie 2.
+func medals() -> Dictionary:
+	return {
+		"time": level_time <= time_target(),
+		"clean": respawns == 0 and squashes == 0 and pump_touches == 0 and damage_taken <= 10.0,
+		"pro": earned >= money_target() * 1.1 and best_streak >= 2,
+	}

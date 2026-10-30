@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -893,3 +893,161 @@ func _test_voice_lines_complete() -> void:
 					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, key]):
 						missing.append("%s/%s_%s" % [lang, v, key])
 	check(missing.is_empty() and total > 50, "Alle %d Sondersprachzeilen (Tankwart, Zentrale, Passagier-Reaktionen) haben Text und Clip %s" % [total, str(missing.slice(0, 4))])
+
+func _key(code: int) -> InputEventKey:
+	var e := InputEventKey.new()
+	e.physical_keycode = code
+	return e
+
+func _test_controls_remap() -> void:
+	var c: Node = load("res://src/core/controls.gd").new()
+	c.path = "user://test_controls.cfg"
+	if FileAccess.file_exists(c.path):
+		DirAccess.remove_absolute(c.path)
+	c._ready()
+	var all_ok := true
+	for a in c.REMAPPABLE:
+		if c.events_of(a, "kb").is_empty() or c.events_of(a, "pad").is_empty():
+			all_ok = false
+	check(all_ok, "Alle belegbaren Aktionen haben Standard-Tasten und Gamepad-Belegung")
+	check(InputMap.event_is_action(_key(KEY_W), "thrust_up") and InputMap.event_is_action(_key(KEY_SPACE), "gear") and InputMap.event_is_action(_key(KEY_ESCAPE), "pause"), "Standard: W = Schub hoch, Leertaste = Fahrwerk, Esc = Pause")
+	# Umbelegen
+	var swapped: String = c.set_slot("thrust_up", "kb", 0, _key(KEY_I))
+	check(swapped == "" and InputMap.event_is_action(_key(KEY_I), "thrust_up") and not InputMap.event_is_action(_key(KEY_W), "thrust_up"), "Umbelegen: I ersetzt W für Schub hoch")
+	check(InputMap.event_is_action(_key(KEY_UP), "thrust_up"), "Zweite Belegung (Pfeil hoch) bleibt erhalten")
+	# Konflikt: R gehört dem Neustart -> Tausch
+	swapped = c.set_slot("gear", "kb", 0, _key(KEY_R))
+	check(swapped == "restart" and InputMap.event_is_action(_key(KEY_R), "gear") and InputMap.event_is_action(_key(KEY_SPACE), "restart") and not InputMap.event_is_action(_key(KEY_R), "restart"), "Konflikt: Doppelte Belegung wird getauscht (Fahrwerk=R, Neustart=Leertaste)")
+	# Gamepad: Stickachse und Knopf
+	var ax := InputEventJoypadMotion.new()
+	ax.axis = JOY_AXIS_RIGHT_X
+	ax.axis_value = -1.0
+	c.set_slot("thrust_left", "pad", 0, ax)
+	var probe := InputEventJoypadMotion.new()
+	probe.axis = JOY_AXIS_RIGHT_X
+	probe.axis_value = -0.9
+	check(InputMap.event_is_action(probe, "thrust_left"), "Gamepad: rechte Stick-Richtung für Schub links belegbar")
+	var btn := InputEventJoypadButton.new()
+	btn.button_index = JOY_BUTTON_X
+	c.set_slot("gear", "pad", 0, btn)
+	var probe_b := InputEventJoypadButton.new()
+	probe_b.button_index = JOY_BUTTON_X
+	check(InputMap.event_is_action(probe_b, "gear"), "Gamepad: X für Fahrwerk belegbar")
+	# Pause und Menüs bleiben fest
+	check(InputMap.event_is_action(_key(KEY_ESCAPE), "pause") and c.REMAPPABLE.find("pause") == -1, "Pause (Esc/Start) ist nicht belegbar und bleibt erreichbar")
+	# Speichern und Laden
+	c.apply_defaults()
+	c.set_slot("thrust_down", "kb", 0, _key(KEY_K))
+	check(FileAccess.file_exists(c.path), "Belegung wird gespeichert")
+	c.apply_defaults()
+	check(InputMap.event_is_action(_key(KEY_S), "thrust_down"), "Zwischenzustand: Standard wiederhergestellt")
+	c.load_bindings()
+	check(InputMap.event_is_action(_key(KEY_K), "thrust_down") and not InputMap.event_is_action(_key(KEY_S), "thrust_down"), "Gespeicherte Belegung wird geladen")
+	check(c.hint_text("keyboard").contains("K") and c.hint_text("gamepad") != "", "HUD-Hinweis folgt der aktuellen Belegung")
+	# Defekte/unvollständige Dateien
+	var f := FileAccess.open(c.path, FileAccess.WRITE)
+	f.store_string("das ist keine gültige cfg [[[")
+	f.close()
+	c.apply_defaults()
+	c.load_bindings()
+	check(InputMap.event_is_action(_key(KEY_W), "thrust_up"), "Defekte Belegungsdatei: Standard bleibt aktiv, kein Absturz")
+	var cf := ConfigFile.new()
+	cf.set_value("bindings", "gear", [{"t": "key", "c": KEY_G}])          # nur Tastatur, kein Gamepad -> unvollständig
+	cf.save(c.path)
+	c.apply_defaults()
+	c.load_bindings()
+	check(InputMap.event_is_action(_key(KEY_SPACE), "gear") and not InputMap.event_is_action(_key(KEY_G), "gear"), "Unvollständige Belegung wird verworfen (Standard bleibt)")
+	c.reset_defaults()
+	check(not FileAccess.file_exists(c.path), "Zurücksetzen löscht die gespeicherte Belegung")
+	c.free()
+
+func _test_medals() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s1_02.json")
+	var r := Run.new()
+	r.start(lvl)
+	var sum_par := 0.0
+	var money_t := 0.0
+	for j in lvl.jobs:
+		sum_par += float(j.par)
+		if String(j.to) != "exit":
+			money_t += float(j.fare) * r.job_mult(j)
+	check(absf(r.time_target() - (sum_par * 1.2 + 10.0)) < 0.01 and absf(r.money_target() - money_t) < 0.01, "Medaillen-Ziele: Zeit %.0f s, Einkommen ¢%.0f aus den Auftragsdaten" % [r.time_target(), r.money_target()])
+	r.level_time = r.time_target() - 1.0
+	r.earned = r.money_target() * 1.2
+	r.best_streak = 3
+	var m := r.medals()
+	check(m.time and m.clean and m.pro, "Alle drei Medaillen bei guter Leistung")
+	r.level_time = r.time_target() + 1.0
+	check(not r.medals().time, "Zu langsam: keine Zeit-Medaille")
+	r.damage_taken = 25.0
+	check(not r.medals().clean, "Zu viel Schaden: keine Sauber-Medaille")
+	r.damage_taken = 0.0
+	r.squashes = 1
+	check(not r.medals().clean, "Fahrgast erschreckt: keine Sauber-Medaille")
+	r.squashes = 0
+	r.pump_touches = 1
+	check(not r.medals().clean, "Zapfsäule berührt: keine Sauber-Medaille")
+	r.pump_touches = 0
+	r.respawns = 1
+	check(not r.medals().clean, "Leben verloren: keine Sauber-Medaille")
+	r.earned = 1.0
+	check(not r.medals().pro, "Zu wenig verdient: keine Meister-Medaille")
+
+func _rm(path: String) -> void:
+	for suffix in ["", ".bad", ".tmp"]:
+		if FileAccess.file_exists(path + suffix):
+			DirAccess.remove_absolute(path + suffix)
+
+func _test_save_robust() -> void:
+	var sv: Node = load("res://src/core/save.gd").new()
+	sv.path = "user://test_save.json"
+	_rm(sv.path)
+	var f := FileAccess.open(sv.path, FileAccess.WRITE)
+	f.store_string("{ defekt [[[")
+	f.close()
+	sv.load_save()
+	check(sv.data.completed.is_empty() and FileAccess.file_exists(sv.path + ".bad"), "Defekter Speicherstand: Standard geladen, Original als .bad gesichert")
+	_rm(sv.path)
+	f = FileAccess.open(sv.path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({"completed": "kaputt"}))
+	f.close()
+	sv.load_save()
+	check(sv.data.completed is Dictionary and sv.data.completed.is_empty(), "Falsche Struktur wird abgefangen")
+	_rm(sv.path)
+	sv.complete_level("s1_01", 60.0, 100.0, 50.0, {"time": true, "clean": false, "pro": false})
+	sv.complete_level("s1_01", 70.0, 120.0, 60.0, {"time": false, "clean": true, "pro": false})
+	var mm: Dictionary = sv.medals_of("s1_01")
+	check(sv.best_time("s1_01") == 60.0 and mm.time and mm.clean and not mm.pro, "Bestzeit bleibt, Medaillen werden über Läufe vereint")
+	check(int(sv.data.stats.credits_total) == 110, "Verdiente Credits summieren sich (%d)" % int(sv.data.stats.credits_total))
+	var sv2: Node = load("res://src/core/save.gd").new()
+	sv2.path = sv.path
+	sv2.load_save()
+	check(sv2.is_completed("s1_01") and sv2.best_time("s1_01") == 60.0, "Speichern und Neuladen (Fortschritt bleibt nach Neustart)")
+	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers")
+	_rm(sv.path)
+	sv.free()
+	sv2.free()
+
+func _test_settings_robust() -> void:
+	var st: Node = load("res://src/core/settings.gd").new()
+	st.path = "user://test_settings.cfg"
+	_rm(st.path)
+	var defaults_music: float = st.values.music
+	var f := FileAccess.open(st.path, FileAccess.WRITE)
+	f.store_string("keine [gültige cfg")
+	f.close()
+	st.load_settings()
+	check(st.values.music == defaults_music, "Defekte Einstellungsdatei: Standardwerte")
+	var cf := ConfigFile.new()
+	cf.set_value("settings", "music", 7.5)
+	cf.set_value("settings", "sfx", "laut")
+	cf.set_value("settings", "vibration", -3.0)
+	cf.set_value("settings", "fps_cap", 144)
+	cf.set_value("settings", "unbekannt", 1)
+	cf.save(st.path)
+	st.load_settings()
+	check(st.values.music == 1.0 and st.values.vibration == 0.0, "Werte außerhalb 0..1 werden begrenzt")
+	check(typeof(st.values.sfx) == TYPE_FLOAT and st.values.sfx == 0.9, "Falscher Typ wird ignoriert (Standard bleibt)")
+	check(int(st.values.fps_cap) == 144 and not st.values.has("unbekannt"), "Gültige Werte werden übernommen, unbekannte Schlüssel ignoriert")
+	_rm(st.path)
+	st.free()

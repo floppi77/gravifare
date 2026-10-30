@@ -122,62 +122,6 @@ static func title(text: String, size := 16) -> Label:
 		l.add_theme_font_override("font", Fonts.title)          # große Überschriften in der Pixel-Schrift
 	return l
 
-## Optionsliste; wird von Haupt- und Pausenmenü benutzt. `back` kehrt zur vorherigen Seite zurück.
+## Optionen (Kategorien-Seiten); wird von Haupt- und Pausenmenü benutzt. `back` kehrt zur vorherigen Seite zurück.
 static func options_panel(back: Callable, rebuild: Callable = Callable()) -> VBoxContainer:
-	var v := VBoxContainer.new()
-	v.alignment = BoxContainer.ALIGNMENT_CENTER
-	v.add_theme_constant_override("separation", 4)
-	v.add_child(title(v.tr("MENU_OPTIONS")))
-	v.add_child(slider_row(v.tr("OPT_MUSIC"), Settings.values.music, func(x): Settings.set_value("music", x)))
-	v.add_child(slider_row(v.tr("OPT_SFX"), Settings.values.sfx, func(x): Settings.set_value("sfx", x)))
-	v.add_child(slider_row(v.tr("OPT_VOICE"), Settings.values.voice, func(x): Settings.set_value("voice", x)))
-	v.add_child(slider_row(v.tr("OPT_DEADZONE"), Settings.values.deadzone, func(x): Settings.set_value("deadzone", clampf(x, 0.05, 0.9))))
-	v.add_child(slider_row(v.tr("OPT_VIBRATION"), Settings.values.vibration, func(x):
-		Settings.set_value("vibration", x)
-		Haptics.pulse(0.4, 0.6, 0.15)))
-	var gear := button("", func(): pass)
-	var refresh := func():
-		gear.text = v.tr("OPT_GEAR") + ": " + v.tr("OPT_GEAR_TOGGLE" if Settings.values.gear_toggle else "OPT_GEAR_HOLD")
-	refresh.call()
-	gear.pressed.connect(func():
-		Settings.set_value("gear_toggle", not Settings.values.gear_toggle)
-		refresh.call())
-	v.add_child(gear)
-	var lang := button("", func(): pass)
-	var lrefresh := func():
-		var code: String = TranslationServer.get_locale().substr(0, 2)
-		lang.text = v.tr("OPT_LANG") + ": " + ("Deutsch" if code == "de" else "English")
-	lrefresh.call()
-	lang.pressed.connect(func():
-		var cur: String = TranslationServer.get_locale().substr(0, 2)
-		Settings.set_value("language", "en" if cur == "de" else "de")
-		lrefresh.call()
-		if rebuild.is_valid():
-			rebuild.call())      # Menü neu aufbauen, damit alle Texte die neue Sprache zeigen
-	v.add_child(lang)
-	var fs := button("", func(): pass)
-	var frefresh := func():
-		fs.text = v.tr("OPT_FULLSCREEN") + ": " + v.tr("ON" if Settings.values.fullscreen else "OFF")
-	frefresh.call()
-	fs.pressed.connect(func():
-		Settings.set_value("fullscreen", not Settings.values.fullscreen)
-		frefresh.call())
-	v.add_child(fs)
-	var rm := button("", func(): pass)
-	var rrefresh := func():
-		rm.text = v.tr("OPT_REDUCE") + ": " + v.tr("ON" if Settings.values.reduce_motion else "OFF")
-	rrefresh.call()
-	rm.pressed.connect(func():
-		Settings.set_value("reduce_motion", not Settings.values.reduce_motion)
-		rrefresh.call())
-	v.add_child(rm)
-	var sub := button("", func(): pass)
-	var srefresh := func():
-		sub.text = v.tr("OPT_SUBTITLES") + ": " + v.tr("ON" if Settings.values.subtitles else "OFF")
-	srefresh.call()
-	sub.pressed.connect(func():
-		Settings.set_value("subtitles", not Settings.values.subtitles)
-		srefresh.call())
-	v.add_child(sub)
-	v.add_child(button(v.tr("MENU_BACK"), back))
-	return v
+	return OptionsPanel.new(back, rebuild)

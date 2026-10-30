@@ -1,12 +1,12 @@
 extends Node
 ## Autoload "Settings": persistente Optionen in user://settings.cfg. Defekte/fehlende Datei -> Standardwerte.
 
-const PATH := "user://settings.cfg"
+var path := "user://settings.cfg"
 var values := {
 	"music": 0.8, "sfx": 0.9, "voice": 1.0,
 	"language": "",
 	"gear_toggle": true, "deadzone": 0.2,
-	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true, "vibration": 1.0,
+	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true, "vibration": 1.0, "fps_cap": 0, "show_fps": false, "hints": true,
 }
 
 func _ready() -> void:
@@ -16,7 +16,7 @@ func _ready() -> void:
 
 func load_settings() -> void:
 	var cf := ConfigFile.new()
-	if cf.load(PATH) != OK:
+	if cf.load(path) != OK:
 		return
 	for k in values:
 		var v = cf.get_value("settings", k, values[k])
@@ -29,7 +29,7 @@ func save_settings() -> void:
 	var cf := ConfigFile.new()
 	for k in values:
 		cf.set_value("settings", k, values[k])
-	cf.save(PATH)
+	cf.save(path)
 
 func set_value(key: String, v) -> void:
 	values[key] = v
@@ -48,6 +48,28 @@ func apply() -> void:
 	Controls.deadzone = values.deadzone
 	for a in ["thrust_left", "thrust_right", "thrust_up", "thrust_down"]:
 		InputMap.action_set_deadzone(a, values.deadzone)
+	Engine.max_fps = int(values.fps_cap)
+	_update_fps_overlay()
 	if not DisplayServer.get_name() == "headless":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED)
+
+var _fps_label: Label
+
+## Kleine FPS-Anzeige oben rechts (Option „FPS anzeigen“).
+func _update_fps_overlay() -> void:
+	if values.show_fps and _fps_label == null:
+		var layer := CanvasLayer.new()
+		layer.layer = 100
+		_fps_label = Label.new()
+		_fps_label.position = Vector2(560, 2)
+		_fps_label.add_theme_font_size_override("font_size", 8)
+		_fps_label.add_theme_color_override("font_color", Color("#5dff9a"))
+		layer.add_child(_fps_label)
+		add_child(layer)
+	if _fps_label != null:
+		_fps_label.get_parent().visible = values.show_fps
+
+func _process(_d: float) -> void:
+	if _fps_label != null and values.show_fps:
+		_fps_label.text = "%d FPS" % Engine.get_frames_per_second()

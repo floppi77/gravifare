@@ -10,6 +10,9 @@ var sub_t := 0.0
 var paused := false
 var game_over := false
 var price_flash := 0.0
+var hint_text := ""
+var hint_t := 0.0
+var result := {}
 var taxi_icon: Texture2D = Cosmetics.paint_texture()
 var font: Font = Fonts.hud
 
@@ -30,6 +33,7 @@ func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
 func _process(delta: float) -> void:
 	message_t = maxf(0.0, message_t - delta)
 	price_flash = maxf(0.0, price_flash - delta * 1.6)
+	hint_t = maxf(0.0, hint_t - delta)
 	sub_t = maxf(0.0, sub_t - delta)
 	queue_redraw()
 
@@ -115,7 +119,7 @@ func _draw() -> void:
 		var a := clampf(sub_t / 0.4, 0.0, 1.0)
 		draw_rect(Rect2(size.x * 0.5 - w * 0.5, size.y - 52, w, 16), Color(0.05, 0.06, 0.15, 0.85 * a))
 		draw_string(Fonts.ui, Vector2(size.x * 0.5 - w * 0.5 + 7, size.y - 40.5), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(1, 1, 1, a))
-	var hint := tr("HUD_HINT_PAD") if Controls.last_device == "keyboard" else tr("HUD_HINT_PAD_PAD")
+	var hint := Controls.hint_text(Controls.last_device)
 	draw_string(font, Vector2(8, size.y - 5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#8a93c9"))
 	if message_t > 0.0:
 		draw_string(font, Vector2(0, size.y * 0.35), message, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color.WHITE)
@@ -130,5 +134,30 @@ func _draw() -> void:
 	elif run.result == Run.Result.COMPLETE:
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#5dff9a"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 16), tr("HUD_COMPLETE_EARNED") % int(run.earned), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
+	if hint_t > 0.0 and hint_text != "":
+		var hw := minf(Fonts.ui.get_string_size(hint_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 16.0, size.x - 40.0)
+		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
+		draw_rect(Rect2(size.x * 0.5 - hw * 0.5, 22, hw, 16), Color(0.04, 0.05, 0.14, 0.82 * ha))
+		draw_rect(Rect2(size.x * 0.5 - hw * 0.5, 22, hw, 16), Color(0.35, 0.88, 0.82, 0.5 * ha), false, 0.67)
+		draw_string(Fonts.ui, Vector2(size.x * 0.5 - hw * 0.5 + 8, 33.5), hint_text, HORIZONTAL_ALIGNMENT_LEFT, hw - 12, 9, Color(0.8, 1.0, 0.95, ha))
+	if run.result == Run.Result.COMPLETE and not result.is_empty():
+		_draw_result()
 	if paused:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
+
+## Ergebnisblock nach dem Level: Zeit gegen Ziel/Bestzeit und die drei Medaillen.
+func _draw_result() -> void:
+	var m: Dictionary = result.medals
+	var y := size.y * 0.42 + 36.0
+	var t_line := tr("RES_TIME") % [int(result.time), int(result.target)]
+	if float(result.best) > 0.0:
+		t_line += "   " + (tr("RES_NEW_BEST") if float(result.time) < float(result.best) else tr("RES_BEST") % int(result.best))
+	draw_string(font, Vector2(0, y), t_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color("#c9cfee"))
+	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
+	for i in items.size():
+		var x := size.x * 0.5 - 150.0 + i * 100.0
+		var got: bool = m[items[i][0]]
+		var col := Color("#ffd24a") if got else Color("#5a628f")
+		draw_circle(Vector2(x + 6, y + 14), 5.0, col)
+		draw_circle(Vector2(x + 6, y + 14), 2.4, Color("#10142b") if not got else Color("#fff3b0"))
+		draw_string(font, Vector2(x + 16, y + 17), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 9, col)

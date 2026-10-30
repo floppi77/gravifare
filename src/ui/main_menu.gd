@@ -54,6 +54,7 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(MenuKit.button(tr("MENU_CONTINUE") if any_done else tr("MENU_PLAY"), func(): Flow.start_campaign(id)))
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
 	box.add_child(MenuKit.button(tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")))
+	box.add_child(MenuKit.button(tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")))
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), show_options))
 	box.add_child(MenuKit.button(tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")))
 	box.add_child(MenuKit.button(tr("MENU_QUIT"), func(): get_tree().quit()))
@@ -93,7 +94,9 @@ func show_levels() -> void:
 		var b := MenuKit.button("%02d" % (i + 1), func(): Flow.start_campaign(ids[i]))
 		b.custom_minimum_size = Vector2(36, 20)
 		if Save.is_completed(ids[i]):
-			b.text += " ✔"
+			var mm := Save.medals_of(ids[i])
+			b.text += " " + ("●" if mm.time else "○") + ("●" if mm.clean else "○") + ("●" if mm.pro else "○")
+			b.custom_minimum_size = Vector2(62, 20)
 		b.disabled = not Save.is_unlocked(ids, i)
 		b.tooltip_text = lvl.names.get(TranslationServer.get_locale().substr(0, 2), lvl.id) if lvl else ids[i]
 		grid.add_child(b)

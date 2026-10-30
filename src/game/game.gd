@@ -141,6 +141,7 @@ func _setup_camera() -> void:
 	cam.limit_right = 100000
 	cam.limit_bottom = 100000     # Begrenzung übernimmt _cam_target(); Offset (Vorausblick/Wackeln) darf kurz darüber
 	cam.position_smoothing_enabled = false
+	cam.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS      # passt zur Physik-Interpolation (keine Warnung)
 	cam.global_position = _cam_target()
 	cam.reset_physics_interpolation()
 
@@ -229,6 +230,7 @@ func _physics_process(_delta: float) -> void:
 		Haptics.thrust(taxi.flame_main + absf(taxi.flame_side) * 0.5)
 		_check_near_miss()
 		_music_tick()
+		_hint_tick()
 	for e in run.log:
 		_on_event(e)
 	cam.global_position = _cam_target()
@@ -236,7 +238,10 @@ func _physics_process(_delta: float) -> void:
 	if run.result == Run.Result.COMPLETE and not completion_saved:
 		completion_saved = true
 		Save.note_max("best_streak", run.best_streak)
-		Save.complete_level(Flow.current_level, run.sim.time, run.money, run.earned)
+		var prev_best := Save.best_time(Flow.current_level)
+		var med := run.medals()
+		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned}
+		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med)
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() != "":
@@ -283,6 +288,42 @@ func _music_tick() -> void:
 	var drive := run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF or run.exit_open or s.vel.length() > 70.0
 	var danger := s.fuel < 25.0 or s.hull < 45.0 or near_cd > 3.0 or run.pump_boom_t >= 0.0
 	Music.set_layers(drive, danger)
+
+## Tutorial-Hinweise (einmalig je Profil, abschaltbar, laufen nach 7 s von selbst aus).
+var _hint_ticks := 0
+func _hint_tick() -> void:
+	_hint_ticks += 1
+	if _hint_ticks % 30 != 0 or not Settings.values.hints or paused or trans_t >= 0.0:
+		return
+	var s := run.sim
+	var dev := Controls.last_device
+	var kind := "kb" if dev == "keyboard" else "pad"
+	if run.level.number <= 3 and run.level_time > 0.6 and Flow.current_level == "s1_01":
+		_hint("start", tr("HINT_START") % Controls.thrust_label(dev))
+	var near_pad := false
+	for id in run.level.pads:
+		var p: Dictionary = run.level.pads[id]
+		if s.pos.x > p.x0 and s.pos.x < p.x1 and s.pos.y < p.row * Tuning.TILE and p.row * Tuning.TILE - s.pos.y < 60.0 and s.state == TaxiSim.State.FLYING:
+			near_pad = true
+	if near_pad and not s.gear_cmd:
+		_hint("gear", tr("HINT_GEAR") % Controls.slot_label("gear", kind, 0))
+	if near_pad and s.gear_extended():
+		_hint("landing", tr("HINT_LANDING"))
+	if run.phase == Run.Phase.CARRYING:
+		_hint("passenger", tr("HINT_PASSENGER"))
+	if run.level.pads.has("F") and s.fuel < 30.0:
+		_hint("fuel", tr("HINT_FUEL"))
+	if run.exit_open:
+		_hint("exit", tr("HINT_EXIT"))
+
+func _hint(key: String, text: String) -> void:
+	var seen: Array = Save.data.get("seen_hints", [])
+	if seen.has(key) or hud.hint_t > 0.0:
+		return
+	seen.append(key)
+	Save.data["seen_hints"] = seen
+	hud.hint_text = text
+	hud.hint_t = 7.0
 
 func _add_shake(amp: float) -> void:
 	if not Settings.values.reduce_motion:
@@ -446,6 +487,8 @@ func _on_event(e: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Levelwechsel
 func _process(delta: float) -> void:
+	if run.result == Run.Result.RUNNING and not paused and trans_t < 0.0:
+		Save.add_playtime(delta / maxf(Engine.time_scale, 0.05))
 	if slowmo_left > 0.0:
 		slowmo_left -= delta / maxf(Engine.time_scale, 0.05)
 		if slowmo_left <= 0.0:
