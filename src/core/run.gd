@@ -36,6 +36,7 @@ var respawns := 0             # verlorene Leben im Level
 var best_streak := 0
 var perfect_count := 0
 var log: Array = []         # Ereignisse des letzten Ticks: {type, ...}
+var pending_log: Array = []   # Ereignisse außerhalb von step() (Rauswerfen, Absturz-Neustart): kommen im nächsten Tick ins log
 var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
 var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in den Unterstand
 var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
@@ -276,6 +277,9 @@ func live_factor() -> float:
 
 func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	log.clear()
+	if not pending_log.is_empty():          # sonst gingen Ereignisse von eject()/respawn_after_crash() vor dem Auslesen verloren
+		log.append_array(pending_log)
+		pending_log.clear()
 	if result != Result.RUNNING:
 		if result == Result.COMPLETE:
 			_step_actors(dt)    # letzte Fahrgäste laufen beim Levelabschluss noch zu Ende
@@ -401,6 +405,7 @@ func eject() -> bool:
 	var a := aboard_actor()
 	if a == null:
 		return false
+	var log_start := log.size()
 	var ex := extra_of(a)
 	var foot_y := sim.pos.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN * sim.gear
 	var ground := _ground_below(sim.pos.x, foot_y)
@@ -420,6 +425,7 @@ func eject() -> bool:
 	else:
 		actor = null
 		_lose_job(a.pname)
+	pending_log.append_array(log.slice(log_start))
 	return true
 
 ## Oberkante des ersten festen Felds unter (x, y).
@@ -657,6 +663,11 @@ func _deliver(job: Dictionary) -> void:
 ## (kein Geld) und wartet – derselbe Fahrgast – erneut an seinem Abholpad. Erledigtes bleibt erledigt. Neues Taxi
 ## am Startpad mit Mindest-Sprit (35 %) bzw. dem Rest-Sprit, falls mehr.
 func respawn_after_crash() -> void:
+	var log_start := log.size()
+	_respawn_after_crash()
+	pending_log.append_array(log.slice(log_start))
+
+func _respawn_after_crash() -> void:
 	var fuel_keep := Tuning.FUEL_MAX        # ein neues Taxi startet immer mit vollem Tank
 	if actor != null and phase == Phase.DROPOFF:
 		_deliver(current_job())             # schon ausgestiegen: bleibt abgeliefert, läuft zum Häuschen

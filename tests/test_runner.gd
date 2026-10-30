@@ -768,6 +768,8 @@ func _test_eject() -> void:
 		if e.type == "ejected":
 			lethal = e.lethal
 	check(lethal and r.actor == null and r.job_index == 1 and r.missed == 1 and r.ejected == 1, "Pflichtauftrag gilt als verpasst, Fahrgast fällt")
+	r.step(Vector2(0, -0.39), false)
+	check(r.log.any(func(e): return e.type == "ejected") and r.log.any(func(e): return e.type == "job_missed"), "Rauswurf-Ereignisse erreichen das Spiel (Schrei, Meldung) – gehen nicht zwischen den Ticks verloren")
 	var splat := false
 	var fell: PassengerActor = r.leavers[r.leavers.size() - 1]
 	var money_before := r.money
