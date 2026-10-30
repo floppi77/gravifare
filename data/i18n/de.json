@@ -193,5 +193,6 @@
  "ACT_EJECT": "Fahrgast rauswerfen",
  "MSG_EJECTED": "%s rausgeworfen!",
  "VOICE_SCREAM": "Aaaaaah!",
- "VOICE_SCREAM_SHORT": "AAAH!"
+ "VOICE_SCREAM_SHORT": "AAAH!",
+ "HUD_TAG_FRAGILE": "◇ ZERBRECHLICH"
 }

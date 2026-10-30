@@ -291,6 +291,20 @@ func pad_sweeps_hit(center: Vector2, half: Vector2) -> bool:
 			return true
 	return false
 
+## Bot: Trifft das Taxi auf seiner voraussichtlichen Bahn (Anfahrt von v0 auf v_des, Zeitkonstante 0,3 s) innerhalb des
+## Horizonts ein Hindernis (Trümmer/Schieber; Pads zählen nicht)? Prüft die Mover-Positionen zu jedem Zeitpunkt mit.
+func movers_collide_traj(p0: Vector2, v0: Vector2, v_des: Vector2, half: Vector2, t0: float, horizon: float) -> bool:
+	var t := 0.1
+	while t <= horizon:
+		var k := 1.0 - exp(-t / 0.3)
+		var p := p0 + v_des * t + (v0 - v_des) * 0.3 * k
+		var box := Rect2(p - half, half * 2.0)
+		for m in movers:
+			if m.kind != "pad" and _mover_rect(m, t0 + t).intersects(box):
+				return true
+		t += 0.1
+	return false
+
 func movers_at_box(center: Vector2, half: Vector2) -> Array:
 	var out: Array = []
 	if movers_ignore:

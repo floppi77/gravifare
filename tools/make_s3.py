@@ -7,7 +7,7 @@ from levelkit import Grid, write
 
 PARS = json.load(open("tools/s3_pars.json")) if os.path.exists("tools/s3_pars.json") else {}
 FINAL = {"S3-10": "S3-01", "S3-04": "S3-02", "S3-02": "S3-03", "S3-03": "S3-04", "S3-05": "S3-05", "S3-01": "S3-06",
-         "S3-08": "S3-07", "S3-06": "S3-08", "S3-07": "S3-09", "S3-09": "S3-10", "S3-11": "S3-11"}      # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
+         "S3-08": "S3-07", "S3-06": "S3-08", "S3-07": "S3-10", "S3-09": "S3-09", "S3-11": "S3-11"}      # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
 BOOST = {"S3-%02d" % i: 26 for i in range(1, 12)}      # zusätzliche Dornenbänder an der Decke je Entwurfsschlüssel
 NAMES = [("Mika", "f"), ("Odo", "m"), ("Lena", "f"), ("Jonas", "m"), ("Ines", "f"), ("Ben", "m"), ("Nora", "f"), ("Tarek", "m")]
 
@@ -73,6 +73,7 @@ def make(key, de, en, g, sq, movers, mech, **extra):
 
 
 def D(x, y, dx=0, dy=0, period=8.0, phase=0.0, w=2, h=1, kind="debris", shape="line"):
+    period = round(period * 0.82 * (0.85 + 0.3 * random.Random(x * 31 + y * 17 + int(period * 10)).random()), 1)     # schneller und je Brocken anders
     return {"kind": kind, "x": x, "y": y, "w": w, "h": h, "dx": dx, "dy": dy, "period": period, "phase": phase, "shape": shape}
 
 
@@ -80,24 +81,24 @@ def MP(pad, x, y, w=5, dx=2, period=16.0, phase=0.0):
     return {"kind": "pad", "pad": str(pad), "x": x, "y": y, "w": w, "dx": dx, "period": period, "phase": phase}
 
 
-def base(g, f_cols=(11, 16), pad3=True, pad4=True):
+def base(g, f_cols=(11, 16), pad3=True, pad4=True, narrow=()):
     """Gemeinsames Gerüst: Start unten links (Pad 1), Ablage links oben (2), Pfeiler mitte (3), Ablage rechts oben (4),
     unten rechts (5), Tankpad links unten."""
     g.rect("#", 1, 20, 38, 20)
     g.pad("1", 2, 8, 19)
-    g.rect("#", 1, 9, 8, 10); g.pad("2", 2, 6, 8)
+    g.rect("#", 1, 9, 8, 10); g.pad("2", 2, 5 if 2 in narrow else 6, 8)
     if pad3:
         g.rect("#", 17, 14, 22, 19); g.pad("3", 17, 21, 13)
     if pad4:
-        g.rect("#", 32, 7, 38, 8); g.pad("4", 33, 37, 6)
-    g.pad("5", 30, 36, 19)
+        g.rect("#", 32, 7, 38, 8); g.pad("4", 34 if 4 in narrow else 33, 37, 6)
+    g.pad("5", 31 if 5 in narrow else 30, 34 if 5 in narrow else 36, 19)
     g.rect("P", f_cols[0], 17, f_cols[0], 18); g.pad("F", f_cols[0], f_cols[1], 19)
     g.gate()
     g.put("S", 5, 18)
 
 
 # ---- S3-01 Schrottplatz: zwei Trümmerbahnen
-g = Grid(); base(g); V1(g)
+g = Grid(); base(g, narrow=(5,)); V1(g)
 make("S3-01", "Schrottlawine", "Scrap Avalanche", g, seq(1),
      [D(10, 11, dx=5, period=10.0), D(27, 10, dy=3, period=7.0, w=1, h=1)], ["debris", "chicane"])
 
@@ -109,7 +110,7 @@ make("S3-02", "Trümmerfeld", "Debris Field", g, seq(2),
 # ---- S3-03 Fließband: Pad 3 fährt auf einer Schiene
 g = Grid(); base(g, pad3=False); V3(g)
 make("S3-03", "Fließband", "Conveyor", g, seq(3),
-     [MP(3, 16, 13, w=5, dx=2, period=16.0), D(27, 10, dy=3, period=8.0, w=1, h=1)], ["debris", "moving_pads", "chicane"])
+     [MP(3, 16, 13, w=5, dx=3, period=16.0), D(27, 10, dy=3, period=8.0, w=1, h=1)], ["debris", "moving_pads", "chicane"])
 
 # ---- S3-04 Kranbahn: Zapfen, zwei Bahnen
 g = Grid(); base(g); V1(g)
@@ -122,22 +123,22 @@ make("S3-05", "Pendelhalle", "Pendulum Hall", g, seq(5),
      [D(14, 12, dx=3, dy=3, period=9.0, shape="circle"), D(27, 11, dx=3, dy=3, period=9.0, phase=4.5, shape="circle")], ["debris", "chicane"])
 
 # ---- S3-06 Doppelfähre: zwei fahrende Pads
-g = Grid(); base(g, pad3=False, pad4=False); V1(g)
+g = Grid(); base(g, pad3=False, pad4=False, narrow=(4,)); V1(g)
 make("S3-06", "Doppelfähre", "Twin Ferry", g, seq(6),
-     [MP(3, 15, 13, w=5, dx=2, period=16.0), MP(4, 31, 7, w=5, dx=2, period=16.0, phase=3.0), D(24, 5, dx=3, period=9.0, w=2, h=1, phase=1.0)], ["debris", "moving_pads", "chicane"])
+     [MP(3, 15, 13, w=5, dx=3, period=12.0), MP(4, 31, 7, w=4, dx=2, period=18.0, phase=3.0), D(24, 5, dx=3, period=9.0, w=2, h=1, phase=1.0)], ["debris", "moving_pads", "chicane"])
 
 # ---- S3-07 Schrottpresse: Trümmerpaar unten, Blöcke
-g = Grid(); base(g); V2(g); V3(g)
+g = Grid(); base(g, narrow=(2,)); V2(g); V3(g)
 make("S3-07", "Schrottpresse", "Scrap Press", g, seq(7),
-     [D(11, 15, dx=4, period=8.0, w=2, h=1), D(10, 11, dx=4, period=8.0, w=2, h=1, phase=4.0), D(27, 8, dy=3, period=7.0, w=1, h=1)], ["debris", "chicane"])
+     [D(9, 11, dx=4, period=9.0), D(25, 9, dy=3, period=8.0, w=1, h=1), D(27, 4, dx=3, period=11.0, w=3, phase=3.0)], ["debris", "chicane"])
 
 # ---- S3-08 Altmetall: fahrendes Pad plus Trümmer, Zapfen
-g = Grid(); base(g, pad3=False); V1(g)
+g = Grid(); base(g, pad3=False, narrow=(2, 5)); V1(g)
 make("S3-08", "Altmetall", "Scrap Metal", g, seq(8),
-     [MP(3, 17, 13, w=5, dx=2, period=16.0), D(9, 12, dx=4, period=9.0), D(27, 5, dx=3, period=9.0, w=2, h=1, phase=2.0), D(30, 12, dx=2, period=8.0, w=2, h=1, phase=1.0)], ["debris", "moving_pads", "chicane"])
+     [MP(3, 17, 13, w=5, dx=3, period=13.0), D(9, 12, dx=4, period=9.0), D(27, 5, dx=3, period=9.0, w=2, h=1, phase=2.0), D(30, 12, dx=2, period=8.0, w=2, h=1, phase=1.0)], ["debris", "moving_pads", "chicane"])
 
 # ---- S3-09 Wrackgasse: enge Gasse, drei Bahnen
-g = Grid(); base(g); V1(g); V3(g)
+g = Grid(); base(g, narrow=(2, 4, 5)); V1(g); V3(g)
 make("S3-09", "Wrackgasse", "Wreck Alley", g, seq(9),
      [D(8, 12, dx=3, period=8.0), D(26, 9, dy=3, period=7.0, w=1, h=1), D(26, 4, dx=3, period=9.0, w=2, phase=3.0)], ["debris", "chicane"])
 
@@ -147,7 +148,7 @@ make("S3-10", "Schrottplatz", "Scrap Yard", g, seq(10),
      [D(9, 11, dx=4, period=9.0), D(25, 9, dy=3, period=8.0, w=1, h=1), D(27, 4, dx=3, period=11.0, w=3, phase=3.0)], ["debris", "chicane"])
 
 # ---- S3-11 Gürtelwächter: alles zusammen
-g = Grid(); base(g, pad3=False, pad4=False); V1(g); V2(g)
+g = Grid(); base(g, pad3=False, pad4=False, narrow=(2, 5)); V1(g); V2(g)
 make("S3-11", "Gürtelwächter", "Belt Guardian", g, seq(11),
-     [MP(3, 15, 13, w=5, dx=2, period=16.0), MP(4, 31, 7, w=5, dx=2, period=16.0, phase=2.0),
-      D(9, 11, dx=4, period=9.0), D(26, 10, dy=3, period=7.0, w=1, h=1, phase=2.0)], ["debris", "moving_pads", "chicane"])
+     [MP(3, 15, 13, w=5, dx=3, period=12.0), MP(4, 31, 7, w=5, dx=2, period=17.0, phase=2.0),
+      D(11, 6, dx=3, period=9.0)], ["debris", "moving_pads", "chicane"])

@@ -144,33 +144,37 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
 	if level.has_movers():
-		# Trümmer/Schieber voraus: im Zeitfenster der Ankunft nicht in ihren Weg fliegen (schweben und warten)
-		if v_des != Vector2.ZERO:
-			var mdir := v_des.normalized()
-			var mspd := maxf(sim.vel.length(), 25.0)
-			for dist: float in [14.0, 14.0 + mspd * 0.5, 14.0 + mspd * 1.0]:
-				var mprobe: Vector2 = sim.pos + mdir * dist
-				if level.movers_block(mprobe, Tuning.HULL_HALF + Vector2(6, 6), level.clock + dist / V_MAX - 0.15, maxf(dist / mspd - dist / V_MAX, 0.0) + 0.8):
-					v_des = Vector2.ZERO
-		# Ein Hindernis kommt auf das Taxi zu: ausweichen (vom Hindernis weg)
-		if sim.state == TaxiSim.State.FLYING:
+		# Trümmer/Schieber: Bahn des Taxis (Anfahrt auf die Wunschgeschwindigkeit) gegen die vorhergesagten Hindernisse prüfen
+		# und bei drohendem Treffer schweben und warten
+		var mhalf := Tuning.HULL_HALF + Vector2(6, 6)
+		if v_des != Vector2.ZERO and level.movers_collide_traj(sim.pos, sim.vel, v_des, mhalf, level.clock, 1.0):
+			v_des = Vector2.ZERO
+		# Trifft die Bahn auch beim Schweben/Bremsen noch ein Hindernis: in eine freie Richtung ausweichen
+		var ehalf := Tuning.HULL_HALF + Vector2(2, 2)
+		if sim.state == TaxiSim.State.FLYING and level.movers_collide_traj(sim.pos, sim.vel, v_des, ehalf, level.clock, 0.5):
+			var near_c := Vector2.ZERO
+			var near_d := 1e9
 			for m in level.movers:
 				if m.kind == "pad":
 					continue
-				var soon: Rect2 = level._mover_rect(m, level.clock + 0.5)
-				if soon.grow(6.0).has_point(sim.pos) or (m.rect as Rect2).grow(6.0).has_point(sim.pos):
-					var away: Vector2 = (sim.pos - (m.rect as Rect2).get_center()).normalized()
-					var chosen := Vector2.ZERO
-					for ang: float in [0.0, 0.7, -0.7, 1.4, -1.4]:         # Ausweichrichtung, die nicht in eine Wand führt
-						var cand: Vector2 = away.rotated(ang)
-						var prev_ig := level.movers_ignore
-						level.movers_ignore = true
-						var blocked := level.box_hits_solid(sim.pos + cand * 26.0, Tuning.HULL_HALF + Vector2(4, 4))
-						level.movers_ignore = prev_ig
-						if not blocked:
-							chosen = cand
-							break
-					v_des = chosen * 40.0
+				var dd: float = ((m.rect as Rect2).get_center() - sim.pos).length()
+				if dd < near_d:
+					near_d = dd
+					near_c = (m.rect as Rect2).get_center()
+			var away: Vector2 = (sim.pos - near_c).normalized()
+			var cands: Array = []
+			for k in 8:
+				cands.append(Vector2.RIGHT.rotated(float(k) * PI / 4.0))
+			cands.sort_custom(func(p: Vector2, q: Vector2) -> bool: return p.dot(away) > q.dot(away))
+			var prev_ig := level.movers_ignore
+			for cand: Vector2 in cands:
+				level.movers_ignore = true
+				var wall := level.box_hits_solid(sim.pos + cand * 24.0, Tuning.HULL_HALF + Vector2(4, 4))
+				level.movers_ignore = prev_ig
+				if wall:
+					continue
+				if not level.movers_collide_traj(sim.pos, sim.vel, cand * 55.0, ehalf, level.clock, 0.8):
+					v_des = cand * 55.0
 					break
 	var blocked_now := v_des_before != Vector2.ZERO and v_des == Vector2.ZERO
 	if was_blocked and not blocked_now and v_des != Vector2.ZERO:

@@ -215,7 +215,7 @@ func min_fare(lvl: LevelData, job: Dictionary) -> float:
 		return 0.0
 	var avg_price := (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
 	var length := LevelMetrics.leg_length(lvl, String(job.from), to_id)
-	var wait := 1.0 + (0.3 if lvl.has_movers() else 0.0) + (0.15 if lvl.has_doors() else 0.0)     # Warten vor Hindernissen kostet Sprit
+	var wait := 1.0 + (0.5 if lvl.has_movers() else 0.0) + (0.15 if lvl.has_doors() else 0.0)     # Warten vor Hindernissen kostet Sprit
 	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price * wait
 	var mult := LevelMetrics.leg_mult(lvl, String(job.from), to_id)
 	return ceilf(cost * Tuning.PROFIT_MARGIN / (Tuning.satisfaction_factor(Tuning.SAT_FLOOR) * mult) / 5.0) * 5.0

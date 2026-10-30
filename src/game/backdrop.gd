@@ -1,5 +1,5 @@
 extends Control
-## Parallax-Hintergrund (Sektor 1). Zwei Ebenen, Offsets ganzzahlig gerundet.
+## Parallax-Hintergrund je Sektor (bg_sN_far/mid/near.png). Drei Ebenen, Offsets ganzzahlig gerundet.
 
 var far: Texture2D = preload("res://assets/art/bg_s1_far.png")
 var mid: Texture2D = preload("res://assets/art/bg_s1_mid.png")
@@ -9,6 +9,19 @@ var lvl: LevelData
 
 func setup(l: LevelData) -> void:
 	lvl = l
+	var n := l.sector
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--bg="):         # Dev: Hintergrund eines anderen Sektors ansehen
+			n = int(a.substr(5))
+	far = _tex(n, "far")
+	mid = _tex(n, "mid")
+	near = _tex(n, "near")
+
+func _tex(n: int, layer: String) -> Texture2D:
+	var p := "res://assets/art/bg_s%d_%s.png" % [n, layer]
+	if not ResourceLoader.exists(p):
+		p = "res://assets/art/bg_s1_%s.png" % layer
+	return load(p)
 
 func _process(_d: float) -> void:
 	queue_redraw()

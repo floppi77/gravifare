@@ -153,3 +153,10 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Planung und Bot**: Die statische Wegplanung ignoriert Trümmer; fahrende Pads belegen ihren ganzen Fahrweg als feste Fläche. Der Bot sagt Trümmer im Ankunftszeitfenster voraus (schwebt, wartet), weicht Hindernissen aus, die auf ihn zukommen, und folgt beim Landeanflug dem Pad (Mitnahme-Geschwindigkeit als Vorsteuerung).
 - **Obergrenzen** ab Level 23: fünf Passagierpads (siehe LEVELS.md). Lebens-Stationen in Level 25 und 30.
 - **Verschoben**: Fahrgasttyp „zerbrechlich“ und Zufallsereignis „Meteoritenschauer“ (waren für Sektor 3 notiert) folgen mit den nächsten Sektoren.
+
+## Runde 14: HUD-Streifen, Sektor-Hintergründe, schmalere Pads
+- **HUD nur in den Randstreifen**: oben auf der Felsreihe 0 (y 0–16: Tank, Hülle, Credits, Leben, Serie, Spritpreis, „Nr/99 Name“, Fortschritt, Landeampel als drei dünne Balken; x 296–344 bleibt für das Torschild frei), unten unter der Bodenreihe (y 337–360: Auftragszeile mit Preis, darunter Steuerungs-/Tutorialhinweis links und Untertitel/Pflicht-Erinnerung rechts). Das Spielfeld dazwischen bleibt frei von UI-Überlappung; nur kurze Meldungen („Funkruf …“) erscheinen vorübergehend mittig.
+- **Eigener Hintergrund je Sektor** (`bg_sN_far/mid/near.png`, Sektor 2–9 aus `tools/art/gen_backgrounds.py`, ersetzbar durch externe Grafiken, Vorgaben in `docs/HINTERGRUENDE.md`). Dev-Flag `--bg=N` zeigt einen anderen Sektor.
+- **Mindest-Landefenster**: bis Level 27 mindestens 34 px (Pads ab 5 Tiles), ab Level 28 darf es auf 18 px sinken (Pads mit 4 Tiles). Sektor 3 nutzt ab Level 28 schmale Pads.
+- **Trümmer** bewegen sich je Brocken unterschiedlich schnell und etwas schneller als zuvor (Perioden ≈ 5–9 s); fahrende Pads haben je Plattform eigenes Tempo (bis ≈ 20 px/s).
+- **Bot (Mover)**: prüft seine Bahn (Anfahrt auf die Wunschgeschwindigkeit) gegen die vorhergesagten Hindernisse und weicht in freie Richtungen aus; plant nach dem Warten neu.
