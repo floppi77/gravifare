@@ -115,11 +115,15 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	return [_accel_to_input(a_des), gear]
 
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.
-static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0) -> Dictionary:
+static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false) -> Dictionary:
 	var r := Run.new()
 	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional
 	r.start(lvl, fuel_in)
 	var bot := Bot.new(r)
+	var rep: Replay = null
+	if record:
+		rep = Replay.new()
+		rep.begin(lvl.id, -1, fuel_in, 0.0, {}, false)
 	var ticks := int(max_seconds / Tuning.TICK)
 	var stuck_pos := r.sim.pos
 	var stuck_ticks := 0
@@ -127,7 +131,10 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0) -> 
 	var min_fuel := r.sim.fuel
 	for i in ticks:
 		var cmd := bot.decide()
-		r.step(cmd[0], cmd[1])
+		var inp: Vector2 = Replay.quantize(cmd[0])
+		if rep != null:
+			rep.add(inp, cmd[1])
+		r.step(inp, cmd[1])
 		if r.result != Run.Result.RUNNING:
 			break
 		if r.sim.state == TaxiSim.State.FLYING:
@@ -149,6 +156,9 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0) -> 
 		"delivered": r.delivered, "jobs": lvl.jobs.size(), "money": r.money, "job_times": r.job_times,
 		"reason": reason if reason != "" else bot.fail_reason,
 	}
+	if rep != null:
+		rep.finish({"complete": out.complete, "time": r.level_time, "money": r.money, "earned": r.earned, "delivered": r.delivered})
+		out["replay"] = rep.to_dict()
 	if not out.complete and out.reason == "":
 		out.reason = "Zeitlimit" if not out.failed else "Taxi zerstört"
 	return out

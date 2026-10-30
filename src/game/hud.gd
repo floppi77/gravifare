@@ -165,7 +165,7 @@ func _draw() -> void:
 func _draw_result() -> void:
 	var m: Dictionary = result.medals
 	var pw := 420.0
-	var ph := 150.0
+	var ph := 166.0
 	var px := size.x * 0.5 - pw * 0.5
 	var py := 62.0
 	draw_rect(Rect2(px - 1, py - 1, pw + 2, ph + 2), Color("#0c0f24"))
@@ -181,13 +181,14 @@ func _draw_result() -> void:
 	draw_string(ui, Vector2(px + 14, py + 66), tr("RES_DEDUCT") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("missed_fees", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#ff9a7a"))
 	var net := float(result.get("net", 0.0))
 	draw_string(ui, Vector2(px + 14, py + 84), tr("RES_NET") % [int(net), int(result.get("balance", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 11, Color("#5dff9a") if net >= 0.0 else Color("#ff6a4a"))
+	draw_string(ui, Vector2(px + 14, py + 99), tr("RES_SCORE") % [int(result.get("score", 0)), int(result.get("best_score", 0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#c4d0ff"))
 	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
 	for i in items.size():
 		var x := px + 14.0 + i * 130.0
 		var got: bool = m[items[i][0]]
 		var col := Color("#ffd24a") if got else Color("#5a628f")
-		_star(Vector2(x + 7, py + 108), 7.0, col, got)
-		draw_string(ui, Vector2(x + 19, py + 112), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, col)
+		_star(Vector2(x + 7, py + 120), 7.0, col, got)
+		draw_string(ui, Vector2(x + 19, py + 124), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, col)
 	draw_string(ui, Vector2(px, py + ph - 12), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#a9b8ff"))
 
 ## Fünfzackiger Stern (Level-Abschluss-Medaille): gefüllt in Gold, wenn erreicht, sonst nur als dunkle Silhouette.

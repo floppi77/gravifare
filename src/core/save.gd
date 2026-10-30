@@ -67,17 +67,26 @@ func best_time(id: String) -> float:
 func medals_of(id: String) -> Dictionary:
 	return data.completed.get(id, {}).get("medals", {"time": false, "clean": false, "pro": false})
 
+func best_score(id: String) -> int:
+	return int(data.completed.get(id, {}).get("score", 0)) if data.completed.has(id) else 0
+
+func total_score() -> int:
+	var t := 0
+	for id in data.completed:
+		t += int(data.completed[id].get("score", 0))
+	return t
+
 func add_playtime(seconds: float) -> void:
 	data.stats["play_seconds"] = float(data.stats.get("play_seconds", 0.0)) + seconds
 
-func complete_level(id: String, time: float, money: float, earned := 0.0, medals := {}) -> void:
+func complete_level(id: String, time: float, money: float, earned := 0.0, medals := {}, score := 0) -> void:
 	var prev: Dictionary = data.completed.get(id, {})
 	var best_time: float = minf(prev.get("time", 1e9), time)
 	var old_m: Dictionary = prev.get("medals", {})
 	var merged := {"time": bool(old_m.get("time", false)) or bool(medals.get("time", false)),
 		"clean": bool(old_m.get("clean", false)) or bool(medals.get("clean", false)),
 		"pro": bool(old_m.get("pro", false)) or bool(medals.get("pro", false))}
-	data.completed[id] = {"time": best_time, "money": maxf(prev.get("money", 0.0), money), "medals": merged}
+	data.completed[id] = {"time": best_time, "money": maxf(prev.get("money", 0.0), money), "medals": merged, "score": maxi(int(prev.get("score", 0)), score)}
 	data.stats["credits_total"] = int(data.stats.get("credits_total", 0)) + int(earned)
 	write()
 

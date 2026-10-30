@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -537,6 +537,36 @@ func _test_campaign_save() -> void:
 	sv3.load_save()
 	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht den gespeicherten Feldzug")
 	_rm(sv.path)
+
+func _test_replay() -> void:
+	var q := Replay.quantize(Vector2(0.3333, -1.7))
+	check(absf(q.x - roundi(0.3333 * 127.0) / 127.0) < 1e-6 and q.y == -1.0, "Eingaben werden auf 1/127 gerundet und begrenzt")
+	for id in ["s1_01", "s1_04", "s1_08"]:
+		var lvl := LevelData.load_file("res://data/levels/%s.json" % id)
+		var res := Bot.fly_level(lvl, 600.0, Tuning.MIN_START_FUEL, true)
+		check(res.complete, "%s: aufgezeichneter Bot-Lauf ist abgeschlossen" % id)
+		var d: Dictionary = JSON.parse_string(JSON.stringify(res.replay))      # wie nach Speichern und Laden
+		var lvl2 := LevelData.load_file("res://data/levels/%s.json" % id)
+		var pl := Replay.play(lvl2, d)
+		check(pl.complete and absf(pl.time - float(d.result.time)) < 0.001 and absf(pl.money - float(d.result.money)) < 0.01 and pl.delivered == int(d.result.delivered),
+			"%s: Wiedergabe reproduziert den Lauf exakt (%.2f s, ¢%d, %d Ticks, %d Läufe RLE)" % [id, pl.time, int(pl.money), pl.ticks, d.runs.size()])
+	# Absturz-Ereignis wird wiedergegeben
+	var lv := _lvl()
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lv)
+	var rep := Replay.new()
+	rep.begin(lv.id, -1, -1.0, 0.0, {}, false)
+	for i in 30:
+		rep.add(Vector2(0, -1), true)
+		r.step(Vector2(0, -1), true)
+	rep.mark_respawn()
+	r.respawn_after_crash()
+	for i in 30:
+		rep.add(Vector2.ZERO, true)
+		r.step(Vector2.ZERO, true)
+	var d2 := rep.to_dict()
+	check(d2.events.size() == 1 and d2.ticks == 60, "Respawn wird als Ereignis aufgezeichnet")
 
 func _test_crash_balance() -> void:
 	var results := {}

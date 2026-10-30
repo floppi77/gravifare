@@ -1,0 +1,109 @@
+class_name Replay
+extends RefCounted
+## Replay-Fundament: Ein Lauf ist durch Start-Parameter (Level, Seed, Sprit, Credits, mitfahrender Fahrgast) und die
+## Eingaben je Tick vollständig bestimmt, weil Run/TaxiSim deterministisch sind. Gespeichert wird lauflängenkodiert
+## (RLE) als JSON; `play()` rechnet einen Lauf headless nach und liefert das Ergebnis (Verifikation, später Geist).
+
+const VERSION := 1
+const DIR := "user://replays/"
+
+var level_id := ""
+var seed := -1
+var fuel := -1.0
+var credits := 0.0
+var carry: Dictionary = {}
+var extras := true
+var runs: Array = []          # [Anzahl Ticks, qx, qy, gear(0/1)]
+var events: Array = []        # [Tick, "respawn"]
+var ticks := 0
+var result: Dictionary = {}
+
+## Eingaben werden auf 1/127 gerundet, damit Aufzeichnung und Wiedergabe exakt dieselben Werte rechnen.
+static func quantize(v: Vector2) -> Vector2:
+	return Vector2(roundi(clampf(v.x, -1.0, 1.0) * 127.0) / 127.0, roundi(clampf(v.y, -1.0, 1.0) * 127.0) / 127.0)
+
+func begin(id: String, run_seed: int, fuel_in: float, credits_in: float, carry_in: Dictionary, extras_on: bool) -> void:
+	level_id = id
+	seed = run_seed
+	fuel = fuel_in
+	credits = credits_in
+	carry = carry_in.duplicate(true)
+	extras = extras_on
+	runs.clear()
+	events.clear()
+	ticks = 0
+	result = {}
+
+func add(v: Vector2, gear: bool) -> void:
+	var qx := roundi(clampf(v.x, -1.0, 1.0) * 127.0)
+	var qy := roundi(clampf(v.y, -1.0, 1.0) * 127.0)
+	var g := 1 if gear else 0
+	if not runs.is_empty() and runs[-1][1] == qx and runs[-1][2] == qy and runs[-1][3] == g:
+		runs[-1][0] += 1
+	else:
+		runs.append([1, qx, qy, g])
+	ticks += 1
+
+func mark_respawn() -> void:
+	events.append([ticks, "respawn"])
+
+func finish(res: Dictionary) -> void:
+	result = res
+
+func to_dict() -> Dictionary:
+	return {"v": VERSION, "level": level_id, "seed": seed, "fuel": fuel, "credits": credits, "carry": carry, "extras": extras,
+		"ticks": ticks, "runs": runs, "events": events, "result": result}
+
+## Rechnet einen Lauf nach. Rückgabe: {complete, time, money, earned, delivered, ticks}.
+static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
+	var r := Run.new()
+	r.extras_enabled = bool(d.get("extras", true))
+	r.start(lvl, float(d.get("fuel", -1.0)), float(d.get("credits", 0.0)), int(d.get("seed", -1)))
+	var carry_d: Dictionary = d.get("carry", {})
+	if not carry_d.is_empty():
+		r.release_carried(carry_d)
+	var evs: Array = d.get("events", [])
+	var ei := 0
+	var tick := 0
+	for run_entry in d.get("runs", []):
+		var v := Vector2(float(run_entry[1]) / 127.0, float(run_entry[2]) / 127.0)
+		for k in int(run_entry[0]):
+			while ei < evs.size() and int(evs[ei][0]) == tick:
+				r.respawn_after_crash()
+				ei += 1
+			r.step(v, int(run_entry[3]) == 1)
+			tick += 1
+			if r.result == Run.Result.COMPLETE:
+				break
+		if r.result == Run.Result.COMPLETE:
+			break
+	return {"complete": r.result == Run.Result.COMPLETE, "time": r.level_time, "money": r.money, "earned": r.earned,
+		"delivered": r.delivered, "ticks": tick}
+
+static func path_for(id: String) -> String:
+	return DIR + id + ".json"
+
+## Speichert den Lauf, wenn er schneller ist als der bisher gespeicherte (nur abgeschlossene Läufe).
+static func save_if_best(d: Dictionary) -> bool:
+	if not bool(d.get("result", {}).get("complete", false)):
+		return false
+	DirAccess.make_dir_recursive_absolute(DIR)
+	var p := path_for(String(d.level))
+	if FileAccess.file_exists(p):
+		var old = JSON.parse_string(FileAccess.get_file_as_string(p))
+		if typeof(old) == TYPE_DICTIONARY and float(old.get("result", {}).get("time", 1e9)) <= float(d.result.time):
+			return false
+	var f := FileAccess.open(p + ".tmp", FileAccess.WRITE)
+	if f == null:
+		return false
+	f.store_string(JSON.stringify(d))
+	f.close()
+	DirAccess.rename_absolute(p + ".tmp", p)
+	return true
+
+static func load_best(id: String) -> Dictionary:
+	var p := path_for(id)
+	if not FileAccess.file_exists(p):
+		return {}
+	var d = JSON.parse_string(FileAccess.get_file_as_string(p))
+	return d if typeof(d) == TYPE_DICTIONARY and int(d.get("v", 0)) == VERSION else {}

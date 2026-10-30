@@ -178,5 +178,7 @@
  "RES_DEDUCT": "Deductions: repairs −¢%d · replacement taxis −¢%d · missed −¢%d",
  "RES_NET": "Result ¢%+d   Balance ¢%d",
  "RES_CONTINUE": "Enter / A: continue to the next level",
- "RES_TO_MENU": "Enter / A: back to the menu"
+ "RES_TO_MENU": "Enter / A: back to the menu",
+ "RES_SCORE": "Score %d  (best %d)",
+ "STAT_SCORE": "Total score"
 }

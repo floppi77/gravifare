@@ -194,6 +194,23 @@ func _ride_hit(e: Dictionary) -> void:
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
 
+## Ausgangs-Fahrgast des Vorlevels steigt auf der Startplattform aus und geht zum Unterstand (Zahlung bei Ankunft).
+func release_carried(c: Dictionary) -> void:
+	if c.is_empty() or sim.landed_pad.is_empty():
+		return
+	var a := PassengerActor.new()
+	a.setup({"passenger": c.name, "gender": c.gender, "look": c.look}, sim.landed_pad, 0, true)
+	a.pay_info = c.get("pay_info", {})
+	a.step_out(sim.pos.x, sim.landed_pad)
+	leavers.append(a)
+
+## Punkte eines Levels: Netto-Einnahmen + 150 je Stern + 2 je Sekunde unter dem Zeitziel + 10 je perfekter Landung.
+func level_score() -> int:
+	var net := maxf(0.0, earned - repair_cost - taxi_fees - missed_fees)
+	var med := medals()
+	var stars := int(med.time) + int(med.clean) + int(med.pro)
+	return int(round(net + 150.0 * stars + 2.0 * maxf(0.0, time_target() - level_time) + 10.0 * perfect_count))
+
 ## Zielplattform eines wartenden Fahrgasts ("1".."9" oder "exit"), "" wenn unbekannt.
 func dest_of(a: PassengerActor) -> String:
 	var ex := extra_of(a)

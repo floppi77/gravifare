@@ -13,6 +13,7 @@ var near_cd := 0.0
 var slowmo_left := 0.0
 var completion_saved := false
 const TV := preload("res://src/game/transition_view.gd")
+var replay: Replay = null              # Aufzeichnung des laufenden Levels (Replay-Fundament)
 var arrive_path := PackedVector2Array()   # hindernisfreier Einflug-Pfad (Pathing.arrival_path)
 var trans_t := -1.0              # Zeitachse des Levelwechsels (siehe transition_view.gd), < 0 = inaktiv
 var next_id := ""
@@ -119,6 +120,8 @@ func load_level(path: String) -> void:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
+	replay = Replay.new()
+	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
 	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
 	gear_on = run.sim.gear_cmd
@@ -228,6 +231,9 @@ func _physics_process(_delta: float) -> void:
 		v = cmd.v
 		gear_on = cmd.g
 	var gear_before := run.sim.gear_cmd
+	v = Replay.quantize(v)
+	if run.result == Run.Result.RUNNING:
+		replay.add(v, gear_on)
 	run.step(v, gear_on)
 	if run.sim.gear_cmd != gear_before:
 		Sfx.play("gear")
@@ -252,7 +258,13 @@ func _physics_process(_delta: float) -> void:
 		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
 		hud.result_age = 0.0
 		hud.next_exists = Flow.next_level_id() != ""
-		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med)
+		var score := run.level_score()
+		hud.result["score"] = score
+		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
+		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
+		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
+		if not Save.dev_session:
+			Replay.save_if_best(replay.to_dict())
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() == "":
@@ -273,6 +285,7 @@ func _lose_life() -> void:
 		hud.game_over = true
 		Save.clear_campaign()
 		return
+	replay.mark_respawn()
 	run.respawn_after_crash()
 	gear_on = run.sim.gear_cmd
 	restart_timer = 0.0
@@ -638,16 +651,9 @@ func _arrival_tick() -> void:
 	Sfx.set_thrust(taxi.flame_main * 0.7, absf(taxi.flame_side))
 
 func _release_carried() -> void:
-	## Der Ausgangs-Fahrgast des letzten Levels steigt auf der Startplattform aus und geht in den Unterstand.
 	var c: Dictionary = Flow.carry_passenger
 	Flow.carry_passenger = {}
-	if c.is_empty() or run.sim.landed_pad.is_empty():
-		return
-	var a := PassengerActor.new()
-	a.setup({"passenger": c.name, "gender": c.gender, "look": c.look}, run.sim.landed_pad, 0, true)
-	a.pay_info = c.get("pay_info", {})            # Bezahlt wird, wenn er sein Häuschen erreicht
-	a.step_out(run.sim.pos.x, run.sim.landed_pad)
-	run.leavers.append(a)
+	run.release_carried(c)
 
 func _end_transition() -> void:
 	Music.duck(0.0)

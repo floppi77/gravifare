@@ -33,6 +33,7 @@ func _ready() -> void:
 		["STAT_DELIVERIES", "%d" % int(st.get("deliveries", 0))],
 		["STAT_PERFECT", "%d" % int(st.get("perfect_landings", 0))],
 		["STAT_STREAK", "%d" % int(st.get("best_streak", 0))],
+		["STAT_SCORE", "%d" % Save.total_score()],
 		["STAT_CREDITS", "¢ %d" % int(st.get("credits_total", 0))],
 		["STAT_CRASHES", "%d" % int(st.get("crashes", 0))],
 		["STAT_PUMP", "%d / %d" % [int(st.get("pump_hits", 0)), int(st.get("pump_explosions", 0))]],

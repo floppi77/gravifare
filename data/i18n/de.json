@@ -178,5 +178,7 @@
  "RES_DEDUCT": "Abzüge: Reparatur −¢%d · Ersatztaxis −¢%d · Verpasst −¢%d",
  "RES_NET": "Ergebnis ¢%+d   Kontostand ¢%d",
  "RES_CONTINUE": "Enter / A: Weiter zum nächsten Level",
- "RES_TO_MENU": "Enter / A: Zurück zum Menü"
+ "RES_TO_MENU": "Enter / A: Zurück zum Menü",
+ "RES_SCORE": "Punkte %d  (Bestwert %d)",
+ "STAT_SCORE": "Gesamtpunkte"
 }
