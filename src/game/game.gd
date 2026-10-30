@@ -38,6 +38,7 @@ func _ready() -> void:
 	unlit.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
 	props.material = unlit
 	taxi.material = unlit
+	_setup_look()
 	load_level(level_path)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--debug-input="):
@@ -46,6 +47,9 @@ func _ready() -> void:
 			gear_on = false
 			run.sim.state = TaxiSim.State.FLYING
 			run.sim.landed_pad = {}
+	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
+		run.sim.hull = 0.0
+		run.sim.state = TaxiSim.State.DESTROYED
 	if OS.get_cmdline_user_args().has("--autopilot"):
 		autopilot = Bot.new(run)
 	if OS.get_cmdline_user_args().has("--debug-complete"):
@@ -58,6 +62,32 @@ func _ready() -> void:
 		run.exit_open = true
 		run.level.exit_open = true
 		props.door = 1.0
+
+## Bildcharakter: HDR-Bloom auf Lichter/Abgase/Neon, leichte Farbkorrektur und Vignette für Tiefe.
+func _setup_look() -> void:
+	var env := Environment.new()
+	env.background_mode = Environment.BG_CANVAS
+	env.glow_enabled = true
+	env.glow_hdr_threshold = 0.92
+	env.glow_intensity = 0.55
+	env.glow_strength = 1.0
+	env.glow_bloom = 0.0
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child(we)
+	var layer := CanvasLayer.new()
+	layer.layer = 5
+	var rect := ColorRect.new()
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\nvoid fragment() {\n\tvec2 u = (UV - 0.5) * vec2(1.0, 1.1);\n\tfloat d = dot(u, u);\n\tCOLOR = vec4(0.0, 0.0, 0.04, smoothstep(0.2, 0.62, d) * 0.42);\n}\n"
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	rect.material = mat
+	layer.add_child(rect)
+	add_child(layer)
 
 func load_level(path: String) -> void:
 	var lvl := LevelData.load_file(path)

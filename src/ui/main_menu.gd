@@ -6,18 +6,9 @@ var box: VBoxContainer
 func _ready() -> void:
 	theme = MenuKit.make_theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var bg := TextureRect.new()
-	bg.texture = load("res://assets/art/bg_s1_far.png")
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_SCALE
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-	var near := TextureRect.new()
-	near.texture = load("res://assets/art/bg_s1_near.png")
-	near.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	near.stretch_mode = TextureRect.STRETCH_SCALE
-	near.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(near)
+	var backdrop := Control.new()
+	backdrop.set_script(load("res://src/ui/menu_backdrop.gd"))
+	add_child(backdrop)
 	box = VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	box.alignment = BoxContainer.ALIGNMENT_CENTER

@@ -60,12 +60,22 @@ static func slider_row(label: String, value: float, on_change: Callable) -> HBox
 ## Flaggenknopf für die Sprachwahl (kein Text). Gewählte Sprache: goldener Rahmen; Fokus: weißer Rahmen.
 static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callable) -> Button:
 	var b := Button.new()
-	b.icon = tex
-	b.expand_icon = true
-	b.add_theme_constant_override("icon_max_width", 40)
-	b.custom_minimum_size = Vector2(52, 36)
+	b.custom_minimum_size = Vector2(54, 38)
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_ALL
+	# Flagge als zentriertes Kind (Button-Icons sitzen nicht mittig im Rahmen)
+	var flag := TextureRect.new()
+	flag.texture = tex
+	flag.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	flag.stretch_mode = TextureRect.STRETCH_SCALE
+	flag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flag.set_anchors_preset(Control.PRESET_CENTER)
+	flag.offset_left = -20.0
+	flag.offset_right = 20.0
+	flag.offset_top = -13.33
+	flag.offset_bottom = 13.33
+	flag.modulate = Color(1, 1, 1, 1.0 if selected else 0.62)
+	b.add_child(flag)
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = Color("#10142b")
 	normal.border_color = Color("#ffe14a") if selected else Color("#3a4580")
@@ -78,9 +88,8 @@ static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callabl
 		b.add_theme_stylebox_override(st, normal)
 	for st in ["hover", "focus", "pressed"]:
 		b.add_theme_stylebox_override(st, focus)
-	b.add_theme_color_override("icon_normal_color", Color(1, 1, 1, 1.0 if selected else 0.62))
-	for c in ["icon_hover_color", "icon_focus_color", "icon_pressed_color"]:
-		b.add_theme_color_override(c, Color.WHITE)
+	b.focus_entered.connect(func(): flag.modulate = Color.WHITE)
+	b.focus_exited.connect(func(): flag.modulate = Color(1, 1, 1, 1.0 if selected else 0.62))
 	b.pressed.connect(func():
 		Sfx.play("ui_ok")
 		cb.call())

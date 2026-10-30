@@ -119,6 +119,29 @@ def tiles():
     for k in range(3): plate(d, rnd, (7 + k) * T, 0, deep=True)
     img.save(OUT + "tiles_s1.png")
 
+def tiles_normal():
+    """Normal-Map zum Tile-Atlas (OpenGL-Konvention, Grün = oben), aus der Helligkeit des Diffuse-Tiles abgeleitet:
+    Fasen, Nieten, Schlitze und Rillen bekommen so echtes Relief unter den 2D-Lichtern."""
+    from scipy.ndimage import gaussian_filter, sobel
+    im = Image.open(OUT + "tiles_s1.png").convert("RGBA")
+    a = np.array(im).astype(float)
+    out = np.zeros_like(a); out[:, :, 0] = 128; out[:, :, 1] = 128; out[:, :, 2] = 255; out[:, :, 3] = 255
+    for i in range(im.size[0] // T):
+        tile = a[:, i * T:(i + 1) * T, :]
+        lum = (0.3 * tile[:, :, 0] + 0.59 * tile[:, :, 1] + 0.11 * tile[:, :, 2]) / 255.0
+        h = gaussian_filter(lum, 0.8, mode="nearest")
+        dx = sobel(h, axis=1, mode="nearest") / 8.0
+        dy = sobel(h, axis=0, mode="nearest") / 8.0
+        k = 3.0
+        nx, ny, nz = -dx * k, dy * k, np.ones_like(h)
+        ln = np.sqrt(nx * nx + ny * ny + nz * nz)
+        n = np.stack([nx / ln, ny / ln, nz / ln], axis=2)
+        blk = (n * 0.5 + 0.5) * 255.0
+        flat = tile[:, :, 3] < 10
+        blk[flat] = (128, 128, 255)
+        out[:, i * T:(i + 1) * T, :3] = blk
+    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "tiles_s1_n.png")
+
 # ------------------------------------------------------------------ Taxi
 def taxi():
     W, H = 96, 60
@@ -510,6 +533,6 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "taxi", "passengers", "shelter", "gate", "background", "space", "flags"):
+    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "background", "space", "flags"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

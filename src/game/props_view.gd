@@ -38,6 +38,7 @@ func _draw() -> void:
 	_draw_pads()
 	_draw_gate()
 	_draw_actors()
+	_draw_taxi_shadow()
 
 func _draw_pads() -> void:
 	var font := ThemeDB.fallback_font
@@ -151,3 +152,25 @@ func _draw_actors() -> void:
 		_draw_actor(l)
 	if run.actor != null:
 		_draw_actor(run.actor)
+
+## Weicher Kontaktschatten des Taxis auf der Fläche darunter: wird mit der Höhe kleiner und blasser.
+func _draw_taxi_shadow() -> void:
+	var s := run.sim
+	if s.state == TaxiSim.State.DESTROYED:
+		return
+	var y := s.pos.y + 8.0
+	var gy := -1.0
+	while y < s.pos.y + 90.0:
+		if level.is_solid_at(Vector2(s.pos.x, y)):
+			gy = floorf(y / T) * T
+			break
+		y += 2.0
+	if gy < 0.0:
+		return
+	var h := clampf((gy - (s.pos.y + 10.0)) / 80.0, 0.0, 1.0)
+	var w := lerpf(26.0, 12.0, h)
+	var a := lerpf(0.5, 0.08, h)
+	var cx := s.pos.x
+	for i in 3:
+		var f := 1.0 - i * 0.28
+		draw_rect(Rect2(cx - w * f * 0.5, gy - 1.3 + i * 0.45, w * f, 1.2), Color(0.02, 0.02, 0.09, a * (0.5 + i * 0.25)))

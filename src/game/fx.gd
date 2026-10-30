@@ -31,6 +31,7 @@ static func make_light(color: Color, radius: float, energy: float, shadows := fa
 	l.texture_scale = radius * 2.0 / 256.0
 	l.color = color
 	l.energy = energy
+	l.height = radius * 0.55          # Höhe über der Ebene: Normal-Maps der Tiles reagieren darauf
 	l.shadow_enabled = shadows
 	l.shadow_filter = Light2D.SHADOW_FILTER_NONE
 	l.shadow_color = Color(0, 0, 0, 0.7)

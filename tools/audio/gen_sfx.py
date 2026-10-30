@@ -7,8 +7,9 @@ rng = np.random.default_rng(5)
 
 def save(name, x):
     x = np.clip(x, -1, 1)
+    ch = 1 if x.ndim == 1 else x.shape[1]
     with wave.open(OUT + name + ".wav", "wb") as w:
-        w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
+        w.setnchannels(ch); w.setsampwidth(2); w.setframerate(SR)
         w.writeframes((x * 32000).astype("<i2").tobytes())
 
 def t(d): return np.arange(int(SR * d)) / SR
@@ -65,35 +66,124 @@ def board():
 def exit_open():
     x = np.concatenate([np.sin(2 * np.pi * f * t(0.1)) * 0.35 * env(int(0.1 * SR), 0.005, 0.05) for f in (523, 659, 784, 1047)])
     save("exit", x)
+def pan(x, p):
+    """Mono -> Stereo mit Gleichleistungs-Panorama (p: -1 links ... +1 rechts, auch als Array)."""
+    ang = (np.asarray(p) + 1.0) * np.pi / 4.0
+    return np.stack([x * np.cos(ang), x * np.sin(ang)], axis=1)
+
+def sos(x, kind, fc, order=2):
+    from scipy import signal
+    return signal.sosfilt(signal.butter(order, fc, btype=kind, fs=SR, output="sos"), x)
+
+def saw_f(freq):
+    """Sägezahn mit zeitveränderlicher Frequenz (Array)."""
+    ph = np.cumsum(freq) / SR
+    return 2.0 * (ph % 1.0) - 1.0
+
+def reverb(st, seconds=1.8, decay=2.6, wet=0.28):
+    from scipy import signal
+    n = int(seconds * SR); tt = np.arange(n) / SR
+    out = np.zeros_like(st)
+    for ch in range(2):
+        ir = rng.standard_normal(n) * np.exp(-tt * decay)
+        ir = sos(ir, "lowpass", 4500)                       # dunkler Raum
+        ir[:int(0.012 * SR)] *= np.linspace(0, 1, int(0.012 * SR))
+        out[:, ch] = signal.fftconvolve(st[:, ch], ir)[:len(st)] * (1.0 / np.sqrt(n / 300.0))
+    return st * (1.0 - wet * 0.5) + out * wet
+
+def pingpong(st, delay_s, fb=0.4, mix=0.35):
+    d = int(delay_s * SR); out = st.copy()
+    buf = st.copy()
+    for k in range(1, 6):
+        sh = np.zeros_like(st)
+        sh[k * d:, 0] = st[:len(st) - k * d, 1 if k % 2 else 0]
+        sh[k * d:, 1] = st[:len(st) - k * d, 0 if k % 2 else 1]
+        out += sh * (fb ** k) * mix
+    return out
+
+def midi(n): return 440.0 * 2 ** ((n - 69) / 12.0)
+
 def transit():
-    """8 s Weltraumflug, passend zur Levelwechsel-Sequenz (0-2 s Ausblenden, 2-5,6 s Flug, 5,6-8 s Anflug).
-    Eigene Synthese: ansteigendes Antriebsbrummen, Vorbeiflug-Whooshes mit Doppler, Funkeln, abfallender Sweep."""
+    """8 s Weltraumflug in Stereo, zeitgenau zur Levelwechsel-Sequenz:
+       0-2 s Aufstieg (Riser) beim Ausblenden, 2 s Einschlag, 2-5,6 s Flug (Pads, Arpeggio, Vorbeiflüge),
+       5,6-8 s Abbremsen und Auflösung beim Anflug. Eigene Synthese, kein Fremdmaterial."""
     d = 8.0; tt = t(d); n = len(tt)
-    # Antriebsfrequenz: steigt 0-2 s, hält, fällt zum Anflug
-    f = np.interp(tt, [0, 2.0, 5.6, 8.0], [55, 138, 142, 80])
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    drone = (np.sin(ph) + 0.5 * np.sin(2 * ph) + 0.28 * np.sign(np.sin(ph * 0.5))) * 0.22
-    amp = np.interp(tt, [0, 1.6, 2.4, 5.6, 7.4, 8.0], [0, 0.7, 1.0, 1.0, 0.55, 0])
-    sweep_f = np.interp(tt, [0, 2.0], [180, 2200])           # Aufstiegs-Sweep beim Ausblenden
-    sw = np.sin(2 * np.pi * np.cumsum(sweep_f) / SR) * 0.12 * np.interp(tt, [0, 0.3, 1.8, 2.2], [0, 1, 0.8, 0])
-    noise = rng.standard_normal(n)
-    air = lp(noise, 0.06) * 0.5 * np.interp(tt, [0, 1.5, 2.2, 5.4, 6.4], [0, 0.6, 0.35, 0.35, 0])
-    whoosh = np.zeros(n)
-    for t0, w in ((2.6, 0.9), (3.9, 1.1), (5.0, 0.8)):      # Planeten ziehen vorbei
-        env_ = np.exp(-((tt - t0) / (w * 0.35)) ** 2)
-        shifted = lp(noise, 0.035 + 0.25 * np.clip((tt - t0) / w + 0.5, 0, 1) ** 2)
-        whoosh += shifted * env_ * 1.3
-    notes = [523, 659, 784, 988, 784, 659]                   # leises Funkeln
-    spark = np.zeros(n)
-    for i, fr in enumerate(notes):
-        s0 = int((2.4 + i * 0.55) * SR); ln = int(0.5 * SR)
-        if s0 + ln < n:
-            x = np.arange(ln) / SR
-            spark[s0:s0 + ln] += np.sin(2 * np.pi * fr * x) * np.exp(-x * 6) * 0.07
-    down = np.sin(2 * np.pi * np.cumsum(np.interp(tt, [5.6, 8.0], [900, 120])) / SR) * 0.07 * np.interp(tt, [5.5, 5.9, 7.2, 8.0], [0, 1, 0.5, 0])
-    x = drone * amp + sw + air + whoosh * 0.55 + spark + down
-    x = np.tanh(x * 1.2) * 0.85
-    save("transit", x)
+    st = np.zeros((n, 2))
+    # --- Riser (0-2 s): Rauschsweep + Tonsweep + Subbass
+    sweep_k = np.interp(tt, [0, 2.0], [0.01, 0.75])
+    noise = lp(rng.standard_normal(n), sweep_k)
+    noise = sos(noise - lp(noise, 0.004), "lowpass", 4200) * 0.55   # Bandpass-Charakter, nicht zu zischend
+    r_env = np.interp(tt, [0, 0.2, 1.7, 2.0, 2.06], [0, 0.25, 1.0, 1.0, 0.0])
+    riser_f = 110 * (1760 / 110) ** np.clip(tt / 2.0, 0, 1)
+    tone = sos(saw_f(riser_f * (1 + 0.004 * np.sin(2 * np.pi * 6 * tt))), "lowpass", 3500) * 0.16
+    sub = np.sin(2 * np.pi * np.cumsum(np.interp(tt, [0, 2.0], [38, 72])) / SR) * 0.45
+    st += pan((noise * 0.9 + tone) * r_env, np.interp(tt, [0, 2.0], [-0.5, 0.5]))
+    st += pan(sub * np.interp(tt, [0, 1.8, 2.05], [0, 0.8, 0]), 0.0)
+    # --- Einschlag bei 2,0 s: Boom + Funkeln
+    ti = np.clip(tt - 2.0, 0, None) * (tt >= 2.0)
+    boom = np.sin(2 * np.pi * (52 + 70 * np.exp(-ti * 9)) * ti) * np.exp(-ti * 3.2) * (tt >= 2.0) * 0.9
+    burst = sos(rng.standard_normal(n), "lowpass", 2500) * np.exp(-ti * 9) * (tt >= 2.0) * 0.5
+    bell = np.sin(2 * np.pi * 1318 * ti + 2.2 * np.sin(2 * np.pi * 1976 * ti)) * np.exp(-ti * 4.0) * (tt >= 2.0) * 0.12
+    st += pan(boom + burst, 0.0) + pan(bell, np.sin(ti * 3) * 0.6)
+    # --- Pad-Akkorde: Am(add9) 2,0-3,8 und Fmaj7 3,8-5,6, danach Auflösung nach C(add9) ab 5,6
+    chords = [(2.0, 3.9, [45, 52, 60, 64, 71]), (3.8, 5.7, [41, 48, 57, 60, 64]), (5.6, 8.0, [48, 55, 60, 64, 67, 74])]
+    pad = np.zeros((n, 2))
+    for (t0, t1, notes) in chords:
+        L = int((t1 - t0) * SR); i0 = int(t0 * SR)
+        x = np.arange(L) / SR
+        env = np.minimum(1.0, x / 0.45) * np.clip((t1 - t0 - x) / 0.7, 0, 1)
+        if t0 >= 5.6:
+            env = np.minimum(1.0, x / 0.6) * np.clip((t1 - t0 - x) / 0.9, 0, 1) * 0.9
+        for j, nn in enumerate(notes):
+            for det, p in ((-6, -0.5), (0, 0.0), (6, 0.5)):
+                f = midi(nn) * 2 ** (det / 1200.0)
+                seg = saw_f(np.full(L, f)) * env * (0.045 if nn < 60 else 0.03)
+                pad[i0:i0 + L] += pan(seg, p * (1 if j % 2 else -1))
+    cutoff = 900 + 700 * np.sin(2 * np.pi * 0.3 * tt)
+    for ch in range(2):
+        pad[:, ch] = sos(pad[:, ch], "lowpass", 1700)
+    st += pad
+    # --- Arpeggio (16tel bei 140 bpm) 2,2-5,5 und Funkel-Auflösung 6,2-7,3
+    step = 60.0 / 140.0 / 4.0
+    pattern = [69, 72, 76, 81, 76, 72, 79, 76, 72, 69, 74, 77, 81, 77, 74, 72]
+    arp = np.zeros((n, 2))
+    k = 0; t0 = 2.2
+    while t0 < 5.5:
+        nn = pattern[k % len(pattern)] + (-4 if t0 > 3.9 else 0)     # zweiter Akkord tiefer (F)
+        L = int(0.26 * SR); i0 = int(t0 * SR); x = np.arange(L) / SR
+        f = midi(nn)
+        seg = (saw_f(np.full(L, f)) * 0.6 + np.sign(np.sin(2 * np.pi * f * x)) * 0.4) * np.exp(-x * 13) * 0.07
+        seg = sos(seg, "lowpass", 2400)
+        arp[i0:i0 + L] += pan(seg, 0.35 * (1 if k % 2 else -1))
+        t0 += step; k += 1
+    t0 = 6.3
+    for j, nn in enumerate([84, 88, 91, 96]):
+        L = int(0.6 * SR); i0 = int(t0 * SR); x = np.arange(L) / SR
+        arp[i0:i0 + L] += pan(np.sin(2 * np.pi * midi(nn) * x) * np.exp(-x * 5) * 0.05, -0.4 + 0.27 * j)
+        t0 += step * 2
+    st += pingpong(arp, 3 * step, 0.45, 0.45)
+    # --- Antriebsdrohnen (steigt, hält, fällt beim Anflug)
+    f_eng = np.interp(tt, [0, 2.0, 5.6, 8.0], [50, 110, 112, 62])
+    eng = sos(saw_f(f_eng) + 0.5 * saw_f(f_eng * 1.005), "lowpass", 380) * 0.17
+    eng += sos(rng.standard_normal(n), "lowpass", 260) * 0.06
+    st += pan(eng * np.interp(tt, [0, 1.5, 2.3, 5.6, 7.2, 8.0], [0, 0.5, 1.0, 1.0, 0.55, 0.0]), 0.0)
+    # --- Vorbeiflüge (Planeten) mit Doppler-Filter und Panorama links->rechts
+    for t0, w, big in ((2.7, 0.9, 0.7), (3.95, 1.25, 1.0), (5.0, 0.8, 0.6)):
+        env = np.exp(-((tt - t0) / (w * 0.33)) ** 2)
+        k_t = 0.03 + 0.28 * np.clip((tt - t0) / w + 0.55, 0, 1) ** 2   # Hochlauf des Filters = Doppler
+        sh = sos(lp(rng.standard_normal(n) * env, k_t), "lowpass", 3800) * 1.5 * big
+        st += pan(sh * 0.42, np.clip((tt - t0) / w * 1.2, -1, 1))
+    # --- Anflug-Abstieg (5,6-7,6)
+    f_dn = np.interp(tt, [5.6, 7.6], [1500, 150])
+    down = sos(saw_f(f_dn), "lowpass", 2200) * 0.09 * np.interp(tt, [5.5, 5.9, 7.0, 7.7], [0, 1, 0.45, 0])
+    st += pan(down, np.interp(tt, [5.6, 7.6], [0.6, -0.2]))
+    st = reverb(st)
+    for ch in range(2):
+        st[:, ch] = sos(st[:, ch], "lowpass", 9500)
+    peak = np.abs(st).max()
+    st = np.tanh(st / peak * 1.25) / np.tanh(1.25) * 0.88
+    st[-int(0.3 * SR):] *= np.linspace(1, 0, int(0.3 * SR))[:, None] ** 2
+    save("transit", st)
 
 def ui_move():
     tt = t(0.04); save("ui_move", np.sign(np.sin(2 * np.pi * 700 * tt)) * 0.15 * env(len(tt), 0.002, 0.02))

@@ -7,7 +7,13 @@ const PX := 1.0 / 3.0                 # ein Bildschirmpixel bei 1080p in Weltein
 
 var level: LevelData
 var run: Run
-var tiles_tex: Texture2D = preload("res://assets/art/tiles_s1.png")
+var tiles_tex: Texture2D
+
+func _ready() -> void:
+	var ct := CanvasTexture.new()
+	ct.diffuse_texture = load("res://assets/art/tiles_s1.png")
+	ct.normal_texture = load("res://assets/art/tiles_s1_n.png")
+	tiles_tex = ct
 
 func setup(r: Run) -> void:
 	run = r

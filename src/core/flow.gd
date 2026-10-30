@@ -60,6 +60,8 @@ func _ready() -> void:
 			for act in ["ui_accept", "ui_cancel", "ui_up", "ui_down", "gear", "pause"]:
 				print(act, " -> ", InputMap.action_get_events(act).map(func(e): return e.as_text()))
 			get_tree().quit.call_deferred()
+		if a.begins_with("--lives="):         # Dev: Anzahl Leben für diesen Lauf
+			lives = int(a.substr(8))
 		if a.begins_with("--lang="):          # Dev: Sprache für diesen Lauf setzen (nicht gespeichert)
 			Loc.set_language(a.substr(7))
 		if a.begins_with("--shot="):

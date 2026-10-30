@@ -3,7 +3,7 @@
 2D-Arcade-Schwebetaxi in Godot 4.7: Trägheit, Schwerkraft, präzise Landungen, 99 handgestaltete Level in 9 Sektoren.
 Geistiger Nachfolger des Genres „Flugtaxi“ – eigene Welt, eigene Level, eigene Grafik und Klänge.
 
-**Stand:** Meilenstein M1 abgeschlossen, M2 (Vertical Slice) in Arbeit: 3 Level, Fahrgäste mit Wartebereichen und Sprachausgabe (DE/EN), Levelwechsel-Sequenz, Licht/Partikel, Sprachwahl per Flagge. Siehe [DESIGN.md](DESIGN.md) und [TESTING.md](TESTING.md).
+**Stand:** Meilenstein M1 abgeschlossen, M2 (Vertical Slice) in Arbeit: 3 Level mit Schwierigkeitsmetrik, 5 Leben, Fahrgäste mit Wartebereichen und Sprachausgabe (DE/EN), zeitabhängige Bezahlung, Levelwechsel-Sequenz, Licht/Normal-Maps/Partikel, animiertes Menü, Sprachwahl per Flagge. Siehe [DESIGN.md](DESIGN.md) und [TESTING.md](TESTING.md).
 Der Titel ist vorläufig; vor einer Veröffentlichung ist eine Markenprüfung (DE/EU) nötig. Eine Lizenz für das eigene Spiel ist **nicht** festgelegt.
 
 ## Starten

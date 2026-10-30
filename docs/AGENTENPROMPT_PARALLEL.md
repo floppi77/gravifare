@@ -325,3 +325,15 @@ Zahlen, die im Originaltext fehlen: Es sind **99 Level** (9 Sektoren à 11 Level
 - `godot --headless --import` einmal nach frischem Checkout (baut den Klassen-Cache); Tests: `godot --headless -s tests/test_runner.gd`.
 - Fallstricke: `CPUParticles2D` hat kein `amount_ratio`; `GDScript` braucht explizite Typen bei Variant-Werten; `pgrep -f`/`pkill -f` treffen die eigene Shell – nicht in Warteschleifen verwenden; `godot --minimized` öffnet unter KDE/Wayland **nicht** minimiert; TextureRect mit großer Textur braucht `expand_mode = EXPAND_IGNORE_SIZE` + `STRETCH_SCALE`; Icon in Button zentrieren, indem man ein zentriertes TextureRect-Kind nutzt (sonst sitzt die Flagge schief im Rahmen); `Control`-Layout in CanvasLayern mit `set_anchors_and_offsets_preset` setzen; Screenshots: `--rendering-driver opengl3 -- --shot=… --frames=…`.
 - Bewährt: Tile-Raster 16 px, Level 40×22 Tiles, Pads/Unterstände aus ASCII-Karte, Autopilot-Bot als Spieltester, Levelwerkzeug (`Grid`-Klasse mit `pad()`, `gate()`), Kontaktbogen-Screenshots je Level.
+
+---
+
+# D) Nachtrag aus dem laufenden Parallelprojekt (neuere Erkenntnisse)
+
+- **Schwierigkeitsmetrik** (Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Padbreite + 10·Gefahren; Enge = engster Flugkorridor der Bot-Route per BFS mit wachsendem Sicherheitsrand) – Test erzwingt, dass sie über die Levelnummern nicht fällt. Typische Stolperfalle: Zwischen einem von der Decke hängenden Block (z. B. dem Torblock) und einem Block darunter müssen mindestens **96 px** Durchflug bleiben; zwischen Regal und hängendem Block mindestens **80 px** (sonst ist der Anflug zu eng – der Auftraggeber hat genau das bemängelt).
+- Jedes Level muss **ab Mindest-Sprit 35 %** lösbar sein (ggf. Tankpad einbauen, sonst Sackgasse). Der Bot sollte nur bei kritischem Stand (< 14 %) tanken, sonst pendelt er zwischen Tankstelle und Auftrag.
+- Fahrgast-Spawn-Regel kann den Bot festsetzen, wenn ein Level sie verletzt (Fahrgast erscheint nicht, solange das Taxi auf seinem Pad steht) → Levelregel per Test erzwingen.
+- **Optik**: Normal-Maps aus der Helligkeit der Tiles ableiten (OpenGL-Konvention), `PointLight2D.height` setzen; **kein `hdr_2d`** und keine `adjustment_*`-Farbkorrektur (Bild wird zu dunkel/überzogen); Umgebungslicht ≈ (0,86/0,90/1,0); Glow-Schwelle ≈ 0,92. Screenshots mit dem Standard-Renderer (Forward+) machen, nicht mit `--rendering-driver opengl3`, sonst weicht der Look ab.
+- **Transit-Sound**: Stereo, zeitgenau zur Sequenz (2 s Riser, Einschlag bei 2,0 s, Pad-Akkorde, Arpeggio mit Ping-Pong-Delay, Vorbeiflug-Whooshes mit Doppler, Abwärts-Sweep, Raumhall, am Ende leise zum Aufsetzen); Spektralschwerpunkt maschinell prüfen (< ~3 kHz, kein Zischen), Spitze < 0,9, kein Clipping.
+- Skyline-/Nebel-Scrolling im Menü: jede zweite Kachel spiegeln, dann sind die Nähte unsichtbar.
+- Mit ausgefahrenem Fahrwerk ist die Geschwindigkeit auf 90 px/s begrenzt; Sturztests (Sofortzerstörung ab 170 px/s) deshalb ohne Fahrwerk durchführen (`gear = 0` explizit setzen – das Setup startet gelandet mit ausgefahrenem Fahrwerk).
