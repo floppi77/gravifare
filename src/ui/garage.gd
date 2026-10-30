@@ -118,5 +118,5 @@ func _column(kind: String, x: float, head: String) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()   # vor dem Szenenwechsel, danach hat der Knoten keinen Viewport mehr
 		Flow.to_menu()
-		get_viewport().set_input_as_handled()
