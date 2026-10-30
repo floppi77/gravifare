@@ -41,6 +41,7 @@ script = ExtResource("3")
 color = Color(0.86, 0.9, 1.0, 1)
 
 [node name="Camera" type="Camera2D" parent="."]
+process_callback = 0
 
 [node name="Hud" type="CanvasLayer" parent="."]
 layer = 10
