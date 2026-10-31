@@ -17,6 +17,9 @@ NAMES = {
     4: [("Erste Spule", "First Coil"), ("Abstoßung", "Repulsion"), ("Zwillingspole", "Twin Poles"), ("Pulsschlag", "Heartbeat"), ("Magnetschacht", "Magnet Shaft"),
         ("Feldlinien", "Field Lines"), ("Polwechsel", "Pole Swap"), ("Dynamo", "Dynamo"), ("Rettungsfeld", "Rescue Field"), ("Magnetträger", "Magnet Carriers"),
         ("Magnetmeister", "Magnet Master")],
+    7: [("Zubringer", "Feeder"), ("Rushhour", "Rush Hour"), ("Kreuzung", "Junction"), ("Stau", "Traffic Jam"), ("Umleitung", "Detour"), ("Hochbahn", "Elevated Line"),
+        ("Gleisdreieck", "Rail Triangle"), ("Knotenpunkt", "Hub"), ("Schichtwechsel", "Shift Change"), ("Hauptverkehr", "Peak Traffic"), ("Leitstelle", "Control Center"),
+        ("Fernverkehr", "Long Distance"), ("Güterbahn", "Freight Line"), ("Expresslinie", "Express Line"), ("Rangierbahnhof", "Marshalling Yard"), ("Transitring", "Transit Ring"), ("Zentralknoten", "Central Hub")],
     6: [("Gezeitenstrom", "Tidal Current"), ("Schwerelos", "Weightless"), ("Springflut", "Spring Tide"), ("Ebbe", "Ebb"), ("Flut", "Flood"),
         ("Mondbahn", "Moon Orbit"), ("Strudel", "Whirlpool"), ("Brandung", "Surf"), ("Sog", "Undertow"), ("Sturmflut", "Storm Surge"),
         ("Gezeitenmeister", "Tide Master"), ("Mahlstrom", "Maelstrom"), ("Orbitalsog", "Orbital Pull"), ("Tidenkönig", "Tide King"), ("Wasserwelt", "Water World")],
@@ -38,6 +41,17 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 7 and i >= 12:
+        t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None)}[i]
+        return {"npads": 7, "jobs": 8, "special": t[1], "moving": 0, "narrow": 2, "debris": 0, "meteors": 0, "slider": False, "traffic": t[0],
+                "mags": 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": 1 if i >= 14 else 0, "grav": 0, "gust": 1,
+                "stalac": 1, "stalag": 0, "base": 160, "target": 0.0}
+    if sector == 7:
+        traffic = [1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3][i - 1]
+        return {"npads": 7, "jobs": 8, "special": {4: "L", 9: "L", 3: "H", 6: "H", 8: "H", 10: "H"}.get(i), "moving": 0,
+                "narrow": 0 if i < 3 else (1 if i < 7 else 2), "debris": 0, "meteors": 0, "slider": False, "traffic": traffic,
+                "mags": 0 if i < 6 else 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": 0 if i < 8 else 1, "grav": 0, "gust": 1,
+                "stalac": 1, "stalag": 0, "base": 160, "target": 0.0}
     if sector == 6 and i >= 12:
         t = {12: (2, 2, "H", 1), 13: (3, 2, "L", 1), 14: (3, 3, None, 1), 15: (2, 2, None, 1)}[i]
         return {"npads": 7, "jobs": 8, "special": t[2], "moving": 0, "narrow": 2, "debris": t[3], "meteors": 0, "slider": False,
@@ -141,6 +155,16 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         raise RuntimeError("zu wenige Strömungen")
     if c.get("grav") and len([z for z in zones if z["kind"] == "gravity"]) < max(1, c["grav"] - 1):
         raise RuntimeError("zu wenige Schwerkraftzonen")
+    ntraf = 0
+    for (x0, y, ln) in (procgen.traffic_lanes(res, rnd, c["traffic"]) if c.get("traffic") else []):
+        speed = rnd.choice([40.0, 48.0, 56.0]) * (1 if ntraf % 2 == 0 else -1)
+        cars = max(2, ln // 9)
+        span = (ln + 2) * 16.0 / abs(speed)
+        for k in range(cars):
+            movers.append({"kind": "vehicle", "x": x0, "y": y, "w": 2, "h": 1, "dx": ln, "speed": speed, "phase": round(k * span / cars + (0.0 if k else 0.0), 2), "tint": ntraf})
+        ntraf += 1
+    if c.get("traffic") and ntraf < max(1, c["traffic"] - 1):
+        raise RuntimeError("zu wenige Verkehrsbahnen")
     import zonefix
     if zonefix.conflicts(zones):
         raise RuntimeError("Kraftzonen überlappen")
@@ -153,7 +177,7 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
     if any("^" in "".join(r) for r in g.rows()):
         mech.append("spikes")
     kinds = {m["kind"] for m in movers}
-    for k_, tag in (("debris", "debris"), ("pad", "moving_pads"), ("meteor", "meteors"), ("slider", "sliders")):
+    for k_, tag in (("debris", "debris"), ("pad", "moving_pads"), ("meteor", "meteors"), ("slider", "sliders"), ("vehicle", "traffic")):
         if k_ in kinds:
             mech.append(tag)
     if any(z["kind"] == "heat" for z in zones):
@@ -315,7 +339,7 @@ def main():
     fl = floor_of(sector)
     ramp = {"floor": fl}
     for i in slots:
-        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
+        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0, 7: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
     print("gültig je Slot:", {i: len(pts[i]) for i in slots}, flush=True)
     plan = None
     for rnd_ in range(4):

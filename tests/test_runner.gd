@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -892,6 +892,70 @@ func _test_beam_heat_hospital() -> void:
 	for i in 240:
 		r.step(Vector2.ZERO, true)
 	check(r.phase == Run.Phase.CARRYING and r.target_pad() == "H", "Krankentransport: nach dem Einsteigen ist das Krankenhaus das Ziel")
+
+func _zone_overlap(a: Dictionary, b: Dictionary) -> bool:
+	var ca: bool = a.kind == "magnet"
+	var cb: bool = b.kind == "magnet"
+	if ca and cb:
+		return (a.center as Vector2).distance_to(b.center) < float(a.r) + float(b.r)
+	if not ca and not cb:
+		return (a.rect as Rect2).intersects(b.rect)
+	var c: Dictionary = a if ca else b
+	var rr: Rect2 = (b.rect if ca else a.rect)
+	var q: Vector2 = (c.center as Vector2).clamp(rr.position, rr.end)
+	return q.distance_to(c.center) < float(c.r)
+
+func _test_force_zones_apart() -> void:
+	# Strömung, Schwerkraft und Magnete überlagern sich in keinem Level (sonst heben sie sich auf)
+	var dir := DirAccess.open("res://data/levels")
+	var bad: Array = []
+	var total := 0
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		var forces: Array = []
+		for z in lv.zones:
+			if z.kind == "wind" or z.kind == "gravity" or z.kind == "magnet":
+				forces.append(z)
+		total += forces.size()
+		for i in forces.size():
+			for j in range(i + 1, forces.size()):
+				if _zone_overlap(forces[i], forces[j]):
+					bad.append("%s (Level %d)" % [lv.id, lv.number])
+	check(bad.is_empty() and total > 20, "Kraftzonen überlappen sich in keinem Level (%d Zonen geprüft) %s" % [total, str(bad.slice(0, 3))])
+
+func _test_traffic() -> void:
+	var rows: Array = []
+	for y in 22:
+		var row := ""
+		for x in 40:
+			row += "#" if (y == 0 or y >= 20 or x == 0 or x == 39) else "."
+		rows.append(row)
+	var lv := LevelData.from_dict({"id": "T-TR", "sector": 7, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
+		"movers": [{"kind": "vehicle", "x": 10, "y": 8, "w": 2, "h": 1, "dx": 16, "speed": 48.0, "phase": 0.0, "tint": 0},
+			{"kind": "vehicle", "x": 10, "y": 12, "w": 2, "h": 1, "dx": 16, "speed": -48.0, "phase": 0.0, "tint": 1}]})
+	var a: Dictionary = lv.movers[0]
+	var b: Dictionary = lv.movers[1]
+	lv.update_movers(2.0)
+	check(absf(a.rect.position.x - (10.0 * Tuning.TILE - 32.0 + 96.0)) < 0.5, "Fahrzeug fährt mit 48 px/s nach rechts (x = %.0f)" % a.rect.position.x)
+	check(b.rect.position.x < 10.0 * Tuning.TILE + 16.0 * Tuning.TILE - 90.0 and b.vel.x < 0.0, "Gegenverkehr fährt nach links")
+	lv.update_movers(0.0)
+	var span := 16.0 * Tuning.TILE + 32.0
+	lv.update_movers(span / 48.0)
+	check(absf(a.rect.position.x - (10.0 * Tuning.TILE - 32.0)) < 1.0, "Fahrzeug tritt am Bahnende ohne Pause wieder ein")
+	var s := TaxiSim.new()
+	s.setup(lv)
+	lv.update_movers(0.0)
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(14.0 * Tuning.TILE, 8.5 * Tuning.TILE)
+	var hit := false
+	for i in int(3.0 / Tuning.TICK):
+		s.step(Vector2(0, -0.39), false)
+		for e in s.events:
+			if e.type == "damage" and e.get("mover", "") == "vehicle":
+				hit = true
+	check(hit, "Berührung mit einem Fahrzeug kostet Hülle (%.0f)" % s.hull)
 
 func _test_eject() -> void:
 	var lvl := _lvl()

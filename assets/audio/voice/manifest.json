@@ -897,32 +897,32 @@
    "seconds": 4.12
   },
   "de/d0_r67": {
-   "text": "Transitknoten. Viel Verkehr, Schleusen und Routen. Bleib höflich.",
-   "seconds": 5.32
+   "text": "Transitknoten. Neu: Verkehr. Fahrzeuge ziehen auf Lichtbahnen, Berührung kostet Hülle.",
+   "seconds": 9.0
   },
   "de/d0_r68": {
-   "text": "Die Lichtbahnen sind nur Dekoration. Meistens.",
-   "seconds": 4.46
+   "text": "Kreuzung. Gegenverkehr und ein Patient, halte dich zwischen den Fahrzeugen.",
+   "seconds": 5.64
   },
   "de/d0_r69": {
-   "text": "Der Knoten meldet Stau auf Ebene drei.",
-   "seconds": 2.44
+   "text": "Stau. Die Lebensstation ist ein guter Platz zum Warten.",
+   "seconds": 4.12
   },
   "de/d0_r70": {
-   "text": "Ein Fahrgast hat sein Gepäck vergessen und kauft einfach neues.",
-   "seconds": 4.68
+   "text": "Umleitung. Der Verkehr wird heute über dich geleitet.",
+   "seconds": 3.31
   },
   "de/d0_r71": {
-   "text": "Die Zentrale hat die Kaffeemaschine repariert. Fast.",
-   "seconds": 3.48
+   "text": "Leitstelle. Fahrzeuge, Strömungen und Magnete. Die Zentrale schaut zu.",
+   "seconds": 5.03
   },
   "de/d0_r72": {
-   "text": "Hupen ist im Weltraum verboten, nützt aber ohnehin nichts.",
-   "seconds": 4.02
+   "text": "Rangierbahnhof. Viel Verkehr und eine Lebensstation zum Durchatmen.",
+   "seconds": 6.24
   },
   "de/d0_r73": {
-   "text": "Du bist heute wunderbar im Takt, Taxi sieben.",
-   "seconds": 4.28
+   "text": "Transitring. Ein Patient wartet zwischen den Fahrzeugen, flieg sanft.",
+   "seconds": 5.67
   },
   "de/d0_r74": {
    "text": "Ein Kollege winkt dir von der Nachbarbahn zu.",
@@ -1157,32 +1157,32 @@
    "seconds": 3.24
   },
   "en/d0_r67": {
-   "text": "Transit Hub. Heavy traffic, locks and routes. Be polite.",
-   "seconds": 4.92
+   "text": "Transit Hub. New: traffic. Vehicles glide along light lanes, touching one costs hull.",
+   "seconds": 7.64
   },
   "en/d0_r68": {
-   "text": "The light lanes are only decoration. Mostly.",
-   "seconds": 3.0
+   "text": "Junction. Oncoming traffic and a patient, keep between the vehicles.",
+   "seconds": 5.4
   },
   "en/d0_r69": {
-   "text": "The hub reports a jam on level three.",
-   "seconds": 2.6
+   "text": "Traffic jam. The life station is a good place to wait.",
+   "seconds": 3.56
   },
   "en/d0_r70": {
-   "text": "A passenger forgot their luggage and simply buys new.",
-   "seconds": 3.96
+   "text": "Detour. Today the traffic is routed around you.",
+   "seconds": 3.48
   },
   "en/d0_r71": {
-   "text": "Dispatch fixed the coffee machine. Almost.",
-   "seconds": 3.32
+   "text": "Control center. Vehicles, currents and magnets. Dispatch is watching.",
+   "seconds": 6.2
   },
   "en/d0_r72": {
-   "text": "Honking is banned in space, and pointless anyway.",
-   "seconds": 4.28
+   "text": "Marshalling yard. Heavy traffic and a life station to catch your breath.",
+   "seconds": 4.36
   },
   "en/d0_r73": {
-   "text": "You are wonderfully on the beat today, Taxi seven.",
-   "seconds": 3.0
+   "text": "Transit ring. A patient waits between the vehicles, fly gently.",
+   "seconds": 5.16
   },
   "en/d0_r74": {
    "text": "A colleague waves at you from the next lane.",

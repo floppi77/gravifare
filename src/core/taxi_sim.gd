@@ -99,7 +99,7 @@ func _door_crush() -> void:
 func _mover_damage(kind: String) -> void:
 	if mover_cd > 0.0 or state == State.DESTROYED:
 		return
-	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else (Tuning.BEAM_DAMAGE if kind == "beam" else Tuning.PADSLAB_DAMAGE)))
+	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else (Tuning.BEAM_DAMAGE if kind == "beam" else (Tuning.VEHICLE_DAMAGE if kind == "vehicle" else Tuning.PADSLAB_DAMAGE))))
 	mover_cd = Tuning.MOVER_COOLDOWN
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "mover": kind})

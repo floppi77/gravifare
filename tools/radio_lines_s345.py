@@ -46,3 +46,11 @@ L345[63] = ("Gezeitenmeister. Die Gezeiten fordern alles, was du gelernt hast.",
 L345[64] = ("Orbitalsog. Die Lebensstation ist in Reichweite, nutze sie.", "Orbital pull. The life station is within reach, use it.")
 L345[65] = ("Mahlstrom. Ein Patient wartet mitten in den Gezeiten.", "Maelstrom. A patient is waiting in the middle of the tides.")
 L345[55] = ("Sonnenzenit. Letztes Level der Schmiede, danach kommen die Gezeiten.", "Solar zenith. Last level of the forge, then come the tides.")
+# ---- Sektor 7 Transitknoten (67–73), passend zu den gebauten Leveln
+L345[67] = ("Transitknoten. Neu: Verkehr. Fahrzeuge ziehen auf Lichtbahnen, Berührung kostet Hülle.", "Transit Hub. New: traffic. Vehicles glide along light lanes, touching one costs hull.")
+L345[68] = ("Kreuzung. Gegenverkehr und ein Patient, halte dich zwischen den Fahrzeugen.", "Junction. Oncoming traffic and a patient, keep between the vehicles.")
+L345[69] = ("Stau. Die Lebensstation ist ein guter Platz zum Warten.", "Traffic jam. The life station is a good place to wait.")
+L345[70] = ("Umleitung. Der Verkehr wird heute über dich geleitet.", "Detour. Today the traffic is routed around you.")
+L345[71] = ("Leitstelle. Fahrzeuge, Strömungen und Magnete. Die Zentrale schaut zu.", "Control center. Vehicles, currents and magnets. Dispatch is watching.")
+L345[72] = ("Rangierbahnhof. Viel Verkehr und eine Lebensstation zum Durchatmen.", "Marshalling yard. Heavy traffic and a life station to catch your breath.")
+L345[73] = ("Transitring. Ein Patient wartet zwischen den Fahrzeugen, flieg sanft.", "Transit ring. A patient waits between the vehicles, fly gently.")

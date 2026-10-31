@@ -530,3 +530,42 @@ def gravity_sites(res, rnd, n):
         if len(out) >= n:
             break
     return out
+
+
+def traffic_lanes(res, rnd, n):
+    """Verkehrsbahnen: freie waagerechte Streifen (3 freie Zeilen, ab 8 Tiles) zwischen den Pad-Anflugzonen und außerhalb des Torbereichs.
+    Rückgabe [(x0, y, länge)] in Tiles (Bahn beginnt bei x0 und ist `länge` Felder lang)."""
+    if n <= 0:
+        return []
+    g = res["grid"]
+
+    def blocked(x, y):
+        for (pa, pb, top) in res["pads"].values():
+            if pa - 1 <= x <= pb + 1 and top - 5 <= y <= top + 1:
+                return True
+        for m in res["moving"]:
+            if m["x"] - m["dx"] - 1 <= x <= m["x"] + m["w"] + m["dx"] + 1 and m["y"] - 5 <= y <= m["y"] + 2:
+                return True
+        return GATE_ZONE[0] <= x <= GATE_ZONE[1] and GATE_ZONE[2] <= y <= GATE_ZONE[3] + 2
+
+    cands = []
+    for y in range(5, 17):
+        x = 1
+        while x < W - 1:
+            if all(g.g[yy][x] == "." for yy in (y, y + 1)) and not blocked(x, y):
+                x1 = x
+                while x1 + 1 < W - 1 and all(g.g[yy][x1 + 1] == "." for yy in (y, y + 1)) and not blocked(x1 + 1, y):
+                    x1 += 1
+                if x1 - x + 1 >= 7:
+                    cands.append((x, x1, y))
+                x = x1 + 1
+            else:
+                x += 1
+    rnd.shuffle(cands)
+    out = []
+    for x0, x1, y in cands:
+        if all(abs(y - o[1]) >= 3 or x1 < o[0] or x0 > o[0] + o[2] for o in out):
+            out.append((x0, y, x1 - x0 + 1))
+        if len(out) >= n:
+            break
+    return out

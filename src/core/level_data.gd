@@ -288,7 +288,8 @@ func _scan_movers(list: Array) -> void:
 			"x": float(d.x) * Tuning.TILE, "y": float(d.y) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
 			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
 			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", "")),
-			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0))}
+			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0)),
+			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0))}
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
 		if kind == "meteor":
@@ -342,8 +343,20 @@ func lane_rect(m: Dictionary) -> Rect2:
 	var x1 := maxf(float(m.x), float(m.x) + float(m.ax)) + float(m.w)
 	return Rect2(x0, float(m.y), x1 - x0, float(m.ay) + float(m.h))
 
+## Fahrzeug (Sektor 7, Verkehr): fährt auf einer Bahn der Länge `dx` Felder ab (x, y) mit `speed` px/s (negativ = nach links), tritt am
+## Ende ohne Pause wieder in die Bahn ein; mehrere Fahrzeuge je Bahn unterscheiden sich in der Phase.
+func _vehicle_rect(m: Dictionary, t: float) -> Rect2:
+	var lane := float(m.ax)
+	var span := lane + float(m.w)
+	var sp := absf(float(m.speed))
+	var p := fposmod((t + float(m.phase)) * sp, span)
+	var x := float(m.x) - float(m.w) + p if float(m.speed) >= 0.0 else float(m.x) + lane - p
+	return Rect2(x, float(m.y), float(m.w), float(m.h))
+
 ## Plasmastrahl: nur in den ersten `on` Sekunden jeder Periode sichtbar und gefährlich (Rechteck x/y/w/h fest).
 func _mover_rect(m: Dictionary, t: float) -> Rect2:
+	if m.kind == "vehicle":
+		return _vehicle_rect(m, t)
 	if m.kind == "beam":
 		if fposmod(t + float(m.phase), float(m.period)) >= float(m.on):
 			return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
@@ -372,6 +385,8 @@ func update_movers(t: float, reset := false) -> void:
 		m.vel = Vector2.ZERO if reset else (r.position - old.position) / Tuning.TICK
 		if m.kind == "meteor":
 			m.vel = Vector2(float(m.ax), float(m.ay)) / float(m.fall) if (not reset and r.position.x > OFFSCREEN) else Vector2.ZERO
+		elif m.kind == "vehicle":
+			m.vel = Vector2(float(m.speed), 0.0) if not reset else Vector2.ZERO
 		m.rect = r
 		if m.kind == "pad":
 			var p: Dictionary = pads[m.pad]

@@ -363,6 +363,9 @@ func _draw_movers() -> void:
 		if m.kind == "beam":
 			_draw_beam(m)
 			continue
+		if m.kind == "vehicle":
+			_draw_vehicle(m)
+			continue
 		if m.kind == "pad":
 			# Schiene über den ganzen Fahrweg
 			var rail_y := r.end.y + 1.0
@@ -389,6 +392,49 @@ func _draw_movers() -> void:
 					draw_rect(Rect2(r.position.x + i * 6.0, r.end.y - 3.0, 6.0, 3.0), warn)
 		else:
 			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
+
+## Verkehr: Fahrzeuge gleiten auf Lichtbahnen. Die Bahn ist eine gestrichelte Leuchtlinie mit Richtungspfeilen, das Fahrzeug ein
+## flacher Schweber mit Kuppel, Scheinwerfer vorn, Triebwerksglühen hinten und Unterboden-Leuchten.
+func _draw_vehicle(m: Dictionary) -> void:
+	var r: Rect2 = m.rect
+	var dir := 1.0 if float(m.speed) >= 0.0 else -1.0
+	var lane_y := float(m.y) + float(m.h) * 0.5
+	var lx0 := float(m.x)
+	var lx1 := float(m.x) + float(m.ax)
+	if int(m.tint) == 0 or true:
+		# Lichtbahn (nur einmal je Bahn zeichnen: das Fahrzeug mit Phase 0 übernimmt es)
+		if absf(float(m.phase)) < 0.001:
+			var n := int((lx1 - lx0) / 12.0)
+			for i in n:
+				var xx := lx0 + float(i) * 12.0 + fmod(t * 14.0 * dir, 12.0)
+				if xx < lx0 or xx > lx1:
+					continue
+				draw_line(Vector2(xx, lane_y), Vector2(xx + 4.0, lane_y), Color(0.45, 0.85, 1.0, 0.22), 1.0)
+			for k in 3:
+				var cx := lx0 + (lx1 - lx0) * (float(k) + 0.5) / 3.0
+				draw_polyline(PackedVector2Array([Vector2(cx - dir * 2.5, lane_y - 2.5), Vector2(cx + dir * 1.5, lane_y), Vector2(cx - dir * 2.5, lane_y + 2.5)]), Color(0.5, 0.9, 1.0, 0.3), 1.0)
+	var tints := [Color("#35e0d2"), Color("#ff6aa0"), Color("#ffd24a"), Color("#8fa8ff")]
+	var body: Color = tints[int(m.tint) % tints.size()]
+	var c := r.get_center()
+	var w := r.size.x
+	# Unterboden-Leuchten und Triebwerksglühen hinten
+	draw_rect(Rect2(r.position.x + 2.0, r.end.y - 1.2, w - 4.0, 1.6), Color(body.r, body.g, body.b, 0.35 + 0.2 * sin(t * 8.0)))
+	var back := Vector2(c.x - dir * (w * 0.5), c.y + 0.5)
+	for i in 4:
+		var f := float(i + 1) / 4.0
+		draw_circle(back - Vector2(dir * f * 8.0, 0.0), (1.0 - f) * 2.4 + 0.5, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))
+	# Karosserie
+	draw_rect(Rect2(r.position.x, r.position.y + 3.0, w, r.size.y - 5.0), Color("#1a1d3a"))
+	draw_rect(Rect2(r.position.x + 0.8, r.position.y + 3.6, w - 1.6, r.size.y - 6.2), body.darkened(0.15))
+	draw_rect(Rect2(r.position.x + 0.8, r.position.y + 3.6, w - 1.6, 1.4), body.lightened(0.35))
+	# Kuppel
+	var dx0 := c.x - 4.5 + dir * 1.5
+	draw_colored_polygon(PackedVector2Array([Vector2(dx0, r.position.y + 3.4), Vector2(dx0 + 2.0, r.position.y + 0.6), Vector2(dx0 + 7.0, r.position.y + 0.6), Vector2(dx0 + 9.0, r.position.y + 3.4)]), Color(0.7, 0.92, 1.0, 0.85))
+	# Scheinwerfer vorn
+	var front := Vector2(c.x + dir * (w * 0.5), c.y + 1.0)
+	draw_circle(front, 1.5, Color(1.0, 0.98, 0.8))
+	draw_colored_polygon(PackedVector2Array([front, front + Vector2(dir * 9.0, -3.0), front + Vector2(dir * 9.0, 3.5)]), Color(1.0, 0.98, 0.7, 0.14))
+	draw_rect(r, Color(1.0, 0.85, 0.3, 0.55), false, 0.7)       # Warnrand: Berührung kostet Hülle
 
 ## Plasmastrahl: zwei Emitter an den Enden; vor dem Einschalten flackert eine dünne Ladelinie, im Takt brennt ein weiß-orangener
 ## Strahl mit Glühen und zuckenden Blitzen.
