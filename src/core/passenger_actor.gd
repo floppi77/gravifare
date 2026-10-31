@@ -38,6 +38,7 @@ var fall_vy := 0.0
 var fall_vx := 0.0
 var ground_y := 0.0
 var dead_t := 0.0
+var medical := false           # Krankenpatient: liegt auf einer Trage
 var shattered := false        # zerbrechlicher Fahrgast zersprungen (Scherbenanimation statt Blutfleck)
 
 func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
@@ -45,6 +46,7 @@ func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 	job_index = index
 	pname = job.get("passenger", "?")
 	gender = job.get("gender", "f")
+	medical = bool(job.get("fragile", false))
 	look = int(job.get("look", _default_look(gender, index)))
 	surface_y = p.row * Tuning.TILE
 	if instant:

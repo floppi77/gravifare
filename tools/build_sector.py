@@ -141,6 +141,9 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         raise RuntimeError("zu wenige Strömungen")
     if c.get("grav") and len([z for z in zones if z["kind"] == "gravity"]) < max(1, c["grav"] - 1):
         raise RuntimeError("zu wenige Schwerkraftzonen")
+    import zonefix
+    if zonefix.conflicts(zones):
+        raise RuntimeError("Kraftzonen überlappen")
     hosp = c["special"] == "H"
     jobs = jobs_of(seq(sector * 100 + i * 13 + variant, c["jobs"], c["npads"], hospital_at=(rnd.choice([1, 2, 3]) if hosp else None), ), base=c["base"])
     if pars:

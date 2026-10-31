@@ -135,23 +135,7 @@ func _draw_zones() -> void:
 		var al := 1.0 if on else 0.25
 		match String(z.kind):
 			"wind":
-				_timer_arc(r.get_center(), z, 7.0)
-				draw_rect(r, Color(0.3, 0.8, 1.0, 0.07 * al))
-				var dir: Vector2 = (z.a as Vector2).normalized()
-				var n := int(maxf(r.size.x, r.size.y) / 14.0)
-				for i in n:
-					var f := fmod(t * 0.7 + float(i) / float(n), 1.0)
-					for row in int(maxf(1.0, minf(r.size.x, r.size.y) / 24.0)):
-						var q := Vector2(r.position.x + r.size.x * (0.5 + dir.x * (f - 0.5)) , r.position.y + r.size.y * (0.5 + dir.y * (f - 0.5)))
-						if absf(dir.x) < 0.5:
-							q.x = r.position.x + (float(row) + 0.5) * r.size.x / maxf(1.0, floorf(r.size.x / 24.0))
-						else:
-							q.y = r.position.y + (float(row) + 0.5) * r.size.y / maxf(1.0, floorf(r.size.y / 24.0))
-						if r.has_point(q):
-							var perp := Vector2(-dir.y, dir.x)
-							draw_polyline(PackedVector2Array([q - dir * 3.0 + perp * 3.0, q + dir * 2.0, q - dir * 3.0 - perp * 3.0]), Color(0.6, 0.95, 1.0, 0.5 * al), 1.0)
-			"magnet":
-				_draw_magnet(z, on)
+				_draw_wind(z, on)
 			"heat":
 				_draw_heat(z, on)
 			"gravity":
@@ -163,6 +147,62 @@ func _draw_zones() -> void:
 					var xx := r.position.x + 9.0 + float(i) * 18.0
 					var s := 3.0 if heavy else -3.0
 					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
+
+## Strömung als Wind: wehende Schlieren in Windrichtung (schneller bei stärkerem Wind), kleine Wirbel, Pfeilspitzen an der Austrittskante.
+## Böen sind aus nur ein schwaches Flimmern und blenden vor dem Einschalten auf.
+func _draw_wind(z: Dictionary, on: bool) -> void:
+	var r: Rect2 = z.rect
+	var dir: Vector2 = (z.a as Vector2).normalized()
+	var spd := clampf((z.a as Vector2).length() / 55.0, 0.6, 1.4)
+	var al := 1.0 if on else 0.14
+	if float(z.period) > 0.0 and not on:
+		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
+		if left < 1.2:
+			al = 0.14 + 0.7 * (1.0 - left / 1.2) * (0.6 + 0.4 * sin(t * 20.0))
+	var horiz := absf(dir.x) > absf(dir.y)
+	var along := r.size.x if horiz else r.size.y
+	var across := r.size.y if horiz else r.size.x
+	var sgn := (dir.x if horiz else dir.y)
+	draw_rect(r, Color(0.7, 0.9, 1.0, 0.09 * al))
+	var n := int(across / 4.0) + 4
+	for i in n:
+		var h := fmod(float(i) * 0.61803 + 0.13, 1.0)
+		var h2 := fmod(float(i) * 0.37 + 0.41, 1.0)
+		var lane := 2.0 + h * (across - 4.0)
+		var ln := 7.0 + 9.0 * h2
+		var fr := fmod(t * spd * (0.45 + 0.5 * h2) + h * 3.0, 1.0)
+		var pos := fr * (along + ln) - ln
+		var wob := sin(t * 3.0 + float(i) * 1.9) * 0.9
+		var p0: Vector2
+		var p1: Vector2
+		if horiz:
+			var xs := pos if sgn > 0.0 else along - pos
+			p0 = r.position + Vector2(xs, lane + wob)
+			p1 = p0 - Vector2(sgn * ln, 0.0)
+		else:
+			var ys := pos if sgn > 0.0 else along - pos
+			p0 = r.position + Vector2(lane + wob, ys)
+			p1 = p0 - Vector2(0.0, sgn * ln)
+		# am Rand ausblenden
+		var inside := r.grow(0.5)
+		var a0 := p0.clamp(r.position, r.end)
+		var a1 := p1.clamp(r.position, r.end)
+		if a0.distance_to(a1) < 1.5:
+			continue
+		draw_line(a1, a0, Color(0.85, 0.95, 1.0, (0.5 + 0.45 * h2) * al), 1.3)
+		draw_line(a1.lerp(a0, 0.5), a0, Color(1.0, 1.0, 1.0, 0.5 * al), 1.0)
+		# kleiner Wirbel am Schlierenkopf
+		if i % 4 == 0 and inside.has_point(p0):
+			draw_arc(p0 + dir * 2.0, 2.2, 0.0, TAU * 0.8, 10, Color(0.9, 0.97, 1.0, 0.5 * al), 0.8)
+	# Pfeilspitzen an der Austrittskante
+	var tip_n := maxi(1, int(across / 14.0))
+	for k in tip_n:
+		var u := (float(k) + 0.5) / float(tip_n)
+		var base: Vector2 = r.position + (Vector2(along if sgn > 0.0 else 0.0, across * u) if horiz else Vector2(across * u, along if sgn > 0.0 else 0.0))
+		var perp := Vector2(-dir.y, dir.x)
+		var back := base - dir * 5.0
+		draw_polyline(PackedVector2Array([back + perp * 3.0, base, back - perp * 3.0]), Color(0.9, 0.97, 1.0, 0.45 * al), 1.0)
+	_timer_arc(r.get_center(), z, 7.0)
 
 ## Takt-Anzeige pulsierender Zonen: ein Ring um den Mittelpunkt. Grün und schrumpfend = noch aktiv; gelb und wachsend = kommt gleich wieder.
 func _timer_arc(c: Vector2, z: Dictionary, rad: float) -> void:
@@ -514,7 +554,10 @@ func _draw_actor(a: PassengerActor) -> void:
 	var is_extra := not run.extra_of(a).is_empty()
 	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8) if is_extra else Color(1, 1, 1, a.fade)       # Zusatzfahrgäste wirken blasser/bläulich
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
-	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
+	if a.medical:
+		_draw_stretcher(a, pos.y, col.a)
+	else:
+		draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	_draw_amount(a, pos)
 	var dest := run.dest_of(a)
@@ -528,6 +571,42 @@ func _draw_actor(a: PassengerActor) -> void:
 		draw_rect(Rect2(bx - 4, by - 3, 8, 8), Color("#0c0f24"))
 		draw_rect(Rect2(bx - 4 + PX * 2, by - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), bubble)
 		draw_string(Fonts.hud, Vector2(bx - 4, by + 4), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24") if not a.angry else Color.WHITE)
+
+## Krankenpatient: blasser Mensch liegt unter einer Decke mit rotem Kreuz auf einer Rolltrage; daneben ein Infusionsständer mit tropfendem
+## Beutel. Koordinaten relativ zur Bildschirmmitte des Fahrgasts (Transform ist gesetzt), y = Plattformoberfläche.
+func _draw_stretcher(a: PassengerActor, y: float, al: float) -> void:
+	var bob := sin(a.walked * 0.6) * 0.3 if a.is_walking() else 0.0
+	var yy := y + bob
+	var ink := Color(0.05, 0.06, 0.16, al)
+	# Räder und Gestell
+	for wx in [-8.0, 8.0]:
+		draw_circle(Vector2(wx, yy - 1.4), 1.5, ink)
+		draw_circle(Vector2(wx, yy - 1.4), 0.7, Color(0.7, 0.75, 0.85, al))
+		draw_line(Vector2(wx, yy - 2.6), Vector2(wx * 0.9, yy - 4.6), Color(0.55, 0.6, 0.75, al), 1.0)
+	draw_rect(Rect2(-10.5, yy - 5.2, 21.0, 1.2), Color(0.6, 0.66, 0.8, al))
+	# Matratze und Kissen
+	draw_rect(Rect2(-10.5, yy - 7.8, 21.0, 2.8), Color(0.94, 0.96, 1.0, al))
+	draw_rect(Rect2(-10.5, yy - 7.8, 21.0, 2.8), ink, false, 0.6)
+	draw_rect(Rect2(-10.0, yy - 9.6, 5.0, 2.0), Color(0.98, 0.98, 1.0, al))
+	# Körper unter der Decke (hellgrün), Kopf links
+	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 2.8), Color(0.55, 0.82, 0.78, al))
+	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 0.9), Color(0.72, 0.92, 0.88, al))
+	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 2.8), ink, false, 0.6)
+	draw_circle(Vector2(-7.4, yy - 10.4), 2.5, Color(0.86, 0.82, 0.74, al))             # blasses Gesicht
+	draw_circle(Vector2(-7.4, yy - 10.4), 2.5, ink, false, 0.6) if false else null
+	draw_rect(Rect2(-8.6, yy - 11.0, 1.1, 0.5), ink)                                       # geschlossene Augen
+	draw_rect(Rect2(-6.8, yy - 11.0, 1.1, 0.5), ink)
+	draw_rect(Rect2(-8.3, yy - 9.3, 1.8, 0.4), Color(0.55, 0.3, 0.3, al))                  # matter Mund
+	# rotes Kreuz auf der Decke
+	draw_rect(Rect2(3.2, yy - 10.2, 1.0, 2.2), Color(0.9, 0.12, 0.18, al))
+	draw_rect(Rect2(2.6, yy - 9.6, 2.2, 1.0), Color(0.9, 0.12, 0.18, al))
+	# Infusionsständer mit tropfendem Beutel
+	draw_line(Vector2(11.5, yy - 3.5), Vector2(11.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), 0.8)
+	draw_line(Vector2(9.5, yy - 17.5), Vector2(13.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), 0.8)
+	draw_rect(Rect2(9.8, yy - 17.0, 3.0, 4.2), Color(0.55, 0.85, 1.0, al * 0.9))
+	draw_line(Vector2(11.3, yy - 12.8), Vector2(5.0, yy - 9.6), Color(0.8, 0.9, 1.0, al * 0.7), 0.5)
+	var drip := fmod(t * 1.3 + float(a.job_index) * 0.37, 1.0)
+	draw_rect(Rect2(11.0, yy - 12.4 + drip * 3.0, 0.8, 0.8), Color(0.7, 0.95, 1.0, al * (1.0 - drip)))
 
 ## Kleiner goldener Stern über wartenden Pflichtfahrgästen.
 func _gold_star(c: Vector2, r: float, fade: float) -> void:

@@ -81,6 +81,8 @@ func _ready() -> void:
 				run.step(Vector2.ZERO, false)
 	if OS.get_cmdline_user_args().has("--debug-patient-lost"):      # Dev: „Patient verloren“-Effekt ansehen
 		_patient_lost({"name": "Mika", "fee": 123.0})
+	if OS.get_cmdline_user_args().has("--debug-medical") and run.actor != null:      # Dev: wartenden Fahrgast als Patient auf der Trage zeigen
+		run.actor.medical = true
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--debug-complete"):
