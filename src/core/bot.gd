@@ -170,6 +170,14 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		var mhalf := Tuning.HULL_HALF + Vector2(6, 6)
 		if v_des != Vector2.ZERO and level.movers_collide_traj(sim.pos, sim.vel, v_des, mhalf, level.clock, 1.0):
 			v_des = Vector2.ZERO
+			# Wartet er mitten in einer Verkehrsbahn, steigt er senkrecht aus der Bahn aus (zur näheren Seite) statt darin zu schweben
+			var lane := level.vehicle_lane_at(sim.pos, Tuning.HULL_HALF + Vector2(4, 4)) if sim.state == TaxiSim.State.FLYING else {}
+			if not lane.is_empty():
+				var cy := float(lane.y) + float(lane.h) * 0.5
+				var dv := -1.0 if sim.pos.y < cy else 1.0
+				if level.box_hits_solid(sim.pos + Vector2(0.0, dv * 26.0), Tuning.HULL_HALF + Vector2(2, 2)):
+					dv = -dv
+				v_des = Vector2(0.0, dv * 60.0)
 		# Trifft die Bahn auch beim Schweben/Bremsen noch ein Hindernis: in eine freie Richtung ausweichen
 		var ehalf := Tuning.HULL_HALF + Vector2(2, 2)
 		if sim.state == TaxiSim.State.FLYING and level.movers_collide_traj(sim.pos, sim.vel, v_des, ehalf, level.clock, 0.5):

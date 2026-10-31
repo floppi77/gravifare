@@ -185,6 +185,8 @@ func _draw_wind(z: Dictionary, on: bool) -> void:
 			p1 = p0 - Vector2(0.0, sgn * ln)
 		# am Rand ausblenden
 		var inside := r.grow(0.5)
+		if level.is_solid_at(p0) or level.is_solid_at(p1):          # Wind weht nur durch Luft, nicht durch Fels
+			continue
 		var a0 := p0.clamp(r.position, r.end)
 		var a1 := p1.clamp(r.position, r.end)
 		if a0.distance_to(a1) < 1.5:
@@ -353,6 +355,48 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 func _draw_movers() -> void:
 	if level == null or not level.has_movers():
 		return
+	_draw_movers_main()
+	_draw_vehicle_portals()
+
+## Tunnelöffnungen in den Seitenwänden an den Enden jeder Verkehrsbahn: Fahrzeuge fahren hier ein und aus. Für das Taxi sind sie
+## nicht betretbar (die Wand bleibt fest). Wird nach den Fahrzeugen gezeichnet und verdeckt so deren Ein- und Austritt.
+func _draw_vehicle_portals() -> void:
+	var seen := {}
+	for m in level.movers:
+		if m.kind != "vehicle" or level.movers_ignore:
+			continue
+		var key := "%d,%d,%d" % [int(m.x), int(m.y), int(m.ax)]
+		if seen.has(key):
+			continue
+		seen[key] = true
+		var tints := [Color("#35e0d2"), Color("#ff6aa0"), Color("#ffd24a"), Color("#8fa8ff")]
+		var col: Color = tints[int(m.tint) % tints.size()]
+		var dir := 1.0 if float(m.speed) >= 0.0 else -1.0
+		var y0 := float(m.y) - 4.0
+		var h := float(m.h) + 12.0
+		var left := Rect2(float(m.x) - T, y0, T, h)
+		var right := Rect2(float(m.x) + float(m.ax), y0, T, h)
+		for pi in 2:
+			var r := left if pi == 0 else right
+			var entry := (pi == 0) == (dir > 0.0)            # hier fahren die Fahrzeuge ein
+			draw_rect(r, Color("#04050c"))
+			draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 1.5), col.darkened(0.2))
+			draw_rect(Rect2(r.position.x, r.end.y - 1.5, r.size.x, 1.5), col.darkened(0.2))
+			var inner := r.position.x + (r.size.x - 1.5 if pi == 0 else 0.0)
+			draw_rect(Rect2(inner, r.position.y, 1.5, r.size.y), col)
+			# laufende Richtungspfeile im Tunnel
+			for k in 2:
+				var f := fmod(t * 1.4 + float(k) * 0.5, 1.0)
+				var cx := r.position.x + 2.0 + f * (r.size.x - 6.0)
+				var cy := r.get_center().y
+				var d := dir
+				draw_polyline(PackedVector2Array([Vector2(cx - d * 2.0, cy - 3.0), Vector2(cx + d * 1.5, cy), Vector2(cx - d * 2.0, cy + 3.0)]), Color(col.r, col.g, col.b, 0.7 * (1.0 - absf(f - 0.5) * 1.2)), 1.0)
+			if entry:
+				draw_circle(Vector2(inner + (0.8 if pi == 1 else 0.7), r.get_center().y), 1.2, Color(0.4, 1.0, 0.5, 0.6 + 0.4 * sin(t * 6.0)))
+			else:
+				draw_circle(Vector2(inner + (0.8 if pi == 1 else 0.7), r.get_center().y), 1.2, Color(1.0, 0.4, 0.3, 0.6 + 0.4 * sin(t * 6.0)))
+
+func _draw_movers_main() -> void:
 	for m in level.movers:
 		var r: Rect2 = m.rect
 		if level.movers_ignore and m.kind != "pad":

@@ -272,6 +272,14 @@ func zone_accel(p: Vector2, t: float) -> Vector2:
 					a += d / dist * float(z.k) * (1.0 - pow(dist / float(z.r), 2.0))
 	return a
 
+## Verkehr: Bahn eines Fahrzeugs, in der die Box liegt ({} sonst). Die Bahn gilt etwas breiter als das Fahrzeug.
+func vehicle_lane_at(center: Vector2, half: Vector2) -> Dictionary:
+	var box := Rect2(center - half, half * 2.0)
+	for m in movers:
+		if m.kind == "vehicle" and Rect2(float(m.x), float(m.y) - 6.0, float(m.ax), float(m.h) + 12.0).intersects(box):
+			return m
+	return {}
+
 func has_meteors() -> bool:
 	for m in movers:
 		if m.kind == "meteor" or m.kind == "beam":

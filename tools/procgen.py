@@ -54,20 +54,20 @@ class Island:
         return (self.rx0, self.rx1, self.top, self.bot)
 
 
-def build(seed, npads=5, special=None, moving=0, narrow=0, stalac=2, stalag=1, tries=400, dense=False, lanes=0):
+def build(seed, npads=5, special=None, moving=0, narrow=0, stalac=2, stalag=1, tries=400, dense=False, lanes=0, bands=0):
     """Erzeugt einen Grundriss. npads = nummerierte Passagierpads inkl. Startpad 1; special = None | "L" | "H";
     moving = Anzahl fahrender Pads (ersetzen Inseln); narrow = Anzahl schmaler Pads (4 statt 5–8 Tiles)."""
     Island.ABOVE = 4 if dense else 5
     for attempt in range(tries):
         rnd = random.Random(seed * 1000 + attempt)
-        r = _try(rnd, npads, special, moving, narrow, stalac, stalag, dense, lanes)
+        r = _try(rnd, npads, special, moving, narrow, stalac, stalag, dense, lanes, bands)
         if r is not None:
             r["attempt"] = attempt
             return r
     raise RuntimeError("kein Grundriss für Seed %d" % seed)
 
 
-def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes=0):
+def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes=0, bands=0):
     g = Grid()
     g.rect("#", 1, FLOOR, W - 2, FLOOR)
     g.gate()
@@ -105,6 +105,15 @@ def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes
             reserved.append(x)
             break
     res_rects = [(x, x, 1, FLOOR - 1) for x in reserved]
+    # reservierte Verkehrsbänder (Wand bis Wand, Zeilen y-1..y+2 frei von Fels): Fahrzeuge fahren hier durch Öffnungen in den Seitenwänden
+    band_rows = []
+    for _ in range(bands):
+        for _t in range(40):
+            y = rnd.randint(8, 14) if not band_rows else rnd.randint(5, 16)
+            if all(abs(y - o) >= 5 for o in band_rows):
+                band_rows.append(y)
+                break
+    res_rects += [(1, W - 2, y - 1, y + 2) for y in band_rows]
     # --- Inseln für die übrigen Pads (und Sonderpad)
     want = [str(i) for i in range(2, npads + 1)]
     if special:
@@ -223,7 +232,7 @@ def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes
         return None
     if not reachable(g, start, [t for t in goals if _block_free(g, *t)]) or any(not _block_free(g, *t) for t in goals):
         return None
-    return {"grid": g, "pads": pads, "islands": islands, "moving": mov, "deco": deco, "start": start, "lanes": reserved}
+    return {"grid": g, "pads": pads, "islands": islands, "moving": mov, "deco": deco, "start": start, "lanes": reserved, "bands": band_rows}
 
 
 # ---------- freie Bahnen und Orte für Hindernisse ----------
@@ -569,3 +578,32 @@ def traffic_lanes(res, rnd, n):
         if len(out) >= n:
             break
     return out
+
+
+def wind_bands(res, rnd, n, gust=0):
+    """Windbereiche laufen immer von einer Wand zur anderen: waagerechte Bänder (Wand bis Wand, 3–4 Zeilen) oder senkrechte Schächte
+    (Decke bis Boden, 3–4 Spalten). Rückgabe [(x0, x1, y0, y1, ax, ay, gust)] – die letzten `gust` Zonen pulsieren als Böen."""
+    out = []
+    rects = []
+    for _ in range(400):
+        if rnd.random() < 0.7:
+            h = rnd.randint(3, 4)
+            y0 = rnd.randint(10, 17 - h)
+            rc = (1, W - 2, y0, y0 + h - 1)
+            mag = rnd.choice([45, 55])
+            ax, ay = rnd.choice([(mag, 0), (-mag, 0)])
+        else:
+            w = rnd.randint(3, 4)
+            x0 = rnd.randint(3, W - 3 - w)
+            rc = (x0, x0 + w - 1, 1, FLOOR - 1)
+            if _rect_hit(rc, (GATE_ZONE[0], GATE_ZONE[1], 1, 8)):
+                continue
+            mag = rnd.choice([45, 55])
+            ax, ay = rnd.choice([(0, mag), (0, -mag)])
+        if any(_rect_hit(rc, o) for o in rects):
+            continue
+        rects.append(rc)
+        out.append((rc[0], rc[1], rc[2], rc[3], ax, ay, False))
+        if len(out) >= n:
+            break
+    return [o[:6] + (i >= len(out) - gust,) for i, o in enumerate(out)]

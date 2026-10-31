@@ -897,48 +897,48 @@
    "seconds": 4.12
   },
   "de/d0_r67": {
-   "text": "Transitknoten. Neu: Verkehr. Fahrzeuge ziehen auf Lichtbahnen, Berührung kostet Hülle.",
-   "seconds": 9.0
+   "text": "Transitknoten. Neu: Verkehr. Fahrzeuge kreuzen den Raum auf Lichtbahnen, Berührung kostet Hülle.",
+   "seconds": 6.71
   },
   "de/d0_r68": {
-   "text": "Kreuzung. Gegenverkehr und ein Patient, halte dich zwischen den Fahrzeugen.",
-   "seconds": 5.64
+   "text": "Hochbahn. Der Verkehr rollt auf zwei Ebenen, und ein Patient wartet.",
+   "seconds": 4.9
   },
   "de/d0_r69": {
-   "text": "Stau. Die Lebensstation ist ein guter Platz zum Warten.",
-   "seconds": 4.12
+   "text": "Gleisdreieck. Die Fahrzeuge kennen ihren Takt, du lernst ihn gleich.",
+   "seconds": 5.4
   },
   "de/d0_r70": {
-   "text": "Umleitung. Der Verkehr wird heute über dich geleitet.",
-   "seconds": 3.31
+   "text": "Knotenpunkt. Der Wind weht quer durch die Halle, dazu ein Patient.",
+   "seconds": 5.56
   },
   "de/d0_r71": {
-   "text": "Leitstelle. Fahrzeuge, Strömungen und Magnete. Die Zentrale schaut zu.",
-   "seconds": 5.03
+   "text": "Hauptverkehr. Ein Patient wartet zwischen den Fahrzeugen, flieg sanft.",
+   "seconds": 5.64
   },
   "de/d0_r72": {
-   "text": "Rangierbahnhof. Viel Verkehr und eine Lebensstation zum Durchatmen.",
-   "seconds": 6.24
+   "text": "Leitstelle. Fahrzeuge, Böen und Magnete. Die Zentrale schaut zu.",
+   "seconds": 6.44
   },
   "de/d0_r73": {
-   "text": "Transitring. Ein Patient wartet zwischen den Fahrzeugen, flieg sanft.",
-   "seconds": 5.67
+   "text": "Expresslinie. Die Fahrzeuge sind heute besonders eilig.",
+   "seconds": 4.28
   },
   "de/d0_r74": {
-   "text": "Ein Kollege winkt dir von der Nachbarbahn zu.",
-   "seconds": 2.56
+   "text": "Rangierbahnhof. Eine Lebensstation zum Durchatmen, mitten im Verkehr.",
+   "seconds": 5.4
   },
   "de/d0_r75": {
-   "text": "Die Station vermisst dein Lächeln. Und die Rechnung.",
-   "seconds": 3.72
+   "text": "Transitring. Noch ein Patient, noch ein Takt, du schaffst das.",
+   "seconds": 4.76
   },
   "de/d0_r76": {
-   "text": "Fast am Ende des Knotens. Halte die Spur.",
-   "seconds": 3.46
+   "text": "Zentralknoten. Fast am Ende des Knotens, halte die Spur.",
+   "seconds": 4.76
   },
   "de/d0_r77": {
-   "text": "Letzter Knoten. Danach wird es dunkel.",
-   "seconds": 3.08
+   "text": "Abschlussbahnhof. Letzter Knoten, danach wird es dunkel. Ein Patient wartet.",
+   "seconds": 6.83
   },
   "de/d0_r78": {
    "text": "Schattenring. Sensoren und Radar. Funkstille ist keine Option, melde dich.",
@@ -1157,48 +1157,48 @@
    "seconds": 3.24
   },
   "en/d0_r67": {
-   "text": "Transit Hub. New: traffic. Vehicles glide along light lanes, touching one costs hull.",
-   "seconds": 7.64
+   "text": "Transit Hub. New: traffic. Vehicles cross the hall on light lanes, touching one costs hull.",
+   "seconds": 7.08
   },
   "en/d0_r68": {
-   "text": "Junction. Oncoming traffic and a patient, keep between the vehicles.",
-   "seconds": 5.4
+   "text": "Elevated line. Traffic rolls on two levels, and a patient is waiting.",
+   "seconds": 5.24
   },
   "en/d0_r69": {
-   "text": "Traffic jam. The life station is a good place to wait.",
-   "seconds": 3.56
+   "text": "Rail triangle. The vehicles know their rhythm, you will learn it soon.",
+   "seconds": 5.52
   },
   "en/d0_r70": {
-   "text": "Detour. Today the traffic is routed around you.",
-   "seconds": 3.48
+   "text": "Hub. Wind blows across the hall, and there is a patient too.",
+   "seconds": 4.92
   },
   "en/d0_r71": {
-   "text": "Control center. Vehicles, currents and magnets. Dispatch is watching.",
-   "seconds": 6.2
+   "text": "Peak traffic. A patient waits between the vehicles, fly gently.",
+   "seconds": 4.76
   },
   "en/d0_r72": {
-   "text": "Marshalling yard. Heavy traffic and a life station to catch your breath.",
-   "seconds": 4.36
+   "text": "Control center. Vehicles, gusts and magnets. Dispatch is watching.",
+   "seconds": 4.92
   },
   "en/d0_r73": {
-   "text": "Transit ring. A patient waits between the vehicles, fly gently.",
-   "seconds": 5.16
+   "text": "Express line. The vehicles are in an extra hurry today.",
+   "seconds": 3.72
   },
   "en/d0_r74": {
-   "text": "A colleague waves at you from the next lane.",
-   "seconds": 2.92
+   "text": "Marshalling yard. A life station to catch your breath, right in the traffic.",
+   "seconds": 5.48
   },
   "en/d0_r75": {
-   "text": "The station misses your smile. And the invoice.",
-   "seconds": 3.88
+   "text": "Transit ring. Another patient, another beat, you can do this.",
+   "seconds": 4.84
   },
   "en/d0_r76": {
-   "text": "Nearly out of the hub. Keep your lane.",
-   "seconds": 3.56
+   "text": "Central hub. Almost at the end of the hub, keep your lane.",
+   "seconds": 4.44
   },
   "en/d0_r77": {
-   "text": "Last hub level. After that it gets dark.",
-   "seconds": 3.4
+   "text": "Terminal station. Last hub level, after that it gets dark. A patient is waiting.",
+   "seconds": 5.96
   },
   "en/d0_r78": {
    "text": "Shadow Ring. Sensors and radar. Radio silence is not an option, check in.",

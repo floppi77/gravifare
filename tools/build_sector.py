@@ -19,7 +19,7 @@ NAMES = {
         ("Magnetmeister", "Magnet Master")],
     7: [("Zubringer", "Feeder"), ("Rushhour", "Rush Hour"), ("Kreuzung", "Junction"), ("Stau", "Traffic Jam"), ("Umleitung", "Detour"), ("Hochbahn", "Elevated Line"),
         ("Gleisdreieck", "Rail Triangle"), ("Knotenpunkt", "Hub"), ("Schichtwechsel", "Shift Change"), ("Hauptverkehr", "Peak Traffic"), ("Leitstelle", "Control Center"),
-        ("Fernverkehr", "Long Distance"), ("Güterbahn", "Freight Line"), ("Expresslinie", "Express Line"), ("Rangierbahnhof", "Marshalling Yard"), ("Transitring", "Transit Ring"), ("Zentralknoten", "Central Hub")],
+        ("Fernverkehr", "Long Distance"), ("Güterbahn", "Freight Line"), ("Expresslinie", "Express Line"), ("Rangierbahnhof", "Marshalling Yard"), ("Transitring", "Transit Ring"), ("Zentralknoten", "Central Hub"), ("Abschlussbahnhof", "Terminal Station")],
     6: [("Gezeitenstrom", "Tidal Current"), ("Schwerelos", "Weightless"), ("Springflut", "Spring Tide"), ("Ebbe", "Ebb"), ("Flut", "Flood"),
         ("Mondbahn", "Moon Orbit"), ("Strudel", "Whirlpool"), ("Brandung", "Surf"), ("Sog", "Undertow"), ("Sturmflut", "Storm Surge"),
         ("Gezeitenmeister", "Tide Master"), ("Mahlstrom", "Maelstrom"), ("Orbitalsog", "Orbital Pull"), ("Tidenkönig", "Tide King"), ("Wasserwelt", "Water World")],
@@ -42,7 +42,7 @@ def cfg(sector, i):
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
     if sector == 7 and i >= 12:
-        t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None)}[i]
+        t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None), 18: (3, "H")}[i]
         return {"npads": 7, "jobs": 8, "special": t[1], "moving": 0, "narrow": 2, "debris": 0, "meteors": 0, "slider": False, "traffic": t[0],
                 "mags": 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": 1 if i >= 14 else 0, "grav": 0, "gust": 1,
                 "stalac": 1, "stalag": 0, "base": 160, "target": 0.0}
@@ -81,7 +81,7 @@ def cfg(sector, i):
 def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
     c = cfg(sector, i)
     seed = sector * 1000 + i * 17 + variant * 101
-    res = procgen.build(seed, c["npads"], c["special"], c["moving"], c["narrow"], c["stalac"], c["stalag"], dense=c["npads"] >= 7, lanes=c["meteors"])
+    res = procgen.build(seed, c["npads"], c["special"], c["moving"], c["narrow"], c["stalac"], c["stalag"], dense=c["npads"] >= 7, lanes=c["meteors"], bands=min(c.get("traffic", 0), 2))
     rnd = random.Random(seed + 7)
     g = copy.deepcopy(res["grid"])
     cells = procgen.spike_cells(res, 60)
@@ -143,7 +143,7 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         raise RuntimeError("zu wenige Hitzezonen")
     if c["mags"] and len([z for z in zones if z["kind"] == "magnet"]) < c["mags"]:
         raise RuntimeError("zu wenige Magnete")
-    for (x0, x1, y0, y1, ax, ay, gust) in (procgen.wind_sites(res, rnd, c["wind"], c.get("gust", 0)) if c.get("wind") else []):
+    for (x0, x1, y0, y1, ax, ay, gust) in (procgen.wind_bands(res, rnd, c["wind"], c.get("gust", 0)) if c.get("wind") else []):
         z = {"kind": "wind", "x": x0, "y": y0, "w": x1 - x0 + 1, "h": y1 - y0 + 1, "ax": ax, "ay": ay}
         if gust:
             per = rnd.choice([8.0, 9.0, 10.0])
@@ -156,20 +156,39 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
     if c.get("grav") and len([z for z in zones if z["kind"] == "gravity"]) < max(1, c["grav"] - 1):
         raise RuntimeError("zu wenige Schwerkraftzonen")
     ntraf = 0
-    for (x0, y, ln) in (procgen.traffic_lanes(res, rnd, c["traffic"]) if c.get("traffic") else []):
+    for y in res.get("bands", []):
         speed = rnd.choice([40.0, 48.0, 56.0]) * (1 if ntraf % 2 == 0 else -1)
-        cars = max(2, ln // 9)
+        ln = 38                                      # Wand bis Wand (Tile 1 bis 38)
+        cars = 3
         span = (ln + 2) * 16.0 / abs(speed)
         for k in range(cars):
-            movers.append({"kind": "vehicle", "x": x0, "y": y, "w": 2, "h": 1, "dx": ln, "speed": speed, "phase": round(k * span / cars + (0.0 if k else 0.0), 2), "tint": ntraf})
+            movers.append({"kind": "vehicle", "x": 1, "y": y, "w": 2, "h": 1, "dx": ln, "speed": speed, "phase": round(k * span / cars, 2), "tint": ntraf})
         ntraf += 1
-    if c.get("traffic") and ntraf < max(1, c["traffic"] - 1):
-        raise RuntimeError("zu wenige Verkehrsbahnen")
+    if c.get("traffic") and ntraf < min(c["traffic"], 2):
+        raise RuntimeError("zu wenige Verkehrsbänder")
     import zonefix
     if zonefix.conflicts(zones):
         raise RuntimeError("Kraftzonen überlappen")
     hosp = c["special"] == "H"
     jobs = jobs_of(seq(sector * 100 + i * 13 + variant, c["jobs"], c["npads"], hospital_at=(rnd.choice([1, 2, 3]) if hosp else None), ), base=c["base"])
+    if res.get("bands"):
+        rows_of = {k: v[2] for k, v in res["pads"].items()}
+        legs = []
+        prev = "1"
+        for j in jobs:
+            legs += [(prev, j["from"]), (j["from"], j["to"])]
+            prev = j["to"] if j["to"] not in ("exit",) else prev
+        legs.append((prev, "exit"))
+        def row(p):
+            return 2 if p == "exit" else rows_of.get(p)
+        cross = 0
+        for yb in res["bands"]:
+            for a_, b_ in legs:
+                ra, rb = row(a_), row(b_)
+                if ra is not None and rb is not None and min(ra, rb) < yb < max(ra, rb):
+                    cross += 1
+        if cross < 3 * len(res["bands"]):
+            raise RuntimeError("Verkehr liegt abseits der Flugrouten")
     if pars:
         for j, p in zip(jobs, pars):
             j["par"] = p
