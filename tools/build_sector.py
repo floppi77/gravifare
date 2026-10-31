@@ -17,6 +17,9 @@ NAMES = {
     4: [("Erste Spule", "First Coil"), ("Abstoßung", "Repulsion"), ("Zwillingspole", "Twin Poles"), ("Pulsschlag", "Heartbeat"), ("Magnetschacht", "Magnet Shaft"),
         ("Feldlinien", "Field Lines"), ("Polwechsel", "Pole Swap"), ("Dynamo", "Dynamo"), ("Rettungsfeld", "Rescue Field"), ("Magnetträger", "Magnet Carriers"),
         ("Magnetmeister", "Magnet Master")],
+    6: [("Gezeitenstrom", "Tidal Current"), ("Schwerelos", "Weightless"), ("Springflut", "Spring Tide"), ("Ebbe", "Ebb"), ("Flut", "Flood"),
+        ("Mondbahn", "Moon Orbit"), ("Strudel", "Whirlpool"), ("Brandung", "Surf"), ("Sog", "Undertow"), ("Sturmflut", "Storm Surge"),
+        ("Gezeitenmeister", "Tide Master")],
     5: [("Erster Funke", "First Spark"), ("Glutschacht", "Ember Shaft"), ("Plasmastrahl", "Plasma Beam"), ("Schmelzofen", "Smelter"), ("Hitzewelle", "Heat Wave"),
         ("Taktgeber", "Pacemaker"), ("Hochofen", "Blast Furnace"), ("Koronaring", "Corona Ring"), ("Gussform", "Casting Mold"), ("Plasmaschmiede", "Plasma Forge"),
         ("Sonnenwende", "Solstice"), ("Sonnenzenit", "Solar Zenith")],
@@ -35,10 +38,17 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 6:
+        wind = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3][i - 1]
+        grav = [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3][i - 1]
+        return {"npads": 7, "jobs": 8, "special": {5: "L", 10: "L", 3: "H", 7: "H", 9: "H"}.get(i), "moving": 0,
+                "narrow": 0 if i < 3 else (1 if i < 7 else 2), "debris": 0 if i < 4 else 1, "meteors": 0, "slider": False,
+                "mags": 0 if i < 6 else 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": wind, "grav": grav, "gust": 0 if i < 3 else (1 if i < 7 else 2),
+                "stalac": 2, "stalag": 1, "base": 150, "target": 0.0}
     if sector == 5 and i >= 8:
-        t = {8: (2, 2, 1, 2, 0, "H"), 9: (2, 2, 1, 2, 2, None), 10: (3, 2, 1, 2, 2, "H"), 11: (3, 3, 2, 2, 2, "L"), 12: (3, 2, 2, 2, 0, "L")}[i]
+        t = {8: (2, 2, 1, 2, 0, "H"), 9: (2, 2, 1, 2, 2, None), 10: (3, 2, 1, 2, 2, "H"), 11: (3, 3, 2, 2, 2, "L"), 12: (2, 2, 2, 2, 2, "L")}[i]
         return {"npads": 7, "jobs": 7, "special": t[5], "moving": 0, "narrow": 2, "debris": t[3], "meteors": t[4], "slider": False,
-                "mags": t[2], "pulsing": 0, "heat": t[0], "beams": t[1], "heat_pulsing": 2, "stalac": 2, "stalag": 1, "base": 140, "target": 0.0}
+                "mags": t[2], "pulsing": 1 if i == 12 else 0, "mixed": i == 12, "heat": t[0], "beams": t[1], "heat_pulsing": 2, "stalac": 2, "stalag": 1, "base": 140, "target": 0.0}
     if sector == 5:
         heat = [1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2][i - 1]
         beams = [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2][i - 1]
@@ -85,6 +95,8 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
                 k = abs(k)
             if c.get("repel_first") and n == 0:
                 k = -abs(k)
+            if c.get("mixed") and n == 1:
+                k = -abs(k)
             if n >= c["mags"] - c.get("pulsing", 0):
                 per = rnd.choice([7.0, 8.0, 9.0])
                 zones.append(MAG(x, y, k, r=r, period=per, on=round(per / 2, 1), phase=rnd.choice([0.0, 2.0, 3.5])))
@@ -113,6 +125,18 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         raise RuntimeError("zu wenige Hitzezonen")
     if c["mags"] and len([z for z in zones if z["kind"] == "magnet"]) < c["mags"]:
         raise RuntimeError("zu wenige Magnete")
+    for (x0, x1, y0, y1, ax, ay, gust) in (procgen.wind_sites(res, rnd, c["wind"], c.get("gust", 0)) if c.get("wind") else []):
+        z = {"kind": "wind", "x": x0, "y": y0, "w": x1 - x0 + 1, "h": y1 - y0 + 1, "ax": ax, "ay": ay}
+        if gust:
+            per = rnd.choice([8.0, 9.0, 10.0])
+            z.update({"period": per, "on": round(per * 0.55, 1), "phase": rnd.choice([0.0, 2.0, 4.0])})
+        zones.append(z)
+    for (x0, x1, y0, y1, gf) in (procgen.gravity_sites(res, rnd, c["grav"]) if c.get("grav") else []):
+        zones.append({"kind": "gravity", "x": x0, "y": y0, "w": x1 - x0 + 1, "h": y1 - y0 + 1, "g": gf})
+    if c.get("wind") and len([z for z in zones if z["kind"] == "wind"]) < max(1, c["wind"] - 1):
+        raise RuntimeError("zu wenige Strömungen")
+    if c.get("grav") and len([z for z in zones if z["kind"] == "gravity"]) < max(1, c["grav"] - 1):
+        raise RuntimeError("zu wenige Schwerkraftzonen")
     hosp = c["special"] == "H"
     jobs = jobs_of(seq(sector * 100 + i * 13 + variant, c["jobs"], c["npads"], hospital_at=(rnd.choice([1, 2, 3]) if hosp else None), ), base=c["base"])
     if pars:
@@ -131,6 +155,12 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
             mech.append("pulsing_heat")
     if "beam" in kinds:
         mech.append("beams")
+    if any(z["kind"] == "wind" for z in zones):
+        mech.append("currents")
+        if any("period" in z for z in zones if z["kind"] == "wind"):
+            mech.append("gusts")
+    if any(z["kind"] == "gravity" for z in zones):
+        mech.append("gravity_zones")
     zones_mag = [z for z in zones if z["kind"] == "magnet"]
     if zones_mag:
         mech.append("magnets")
@@ -238,7 +268,7 @@ def dp_points(slots, pts, ramp):
 
 def main():
     sector = int(sys.argv[1])
-    K = 8 if sector == 5 else 5
+    K = 8 if sector >= 5 else 5
     for a_ in sys.argv:
         if a_.startswith("--k="):
             K = int(a_[4:])
@@ -278,7 +308,7 @@ def main():
     fl = floor_of(sector)
     ramp = {"floor": fl}
     for i in slots:
-        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
+        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
     print("gültig je Slot:", {i: len(pts[i]) for i in slots}, flush=True)
     plan = None
     for rnd_ in range(4):
@@ -314,6 +344,7 @@ def main():
         for i in slots:
             print(i, sorted(round(sc, 1) for sc, _ in pts[i]))
         return
+    print("Punkte-Bereich je Slot:", {i: (round(min(x[0] for x in pts[i]), 1), round(max(x[0] for x in pts[i]), 1)) for i in slots if pts[i]}, "Boden", round(fl, 1), flush=True)
     keep_slots = sorted(plan)
     scores = {i: info[(i, plan[i])]["score"] for i in keep_slots}
     print("Plan (Slot: Variante, Dornen, Score):", {i: (plan[i][0], plan[i][1], round(scores[i], 1)) for i in keep_slots}, flush=True)
@@ -332,7 +363,7 @@ def main():
         r = info[(i, plan[i])]
         times = r["times"] + [30.0]
         pars = [int(round(1.3 * t + 8)) for t in times]
-        d2, _ = make_level(sector, i, v, nn, pars[: 7], idx=n)
+        d2, _ = make_level(sector, i, v, nn, pars[: 8], idx=n)
         fn = "data/levels/s%d_%02d.json" % (sector, n)
         json.dump(d2, open(fn, "w"), indent=1, ensure_ascii=False)
         final_paths[fn] = i

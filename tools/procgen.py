@@ -479,3 +479,54 @@ def beam_sites(res, rnd, n):
         if len(out) >= n:
             break
     return out
+
+
+def _zone_ok(res, rc, others, margin_pad=0):
+    g = res["grid"]
+    x0, x1, y0, y1 = rc
+    if any(g.g[y][x] != "." for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)):
+        return False
+    if _rect_hit(rc, (GATE_ZONE[0] - 1, GATE_ZONE[1] + 1, 1, 10)):
+        return False
+    if any(_rect_hit(rc, (o.rx0 - 1 - o.ext - margin_pad, o.rx1 + 1 + o.ext + margin_pad, o.top - 3 - margin_pad, o.bot + 1)) for o in res["islands"]):
+        return False
+    if any(_rect_hit((rc[0] - 1, rc[1] + 1, rc[2] - 1, rc[3] + 1), o) for o in others):
+        return False
+    return True
+
+
+def wind_sites(res, rnd, n, gust=0):
+    """Strömungen: Rechtecke (4–8 × 3–6 Tiles) in freier Luft, fern von Pads; Richtung waagerecht oder senkrecht, 45–65 px/s².
+    Rückgabe [(x0, x1, y0, y1, ax, ay, gust)] – die letzten `gust` Zonen pulsieren als Böen."""
+    out = []
+    for _ in range(800):
+        w = rnd.randint(3, 7)
+        h = rnd.randint(3, 5)
+        x0 = rnd.randint(3, W - 3 - w)
+        y0 = rnd.randint(4, 17 - h)
+        rc = (x0, x0 + w - 1, y0, y0 + h - 1)
+        if not _zone_ok(res, rc, [o[:4] for o in out]):
+            continue
+        mag = rnd.choice([45, 55, 65])
+        ax, ay = rnd.choice([(mag, 0), (-mag, 0), (0, mag), (0, -mag)])
+        out.append((rc[0], rc[1], rc[2], rc[3], ax, ay, False))
+        if len(out) >= n:
+            break
+    return [o[:6] + (i >= len(out) - gust,) for i, o in enumerate(out)]
+
+
+def gravity_sites(res, rnd, n):
+    """Schwerkraftzonen: Rechtecke (5–9 × 4–8 Tiles); Faktor 0,4 (leicht) oder 1,7 (schwer)."""
+    out = []
+    for _ in range(800):
+        w = rnd.randint(4, 7)
+        h = rnd.randint(3, 6)
+        x0 = rnd.randint(3, W - 3 - w)
+        y0 = rnd.randint(4, 17 - h)
+        rc = (x0, x0 + w - 1, y0, y0 + h - 1)
+        if not _zone_ok(res, rc, [o[:4] for o in out]):
+            continue
+        out.append((rc[0], rc[1], rc[2], rc[3], rnd.choice([0.4, 1.7])))
+        if len(out) >= n:
+            break
+    return out

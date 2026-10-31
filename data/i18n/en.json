@@ -205,5 +205,8 @@
  "MSG_HEAT": "Heat! The hull is glowing",
  "HUD_PATIENT_LOST": "PATIENT LOST",
  "MSG_PATIENT_LOST": "Patient lost! %s – penalty ¢%d",
+ "MSG_FIELD_WIND": "Current! The taxi is swept along",
+ "MSG_FIELD_HEAVY": "Gravity zone: everything gets heavier",
+ "MSG_FIELD_LIGHT": "Gravity zone: everything gets lighter",
  "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT"
 }

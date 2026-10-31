@@ -14,6 +14,12 @@ extends RefCounted
 ## Mechaniken sind nach oben offen (Länge bis 2, Aufträge bis 1,5, Gefahren bis 3, Mechaniken bis 12), damit
 ## die Rangfolge bis Level 99 nicht an eine Obergrenze von 100 stößt.
 
+## Ab Sektor 6 kommt ein Sektorzuschlag dazu: Gefahren, Mechaniken und Länge sind in Sektor 3–5 an ihren Obergrenzen angekommen
+## (Gefahren 3,0 · Mechaniken 12), die Folge steigt ab dort je Sektor neu an. Der Zuschlag steht für das, was Spielende aus den
+## früheren Sektoren beherrschen müssen.
+const SECTOR_BONUS_FROM := 5
+const SECTOR_BONUS := 25.0
+
 const MAX_MARGIN := 48.0
 const STEP := 4.0
 static var _leg_cache := {}
@@ -118,7 +124,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var features := clampf(float((lvl.raw.get("mechanics", []) as Array).size()), 0.0, 12.0)
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
-		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features,
+		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)),
 		"solvable": clearance > 0.0,
 	}
 

@@ -314,11 +314,17 @@ func _field_feedback() -> void:
 		taxi.burst_sparks()
 	if run.sim.time - field_msg_t > 6.0:
 		field_msg_t = run.sim.time
-		var pull := false
+		var key := "MSG_FIELD_PUSH"
 		for z in run.level.zones:
-			if z.kind == "magnet" and (z.rect as Rect2).has_point(run.sim.pos):
-				pull = float(z.k) > 0.0
-		hud.flash_message(tr("MSG_FIELD_PULL") if pull else tr("MSG_FIELD_PUSH"), 1.6)
+			if not (z.rect as Rect2).has_point(run.sim.pos) or not run.level.zone_active(z, run.sim.time):
+				continue
+			if z.kind == "magnet":
+				key = "MSG_FIELD_PULL" if float(z.k) > 0.0 else "MSG_FIELD_PUSH"
+			elif z.kind == "wind":
+				key = "MSG_FIELD_WIND"
+			elif z.kind == "gravity":
+				key = "MSG_FIELD_HEAVY" if float(z.g) > 1.0 else "MSG_FIELD_LIGHT"
+		hud.flash_message(tr(key), 1.6)
 
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):

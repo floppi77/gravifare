@@ -205,5 +205,8 @@
  "MSG_HEAT": "Hitze! Die Hülle glüht",
  "HUD_PATIENT_LOST": "PATIENT VERLOREN",
  "MSG_PATIENT_LOST": "Patient verloren! %s – Strafe ¢%d",
+ "MSG_FIELD_WIND": "Strömung! Das Taxi wird mitgerissen",
+ "MSG_FIELD_HEAVY": "Schwerkraftzone: alles wird schwerer",
+ "MSG_FIELD_LIGHT": "Schwerkraftzone: alles wird leichter",
  "HUD_TAG_FRAGILE": "+ KRANKENTRANSPORT"
 }
