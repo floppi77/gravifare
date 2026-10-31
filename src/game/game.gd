@@ -75,6 +75,10 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--autopilot"):
 		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
 		autopilot = Bot.new(run)
+	for ua in OS.get_cmdline_user_args():
+		if ua.begins_with("--skip-time="):          # Dev: Spielzeit vorspulen (Taxi bleibt stehen), z. B. für Screenshots von Meteoriten
+			for i in int(float(ua.substr(12)) / Tuning.TICK):
+				run.step(Vector2.ZERO, false)
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--debug-complete"):
@@ -253,6 +257,7 @@ func _physics_process(_delta: float) -> void:
 		_check_near_miss()
 		_music_tick()
 		_hint_tick()
+		_field_feedback()
 	for e in run.log:
 		_on_event(e)
 	cam.global_position = _cam_target()
@@ -282,6 +287,36 @@ func _physics_process(_delta: float) -> void:
 		restart_timer += Tuning.TICK
 		if restart_timer > 1.2:
 			_lose_life()
+
+var field_cd := 0.0
+var heat_msg_t := -99.0
+var field_msg_t := -99.0
+
+## Im Magnetfeld: Rütteln, Funken und Rumble, damit man die Kraft spürt; beim Einflug eine Meldung (Anziehung oder Abstoßung).
+func _field_feedback() -> void:
+	if not run.level.has_zones() or run.sim.state != TaxiSim.State.FLYING:
+		return
+	if run.level.heat_at(run.sim.pos, run.sim.time) and run.sim.time - heat_msg_t > 5.0:
+		heat_msg_t = run.sim.time
+		hud.flash_message(tr("MSG_HEAT"), 1.8)
+	var za := run.level.zone_accel(run.sim.pos, run.sim.time)
+	var mag := za.length()
+	if mag < 12.0:
+		return
+	var s := clampf(mag / 120.0, 0.0, 1.0)
+	_add_shake(0.25 + 0.9 * s)
+	Haptics.pulse(0.04, 0.2 + 0.6 * s, 0.06)
+	field_cd -= Tuning.TICK
+	if field_cd <= 0.0:
+		field_cd = 0.3
+		taxi.burst_sparks()
+	if run.sim.time - field_msg_t > 6.0:
+		field_msg_t = run.sim.time
+		var pull := false
+		for z in run.level.zones:
+			if z.kind == "magnet" and (z.rect as Rect2).has_point(run.sim.pos):
+				pull = float(z.k) > 0.0
+		hud.flash_message(tr("MSG_FIELD_PULL") if pull else tr("MSG_FIELD_PUSH"), 1.6)
 
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
@@ -448,7 +483,9 @@ func _on_event(e: Dictionary) -> void:
 		"boarded":
 			Sfx.play("board", -6.0)
 			Sfx.play_voice(e.voice, "dest_" + e.dest)
-			hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else tr("VOICE_DEST") % e.dest, 2.8)
+			hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else (tr("VOICE_DEST_H") if e.dest == "H" else tr("VOICE_DEST") % e.dest), 2.8)
+			if int(e.job) >= 0 and bool(run.jobs[e.job].get("fragile", false)):
+				hud.flash_message(tr("MSG_MEDICAL"), 3.2)
 		"delivered":
 			var msg := tr("MSG_DELIVERED2") % [int(e.pay), e.factor]
 			if int(e.get("combo", 0)) > 0:
@@ -477,6 +514,10 @@ func _on_event(e: Dictionary) -> void:
 				voice_cd = Time.get_ticks_msec() / 1000.0 + 2.5
 				Sfx.play_voice(e.voice, "bumpy")
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
+		"beam_warn":
+			hud.flash_message(tr("MSG_BEAM_WARN"), 2.0)
+			Sfx.play("warn", -5.0)
+			Haptics.pulse(0.15, 0.2, 0.2)
 		"meteor_warn":
 			hud.flash_message(tr("MSG_METEOR_WARN"), 2.4)
 			Sfx.play("warn", -4.0)
@@ -601,11 +642,11 @@ func _process(delta: float) -> void:
 
 var radio_played := false
 
-## Funkspruch der Zentrale während der Weltraumfahrt: Sektor-Intro beim ersten Level eines Sektors, sonst eine
-## allgemeine Zeile (reproduzierbar aus der Levelnummer).
+## Funkspruch der Zentrale während der Weltraumfahrt: ein eigener Spruch je Level; wird dort etwas Neues eingeführt,
+## bezieht er sich darauf, sonst ist es Plauderei.
 func _play_radio() -> void:
 	var nl := LevelData.load_file(Flow.level_path(next_id))
-	var key := "intro_%d" % clampi(nl.sector, 1, 9) if nl.index == 1 else "g%d" % ((nl.number * 7) % 10 + 1)
+	var key := "r%d" % nl.number          # jedes Level hat einen eigenen Funkspruch (data/voice_lines.json, Stimme d0)
 	var txt := Sfx.line_text("d0", key)
 	if txt == "":
 		return

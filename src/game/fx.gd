@@ -113,7 +113,7 @@ func _occluder(r: Rect2) -> LightOccluder2D:
 func _build_lights() -> void:
 	for id in level.pads:
 		var p: Dictionary = level.pads[id]
-		var col := Color("#ff6aa0") if p.life else (Color("#ffa530") if p.fuel else Color("#35e0d2"))
+		var col := Color("#ff6aa0") if p.life else (Color("#ffa530") if p.fuel else (Color("#ff5a64") if p.get("hospital", false) else Color("#35e0d2")))
 		var l := make_light(col, 90.0, 2.3)
 		l.position = Vector2(p.center, p.row * T - 6.0)
 		add_child(l)
@@ -186,7 +186,7 @@ func _process(delta: float) -> void:
 		var l: PointLight2D = pad_lights[id]
 		if level.pads[id].get("moving", false):
 			l.position.x = level.pads[id].center
-		var base_col := Color("#ff6aa0") if level.pads[id].life else (Color("#ffa530") if level.pads[id].fuel else Color("#35e0d2"))
+		var base_col := Color("#ff6aa0") if level.pads[id].life else (Color("#ffa530") if level.pads[id].fuel else (Color("#ff5a64") if level.pads[id].get("hospital", false) else Color("#35e0d2")))
 		if id == target:
 			l.color = base_col.lerp(Color("#ffe14a"), 0.6)
 			l.energy = 3.0 + 0.8 * sin(_t * 6.0)

@@ -227,7 +227,7 @@ func min_fare(lvl: LevelData, job: Dictionary) -> float:
 		return 0.0
 	var avg_price := (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
 	var length := LevelMetrics.leg_length(lvl, String(job.from), to_id)
-	var wait := 1.0 + (0.5 if lvl.has_movers() else 0.0) + (0.15 if lvl.has_doors() else 0.0)     # Warten vor Hindernissen kostet Sprit
+	var wait := 1.0 + (0.5 if lvl.has_movers() else 0.0) + (0.15 if lvl.has_doors() else 0.0) + (0.2 if lvl.has_meteors() else 0.0)     # Warten vor Hindernissen (Meteoriten, Strahlen) kostet Sprit
 	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price * wait
 	var mult := LevelMetrics.leg_mult(lvl, String(job.from), to_id)
 	return ceilf(cost * Tuning.PROFIT_MARGIN / (Tuning.satisfaction_factor(Tuning.SAT_FLOOR) * mult) / 5.0) * 5.0
@@ -487,7 +487,10 @@ func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 
 ## Perfekte Landung = weich (≤ 22 px/s), kaum seitlich (≤ 12 px/s), waagerecht (≤ 4°). Serie bis +30 % Fahrpreis.
 func _evaluate_landing(e: Dictionary) -> void:
-	if float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
+	var flown: bool = float(e.get("air_t", 99.0)) >= Tuning.PERFECT_MIN_AIR and float(e.get("air_path", 999.0)) >= Tuning.PERFECT_MIN_PATH
+	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
+		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
+	if flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		streak += 1
 		perfect_count += 1
 		best_streak = maxi(best_streak, streak)

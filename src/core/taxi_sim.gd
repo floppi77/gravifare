@@ -21,6 +21,9 @@ var events: Array = []
 var spike_cd := 0.0
 var mover_cd := 0.0
 var meteor_cd := 0.0
+var heat_cd := 0.0
+var air_t := 0.0             # Flugzeit seit dem letzten Abheben (für „perfekte Landung“)
+var air_path := 0.0          # zurückgelegte Strecke seit dem letzten Abheben (px)
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -37,6 +40,9 @@ func setup(lvl: LevelData) -> void:
 	spike_cd = 0.0
 	mover_cd = 0.0
 	meteor_cd = 0.0
+	heat_cd = 0.0
+	air_t = 0.0
+	air_path = 0.0
 	lvl.clock = 0.0
 	lvl.update_movers(0.0, true)
 	events.clear()
@@ -91,10 +97,23 @@ func _door_crush() -> void:
 func _mover_damage(kind: String) -> void:
 	if mover_cd > 0.0 or state == State.DESTROYED:
 		return
-	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else Tuning.PADSLAB_DAMAGE))
+	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else (Tuning.BEAM_DAMAGE if kind == "beam" else Tuning.PADSLAB_DAMAGE)))
 	mover_cd = Tuning.MOVER_COOLDOWN
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "mover": kind})
+	if hull <= 0.0:
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed"})
+
+## Hitzezone: solange das Taxi darin fliegt, alle 0,25 s Hüllenschaden.
+func _heat(dt: float) -> void:
+	heat_cd = maxf(0.0, heat_cd - dt)
+	if heat_cd > 0.0 or state == State.DESTROYED or level.zones.is_empty() or not level.heat_at(pos, time):
+		return
+	heat_cd = 0.25
+	hull -= Tuning.HEAT_DAMAGE
+	events.append({"type": "damage", "amount": Tuning.HEAT_DAMAGE, "speed": 0.0, "heat": true})
 	if hull <= 0.0:
 		hull = 0.0
 		state = State.DESTROYED
@@ -106,11 +125,11 @@ func _meteor_alert(dt: float) -> void:
 	if meteor_cd > 0.0:
 		return
 	for m in level.movers:
-		if m.kind == "meteor":
+		if m.kind == "meteor" or m.kind == "beam":
 			var eta := level.meteor_eta(m, time)
 			if eta > 0.0 and eta <= float(m.warn):
 				meteor_cd = 6.0
-				events.append({"type": "meteor_warn"})
+				events.append({"type": "meteor_warn" if m.kind == "meteor" else "beam_warn"})
 				return
 
 ## Taxi stößt (durch eigene Bewegung) an einen Mover.
@@ -131,6 +150,9 @@ func _mover_push() -> void:
 		var r: Rect2 = m.rect
 		if not r.intersects(box):
 			continue
+		if m.kind == "beam":                 # Strahl schiebt nicht, er verbrennt nur
+			_mover_damage("beam")
+			continue
 		var opts := [[box.end.x - r.position.x, Vector2(-1, 0)], [r.end.x - box.position.x, Vector2(1, 0)],
 			[box.end.y - r.position.y, Vector2(0, -1)], [r.end.y - box.position.y, Vector2(0, 1)]]
 		var best: Array = opts[0]
@@ -142,6 +164,8 @@ func _mover_push() -> void:
 		if state == State.LANDED:
 			state = State.FLYING
 			landed_pad = {}
+			air_t = 0.0
+			air_path = 0.0
 		_mover_damage(m.kind)
 		return
 
@@ -176,6 +200,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	mover_cd = maxf(0.0, mover_cd - dt)
 	level.update_movers(time)
 	_meteor_alert(dt)
+	_heat(dt)
 	_door_crush()
 	_mover_push()
 	gear_cmd = gear_request
@@ -194,6 +219,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			vel.x = float(landed_pad.get("dx_step", 0.0)) / dt        # fährt die Plattform, startet das Taxi mit ihrem Tempo
 			state = State.FLYING
 			landed_pad = {}
+			air_t = 0.0
+			air_path = 0.0
 			events.append({"type": "liftoff"})
 		else:
 			vel = Vector2.ZERO
@@ -201,6 +228,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			tilt = move_toward(tilt, 0.0, dt * 2.0)
 			return
 
+	air_t += dt
+	air_path += vel.length() * dt
 	var acc := Vector2(0.0, level.gravity)
 	if not level.zones.is_empty():
 		acc += level.zone_accel(pos, time)
@@ -277,7 +306,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		tilt = 0.0
 		state = State.LANDED
 		landed_pad = pad_l
-		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y, "vx": speed_x, "tilt": tilt_in})
+		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y, "vx": speed_x, "tilt": tilt_in, "air_t": air_t, "air_path": air_path})
 	else:
 		var reason := "pos" if not on_pad else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > Tuning.LAND_TILT else "speed"))
 		events.append({"type": "bad_landing", "reason": reason})

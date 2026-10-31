@@ -99,5 +99,7 @@ func count_event(key: String, n := 1) -> void:
 	data.stats[key] = int(data.stats.get(key, 0)) + n
 
 ## Ein Level ist frei, wenn es das erste ist oder sein Vorgänger abgeschlossen wurde.
+const DEBUG_UNLOCK_ALL := true       # TEMPORÄR (Debug): alle Level in der Levelauswahl frei – vor der Veröffentlichung auf false setzen
+
 func is_unlocked(ids: Array, i: int) -> bool:
-	return i == 0 or is_completed(ids[i - 1]) or is_completed(ids[i])
+	return DEBUG_UNLOCK_ALL or i == 0 or is_completed(ids[i - 1]) or is_completed(ids[i])

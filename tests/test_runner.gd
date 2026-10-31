@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -712,7 +712,7 @@ func _test_life_station() -> void:
 		if not f.ends_with(".json"):
 			continue
 		var lv := LevelData.load_file("res://data/levels/" + f)
-		if lv.number % 5 == 0:
+		if lv.number % 5 == 0 and lv.sector <= 4:          # Sektor 5 ist noch ein Teilsektor (Lebensstationen dort in Level 48 und 51)
 			check(lv.pads.has("L") and lv.pads["L"].land_window >= 28.0, "%s (Level %d): Lebens-Station vorhanden (alle 5 Level)" % [lv.id, lv.number])
 	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
 	var r := Run.new()
@@ -802,6 +802,82 @@ func _test_fragile_and_meteors() -> void:
 			break
 	check(warned, "Meteoritenschauer meldet vorher eine Warnung")
 	check(hit and s.hull < 100.0, "Meteoriten-Treffer: Schaden (%.0f Hülle)" % s.hull)
+
+func _test_perfect_needs_flight() -> void:
+	# Eine „perfekte Landung“ zählt nur nach echtem Flug (Zeit und Strecke seit dem Abheben), nicht nach Hüpfern auf der Stelle
+	var r := Run.new()
+	r.start(_lvl())
+	r.log.clear()
+	r._evaluate_landing({"vy": 10.0, "vx": 3.0, "tilt": 0.02, "air_t": 0.1, "air_path": 3.0})
+	check(r.streak == 0 and r.perfect_count == 0, "Hüpfer direkt nach dem Abheben (0,1 s) zählt nicht als perfekt")
+	r._evaluate_landing({"vy": 10.0, "vx": 3.0, "tilt": 0.02, "air_t": 3.0, "air_path": 10.0})
+	check(r.perfect_count == 0, "Zu kurze Strecke (10 px) zählt nicht als perfekt")
+	r._evaluate_landing({"vy": 10.0, "vx": 3.0, "tilt": 0.02, "air_t": 3.0, "air_path": 120.0})
+	check(r.perfect_count == 1 and r.streak == 1, "Echter Flug (3 s, 120 px) und sanfte Landung = perfekt")
+	r._evaluate_landing({"vy": 10.0, "vx": 3.0, "tilt": 0.02, "air_t": 0.2, "air_path": 4.0})
+	check(r.streak == 1, "Ein Hüpfer unterbricht die Serie nicht und verlängert sie nicht")
+	# Im Sim: Abheben setzt die Zähler zurück, jeder Flugtick zählt hoch
+	var s := TaxiSim.new()
+	s.setup(_lvl())
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(300.0, 100.0)
+	s.air_t = 0.0
+	s.air_path = 0.0
+	for i in 120:
+		s.step(Vector2(0.3, -0.39), false)
+	check(s.air_t > 0.9 and s.air_path > 10.0, "Flugzeit und Flugstrecke wachsen im Flug (%.1f s, %.0f px)" % [s.air_t, s.air_path])
+
+func _test_beam_heat_hospital() -> void:
+	var rows: Array = []
+	for y in 22:
+		var row := ""
+		for x in 40:
+			row += "#" if (y == 0 or y >= 20 or x == 0 or x == 39) else "."
+		rows.append(row)
+	rows[1] = "#" + ".".repeat(14) + "##EEEE##" + ".".repeat(15) + "#"
+	rows[19] = "#" + ".".repeat(3) + "11111" + ".".repeat(5) + "HHHHH" + ".".repeat(21) + "#"
+	rows[18] = rows[18].substr(0, 4) + "S" + rows[18].substr(5)
+	var lv := LevelData.from_dict({"id": "T-BH", "sector": 5, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [{"from": "1", "to": "H", "fare": 100, "par": 50, "passenger": "Mika", "gender": "f", "fragile": true}],
+		"movers": [{"kind": "beam", "x": 10, "y": 5, "w": 8, "h": 1, "period": 10.0, "on": 3.0, "phase": 0.0, "warn": 2.0}],
+		"zones": [{"kind": "heat", "x": 24, "y": 5, "w": 3, "h": 3}]})
+	check(lv.pads.has("H") and lv.pads["H"].hospital and not lv.is_passenger_pad("H") and lv.is_passenger_pad("1"), "Krankenhaus-Pad H wird erkannt, ist aber kein nummeriertes Passagierpad")
+	check(lv.pads["H"].shelter.size.x > 0.0, "Krankenhaus hat einen Unterstand (Fahrgast läuft hinein)")
+	var m: Dictionary = lv.movers[0]
+	lv.update_movers(1.0)
+	check(m.rect.position.x == 160.0 and lv.meteor_eta(m, 1.0) == 0.0, "Plasmastrahl ist im Takt aktiv")
+	lv.update_movers(5.0)
+	check(m.rect.position.x < -500.0 and absf(lv.meteor_eta(m, 5.0) - 5.0) < 0.001, "Plasmastrahl ist zwischen den Pulsen aus (nächster in 5 s)")
+	check(not lv.meteor_threat(Rect2(160, 80, 16, 16), 5.0, 2.2).is_empty() == false and not lv.meteor_threat(Rect2(160, 80, 16, 16), 8.5, 2.2).is_empty(), "Strahl-Bahn gilt erst kurz vor dem Puls als bedroht")
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.state = TaxiSim.State.FLYING
+	s.pos = Vector2(14.0 * Tuning.TILE, 5.5 * Tuning.TILE)
+	var beam_hit := false
+	for i in int(3.0 / Tuning.TICK):
+		s.step(Vector2(0, -0.39), false)
+		for e in s.events:
+			if e.type == "damage" and e.get("mover", "") == "beam":
+				beam_hit = true
+	check(beam_hit, "Plasmastrahl verbrennt das Taxi")
+	var s2 := TaxiSim.new()
+	s2.setup(lv)
+	s2.state = TaxiSim.State.FLYING
+	s2.pos = Vector2(25.5 * Tuning.TILE, 6.5 * Tuning.TILE)
+	var heat := 0
+	for i in int(2.0 / Tuning.TICK):
+		s2.step(Vector2(0, -0.39), false)
+		for e in s2.events:
+			if e.type == "damage" and e.get("heat", false):
+				heat += 1
+	check(heat >= 6 and s2.hull < 85.0, "Hitzezone: Hüllenschaden alle 0,25 s (%d Treffer, Hülle %.0f)" % [heat, s2.hull])
+	check(not Pathing.free_at(lv, Vector2(25.5 * Tuning.TILE, 6.5 * Tuning.TILE), 0.0) and Pathing.free_at(lv, Vector2(30.0 * Tuning.TILE, 12.0 * Tuning.TILE), 0.0), "Planung meidet Hitzezonen")
+	# Krankentransport: Zielpad ist H
+	var r := Run.new()
+	r.start(lv)
+	_land_on(r, "1")
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.CARRYING and r.target_pad() == "H", "Krankentransport: nach dem Einsteigen ist das Krankenhaus das Ziel")
 
 func _test_eject() -> void:
 	var lvl := _lvl()
@@ -1688,7 +1764,7 @@ func _test_save_robust() -> void:
 	sv2.path = sv.path
 	sv2.load_save()
 	check(sv2.is_completed("s1_01") and sv2.best_time("s1_01") == 60.0, "Speichern und Neuladen (Fortschritt bleibt nach Neustart)")
-	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers")
+	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and (Save.DEBUG_UNLOCK_ALL or not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2)), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers (Debug: alles frei)")
 	_rm(sv.path)
 	sv.free()
 	sv2.free()

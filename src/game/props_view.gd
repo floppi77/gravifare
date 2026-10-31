@@ -59,6 +59,8 @@ func _draw_pads() -> void:
 		var y: float = p.row * T
 		var is_target: bool = id == target
 		var col := Color("#ff6aa0") if p.life else (Color("#35e0d2") if not p.fuel else Color("#ffa530"))
+		if p.get("hospital", false):
+			col = Color("#ff5a64")
 		# Wartebereich-Unterstand, Pfosten mit Signalbaken nur am freien Ende
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
@@ -86,6 +88,8 @@ func _draw_pads() -> void:
 			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
 		if p.life:
 			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.LIFE_PRICE)
+		if p.get("hospital", false):
+			_draw_hospital_sign(p, y)
 		if is_target:
 			var pulse := 0.5 + 0.5 * sin(t * 6.0)
 			var c2 := Color("#ffe14a")
@@ -146,13 +150,9 @@ func _draw_zones() -> void:
 							var perp := Vector2(-dir.y, dir.x)
 							draw_polyline(PackedVector2Array([q - dir * 3.0 + perp * 3.0, q + dir * 2.0, q - dir * 3.0 - perp * 3.0]), Color(0.6, 0.95, 1.0, 0.5 * al), 1.0)
 			"magnet":
-				var c: Vector2 = z.center
-				var attract := float(z.k) > 0.0
-				draw_circle(c, 3.0, Color(1.0, 0.35, 0.55, 0.9) if attract else Color(0.4, 0.7, 1.0, 0.9))
-				for i in 3:
-					var f := fmod(t * 0.6 + float(i) / 3.0, 1.0)
-					var rr: float = float(z.r) * (1.0 - f if attract else f)
-					draw_arc(c, rr, 0.0, TAU, 40, Color(1.0, 0.4, 0.6, 0.7 * (1.0 - absf(f - 0.5) * 1.2) * al) if attract else Color(0.45, 0.75, 1.0, 0.7 * (1.0 - absf(f - 0.5) * 1.2) * al), 1.0)
+				_draw_magnet(z, on)
+			"heat":
+				_draw_heat(z, on)
 			"gravity":
 				var heavy := float(z.g) > 1.0
 				draw_rect(r, Color(0.9, 0.3, 0.9, 0.08 * al) if heavy else Color(0.4, 1.0, 0.7, 0.08 * al))
@@ -163,6 +163,89 @@ func _draw_zones() -> void:
 					var s := 3.0 if heavy else -3.0
 					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
 
+## Hitzezone: glühender Dunstschleier mit aufsteigenden Funken und Flimmerlinien; pulsierende Auslässe sind aus gedämpft
+## und kündigen das Einschalten mit Flackern an.
+func _draw_heat(z: Dictionary, on: bool) -> void:
+	var r: Rect2 = z.rect
+	var al := 1.0 if on else 0.18
+	if float(z.period) > 0.0 and not on:
+		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
+		if left < 1.2:
+			al = 0.18 + 0.7 * (0.5 + 0.5 * sin(t * 24.0)) * (1.0 - left / 1.2)
+	for i in 6:
+		var f := float(i) / 5.0
+		var h := r.size.y * (1.0 - f)
+		draw_rect(Rect2(r.position.x, r.end.y - h, r.size.x, h), Color(1.0, 0.35 + 0.3 * f, 0.1, 0.05 * al))
+	for i in int(r.size.x / 6.0):
+		var x := r.position.x + 3.0 + float(i) * 6.0
+		var h := fmod(float(i) * 0.61803, 1.0)
+		var fr := fmod(t * (0.5 + 0.5 * h) + h * 3.0, 1.0)
+		var y := r.end.y - fr * r.size.y
+		draw_rect(Rect2(x + sin(t * 3.0 + float(i)) * 2.0, y, 1.5, 1.5), Color(1.0, 0.75 - 0.4 * fr, 0.2, (1.0 - fr) * 0.9 * al))
+	for k in 3:
+		var yy := r.position.y + r.size.y * (0.25 + 0.25 * float(k))
+		var pts := PackedVector2Array()
+		for i in 12:
+			var u := float(i) / 11.0
+			pts.append(Vector2(r.position.x + u * r.size.x, yy + sin(t * 4.0 + u * 9.0 + float(k)) * 1.6))
+		draw_polyline(pts, Color(1.0, 0.7, 0.3, 0.22 * al), 1.0)
+	draw_rect(r, Color(1.0, 0.4, 0.15, 0.55 * al), false, 1.0)
+
+## Magnetzone: Spule (Hufeisen mit Polkappen), Feldlinien, einströmende (Anziehung, warm) oder ausströmende (Abstoßung, kalt)
+## Partikel und weiche Energieringe. Pulsierende Magnete zeigen vor dem Einschalten ein Flackern und sind ausgeschaltet gedämpft.
+func _draw_magnet(z: Dictionary, on: bool) -> void:
+	var c: Vector2 = z.center
+	var R: float = z.r
+	var attract := float(z.k) > 0.0
+	var hot := Color(1.0, 0.45, 0.55) if attract else Color(0.4, 0.8, 1.0)
+	var deep := Color(0.55, 0.12, 0.3) if attract else Color(0.1, 0.25, 0.6)
+	var al := 1.0 if on else 0.22
+	if float(z.period) > 0.0 and not on:
+		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
+		if left < 1.2:
+			al = 0.22 + 0.7 * (0.5 + 0.5 * sin(t * 24.0)) * (1.0 - left / 1.2)         # kündigt das Einschalten an
+	# weiches Energiefeld (konzentrische Scheiben)
+	for i in 7:
+		var f := float(i + 1) / 7.0
+		draw_circle(c, R * f, Color(deep.r, deep.g, deep.b, 0.035 * al))
+	# Feldlinien: gekrümmte Bögen um den Kern
+	for i in 8:
+		var ang := float(i) / 8.0 * TAU + t * 0.25 * (1.0 if attract else -1.0)
+		var pts := PackedVector2Array()
+		for k in 9:
+			var u := float(k) / 8.0
+			var rr := lerpf(7.0, R * 0.96, u)
+			var aa := ang + sin(u * PI) * 0.55
+			pts.append(c + Vector2(cos(aa), sin(aa)) * rr)
+		draw_polyline(pts, Color(hot.r, hot.g, hot.b, 0.16 * al), 1.0)
+	# Partikel strömen hinein (Anziehung) oder hinaus (Abstoßung)
+	for i in 28:
+		var h := fmod(float(i) * 0.6180339, 1.0)
+		var ang := float(i) / 28.0 * TAU + h * 2.0
+		var fr := fmod(t * (0.35 + 0.25 * h) + h * 3.0, 1.0)
+		var u := (1.0 - fr) if attract else fr
+		var rr := lerpf(8.0, R, u)
+		var p := c + Vector2(cos(ang + u * 0.6), sin(ang + u * 0.6)) * rr
+		var tail := Vector2(cos(ang + u * 0.6), sin(ang + u * 0.6)) * (4.0 if attract else -4.0)
+		var fade := sin(fr * PI)
+		draw_line(p, p + tail, Color(hot.r, hot.g, hot.b, 0.85 * fade * al), 1.2)
+	# Wellenringe
+	for i in 3:
+		var f := fmod(t * 0.5 + float(i) / 3.0, 1.0)
+		var rr := R * ((1.0 - f) if attract else f)
+		draw_arc(c, rr, 0.0, TAU, 48, Color(hot.r, hot.g, hot.b, 0.5 * sin(f * PI) * al), 1.0)
+	# Kern: metallische Kugel mit Hufeisen und Polkappen
+	draw_circle(c, 6.5, Color(0.04, 0.05, 0.14, 0.9 * al))
+	draw_circle(c, 5.0, Color(0.32, 0.35, 0.5, al))
+	draw_circle(c + Vector2(-1.2, -1.4), 2.0, Color(0.85, 0.9, 1.0, 0.7 * al))
+	var rot := t * 0.8 * (1.0 if attract else -1.0)
+	draw_arc(c, 8.5, rot + 0.5, rot + PI - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
+	draw_arc(c, 8.5, rot + PI + 0.5, rot + TAU - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
+	for sgn in [1.0, -1.0]:
+		var ep := c + Vector2(cos(rot + (0.5 if sgn > 0.0 else PI + 0.5)), sin(rot + (0.5 if sgn > 0.0 else PI + 0.5))) * 8.5
+		draw_circle(ep, 2.0, Color(1.0, 0.3, 0.35, al) if sgn > 0.0 else Color(0.35, 0.6, 1.0, al))
+	draw_circle(c, 2.2 + 0.6 * sin(t * 6.0), Color(hot.r, hot.g, hot.b, 0.9 * al))
+
 func _draw_movers() -> void:
 	if level == null or not level.has_movers():
 		return
@@ -172,6 +255,9 @@ func _draw_movers() -> void:
 			continue                         # beim Einflug ausgeblendet
 		if m.kind == "meteor":
 			_draw_meteor(m)
+			continue
+		if m.kind == "beam":
+			_draw_beam(m)
 			continue
 		if m.kind == "pad":
 			# Schiene über den ganzen Fahrweg
@@ -200,6 +286,46 @@ func _draw_movers() -> void:
 		else:
 			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
 
+## Plasmastrahl: zwei Emitter an den Enden; vor dem Einschalten flackert eine dünne Ladelinie, im Takt brennt ein weiß-orangener
+## Strahl mit Glühen und zuckenden Blitzen.
+func _draw_beam(m: Dictionary) -> void:
+	var lr: Rect2 = level.lane_rect(m)
+	var horiz := lr.size.x >= lr.size.y
+	var eta := level.meteor_eta(m, level.clock)
+	var active := eta <= 0.0
+	var a0: Vector2 = lr.position + (Vector2(0.0, lr.size.y * 0.5) if horiz else Vector2(lr.size.x * 0.5, 0.0))
+	var a1: Vector2 = lr.position + (Vector2(lr.size.x, lr.size.y * 0.5) if horiz else Vector2(lr.size.x * 0.5, lr.size.y))
+	var hot := Color(1.0, 0.62, 0.2)
+	# Emitter (Düsenblöcke)
+	for pt in [a0, a1]:
+		draw_rect(Rect2(pt.x - 5.0, pt.y - 5.0, 10.0, 10.0), Color("#1a1d3a"))
+		draw_rect(Rect2(pt.x - 4.0, pt.y - 4.0, 8.0, 8.0), Color("#3a4580"))
+		draw_circle(pt, 2.4, Color(1.0, 0.4 + (0.4 if active else 0.0), 0.2, 0.9 if active else 0.5 + 0.4 * sin(t * 6.0)))
+	if not active and eta <= float(m.warn):
+		var k := 1.0 - eta / float(m.warn)
+		var fl := 0.25 + 0.5 * absf(sin(t * (10.0 + 14.0 * k)))
+		draw_line(a0, a1, Color(1.0, 0.45, 0.2, fl * (0.4 + 0.6 * k)), 1.0)
+		return
+	if not active:
+		draw_line(a0, a1, Color(0.5, 0.45, 0.6, 0.18), 1.0)
+		return
+	var thick := (lr.size.y if horiz else lr.size.x)
+	for i in 4:
+		var f := float(i) / 3.0
+		var w := thick * (1.0 - f * 0.65)
+		var col := Color(hot.r, hot.g - 0.25 * (1.0 - f), 0.25 + 0.7 * f, 0.18 + 0.5 * f)
+		var rr := Rect2(lr.position + (Vector2(0.0, (lr.size.y - w) * 0.5) if horiz else Vector2((lr.size.x - w) * 0.5, 0.0)), Vector2(lr.size.x, w) if horiz else Vector2(w, lr.size.y))
+		draw_rect(rr, col)
+	# zuckender Blitz
+	var pts := PackedVector2Array()
+	var n := 14
+	for i in n + 1:
+		var u := float(i) / float(n)
+		var p := a0.lerp(a1, u)
+		var jit := sin(t * 40.0 + float(i) * 2.3) * 1.6 * sin(u * PI)
+		pts.append(p + (Vector2(0.0, jit) if horiz else Vector2(jit, 0.0)))
+	draw_polyline(pts, Color(1.0, 1.0, 0.9, 0.95), 1.0)
+
 ## Meteorit: vor dem Fall blinkt seine Bahn als Warnstreifen, im Fall zieht er einen Feuerschweif hinter sich her.
 func _draw_meteor(m: Dictionary) -> void:
 	var eta := level.meteor_eta(m, level.clock)
@@ -219,14 +345,46 @@ func _draw_meteor(m: Dictionary) -> void:
 		return
 	var dir := (a1 - a0).normalized()
 	var c := r.get_center()
-	for i in 6:
-		var f := float(i + 1) / 6.0
-		var p := c - dir * f * 22.0
-		var sz := (1.0 - f) * float(m.w) * 0.55 + 1.0
-		draw_rect(Rect2(p.x - sz * 0.5, p.y - sz * 0.5, sz, sz), Color(1.0, 0.55 - f * 0.3, 0.12, 0.85 - f * 0.7))
-	draw_rect(Rect2(r.position.x + 1.0, r.position.y + 1.0, r.size.x - 2.0, r.size.y - 2.0), Color("#5a4b52"))
-	draw_rect(Rect2(r.position.x + 3.0, r.position.y + 3.0, r.size.x - 6.0, r.size.y - 6.0), Color("#8a7480"))
-	draw_rect(r, Color("#ff8a2e"), false, 1.0)
+	# Feuerschweif
+	for i in 8:
+		var f := float(i + 1) / 8.0
+		var p := c - dir * f * 26.0 + Vector2(sin(t * 30.0 + float(i)) * 0.8, 0.0)
+		var sz := (1.0 - f) * 9.0 + 1.5
+		draw_circle(p, sz * 0.5, Color(1.0, 0.6 - f * 0.35, 0.12, 0.5 * (1.0 - f)))
+	# Brocken: unregelmäßige „Kartoffel“ mit Kratern, dreht sich beim Fallen
+	var seed := int(m.x) * 7 + int(m.y) * 13 + int(m.phase * 10.0)
+	var rot := t * (1.8 + float(seed % 5) * 0.3) * (1.0 if seed % 2 == 0 else -1.0)
+	var rad := 11.0 * (float(m.w) / 16.0 * 0.5 + 0.5)
+	var pts := PackedVector2Array()
+	var hi := PackedVector2Array()
+	for i in 11:
+		var h := fmod(float(seed * 31 + i * 17) * 0.618, 1.0)
+		var ang := float(i) / 11.0 * TAU + rot
+		var rr := rad * (0.72 + 0.4 * h + 0.1 * sin(float(i) * 1.7))
+		var v := Vector2(cos(ang), sin(ang)) * Vector2(1.0, 0.86)
+		pts.append(c + v * rr)
+		hi.append(c + Vector2(-1.4, -1.6) + v * rr * 0.62)
+	draw_colored_polygon(pts, Color("#4b3f46"))
+	draw_colored_polygon(hi, Color("#7d6a70"))
+	for i in 3:
+		var ca := rot * 0.6 + float(i) * 2.3 + float(seed % 7)
+		var cp := c + Vector2(cos(ca), sin(ca)) * rad * (0.25 + 0.18 * float(i))
+		draw_circle(cp, 1.3 + 0.5 * float(i % 2), Color(0.18, 0.14, 0.17, 0.85))
+		draw_circle(cp + Vector2(-0.4, -0.4), 0.6, Color(0.55, 0.47, 0.5, 0.8))
+	pts.append(pts[0])
+	draw_polyline(pts, Color(1.0, 0.55, 0.2, 0.9), 1.0)
+
+## Krankenhaus-Plattform: weißes Schild mit rotem Kreuz über dem Unterstand und ein rot blinkendes Rundumlicht.
+func _draw_hospital_sign(p: Dictionary, y: float) -> void:
+	var sh: Rect2 = p.get("shelter", Rect2())
+	var cx: float = sh.get_center().x if sh.size.x > 0.0 else float(p.center)
+	var top := y - 27.0
+	draw_rect(Rect2(cx - 6.0, top, 12.0, 12.0), Color("#0c0f24"))
+	draw_rect(Rect2(cx - 5.0, top + 1.0, 10.0, 10.0), Color("#f4f6ff"))
+	draw_rect(Rect2(cx - 1.5, top + 2.5, 3.0, 7.0), Color("#e5202e"))
+	draw_rect(Rect2(cx - 3.5, top + 4.5, 7.0, 3.0), Color("#e5202e"))
+	var blink := 0.5 + 0.5 * sin(t * 7.0)
+	draw_circle(Vector2(cx, top - 3.0), 2.0, Color(1.0, 0.2 + 0.4 * blink, 0.2, 0.6 + 0.4 * blink))
 
 func _draw_gate() -> void:
 	if level.exit_cells.is_empty():
@@ -335,6 +493,12 @@ func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool)
 	var edge_c := Color(1.0, 0.82, 0.2, fade) if mandatory else Color(0.3, 0.85, 0.95, fade)
 	draw_rect(Rect2(bx - 5.0, by - 5.0, 10, 10), edge_c)
 	draw_rect(Rect2(bx - 5.0 + PX * 2, by - 5.0 + PX * 2, 10 - PX * 4, 10 - PX * 4), Color(1.0, 0.97, 0.8, fade) if mandatory else Color(0.9, 0.97, 1.0, fade))
+	if dest == "H":
+		draw_rect(Rect2(bx - 6.0, by - 5.0, 12.0, 12.0), Color(0.04, 0.05, 0.14, fade))
+		draw_rect(Rect2(bx - 5.0, by - 4.0, 10.0, 10.0), Color(0.96, 0.97, 1.0, fade))
+		draw_rect(Rect2(bx - 1.5, by - 3.0, 3.0, 8.0), Color(0.9, 0.12, 0.18, fade))
+		draw_rect(Rect2(bx - 4.0, by - 0.5, 8.0, 3.0), Color(0.9, 0.12, 0.18, fade))
+		return
 	if dest == "exit":
 		var g := Color(0.1, 0.55, 0.3, fade)
 		draw_colored_polygon(PackedVector2Array([Vector2(bx, by - 3.2), Vector2(bx + 3.0, by + 0.2), Vector2(bx - 3.0, by + 0.2)]), g)

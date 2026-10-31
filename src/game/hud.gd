@@ -114,7 +114,7 @@ func _draw() -> void:
 		if run.phase == Run.Phase.CARRYING and run.is_exit_job(job):
 			txt = tr("HUD_TAG_MAIN") + "  " + frag + tr("HUD_TO_EXIT") % who
 		elif run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF:
-			txt = tr("HUD_TAG_MAIN") + "  " + frag + tr("HUD_DELIVER") % [who, run.target_pad()]
+			txt = tr("HUD_TAG_MAIN") + "  " + frag + (tr("HUD_DELIVER_H") % who if run.target_pad() == "H" else tr("HUD_DELIVER") % [who, run.target_pad()])
 		elif run.actor != null:
 			txt = tr("HUD_TAG_MAIN") + "  " + frag + tr("HUD_PICKUP") % [who, run.target_pad()]
 		else:

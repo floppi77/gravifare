@@ -37,9 +37,9 @@ NUM_DE = ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "a
 NUM_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 LINES = {
     "de": {"language": "German", "lines": {
-        "call": "Hey Taxi!", "thanks": "Danke!", "angry": "Hey, Idiot!", "dest_exit": "Zum Ausgang, bitte!", **{f"dest_{n}": f"Plattform {NUM_DE[n]}, bitte!" for n in range(1, 10)}}},
+        "call": "Hey Taxi!", "thanks": "Danke!", "angry": "Hey, Idiot!", "dest_exit": "Zum Ausgang, bitte!", "dest_H": "Zum Krankenhaus, bitte!", **{f"dest_{n}": f"Plattform {NUM_DE[n]}, bitte!" for n in range(1, 10)}}},
     "en": {"language": "English", "lines": {
-        "call": "Hey Taxi!", "thanks": "Thanks!", "angry": "Hey, idiot!", "dest_exit": "To the exit, please!", **{f"dest_{n}": f"Platform {NUM_EN[n]}, please!" for n in range(1, 10)}}},
+        "call": "Hey Taxi!", "thanks": "Thanks!", "angry": "Hey, idiot!", "dest_exit": "To the exit, please!", "dest_H": "To the hospital, please!", **{f"dest_{n}": f"Platform {NUM_EN[n]}, please!" for n in range(1, 10)}}},
 }
 
 def trim(x, sr):

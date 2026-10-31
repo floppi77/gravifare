@@ -7,7 +7,7 @@ func _ready() -> void:
 			get_tree().change_scene_to_file.call_deferred("res://src/ui/%s.tscn" % a.substr(8).replace("menu", "main_menu"))
 			return
 		if a.begins_with("--level="):
-			Flow.current_level = a.substr(8)
+			Flow.current_level = Flow.resolve_level(a.substr(8))
 			get_tree().change_scene_to_file.call_deferred(Flow.GAME)
 			return
 	get_tree().change_scene_to_file.call_deferred(Flow.MENU)

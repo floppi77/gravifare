@@ -56,6 +56,8 @@ const EJECT_LETHAL_HEIGHT := 24.0 # Fallhöhe (px) ab der ein rausgeworfener Fah
 const DEBRIS_DAMAGE := 15.0       # Trümmer (bewegliche Brocken): Schaden je Berührung
 const SLIDER_DAMAGE := 30.0       # Schieber (große bewegliche Blöcke): Quetschung wie beim Tor
 const PADSLAB_DAMAGE := 8.0       # seitliches Anstoßen an eine fahrende Landeplattform
+const BEAM_DAMAGE := 25.0         # Plasmastrahl: Schaden je Treffer
+const HEAT_DAMAGE := 3.0          # Hitzezone: Schaden alle 0,25 s
 const METEOR_DAMAGE := 20.0       # Meteorit: Schaden je Treffer
 const MOVER_COOLDOWN := 0.6
 const OUT_OF_FUEL_TIME := 3.0     # Sekunden mit leerem Tank (außer an einer funktionierenden Zapfsäule), dann Taxi verloren
@@ -165,6 +167,8 @@ const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast
 const RIDE_PEN_MAX := 0.5
 const MISSED_FEE_FACTOR := 0.35   # Abzug für einen verpassten Pflichtfahrgast: Anteil des (unskalierten) Fahrpreises
 # Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis
+const PERFECT_MIN_AIR := 1.5     # Flugzeit seit dem Abheben, ab der eine Landung „perfekt“ zählen kann (kein Hüpfen auf der Stelle)
+const PERFECT_MIN_PATH := 40.0   # … und zurückgelegte Strecke (px)
 const PERFECT_VX := 12.0
 const PERFECT_TILT := 0.07
 const COMBO_STEP := 0.05          # +5 % je Serienstufe

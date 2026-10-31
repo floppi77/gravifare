@@ -152,10 +152,17 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 			var mh := Tuning.HULL_HALF + Vector2(10, 10)
 			var th := level.meteor_threat(Rect2(sim.pos - mh, mh * 2.0), level.clock, 2.2)
 			if not th.is_empty():
-				var dir := 1.0 if sim.pos.x >= float(th.x) + float(th.w) * 0.5 else -1.0
-				if level.box_hits_solid(sim.pos + Vector2(dir * 28.0, 0.0), Tuning.HULL_HALF + Vector2(2, 2)):
-					dir = -dir
-				v_des = Vector2(dir * 70.0, 0.0)
+				var lr := level.lane_rect(th)
+				if lr.size.x > lr.size.y * 1.5:            # waagerechter Strahl: nach oben/unten ausweichen
+					var dv := 1.0 if sim.pos.y >= lr.get_center().y else -1.0
+					if level.box_hits_solid(sim.pos + Vector2(0.0, dv * 28.0), Tuning.HULL_HALF + Vector2(2, 2)):
+						dv = -dv
+					v_des = Vector2(0.0, dv * 70.0)
+				else:
+					var dir := 1.0 if sim.pos.x >= lr.get_center().x else -1.0
+					if level.box_hits_solid(sim.pos + Vector2(dir * 28.0, 0.0), Tuning.HULL_HALF + Vector2(2, 2)):
+						dir = -dir
+					v_des = Vector2(dir * 70.0, 0.0)
 			elif v_des != Vector2.ZERO:
 				var ahead := sim.pos + v_des.normalized() * 26.0
 				if not level.meteor_threat(Rect2(ahead - mh, mh * 2.0), level.clock, 2.2).is_empty():

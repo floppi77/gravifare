@@ -404,3 +404,7 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 ## Q) Nachträge Runde 15
 - Hintergründe sind ganze Bilder `assets/art/bg_sN.png` (nicht mehr drei Ebenen); Logo `assets/art/logo.png`. Die Generator-Skripte für Platzhalter-Ebenen wurden entfernt.
 - Neue Mechaniken: zerbrechliche Fahrgäste (`fragile`), Meteoritenschauer (`meteor`), Zonen (`zones`: wind, gravity, magnet). Sektor 3 und 4 sind gebaut (`tools/make_s3.py`, `tools/make_s4.py`); Bot kompensiert Zonen und weicht Meteoriten aus.
+
+## R) Nachträge Runde 16
+- Level 23–51 (Sektor 3–5) entstehen prozedural: `python3 tools/build_sector.py <3|4|5>`; dabei KEINE Änderungen an `src/` speichern (die Messprozesse lesen die Skripte neu). Die alten Handgenerator-Skripte `make_s3.py`/`make_s4.py` sind entfernt.
+- Krankenhaus-Pad `H` (nur Ziel von Krankentransporten), Mover `beam`, Zone `heat`; Perfekt-Landung braucht Flug (siehe DESIGN.md Runde 16). Levelnummern statt Sektor-Kürzel verwenden; `--level=34` funktioniert.

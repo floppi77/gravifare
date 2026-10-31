@@ -108,7 +108,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	for mv in lvl.movers:
 		hazards += 2 if mv.kind == "pad" else (4 if mv.kind == "slider" else 3)       # bewegliche Hindernisse zählen als Gefahr (Meteoriten wie Trümmer)
 	for z in lvl.zones:
-		hazards += 2          # Zonen (Strömung, Magnet, Schwerkraft) zählen wie Hindernisse
+		hazards += 4 if z.kind == "heat" else 2          # Zonen (Strömung, Magnet, Schwerkraft) zählen wie Hindernisse
 	lvl.exit_open = was_open
 	var eng := clampf((MAX_MARGIN - clearance) / (MAX_MARGIN - STEP), 0.0, 1.0)
 	var length := clampf(route_len / 3500.0, 0.0, 2.0)

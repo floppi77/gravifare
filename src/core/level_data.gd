@@ -91,12 +91,12 @@ func _scan() -> void:
 				spawn = Vector2(x * Tuning.TILE + Tuning.TILE * 0.5, y * Tuning.TILE + Tuning.TILE * 0.5)
 			elif c == "E":
 				exit_cells.append(Vector2i(x, y))
-			elif (c >= "1" and c <= "9") or c == "F" or c == "L":
+			elif (c >= "1" and c <= "9") or c == "F" or c == "L" or c == "H":
 				var x1 := x
 				while x1 + 1 < row.length() and row[x1 + 1] == c:
 					x1 += 1
 				pads[c] = {"id": c, "x0": x * Tuning.TILE, "x1": (x1 + 1) * Tuning.TILE, "row": y,
-					"center": (x * Tuning.TILE + (x1 + 1) * Tuning.TILE) * 0.5, "fuel": c == "F", "life": c == "L"}
+					"center": (x * Tuning.TILE + (x1 + 1) * Tuning.TILE) * 0.5, "fuel": c == "F", "life": c == "L", "hospital": c == "H"}
 				x = x1
 			x += 1
 
@@ -211,12 +211,12 @@ func _scan_doors(params: Dictionary) -> void:
 					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0))}
 				doors[c].cells.append(Vector2i(x, y))
 
-## Passagierpad (weder Tank- noch Lebens-Station).
+## Passagierpad (weder Tank-, Lebens-Station noch Krankenhaus; das Krankenhaus „H“ ist nur Ziel von Krankentransporten).
 func is_passenger_pad(id: String) -> bool:
-	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false)
+	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false) and not pads[id].get("hospital", false)
 
 ## Zonen (Sektor 4–6): JSON "zones". Kinds: "wind" (Strömung: konstante Beschleunigung ax/ay in einem Rechteck x/y/w/h, Felder),
-## "magnet" (Kreis um cx/cy mit Radius r Feldern: k > 0 zieht zur Mitte, k < 0 stößt ab; Stärke fällt linear zum Rand)
+## "magnet" (Kreis um cx/cy mit Radius r Feldern: k > 0 zieht zur Mitte, k < 0 stößt ab; Stärke fällt zum Rand quadratisch ab)
 ## und "gravity" (Rechteck mit Schwerkraftfaktor g). Optional "period"/"on"/"phase": nur während der ersten `on` Sekunden
 ## jeder Periode aktiv (Böen, pulsierende Magnete).
 var zones: Array = []
@@ -230,6 +230,23 @@ func _scan_zones(list: Array) -> void:
 		if z.kind == "magnet":
 			z["rect"] = Rect2(z.center - Vector2(z.r, z.r), Vector2(z.r, z.r) * 2.0)
 		zones.append(z)
+
+## Hitzezone (Sektor 5): Rechteck, in dem die Hülle verbrennt; optional pulsierend (Dampfauslass).
+func heat_at(p: Vector2, t: float) -> bool:
+	for z in zones:
+		if z.kind == "heat" and (z.rect as Rect2).has_point(p) and zone_active(z, t):
+			return true
+	return false
+
+## Planung: Hitzezonen gelten unabhängig vom Takt als feste Fläche.
+func heat_hit_box(center: Vector2, half: Vector2) -> bool:
+	if zones.is_empty():
+		return false
+	var box := Rect2(center - half, half * 2.0)
+	for z in zones:
+		if z.kind == "heat" and (z.rect as Rect2).intersects(box):
+			return true
+	return false
 
 func has_zones() -> bool:
 	return not zones.is_empty()
@@ -252,12 +269,12 @@ func zone_accel(p: Vector2, t: float) -> Vector2:
 				var d: Vector2 = (z.center as Vector2) - p
 				var dist := d.length()
 				if dist < float(z.r) and dist > 2.0:
-					a += d / dist * float(z.k) * (1.0 - dist / float(z.r))
+					a += d / dist * float(z.k) * (1.0 - pow(dist / float(z.r), 2.0))
 	return a
 
 func has_meteors() -> bool:
 	for m in movers:
-		if m.kind == "meteor":
+		if m.kind == "meteor" or m.kind == "beam":
 			return true
 	return false
 
@@ -271,7 +288,9 @@ func _scan_movers(list: Array) -> void:
 			"x": float(d.x) * Tuning.TILE, "y": float(d.y) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
 			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
 			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", "")),
-			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0))}
+			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0))}
+		if kind == "beam":
+			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
 		if kind == "meteor":
 			m["w"] = float(d.get("w", 1)) * Tuning.TILE
 			m["h"] = float(d.get("h", 1)) * Tuning.TILE
@@ -302,20 +321,33 @@ func meteor_progress(m: Dictionary, t: float) -> float:
 ## Meteor: Sekunden bis zum nächsten Fall (0, solange er fällt).
 func meteor_eta(m: Dictionary, t: float) -> float:
 	var c := fposmod(t + float(m.phase), float(m.period))
+	if m.kind == "beam":
+		return 0.0 if c < float(m.on) else float(m.period) - c
 	return 0.0 if c < float(m.fall) else float(m.period) - c
 
 ## Bot: Liegt die Box in der Bahn eines Meteors, der gerade fällt oder innerhalb von `horizon` Sekunden fällt? Gibt ihn zurück (sonst {}).
 func meteor_threat(box: Rect2, t0: float, horizon: float) -> Dictionary:
 	for m in movers:
-		if m.kind != "meteor" or meteor_eta(m, t0) > horizon:
+		if (m.kind != "meteor" and m.kind != "beam") or meteor_eta(m, t0) > horizon:
 			continue
-		var x0 := minf(float(m.x), float(m.x) + float(m.ax))
-		var x1 := maxf(float(m.x), float(m.x) + float(m.ax)) + float(m.w)
-		if Rect2(x0, float(m.y), x1 - x0, float(m.ay) + float(m.h)).intersects(box):
+		if lane_rect(m).intersects(box):
 			return m
 	return {}
 
+## Bahn eines Meteors bzw. Fläche eines Plasmastrahls (für Warnung und Ausweichen).
+func lane_rect(m: Dictionary) -> Rect2:
+	if m.kind == "beam":
+		return Rect2(float(m.x), float(m.y), float(m.w), float(m.h))
+	var x0 := minf(float(m.x), float(m.x) + float(m.ax))
+	var x1 := maxf(float(m.x), float(m.x) + float(m.ax)) + float(m.w)
+	return Rect2(x0, float(m.y), x1 - x0, float(m.ay) + float(m.h))
+
+## Plasmastrahl: nur in den ersten `on` Sekunden jeder Periode sichtbar und gefährlich (Rechteck x/y/w/h fest).
 func _mover_rect(m: Dictionary, t: float) -> Rect2:
+	if m.kind == "beam":
+		if fposmod(t + float(m.phase), float(m.period)) >= float(m.on):
+			return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
+		return Rect2(float(m.x), float(m.y), float(m.w), float(m.h))
 	if m.kind == "meteor":
 		var k := meteor_progress(m, t)
 		if k < 0.0:
@@ -471,7 +503,7 @@ func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
 	if c != "" and DOOR_CHARS.contains(c):
 		return _door_cell_closed(cx, cy, c)
-	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or (c == "E" and not exit_open)
+	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or c == "H" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
 	if not movers.is_empty() and not movers_ignore:
@@ -514,7 +546,7 @@ func pad_at_foot(p: Vector2) -> Dictionary:
 	var cx := floori(p.x / Tuning.TILE)
 	var cy := floori(p.y / Tuning.TILE)
 	var c := cell(cx, cy)
-	if (c >= "1" and c <= "9") or c == "F" or c == "L":
+	if (c >= "1" and c <= "9") or c == "F" or c == "L" or c == "H":
 		var pad: Dictionary = pads.get(c, {})
 		if not pad.is_empty() and pad.row == cy:
 			return pad

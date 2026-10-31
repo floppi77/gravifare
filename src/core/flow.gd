@@ -22,6 +22,15 @@ func level_ids() -> Array:
 	ids.sort()
 	return ids
 
+## Dev: Level aus Kommandozeile/Eingabe auflösen – Levelnummer (34), Dateiname (s4_01) oder Anzeigename (S4-01, s4-01).
+func resolve_level(arg: String) -> String:
+	var ids := level_ids()
+	var a := arg.strip_edges().to_lower().replace("-", "_")
+	if a.is_valid_int():
+		var n := int(a)
+		return ids[n - 1] if n >= 1 and n <= ids.size() else a
+	return a
+
 func level_path(id: String) -> String:
 	return "res://data/levels/%s.json" % id
 

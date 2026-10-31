@@ -2,27 +2,72 @@ class_name MenuKit
 extends RefCounted
 ## Gemeinsame Menü-Bausteine (Theme, Buttons, Slider) – ein einheitlicher Stil für alle Menüs.
 
+## Knopf-Grafik mit Räumlichkeit: Verlaufsfläche, 1 px helle Kante, abgerundete Ecken und eine dunkle Unterkante (Tiefe).
+## `lift` = Höhe der Unterkante in px (gedrückt: kleiner, die Fläche sinkt ab).
+static func _button_box(top: Color, bot: Color, rim: Color, edge: Color, lift := 3) -> StyleBoxTexture:
+	var w := 28
+	var h := 24
+	var r := 5.0
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	var face_h := h - 3 - 2          # Platz für Unterkante (3) und Schatten (2)
+	var y0 := 3 - lift               # gedrückt: Fläche sitzt tiefer
+	for y in h:
+		for x in w:
+			var c := Color(0, 0, 0, 0)
+			# Schatten unter dem Knopf
+			if _in_rrect(x, y, 1, y0 + 4, w - 2, face_h + lift, r):
+				c = Color(0, 0, 0, 0.28)
+			# Unterkante (Dicke)
+			if _in_rrect(x, y, 0, y0 + lift, w, face_h, r):
+				c = edge
+			# Fläche
+			if _in_rrect(x, y, 0, y0, w, face_h, r):
+				var u := clampf(float(y - y0) / float(face_h - 1), 0.0, 1.0)
+				c = top.lerp(bot, u)
+				if not _in_rrect(x, y, 1, y0 + 1, w - 2, face_h - 2, maxf(r - 1.0, 1.0)):
+					c = rim                                              # dünne Kante
+				elif y == y0 + 1:
+					c = c.lightened(0.18)                                # Glanzkante oben
+			img.set_pixel(x, y, c)
+	var sb := StyleBoxTexture.new()
+	sb.texture = ImageTexture.create_from_image(img)
+	sb.texture_margin_left = 8.0
+	sb.texture_margin_right = 8.0
+	sb.texture_margin_top = 8.0
+	sb.texture_margin_bottom = 9.0
+	sb.content_margin_left = 8.0
+	sb.content_margin_right = 8.0
+	sb.content_margin_top = 4.0
+	sb.content_margin_bottom = 6.0
+	return sb
+
+static func _in_rrect(x: int, y: int, rx: float, ry: float, rw: float, rh: float, r: float) -> bool:
+	var px := float(x) + 0.5
+	var py := float(y) + 0.5
+	if px < rx or px > rx + rw or py < ry or py > ry + rh:
+		return false
+	var cx := clampf(px, rx + r, rx + rw - r)
+	var cy := clampf(py, ry + r, ry + rh - r)
+	return Vector2(px - cx, py - cy).length() <= r
+
 static func make_theme() -> Theme:
 	var th := Theme.new()
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("#1b1f3a")
-	normal.border_color = Color("#3a4580")
-	normal.set_border_width_all(2)
-	normal.set_content_margin_all(5)
-	var focus := normal.duplicate() as StyleBoxFlat
-	focus.bg_color = Color("#2f3a78")
-	focus.border_color = Color("#ffe14a")
-	var pressed := focus.duplicate() as StyleBoxFlat
-	pressed.bg_color = Color("#4a56a8")
+	var normal := _button_box(Color("#34407f"), Color("#1c2352"), Color("#7380c8"), Color("#0b0f2a"))
+	var focus := _button_box(Color("#4a5ab5"), Color("#2a3680"), Color("#ffe14a"), Color("#0b0f2a"))
+	var pressed := _button_box(Color("#2a3680"), Color("#4a5ab5"), Color("#ffe14a"), Color("#0b0f2a"), 1)
+	var disabled := _button_box(Color("#232a52"), Color("#171c3c"), Color("#3a4580"), Color("#0b0f2a"))
 	th.set_stylebox("normal", "Button", normal)
 	th.set_stylebox("hover", "Button", focus)
 	th.set_stylebox("focus", "Button", focus)
 	th.set_stylebox("pressed", "Button", pressed)
-	th.set_stylebox("disabled", "Button", normal)
-	th.set_color("font_color", "Button", Color("#c9cfee"))
+	th.set_stylebox("disabled", "Button", disabled)
+	th.set_color("font_color", "Button", Color("#d6dbf5"))
 	th.set_color("font_focus_color", "Button", Color.WHITE)
 	th.set_color("font_hover_color", "Button", Color.WHITE)
+	th.set_color("font_pressed_color", "Button", Color.WHITE)
 	th.set_color("font_disabled_color", "Button", Color("#5a628f"))
+	th.set_color("font_outline_color", "Button", Color(0.02, 0.03, 0.1, 0.9))
+	th.set_constant("outline_size", "Button", 1)
 	th.set_font_size("font_size", "Button", 10)
 	th.set_font_size("font_size", "Label", 10)
 	th.set_color("font_color", "Label", Color("#c9cfee"))
@@ -31,7 +76,7 @@ static func make_theme() -> Theme:
 static func button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.custom_minimum_size = Vector2(160, 20)
+	b.custom_minimum_size = Vector2(128, 19)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.focus_mode = Control.FOCUS_ALL
 	b.pressed.connect(func():

@@ -767,6 +767,790 @@
   "en/m1_bumpy": {
    "text": "Careful, please!",
    "seconds": 1.38
+  },
+  "de/d0_r2": {
+   "text": "Tankstelle voraus: Landen, tanken, zahlen. Die Preise schwanken.",
+   "seconds": 5.8
+  },
+  "de/d0_r3": {
+   "text": "Ein enger Schacht. Gut, dass du Fingerspitzengefühl hast.",
+   "seconds": 5.09
+  },
+  "de/d0_r4": {
+   "text": "Terrassenlandung. Der Hausmeister bittet um saubere Plattformen.",
+   "seconds": 4.2
+  },
+  "de/d0_r5": {
+   "text": "Neu: Lebensstationen für tausend Credits. Und Fahrgäste winken jetzt spontan.",
+   "seconds": 5.79
+  },
+  "de/d0_r6": {
+   "text": "Der Tankwart ist heute gereizt. Rempel seine Zapfsäule nicht an.",
+   "seconds": 4.2
+  },
+  "de/d0_r7": {
+   "text": "Rundkurs. Wer im Kreis fliegt, sieht mehr von der Stadt.",
+   "seconds": 5.79
+  },
+  "de/d0_r8": {
+   "text": "Achtung, Dornen! Jede Berührung kostet dreißig Hülle.",
+   "seconds": 4.36
+  },
+  "de/d0_r9": {
+   "text": "Nadelspitzen. Hetz dich nicht, aber trödel auch nicht.",
+   "seconds": 3.8
+  },
+  "de/d0_r10": {
+   "text": "Tanknot gemeldet. Die Tankstelle sitzt hoch oben.",
+   "seconds": 3.64
+  },
+  "de/d0_r11": {
+   "text": "Meisterprüfung. Danach hast du dir einen Kaffee verdient.",
+   "seconds": 3.88
+  },
+  "de/d0_r12": {
+   "text": "Neon-Schluchten voraus. Eng, hell und voller Verkehr.",
+   "seconds": 4.68
+  },
+  "de/d0_r13": {
+   "text": "Neonallee. Das Licht ist hübsch, der Abstand zur Wand wichtiger.",
+   "seconds": 4.76
+  },
+  "de/d0_r14": {
+   "text": "Neu: Schleusentore. Sie schließen im Takt, lass dich nicht einsperren.",
+   "seconds": 5.64
+  },
+  "de/d0_r15": {
+   "text": "Zwei Schleusen hintereinander. Zähl den Takt mit.",
+   "seconds": 3.56
+  },
+  "de/d0_r16": {
+   "text": "Rushhour in den Schluchten. Alle wollen gleichzeitig irgendwohin.",
+   "seconds": 4.76
+  },
+  "de/d0_r17": {
+   "text": "Doppelte Schleuse, doppelte Geduld.",
+   "seconds": 4.04
+  },
+  "de/d0_r18": {
+   "text": "Fallgitter! Schnell durch, aber nicht zu schnell.",
+   "seconds": 3.48
+  },
+  "de/d0_r19": {
+   "text": "Das Neonlabyrinth. Kein Faden, aber ein guter Orientierungssinn.",
+   "seconds": 5.16
+  },
+  "de/d0_r20": {
+   "text": "Schleusenkammer. Der Kaffee dort ist übrigens schrecklich.",
+   "seconds": 3.77
+  },
+  "de/d0_r21": {
+   "text": "Neonfinale. Gleich hast du die Schluchten hinter dir.",
+   "seconds": 4.04
+  },
+  "de/d0_r22": {
+   "text": "Glasfassade. Bitte nicht hineinfliegen, das gibt Ärger mit dem Hausmeister.",
+   "seconds": 5.8
+  },
+  "de/d0_r56": {
+   "text": "Gezeitenorbit. Strömungen und wechselnde Schwerkraft, oben und unten sind Ansichtssache.",
+   "seconds": 6.54
+  },
+  "de/d0_r57": {
+   "text": "Hier ziehen die Gezeiten an allem, sogar an deiner Kaffeetasse.",
+   "seconds": 4.4
+  },
+  "de/d0_r58": {
+   "text": "Die Fahrgäste schwören, der Mond sei heute näher.",
+   "seconds": 3.46
+  },
+  "de/d0_r59": {
+   "text": "Ein Funkloch voraus. Falls du mich nicht hörst: alles gut.",
+   "seconds": 5.8
+  },
+  "de/d0_r60": {
+   "text": "Sechzig Level. Die Zentrale ist stolz auf dich.",
+   "seconds": 4.5
+  },
+  "de/d0_r61": {
+   "text": "Die Tankpreise tanzen mit den Gezeiten. Beobachte die Anzeige.",
+   "seconds": 4.28
+  },
+  "de/d0_r62": {
+   "text": "Ein Fahrgast fragt, ob man hier schwimmen darf. Nein.",
+   "seconds": 4.68
+  },
+  "de/d0_r63": {
+   "text": "Gegenstrom voraus, aber du kennst ja deine Düsen.",
+   "seconds": 3.88
+  },
+  "de/d0_r64": {
+   "text": "Der Kapitän der Orbitalfähre grüßt dich mit der Hupe.",
+   "seconds": 3.24
+  },
+  "de/d0_r65": {
+   "text": "Bald ist das Wasser hinter dir. Halte noch durch.",
+   "seconds": 5.16
+  },
+  "de/d0_r66": {
+   "text": "Letztes Level der Gezeiten. Gleich geht es zum Knotenpunkt.",
+   "seconds": 4.12
+  },
+  "de/d0_r67": {
+   "text": "Transitknoten. Viel Verkehr, Schleusen und Routen. Bleib höflich.",
+   "seconds": 5.32
+  },
+  "de/d0_r68": {
+   "text": "Die Lichtbahnen sind nur Dekoration. Meistens.",
+   "seconds": 4.46
+  },
+  "de/d0_r69": {
+   "text": "Der Knoten meldet Stau auf Ebene drei.",
+   "seconds": 2.44
+  },
+  "de/d0_r70": {
+   "text": "Ein Fahrgast hat sein Gepäck vergessen und kauft einfach neues.",
+   "seconds": 4.68
+  },
+  "de/d0_r71": {
+   "text": "Die Zentrale hat die Kaffeemaschine repariert. Fast.",
+   "seconds": 3.48
+  },
+  "de/d0_r72": {
+   "text": "Hupen ist im Weltraum verboten, nützt aber ohnehin nichts.",
+   "seconds": 4.02
+  },
+  "de/d0_r73": {
+   "text": "Du bist heute wunderbar im Takt, Taxi sieben.",
+   "seconds": 4.28
+  },
+  "de/d0_r74": {
+   "text": "Ein Kollege winkt dir von der Nachbarbahn zu.",
+   "seconds": 2.56
+  },
+  "de/d0_r75": {
+   "text": "Die Station vermisst dein Lächeln. Und die Rechnung.",
+   "seconds": 3.72
+  },
+  "de/d0_r76": {
+   "text": "Fast am Ende des Knotens. Halte die Spur.",
+   "seconds": 3.46
+  },
+  "de/d0_r77": {
+   "text": "Letzter Knoten. Danach wird es dunkel.",
+   "seconds": 3.08
+  },
+  "de/d0_r78": {
+   "text": "Schattenring. Sensoren und Radar. Funkstille ist keine Option, melde dich.",
+   "seconds": 6.57
+  },
+  "de/d0_r79": {
+   "text": "Hier ist es dunkel. Schalte im Kopf das Licht an.",
+   "seconds": 3.84
+  },
+  "de/d0_r80": {
+   "text": "Die Sensoren sehen mehr als du. Vertrau ihnen.",
+   "seconds": 4.02
+  },
+  "de/d0_r81": {
+   "text": "Ein Schatten bewegt sich. Wahrscheinlich nur ein Fahrgast.",
+   "seconds": 4.68
+  },
+  "de/d0_r82": {
+   "text": "Der Ring ist still. Zu still, wenn du mich fragst.",
+   "seconds": 3.4
+  },
+  "de/d0_r83": {
+   "text": "Das Radar zeigt ein Objekt: dich. Sehr gut.",
+   "seconds": 4.04
+  },
+  "de/d0_r84": {
+   "text": "Kein Stress, aber der Ring wird nicht heller.",
+   "seconds": 3.8
+  },
+  "de/d0_r85": {
+   "text": "Ein Fahrgast bittet um eine Taschenlampe. Ich fürchte, nein.",
+   "seconds": 5.16
+  },
+  "de/d0_r86": {
+   "text": "Du fliegst wie im Schlaf. Bitte wach bleiben.",
+   "seconds": 3.32
+  },
+  "de/d0_r87": {
+   "text": "Gleich siehst du wieder Sterne. Echte.",
+   "seconds": 3.4
+  },
+  "de/d0_r88": {
+   "text": "Letztes Level im Schatten. Danach das Finale.",
+   "seconds": 3.48
+  },
+  "de/d0_r89": {
+   "text": "Singularitätsrand. Alle Systeme gleichzeitig. Jetzt zählt jede Sekunde.",
+   "seconds": 7.32
+  },
+  "de/d0_r90": {
+   "text": "Die Zeit läuft hier langsamer. Deine Rechnung nicht.",
+   "seconds": 3.8
+  },
+  "de/d0_r91": {
+   "text": "Das Licht biegt sich. Bleib trotzdem auf Kurs.",
+   "seconds": 3.24
+  },
+  "de/d0_r92": {
+   "text": "Die Zentrale hält den Atem an.",
+   "seconds": 2.29
+  },
+  "de/d0_r93": {
+   "text": "Ein Fahrgast fragt, ob das ein Wurmloch ist. Bitte nicht.",
+   "seconds": 4.56
+  },
+  "de/d0_r94": {
+   "text": "Du bist der beste Pilot, den die Zentrale je hatte. Sag es keinem.",
+   "seconds": 4.68
+  },
+  "de/d0_r95": {
+   "text": "Alle Instrumente zittern, deine Hände hoffentlich nicht.",
+   "seconds": 6.41
+  },
+  "de/d0_r96": {
+   "text": "Nur noch wenige Level, Taxi sieben.",
+   "seconds": 2.28
+  },
+  "de/d0_r97": {
+   "text": "Der Rand wird enger. Dein Können nicht.",
+   "seconds": 2.92
+  },
+  "de/d0_r98": {
+   "text": "Das vorletzte Level. Atme tief durch.",
+   "seconds": 3.48
+  },
+  "de/d0_r99": {
+   "text": "Letztes Level. Zeig, was du kannst, Taxi sieben.",
+   "seconds": 4.28
+  },
+  "en/d0_r2": {
+   "text": "Fuel stop ahead: land, refuel, pay. Prices fluctuate.",
+   "seconds": 5.96
+  },
+  "en/d0_r3": {
+   "text": "A narrow shaft. Good thing you have a delicate touch.",
+   "seconds": 3.8
+  },
+  "en/d0_r4": {
+   "text": "Terrace landing. The caretaker asks for clean platforms.",
+   "seconds": 3.88
+  },
+  "en/d0_r5": {
+   "text": "New: life stations for a thousand credits. And passengers now hail you spontaneously.",
+   "seconds": 5.88
+  },
+  "en/d0_r6": {
+   "text": "The attendant is cranky today. Do not bump his pump.",
+   "seconds": 4.12
+  },
+  "en/d0_r7": {
+   "text": "Circuit route. Flying in circles shows more of the city.",
+   "seconds": 3.88
+  },
+  "en/d0_r8": {
+   "text": "Watch out, spikes! Every touch costs thirty hull.",
+   "seconds": 3.64
+  },
+  "en/d0_r9": {
+   "text": "Needle points. Do not rush, but do not dawdle either.",
+   "seconds": 4.2
+  },
+  "en/d0_r10": {
+   "text": "Fuel emergency reported. The station sits high up.",
+   "seconds": 3.88
+  },
+  "en/d0_r11": {
+   "text": "Master exam. Afterwards you have earned a coffee.",
+   "seconds": 4.44
+  },
+  "en/d0_r12": {
+   "text": "Neon Canyons ahead. Tight, bright and busy.",
+   "seconds": 4.28
+  },
+  "en/d0_r13": {
+   "text": "Neon Avenue. The lights are pretty, the distance to the wall matters more.",
+   "seconds": 4.92
+  },
+  "en/d0_r14": {
+   "text": "New: lock gates. They close on a beat, do not get trapped.",
+   "seconds": 5.48
+  },
+  "en/d0_r15": {
+   "text": "Two locks in a row. Count the beat.",
+   "seconds": 1.96
+  },
+  "en/d0_r16": {
+   "text": "Rush hour in the canyons. Everyone wants to go somewhere at once.",
+   "seconds": 3.88
+  },
+  "en/d0_r17": {
+   "text": "Double lock, double patience.",
+   "seconds": 2.36
+  },
+  "en/d0_r18": {
+   "text": "Portcullis! Go through fast, but not too fast.",
+   "seconds": 3.64
+  },
+  "en/d0_r19": {
+   "text": "The neon labyrinth. No thread, but a good sense of direction.",
+   "seconds": 3.64
+  },
+  "en/d0_r20": {
+   "text": "Lock chamber. The coffee there is terrible, by the way.",
+   "seconds": 4.04
+  },
+  "en/d0_r21": {
+   "text": "Neon finale. You are almost through the canyons.",
+   "seconds": 3.48
+  },
+  "en/d0_r22": {
+   "text": "Glass facade. Please do not fly into it, the caretaker will complain.",
+   "seconds": 5.8
+  },
+  "en/d0_r56": {
+   "text": "Tidal Orbit. Currents and shifting gravity; up and down are a matter of opinion.",
+   "seconds": 5.24
+  },
+  "en/d0_r57": {
+   "text": "Tides pull at everything here, even your coffee cup.",
+   "seconds": 3.8
+  },
+  "en/d0_r58": {
+   "text": "Passengers swear the moon is closer today.",
+   "seconds": 2.68
+  },
+  "en/d0_r59": {
+   "text": "A radio dead zone ahead. If you cannot hear me: all good.",
+   "seconds": 5.64
+  },
+  "en/d0_r60": {
+   "text": "Sixty levels. Dispatch is proud of you.",
+   "seconds": 3.8
+  },
+  "en/d0_r61": {
+   "text": "Fuel prices dance with the tides. Watch the display.",
+   "seconds": 4.09
+  },
+  "en/d0_r62": {
+   "text": "A passenger asks if one may swim here. No.",
+   "seconds": 4.2
+  },
+  "en/d0_r63": {
+   "text": "Counter current ahead, but you know your thrusters.",
+   "seconds": 2.84
+  },
+  "en/d0_r64": {
+   "text": "The orbital ferry captain greets you with the horn.",
+   "seconds": 3.0
+  },
+  "en/d0_r65": {
+   "text": "The water is almost behind you. Hold on a little longer.",
+   "seconds": 4.12
+  },
+  "en/d0_r66": {
+   "text": "Last tidal level. Next stop: the hub.",
+   "seconds": 3.24
+  },
+  "en/d0_r67": {
+   "text": "Transit Hub. Heavy traffic, locks and routes. Be polite.",
+   "seconds": 4.92
+  },
+  "en/d0_r68": {
+   "text": "The light lanes are only decoration. Mostly.",
+   "seconds": 3.0
+  },
+  "en/d0_r69": {
+   "text": "The hub reports a jam on level three.",
+   "seconds": 2.6
+  },
+  "en/d0_r70": {
+   "text": "A passenger forgot their luggage and simply buys new.",
+   "seconds": 3.96
+  },
+  "en/d0_r71": {
+   "text": "Dispatch fixed the coffee machine. Almost.",
+   "seconds": 3.32
+  },
+  "en/d0_r72": {
+   "text": "Honking is banned in space, and pointless anyway.",
+   "seconds": 4.28
+  },
+  "en/d0_r73": {
+   "text": "You are wonderfully on the beat today, Taxi seven.",
+   "seconds": 3.0
+  },
+  "en/d0_r74": {
+   "text": "A colleague waves at you from the next lane.",
+   "seconds": 2.92
+  },
+  "en/d0_r75": {
+   "text": "The station misses your smile. And the invoice.",
+   "seconds": 3.88
+  },
+  "en/d0_r76": {
+   "text": "Nearly out of the hub. Keep your lane.",
+   "seconds": 3.56
+  },
+  "en/d0_r77": {
+   "text": "Last hub level. After that it gets dark.",
+   "seconds": 3.4
+  },
+  "en/d0_r78": {
+   "text": "Shadow Ring. Sensors and radar. Radio silence is not an option, check in.",
+   "seconds": 7.32
+  },
+  "en/d0_r79": {
+   "text": "It is dark here. Turn on the lights in your head.",
+   "seconds": 3.08
+  },
+  "en/d0_r80": {
+   "text": "The sensors see more than you. Trust them.",
+   "seconds": 3.32
+  },
+  "en/d0_r81": {
+   "text": "A shadow moves. Probably just a passenger.",
+   "seconds": 3.4
+  },
+  "en/d0_r82": {
+   "text": "The ring is quiet. Too quiet, if you ask me.",
+   "seconds": 3.72
+  },
+  "en/d0_r83": {
+   "text": "Radar shows one object: you. Very good.",
+   "seconds": 4.28
+  },
+  "en/d0_r84": {
+   "text": "No stress, but the ring is not getting any brighter.",
+   "seconds": 3.24
+  },
+  "en/d0_r85": {
+   "text": "A passenger asks for a flashlight. I am afraid not.",
+   "seconds": 4.2
+  },
+  "en/d0_r86": {
+   "text": "You fly as if asleep. Please stay awake.",
+   "seconds": 4.04
+  },
+  "en/d0_r87": {
+   "text": "Soon you will see stars again. Real ones.",
+   "seconds": 3.8
+  },
+  "en/d0_r88": {
+   "text": "Last level in the shadow. Then the finale.",
+   "seconds": 3.83
+  },
+  "en/d0_r89": {
+   "text": "Singularity Edge. All systems at once. Every second counts now.",
+   "seconds": 5.32
+  },
+  "en/d0_r90": {
+   "text": "Time runs slower here. Your invoice does not.",
+   "seconds": 3.48
+  },
+  "en/d0_r91": {
+   "text": "Light bends here. Stay on course anyway.",
+   "seconds": 2.84
+  },
+  "en/d0_r92": {
+   "text": "Dispatch is holding its breath.",
+   "seconds": 2.44
+  },
+  "en/d0_r93": {
+   "text": "A passenger asks if that is a wormhole. Please, no.",
+   "seconds": 4.84
+  },
+  "en/d0_r94": {
+   "text": "You are the best pilot dispatch ever had. Tell no one.",
+   "seconds": 4.28
+  },
+  "en/d0_r95": {
+   "text": "All instruments tremble, hopefully not your hands.",
+   "seconds": 3.56
+  },
+  "en/d0_r96": {
+   "text": "Only a few levels left, Taxi seven.",
+   "seconds": 2.36
+  },
+  "en/d0_r97": {
+   "text": "The edge grows narrow. Your skill does not.",
+   "seconds": 3.24
+  },
+  "en/d0_r98": {
+   "text": "The second to last level. Take a deep breath.",
+   "seconds": 3.8
+  },
+  "en/d0_r99": {
+   "text": "Final level. Show them what you've got, Taxi seven.",
+   "seconds": 3.24
+  },
+  "de/f0_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.66
+  },
+  "de/f1_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 2.94
+  },
+  "de/m0_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.6
+  },
+  "de/m1_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.71
+  },
+  "en/f0_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.34
+  },
+  "en/f1_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 2.06
+  },
+  "en/m0_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.34
+  },
+  "en/m1_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.54
+  },
+  "de/d0_r23": {
+   "text": "Schrottgürtel. Trümmer driften durchs Feld, jede Berührung kostet Hülle.",
+   "seconds": 4.52
+  },
+  "de/d0_r24": {
+   "text": "Die Kranbahn ist heute gut besucht. Halte Abstand zu den Brocken.",
+   "seconds": 4.28
+  },
+  "de/d0_r25": {
+   "text": "Neu: fahrende Landeplattformen auf Schienen. Lande im Tempo der Plattform.",
+   "seconds": 7.31
+  },
+  "de/d0_r26": {
+   "text": "Das Trümmerfeld meldet dichten Verkehr. Fliege vorausschauend.",
+   "seconds": 3.88
+  },
+  "de/d0_r27": {
+   "text": "Neu: Krankentransporte. Fahrgast ins Krankenhaus, jede Beschädigung ist gefährlich.",
+   "seconds": 5.79
+  },
+  "de/d0_r28": {
+   "text": "Doppelfähre. Zwei Plattformen fahren, such dir die freundlichere aus.",
+   "seconds": 5.56
+  },
+  "de/d0_r29": {
+   "text": "Meteoritenschauer! Die Bahnen blinken kurz vor dem Einschlag.",
+   "seconds": 4.76
+  },
+  "de/d0_r30": {
+   "text": "Altmetall. Der Schrotthändler lässt grüßen und fragt nach Rabatt.",
+   "seconds": 3.96
+  },
+  "de/d0_r31": {
+   "text": "Lazarettgürtel. Krankenflug bitte sanft und ohne Hektik.",
+   "seconds": 4.68
+  },
+  "de/d0_r32": {
+   "text": "Schrottpresse. Ein Patient wartet, und Meteoriten sind auch unterwegs.",
+   "seconds": 5.24
+  },
+  "de/d0_r33": {
+   "text": "Gürtelwächter. Neu: Schieber, große Blöcke, die quetschen. Pass auf!",
+   "seconds": 5.56
+  },
+  "de/d0_r34": {
+   "text": "Magnetfeld erkannt. Neu: Magnete ziehen dein Taxi an. Steuere dagegen!",
+   "seconds": 6.5
+  },
+  "de/d0_r35": {
+   "text": "Neu: abstoßende Magnete. Sie schieben dich fort, nutze das.",
+   "seconds": 5.8
+  },
+  "de/d0_r36": {
+   "text": "Zwillingspole. Einer zieht, einer schiebt, dein Kaffee schwappt.",
+   "seconds": 4.67
+  },
+  "de/d0_r37": {
+   "text": "Neu: pulsierende Felder. Sie schalten im Takt, warte den richtigen Moment ab.",
+   "seconds": 6.22
+  },
+  "de/d0_r38": {
+   "text": "Magnetschacht. Zwei Felder, ein Schacht, viel Geduld.",
+   "seconds": 5.56
+  },
+  "de/d0_r39": {
+   "text": "Feldlinien. Drei Magnete, und einer davon hat schlechte Laune.",
+   "seconds": 4.87
+  },
+  "de/d0_r40": {
+   "text": "Polwechsel. Die Felder tauschen die Pole. Eine Lebensstation ist auch dabei.",
+   "seconds": 5.89
+  },
+  "de/d0_r41": {
+   "text": "Dynamo. Alles pulsiert, bleib im Rhythmus.",
+   "seconds": 4.12
+  },
+  "de/d0_r42": {
+   "text": "Rettungsfeld. Ein Patient im Magnetfeld, flieg besonders sanft.",
+   "seconds": 5.93
+  },
+  "de/d0_r43": {
+   "text": "Magnetträger. Die Plattformen fahren, die Felder auch.",
+   "seconds": 4.12
+  },
+  "de/d0_r44": {
+   "text": "Magnetmeister. Letztes Level im Magnetfeld, danach wird es heiß.",
+   "seconds": 5.48
+  },
+  "de/d0_r45": {
+   "text": "Solarschmiede. Neu: Hitzezonen. Wer darin fliegt, glüht, und die Hülle schmilzt.",
+   "seconds": 7.8
+  },
+  "de/d0_r46": {
+   "text": "Neu: Plasmastrahlen. Sie laden kurz auf, dann brennen sie. Warte den Takt ab.",
+   "seconds": 6.51
+  },
+  "de/d0_r47": {
+   "text": "Hitzewelle. Neu: pulsierende Hitzeauslässe, sie schalten im Takt.",
+   "seconds": 6.01
+  },
+  "de/d0_r48": {
+   "text": "Taktgeber. Heiß, getaktet und mit einer Lebensstation zum Aufatmen.",
+   "seconds": 5.88
+  },
+  "de/d0_r49": {
+   "text": "Hochofen. Die Schmiedemeister behaupten, es sei gemütlich.",
+   "seconds": 4.57
+  },
+  "de/d0_r50": {
+   "text": "Sonnenschmiede. Zwei Strahlen, gleiche Regel: erst warten, dann fliegen.",
+   "seconds": 6.57
+  },
+  "de/d0_r51": {
+   "text": "Schmiedemeister. Bleib cool, Taxi sieben, die Schmiede schaut zu.",
+   "seconds": 5.13
+  },
+  "en/d0_r23": {
+   "text": "Scrap Belt. Debris drifts through the field, every touch costs hull.",
+   "seconds": 4.76
+  },
+  "en/d0_r24": {
+   "text": "The crane track is busy today. Keep your distance from the chunks.",
+   "seconds": 4.2
+  },
+  "en/d0_r25": {
+   "text": "New: moving landing pads on rails. Land at the pad's own speed.",
+   "seconds": 5.56
+  },
+  "en/d0_r26": {
+   "text": "The debris field reports heavy traffic. Fly ahead of the chunks.",
+   "seconds": 4.68
+  },
+  "en/d0_r27": {
+   "text": "New: medical transports. Patient to the hospital, any damage is dangerous.",
+   "seconds": 6.28
+  },
+  "en/d0_r28": {
+   "text": "Twin ferry. Two platforms are moving, pick the friendlier one.",
+   "seconds": 4.12
+  },
+  "en/d0_r29": {
+   "text": "Meteor shower! The lanes flash shortly before impact.",
+   "seconds": 3.72
+  },
+  "en/d0_r30": {
+   "text": "Scrap metal. The scrap dealer says hello and asks for a discount.",
+   "seconds": 4.2
+  },
+  "en/d0_r31": {
+   "text": "Medic belt. Medical flight, please gentle and without haste.",
+   "seconds": 4.6
+  },
+  "en/d0_r32": {
+   "text": "Scrap press. A patient is waiting, and meteors are on the way too.",
+   "seconds": 4.68
+  },
+  "en/d0_r33": {
+   "text": "Belt guardian. New: sliders, big blocks that crush. Watch out!",
+   "seconds": 5.16
+  },
+  "en/d0_r34": {
+   "text": "Magnetic field detected. New: magnets pull your taxi in. Steer against it!",
+   "seconds": 6.76
+  },
+  "en/d0_r35": {
+   "text": "New: repelling magnets. They push you away, use that.",
+   "seconds": 5.08
+  },
+  "en/d0_r36": {
+   "text": "Twin poles. One pulls, one pushes, your coffee sloshes.",
+   "seconds": 5.48
+  },
+  "en/d0_r37": {
+   "text": "New: pulsing fields. They switch on a beat, wait for the right moment.",
+   "seconds": 4.36
+  },
+  "en/d0_r38": {
+   "text": "Magnet shaft. Two fields, one shaft, plenty of patience.",
+   "seconds": 5.48
+  },
+  "en/d0_r39": {
+   "text": "Field lines. Three magnets, and one of them is in a bad mood.",
+   "seconds": 4.1
+  },
+  "en/d0_r40": {
+   "text": "Pole swap. The fields trade their poles. A life station is on board too.",
+   "seconds": 5.8
+  },
+  "en/d0_r41": {
+   "text": "Dynamo. Everything pulses, stay in rhythm.",
+   "seconds": 4.2
+  },
+  "en/d0_r42": {
+   "text": "Rescue field. A patient inside the magnetic field, fly extra gently.",
+   "seconds": 6.04
+  },
+  "en/d0_r43": {
+   "text": "Magnet carriers. The platforms move, and so do the fields.",
+   "seconds": 4.84
+  },
+  "en/d0_r44": {
+   "text": "Magnet master. Last level in the magnetic field, then it gets hot.",
+   "seconds": 5.88
+  },
+  "en/d0_r45": {
+   "text": "Solar forge. New: heat zones. Whoever flies inside glows, and the hull melts.",
+   "seconds": 8.12
+  },
+  "en/d0_r46": {
+   "text": "New: plasma beams. They charge briefly, then burn. Wait for the beat.",
+   "seconds": 5.96
+  },
+  "en/d0_r47": {
+   "text": "Heat wave. New: pulsing heat vents, they switch on a beat.",
+   "seconds": 6.24
+  },
+  "en/d0_r48": {
+   "text": "Pacemaker. Hot, timed, and with a life station to catch your breath.",
+   "seconds": 5.32
+  },
+  "en/d0_r49": {
+   "text": "Blast furnace. The forge masters claim it is cozy.",
+   "seconds": 4.68
+  },
+  "en/d0_r50": {
+   "text": "Solar forge. Two beams, same rule: wait first, then fly.",
+   "seconds": 6.36
+  },
+  "en/d0_r51": {
+   "text": "Forge master. Stay cool, Taxi seven, the forge is watching.",
+   "seconds": 4.2
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

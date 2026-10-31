@@ -196,5 +196,12 @@
  "VOICE_SCREAM_SHORT": "AAAH!",
  "MSG_FRAGILE_BROKE": "Fragile! %s is hurt – job lost",
  "MSG_METEOR_WARN": "Meteor shower!",
- "HUD_TAG_FRAGILE": "◇ FRAGILE"
+ "MSG_FIELD_PULL": "Magnetic field! The taxi is pulled in",
+ "MSG_FIELD_PUSH": "Magnetic field! The taxi is pushed away",
+ "HUD_DELIVER_H": "Take %s to the hospital",
+ "VOICE_DEST_H": "To the hospital, please!",
+ "MSG_MEDICAL": "Medical transport! Fly gently – any damage is dangerous",
+ "MSG_BEAM_WARN": "Plasma beam charging!",
+ "MSG_HEAT": "Heat! The hull is glowing",
+ "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT"
 }
