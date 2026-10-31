@@ -251,8 +251,13 @@ func _physics_process(_delta: float) -> void:
 	if run.sim.gear_cmd != gear_before:
 		Sfx.play("gear")
 	Sfx.set_thrust(taxi.flame_main if run.result == Run.Result.RUNNING else 0.0, absf(taxi.flame_side))
-	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0 and int(run.sim.time * 120.0) % 120 == 0:
-		Sfx.play("warn", -6.0)
+	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0:
+		warn_cd -= Tuning.TICK
+		if warn_cd <= 0.0:
+			Sfx.play("warn", -6.0)
+			warn_cd = lerpf(0.12, 1.0, clampf(run.sim.fuel / 25.0, 0.0, 1.0))        # je leerer der Tank, desto schneller piept es
+	else:
+		warn_cd = 0.0
 	taxi.sync_state()
 	if run.result == Run.Result.RUNNING:
 		Haptics.thrust(taxi.flame_main + absf(taxi.flame_side) * 0.5)
@@ -291,6 +296,7 @@ func _physics_process(_delta: float) -> void:
 			_lose_life()
 
 var field_cd := 0.0
+var warn_cd := 0.0
 var heat_msg_t := -99.0
 var field_msg_t := -99.0
 

@@ -861,8 +861,8 @@
    "seconds": 4.4
   },
   "de/d0_r58": {
-   "text": "Die Fahrgäste schwören, der Mond sei heute näher.",
-   "seconds": 3.46
+   "text": "Springflut. Neu: Böen, Strömungen, die im Takt an- und ausgehen. Und ein Patient wartet.",
+   "seconds": 7.42
   },
   "de/d0_r59": {
    "text": "Ein Funkloch voraus. Falls du mich nicht hörst: alles gut.",
@@ -1121,8 +1121,8 @@
    "seconds": 3.8
   },
   "en/d0_r58": {
-   "text": "Passengers swear the moon is closer today.",
-   "seconds": 2.68
+   "text": "Spring tide. New: gusts, currents that switch on and off on a beat. And a patient is waiting.",
+   "seconds": 6.92
   },
   "en/d0_r59": {
    "text": "A radio dead zone ahead. If you cannot hear me: all good.",
@@ -1377,8 +1377,8 @@
    "seconds": 4.67
   },
   "de/d0_r37": {
-   "text": "Neu: pulsierende Felder. Sie schalten im Takt, warte den richtigen Moment ab.",
-   "seconds": 6.22
+   "text": "Neu: Magnete, die im Takt an- und ausschalten. Achte auf den Ring um den Kern.",
+   "seconds": 6.97
   },
   "de/d0_r38": {
    "text": "Magnetschacht. Zwei Felder, ein Schacht, viel Geduld.",
@@ -1417,8 +1417,8 @@
    "seconds": 6.51
   },
   "de/d0_r47": {
-   "text": "Hitzewelle. Neu: pulsierende Hitzeauslässe, sie schalten im Takt.",
-   "seconds": 6.01
+   "text": "Hitzewelle. Neu: Lavablasen, die im Takt erlöschen und wieder aufglühen.",
+   "seconds": 5.62
   },
   "de/d0_r48": {
    "text": "Taktgeber. Heiß, getaktet und mit einer Lebensstation zum Aufatmen.",
@@ -1493,8 +1493,8 @@
    "seconds": 5.48
   },
   "en/d0_r37": {
-   "text": "New: pulsing fields. They switch on a beat, wait for the right moment.",
-   "seconds": 4.36
+   "text": "New: magnets that switch on and off on a beat. Watch the ring around the core.",
+   "seconds": 5.88
   },
   "en/d0_r38": {
    "text": "Magnet shaft. Two fields, one shaft, plenty of patience.",
@@ -1533,8 +1533,8 @@
    "seconds": 5.96
   },
   "en/d0_r47": {
-   "text": "Heat wave. New: pulsing heat vents, they switch on a beat.",
-   "seconds": 6.24
+   "text": "Heat wave. New: lava blobs that cool down and glow up again on a beat.",
+   "seconds": 5.19
   },
   "en/d0_r48": {
    "text": "Pacemaker. Hot, timed, and with a life station to catch your breath.",
@@ -1583,6 +1583,14 @@
   "en/d0_patient_lost": {
    "text": "Patient lost. That will be expensive.",
    "seconds": 3.32
+  },
+  "de/d0_r55": {
+   "text": "Sonnenzenit. Letztes Level der Schmiede, danach kommen die Gezeiten.",
+   "seconds": 5.4
+  },
+  "en/d0_r55": {
+   "text": "Solar zenith. Last level of the forge, then come the tides.",
+   "seconds": 6.12
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

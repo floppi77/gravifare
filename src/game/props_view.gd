@@ -135,6 +135,7 @@ func _draw_zones() -> void:
 		var al := 1.0 if on else 0.25
 		match String(z.kind):
 			"wind":
+				_timer_arc(r.get_center(), z, 7.0)
 				draw_rect(r, Color(0.3, 0.8, 1.0, 0.07 * al))
 				var dir: Vector2 = (z.a as Vector2).normalized()
 				var n := int(maxf(r.size.x, r.size.y) / 14.0)
@@ -162,6 +163,17 @@ func _draw_zones() -> void:
 					var xx := r.position.x + 9.0 + float(i) * 18.0
 					var s := 3.0 if heavy else -3.0
 					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
+
+## Takt-Anzeige pulsierender Zonen: ein Ring um den Mittelpunkt. Grün und schrumpfend = noch aktiv; gelb und wachsend = kommt gleich wieder.
+func _timer_arc(c: Vector2, z: Dictionary, rad: float) -> void:
+	if float(z.period) <= 0.0:
+		return
+	var p := fposmod(level.clock + float(z.phase), float(z.period))
+	var on_t := float(z.on)
+	if p < on_t:
+		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * (1.0 - p / on_t), 28, Color(0.5, 1.0, 0.6, 0.9), 1.6)
+	else:
+		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((p - on_t) / (float(z.period) - on_t)), 28, Color(1.0, 0.85, 0.3, 0.8), 1.2)
 
 ## Hitzezone als Lavablase: unregelmäßiger, wabernder Klumpen aus Magma mit Kruste, Rissen, aufsteigenden Blasen, Tropfen und
 ## Funken, dazu Hitzeflimmern. Pulsierende Auslässe sind aus erkaltet (dunkles Gestein mit glimmenden Rissen) und kündigen das
@@ -234,6 +246,7 @@ func _draw_heat(z: Dictionary, on: bool) -> void:
 			var u := float(i) / 9.0
 			pts.append(Vector2(c.x - rx + u * rx * 2.0, c.y - ry * 1.15 - float(k) * 3.5 + sin(t * 4.0 + u * 8.0 + float(k)) * 1.4))
 		draw_polyline(pts, Color(1.0, 0.8, 0.5, 0.12 * glow), 1.0)
+	_timer_arc(c, z, minf(rx, ry) * 0.35 + 3.0)
 
 func _scaled(poly: PackedVector2Array, c: Vector2, f: float) -> PackedVector2Array:
 	var out := PackedVector2Array()
@@ -295,6 +308,7 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 		var ep := c + Vector2(cos(rot + (0.5 if sgn > 0.0 else PI + 0.5)), sin(rot + (0.5 if sgn > 0.0 else PI + 0.5))) * 8.5
 		draw_circle(ep, 2.0, Color(1.0, 0.3, 0.35, al) if sgn > 0.0 else Color(0.35, 0.6, 1.0, al))
 	draw_circle(c, 2.2 + 0.6 * sin(t * 6.0), Color(hot.r, hot.g, hot.b, 0.9 * al))
+	_timer_arc(c, z, 13.0)
 
 func _draw_movers() -> void:
 	if level == null or not level.has_movers():

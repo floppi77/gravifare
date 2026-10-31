@@ -147,20 +147,22 @@ func _draw() -> void:
 			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
 			draw_string(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 182, 10, fc)
 	var row_b := BOT_Y + 22.0
-	if hint_t > 0.0 and hint_text != "":
-		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
-		draw_string(Fonts.ui, Vector2(8, row_b), hint_text, HORIZONTAL_ALIGNMENT_LEFT, 330, 8, Color(0.8, 1.0, 0.95, ha))
-	else:
-		draw_string(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), HORIZONTAL_ALIGNMENT_LEFT, 330, 7, Color("#8a93c9"))
+	# Untere Zeile: links Steuerungshinweis (bzw. gesprochener Untertitel/Hinweis), rechts alle Meldungen des Spiels
 	if sub_t > 0.0:
 		var line := "%s: %s" % [sub_speaker, sub_text]
 		var a := clampf(sub_t / 0.4, 0.0, 1.0)
-		draw_string(Fonts.ui, Vector2(340, row_b), line, HORIZONTAL_ALIGNMENT_RIGHT, 296, 8, Color(1, 1, 1, a))
+		_fit_text(Fonts.ui, Vector2(8, row_b), line, 330.0, 8, Color(1, 1, 1, a), HORIZONTAL_ALIGNMENT_LEFT)
+	elif hint_t > 0.0 and hint_text != "":
+		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
+		_fit_text(Fonts.ui, Vector2(8, row_b), hint_text, 330.0, 8, Color(0.8, 1.0, 0.95, ha), HORIZONTAL_ALIGNMENT_LEFT)
+	else:
+		draw_string(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), HORIZONTAL_ALIGNMENT_LEFT, 330, 7, Color("#8a93c9"))
+	if message_t > 0.0:
+		var ma := clampf(message_t / 0.4, 0.0, 1.0)
+		_fit_text(font, Vector2(340, row_b), message, 296.0, 9, Color(1.0, 0.95, 0.7, ma), HORIZONTAL_ALIGNMENT_RIGHT)
 	elif not ex_aboard.is_empty() and not job.is_empty():     # Erinnerung an die Pflicht, solange ein Zusatzfahrgast mitfährt
 		var rem := tr("HUD_MAIN_WAITING") % [job.get("passenger", "?"), job.get("to", "") if run.phase == Run.Phase.CARRYING else job.get("from", "")]
-		draw_string(font, Vector2(340, row_b), rem, HORIZONTAL_ALIGNMENT_RIGHT, 296, 8, Color("#ffd24a"))
-	if message_t > 0.0:
-		draw_string(font, Vector2(0, size.y * 0.35), message, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color.WHITE)
+		_fit_text(font, Vector2(340, row_b), rem, 296.0, 8, Color("#ffd24a"), HORIZONTAL_ALIGNMENT_RIGHT)
 	if game_over:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.6))
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_GAME_OVER"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 28, Color("#ff4d6d"))
@@ -178,48 +180,45 @@ func _draw() -> void:
 	if paused:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
 
-## „Patient verloren“: roter Vollbild-Blitz und pulsierender Rand, mittig ein EKG-Monitor. Der Puls schlägt dreimal, wird
-## schwächer und geht in die Nulllinie über (dazu der Dauerton); darunter Name und Strafe.
+## Text, der in `width` passen muss: Schriftgröße schrumpft bis 6 px, damit nichts abgeschnitten wird oder überläuft.
+func _fit_text(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color, align: int) -> void:
+	var sz := fs
+	while sz > 6 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:
+		sz -= 1
+	draw_string(f, pos, text, align, width, sz, col)
+
+## „Patient verloren“ im unteren HUD rechts (dort, wo sonst Faktor und Preis stehen): roter Streifen mit EKG, das dreimal schlägt und
+## in die Nulllinie übergeht, dazu „PATIENT VERLOREN“ und die Strafe. Blinkender Rand.
 func _draw_patient_lost() -> void:
 	var a := lost_age
 	var fade := minf(1.0, a / 0.15) * clampf((LOST_TOTAL - a) / 0.7, 0.0, 1.0)
+	var x0 := 316.0
+	var w := 320.0
+	var y0 := BOT_Y
+	var h := 13.0
 	var calm: bool = Settings.values.reduce_motion
-	# Vollbild: Blitz am Anfang, danach ein pulsierender roter Rand
-	var flash := 0.0 if calm else clampf(1.0 - a / 0.5, 0.0, 1.0) * 0.45
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.9, 0.05, 0.08, flash))
-	var pulse := 0.5 + 0.5 * sin(a * 5.0)
-	for i in 6:
-		var m := 4.0 + float(i) * 9.0
-		var al := (0.20 - 0.03 * float(i)) * fade * (0.7 + 0.3 * pulse)
-		draw_rect(Rect2(m, m, size.x - m * 2.0, size.y - m * 2.0), Color(0.85, 0.05, 0.1, al), false, 9.0)
-	# Monitor
-	var pw := 300.0
-	var ph := 92.0
-	var px := size.x * 0.5 - pw * 0.5
-	var py := 96.0 - (1.0 - minf(1.0, a / 0.25)) * 14.0
-	draw_rect(Rect2(px - 2, py - 2, pw + 4, ph + 4), Color(0.02, 0.0, 0.02, 0.9 * fade))
-	draw_rect(Rect2(px, py, pw, ph), Color(0.07, 0.01, 0.03, 0.92 * fade))
-	draw_rect(Rect2(px, py, pw, ph), Color(0.9, 0.15, 0.2, fade), false, 1.0)
-	draw_string(font, Vector2(px, py + 14.0), tr("HUD_PATIENT_LOST"), HORIZONTAL_ALIGNMENT_CENTER, pw, 14, Color(1.0, 0.35, 0.4, fade))
-	# EKG-Spur
-	var ty := py + 44.0
-	var tx0 := px + 10.0
-	var tw := pw - 20.0
-	var amp := clampf(1.0 - (a - 0.9) / 1.0, 0.0, 1.0)          # Herzschläge klingen aus, ab ≈ 1,9 s Nulllinie
+	var blink := 0.6 if calm else 0.5 + 0.5 * sin(a * 9.0)
+	draw_rect(Rect2(x0 - 1, y0 - 1, w + 2, h + 2), Color(0.02, 0.0, 0.02, 0.95 * fade))
+	draw_rect(Rect2(x0, y0, w, h), Color(0.3, 0.02, 0.05, 0.96 * fade))
+	draw_rect(Rect2(x0, y0, w, h), Color(1.0, 0.25 + 0.25 * blink, 0.3, fade), false, 1.0)
+	# EKG-Spur links im Streifen
+	var tx0 := x0 + 4.0
+	var tw := 78.0
+	var ty := y0 + h * 0.5 + 1.0
+	var amp := clampf(1.0 - (a - 0.9) / 1.0, 0.0, 1.0)
 	var pts := PackedVector2Array()
-	for i in 96:
-		var u := float(i) / 95.0
-		var ph_ := fposmod(u * 3.0 - a * 1.1, 1.0)
-		var spike := exp(-pow((ph_ - 0.30) * 24.0, 2.0)) * 1.0 - exp(-pow((ph_ - 0.38) * 20.0, 2.0)) * 0.35 + exp(-pow((ph_ - 0.62) * 9.0, 2.0)) * 0.15
-		pts.append(Vector2(tx0 + u * tw, ty - spike * 20.0 * amp))
-	var col := Color(0.4, 1.0, 0.5, fade).lerp(Color(1.0, 0.25, 0.25, fade), 1.0 - amp)
-	draw_polyline(pts, col, 1.2)
-	# wandernder Punkt am rechten Ende; ab Nulllinie blinkt er
-	var dot_a := 1.0 if amp > 0.0 else (0.5 + 0.5 * sin(a * 12.0))
-	draw_circle(Vector2(tx0 + tw, pts[95].y), 1.8, Color(col.r, col.g, col.b, dot_a * fade))
-	# Name und Strafe
-	draw_string(font, Vector2(px, py + 72.0), lost_name, HORIZONTAL_ALIGNMENT_CENTER, pw * 0.5, 10, Color(1, 1, 1, fade * 0.9))
-	draw_string(font, Vector2(px + pw * 0.5, py + 74.0), "−¢%d" % lost_fee, HORIZONTAL_ALIGNMENT_CENTER, pw * 0.5, 14, Color(1.0, 0.3, 0.3, fade))
+	for i in 40:
+		var u := float(i) / 39.0
+		var ph_ := fposmod(u * 2.0 - a * 1.1, 1.0)
+		var spike := exp(-pow((ph_ - 0.30) * 18.0, 2.0)) - exp(-pow((ph_ - 0.38) * 14.0, 2.0)) * 0.35 + exp(-pow((ph_ - 0.62) * 8.0, 2.0)) * 0.15
+		pts.append(Vector2(tx0 + u * tw, ty - spike * 5.0 * amp))
+	var col := Color(0.4, 1.0, 0.5, fade).lerp(Color(1.0, 0.3, 0.3, fade), 1.0 - amp)
+	draw_polyline(pts, col, 1.0)
+	var dot_a := 1.0 if amp > 0.0 else (0.4 + 0.6 * blink)
+	draw_circle(Vector2(tx0 + tw, pts[39].y), 1.4, Color(col.r, col.g, col.b, dot_a * fade))
+	# Text: Titel, Name und Strafe
+	var label := "%s  %s  −¢%d" % [tr("HUD_PATIENT_LOST"), lost_name, lost_fee]
+	_fit_text(font, Vector2(x0 + tw + 10.0, y0 + 10.0), label, w - tw - 16.0, 10, Color(1.0, 0.92, 0.92, fade), HORIZONTAL_ALIGNMENT_LEFT)
 
 ## Ergebnisansicht nach dem Level: bleibt stehen, bis der Spieler bestätigt (Enter/A).
 func _draw_result() -> void:

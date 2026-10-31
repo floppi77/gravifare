@@ -1,24 +1,18 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
 config_version=5
 
 [application]
+
 config/name="GraviFare"
-config/features=PackedStringArray("4.7")
 run/main_scene="res://src/game/boot.tscn"
-
-[display]
-window/size/viewport_width=640
-window/size/viewport_height=360
-window/size/window_width_override=1920
-window/size/window_height_override=1080
-window/stretch/mode="canvas_items"
-window/stretch/scale_mode="integer"
-
-[physics]
-common/physics_ticks_per_second=120
-common/physics_interpolation=true
-
-[rendering]
-textures/canvas_textures/default_texture_filter=0
+config/features=PackedStringArray("4.7")
 
 [autoload]
 
@@ -32,3 +26,21 @@ Music="*res://src/core/music.gd"
 Save="*res://src/core/save.gd"
 Cosmetics="*res://src/core/cosmetics.gd"
 Flow="*res://src/core/flow.gd"
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
+
+[physics]
+
+common/physics_ticks_per_second=120
+common/physics_interpolation=true
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

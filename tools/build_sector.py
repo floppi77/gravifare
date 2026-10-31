@@ -19,7 +19,7 @@ NAMES = {
         ("Magnetmeister", "Magnet Master")],
     6: [("Gezeitenstrom", "Tidal Current"), ("Schwerelos", "Weightless"), ("Springflut", "Spring Tide"), ("Ebbe", "Ebb"), ("Flut", "Flood"),
         ("Mondbahn", "Moon Orbit"), ("Strudel", "Whirlpool"), ("Brandung", "Surf"), ("Sog", "Undertow"), ("Sturmflut", "Storm Surge"),
-        ("Gezeitenmeister", "Tide Master")],
+        ("Gezeitenmeister", "Tide Master"), ("Mahlstrom", "Maelstrom"), ("Orbitalsog", "Orbital Pull"), ("Tidenkönig", "Tide King"), ("Wasserwelt", "Water World")],
     5: [("Erster Funke", "First Spark"), ("Glutschacht", "Ember Shaft"), ("Plasmastrahl", "Plasma Beam"), ("Schmelzofen", "Smelter"), ("Hitzewelle", "Heat Wave"),
         ("Taktgeber", "Pacemaker"), ("Hochofen", "Blast Furnace"), ("Koronaring", "Corona Ring"), ("Gussform", "Casting Mold"), ("Plasmaschmiede", "Plasma Forge"),
         ("Sonnenwende", "Solstice"), ("Sonnenzenit", "Solar Zenith")],
@@ -38,6 +38,10 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 6 and i >= 12:
+        t = {12: (2, 2, "H", 1), 13: (3, 2, "L", 1), 14: (3, 3, None, 1), 15: (2, 2, None, 1)}[i]
+        return {"npads": 7, "jobs": 8, "special": t[2], "moving": 0, "narrow": 2, "debris": t[3], "meteors": 0, "slider": False,
+                "mags": 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": t[0], "grav": t[1], "gust": 2, "stalac": 2, "stalag": 1, "base": 150, "target": 0.0}
     if sector == 6:
         wind = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3][i - 1]
         grav = [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3][i - 1]

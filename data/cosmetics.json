@@ -4,8 +4,8 @@
    "id": "std",
    "kind": "paint",
    "name": {
-    "de": "Taxi-Gelb",
-    "en": "Taxi Yellow"
+	"de": "Taxi-Gelb",
+	"en": "Taxi Yellow"
    },
    "unlock": null
   },
@@ -13,92 +13,92 @@
    "id": "neon",
    "kind": "paint",
    "name": {
-    "de": "Neon-Magenta",
-    "en": "Neon Magenta"
+	"de": "Neon-Magenta",
+	"en": "Neon Magenta"
    },
    "unlock": {
-    "stat": "levels_done",
-    "min": 1
+	"stat": "levels_done",
+	"min": 1
    }
   },
   {
    "id": "mint",
    "kind": "paint",
    "name": {
-    "de": "Minze",
-    "en": "Mint"
+	"de": "Minze",
+	"en": "Mint"
    },
    "unlock": {
-    "stat": "levels_done",
-    "min": 3
+	"stat": "levels_done",
+	"min": 3
    }
   },
   {
    "id": "night",
    "kind": "paint",
    "name": {
-    "de": "Nachtblau",
-    "en": "Midnight"
+	"de": "Nachtblau",
+	"en": "Midnight"
    },
    "unlock": {
-    "stat": "perfect_landings",
-    "min": 10
+	"stat": "perfect_landings",
+	"min": 10
    }
   },
   {
    "id": "sunset",
    "kind": "paint",
    "name": {
-    "de": "Abendrot",
-    "en": "Sunset"
+	"de": "Abendrot",
+	"en": "Sunset"
    },
    "unlock": {
-    "stat": "deliveries",
-    "min": 10
+	"stat": "deliveries",
+	"min": 10
    }
   },
   {
    "id": "candy",
    "kind": "paint",
    "name": {
-    "de": "Zuckerguss",
-    "en": "Candy"
+	"de": "Zuckerguss",
+	"en": "Candy"
    },
    "unlock": {
-    "stat": "best_streak",
-    "min": 4
+	"stat": "best_streak",
+	"min": 4
    }
   },
   {
    "id": "wasp",
    "kind": "paint",
    "name": {
-    "de": "Wespe",
-    "en": "Wasp"
+	"de": "Wespe",
+	"en": "Wasp"
    },
    "unlock": {
-    "stat": "crashes",
-    "min": 3
+	"stat": "crashes",
+	"min": 3
    }
   },
   {
    "id": "gold",
    "kind": "paint",
    "name": {
-    "de": "Gold",
-    "en": "Gold"
+	"de": "Gold",
+	"en": "Gold"
    },
    "unlock": {
-    "stat": "levels_done",
-    "min": 11
+	"stat": "levels_done",
+	"min": 11
    }
   },
   {
    "id": "none",
    "kind": "sticker",
    "name": {
-    "de": "Kein Aufkleber",
-    "en": "No sticker"
+	"de": "Kein Aufkleber",
+	"en": "No sticker"
    },
    "unlock": null
   },
@@ -106,72 +106,72 @@
    "id": "flame",
    "kind": "sticker",
    "name": {
-    "de": "Flamme",
-    "en": "Flame"
+	"de": "Flamme",
+	"en": "Flame"
    },
    "unlock": {
-    "stat": "levels_done",
-    "min": 2
+	"stat": "levels_done",
+	"min": 2
    }
   },
   {
    "id": "star",
    "kind": "sticker",
    "name": {
-    "de": "Stern",
-    "en": "Star"
+	"de": "Stern",
+	"en": "Star"
    },
    "unlock": {
-    "stat": "perfect_landings",
-    "min": 5
+	"stat": "perfect_landings",
+	"min": 5
    }
   },
   {
    "id": "bolt",
    "kind": "sticker",
    "name": {
-    "de": "Blitz",
-    "en": "Bolt"
+	"de": "Blitz",
+	"en": "Bolt"
    },
    "unlock": {
-    "stat": "best_streak",
-    "min": 3
+	"stat": "best_streak",
+	"min": 3
    }
   },
   {
    "id": "heart",
    "kind": "sticker",
    "name": {
-    "de": "Herz",
-    "en": "Heart"
+	"de": "Herz",
+	"en": "Heart"
    },
    "unlock": {
-    "stat": "deliveries",
-    "min": 5
+	"stat": "deliveries",
+	"min": 5
    }
   },
   {
    "id": "boom",
    "kind": "sticker",
    "name": {
-    "de": "Tankstellenschreck",
-    "en": "Pump Terror"
+	"de": "Tankstellenschreck",
+	"en": "Pump Terror"
    },
    "unlock": {
-    "stat": "pump_explosions",
-    "min": 1
+	"stat": "pump_explosions",
+	"min": 1
    }
   },
   {
    "id": "crown",
    "kind": "sticker",
    "name": {
-    "de": "Krone",
-    "en": "Crown"
+	"de": "Krone",
+	"en": "Crown"
    },
    "unlock": {
-    "stat": "levels_done",
-    "min": 22
+	"stat": "levels_done",
+	"min": 22
    }
   }
  ]

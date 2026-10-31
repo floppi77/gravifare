@@ -186,3 +186,11 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Plasmastrahl** ist nicht mehr fest: man fliegt hindurch und verliert 12 Hülle alle 0,3 s, solange man darin ist (vorher blieb das Taxi darin hängen).
 - **Hitzezone als Lavablase**: wabernder Magma-Klumpen mit Kruste, Rissen, Blasen, Tropfen, Funken und Hitzeflimmern; pulsierende Auslässe sind erkaltet und glühen vor dem Einschalten auf.
 - **Sektor 5** hat Level 45–54 (10 Level); Level 55 (Lebensstation, Abschluss) fehlt noch, weil kein Kandidat über dem Metrik-Boden (≈ 175) bot-lösbar war. `build_sector.py 5 --extend --slots=<n>` ergänzt einzelne Slots.
+
+## Runde 18: Patientenverlust, Meldungen im HUD, Sektor 5–6
+- **Patient verloren** (Ereignis `patient_lost` mit Strafbetrag, auch bei Rauswurf und Zusatz-Patienten): Glasklirren, nach 0,45 s der EKG-Dauerton (`flatline`), nach 2 s die Zentrale („Patient verloren. Das wird teuer.“), Wackeln und Rumble. Im HUD erscheint **unten rechts** (anstelle von Faktor/Preis) ein roter Streifen mit EKG, das in die Nulllinie übergeht, plus „PATIENT VERLOREN – Name – −¢Betrag“. Kein Vollbild-Effekt mehr.
+- **Alle Meldungen** (`flash_message`) stehen jetzt in der unteren Zeile **rechts**; gesprochene Untertitel ersetzen links kurz den Steuerungshinweis. Texte schrumpfen bis 6 px, damit nichts abgeschnitten wird.
+- **Tank-Piepen** wird mit sinkendem Tank schneller (1 s bei 25 % bis 0,12 s bei fast leerem Tank).
+- **„Neu:“-Ansagen** nur beim tatsächlich ersten Auftreten (per Skript gegen die Level-Daten geprüft); Ansagen zu Takt-Elementen (Level 37, 47, 58) wurden verständlicher formuliert. Pulsierende Magnete, Lavablasen und Böen zeigen einen Taktring (grün = noch aktiv, gelb = kommt gleich wieder).
+- **Metrik**: ab Sektor 6 Sektorzuschlag +25 je Sektor (`LevelMetrics.SECTOR_BONUS`), weil Gefahren (3,0) und Mechaniken (12) in Sektor 3–5 ihre Obergrenzen erreicht hatten; innerhalb jedes Sektors steigt die Folge weiter an.
+- **Sektor 5** ist mit Level 55 komplett (Level 45–55). **Sektor 6 „Gezeitenorbit“** (Level 56–66): Strömungen (`wind`), böige Strömungen, Schwerkraftzonen (`gravity`), acht Aufträge, Krankentransporte in 58, 61 und 65; Lebensstationen in 62 und 64.
