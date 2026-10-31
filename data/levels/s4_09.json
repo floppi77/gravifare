@@ -74,11 +74,12 @@
   },
   {
    "from": "4",
-   "to": "1",
-   "fare": 180,
+   "to": "H",
+   "fare": 225,
    "par": 28,
    "passenger": "Ben",
-   "gender": "m"
+   "gender": "m",
+   "fragile": true
   },
   {
    "from": "5",

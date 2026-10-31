@@ -759,8 +759,11 @@ func _test_fragile_and_meteors() -> void:
 	r.jobs[0]["fragile"] = true
 	_board_main(r, lvl)
 	check(r.phase == Run.Phase.CARRYING and r.actor != null, "Zerbrechlicher Fahrgast sitzt im Taxi")
+	r.money = 1000.0
+	var price := r.prospect()
 	r._ride_hit({"amount": 5.0})
 	check(r.actor == null and r.missed == 1 and r.pen_ride == 0.0, "Beschädigung an Bord: zerbrechlicher Fahrgast weg, Auftrag verpasst")
+	check(r.missed_fees >= price - 1.0 and r.missed_fees > float(lvl.jobs[0].fare) * Tuning.MISSED_FEE_FACTOR, "Verlorener Krankenpatient kostet den aktuellen Preis (¢%d von ¢%d)" % [int(r.missed_fees), int(price)])
 	check(r.log.any(func(e): return e.type == "fragile_broke") and r.log.any(func(e): return e.type == "job_missed"), "Ereignisse fragile_broke und job_missed werden gemeldet")
 	var r2 := Run.new()
 	r2.extras_enabled = false
@@ -859,6 +862,16 @@ func _test_beam_heat_hospital() -> void:
 			if e.type == "damage" and e.get("mover", "") == "beam":
 				beam_hit = true
 	check(beam_hit, "Plasmastrahl verbrennt das Taxi")
+	lv.update_movers(1.0)
+	check(not lv.box_hits_solid(Vector2(14.0 * Tuning.TILE, 5.5 * Tuning.TILE), Tuning.HULL_HALF), "Plasmastrahl ist nicht fest (man fliegt hindurch)")
+	var s3 := TaxiSim.new()
+	s3.setup(lv)
+	s3.state = TaxiSim.State.FLYING
+	s3.pos = Vector2(10.5 * Tuning.TILE, 5.5 * Tuning.TILE)
+	var x_start := s3.pos.x
+	for i in int(1.0 / Tuning.TICK):
+		s3.step(Vector2(0.8, -0.39), false)
+	check(s3.pos.x > x_start + 25.0 and s3.hull < 100.0, "Im Strahl gefangen? Nein: das Taxi fliegt weiter (%.0f px) und nimmt Schaden (Hülle %.0f)" % [s3.pos.x - x_start, s3.hull])
 	var s2 := TaxiSim.new()
 	s2.setup(lv)
 	s2.state = TaxiSim.State.FLYING

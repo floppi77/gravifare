@@ -18,8 +18,8 @@ NAMES = {
         ("Feldlinien", "Field Lines"), ("Polwechsel", "Pole Swap"), ("Dynamo", "Dynamo"), ("Rettungsfeld", "Rescue Field"), ("Magnetträger", "Magnet Carriers"),
         ("Magnetmeister", "Magnet Master")],
     5: [("Erster Funke", "First Spark"), ("Glutschacht", "Ember Shaft"), ("Plasmastrahl", "Plasma Beam"), ("Schmelzofen", "Smelter"), ("Hitzewelle", "Heat Wave"),
-        ("Taktgeber", "Pacemaker"), ("Hochofen", "Blast Furnace"), ("Koronaring", "Corona Ring"), ("Gussform", "Casting Mold"), ("Sonnenschmiede", "Solar Forge"),
-        ("Schmiedemeister", "Forge Master")],
+        ("Taktgeber", "Pacemaker"), ("Hochofen", "Blast Furnace"), ("Koronaring", "Corona Ring"), ("Gussform", "Casting Mold"), ("Plasmaschmiede", "Plasma Forge"),
+        ("Sonnenwende", "Solstice"), ("Sonnenzenit", "Solar Zenith")],
 }
 
 
@@ -35,6 +35,10 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 5 and i >= 8:
+        t = {8: (2, 2, 1, 2, 0, "H"), 9: (2, 2, 1, 2, 2, None), 10: (3, 2, 1, 2, 2, "H"), 11: (3, 3, 2, 2, 2, "L"), 12: (3, 2, 2, 2, 0, "L")}[i]
+        return {"npads": 7, "jobs": 7, "special": t[5], "moving": 0, "narrow": 2, "debris": t[3], "meteors": t[4], "slider": False,
+                "mags": t[2], "pulsing": 0, "heat": t[0], "beams": t[1], "heat_pulsing": 2, "stalac": 2, "stalag": 1, "base": 140, "target": 0.0}
     if sector == 5:
         heat = [1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2][i - 1]
         beams = [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2][i - 1]
@@ -195,6 +199,8 @@ FLOOR_PREV = {3: 113.2}        # Höchster Score des Vorgängersektors (S2-11); 
 
 
 def floor_of(sector):
+    if "--extend" in sys.argv:
+        return max(json.load(open("tools/sector_scores.json"))[str(sector)]) + 0.3
     f = FLOOR_PREV.get(sector)
     if f is None:
         sc = json.load(open("tools/sector_scores.json"))
@@ -233,7 +239,14 @@ def dp_points(slots, pts, ramp):
 def main():
     sector = int(sys.argv[1])
     K = 8 if sector == 5 else 5
-    slots = list(range(1, 12))
+    for a_ in sys.argv:
+        if a_.startswith("--k="):
+            K = int(a_[4:])
+    extend = "--extend" in sys.argv          # bestehende Level behalten, nur die Slots 8–11 ergänzen
+    slots = [8, 9, 10, 11] if extend else list(range(1, 12))
+    for a_ in sys.argv:
+        if a_.startswith("--slots="):
+            slots = [int(x) for x in a_[8:].split(",")]
     cands = {}
     paths = []
     for i in slots:
@@ -265,7 +278,7 @@ def main():
     fl = floor_of(sector)
     ramp = {"floor": fl}
     for i in slots:
-        ramp[i] = fl + {3: 20.0, 4: 7.0, 5: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
+        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
     print("gültig je Slot:", {i: len(pts[i]) for i in slots}, flush=True)
     plan = None
     for rnd_ in range(4):
@@ -309,10 +322,12 @@ def main():
     if "--dry" in sys.argv:
         return
     sc_all = json.load(open("tools/sector_scores.json")) if os.path.exists("tools/sector_scores.json") else {}
-    for old in [f for f in os.listdir("data/levels") if f.startswith("s%d_" % sector)]:
-        os.remove("data/levels/" + old)
+    if not extend:
+        for old in [f for f in os.listdir("data/levels") if f.startswith("s%d_" % sector)]:
+            os.remove("data/levels/" + old)
     final_paths = {}
-    for n, i in enumerate(keep_slots, 1):
+    start_idx = (len(json.load(open("tools/sector_scores.json")).get(str(sector), [])) + 1) if extend else 1
+    for n, i in enumerate(keep_slots, start_idx):
         v, nn = plan[i]
         r = info[(i, plan[i])]
         times = r["times"] + [30.0]
@@ -331,7 +346,7 @@ def main():
         if r is not None:
             scores[i] = r["score"]
     print("Endscores:", {i: round(scores[i], 1) for i in keep_slots}, "ungültig:", bad)
-    sc_all[str(sector)] = [scores[i] for i in keep_slots]
+    sc_all[str(sector)] = (sc_all.get(str(sector), []) if extend else []) + [scores[i] for i in keep_slots]
     json.dump(sc_all, open("tools/sector_scores.json", "w"))
     print("geschrieben:", len(final_paths), "Level")
 

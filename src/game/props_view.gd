@@ -163,33 +163,83 @@ func _draw_zones() -> void:
 					var s := 3.0 if heavy else -3.0
 					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
 
-## Hitzezone: glühender Dunstschleier mit aufsteigenden Funken und Flimmerlinien; pulsierende Auslässe sind aus gedämpft
-## und kündigen das Einschalten mit Flackern an.
+## Hitzezone als Lavablase: unregelmäßiger, wabernder Klumpen aus Magma mit Kruste, Rissen, aufsteigenden Blasen, Tropfen und
+## Funken, dazu Hitzeflimmern. Pulsierende Auslässe sind aus erkaltet (dunkles Gestein mit glimmenden Rissen) und kündigen das
+## Einschalten mit Aufglühen an.
 func _draw_heat(z: Dictionary, on: bool) -> void:
 	var r: Rect2 = z.rect
-	var al := 1.0 if on else 0.18
+	var glow := 1.0
 	if float(z.period) > 0.0 and not on:
 		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
-		if left < 1.2:
-			al = 0.18 + 0.7 * (0.5 + 0.5 * sin(t * 24.0)) * (1.0 - left / 1.2)
+		glow = 0.12 + (0.7 * (1.0 - left / 1.2) * (0.6 + 0.4 * sin(t * 22.0)) if left < 1.2 else 0.0)
+	var c := r.get_center()
+	var rx := r.size.x * 0.5
+	var ry := r.size.y * 0.5
+	var seed := int(r.position.x) * 7 + int(r.position.y) * 13
+	var n := 22
+	var outline := PackedVector2Array()
+	for i in n:
+		var ang := float(i) / float(n) * TAU
+		var k := 0.88 + 0.07 * sin(t * 1.4 + float(i) * 1.7 + float(seed % 5)) + 0.05 * sin(t * 0.9 + float(i) * 2.9)
+		outline.append(c + Vector2(cos(ang) * rx * k, sin(ang) * ry * k))
+	# Strahlungshalo
+	for i in 4:
+		var f := 1.0 + 0.22 * float(i)
+		draw_colored_polygon(_scaled(outline, c, f), Color(1.0, 0.3, 0.05, 0.05 * glow))
+	# Kruste (außen) und Magma
+	draw_colored_polygon(outline, Color(0.16, 0.05, 0.04).lerp(Color(0.35, 0.09, 0.04), glow * 0.5))
+	var body := Color(0.78, 0.18, 0.05).lerp(Color(0.2, 0.07, 0.05), 1.0 - glow)
+	draw_colored_polygon(_scaled(outline, c, 0.9), body)
+	draw_colored_polygon(_scaled(outline, c, 0.68), Color(1.0, 0.45, 0.08, glow).lerp(Color(0.3, 0.1, 0.06, 1.0), 1.0 - glow))
+	draw_colored_polygon(_scaled(outline, c, 0.4), Color(1.0, 0.78, 0.25, glow))
+	draw_colored_polygon(_scaled(outline, c, 0.18), Color(1.0, 0.97, 0.7, glow))
+	# dunkle Krustenplatten, die über das Magma treiben, mit glühenden Rissen
+	for i in 4:
+		var ph := t * (0.25 + 0.1 * float(i)) + float(i) * 1.9 + float(seed % 7)
+		var pc := c + Vector2(cos(ph), sin(ph * 0.8)) * Vector2(rx, ry) * 0.45
+		var plate := PackedVector2Array()
+		for j in 6:
+			var aa := float(j) / 6.0 * TAU + ph
+			plate.append(pc + Vector2(cos(aa) * (3.5 + 1.5 * float((i + j) % 2)), sin(aa) * (2.6 + 1.2 * float((i + j) % 3))))
+		draw_colored_polygon(plate, Color(0.14, 0.05, 0.04, 0.85))
+		plate.append(plate[0])
+		draw_polyline(plate, Color(1.0, 0.5, 0.1, 0.7 * glow), 0.8)
+	# Blasen steigen auf und platzen
+	for i in 5:
+		var h := fmod(float(i) * 0.618 + float(seed % 11) * 0.1, 1.0)
+		var fr := fmod(t * (0.35 + 0.2 * h) + h * 3.0, 1.0)
+		var bp := Vector2(c.x + (h - 0.5) * rx * 1.3, c.y + ry * 0.55 - fr * ry * 1.1)
+		var rad := 1.2 + 1.6 * fr
+		if fr < 0.88:
+			draw_arc(bp, rad, 0.0, TAU, 12, Color(1.0, 0.85, 0.4, 0.8 * glow), 0.9)
+			draw_circle(bp + Vector2(-0.4, -0.4), 0.5, Color(1.0, 1.0, 0.85, 0.7 * glow))
+		else:
+			var q := (fr - 0.88) / 0.12
+			draw_arc(bp, rad + 3.0 * q, 0.0, TAU, 12, Color(1.0, 0.6, 0.2, (1.0 - q) * glow), 0.8)
+	# Tropfen fallen unten ab, Funken steigen nach oben
+	for i in 4:
+		var h := fmod(float(i) * 0.37 + float(seed % 13) * 0.07, 1.0)
+		var fr := fmod(t * 0.45 + h * 2.0, 1.0)
+		var dp := Vector2(c.x + (h - 0.5) * rx * 1.0, c.y + ry * 0.8 + fr * (ry * 0.9 + 6.0))
+		draw_circle(dp, 1.3 * (1.0 - fr * 0.4), Color(1.0, 0.5, 0.1, (1.0 - fr) * 0.9 * glow))
 	for i in 6:
-		var f := float(i) / 5.0
-		var h := r.size.y * (1.0 - f)
-		draw_rect(Rect2(r.position.x, r.end.y - h, r.size.x, h), Color(1.0, 0.35 + 0.3 * f, 0.1, 0.05 * al))
-	for i in int(r.size.x / 6.0):
-		var x := r.position.x + 3.0 + float(i) * 6.0
-		var h := fmod(float(i) * 0.61803, 1.0)
-		var fr := fmod(t * (0.5 + 0.5 * h) + h * 3.0, 1.0)
-		var y := r.end.y - fr * r.size.y
-		draw_rect(Rect2(x + sin(t * 3.0 + float(i)) * 2.0, y, 1.5, 1.5), Color(1.0, 0.75 - 0.4 * fr, 0.2, (1.0 - fr) * 0.9 * al))
+		var h := fmod(float(i) * 0.7 + float(seed % 9) * 0.11, 1.0)
+		var fr := fmod(t * (0.5 + 0.4 * h) + h * 2.0, 1.0)
+		var sp := Vector2(c.x + (h - 0.5) * rx * 1.6 + sin(t * 3.0 + float(i)) * 2.0, c.y - ry * 0.6 - fr * 14.0)
+		draw_rect(Rect2(sp.x, sp.y, 1.2, 1.2), Color(1.0, 0.8 - 0.4 * fr, 0.2, (1.0 - fr) * 0.9 * glow))
+	# Hitzeflimmern über der Blase
 	for k in 3:
-		var yy := r.position.y + r.size.y * (0.25 + 0.25 * float(k))
 		var pts := PackedVector2Array()
-		for i in 12:
-			var u := float(i) / 11.0
-			pts.append(Vector2(r.position.x + u * r.size.x, yy + sin(t * 4.0 + u * 9.0 + float(k)) * 1.6))
-		draw_polyline(pts, Color(1.0, 0.7, 0.3, 0.22 * al), 1.0)
-	draw_rect(r, Color(1.0, 0.4, 0.15, 0.55 * al), false, 1.0)
+		for i in 10:
+			var u := float(i) / 9.0
+			pts.append(Vector2(c.x - rx + u * rx * 2.0, c.y - ry * 1.15 - float(k) * 3.5 + sin(t * 4.0 + u * 8.0 + float(k)) * 1.4))
+		draw_polyline(pts, Color(1.0, 0.8, 0.5, 0.12 * glow), 1.0)
+
+func _scaled(poly: PackedVector2Array, c: Vector2, f: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for p_ in poly:
+		out.append(c + (p_ - c) * f)
+	return out
 
 ## Magnetzone: Spule (Hufeisen mit Polkappen), Feldlinien, einströmende (Anziehung, warm) oder ausströmende (Abstoßung, kalt)
 ## Partikel und weiche Energieringe. Pulsierende Magnete zeigen vor dem Einschalten ein Flackern und sind ausgeschaltet gedämpft.

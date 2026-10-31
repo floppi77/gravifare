@@ -1551,6 +1551,30 @@
   "en/d0_r51": {
    "text": "Forge master. Stay cool, Taxi seven, the forge is watching.",
    "seconds": 4.2
+  },
+  "de/d0_r52": {
+   "text": "Gussform. Meteoriten über der Schmiede, Strahlen darunter. Alles gleichzeitig.",
+   "seconds": 6.6
+  },
+  "de/d0_r53": {
+   "text": "Plasmaschmiede. Ein Patient wartet, die Strahlen auch. Sanft und im richtigen Takt.",
+   "seconds": 7.21
+  },
+  "de/d0_r54": {
+   "text": "Sonnenwende. Die Schmiede ist fast geschafft. Bleib cool, Taxi sieben.",
+   "seconds": 5.88
+  },
+  "en/d0_r52": {
+   "text": "Casting mold. Meteors above the forge, beams below. All at once.",
+   "seconds": 5.0
+  },
+  "en/d0_r53": {
+   "text": "Plasma forge. A patient is waiting, and so are the beams. Gently and on the beat.",
+   "seconds": 6.12
+  },
+  "en/d0_r54": {
+   "text": "Solstice. The forge is almost done. Stay cool, Taxi seven.",
+   "seconds": 5.16
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

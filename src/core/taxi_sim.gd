@@ -22,6 +22,7 @@ var spike_cd := 0.0
 var mover_cd := 0.0
 var meteor_cd := 0.0
 var heat_cd := 0.0
+var beam_cd := 0.0
 var air_t := 0.0             # Flugzeit seit dem letzten Abheben (für „perfekte Landung“)
 var air_path := 0.0          # zurückgelegte Strecke seit dem letzten Abheben (px)
 
@@ -41,6 +42,7 @@ func setup(lvl: LevelData) -> void:
 	mover_cd = 0.0
 	meteor_cd = 0.0
 	heat_cd = 0.0
+	beam_cd = 0.0
 	air_t = 0.0
 	air_path = 0.0
 	lvl.clock = 0.0
@@ -106,6 +108,18 @@ func _mover_damage(kind: String) -> void:
 		state = State.DESTROYED
 		events.append({"type": "destroyed"})
 
+## Plasmastrahl: Hüllenschaden alle 0,3 s, solange das Taxi im Strahl ist; man kann ungehindert weiterfliegen.
+func _beam_burn() -> void:
+	if beam_cd > 0.0 or state == State.DESTROYED:
+		return
+	beam_cd = 0.3
+	hull -= Tuning.BEAM_DAMAGE
+	events.append({"type": "damage", "amount": Tuning.BEAM_DAMAGE, "speed": 0.0, "mover": "beam"})
+	if hull <= 0.0:
+		hull = 0.0
+		state = State.DESTROYED
+		events.append({"type": "destroyed"})
+
 ## Hitzezone: solange das Taxi darin fliegt, alle 0,25 s Hüllenschaden.
 func _heat(dt: float) -> void:
 	heat_cd = maxf(0.0, heat_cd - dt)
@@ -150,8 +164,8 @@ func _mover_push() -> void:
 		var r: Rect2 = m.rect
 		if not r.intersects(box):
 			continue
-		if m.kind == "beam":                 # Strahl schiebt nicht, er verbrennt nur
-			_mover_damage("beam")
+		if m.kind == "beam":                 # Strahl schiebt nicht, er verbrennt nur (solange man darin ist)
+			_beam_burn()
 			continue
 		var opts := [[box.end.x - r.position.x, Vector2(-1, 0)], [r.end.x - box.position.x, Vector2(1, 0)],
 			[box.end.y - r.position.y, Vector2(0, -1)], [r.end.y - box.position.y, Vector2(0, 1)]]
@@ -198,6 +212,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	spike_cd = maxf(0.0, spike_cd - dt)
 	level.clock = time
 	mover_cd = maxf(0.0, mover_cd - dt)
+	beam_cd = maxf(0.0, beam_cd - dt)
 	level.update_movers(time)
 	_meteor_alert(dt)
 	_heat(dt)

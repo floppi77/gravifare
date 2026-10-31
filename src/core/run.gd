@@ -203,7 +203,11 @@ func _ride_hit(e: Dictionary) -> void:
 	if a == null or e.get("fatal", false):
 		return
 	if actor == a and bool(current_job().get("fragile", false)):
-		_fragile_break(a)           # zerbrechlicher Fahrgast: jede Beschädigung beendet die Fahrt
+		_fragile_break(a)           # Krankenpatient: jede Beschädigung beendet die Fahrt
+		return
+	var ex := extra_of(a)
+	if not ex.is_empty() and bool(ex.job.get("fragile", false)):
+		_extra_break(ex)            # Krankenpatient als Zusatzfahrgast
 		return
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
@@ -212,10 +216,25 @@ func _ride_hit(e: Dictionary) -> void:
 func _fragile_break(a: PassengerActor) -> void:
 	a.pay_info = {}
 	log.append({"type": "fragile_broke", "voice": a.voice_key(), "name": a.pname})
+	var price := prospect()            # verlorener Patient: Strafe in Höhe des aktuellen Preises (zusätzlich zum ausbleibenden Geld)
 	a.vanish_hurt(sim.pos.x, sim.pos.y)
 	leavers.append(a)
 	actor = null
-	_lose_job(a.pname)
+	_lose_job(a.pname, price)
+
+## Zusatz-Krankenpatient verletzt: weg, Strafe in Höhe des aktuellen Preises.
+func _extra_break(ex: Dictionary) -> void:
+	var a: PassengerActor = ex.actor
+	var fee := minf(snappedf(extra_prospect(ex), 1.0), money)
+	money -= fee
+	missed_fees += fee
+	extras_missed += 1
+	a.pay_info = {}
+	log.append({"type": "fragile_broke", "voice": a.voice_key(), "name": a.pname})
+	log.append({"type": "job_missed", "name": a.pname, "fee": fee})
+	a.vanish_hurt(sim.pos.x, sim.pos.y)
+	leavers.append(a)
+	extras.erase(ex)
 
 ## Mindest-Grundpreis eines Auftrags: bei 25 % Zufriedenheit (Zeitfaktor ≈ 0,66) deckt er mit Streckenzuschlag den
 ## geschätzten Sprit für Anflug und Fahrt plus 15 % Gewinn. Auf 5 aufgerundet.
@@ -388,8 +407,8 @@ func _miss_job() -> void:
 	_lose_job(old.pname)
 
 ## Gemeinsame Buchhaltung für einen nicht beförderten Pflichtauftrag (verpasst oder rausgeworfen).
-func _lose_job(pname: String) -> void:
-	var fee := minf(snappedf(float(level.jobs[job_index].get("fare", 50)) * Tuning.MISSED_FEE_FACTOR, 1.0), money)
+func _lose_job(pname: String, extra_fee := 0.0) -> void:
+	var fee := minf(maxf(snappedf(float(level.jobs[job_index].get("fare", 50)) * Tuning.MISSED_FEE_FACTOR, 1.0), snappedf(extra_fee, 1.0)), money)
 	money -= fee
 	missed += 1
 	missed_fees += fee
@@ -436,8 +455,9 @@ func eject() -> bool:
 	if not ex.is_empty():
 		extras.erase(ex)
 	else:
+		var price := prospect() if bool(current_job().get("fragile", false)) else 0.0
 		actor = null
-		_lose_job(a.pname)
+		_lose_job(a.pname, price)
 	pending_log.append_array(log.slice(log_start))
 	return true
 
@@ -878,6 +898,9 @@ func _spawn_extra() -> void:
 	if dests.is_empty():
 		return
 	var to_id: String = dests[flow_rng.randi() % dests.size()]
+	var medical: bool = level.pads.has("H") and flow_rng.randf() < 0.35          # manche Zusatzfahrgäste sind Krankenpatienten (Ziel Krankenhaus)
+	if medical:
+		to_id = "H"
 	extra_count += 1
 	var used: Array = []
 	for j in jobs:
@@ -901,6 +924,9 @@ func _spawn_extra() -> void:
 	base_fare = maxf(base_fare, min_fare(level, probe))
 	var job := {"from": from_id, "to": to_id, "fare": base_fare, "par": snappedf(14.0 + dist / 38.0, 1.0),
 		"passenger": ident.name, "gender": ident.gender, "look": ident.look}
+	if medical:
+		job["fragile"] = true
+		job["fare"] = snappedf(base_fare * 1.25, 5.0)
 	var a := PassengerActor.new()
 	a.setup(job, level.pads[from_id], 100 + extra_count, false)
 	var pat := flow_rng.randf_range(Tuning.EXTRA_PATIENCE_MIN, Tuning.EXTRA_PATIENCE_MAX)

@@ -58,11 +58,12 @@
   },
   {
    "from": "5",
-   "to": "2",
-   "fare": 150,
+   "to": "H",
+   "fare": 187,
    "par": 23,
    "passenger": "Jonas",
-   "gender": "m"
+   "gender": "m",
+   "fragile": true
   },
   {
    "from": "1",

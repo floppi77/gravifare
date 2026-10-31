@@ -395,7 +395,7 @@ func movers_hit_box(center: Vector2, half: Vector2) -> bool:
 		return false
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.rect.intersects(box):
+		if m.kind != "beam" and m.rect.intersects(box):          # Plasmastrahlen sind nicht fest: man fliegt hindurch (und verbrennt)
 			return true
 	return false
 
@@ -508,7 +508,7 @@ func is_solid_cell(cx: int, cy: int) -> bool:
 func is_solid_at(p: Vector2) -> bool:
 	if not movers.is_empty() and not movers_ignore:
 		for m in movers:
-			if m.rect.has_point(p):
+			if m.kind != "beam" and m.rect.has_point(p):
 				return true
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))
 

@@ -100,5 +100,5 @@ func _draw_world() -> void:
 				_spike_tile(cx, cy)
 			elif c == "F" or c == "L":
 				_tile(5, cx, cy)
-			elif c >= "1" and c <= "9":
+			elif (c >= "1" and c <= "9") or c == "H":
 				_tile(4, cx, cy)

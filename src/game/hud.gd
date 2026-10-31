@@ -105,7 +105,8 @@ func _draw() -> void:
 	var txt := ""
 	var ex_aboard := run._extra_aboard()
 	if not ex_aboard.is_empty():
-		txt = tr("HUD_TAG_EXTRA") + "  " + tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()]
+		var xf: String = tr("HUD_TAG_FRAGILE") + " " if ex_aboard.job.get("fragile", false) else ""
+		txt = tr("HUD_TAG_EXTRA") + "  " + xf + (tr("HUD_DELIVER_H") % ex_aboard.actor.pname if run.target_pad() == "H" else tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()])
 	elif job.is_empty():
 		txt = tr("HUD_GO_EXIT") if run.exit_open else ""
 	else:
