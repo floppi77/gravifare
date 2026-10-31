@@ -941,20 +941,20 @@
    "seconds": 6.83
   },
   "de/d0_r78": {
-   "text": "Schattenring. Neu: Dunkelheit und Radar. Nur Taxi, Plattformen und Tor leuchten, der Radar-Ping zeigt den Rest.",
-   "seconds": 9.49
+   "text": "Schattenring. Neu: Dunkelheit. Nur Taxi, Plattformen und Tor leuchten, den Rest erahnst du nur.",
+   "seconds": 10.3
   },
   "de/d0_r79": {
-   "text": "Nachtschicht. Der Radar pingt alle paar Sekunden, merke dir, was du gesehen hast.",
-   "seconds": 5.96
+   "text": "Nachtschicht. Präge dir den Weg ein, bevor du hineinfliegst.",
+   "seconds": 3.64
   },
   "de/d0_r80": {
    "text": "Peilung. Verkehr in der Dunkelheit, die Fahrzeuge leuchten, und ein Patient wartet.",
    "seconds": 6.6
   },
   "de/d0_r81": {
-   "text": "Funkschatten. Ein Magnet versteckt sich im Dunkeln, der Radar verrät ihn.",
-   "seconds": 6.17
+   "text": "Funkschatten. Ein Magnet versteckt sich im Dunkeln, du spürst ihn, bevor du ihn siehst.",
+   "seconds": 7.53
   },
   "de/d0_r82": {
    "text": "Sensorfeld. Wind, Magnet und Verkehr im Dunkeln. Eine Lebensstation hilft dir.",
@@ -965,12 +965,12 @@
    "seconds": 7.0
   },
   "de/d0_r84": {
-   "text": "Schattenring. Zwei Verkehrsrouten im Dunkeln, der Radar pingt schneller.",
-   "seconds": 4.89
+   "text": "Schattenring. Zwei Verkehrsrouten im Dunkeln, nur die Scheinwerfer verraten sie.",
+   "seconds": 5.51
   },
   "de/d0_r85": {
-   "text": "Finsternis. Fast kein Licht mehr. Vertraue dem Radar, Taxi sieben.",
-   "seconds": 8.17
+   "text": "Finsternis. Fast kein Licht mehr. Vertraue deinem Gefühl, Taxi sieben.",
+   "seconds": 6.51
   },
   "de/d0_r86": {
    "text": "Du fliegst wie im Schlaf. Bitte wach bleiben.",
@@ -1201,20 +1201,20 @@
    "seconds": 5.96
   },
   "en/d0_r78": {
-   "text": "Shadow Ring. New: darkness and radar. Only taxi, platforms and gate are lit, the radar ping shows the rest.",
-   "seconds": 8.2
+   "text": "Shadow Ring. New: darkness. Only taxi, platforms and gate are lit, the rest you can only guess.",
+   "seconds": 7.4
   },
   "en/d0_r79": {
-   "text": "Night shift. The radar pings every few seconds, remember what you have seen.",
-   "seconds": 6.57
+   "text": "Night shift. Memorize the way before you fly in.",
+   "seconds": 4.04
   },
   "en/d0_r80": {
    "text": "Bearing. Traffic in the dark, the vehicles glow, and a patient is waiting.",
    "seconds": 6.12
   },
   "en/d0_r81": {
-   "text": "Radio shadow. A magnet hides in the dark, the radar gives it away.",
-   "seconds": 4.76
+   "text": "Radio shadow. A magnet hides in the dark, you feel it before you see it.",
+   "seconds": 4.92
   },
   "en/d0_r82": {
    "text": "Sensor field. Wind, magnet and traffic in the dark. A life station helps you.",
@@ -1225,12 +1225,12 @@
    "seconds": 5.88
   },
   "en/d0_r84": {
-   "text": "Shadow ring. Two traffic routes in the dark, the radar pings faster.",
-   "seconds": 5.0
+   "text": "Shadow ring. Two traffic routes in the dark, only the headlights give them away.",
+   "seconds": 5.56
   },
   "en/d0_r85": {
-   "text": "Darkness. Almost no light left. Trust the radar, Taxi seven.",
-   "seconds": 5.0
+   "text": "Darkness. Almost no light left. Trust your instincts, Taxi seven.",
+   "seconds": 4.76
   },
   "en/d0_r86": {
    "text": "You fly as if asleep. Please stay awake.",

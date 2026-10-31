@@ -39,7 +39,6 @@ var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 ## blinkt seine Bahn). Bewegung nach der Simulationszeit.
 var movers: Array = []
 var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast schwarz); nur Taxi, Plattformen, Tor und leuchtende Gefahren sind beleuchtet
-var radar := 0.0                 # Sektor 8: Periode des Radar-Pings (s), der das Gelände kurz sichtbar macht; 0 = kein Radar
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 
 static func load_file(path: String) -> LevelData:
@@ -80,7 +79,6 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l._scan_movers(d.get("movers", []))
 	l._scan_zones(d.get("zones", []))
 	l.dark = clampf(float(d.get("dark", 0.0)), 0.0, 1.0)
-	l.radar = maxf(float(d.get("radar", 0.0)), 0.0)
 	l._plan_shelters()
 	l._finish_moving_pads()
 	return l
@@ -312,6 +310,8 @@ func _scan_movers(list: Array) -> void:
 			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0)),
 			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0)), "paint": int(d.get("paint", d.get("tint", 0)))}
 		if kind == "vehicle":
+			m["w"] = 26.0                         # Trefferfläche passend zum Rumpf des Taxi-Sprites (32 × 20 px), etwas kleiner als die Grafik
+			m["h"] = 12.0
 			_setup_vehicle_path(m, d)
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)

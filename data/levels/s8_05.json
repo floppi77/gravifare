@@ -104,11 +104,9 @@
   "magnets",
   "attract_fields",
   "life_station",
-  "darkness",
-  "radar"
+  "darkness"
  ],
  "dark": 0.75,
- "radar": 7.0,
  "movers": [
   {
    "kind": "vehicle",

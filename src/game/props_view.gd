@@ -475,8 +475,9 @@ func _draw_vehicle(m: Dictionary) -> void:
 	for i in 4:
 		var f := float(i + 1) / 4.0
 		draw_circle(Vector2(-fwd * (14.0 + f * 7.0), 3.0 + sin(t * 20.0 + float(i)) * 0.6), (1.0 - f) * 2.2 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))
-	draw_colored_polygon(PackedVector2Array([Vector2(fwd * 15.0, 0.0), Vector2(fwd * 30.0, -5.0), Vector2(fwd * 30.0, 6.0)]), Color(1.0, 0.98, 0.7, 0.12))
+	draw_colored_polygon(PackedVector2Array([Vector2(fwd * 14.0, 2.0), Vector2(fwd * 22.0, -1.5), Vector2(fwd * 22.0, 5.5)]), Color(1.0, 0.98, 0.7, 0.16))
 	draw_texture_rect(tex, Rect2(-16.0 if flip > 0.0 else 16.0, -10.0, 32.0 * flip, 20.0), false)
+	draw_circle(Vector2(fwd * 13.5, 2.0), 1.4, Color(1.0, 0.98, 0.75, 0.95))                                   # Scheinwerfer sitzt an der Nase
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 ## Plasmastrahl: zwei Emitter an den Enden; vor dem Einschalten flackert eine dünne Ladelinie, im Takt brennt ein weiß-orangener

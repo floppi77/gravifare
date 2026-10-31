@@ -17,6 +17,10 @@ NAMES = {
     4: [("Erste Spule", "First Coil"), ("Abstoßung", "Repulsion"), ("Zwillingspole", "Twin Poles"), ("Pulsschlag", "Heartbeat"), ("Magnetschacht", "Magnet Shaft"),
         ("Feldlinien", "Field Lines"), ("Polwechsel", "Pole Swap"), ("Dynamo", "Dynamo"), ("Rettungsfeld", "Rescue Field"), ("Magnetträger", "Magnet Carriers"),
         ("Magnetmeister", "Magnet Master")],
+    9: [("Ereignishorizont", "Event Horizon"), ("Akkretionsscheibe", "Accretion Disc"), ("Gravitationslinse", "Gravitational Lens"), ("Zeitdehnung", "Time Dilation"),
+        ("Spaghettisierung", "Spaghettification"), ("Singularität", "Singularity"), ("Hawking-Strahlung", "Hawking Radiation"), ("Doppelstern", "Binary Star"),
+        ("Rotverschiebung", "Redshift"), ("Schwarzes Loch", "Black Hole"), ("Das letzte Rennen", "The Last Run"), ("Sternenstaub", "Stardust"), ("Quantenschaum", "Quantum Foam"),
+        ("Photonenring", "Photon Ring"), ("Gezeitenkraft", "Tidal Force"), ("Jenseits", "Beyond")],
     8: [("Dämmerung", "Dusk"), ("Nachtschicht", "Night Shift"), ("Peilung", "Bearing"), ("Funkschatten", "Radio Shadow"), ("Sensorfeld", "Sensor Field"),
         ("Lichtlos", "Lightless"), ("Echolot", "Echo Sounder"), ("Schattenring", "Shadow Ring"), ("Blindflug", "Blind Flight"), ("Sonarkamm", "Sonar Ridge"),
         ("Finsternis", "Darkness"), ("Nachtwache", "Night Watch"), ("Schattenwurf", "Shadow Cast"), ("Dunkelkammer", "Darkroom"), ("Mitternacht", "Midnight"),
@@ -45,13 +49,20 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 9:
+        k = (i - 1) % 11 + 1
+        return {"npads": 7, "jobs": 9, "special": {2: "L", 7: "L", 3: "H", 5: "H", 9: "H", 11: "H"}.get(k), "moving": 0,
+                "narrow": 1 if k < 4 else 2, "debris": 0 if k < 3 else 1, "meteors": 0 if k < 7 else 2, "slider": False, "traffic": 1 if k < 5 else 2,
+                "mags": 1 if k < 5 else 2, "pulsing": 0 if k < 5 else 1, "mixed": k >= 5, "heat": 0 if k < 4 else (1 if k < 8 else 2),
+                "beams": 0 if k < 3 else (1 if k < 8 else 2), "wind": 0 if k < 2 else 1, "grav": 0, "gust": 1, "heat_pulsing": 1 if k >= 8 else 0,
+                "stalac": 1, "stalag": 0, "base": 180, "target": 0.0, "dark": round(0.7 + 0.02 * k, 2)}
     if sector == 8:
         k = (i - 1) % 11 + 1
         traffic = [0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2][k - 1]
         return {"npads": 7, "jobs": 8, "special": {5: "L", 10: "L", 3: "H", 6: "H", 9: "H"}.get(k), "moving": 0,
                 "narrow": 0 if k < 3 else (1 if k < 7 else 2), "debris": 0, "meteors": 0, "slider": False, "traffic": traffic,
                 "mags": 0 if k < 4 else 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0 if k < 6 else 1, "wind": 0 if k < 5 else 1, "grav": 0, "gust": 1,
-                "stalac": 1, "stalag": 0, "base": 170, "target": 0.0, "dark": round(0.6 + 0.03 * k, 2), "radar": round(9.0 - 0.4 * k, 1)}
+                "stalac": 1, "stalag": 0, "base": 170, "target": 0.0, "dark": round(0.6 + 0.03 * k, 2)}
     if sector == 7 and i >= 12:
         t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None), 18: (3, "H")}[(i - 12) % 7 + 12]
         rich = i >= 19                                   # spätere Slots: mehr Mechaniken gleichzeitig (Abstoßung, Pulsieren, Strahl)
@@ -248,8 +259,7 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None, cfgo=None):
          "map": g.rows(), "jobs": jobs, "mechanics": mech}
     if c.get("dark"):
         d["dark"] = c["dark"]
-        d["radar"] = c.get("radar", 0.0)
-        d["mechanics"] = d["mechanics"] + ["darkness"] + (["radar"] if c.get("radar") else [])
+        d["mechanics"] = d["mechanics"] + ["darkness"]
     if movers:
         d["movers"] = movers
     if zones:
@@ -434,7 +444,7 @@ def main():
     fl = floor_of(sector)
     ramp = {"floor": fl}
     for i in slots:
-        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0, 7: 14.0, 8: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
+        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0, 7: 14.0, 8: 14.0, 9: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
     print("gültig je Slot:", {i: len(pts[i]) for i in slots}, flush=True)
     plan = None
     for rnd_ in range(4):

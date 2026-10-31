@@ -260,16 +260,7 @@ def shatter():
     x += np.sin(2 * np.pi * 120 * tt) * np.exp(-tt * 30) * 0.4
     save("shatter", np.tanh(x) * 0.8)
 
-def radar():
-    """Sonar-Ping: kurzer, fallender Sinuston mit leisem Echo."""
-    d = 1.2; tt = t(d)
-    f = np.interp(tt, [0, 0.25, d], [2200, 1500, 1200])
-    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt * 7) * 0.45
-    e = int(0.32 * SR)
-    x[e:] += x[:-e] * 0.32
-    save("radar", x * np.minimum(1.0, tt / 0.004))
-
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter, radar): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter): f()
     print(sorted(os.listdir(OUT)))

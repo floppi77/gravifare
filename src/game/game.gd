@@ -85,11 +85,8 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--debug-medical") and run.actor != null:      # Dev: wartenden Fahrgast als Patient auf der Trage zeigen
 		run.actor.medical = true
 	for ua2 in OS.get_cmdline_user_args():
-		if ua2.begins_with("--dark="):               # Dev: Dunkelheit (und --radar=<s>) in jedem Level ansehen
+		if ua2.begins_with("--dark="):               # Dev: Dunkelheit in jedem Level ansehen
 			run.level.dark = float(ua2.substr(7))
-			for ub in OS.get_cmdline_user_args():
-				if ub.begins_with("--radar="):
-					run.level.radar = float(ub.substr(8))
 			dark.setup(run, cam)
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3

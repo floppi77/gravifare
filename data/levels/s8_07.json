@@ -105,11 +105,9 @@
   "gusts",
   "magnets",
   "attract_fields",
-  "darkness",
-  "radar"
+  "darkness"
  ],
  "dark": 0.84,
- "radar": 5.8,
  "movers": [
   {
    "kind": "beam",

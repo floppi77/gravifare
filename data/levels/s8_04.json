@@ -102,11 +102,9 @@
   "traffic",
   "magnets",
   "attract_fields",
-  "darkness",
-  "radar"
+  "darkness"
  ],
  "dark": 0.72,
- "radar": 7.4,
  "movers": [
   {
    "kind": "vehicle",

@@ -34,7 +34,7 @@ def cfg_from_level(d):
          "gust": sum(1 for z in winds if "period" in z), "heat_pulsing": sum(1 for z in zs if z["kind"] == "heat" and "period" in z),
          "stalac": 1 if max(ids) >= 7 else 2, "stalag": 0 if max(ids) >= 7 else 1, "base": d["jobs"][0]["fare"], "target": 0.0}
     if d.get("dark"):
-        c["dark"], c["radar"] = d["dark"], d.get("radar", 0.0)
+        c["dark"] = d["dark"]
     return c
 
 

@@ -124,7 +124,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var features := clampf(float((lvl.raw.get("mechanics", []) as Array).size()), 0.0, 12.0)
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
-		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)),
+		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + 12.0 * lvl.dark + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)),
 		"solvable": clearance > 0.0,
 	}
 

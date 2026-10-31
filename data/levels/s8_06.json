@@ -106,11 +106,9 @@
   "magnets",
   "attract_fields",
   "medical",
-  "darkness",
-  "radar"
+  "darkness"
  ],
  "dark": 0.78,
- "radar": 6.6,
  "movers": [
   {
    "kind": "beam",

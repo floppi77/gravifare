@@ -99,9 +99,7 @@
  "mechanics": [
   "chicane",
   "spikes",
-  "darkness",
-  "radar"
+  "darkness"
  ],
- "dark": 0.63,
- "radar": 8.6
+ "dark": 0.63
 }

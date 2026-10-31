@@ -21,7 +21,10 @@ func _ready() -> void:
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
 	add_child(box)
-	show_main()
+	if OS.get_cmdline_user_args().has("--levels"):      # Dev: direkt die Levelauswahl zeigen
+		show_levels()
+	else:
+		show_main()
 
 func _clear() -> void:
 	for c in box.get_children():
@@ -95,17 +98,24 @@ func show_levels() -> void:
 	_clear()
 	box.add_child(MenuKit.title(tr("MENU_LEVELS")))
 	var ids := Flow.level_ids()
+	# Bei 99 Leveln scrollt die Auswahl (Maus, Stick/Pfeiltasten folgen dem Fokus), die Seite bleibt niedrig
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 226)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	box.add_child(scroll)
 	var grid := GridContainer.new()
-	grid.columns = 6
-	box.add_child(grid)
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 3)
+	grid.add_theme_constant_override("v_separation", 3)
+	scroll.add_child(grid)
 	for i in ids.size():
 		var lvl := LevelData.load_file(Flow.level_path(ids[i]))
-		var b := MenuKit.button("%02d" % (i + 1), func(): Flow.start_campaign(ids[i]))
-		b.custom_minimum_size = Vector2(36, 20)
+		var b := MenuKit.button("%02d" % (lvl.number if lvl else i + 1), func(): Flow.start_campaign(ids[i]))
+		b.custom_minimum_size = Vector2(62, 20)
 		if Save.is_completed(ids[i]):
 			var mm := Save.medals_of(ids[i])
 			b.text += " " + ("★" if mm.time else "☆") + ("★" if mm.clean else "☆") + ("★" if mm.pro else "☆")
-			b.custom_minimum_size = Vector2(62, 20)
 		b.disabled = not Save.is_unlocked(ids, i)
 		b.tooltip_text = lvl.names.get(TranslationServer.get_locale().substr(0, 2), lvl.id) if lvl else ids[i]
 		grid.add_child(b)
