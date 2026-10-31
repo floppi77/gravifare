@@ -28,7 +28,8 @@ func resolve_level(arg: String) -> String:
 	var a := arg.strip_edges().to_lower().replace("-", "_")
 	if a.is_valid_int():
 		var n := int(a)
-		return ids[n - 1] if n >= 1 and n <= ids.size() else a
+		var id := "s%d_%02d" % [(n - 1) / 11 + 1, (n - 1) % 11 + 1]       # Levelnummer = (Sektor-1)*11 + Index (auch mit Lücken)
+		return id if ids.has(id) else a
 	return a
 
 func level_path(id: String) -> String:
