@@ -2,7 +2,7 @@
 
 Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N; jedes Pad hat Platz für einen Wartebereich-Unterstand (2 Tiles Luft über einem Padende); das Ausgangstor liegt mittig oben und öffnet erst, wenn der **Ausgangs-Fahrgast** (letzter Auftrag, `to: "exit"`) an Bord ist; jeder Auftrag hat einen eigenen Fahrgast; der erste Fahrgast wartet nicht auf dem Startpad, und jeder Fahrgast beginnt an einem anderen Pad, als der vorherige endete; unter dem Torblock bleiben mindestens 96 px Durchflug. Das Tankpad (`F`) braucht eine 2 Tiles hohe Zapfsäule (`P`) am Padende und ein freies Landefenster ≥ 28 px; Preisbereich je Level optional (`fuel`). Jedes Level muss der Bot **ab dem Mindest-Sprit (35 %)** lösen. **Pads sind unterschiedlich groß** (5 bis 8 Tiles; je kleiner, desto schwieriger), aber jedes Passagierpad hat ein **freies Landefenster** neben dem Wartebereich, mindestens 34 px in Level 1–3, **sinkend bis 20 px in Level 99** (`Tuning.min_land_window`, Test) – späte Level dürfen deutlich kleinere Plattformen haben. Die Grenze gilt je Pad: **Größere Pads im selben Level sind erlaubt, unterschiedlich große Pads innerhalb eines Levels dürfen gemischt auftreten.**
 
-Status: **33 von 99 Leveln vorhanden** (Sektor 1–3 komplett, S1-01 bis S3-11). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle). Übersichtsbilder: `docs/levels/`.
+Status: **44 von 99 Leveln vorhanden** (Sektor 1–4 komplett, S1-01 bis S4-11). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle), `tools/make_s2.py`, `tools/make_s3.py`, `tools/make_s4.py` (Pars je Sektor in `tools/sN_pars.json` = Bot-Zeit × 1,3 + 8 s). Übersichtsbilder: `docs/levels/`.
 
 ## Obergrenzen und Plattform-Stufen (Tests: `_test_level_caps`, `_test_life_station`)
 | Level | Passagierpads (max.) | Pflichtfahrgäste (max.) | Anmerkung |
@@ -36,8 +36,8 @@ Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·G
 |---|---|---|---|
 | 1 Sternenhafen | 01–11 | Schub, Trägheit, Landung, Tanken, Engstellen, Dornen, Meisterprüfung | 01–11 gebaut |
 | 2 Neon-Schluchten | 12–22 | Schächte, Engstellen, **bewegliche Tore** (Schleusen, Falltüren) | 12–22 gebaut |
-| 3 Schrottgürtel | 23–33 | **Trümmer** (bewegliche Brocken), **fahrende Landeplattformen** auf Schienen; fünf Passagierpads | 23–33 gebaut |
-| 4 Magnetfeld | 34–44 | anziehende/abstoßende Zonen | offen |
+| 3 Schrottgürtel | 23–33 | **Trümmer**, **fahrende Landeplattformen**, **Meteoritenschauer** (mit Warnung), **Schieber**, **zerbrechliche Fahrgäste**; fünf Passagierpads | 23–33 gebaut |
+| 4 Magnetfeld | 34–44 | **Magnetzonen** (anziehend/abstoßend, teils pulsierend), sechs Passagierpads, sieben Aufträge | 34–44 gebaut |
 | 5 Solarschmiede | 45–55 | Hitzezonen, Strahlen, Takt | offen |
 | 6 Gezeitenorbit | 56–66 | wechselnde Schwerkraft, Strömungen | offen |
 | 7 Transitknoten | 67–77 | Verkehr, Schleusen, Routen | offen |
@@ -69,14 +69,25 @@ Score = 40·Enge + 25·Streckenlänge + 15·Aufträge + 10·Landefenster + 10·G
 | S2-09 | Schleusenkammer (doors) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 1→4, Jonas 2→3, Ines 4→1, Ben 3→Ausgang | 110.7 | 8 px | 6525 px | 34 px | bestanden (191 s, Tank 68 %) | **offen** |
 | S2-10 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 112.3 | 8 px | 5687 px | 34 px | bestanden (238 s, Tank 48 %) | **offen** |
 | S2-11 | Glasfassade (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 113.2 | 12 px | 5980 px | 34 px | bestanden (234 s, Tank 47 %) | **offen** |
-| S3-01 | Schrottplatz (debris, chicane, spikes) | Mika 2→5, Odo 4→1, Lena 3→5, Jonas 4→3, Ines 2→1, Ben 5→Ausgang | 113.4 | 12 px | 3908 px | 34 px | bestanden (155 s, Tank 41 %) | **offen** |
-| S3-02 | Kranbahn (debris, chicane, spikes) | Mika 3→4, Odo 1→5, Lena 4→2, Jonas 1→2, Ines 1→5, Ben 3→Ausgang | 114.3 | 12 px | 3897 px | 34 px | bestanden (193 s, Tank 32 %) | **offen** |
-| S3-03 | Trümmerfeld (debris, chicane, spikes) + Lebens-Station | Mika 2→1, Odo 2→4, Lena 2→4, Jonas 3→2, Ines 1→3, Ben 5→Ausgang | 115.4 | 12 px | 4041 px | 34 px | bestanden (138 s, Tank 32 %) | **offen** |
-| S3-04 | Fließband (debris, moving_pads, chicane, spikes) | Mika 3→2, Odo 4→5, Lena 1→2, Jonas 5→3, Ines 2→3, Ben 5→Ausgang | 116.4 | 12 px | 3702 px | 34 px | bestanden (127 s, Tank 41 %) | **offen** |
-| S3-05 | Pendelhalle (debris, chicane, spikes) | Mika 4→3, Odo 1→5, Lena 2→1, Jonas 3→1, Ines 4→5, Ben 2→Ausgang | 116.7 | 12 px | 4437 px | 34 px | bestanden (158 s, Tank 37 %) | **offen** |
-| S3-06 | Schrottlawine (debris, chicane, spikes) | Mika 3→1, Odo 4→1, Lena 5→4, Jonas 5→4, Ines 2→1, Ben 5→Ausgang | 116.7 | 12 px | 4443 px | 34 px | bestanden (161 s, Tank 33 %) | **offen** |
-| S3-07 | Altmetall (debris, moving_pads, chicane, spikes) | Mika 3→4, Odo 5→2, Lena 3→1, Jonas 2→3, Ines 2→3, Ben 5→Ausgang | 117.7 | 12 px | 3524 px | 34 px | bestanden (156 s, Tank 39 %) | **offen** |
-| S3-08 | Doppelfähre (debris, moving_pads, chicane, spikes) + Lebens-Station | Mika 2→5, Odo 3→1, Lena 2→3, Jonas 5→3, Ines 4→1, Ben 4→Ausgang | 118.5 | 12 px | 3918 px | 34 px | bestanden (169 s, Tank 24 %) | **offen** |
-| S3-09 | Schrottpresse (debris, chicane, spikes) | Mika 4→2, Odo 5→1, Lena 2→1, Jonas 4→1, Ines 3→1, Ben 2→Ausgang | 119.3 | 12 px | 4515 px | 34 px | bestanden (207 s, Tank 60 %) | **offen** |
-| S3-10 | Wrackgasse (debris, chicane, spikes) | Mika 5→3, Odo 4→2, Lena 3→1, Jonas 4→5, Ines 1→4, Ben 1→Ausgang | 119.3 | 12 px | 4729 px | 34 px | bestanden (153 s, Tank 39 %) | **offen** |
-| S3-11 | Gürtelwächter (debris, moving_pads, chicane, spikes) | Mika 5→4, Odo 5→2, Lena 3→5, Jonas 2→1, Ines 5→3, Ben 2→Ausgang | 122.8 | 12 px | 4317 px | 34 px | bestanden (172 s, Tank 26 %) | **offen** |
+| S3-01 | Schrottplatz (debris, chicane, spikes) | Mika 2→5, Odo 4→1, Lena 3→5, Jonas 4→3, Ines 2→1, Ben 5→Ausgang | 113.4 | 12 px | 3908 px | 34 px | bestanden (141 s, Tank 53 %) | **offen** |
+| S3-02 | Kranbahn (debris, chicane, spikes) | Mika 3→4, Odo 1→5, Lena 4→2, Jonas 1→2, Ines 1→5, Ben 3→Ausgang | 114.3 | 12 px | 3897 px | 34 px | bestanden (136 s, Tank 37 %) | **offen** |
+| S3-03 | Fließband (debris, moving_pads, chicane, spikes) + Lebens-Station | Mika 3→2, Odo 4→5, Lena 1→2, Jonas 5→3, Ines 2→3, Ben 5→Ausgang | 116.5 | 12 px | 3703 px | 34 px | bestanden (160 s, Tank 41 %) | **offen** |
+| S3-04 | Schrottlawine (debris, chicane, spikes) | Mika 3→1, Odo 4→1, Lena 5→4, Jonas 5→4, Ines 2→1, Ben 5→Ausgang | 116.7 | 12 px | 4443 px | 34 px | bestanden (124 s, Tank 44 %) | **offen** |
+| S3-05 | Trümmerfeld (debris, chicane, spikes, fragile) + zerbrechlicher Fahrgast | Mika 2→1, Odo 2→4, Lena 2→4, Jonas 3→2, Ines 1→3, Ben 5→Ausgang | 120.4 | 12 px | 4041 px | 34 px | bestanden (142 s, Tank 48 %) | **offen** |
+| S3-06 | Doppelfähre (debris, moving_pads, chicane, spikes) | Mika 2→5, Odo 3→1, Lena 2→3, Jonas 5→3, Ines 4→1, Ben 4→Ausgang | 120.6 | 12 px | 3898 px | 18 px | bestanden (154 s, Tank 33 %) | **offen** |
+| S3-07 | Altmetall (debris, moving_pads, chicane, spikes, meteors) | Mika 3→4, Odo 5→2, Lena 3→1, Jonas 2→3, Ines 2→3, Ben 5→Ausgang | 129.6 | 12 px | 3545 px | 18 px | bestanden (160 s, Tank 35 %) | **offen** |
+| S3-08 | Pendelhalle (debris, chicane, spikes, fragile, meteors) + Lebens-Station + zerbrechlicher Fahrgast | Mika 4→3, Odo 1→5, Lena 2→1, Jonas 3→1, Ines 4→5, Ben 2→Ausgang | 131.2 | 12 px | 4437 px | 34 px | bestanden (186 s, Tank 66 %) | **offen** |
+| S3-09 | Gürtelwächter (debris, moving_pads, chicane, spikes, meteors) | Mika 5→4, Odo 5→2, Lena 3→5, Jonas 2→1, Ines 5→3, Ben 2→Ausgang | 131.5 | 12 px | 4303 px | 18 px | bestanden (167 s, Tank 29 %) | **offen** |
+| S3-10 | Schrottpresse (debris, chicane, spikes, fragile, meteors) + zerbrechlicher Fahrgast | Mika 4→2, Odo 5→1, Lena 2→1, Jonas 4→1, Ines 3→1, Ben 2→Ausgang | 136.3 | 12 px | 4557 px | 18 px | bestanden (164 s, Tank 41 %) | **offen** |
+| S3-11 | Wrackgasse (debris, chicane, spikes, meteors, sliders) | Mika 5→3, Odo 4→2, Lena 3→1, Jonas 4→5, Ines 1→4, Ben 1→Ausgang | 136.7 | 12 px | 4755 px | 18 px | bestanden (191 s, Tank 60 %) | **offen** |
+| S4-01 | Pulsschlag (spikes, chicane, magnets, pulsing_fields, attract_fields) | Mika 4→3, Odo 1→3, Lena 6→3, Jonas 5→3, Ines 6→2, Ben 4→5, Nora 1→Ausgang | 144.2 | 8 px | 4271 px | 34 px | bestanden (127 s, Tank 61 %) | **offen** |
+| S4-02 | Abstoßung (spikes, chicane, magnets, life_station, repel_fields) + Lebens-Station | Mika 2→3, Odo 6→1, Lena 4→5, Jonas 2→6, Ines 4→6, Ben 4→5, Nora 2→Ausgang | 144.2 | 8 px | 4314 px | 18 px | bestanden (138 s, Tank 50 %) | **offen** |
+| S4-03 | Erste Spule (spikes, chicane, magnets, attract_fields) | Mika 6→2, Odo 6→3, Lena 5→1, Jonas 6→2, Ines 6→2, Ben 4→5, Nora 2→Ausgang | 146.2 | 8 px | 5253 px | 34 px | bestanden (143 s, Tank 50 %) | **offen** |
+| S4-04 | Gegenpol (spikes, chicane, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 5→6, Odo 2→5, Lena 4→3, Jonas 6→1, Ines 6→4, Ben 6→3, Nora 1→Ausgang | 150.9 | 8 px | 4140 px | 18 px | bestanden (137 s, Tank 30 %) | **offen** |
+| S4-05 | Zwillingspole (spikes, chicane, magnets, repel_fields, attract_fields) | Mika 5→2, Odo 1→6, Lena 1→5, Jonas 4→3, Ines 1→5, Ben 1→3, Nora 2→Ausgang | 151.3 | 8 px | 5338 px | 34 px | bestanden (142 s, Tank 47 %) | **offen** |
+| S4-06 | Dynamo (spikes, chicane, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 4→2, Odo 5→4, Lena 6→1, Jonas 2→3, Ines 6→4, Ben 3→6, Nora 5→Ausgang | 151.4 | 8 px | 4209 px | 18 px | bestanden (129 s, Tank 53 %) | **offen** |
+| S4-07 | Polwechsel (spikes, chicane, magnets, life_station, pulsing_fields, repel_fields, attract_fields) + Lebens-Station | Mika 3→6, Odo 5→4, Lena 5→3, Jonas 2→5, Ines 6→1, Ben 4→3, Nora 6→Ausgang | 151.6 | 8 px | 3878 px | 18 px | bestanden (145 s, Tank 47 %) | **offen** |
+| S4-08 | Feldlinien (spikes, chicane, magnets, repel_fields, attract_fields) | Mika 3→1, Odo 5→1, Lena 4→2, Jonas 4→2, Ines 3→1, Ben 2→6, Nora 3→Ausgang | 152.5 | 8 px | 4985 px | 18 px | bestanden (137 s, Tank 53 %) | **offen** |
+| S4-09 | Schleusenfeld (spikes, chicane, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 2→3, Odo 1→6, Lena 4→1, Jonas 6→3, Ines 5→2, Ben 6→1, Nora 6→Ausgang | 153.1 | 8 px | 4589 px | 18 px | bestanden (141 s, Tank 47 %) | **offen** |
+| S4-10 | Magnetschacht (spikes, chicane, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 6→3, Odo 6→1, Lena 2→4, Jonas 6→5, Ines 3→4, Ben 2→4, Nora 2→Ausgang | 154.7 | 8 px | 4814 px | 18 px | bestanden (136 s, Tank 48 %) | **offen** |
+| S4-11 | Magnetmeister (spikes, chicane, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 5→4, Odo 5→3, Lena 5→2, Jonas 4→5, Ines 1→4, Ben 2→6, Nora 4→Ausgang | 162.7 | 8 px | 5647 px | 18 px | bestanden (157 s, Tank 34 %) | **offen** |

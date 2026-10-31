@@ -76,6 +76,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l._scan()
 	l._scan_doors(d.get("doors", {}))
 	l._scan_movers(d.get("movers", []))
+	l._scan_zones(d.get("zones", []))
 	l._plan_shelters()
 	l._finish_moving_pads()
 	return l
@@ -213,6 +214,46 @@ func _scan_doors(params: Dictionary) -> void:
 ## Passagierpad (weder Tank- noch Lebens-Station).
 func is_passenger_pad(id: String) -> bool:
 	return pads.has(id) and not pads[id].fuel and not pads[id].get("life", false)
+
+## Zonen (Sektor 4–6): JSON "zones". Kinds: "wind" (Strömung: konstante Beschleunigung ax/ay in einem Rechteck x/y/w/h, Felder),
+## "magnet" (Kreis um cx/cy mit Radius r Feldern: k > 0 zieht zur Mitte, k < 0 stößt ab; Stärke fällt linear zum Rand)
+## und "gravity" (Rechteck mit Schwerkraftfaktor g). Optional "period"/"on"/"phase": nur während der ersten `on` Sekunden
+## jeder Periode aktiv (Böen, pulsierende Magnete).
+var zones: Array = []
+
+func _scan_zones(list: Array) -> void:
+	for d in list:
+		var z := {"kind": String(d.get("kind", "wind")), "period": float(d.get("period", 0.0)), "on": float(d.get("on", 0.0)), "phase": float(d.get("phase", 0.0)),
+			"rect": Rect2(float(d.get("x", 0)) * Tuning.TILE, float(d.get("y", 0)) * Tuning.TILE, float(d.get("w", 1)) * Tuning.TILE, float(d.get("h", 1)) * Tuning.TILE),
+			"a": Vector2(float(d.get("ax", 0.0)), float(d.get("ay", 0.0))), "g": float(d.get("g", 1.0)), "k": float(d.get("k", 0.0)),
+			"center": Vector2(float(d.get("cx", 0.0)), float(d.get("cy", 0.0))) * Tuning.TILE, "r": float(d.get("r", 4.0)) * Tuning.TILE}
+		if z.kind == "magnet":
+			z["rect"] = Rect2(z.center - Vector2(z.r, z.r), Vector2(z.r, z.r) * 2.0)
+		zones.append(z)
+
+func has_zones() -> bool:
+	return not zones.is_empty()
+
+func zone_active(z: Dictionary, t: float) -> bool:
+	return float(z.period) <= 0.0 or fposmod(t + float(z.phase), float(z.period)) < float(z.on)
+
+## Zusätzliche Beschleunigung (px/s²) durch Zonen am Ort p zur Zeit t.
+func zone_accel(p: Vector2, t: float) -> Vector2:
+	var a := Vector2.ZERO
+	for z in zones:
+		if not (z.rect as Rect2).has_point(p) or not zone_active(z, t):
+			continue
+		match String(z.kind):
+			"wind":
+				a += z.a as Vector2
+			"gravity":
+				a.y += (float(z.g) - 1.0) * gravity
+			"magnet":
+				var d: Vector2 = (z.center as Vector2) - p
+				var dist := d.length()
+				if dist < float(z.r) and dist > 2.0:
+					a += d / dist * float(z.k) * (1.0 - dist / float(z.r))
+	return a
 
 func has_meteors() -> bool:
 	for m in movers:

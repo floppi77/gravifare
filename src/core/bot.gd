@@ -195,6 +195,8 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		goal_key = ""                       # nach dem Warten (Absinken, Drift) neu planen
 	was_blocked = blocked_now or (was_blocked and v_des == Vector2.ZERO)
 	var a_des := (v_des - sim.vel) / 0.30 + sim.vel * sim.drag()
+	if level.has_zones():
+		a_des -= level.zone_accel(sim.pos, level.clock)      # Strömung/Magnet/Schwerkraftzone ausgleichen
 	return [_accel_to_input(a_des), gear]
 
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.

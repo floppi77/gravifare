@@ -202,6 +202,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			return
 
 	var acc := Vector2(0.0, level.gravity)
+	if not level.zones.is_empty():
+		acc += level.zone_accel(pos, time)
 	acc.y -= up_power() * up
 	acc.y += down_power() * down
 	acc.x += side_power() * side

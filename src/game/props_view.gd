@@ -45,6 +45,7 @@ func _draw() -> void:
 	_draw_pumps()
 	_draw_gate()
 	_draw_doors()
+	_draw_zones()
 	_draw_movers()
 	_draw_actors()
 	_draw_taxi_shadow()
@@ -120,6 +121,48 @@ func _draw_doors() -> void:
 
 ## Bewegliche Hindernisse: Trümmer (zerklüfteter Brocken mit orangem Warnrand), Schieber (Block mit Warnstreifen) und
 ## fahrende Landeplattformen (Platte auf Schiene mit leuchtender Landefläche; der Unterstand fährt mit).
+## Zonen: schwach getönte Flächen mit laufender Animation (Chevrons = Strömung, Ringe = Magnet, Pfeile = Schwerkraft).
+func _draw_zones() -> void:
+	if level == null or not level.has_zones():
+		return
+	for z in level.zones:
+		var r: Rect2 = z.rect
+		var on := level.zone_active(z, level.clock)
+		var al := 1.0 if on else 0.25
+		match String(z.kind):
+			"wind":
+				draw_rect(r, Color(0.3, 0.8, 1.0, 0.07 * al))
+				var dir: Vector2 = (z.a as Vector2).normalized()
+				var n := int(maxf(r.size.x, r.size.y) / 14.0)
+				for i in n:
+					var f := fmod(t * 0.7 + float(i) / float(n), 1.0)
+					for row in int(maxf(1.0, minf(r.size.x, r.size.y) / 24.0)):
+						var q := Vector2(r.position.x + r.size.x * (0.5 + dir.x * (f - 0.5)) , r.position.y + r.size.y * (0.5 + dir.y * (f - 0.5)))
+						if absf(dir.x) < 0.5:
+							q.x = r.position.x + (float(row) + 0.5) * r.size.x / maxf(1.0, floorf(r.size.x / 24.0))
+						else:
+							q.y = r.position.y + (float(row) + 0.5) * r.size.y / maxf(1.0, floorf(r.size.y / 24.0))
+						if r.has_point(q):
+							var perp := Vector2(-dir.y, dir.x)
+							draw_polyline(PackedVector2Array([q - dir * 3.0 + perp * 3.0, q + dir * 2.0, q - dir * 3.0 - perp * 3.0]), Color(0.6, 0.95, 1.0, 0.5 * al), 1.0)
+			"magnet":
+				var c: Vector2 = z.center
+				var attract := float(z.k) > 0.0
+				draw_circle(c, 3.0, Color(1.0, 0.35, 0.55, 0.9) if attract else Color(0.4, 0.7, 1.0, 0.9))
+				for i in 3:
+					var f := fmod(t * 0.6 + float(i) / 3.0, 1.0)
+					var rr: float = float(z.r) * (1.0 - f if attract else f)
+					draw_arc(c, rr, 0.0, TAU, 40, Color(1.0, 0.4, 0.6, 0.7 * (1.0 - absf(f - 0.5) * 1.2) * al) if attract else Color(0.45, 0.75, 1.0, 0.7 * (1.0 - absf(f - 0.5) * 1.2) * al), 1.0)
+			"gravity":
+				var heavy := float(z.g) > 1.0
+				draw_rect(r, Color(0.9, 0.3, 0.9, 0.08 * al) if heavy else Color(0.4, 1.0, 0.7, 0.08 * al))
+				for i in int(r.size.x / 18.0):
+					var f := fmod(t * 0.5 + float(i) * 0.37, 1.0)
+					var yy := r.position.y + (f if heavy else 1.0 - f) * r.size.y
+					var xx := r.position.x + 9.0 + float(i) * 18.0
+					var s := 3.0 if heavy else -3.0
+					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
+
 func _draw_movers() -> void:
 	if level == null or not level.has_movers():
 		return
