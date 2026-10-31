@@ -47,9 +47,10 @@ def replace(n, K=14):
     sector, idx, fn = level_file(n)
     old = json.load(open(fn))
     s0 = score_of(fn)
-    lo = score_of(level_file(n - 1)[2]) if n > 1 else 0.0
-    nxt = level_file(n + 1)[2]
-    hi = score_of(nxt) if os.path.exists(nxt) else 1e9
+    prev = next((level_file(m)[2] for m in range(n - 1, 0, -1) if os.path.exists(level_file(m)[2])), None)
+    lo = score_of(prev) if prev else 0.0
+    nxt = next((level_file(m)[2] for m in range(n + 1, 100) if os.path.exists(level_file(m)[2])), None)
+    hi = score_of(nxt) if nxt else 1e9
     c = cfg_from_level(old)
     others = bs.existing_layouts(skip_sector=None, skip_levels=(n,))
     print("Level %d: Score %.1f, Fenster (%.1f, %.1f)" % (n, s0, lo, hi), flush=True)

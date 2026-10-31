@@ -255,7 +255,7 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None, cfgo=None):
     if c["special"]:
         # Sonderpad: Zeichen bleibt im Raster (L bzw. H)
         pass
-    d = {"id": ident, "sector": sector, "index": idx, "name": {"de": NAMES[sector][i - 1][0], "en": NAMES[sector][i - 1][1]},
+    d = {"id": ident, "sector": sector, "index": idx, "name": {"de": NAMES[sector][(i - 1) % len(NAMES[sector])][0], "en": NAMES[sector][(i - 1) % len(NAMES[sector])][1]},
          "map": g.rows(), "jobs": jobs, "mechanics": mech}
     if c.get("dark"):
         d["dark"] = c["dark"]

@@ -961,7 +961,7 @@ func _test_traffic() -> void:
 	check(hit, "Berührung mit einem Fahrzeug kostet Hülle (%.0f)" % s.hull)
 
 func _test_darkness_fields() -> void:
-	# Sektor 8: Dunkelheit kommt aus dem Level; alle Level ab 78 sind dunkel, frühere hell
+	# Sektor 8 und 9: Dunkelheit kommt aus dem Level; alle Level ab 78 sind dunkel, frühere hell
 	var dark_n := 0
 	var bright_ok := true
 	var dir := DirAccess.open("res://data/levels")
@@ -969,12 +969,12 @@ func _test_darkness_fields() -> void:
 		if not f.ends_with(".json"):
 			continue
 		var lv := LevelData.load_file("res://data/levels/" + f)
-		if lv.sector == 8:
+		if lv.sector >= 8:
 			if lv.dark >= 0.5:
 				dark_n += 1
 		elif lv.dark != 0.0:
 			bright_ok = false
-	check(dark_n >= 8 and bright_ok, "Sektor 8: %d dunkle Level, alle anderen hell" % dark_n)
+	check(dark_n >= 8 and bright_ok, "Sektor 8/9: %d dunkle Level, alle anderen hell" % dark_n)
 
 func _test_eject() -> void:
 	var lvl := _lvl()
