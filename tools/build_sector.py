@@ -2,7 +2,7 @@
 Aufruf (Projektwurzel):  python3 tools/build_sector.py 3|4|5 [--dry]
 Ablauf: je Slot K Kandidaten (andere Seeds) -> Bot-Lauf + Metrik (tools/batch_eval.gd) -> bester Kandidat -> Dornenzahl so
 justieren, dass die Metrik dem Ziel des Slots entspricht (monotone Schwierigkeit) -> Pars aus den Bot-Zeiten -> data/levels."""
-import sys, os, json, random, subprocess, copy, concurrent.futures as cf
+import sys, os, json, random, subprocess, copy, glob, concurrent.futures as cf
 sys.path.insert(0, "tools")
 import procgen
 from levelparts import *
@@ -17,9 +17,13 @@ NAMES = {
     4: [("Erste Spule", "First Coil"), ("Abstoßung", "Repulsion"), ("Zwillingspole", "Twin Poles"), ("Pulsschlag", "Heartbeat"), ("Magnetschacht", "Magnet Shaft"),
         ("Feldlinien", "Field Lines"), ("Polwechsel", "Pole Swap"), ("Dynamo", "Dynamo"), ("Rettungsfeld", "Rescue Field"), ("Magnetträger", "Magnet Carriers"),
         ("Magnetmeister", "Magnet Master")],
+    8: [("Dämmerung", "Dusk"), ("Nachtschicht", "Night Shift"), ("Peilung", "Bearing"), ("Funkschatten", "Radio Shadow"), ("Sensorfeld", "Sensor Field"),
+        ("Lichtlos", "Lightless"), ("Echolot", "Echo Sounder"), ("Schattenring", "Shadow Ring"), ("Blindflug", "Blind Flight"), ("Sonarkamm", "Sonar Ridge"),
+        ("Finsternis", "Darkness"), ("Nachtwache", "Night Watch"), ("Schattenwurf", "Shadow Cast"), ("Dunkelkammer", "Darkroom"), ("Mitternacht", "Midnight"),
+        ("Letzte Peilung", "Final Bearing")],
     7: [("Zubringer", "Feeder"), ("Rushhour", "Rush Hour"), ("Kreuzung", "Junction"), ("Stau", "Traffic Jam"), ("Umleitung", "Detour"), ("Hochbahn", "Elevated Line"),
         ("Gleisdreieck", "Rail Triangle"), ("Knotenpunkt", "Hub"), ("Schichtwechsel", "Shift Change"), ("Hauptverkehr", "Peak Traffic"), ("Leitstelle", "Control Center"),
-        ("Fernverkehr", "Long Distance"), ("Güterbahn", "Freight Line"), ("Expresslinie", "Express Line"), ("Rangierbahnhof", "Marshalling Yard"), ("Transitring", "Transit Ring"), ("Zentralknoten", "Central Hub"), ("Abschlussbahnhof", "Terminal Station")],
+        ("Fernverkehr", "Long Distance"), ("Güterbahn", "Freight Line"), ("Expresslinie", "Express Line"), ("Rangierbahnhof", "Marshalling Yard"), ("Transitring", "Transit Ring"), ("Zentralknoten", "Central Hub"), ("Abschlussbahnhof", "Terminal Station"), ("Fernbahnhof", "Main Station"), ("Schienenring", "Rail Ring"), ("Bahnsteig", "Platform")],
     6: [("Gezeitenstrom", "Tidal Current"), ("Schwerelos", "Weightless"), ("Springflut", "Spring Tide"), ("Ebbe", "Ebb"), ("Flut", "Flood"),
         ("Mondbahn", "Moon Orbit"), ("Strudel", "Whirlpool"), ("Brandung", "Surf"), ("Sog", "Undertow"), ("Sturmflut", "Storm Surge"),
         ("Gezeitenmeister", "Tide Master"), ("Mahlstrom", "Maelstrom"), ("Orbitalsog", "Orbital Pull"), ("Tidenkönig", "Tide King"), ("Wasserwelt", "Water World")],
@@ -41,10 +45,19 @@ def cfg(sector, i):
         return {"npads": 6, "jobs": 7, "special": {2: "L", 7: "L", 4: "H", 9: "H"}.get(i), "moving": 0 if i < 6 else 1,
                 "narrow": 0 if i < 5 else (1 if i < 8 else 2), "debris": 0 if i < 8 else (1 if i < 10 else 2), "meteors": 0, "slider": False,
                 "mags": mags, "pulsing": pulsing, "repel_first": i == 2, "stalac": 2, "stalag": 1, "base": 130, "target": 136.0 + 2.5 * (i - 1)}
+    if sector == 8:
+        k = (i - 1) % 11 + 1
+        traffic = [0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2][k - 1]
+        return {"npads": 7, "jobs": 8, "special": {5: "L", 10: "L", 3: "H", 6: "H", 9: "H"}.get(k), "moving": 0,
+                "narrow": 0 if k < 3 else (1 if k < 7 else 2), "debris": 0, "meteors": 0, "slider": False, "traffic": traffic,
+                "mags": 0 if k < 4 else 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0 if k < 6 else 1, "wind": 0 if k < 5 else 1, "grav": 0, "gust": 1,
+                "stalac": 1, "stalag": 0, "base": 170, "target": 0.0, "dark": round(0.6 + 0.03 * k, 2), "radar": round(9.0 - 0.4 * k, 1)}
     if sector == 7 and i >= 12:
-        t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None), 18: (3, "H")}[i]
+        t = {12: (3, None), 13: (3, "H"), 14: (3, None), 15: (3, "L"), 16: (3, "H"), 17: (3, None), 18: (3, "H")}[(i - 12) % 7 + 12]
+        rich = i >= 19                                   # spätere Slots: mehr Mechaniken gleichzeitig (Abstoßung, Pulsieren, Strahl)
+        i = (i - 12) % 7 + 12
         return {"npads": 7, "jobs": 8, "special": t[1], "moving": 0, "narrow": 2, "debris": 0, "meteors": 0, "slider": False, "traffic": t[0],
-                "mags": 1, "pulsing": 0, "mixed": False, "heat": 0, "beams": 0, "wind": 1 if i >= 14 else 0, "grav": 0, "gust": 1,
+                "mags": 2 if rich else 1, "pulsing": 1 if rich else 0, "mixed": rich, "heat": 0, "beams": 1 if rich else 0, "wind": 1 if (i >= 14 or rich) else 0, "grav": 0, "gust": 1,
                 "stalac": 1, "stalag": 0, "base": 160, "target": 0.0}
     if sector == 7:
         traffic = [1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3][i - 1]
@@ -78,8 +91,8 @@ def cfg(sector, i):
     raise ValueError(sector)
 
 
-def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
-    c = cfg(sector, i)
+def make_level(sector, i, variant, spikes=0, pars=None, idx=None, cfgo=None):
+    c = cfgo or cfg(sector, i)
     seed = sector * 1000 + i * 17 + variant * 101
     res = procgen.build(seed, c["npads"], c["special"], c["moving"], c["narrow"], c["stalac"], c["stalag"], dense=c["npads"] >= 7, lanes=c["meteors"], bands=min(c.get("traffic", 0), 2))
     rnd = random.Random(seed + 7)
@@ -156,16 +169,17 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
     if c.get("grav") and len([z for z in zones if z["kind"] == "gravity"]) < max(1, c["grav"] - 1):
         raise RuntimeError("zu wenige Schwerkraftzonen")
     ntraf = 0
-    for y in res.get("bands", []):
-        speed = rnd.choice([40.0, 48.0, 56.0]) * (1 if ntraf % 2 == 0 else -1)
-        ln = 38                                      # Wand bis Wand (Tile 1 bis 38)
-        cars = 3
-        span = (ln + 2) * 16.0 / abs(speed)
+    for ri, rt in enumerate(res.get("routes", [])):
+        speed = rnd.choice([40.0, 48.0, 56.0])
+        pts = [[round(x, 2), round(y, 2)] for (x, y) in rt["pts"]]
+        length = sum(((pts[i + 1][0] - pts[i][0]) ** 2 + (pts[i + 1][1] - pts[i][1]) ** 2) ** 0.5 for i in range(len(pts) - 1)) * 16.0
+        period = (length + 64.0) / speed
+        cars = 3 if length > 600 else 2
         for k in range(cars):
-            movers.append({"kind": "vehicle", "x": 1, "y": y, "w": 2, "h": 1, "dx": ln, "speed": speed, "phase": round(k * span / cars, 2), "tint": ntraf})
+            movers.append({"kind": "vehicle", "path": pts, "w": 2, "h": 1, "speed": speed, "phase": round(k * period / cars, 2), "paint": (ntraf + k) % 5})
         ntraf += 1
     if c.get("traffic") and ntraf < min(c["traffic"], 2):
-        raise RuntimeError("zu wenige Verkehrsbänder")
+        raise RuntimeError("zu wenige Verkehrsrouten")
     import zonefix
     if zonefix.conflicts(zones):
         raise RuntimeError("Kraftzonen überlappen")
@@ -182,12 +196,13 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         def row(p):
             return 2 if p == "exit" else rows_of.get(p)
         cross = 0
-        for yb in res["bands"]:
-            for a_, b_ in legs:
-                ra, rb = row(a_), row(b_)
-                if ra is not None and rb is not None and min(ra, rb) < yb < max(ra, rb):
-                    cross += 1
-        if cross < 3 * len(res["bands"]):
+        for rt in res["routes"]:
+            for yb in rt["hrows"]:
+                for a_, b_ in legs:
+                    ra, rb = row(a_), row(b_)
+                    if ra is not None and rb is not None and min(ra, rb) < yb < max(ra, rb):
+                        cross += 1
+        if cross < 3 * len(res["routes"]):
             raise RuntimeError("Verkehr liegt abseits der Flugrouten")
     if pars:
         for j, p in zip(jobs, pars):
@@ -231,6 +246,10 @@ def make_level(sector, i, variant, spikes=0, pars=None, idx=None):
         pass
     d = {"id": ident, "sector": sector, "index": idx, "name": {"de": NAMES[sector][i - 1][0], "en": NAMES[sector][i - 1][1]},
          "map": g.rows(), "jobs": jobs, "mechanics": mech}
+    if c.get("dark"):
+        d["dark"] = c["dark"]
+        d["radar"] = c.get("radar", 0.0)
+        d["mechanics"] = d["mechanics"] + ["darkness"] + (["radar"] if c.get("radar") else [])
     if movers:
         d["movers"] = movers
     if zones:
@@ -273,6 +292,52 @@ def valid(d, r):
         return False
     fragile = any(j.get("fragile") for j in d["jobs"])
     return r["hull"] >= (99.5 if fragile else 95.0) and r["delivered"] >= r["jobs"] - 1
+
+
+def pad_centers(d):
+    ps = []
+    for y, row in enumerate(d["map"]):
+        x = 0
+        while x < len(row):
+            c = row[x]
+            if c in "123456789FLH":
+                x1 = x
+                while x1 + 1 < len(row) and row[x1 + 1] == c:
+                    x1 += 1
+                ps.append(((x + x1) / 2.0, y))
+                x = x1
+            x += 1
+    for m in d.get("movers", []):
+        if m["kind"] == "pad":
+            ps.append((m["x"] + m["w"] / 2.0, m["y"]))
+    return ps
+
+
+def pad_dist(a, b):
+    """Mittlerer Abstand (Felder) zwischen zwei Pad-Anordnungen; klein = sehen gleich aus."""
+    def one(A, B):
+        return sum(min(abs(x - u) + abs(y - v) for (u, v) in B) for (x, y) in A) / max(1, len(A))
+    return (one(a, b) + one(b, a)) / 2.0
+
+
+MIN_DIST = 2.4          # darunter gelten zwei nahe beieinander liegende Level als zu ähnlich
+MIN_DIST_FAR = 1.5      # für weit entfernte Level (mehr als 8 Level Abstand) genügt ein geringerer Abstand
+
+
+def too_similar(n, pc, others):
+    """Ist der Grundriss (Pad-Mittelpunkte pc) für Level n einem anderen Level zu ähnlich? others = {Levelnummer: Pad-Mittelpunkte}."""
+    return any(pad_dist(pc, o) < (MIN_DIST if abs(m - n) <= 8 else MIN_DIST_FAR) for m, o in others.items())
+
+
+def existing_layouts(skip_sector=None, skip_levels=()):
+    out = {}
+    for f in glob.glob("data/levels/s*.json"):
+        d = json.load(open(f))
+        n = (d["sector"] - 1) * 11 + d["index"]
+        if d["sector"] <= 2 or d["sector"] == skip_sector or n in skip_levels:
+            continue
+        out[n] = pad_centers(d)
+    return out
 
 
 FLOOR_PREV = {3: 113.2}        # Höchster Score des Vorgängersektors (S2-11); für Sektor 4+ aus tools/sector_scores.json
@@ -339,7 +404,18 @@ def main():
             p = write_cand(d, "s%d_%02d_v%d_n0" % (sector, i, v))
             cands[p] = (i, v, d, nsp)
             paths.append(p)
-    print("Kandidaten:", len(paths), flush=True)
+    # Diversität: Kandidaten, deren Plattformen wie in einem anderen Level liegen, entfallen
+    layouts = {}
+    others = existing_layouts(skip_sector=None if extend else sector)
+    similar = 0
+    for p in list(paths):
+        i_, v_, d_, nsp_ = cands[p]
+        pc = pad_centers(d_)
+        layouts[(i_, v_)] = pc
+        if too_similar((sector - 1) * 11 + i_, pc, others):
+            paths.remove(p)
+            similar += 1
+    print("Kandidaten:", len(paths), "(%d wegen ähnlicher Plattformen verworfen)" % similar, flush=True)
     # Vorfilter (schnell, ohne Bot): Wegplanung mit dem Bot-Rand von 7 px muss die ganze Route finden (Korridor ≥ 8)
     pre = run_eval(paths, nobot=True)
     keep = [p for p in paths if pre.get(p) is not None and pre[p]["clear"] >= 8.0]
@@ -358,7 +434,7 @@ def main():
     fl = floor_of(sector)
     ramp = {"floor": fl}
     for i in slots:
-        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0, 7: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
+        ramp[i] = fl + 3.0 * (slots.index(i)) if extend else fl + {3: 20.0, 4: 7.0, 5: 14.0, 6: 14.0, 7: 14.0, 8: 14.0}.get(sector, 18.0) * (i - 1) / 10.0
     print("gültig je Slot:", {i: len(pts[i]) for i in slots}, flush=True)
     plan = None
     for rnd_ in range(4):
@@ -387,6 +463,25 @@ def main():
                 info[(i, (v, n))] = r
         print("Runde %d: Punkte je Slot:" % rnd_, {i: len(pts[i]) for i in slots}, flush=True)
         plan = dp_points(slots, pts, ramp)
+        for _guard in range(30):                           # innerhalb des Sektors dürfen sich zwei Level nicht zu ähnlich sehen
+            if not plan:
+                break
+            bad = None
+            chosen_ = sorted(plan)
+            for x_ in range(len(chosen_)):
+                for y_ in range(x_ + 1, len(chosen_)):
+                    ia, ib = chosen_[x_], chosen_[y_]
+                    la, lb = layouts.get((ia, plan[ia][0])), layouts.get((ib, plan[ib][0]))
+                    if la is not None and lb is not None and pad_dist(la, lb) < MIN_DIST:
+                        bad = ib
+                        break
+                if bad is not None:
+                    break
+            if bad is None:
+                break
+            vb = plan[bad][0]
+            pts[bad] = [q for q in pts[bad] if q[1][0] != vb]
+            plan = dp_points(slots, pts, ramp)
         if plan is not None and len(plan) == len(slots):
             break
     if plan is None:

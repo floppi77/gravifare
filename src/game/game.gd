@@ -32,6 +32,7 @@ var arrive_prev := Vector2.ZERO
 @onready var props: Node2D = $World/Props
 @onready var fx: Node2D = $World/Fx
 @onready var trans: Control = $Trans/Root
+var dark: Control
 var script_inputs: Array = []
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
@@ -83,6 +84,13 @@ func _ready() -> void:
 		_patient_lost({"name": "Mika", "fee": 123.0})
 	if OS.get_cmdline_user_args().has("--debug-medical") and run.actor != null:      # Dev: wartenden Fahrgast als Patient auf der Trage zeigen
 		run.actor.medical = true
+	for ua2 in OS.get_cmdline_user_args():
+		if ua2.begins_with("--dark="):               # Dev: Dunkelheit (und --radar=<s>) in jedem Level ansehen
+			run.level.dark = float(ua2.substr(7))
+			for ub in OS.get_cmdline_user_args():
+				if ub.begins_with("--radar="):
+					run.level.radar = float(ub.substr(8))
+			dark.setup(run, cam)
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--debug-complete"):
@@ -134,6 +142,14 @@ func load_level(path: String) -> void:
 	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
 	gear_on = run.sim.gear_cmd
+	if dark == null:
+		var dl := CanvasLayer.new()
+		dl.layer = 4                                       # über der Spielwelt, unter dem HUD
+		add_child(dl)
+		dark = Control.new()
+		dark.set_script(load("res://src/game/dark_view.gd"))
+		dl.add_child(dark)
+	dark.setup(run, cam)
 	world_tiles.setup(run)
 	props.setup(run)
 	fx.setup(run)

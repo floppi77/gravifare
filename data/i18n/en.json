@@ -208,5 +208,16 @@
  "MSG_FIELD_WIND": "Current! The taxi is swept along",
  "MSG_FIELD_HEAVY": "Gravity zone: everything gets heavier",
  "MSG_FIELD_LIGHT": "Gravity zone: everything gets lighter",
+ "RES_H_TIME": "TIME",
+ "RES_TARGET": "Target ≤ %d s",
+ "RES_H_EARNED": "EARNINGS",
+ "RES_JOBS": "Jobs %d/%d · Extra rides %d",
+ "RES_REPAIR": "Repairs",
+ "RES_TAXIS": "Replacement taxis",
+ "RES_MISSED": "Missed",
+ "RES_H_NET": "RESULT",
+ "RES_H_BALANCE": "BALANCE",
+ "RES_H_SCORE": "SCORE",
+ "RES_BEST_SCORE": "Best %d",
  "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT"
 }

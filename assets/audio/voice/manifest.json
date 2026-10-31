@@ -897,36 +897,36 @@
    "seconds": 4.12
   },
   "de/d0_r67": {
-   "text": "Transitknoten. Neu: Verkehr. Fahrzeuge kreuzen den Raum auf Lichtbahnen, Berührung kostet Hülle.",
-   "seconds": 6.71
+   "text": "Transitknoten. Neu: Verkehr. Fahrzeuge fliegen durch Tunnelöffnungen in den Wänden ein und aus.",
+   "seconds": 7.48
   },
   "de/d0_r68": {
-   "text": "Hochbahn. Der Verkehr rollt auf zwei Ebenen, und ein Patient wartet.",
-   "seconds": 4.9
+   "text": "Knotenpunkt. Die Fahrzeuge knicken ab, wähle deinen Moment. Und ein Patient wartet.",
+   "seconds": 7.41
   },
   "de/d0_r69": {
-   "text": "Gleisdreieck. Die Fahrzeuge kennen ihren Takt, du lernst ihn gleich.",
-   "seconds": 5.4
+   "text": "Schichtwechsel. Der Verkehr wechselt die Spur, die Lebensstation hilft.",
+   "seconds": 4.99
   },
   "de/d0_r70": {
-   "text": "Knotenpunkt. Der Wind weht quer durch die Halle, dazu ein Patient.",
-   "seconds": 5.56
-  },
-  "de/d0_r71": {
-   "text": "Hauptverkehr. Ein Patient wartet zwischen den Fahrzeugen, flieg sanft.",
+   "text": "Leitstelle. Verkehr, Wind und ein Magnet. Die Zentrale schaut zu.",
    "seconds": 5.64
   },
-  "de/d0_r72": {
-   "text": "Leitstelle. Fahrzeuge, Böen und Magnete. Die Zentrale schaut zu.",
-   "seconds": 6.44
+  "de/d0_r71": {
+   "text": "Güterbahn. Ein Patient wartet zwischen den Frachtern, flieg sanft.",
+   "seconds": 5.14
   },
-  "de/d0_r73": {
+  "de/d0_r72": {
    "text": "Expresslinie. Die Fahrzeuge sind heute besonders eilig.",
    "seconds": 4.28
   },
+  "de/d0_r73": {
+   "text": "Transitring. Noch ein Patient, noch ein Takt, du schaffst das.",
+   "seconds": 4.76
+  },
   "de/d0_r74": {
-   "text": "Rangierbahnhof. Eine Lebensstation zum Durchatmen, mitten im Verkehr.",
-   "seconds": 5.4
+   "text": "Zentralknoten. Letzter Knoten, danach wird es dunkel.",
+   "seconds": 6.04
   },
   "de/d0_r75": {
    "text": "Transitring. Noch ein Patient, noch ein Takt, du schaffst das.",
@@ -941,36 +941,36 @@
    "seconds": 6.83
   },
   "de/d0_r78": {
-   "text": "Schattenring. Sensoren und Radar. Funkstille ist keine Option, melde dich.",
-   "seconds": 6.57
+   "text": "Schattenring. Neu: Dunkelheit und Radar. Nur Taxi, Plattformen und Tor leuchten, der Radar-Ping zeigt den Rest.",
+   "seconds": 9.49
   },
   "de/d0_r79": {
-   "text": "Hier ist es dunkel. Schalte im Kopf das Licht an.",
-   "seconds": 3.84
+   "text": "Nachtschicht. Der Radar pingt alle paar Sekunden, merke dir, was du gesehen hast.",
+   "seconds": 5.96
   },
   "de/d0_r80": {
-   "text": "Die Sensoren sehen mehr als du. Vertrau ihnen.",
-   "seconds": 4.02
+   "text": "Peilung. Verkehr in der Dunkelheit, die Fahrzeuge leuchten, und ein Patient wartet.",
+   "seconds": 6.6
   },
   "de/d0_r81": {
-   "text": "Ein Schatten bewegt sich. Wahrscheinlich nur ein Fahrgast.",
-   "seconds": 4.68
+   "text": "Funkschatten. Ein Magnet versteckt sich im Dunkeln, der Radar verrät ihn.",
+   "seconds": 6.17
   },
   "de/d0_r82": {
-   "text": "Der Ring ist still. Zu still, wenn du mich fragst.",
-   "seconds": 3.4
+   "text": "Sensorfeld. Wind, Magnet und Verkehr im Dunkeln. Eine Lebensstation hilft dir.",
+   "seconds": 6.64
   },
   "de/d0_r83": {
-   "text": "Das Radar zeigt ein Objekt: dich. Sehr gut.",
-   "seconds": 4.04
+   "text": "Lichtlos. Plasmastrahlen leuchten nur, wenn sie feuern. Und ein Patient wartet.",
+   "seconds": 7.0
   },
   "de/d0_r84": {
-   "text": "Kein Stress, aber der Ring wird nicht heller.",
-   "seconds": 3.8
+   "text": "Schattenring. Zwei Verkehrsrouten im Dunkeln, der Radar pingt schneller.",
+   "seconds": 4.89
   },
   "de/d0_r85": {
-   "text": "Ein Fahrgast bittet um eine Taschenlampe. Ich fürchte, nein.",
-   "seconds": 5.16
+   "text": "Finsternis. Fast kein Licht mehr. Vertraue dem Radar, Taxi sieben.",
+   "seconds": 8.17
   },
   "de/d0_r86": {
    "text": "Du fliegst wie im Schlaf. Bitte wach bleiben.",
@@ -1157,36 +1157,36 @@
    "seconds": 3.24
   },
   "en/d0_r67": {
-   "text": "Transit Hub. New: traffic. Vehicles cross the hall on light lanes, touching one costs hull.",
-   "seconds": 7.08
+   "text": "Transit Hub. New: traffic. Vehicles fly in and out through tunnel openings in the walls.",
+   "seconds": 7.4
   },
   "en/d0_r68": {
-   "text": "Elevated line. Traffic rolls on two levels, and a patient is waiting.",
-   "seconds": 5.24
-  },
-  "en/d0_r69": {
-   "text": "Rail triangle. The vehicles know their rhythm, you will learn it soon.",
-   "seconds": 5.52
-  },
-  "en/d0_r70": {
-   "text": "Hub. Wind blows across the hall, and there is a patient too.",
-   "seconds": 4.92
-  },
-  "en/d0_r71": {
-   "text": "Peak traffic. A patient waits between the vehicles, fly gently.",
+   "text": "Hub. The vehicles turn off, pick your moment. And a patient is waiting.",
    "seconds": 4.76
   },
-  "en/d0_r72": {
-   "text": "Control center. Vehicles, gusts and magnets. Dispatch is watching.",
-   "seconds": 4.92
+  "en/d0_r69": {
+   "text": "Shift change. The traffic changes lanes, the life station helps.",
+   "seconds": 5.48
   },
-  "en/d0_r73": {
+  "en/d0_r70": {
+   "text": "Control center. Traffic, wind and a magnet. Dispatch is watching.",
+   "seconds": 5.32
+  },
+  "en/d0_r71": {
+   "text": "Freight line. A patient waits between the freighters, fly gently.",
+   "seconds": 4.52
+  },
+  "en/d0_r72": {
    "text": "Express line. The vehicles are in an extra hurry today.",
    "seconds": 3.72
   },
+  "en/d0_r73": {
+   "text": "Transit ring. Another patient, another beat, you can do this.",
+   "seconds": 4.84
+  },
   "en/d0_r74": {
-   "text": "Marshalling yard. A life station to catch your breath, right in the traffic.",
-   "seconds": 5.48
+   "text": "Central hub. Last hub level, after that it gets dark.",
+   "seconds": 4.2
   },
   "en/d0_r75": {
    "text": "Transit ring. Another patient, another beat, you can do this.",
@@ -1201,36 +1201,36 @@
    "seconds": 5.96
   },
   "en/d0_r78": {
-   "text": "Shadow Ring. Sensors and radar. Radio silence is not an option, check in.",
-   "seconds": 7.32
+   "text": "Shadow Ring. New: darkness and radar. Only taxi, platforms and gate are lit, the radar ping shows the rest.",
+   "seconds": 8.2
   },
   "en/d0_r79": {
-   "text": "It is dark here. Turn on the lights in your head.",
-   "seconds": 3.08
+   "text": "Night shift. The radar pings every few seconds, remember what you have seen.",
+   "seconds": 6.57
   },
   "en/d0_r80": {
-   "text": "The sensors see more than you. Trust them.",
-   "seconds": 3.32
+   "text": "Bearing. Traffic in the dark, the vehicles glow, and a patient is waiting.",
+   "seconds": 6.12
   },
   "en/d0_r81": {
-   "text": "A shadow moves. Probably just a passenger.",
-   "seconds": 3.4
+   "text": "Radio shadow. A magnet hides in the dark, the radar gives it away.",
+   "seconds": 4.76
   },
   "en/d0_r82": {
-   "text": "The ring is quiet. Too quiet, if you ask me.",
-   "seconds": 3.72
+   "text": "Sensor field. Wind, magnet and traffic in the dark. A life station helps you.",
+   "seconds": 6.52
   },
   "en/d0_r83": {
-   "text": "Radar shows one object: you. Very good.",
-   "seconds": 4.28
+   "text": "Lightless. Plasma beams only glow when they fire. And a patient is waiting.",
+   "seconds": 5.88
   },
   "en/d0_r84": {
-   "text": "No stress, but the ring is not getting any brighter.",
-   "seconds": 3.24
+   "text": "Shadow ring. Two traffic routes in the dark, the radar pings faster.",
+   "seconds": 5.0
   },
   "en/d0_r85": {
-   "text": "A passenger asks for a flashlight. I am afraid not.",
-   "seconds": 4.2
+   "text": "Darkness. Almost no light left. Trust the radar, Taxi seven.",
+   "seconds": 5.0
   },
   "en/d0_r86": {
    "text": "You fly as if asleep. Please stay awake.",

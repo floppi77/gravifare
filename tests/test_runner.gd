@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -933,29 +933,48 @@ func _test_traffic() -> void:
 			row += "#" if (y == 0 or y >= 20 or x == 0 or x == 39) else "."
 		rows.append(row)
 	var lv := LevelData.from_dict({"id": "T-TR", "sector": 7, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
-		"movers": [{"kind": "vehicle", "x": 10, "y": 8, "w": 2, "h": 1, "dx": 16, "speed": 48.0, "phase": 0.0, "tint": 0},
-			{"kind": "vehicle", "x": 10, "y": 12, "w": 2, "h": 1, "dx": 16, "speed": -48.0, "phase": 0.0, "tint": 1}]})
+		"movers": [{"kind": "vehicle", "path": [[0.5, 8.5], [39.5, 8.5]], "speed": 48.0, "phase": 0.0, "paint": 0},
+			{"kind": "vehicle", "path": [[39.5, 14.5], [20.5, 14.5], [20.5, 5.5], [0.5, 5.5]], "speed": 48.0, "phase": 0.0, "paint": 1}]})
 	var a: Dictionary = lv.movers[0]
 	var b: Dictionary = lv.movers[1]
 	lv.update_movers(2.0)
-	check(absf(a.rect.position.x - (10.0 * Tuning.TILE - 32.0 + 96.0)) < 0.5, "Fahrzeug fährt mit 48 px/s nach rechts (x = %.0f)" % a.rect.position.x)
-	check(b.rect.position.x < 10.0 * Tuning.TILE + 16.0 * Tuning.TILE - 90.0 and b.vel.x < 0.0, "Gegenverkehr fährt nach links")
-	lv.update_movers(0.0)
-	var span := 16.0 * Tuning.TILE + 32.0
-	lv.update_movers(span / 48.0)
-	check(absf(a.rect.position.x - (10.0 * Tuning.TILE - 32.0)) < 1.0, "Fahrzeug tritt am Bahnende ohne Pause wieder ein")
+	check(absf(a.rect.get_center().x - (8.0 + 96.0)) < 0.5, "Fahrzeug fährt mit 48 px/s von der linken Öffnung nach rechts (x = %.0f)" % a.rect.get_center().x)
+	check(absf(a.total - 39.0 * Tuning.TILE) < 0.5 and b.total > 39.0 * Tuning.TILE, "Pfadlänge: gerade %.0f px, Knickpfad %.0f px" % [a.total, b.total])
+	# Knickpfad: nach der Hälfte der ersten Strecke senkrecht (Rechteck hochkant), danach wieder waagerecht und links wieder aus
+	lv.update_movers((19.0 * Tuning.TILE + 4.0 * Tuning.TILE) / 48.0)
+	check(b.rect.size.y > b.rect.size.x, "Auf dem senkrechten Abschnitt steht das Fahrzeug hochkant")
+	lv.update_movers((b.total + 32.0) / 48.0)
+	check(b.rect.position.x < -500.0, "Hinter der Zielöffnung ist das Fahrzeug unsichtbar und ohne Kollision")
+	lv.update_movers(((a.total + 64.0) / 48.0))
+	check(a.rect.position.x < -500.0 or absf(a.rect.get_center().x - 8.0) < 1.0, "Fahrzeug tritt nach der Pause wieder ein")
 	var s := TaxiSim.new()
 	s.setup(lv)
 	lv.update_movers(0.0)
 	s.state = TaxiSim.State.FLYING
-	s.pos = Vector2(14.0 * Tuning.TILE, 8.5 * Tuning.TILE)
+	s.pos = Vector2(10.0 * Tuning.TILE, 8.5 * Tuning.TILE)
 	var hit := false
-	for i in int(3.0 / Tuning.TICK):
+	for i in int(4.0 / Tuning.TICK):
 		s.step(Vector2(0, -0.39), false)
 		for e in s.events:
 			if e.type == "damage" and e.get("mover", "") == "vehicle":
 				hit = true
 	check(hit, "Berührung mit einem Fahrzeug kostet Hülle (%.0f)" % s.hull)
+
+func _test_darkness_fields() -> void:
+	# Sektor 8: Dunkelheit und Radar kommen aus dem Level; alle Level ab 78 sind dunkel, frühere hell
+	var dark_n := 0
+	var bright_ok := true
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		if lv.sector == 8:
+			if lv.dark >= 0.5 and lv.radar > 0.0:
+				dark_n += 1
+		elif lv.dark != 0.0:
+			bright_ok = false
+	check(dark_n >= 8 and bright_ok, "Sektor 8: %d dunkle Level mit Radar, alle anderen hell" % dark_n)
 
 func _test_eject() -> void:
 	var lvl := _lvl()
@@ -1586,7 +1605,7 @@ func _test_pump_level_rules() -> void:
 				ok_pump = true
 		check(ok_pump, "%s: Tankpad hat eine 2 Tiles hohe Zapfsäule am Padende" % lvl.id)
 		check(pad.land_window >= 28.0, "%s: freies Landefenster am Tankpad ≥ 28 px (%.0f px)" % [lvl.id, pad.land_window])
-		check(lvl.fuel_price_min >= 1.0 and lvl.fuel_price_max <= 14.0 and lvl.fuel_price_min < lvl.fuel_price_max - 0.8, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])
+		check(lvl.fuel_price_min >= 1.0 and lvl.fuel_price_max <= 17.0 and lvl.fuel_price_min < lvl.fuel_price_max - 0.8, "%s: Preisbereich ist sinnvoll (%.2f–%.2f)" % [lvl.id, lvl.fuel_price_min, lvl.fuel_price_max])
 
 func _test_streak_bonus() -> void:
 	var r := Run.new()

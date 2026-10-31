@@ -38,6 +38,8 @@ var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 ## je Periode einmal von (x, y) um (dx, dy) Felder in "fall" Sekunden und ist sonst unsichtbar; "warn" Sekunden vorher
 ## blinkt seine Bahn). Bewegung nach der Simulationszeit.
 var movers: Array = []
+var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast schwarz); nur Taxi, Plattformen, Tor und leuchtende Gefahren sind beleuchtet
+var radar := 0.0                 # Sektor 8: Periode des Radar-Pings (s), der das Gelände kurz sichtbar macht; 0 = kein Radar
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 
 static func load_file(path: String) -> LevelData:
@@ -77,6 +79,8 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l._scan_doors(d.get("doors", {}))
 	l._scan_movers(d.get("movers", []))
 	l._scan_zones(d.get("zones", []))
+	l.dark = clampf(float(d.get("dark", 0.0)), 0.0, 1.0)
+	l.radar = maxf(float(d.get("radar", 0.0)), 0.0)
 	l._plan_shelters()
 	l._finish_moving_pads()
 	return l
@@ -272,13 +276,22 @@ func zone_accel(p: Vector2, t: float) -> Vector2:
 					a += d / dist * float(z.k) * (1.0 - pow(dist / float(z.r), 2.0))
 	return a
 
-## Verkehr: Bahn eines Fahrzeugs, in der die Box liegt ({} sonst). Die Bahn gilt etwas breiter als das Fahrzeug.
+## Verkehr: Bahnabschnitt eines Fahrzeugpfads, in dem die Box liegt ({} sonst); "horizontal" sagt, wie der Abschnitt verläuft.
 func vehicle_lane_at(center: Vector2, half: Vector2) -> Dictionary:
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.kind == "vehicle" and Rect2(float(m.x), float(m.y) - 6.0, float(m.ax), float(m.h) + 12.0).intersects(box):
-			return m
+		if m.kind != "vehicle":
+			continue
+		for ln in m.lanes:
+			if (ln.rect as Rect2).intersects(box):
+				return ln
 	return {}
+
+func has_traffic() -> bool:
+	for m in movers:
+		if m.kind == "vehicle":
+			return true
+	return false
 
 func has_meteors() -> bool:
 	for m in movers:
@@ -293,11 +306,13 @@ func _scan_movers(list: Array) -> void:
 	for d in list:
 		var kind := String(d.get("kind", "debris"))
 		var m := {"kind": kind, "w": float(d.get("w", 2)) * Tuning.TILE, "h": float(d.get("h", 1)) * Tuning.TILE,
-			"x": float(d.x) * Tuning.TILE, "y": float(d.y) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
+			"x": float(d.get("x", 0)) * Tuning.TILE, "y": float(d.get("y", 0)) * Tuning.TILE, "ax": float(d.get("dx", 0)) * Tuning.TILE,
 			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
 			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", "")),
 			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0)),
-			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0))}
+			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0)), "paint": int(d.get("paint", d.get("tint", 0)))}
+		if kind == "vehicle":
+			_setup_vehicle_path(m, d)
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
 		if kind == "meteor":
@@ -308,7 +323,7 @@ func _scan_movers(list: Array) -> void:
 			var id: String = m.pad
 			m["h"] = 2.0 * Tuning.TILE
 			m["ay"] = 0.0
-			pads[id] = {"id": id, "x0": m.x, "x1": m.x + m.w, "row": int(d.y), "center": m.x + m.w * 0.5, "fuel": false, "life": false, "moving": true, "dx": 0.0, "dx_step": 0.0}
+			pads[id] = {"id": id, "x0": m.x, "x1": m.x + m.w, "row": int(d.get("y", 0)), "center": m.x + m.w * 0.5, "fuel": false, "life": false, "moving": true, "dx": 0.0, "dx_step": 0.0}
 		m["rect"] = _mover_rect(m, 0.0)
 		m["vel"] = Vector2.ZERO
 		movers.append(m)
@@ -351,15 +366,63 @@ func lane_rect(m: Dictionary) -> Rect2:
 	var x1 := maxf(float(m.x), float(m.x) + float(m.ax)) + float(m.w)
 	return Rect2(x0, float(m.y), x1 - x0, float(m.ay) + float(m.h))
 
-## Fahrzeug (Sektor 7, Verkehr): fährt auf einer Bahn der Länge `dx` Felder ab (x, y) mit `speed` px/s (negativ = nach links), tritt am
-## Ende ohne Pause wieder in die Bahn ein; mehrere Fahrzeuge je Bahn unterscheiden sich in der Phase.
-func _vehicle_rect(m: Dictionary, t: float) -> Rect2:
-	var lane := float(m.ax)
-	var span := lane + float(m.w)
+## Fahrzeug (Sektor 7+, Verkehr): fährt auf einem Pfad ("path": Mittelpunkte in Feldern, meist von einer Wandöffnung zu einer anderen, auch mit
+## Knicken) mit `speed` px/s. Ankunft in der Zielöffnung = unsichtbar bis zum erneuten Eintritt; mehrere Fahrzeuge je Pfad unterscheiden sich in
+## der Phase. (Alt: "x", "y", "dx" = gerade Bahn von Wand zu Wand.)
+func _setup_vehicle_path(m: Dictionary, d: Dictionary) -> void:
+	var pts := PackedVector2Array()
+	if d.has("path"):
+		for p in d.path:
+			pts.append(Vector2(float(p[0]), float(p[1])) * Tuning.TILE)
+	else:
+		var y := float(d.get("y", 0)) + 0.5
+		var x0 := float(d.get("x", 1)) - 0.5
+		var lane := float(d.get("dx", 38))
+		if float(d.get("speed", 50.0)) >= 0.0:
+			pts.append(Vector2(x0, y) * Tuning.TILE)
+			pts.append(Vector2(x0 + lane + 1.0, y) * Tuning.TILE)
+		else:
+			pts.append(Vector2(x0 + lane + 1.0, y) * Tuning.TILE)
+			pts.append(Vector2(x0, y) * Tuning.TILE)
+	m["pts"] = pts
+	var total := 0.0
+	var lanes: Array = []
+	for i in range(pts.size() - 1):
+		total += pts[i].distance_to(pts[i + 1])
+		var r := Rect2(pts[i], Vector2.ZERO).expand(pts[i + 1])
+		var horiz := absf(pts[i + 1].x - pts[i].x) >= absf(pts[i + 1].y - pts[i].y)
+		lanes.append({"rect": r.grow_individual(16.0 if horiz else 8.0, 8.0 if horiz else 16.0, 16.0 if horiz else 8.0, 8.0 if horiz else 16.0), "horizontal": horiz})
+	m["total"] = total
+	m["lanes"] = lanes
+
+## Position und Ausrichtung des Fahrzeugs entlang des Pfads.
+func vehicle_state(m: Dictionary, t: float) -> Dictionary:
 	var sp := absf(float(m.speed))
-	var p := fposmod((t + float(m.phase)) * sp, span)
-	var x := float(m.x) - float(m.w) + p if float(m.speed) >= 0.0 else float(m.x) + lane - p
-	return Rect2(x, float(m.y), float(m.w), float(m.h))
+	var period := float(m.total) + 64.0
+	var s := fposmod((t + float(m.phase)) * sp, period)
+	if s > float(m.total):
+		return {"visible": false}
+	var pts: PackedVector2Array = m.pts
+	var acc := 0.0
+	for i in range(pts.size() - 1):
+		var seg := pts[i].distance_to(pts[i + 1])
+		if s <= acc + seg or i == pts.size() - 2:
+			var dir := (pts[i + 1] - pts[i]).normalized()
+			return {"visible": true, "pos": pts[i] + dir * (s - acc), "dir": dir}
+		acc += seg
+	return {"visible": false}
+
+func _vehicle_rect(m: Dictionary, t: float) -> Rect2:
+	var st := vehicle_state(m, t)
+	if not st.visible:
+		return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
+	var dir: Vector2 = st.dir
+	var w := float(m.w)
+	var h := float(m.h)
+	var c: Vector2 = st.pos
+	if absf(dir.x) >= absf(dir.y):
+		return Rect2(c.x - w * 0.5, c.y - h * 0.5, w, h)
+	return Rect2(c.x - h * 0.5, c.y - w * 0.5, h, w)
 
 ## Plasmastrahl: nur in den ersten `on` Sekunden jeder Periode sichtbar und gefährlich (Rechteck x/y/w/h fest).
 func _mover_rect(m: Dictionary, t: float) -> Rect2:
@@ -394,7 +457,8 @@ func update_movers(t: float, reset := false) -> void:
 		if m.kind == "meteor":
 			m.vel = Vector2(float(m.ax), float(m.ay)) / float(m.fall) if (not reset and r.position.x > OFFSCREEN) else Vector2.ZERO
 		elif m.kind == "vehicle":
-			m.vel = Vector2(float(m.speed), 0.0) if not reset else Vector2.ZERO
+			var vs := vehicle_state(m, t)
+			m.vel = (vs.dir * absf(float(m.speed))) if (vs.visible and not reset) else Vector2.ZERO
 		m.rect = r
 		if m.kind == "pad":
 			var p: Dictionary = pads[m.pad]

@@ -1,0 +1,125 @@
+extends Control
+## Dunkelheit und Radar (Sektor 8): ein Vollbild-Shader dunkelt das Spielfeld ab und lässt Lichtkegel frei – um das Taxi, an Plattformen, am Tor
+## und an leuchtenden Gefahren (Fahrzeuge, Meteoriten, Strahlen, Lavablasen). Das Radar schickt in festen Abständen einen Ring vom Taxi aus, der
+## das Gelände unterwegs kurz sichtbar macht.
+
+const MAX_LIGHTS := 32
+const PING_TIME := 1.6
+const PING_RADIUS := 280.0
+
+var run: Run
+var cam: Camera2D
+var rect: ColorRect
+var mat: ShaderMaterial
+var last_ping := -1
+
+const SHADER := """
+shader_type canvas_item;
+uniform vec2 size = vec2(640.0, 360.0);
+uniform float dark = 0.8;
+uniform vec3 lights[32];
+uniform int n = 0;
+uniform vec3 ping = vec3(0.0);
+uniform float ping_a = 0.0;
+void fragment() {
+	vec2 p = UV * size;
+	float lit = 0.0;
+	for (int i = 0; i < 32; i++) {
+		if (i >= n) { break; }
+		vec3 l = lights[i];
+		float d = length(p - l.xy);
+		lit = max(lit, 1.0 - smoothstep(l.z * 0.3, l.z, d));
+	}
+	float ring = 0.0;
+	if (ping_a > 0.0) {
+		float d = length(p - ping.xy);
+		ring = exp(-pow((d - ping.z) / 10.0, 2.0)) * ping_a;
+		lit = max(lit, ring * 0.92);
+	}
+	float a = dark * (1.0 - lit);
+	vec3 col = vec3(0.01, 0.0, 0.06) + vec3(0.1, 0.8, 1.0) * ring * 0.7;
+	COLOR = vec4(col, max(a, ring * 0.3));
+}
+"""
+
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	rect = ColorRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var sh := Shader.new()
+	sh.code = SHADER
+	mat = ShaderMaterial.new()
+	mat.shader = sh
+	rect.material = mat
+	add_child(rect)
+	visible = false
+
+func setup(r: Run, c: Camera2D) -> void:
+	run = r
+	cam = c
+	last_ping = -1
+	visible = r.level.dark > 0.0
+	if visible:
+		mat.set_shader_parameter("dark", r.level.dark)
+
+func _screen(world: Vector2) -> Vector2:
+	var center := cam.get_screen_center_position() if cam != null else Vector2(320, 180)
+	return world - center + Vector2(320.0, 180.0)
+
+func _process(_d: float) -> void:
+	if run == null or not visible:
+		return
+	var lv := run.level
+	var lights := PackedVector3Array()
+	var tp := _screen(run.sim.pos)
+	lights.append(Vector3(tp.x, tp.y, 72.0 + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
+	for id in lv.pads:
+		var p: Dictionary = lv.pads[id]
+		var c := _screen(Vector2(float(p.center), float(p.row) * Tuning.TILE - 8.0))
+		lights.append(Vector3(c.x, c.y, 38.0))
+	var ex := _screen(lv.exit_rect().get_center())
+	lights.append(Vector3(ex.x, ex.y, 54.0 if run.exit_open else 30.0))
+	for m in lv.movers:
+		if lights.size() >= MAX_LIGHTS - 2:
+			break
+		var r: Rect2 = m.rect
+		if r.position.x < -500.0 or m.kind == "pad":
+			continue
+		if m.kind == "vehicle":
+			var c := _screen(r.get_center())
+			lights.append(Vector3(c.x, c.y, 24.0))
+		elif m.kind == "meteor" or m.kind == "debris":
+			var c := _screen(r.get_center())
+			lights.append(Vector3(c.x, c.y, 24.0 if m.kind == "meteor" else 16.0))
+		elif m.kind == "beam":
+			var c := _screen(r.get_center())
+			lights.append(Vector3(c.x, c.y, maxf(r.size.x, r.size.y) * 0.55 + 12.0))
+	for z in lv.zones:
+		if lights.size() >= MAX_LIGHTS - 1:
+			break
+		if z.kind == "heat" and lv.zone_active(z, run.sim.time):
+			var c := _screen((z.rect as Rect2).get_center())
+			lights.append(Vector3(c.x, c.y, 46.0))
+	var padded := PackedVector3Array(lights)
+	var n := padded.size()
+	while padded.size() < MAX_LIGHTS:
+		padded.append(Vector3.ZERO)
+	mat.set_shader_parameter("lights", padded)
+	mat.set_shader_parameter("n", n)
+	# Radar-Ping
+	var a := 0.0
+	var pr := 0.0
+	if lv.radar > 0.0:
+		var tm := run.sim.time
+		var idx := int(floorf(tm / lv.radar))
+		var ph := tm - float(idx) * lv.radar
+		if idx != last_ping and ph < 0.2:
+			last_ping = idx
+			Sfx.play("radar", -8.0)
+		if ph < PING_TIME:
+			pr = ph / PING_TIME * PING_RADIUS
+			a = 1.0 - ph / PING_TIME
+	mat.set_shader_parameter("ping", Vector3(tp.x, tp.y, pr))
+	mat.set_shader_parameter("ping_a", a)

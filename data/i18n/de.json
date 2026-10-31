@@ -208,5 +208,16 @@
  "MSG_FIELD_WIND": "Strömung! Das Taxi wird mitgerissen",
  "MSG_FIELD_HEAVY": "Schwerkraftzone: alles wird schwerer",
  "MSG_FIELD_LIGHT": "Schwerkraftzone: alles wird leichter",
+ "RES_H_TIME": "ZEIT",
+ "RES_TARGET": "Ziel ≤ %d s",
+ "RES_H_EARNED": "EINNAHMEN",
+ "RES_JOBS": "Aufträge %d/%d · Zusatzfahrten %d",
+ "RES_REPAIR": "Reparatur",
+ "RES_TAXIS": "Ersatztaxis",
+ "RES_MISSED": "Verpasst",
+ "RES_H_NET": "ERGEBNIS",
+ "RES_H_BALANCE": "KONTOSTAND",
+ "RES_H_SCORE": "PUNKTE",
+ "RES_BEST_SCORE": "Best %d",
  "HUD_TAG_FRAGILE": "+ KRANKENTRANSPORT"
 }

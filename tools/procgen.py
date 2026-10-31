@@ -40,6 +40,49 @@ def reachable(g, start, goals):
     return all(t in seen for t in goals)
 
 
+def _rects_hit(ra, rb, margin=1):
+    return any(_rect_hit((r[0] - margin, r[1] + margin, r[2] - margin, r[3] + margin), q) for r in ra for q in rb)
+
+
+def make_routes(rnd, n):
+    """Fahrzeugrouten von einer Wandöffnung zu einer anderen (links/rechts), gerade, mit einem Knick (Z: links rein, rechts raus auf
+    anderer Höhe) oder U-förmig (links rein, links wieder raus). Rückgabe [{"pts": [(x, y)] in Feldern (Mittelpunkte, Enden in der Wand),
+    "rects": reservierte Rechtecke (x0, x1, y0, y1), "hrows": Zeilen der waagerechten Abschnitte}]."""
+    routes = []
+    for _ in range(n):
+        for _t in range(60):
+            kind = rnd.choice(["straight", "z", "u", "z", "u"])
+            mirror = rnd.random() < 0.5
+            y1 = rnd.randint(6, 15)
+            if kind == "straight":
+                pts = [(0.5, y1 + 0.5), (39.5, y1 + 0.5)]
+                rects = [(1, 38, y1 - 1, y1 + 2)]
+                hrows = [y1]
+            else:
+                y2 = rnd.randint(6, 15)
+                if abs(y2 - y1) < 4:
+                    continue
+                xt = rnd.randint(9, 30)
+                lo, hi = min(y1, y2), max(y1, y2)
+                if _rect_hit((xt - 1, xt + 2, lo - 1, hi + 2), (GATE_ZONE[0], GATE_ZONE[1], 1, 8)):
+                    continue
+                if kind == "z":
+                    pts = [(0.5, y1 + 0.5), (xt + 0.5, y1 + 0.5), (xt + 0.5, y2 + 0.5), (39.5, y2 + 0.5)]
+                    rects = [(1, xt + 1, y1 - 1, y1 + 2), (xt - 1, xt + 2, lo - 1, hi + 2), (xt, 38, y2 - 1, y2 + 2)]
+                else:
+                    pts = [(0.5, y1 + 0.5), (xt + 0.5, y1 + 0.5), (xt + 0.5, y2 + 0.5), (0.5, y2 + 0.5)]
+                    rects = [(1, xt + 1, y1 - 1, y1 + 2), (xt - 1, xt + 2, lo - 1, hi + 2), (1, xt + 1, y2 - 1, y2 + 2)]
+                hrows = [y1, y2]
+            if mirror:
+                pts = [(40.0 - x, y) for (x, y) in pts]
+                rects = [(39 - r[1], 39 - r[0], r[2], r[3]) for r in rects]
+            if any(_rects_hit(rects, o["rects"], 1) for o in routes):
+                continue
+            routes.append({"kind": kind, "pts": pts, "rects": rects, "hrows": hrows})
+            break
+    return routes
+
+
 class Island:
     def __init__(self, kind, rx0, rx1, top, bot, px0, px1, ext=0):
         self.kind, self.rx0, self.rx1, self.top, self.bot, self.px0, self.px1, self.ext = kind, rx0, rx1, top, bot, px0, px1, ext
@@ -106,14 +149,10 @@ def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes
             break
     res_rects = [(x, x, 1, FLOOR - 1) for x in reserved]
     # reservierte Verkehrsbänder (Wand bis Wand, Zeilen y-1..y+2 frei von Fels): Fahrzeuge fahren hier durch Öffnungen in den Seitenwänden
-    band_rows = []
-    for _ in range(bands):
-        for _t in range(40):
-            y = rnd.randint(8, 14) if not band_rows else rnd.randint(5, 16)
-            if all(abs(y - o) >= 5 for o in band_rows):
-                band_rows.append(y)
-                break
-    res_rects += [(1, W - 2, y - 1, y + 2) for y in band_rows]
+    routes = make_routes(rnd, bands) if bands else []
+    band_rows = [r["hrows"][0] for r in routes]
+    for r in routes:
+        res_rects += r["rects"]
     # --- Inseln für die übrigen Pads (und Sonderpad)
     want = [str(i) for i in range(2, npads + 1)]
     if special:
@@ -232,7 +271,7 @@ def _try(rnd, npads, special, moving, narrow, stalac, stalag, dense=False, lanes
         return None
     if not reachable(g, start, [t for t in goals if _block_free(g, *t)]) or any(not _block_free(g, *t) for t in goals):
         return None
-    return {"grid": g, "pads": pads, "islands": islands, "moving": mov, "deco": deco, "start": start, "lanes": reserved, "bands": band_rows}
+    return {"grid": g, "pads": pads, "islands": islands, "moving": mov, "deco": deco, "start": start, "lanes": reserved, "bands": band_rows, "routes": routes}
 
 
 # ---------- freie Bahnen und Orte für Hindernisse ----------

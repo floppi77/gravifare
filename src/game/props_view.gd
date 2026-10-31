@@ -65,6 +65,7 @@ func _draw_pads() -> void:
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
 			draw_texture_rect(shelter_tex, shelter, false)
+			_light_shelter(shelter, id)
 			var rx := shelter.get_center().x
 			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
 		var poles: Array = [p.x0 + 2.0, p.x1 - 3.0]
@@ -358,43 +359,46 @@ func _draw_movers() -> void:
 	_draw_movers_main()
 	_draw_vehicle_portals()
 
-## Tunnelöffnungen in den Seitenwänden an den Enden jeder Verkehrsbahn: Fahrzeuge fahren hier ein und aus. Für das Taxi sind sie
+## Tunnelöffnungen in den Seitenwänden an Anfang und Ende jedes Fahrzeugpfads: Fahrzeuge fahren hier ein und aus. Für das Taxi sind sie
 ## nicht betretbar (die Wand bleibt fest). Wird nach den Fahrzeugen gezeichnet und verdeckt so deren Ein- und Austritt.
+const PAINTS := ["candy", "mint", "neon", "night", "gold"]
+var _paint_tex := {}
+
+func _vehicle_tex(i: int) -> Texture2D:
+	var id: String = PAINTS[i % PAINTS.size()]
+	if not _paint_tex.has(id):
+		_paint_tex[id] = load("res://assets/art/taxi_%s.png" % id)
+	return _paint_tex[id]
+
 func _draw_vehicle_portals() -> void:
 	var seen := {}
 	for m in level.movers:
 		if m.kind != "vehicle" or level.movers_ignore:
 			continue
-		var key := "%d,%d,%d" % [int(m.x), int(m.y), int(m.ax)]
+		var pts: PackedVector2Array = m.pts
+		var key := str(pts)
 		if seen.has(key):
 			continue
 		seen[key] = true
-		var tints := [Color("#35e0d2"), Color("#ff6aa0"), Color("#ffd24a"), Color("#8fa8ff")]
-		var col: Color = tints[int(m.tint) % tints.size()]
-		var dir := 1.0 if float(m.speed) >= 0.0 else -1.0
-		var y0 := float(m.y) - 4.0
-		var h := float(m.h) + 12.0
-		var left := Rect2(float(m.x) - T, y0, T, h)
-		var right := Rect2(float(m.x) + float(m.ax), y0, T, h)
+		var col: Color = Color.from_hsv(fmod(0.5 + 0.12 * float(int(m.paint)), 1.0), 0.55, 1.0)
 		for pi in 2:
-			var r := left if pi == 0 else right
-			var entry := (pi == 0) == (dir > 0.0)            # hier fahren die Fahrzeuge ein
+			var p: Vector2 = pts[0] if pi == 0 else pts[pts.size() - 1]
+			var dir: Vector2 = (pts[1] - pts[0]).normalized() if pi == 0 else (pts[pts.size() - 1] - pts[pts.size() - 2]).normalized()
+			var entry := pi == 0
+			# Öffnung sitzt in der Wandspalte (Pfadende liegt in der Wand): senkrecht ±1,5 Felder hoch
+			var r := Rect2(floorf(p.x / T) * T, p.y - T * 0.75, T, T * 1.5)
 			draw_rect(r, Color("#04050c"))
 			draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 1.5), col.darkened(0.2))
 			draw_rect(Rect2(r.position.x, r.end.y - 1.5, r.size.x, 1.5), col.darkened(0.2))
-			var inner := r.position.x + (r.size.x - 1.5 if pi == 0 else 0.0)
+			var inner := r.position.x + (r.size.x - 1.5 if r.position.x < 8.0 else 0.0)
 			draw_rect(Rect2(inner, r.position.y, 1.5, r.size.y), col)
-			# laufende Richtungspfeile im Tunnel
 			for k in 2:
 				var f := fmod(t * 1.4 + float(k) * 0.5, 1.0)
 				var cx := r.position.x + 2.0 + f * (r.size.x - 6.0)
 				var cy := r.get_center().y
-				var d := dir
+				var d := 1.0 if (dir.x > 0.0) == entry else -1.0
 				draw_polyline(PackedVector2Array([Vector2(cx - d * 2.0, cy - 3.0), Vector2(cx + d * 1.5, cy), Vector2(cx - d * 2.0, cy + 3.0)]), Color(col.r, col.g, col.b, 0.7 * (1.0 - absf(f - 0.5) * 1.2)), 1.0)
-			if entry:
-				draw_circle(Vector2(inner + (0.8 if pi == 1 else 0.7), r.get_center().y), 1.2, Color(0.4, 1.0, 0.5, 0.6 + 0.4 * sin(t * 6.0)))
-			else:
-				draw_circle(Vector2(inner + (0.8 if pi == 1 else 0.7), r.get_center().y), 1.2, Color(1.0, 0.4, 0.3, 0.6 + 0.4 * sin(t * 6.0)))
+			draw_circle(Vector2(inner + 0.7, r.get_center().y), 1.2, Color(0.4, 1.0, 0.5, 0.6 + 0.4 * sin(t * 6.0)) if entry else Color(1.0, 0.4, 0.3, 0.6 + 0.4 * sin(t * 6.0)))
 
 func _draw_movers_main() -> void:
 	for m in level.movers:
@@ -437,48 +441,43 @@ func _draw_movers_main() -> void:
 		else:
 			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
 
-## Verkehr: Fahrzeuge gleiten auf Lichtbahnen. Die Bahn ist eine gestrichelte Leuchtlinie mit Richtungspfeilen, das Fahrzeug ein
-## flacher Schweber mit Kuppel, Scheinwerfer vorn, Triebwerksglühen hinten und Unterboden-Leuchten.
+## Verkehr: Fahrzeuge sind kleine Taxis wie das eigene (gleiche Grafik in anderen Lackierungen) mit Triebwerksflamme und Scheinwerferkegel; der Pfad
+## ist eine gestrichelte Leuchtlinie mit Richtungspfeilen. Auf senkrechten Abschnitten stehen die Fahrzeuge hochkant.
 func _draw_vehicle(m: Dictionary) -> void:
-	var r: Rect2 = m.rect
-	var dir := 1.0 if float(m.speed) >= 0.0 else -1.0
-	var lane_y := float(m.y) + float(m.h) * 0.5
-	var lx0 := float(m.x)
-	var lx1 := float(m.x) + float(m.ax)
-	if int(m.tint) == 0 or true:
-		# Lichtbahn (nur einmal je Bahn zeichnen: das Fahrzeug mit Phase 0 übernimmt es)
-		if absf(float(m.phase)) < 0.001:
-			var n := int((lx1 - lx0) / 12.0)
-			for i in n:
-				var xx := lx0 + float(i) * 12.0 + fmod(t * 14.0 * dir, 12.0)
-				if xx < lx0 or xx > lx1:
-					continue
-				draw_line(Vector2(xx, lane_y), Vector2(xx + 4.0, lane_y), Color(0.45, 0.85, 1.0, 0.22), 1.0)
-			for k in 3:
-				var cx := lx0 + (lx1 - lx0) * (float(k) + 0.5) / 3.0
-				draw_polyline(PackedVector2Array([Vector2(cx - dir * 2.5, lane_y - 2.5), Vector2(cx + dir * 1.5, lane_y), Vector2(cx - dir * 2.5, lane_y + 2.5)]), Color(0.5, 0.9, 1.0, 0.3), 1.0)
-	var tints := [Color("#35e0d2"), Color("#ff6aa0"), Color("#ffd24a"), Color("#8fa8ff")]
-	var body: Color = tints[int(m.tint) % tints.size()]
-	var c := r.get_center()
-	var w := r.size.x
-	# Unterboden-Leuchten und Triebwerksglühen hinten
-	draw_rect(Rect2(r.position.x + 2.0, r.end.y - 1.2, w - 4.0, 1.6), Color(body.r, body.g, body.b, 0.35 + 0.2 * sin(t * 8.0)))
-	var back := Vector2(c.x - dir * (w * 0.5), c.y + 0.5)
+	var pts: PackedVector2Array = m.pts
+	var col: Color = Color.from_hsv(fmod(0.5 + 0.12 * float(int(m.paint)), 1.0), 0.55, 1.0)
+	# Leuchtpfad (nur beim Fahrzeug mit Phase 0 je Pfad)
+	if absf(float(m.phase)) < 0.001:
+		for i in range(pts.size() - 1):
+			var a0: Vector2 = pts[i]
+			var a1: Vector2 = pts[i + 1]
+			var seg := a1 - a0
+			var ln := seg.length()
+			var dir := seg / maxf(ln, 0.001)
+			var n := int(ln / 12.0)
+			for k in n:
+				var u := fmod(float(k) * 12.0 + t * 14.0, ln)
+				draw_line(a0 + dir * u, a0 + dir * minf(u + 4.0, ln), Color(0.45, 0.85, 1.0, 0.2), 1.0)
+			var mid := a0 + seg * 0.5
+			var perp := Vector2(-dir.y, dir.x)
+			draw_polyline(PackedVector2Array([mid - dir * 3.0 + perp * 2.5, mid + dir * 1.5, mid - dir * 3.0 - perp * 2.5]), Color(0.5, 0.9, 1.0, 0.3), 1.0)
+	var st := level.vehicle_state(m, level.clock)
+	if not st.visible:
+		return
+	var c: Vector2 = st.pos
+	var dir: Vector2 = st.dir
+	var tex := _vehicle_tex(int(m.paint))
+	var ang := dir.angle() if dir.x >= 0.0 else dir.angle() + PI          # Fahrtrichtung links: Sprite gespiegelt statt auf dem Kopf
+	var flip := -1.0 if dir.x < -0.01 else 1.0
+	# Triebwerksflamme hinten und Scheinwerferkegel vorn (im gedrehten Koordinatensystem)
+	draw_set_transform(c, ang, Vector2(1.0, 1.0))
+	var fwd := 1.0 if dir.x >= 0.0 else -1.0
 	for i in 4:
 		var f := float(i + 1) / 4.0
-		draw_circle(back - Vector2(dir * f * 8.0, 0.0), (1.0 - f) * 2.4 + 0.5, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))
-	# Karosserie
-	draw_rect(Rect2(r.position.x, r.position.y + 3.0, w, r.size.y - 5.0), Color("#1a1d3a"))
-	draw_rect(Rect2(r.position.x + 0.8, r.position.y + 3.6, w - 1.6, r.size.y - 6.2), body.darkened(0.15))
-	draw_rect(Rect2(r.position.x + 0.8, r.position.y + 3.6, w - 1.6, 1.4), body.lightened(0.35))
-	# Kuppel
-	var dx0 := c.x - 4.5 + dir * 1.5
-	draw_colored_polygon(PackedVector2Array([Vector2(dx0, r.position.y + 3.4), Vector2(dx0 + 2.0, r.position.y + 0.6), Vector2(dx0 + 7.0, r.position.y + 0.6), Vector2(dx0 + 9.0, r.position.y + 3.4)]), Color(0.7, 0.92, 1.0, 0.85))
-	# Scheinwerfer vorn
-	var front := Vector2(c.x + dir * (w * 0.5), c.y + 1.0)
-	draw_circle(front, 1.5, Color(1.0, 0.98, 0.8))
-	draw_colored_polygon(PackedVector2Array([front, front + Vector2(dir * 9.0, -3.0), front + Vector2(dir * 9.0, 3.5)]), Color(1.0, 0.98, 0.7, 0.14))
-	draw_rect(r, Color(1.0, 0.85, 0.3, 0.55), false, 0.7)       # Warnrand: Berührung kostet Hülle
+		draw_circle(Vector2(-fwd * (14.0 + f * 7.0), 3.0 + sin(t * 20.0 + float(i)) * 0.6), (1.0 - f) * 2.2 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))
+	draw_colored_polygon(PackedVector2Array([Vector2(fwd * 15.0, 0.0), Vector2(fwd * 30.0, -5.0), Vector2(fwd * 30.0, 6.0)]), Color(1.0, 0.98, 0.7, 0.12))
+	draw_texture_rect(tex, Rect2(-16.0 if flip > 0.0 else 16.0, -10.0, 32.0 * flip, 20.0), false)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 ## Plasmastrahl: zwei Emitter an den Enden; vor dem Einschalten flackert eine dünne Ladelinie, im Takt brennt ein weiß-orangener
 ## Strahl mit Glühen und zuckenden Blitzen.
@@ -567,6 +566,32 @@ func _draw_meteor(m: Dictionary) -> void:
 		draw_circle(cp + Vector2(-0.4, -0.4), 0.6, Color(0.55, 0.47, 0.5, 0.8))
 	pts.append(pts[0])
 	draw_polyline(pts, Color(1.0, 0.55, 0.2, 0.9), 1.0)
+
+## Beleuchtete Wartehütte: warmes Fensterlicht, Halo und ein Lichtfleck auf der Plattform. Wartet dort ein Fahrgast, leuchtet sie heller
+## und flackert leicht; sonst brennt ein gedämpftes Licht.
+func _light_shelter(sh: Rect2, id: String) -> void:
+	var waiting := false
+	if run.actor != null and String(run.actor.pad.id) == id and run.actor.state in [PassengerActor.S.WAITING, PassengerActor.S.EMERGING, PassengerActor.S.TO_TAXI]:
+		waiting = true
+	for ex in run.extras:
+		if String(ex.job.from) == id and int(ex.state) == Run.ES.WAIT:
+			waiting = true
+	var k := 1.0 if waiting else 0.55
+	var fl := 1.0 + (0.06 * sin(t * 9.0 + sh.position.x) if waiting else 0.0)
+	var c := sh.get_center()
+	# Halo (weiche Scheiben)
+	for i in 6:
+		var f := float(i + 1) / 6.0
+		draw_circle(c + Vector2(0.0, 1.0), 6.0 + 22.0 * f, Color(1.0, 0.8, 0.4, 0.06 * k * (1.0 - f * 0.55) * fl))
+	# Fensterlicht (die beiden Scheiben links und rechts der Tür)
+	var win := Color(1.0, 0.86, 0.45, 0.62 * k * fl)
+	draw_rect(Rect2(sh.position.x + sh.size.x * 0.08, sh.position.y + sh.size.y * 0.34, sh.size.x * 0.24, sh.size.y * 0.38), win)
+	draw_rect(Rect2(sh.position.x + sh.size.x * 0.68, sh.position.y + sh.size.y * 0.34, sh.size.x * 0.24, sh.size.y * 0.38), win)
+	# Lichtfleck auf der Plattform vor der Tür
+	var floor_y := sh.end.y
+	for i in 3:
+		var f := 1.0 - float(i) * 0.3
+		draw_rect(Rect2(c.x - 9.0 * f, floor_y - 0.8 + float(i) * 0.35, 18.0 * f, 1.0), Color(1.0, 0.85, 0.45, 0.22 * k * fl))
 
 ## Krankenhaus-Plattform: weißes Schild mit rotem Kreuz über dem Unterstand und ein rot blinkendes Rundumlicht.
 func _draw_hospital_sign(p: Dictionary, y: float) -> void:

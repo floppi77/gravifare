@@ -223,32 +223,73 @@ func _draw_patient_lost() -> void:
 ## Ergebnisansicht nach dem Level: bleibt stehen, bis der Spieler bestätigt (Enter/A).
 func _draw_result() -> void:
 	var m: Dictionary = result.medals
-	var pw := 420.0
-	var ph := 166.0
-	var px := size.x * 0.5 - pw * 0.5
-	var py := 62.0
-	draw_rect(Rect2(px - 1, py - 1, pw + 2, ph + 2), Color("#0c0f24"))
-	draw_rect(Rect2(px, py, pw, ph), Color(0.06, 0.08, 0.2, 0.93))
-	draw_rect(Rect2(px, py, pw, ph), Color("#3a4580"), false, 0.8)
 	var ui := Fonts.ui
-	draw_string(font, Vector2(px, py + 17), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, pw, 14, Color("#5dff9a"))
-	var t_line := tr("RES_TIME") % [int(result.time), int(result.target)]
-	if float(result.best) > 0.0:
-		t_line += "   " + (tr("RES_NEW_BEST") if float(result.time) < float(result.best) else tr("RES_BEST") % int(result.best))
-	draw_string(ui, Vector2(px + 14, py + 36), t_line, HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#c9cfee"))
-	draw_string(ui, Vector2(px + 14, py + 51), tr("RES_EARNED") % [int(result.earned), int(result.get("delivered", 0)), int(result.get("jobs", 0)), int(result.get("extras", 0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#ffe14a"))
-	draw_string(ui, Vector2(px + 14, py + 66), tr("RES_DEDUCT") % [int(result.get("repair", 0.0)), int(result.get("taxi_fees", 0.0)), int(result.get("missed_fees", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#ff9a7a"))
-	var net := float(result.get("net", 0.0))
-	draw_string(ui, Vector2(px + 14, py + 84), tr("RES_NET") % [int(net), int(result.get("balance", 0.0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 11, Color("#5dff9a") if net >= 0.0 else Color("#ff6a4a"))
-	draw_string(ui, Vector2(px + 14, py + 99), tr("RES_SCORE") % [int(result.get("score", 0)), int(result.get("best_score", 0))], HORIZONTAL_ALIGNMENT_LEFT, pw - 28, 10, Color("#c4d0ff"))
+	var pw := 384.0
+	var ph := 236.0
+	var px := size.x * 0.5 - pw * 0.5
+	var py := size.y * 0.5 - ph * 0.5
+	# Tafel mit Doppelrand und Kopfband
+	draw_rect(Rect2(px - 3, py - 3, pw + 6, ph + 6), Color(0.02, 0.03, 0.09, 0.7))
+	draw_rect(Rect2(px - 1, py - 1, pw + 2, ph + 2), Color("#0c0f24"))
+	draw_rect(Rect2(px, py, pw, ph), Color(0.06, 0.08, 0.2, 0.96))
+	draw_rect(Rect2(px, py, pw, 38.0), Color(0.1, 0.22, 0.2, 0.95))
+	draw_rect(Rect2(px, py + 38.0, pw, 1.0), Color("#5dff9a"))
+	draw_rect(Rect2(px, py, pw, ph), Color("#3a4580"), false, 0.8)
+	draw_string(font, Vector2(px, py + 19.0), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#5dff9a"))
+	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
+	draw_string(ui, Vector2(px, py + 33.0), "Level %d · %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
+	# Medaillen als drei Karten
 	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
+	var cw := 112.0
+	var gap := (pw - 28.0 - cw * 3.0) / 2.0
 	for i in items.size():
-		var x := px + 14.0 + i * 130.0
+		var cx := px + 14.0 + float(i) * (cw + gap)
 		var got: bool = m[items[i][0]]
-		var col := Color("#ffd24a") if got else Color("#5a628f")
-		_star(Vector2(x + 7, py + 120), 7.0, col, got)
-		draw_string(ui, Vector2(x + 19, py + 124), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, col)
-	draw_string(ui, Vector2(px, py + ph - 12), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#a9b8ff"))
+		var edge := Color("#ffd24a") if got else Color("#3a4580")
+		draw_rect(Rect2(cx, py + 48.0, cw, 34.0), Color(0.12, 0.14, 0.3, 0.9) if got else Color(0.07, 0.09, 0.2, 0.9))
+		draw_rect(Rect2(cx, py + 48.0, cw, 34.0), edge, false, 1.0 if got else 0.7)
+		_star(Vector2(cx + 20.0, py + 65.0), 9.0, Color("#ffd24a") if got else Color("#4a5280"), got)
+		draw_string(ui, Vector2(cx + 36.0, py + 69.0), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, cw - 40.0, 11, Color("#ffe9a0") if got else Color("#6a729f"))
+	# linke Spalte: Zeit mit Balken, rechte Spalte: Einnahmen und Abzüge
+	var lx := px + 16.0
+	var rx := px + pw * 0.5 + 8.0
+	var colw := pw * 0.5 - 24.0
+	draw_string(ui, Vector2(lx, py + 100.0), tr("RES_H_TIME"), HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#7c86bb"))
+	var t_ok := float(result.time) <= float(result.target)
+	draw_string(font, Vector2(lx, py + 120.0), "%d s" % int(result.time), HORIZONTAL_ALIGNMENT_LEFT, colw, 18, Color("#5dff9a") if t_ok else Color("#ff9a7a"))
+	var bar_y := py + 128.0
+	var frac := clampf(float(result.time) / maxf(float(result.target) * 1.5, 1.0), 0.0, 1.0)
+	draw_rect(Rect2(lx, bar_y, colw, 5.0), Color("#232a52"))
+	draw_rect(Rect2(lx, bar_y, colw * frac, 5.0), Color("#5dff9a") if t_ok else Color("#ff9a7a"))
+	var tx := lx + colw * (1.0 / 1.5)                              # Zeitziel-Marke bei 100 %
+	draw_rect(Rect2(tx - 0.5, bar_y - 3.0, 1.5, 11.0), Color.WHITE)
+	draw_string(ui, Vector2(lx, py + 148.0), tr("RES_TARGET") % int(result.target), HORIZONTAL_ALIGNMENT_LEFT, colw, 9, Color("#a9b8ff"))
+	var best_line := tr("RES_NEW_BEST") if (float(result.best) <= 0.0 or float(result.time) < float(result.best)) else tr("RES_BEST") % int(result.best)
+	draw_string(ui, Vector2(lx, py + 161.0), best_line, HORIZONTAL_ALIGNMENT_LEFT, colw, 9, Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else Color("#8a93c9"))
+	draw_rect(Rect2(px + pw * 0.5 - 0.5, py + 92.0, 1.0, 76.0), Color("#232a52"))
+	draw_string(ui, Vector2(rx, py + 100.0), tr("RES_H_EARNED"), HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#7c86bb"))
+	draw_string(font, Vector2(rx, py + 120.0), "¢ %d" % int(result.earned), HORIZONTAL_ALIGNMENT_LEFT, colw, 18, Color("#ffe14a"))
+	draw_string(ui, Vector2(rx, py + 133.0), tr("RES_JOBS") % [int(result.get("delivered", 0)), int(result.get("jobs", 0)), int(result.get("extras", 0))], HORIZONTAL_ALIGNMENT_LEFT, colw, 9, Color("#a9b8ff"))
+	var rows := [[tr("RES_REPAIR"), float(result.get("repair", 0.0))], [tr("RES_TAXIS"), float(result.get("taxi_fees", 0.0))], [tr("RES_MISSED"), float(result.get("missed_fees", 0.0))]]
+	for i in rows.size():
+		var yy := py + 146.0 + float(i) * 10.0
+		var amt: float = rows[i][1]
+		var rc := Color("#ff9a7a") if amt > 0.0 else Color("#5a628f")
+		draw_string(ui, Vector2(rx, yy), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#8a93c9"))
+		draw_string(ui, Vector2(rx, yy), "−¢%d" % int(amt), HORIZONTAL_ALIGNMENT_RIGHT, colw, 8, rc)
+	# Ergebnisband: Netto und Kontostand, Punkte
+	var net := float(result.get("net", 0.0))
+	draw_rect(Rect2(px + 12.0, py + 176.0, pw - 24.0, 24.0), Color(0.1, 0.14, 0.3, 0.9))
+	draw_rect(Rect2(px + 12.0, py + 176.0, pw - 24.0, 24.0), Color("#3a4580"), false, 0.7)
+	draw_string(ui, Vector2(px + 20.0, py + 186.0), tr("RES_H_NET"), HORIZONTAL_ALIGNMENT_LEFT, 80.0, 8, Color("#7c86bb"))
+	draw_string(font, Vector2(px + 20.0, py + 197.0), "%s¢ %d" % ["+" if net >= 0.0 else "−", int(absf(net))], HORIZONTAL_ALIGNMENT_LEFT, 120.0, 12, Color("#5dff9a") if net >= 0.0 else Color("#ff6a4a"))
+	draw_string(ui, Vector2(px + 140.0, py + 186.0), tr("RES_H_BALANCE"), HORIZONTAL_ALIGNMENT_LEFT, 90.0, 8, Color("#7c86bb"))
+	draw_string(font, Vector2(px + 140.0, py + 197.0), "¢ %d" % int(result.get("balance", 0.0)), HORIZONTAL_ALIGNMENT_LEFT, 110.0, 12, Color("#ffe14a"))
+	draw_string(ui, Vector2(px + 260.0, py + 186.0), tr("RES_H_SCORE"), HORIZONTAL_ALIGNMENT_LEFT, 100.0, 8, Color("#7c86bb"))
+	draw_string(font, Vector2(px + 260.0, py + 197.0), "%d" % int(result.get("score", 0)), HORIZONTAL_ALIGNMENT_LEFT, 70.0, 12, Color("#c4d0ff"))
+	draw_string(ui, Vector2(px + 300.0, py + 197.0), tr("RES_BEST_SCORE") % int(result.get("best_score", 0)), HORIZONTAL_ALIGNMENT_LEFT, 80.0, 8, Color("#8a93c9"))
+	var blink := 0.65 + 0.35 * sin(result_age * 4.0)
+	draw_string(ui, Vector2(px, py + ph - 10.0), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color(0.66, 0.72, 1.0, blink))
 
 ## Fünfzackiger Stern (Level-Abschluss-Medaille): gefüllt in Gold, wenn erreicht, sonst nur als dunkle Silhouette.
 func _star(c: Vector2, r: float, col: Color, filled: bool) -> void:
