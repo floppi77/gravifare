@@ -400,3 +400,7 @@ Zusätzlich zu den Nachträgen oben: **frei belegbare Steuerung** (Tastatur + Ga
 ## P) Nachträge Runde 13
 - Sektor 3 „Schrottgürtel“ (Level 23–33): **Trümmer** (bewegliche Brocken, Schaden 15) und **fahrende Landeplattformen** (Schiene, ≈ 13 px/s), fünf Passagierpads, Lebens-Stationen in Level 25 und 30. Der Bot weicht Trümmern aus und folgt fahrenden Pads. Details: DESIGN.md.
 - Der Schrei beim Rauswerfen ging verloren, weil Ereignisse außerhalb von `Run.step()` vor dem Auslesen gelöscht wurden – jetzt gepuffert (`pending_log`).
+
+## Q) Nachträge Runde 15
+- Hintergründe sind ganze Bilder `assets/art/bg_sN.png` (nicht mehr drei Ebenen); Logo `assets/art/logo.png`. Die Generator-Skripte für Platzhalter-Ebenen wurden entfernt.
+- Neue Mechaniken: zerbrechliche Fahrgäste (`fragile`), Meteoritenschauer (`meteor`), Zonen (`zones`: wind, gravity, magnet). Sektor 3 und 4 sind gebaut (`tools/make_s3.py`, `tools/make_s4.py`); Bot kompensiert Zonen und weicht Meteoriten aus.

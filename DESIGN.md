@@ -152,7 +152,7 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Fahrende Pads**: Fläche, Landefenster, Wartepunkt und Unterstand fahren mit; gelandete Taxis und wartende/aussteigende Fahrgäste fahren mit (Position und Laufziel werden je Tick verschoben). Die Landegeschwindigkeit zählt **relativ zur Plattform**; beim Abheben übernimmt das Taxi ihr Tempo. Höchsttempo der Plattformen bewusst klein (≈ 13 px/s: 2 Tiles Hub, 16 s Takt).
 - **Planung und Bot**: Die statische Wegplanung ignoriert Trümmer; fahrende Pads belegen ihren ganzen Fahrweg als feste Fläche. Der Bot sagt Trümmer im Ankunftszeitfenster voraus (schwebt, wartet), weicht Hindernissen aus, die auf ihn zukommen, und folgt beim Landeanflug dem Pad (Mitnahme-Geschwindigkeit als Vorsteuerung).
 - **Obergrenzen** ab Level 23: fünf Passagierpads (siehe LEVELS.md). Lebens-Stationen in Level 25 und 30.
-- **Verschoben**: Fahrgasttyp „zerbrechlich“ und Zufallsereignis „Meteoritenschauer“ (waren für Sektor 3 notiert) folgen mit den nächsten Sektoren.
+- Fahrgasttyp „zerbrechlich“, Meteoritenschauer und Schieber kamen in Runde 15 hinzu (siehe unten).
 
 ## Runde 14: HUD-Streifen, Sektor-Hintergründe, schmalere Pads
 - **HUD nur in den Randstreifen**: oben auf der Felsreihe 0 (y 0–16: Tank, Hülle, Credits, Leben, Serie, Spritpreis, „Nr/99 Name“, Fortschritt, Landeampel als drei dünne Balken; x 296–344 bleibt für das Torschild frei), unten unter der Bodenreihe (y 337–360: Auftragszeile mit Preis, darunter Steuerungs-/Tutorialhinweis links und Untertitel/Pflicht-Erinnerung rechts). Das Spielfeld dazwischen bleibt frei von UI-Überlappung; nur kurze Meldungen („Funkruf …“) erscheinen vorübergehend mittig.
@@ -160,3 +160,11 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Mindest-Landefenster**: bis Level 27 mindestens 34 px (Pads ab 5 Tiles), ab Level 28 darf es auf 18 px sinken (Pads mit 4 Tiles). Sektor 3 nutzt ab Level 28 schmale Pads.
 - **Trümmer** bewegen sich je Brocken unterschiedlich schnell und etwas schneller als zuvor (Perioden ≈ 5–9 s); fahrende Pads haben je Plattform eigenes Tempo (bis ≈ 20 px/s).
 - **Bot (Mover)**: prüft seine Bahn (Anfahrt auf die Wunschgeschwindigkeit) gegen die vorhergesagten Hindernisse und weicht in freie Richtungen aus; plant nach dem Warten neu.
+
+## Runde 15: Bilder, zerbrechlich, Meteoriten, Schieber, Zonen, Sektor 4
+- **Hintergründe**: je Sektor ein extern erstelltes Bild `assets/art/bg_sN.png` (1920×1080), gezeichnet 1,06-fach mit 5 % Parallax und je Sektor abgedunkelt (`Backdrop.DIM`); Zuordnung und Abdunklung in `docs/HINTERGRUENDE.md`. Das Logo (`assets/art/logo.png`) ersetzt die Textüberschrift im Hauptmenü.
+- **Zerbrechlicher Fahrgast** (Job-Flag `fragile`, +25 % Fahrpreis): jede Beschädigung an Bord (Aufprall, Trümmer, Dornen …) beendet die Fahrt – Fahrgast zerspringt (Scherben), Auftrag gilt als verpasst (`Run._fragile_break`). HUD-Marke „◇ ZERBRECHLICH“. In S3-05, S3-08 und S3-10.
+- **Meteoritenschauer** (Mover `meteor`: Startpunkt, Fallstrecke dx/dy, `fall`, `period`, `phase`, `warn`): fällt je Periode einmal, sonst unsichtbar; 2 s vorher blinkt die Bahn und es gibt Warnton/Meldung (`meteor_warn`). Schaden 20, der Aufprall überträgt nur 30 % der Fallgeschwindigkeit (streift). Der Bot weicht aus (`LevelData.meteor_threat`): bedrohte Bahn seitlich verlassen, nicht hineinfliegen. In S3-05, S3-07, S3-09, S3-10, S3-11.
+- **Schieber** (großer Block, Quetschung 30) in S3-11 (Kreuzung über Pad 3).
+- **Zonen-Engine** (JSON `zones`, `LevelData.zone_accel`): `wind` (Strömung), `gravity` (Schwerkraftfaktor), `magnet` (Kreis, `k` > 0 zieht, < 0 stößt ab, linear abfallend); optional `period`/`on`/`phase` (Pulsieren). `TaxiSim` addiert die Beschleunigung, der Bot gleicht sie aus (Vorsteuerung). Zonen zählen als Gefahr (je 2) in der Metrik. Wind und Schwerkraft sind implementiert und gezeichnet, aber noch in keinem Level genutzt (Sektor 6).
+- **Sektor 4 „Magnetfeld“** (Level 34–44): sechs Passagierpads, sieben Aufträge, Magnetzonen (zeitweise schaltend), Dornen unter den Ablagen; Lebens-Stationen in 35 und 40.
