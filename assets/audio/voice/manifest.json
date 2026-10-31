@@ -1575,6 +1575,14 @@
   "en/d0_r54": {
    "text": "Solstice. The forge is almost done. Stay cool, Taxi seven.",
    "seconds": 5.16
+  },
+  "de/d0_patient_lost": {
+   "text": "Patient verloren. Das wird teuer.",
+   "seconds": 3.48
+  },
+  "en/d0_patient_lost": {
+   "text": "Patient lost. That will be expensive.",
+   "seconds": 3.32
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

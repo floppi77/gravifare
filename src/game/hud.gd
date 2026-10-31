@@ -10,6 +10,11 @@ var sub_t := 0.0
 var paused := false
 var game_over := false
 var price_flash := 0.0
+var lost_t := 0.0                # Restzeit der „Patient verloren“-Anzeige
+var lost_age := 99.0
+var lost_name := ""
+var lost_fee := 0
+const LOST_TOTAL := 4.6
 var hint_text := ""
 var hint_t := 0.0
 var result := {}
@@ -25,6 +30,13 @@ func flash_message(text: String, seconds := 2.0) -> void:
 	message = text
 	message_t = seconds
 
+## Krankenpatient verloren: roter Blitz, EKG-Monitor mit Nulllinie, Name und Strafbetrag.
+func patient_lost(pname: String, fee: int) -> void:
+	lost_name = pname
+	lost_fee = fee
+	lost_t = LOST_TOTAL
+	lost_age = 0.0
+
 func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
 	if not Settings.values.subtitles:
 		return
@@ -34,6 +46,8 @@ func subtitle(speaker: String, text: String, seconds := 2.4) -> void:
 
 func _process(delta: float) -> void:
 	message_t = maxf(0.0, message_t - delta)
+	lost_t = maxf(0.0, lost_t - delta)
+	lost_age += delta
 	price_flash = maxf(0.0, price_flash - delta * 1.6)
 	if not result.is_empty():
 		result_age += delta
@@ -157,10 +171,55 @@ func _draw() -> void:
 		draw_string(font, Vector2(0, size.y * 0.45 + 16), tr("HUD_LAST_LIFE") if Flow.lives <= 1 else tr("HUD_LIFE_LOST") % (Flow.lives - 1), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.COMPLETE and result.is_empty():
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#5dff9a"))
+	if lost_t > 0.0:
+		_draw_patient_lost()
 	if run.result == Run.Result.COMPLETE and not result.is_empty():
 		_draw_result()
 	if paused:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
+
+## „Patient verloren“: roter Vollbild-Blitz und pulsierender Rand, mittig ein EKG-Monitor. Der Puls schlägt dreimal, wird
+## schwächer und geht in die Nulllinie über (dazu der Dauerton); darunter Name und Strafe.
+func _draw_patient_lost() -> void:
+	var a := lost_age
+	var fade := minf(1.0, a / 0.15) * clampf((LOST_TOTAL - a) / 0.7, 0.0, 1.0)
+	var calm: bool = Settings.values.reduce_motion
+	# Vollbild: Blitz am Anfang, danach ein pulsierender roter Rand
+	var flash := 0.0 if calm else clampf(1.0 - a / 0.5, 0.0, 1.0) * 0.45
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.9, 0.05, 0.08, flash))
+	var pulse := 0.5 + 0.5 * sin(a * 5.0)
+	for i in 6:
+		var m := 4.0 + float(i) * 9.0
+		var al := (0.20 - 0.03 * float(i)) * fade * (0.7 + 0.3 * pulse)
+		draw_rect(Rect2(m, m, size.x - m * 2.0, size.y - m * 2.0), Color(0.85, 0.05, 0.1, al), false, 9.0)
+	# Monitor
+	var pw := 300.0
+	var ph := 92.0
+	var px := size.x * 0.5 - pw * 0.5
+	var py := 96.0 - (1.0 - minf(1.0, a / 0.25)) * 14.0
+	draw_rect(Rect2(px - 2, py - 2, pw + 4, ph + 4), Color(0.02, 0.0, 0.02, 0.9 * fade))
+	draw_rect(Rect2(px, py, pw, ph), Color(0.07, 0.01, 0.03, 0.92 * fade))
+	draw_rect(Rect2(px, py, pw, ph), Color(0.9, 0.15, 0.2, fade), false, 1.0)
+	draw_string(font, Vector2(px, py + 14.0), tr("HUD_PATIENT_LOST"), HORIZONTAL_ALIGNMENT_CENTER, pw, 14, Color(1.0, 0.35, 0.4, fade))
+	# EKG-Spur
+	var ty := py + 44.0
+	var tx0 := px + 10.0
+	var tw := pw - 20.0
+	var amp := clampf(1.0 - (a - 0.9) / 1.0, 0.0, 1.0)          # Herzschläge klingen aus, ab ≈ 1,9 s Nulllinie
+	var pts := PackedVector2Array()
+	for i in 96:
+		var u := float(i) / 95.0
+		var ph_ := fposmod(u * 3.0 - a * 1.1, 1.0)
+		var spike := exp(-pow((ph_ - 0.30) * 24.0, 2.0)) * 1.0 - exp(-pow((ph_ - 0.38) * 20.0, 2.0)) * 0.35 + exp(-pow((ph_ - 0.62) * 9.0, 2.0)) * 0.15
+		pts.append(Vector2(tx0 + u * tw, ty - spike * 20.0 * amp))
+	var col := Color(0.4, 1.0, 0.5, fade).lerp(Color(1.0, 0.25, 0.25, fade), 1.0 - amp)
+	draw_polyline(pts, col, 1.2)
+	# wandernder Punkt am rechten Ende; ab Nulllinie blinkt er
+	var dot_a := 1.0 if amp > 0.0 else (0.5 + 0.5 * sin(a * 12.0))
+	draw_circle(Vector2(tx0 + tw, pts[95].y), 1.8, Color(col.r, col.g, col.b, dot_a * fade))
+	# Name und Strafe
+	draw_string(font, Vector2(px, py + 72.0), lost_name, HORIZONTAL_ALIGNMENT_CENTER, pw * 0.5, 10, Color(1, 1, 1, fade * 0.9))
+	draw_string(font, Vector2(px + pw * 0.5, py + 74.0), "−¢%d" % lost_fee, HORIZONTAL_ALIGNMENT_CENTER, pw * 0.5, 14, Color(1.0, 0.3, 0.3, fade))
 
 ## Ergebnisansicht nach dem Level: bleibt stehen, bis der Spieler bestätigt (Enter/A).
 func _draw_result() -> void:

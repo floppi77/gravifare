@@ -238,7 +238,29 @@ def splat():
     x += sos(rng.standard_normal(len(tt)), "bandpass", [600, 2400], 2) * np.exp(-tt * 40) * 0.5
     save("splat", np.tanh(x) * 0.9)
 
+def flatline():
+    """EKG-Monitor: drei Herzschläge, die langsamer werden, dann der lange Dauerton der Nulllinie (Patient verloren)."""
+    parts = []
+    for gap in (0.34, 0.52, 0.80):
+        b = np.sin(2 * np.pi * 1000 * t(0.11)) * 0.30 * env(int(0.11 * SR), 0.004, 0.03)
+        parts += [b, np.zeros(int(gap * SR))]
+    d = 2.3; tt = t(d)
+    tone = np.sin(2 * np.pi * 1000 * tt) * 0.30 * np.minimum(1.0, tt / 0.01) * np.clip((d - tt) / 0.5, 0, 1)
+    parts.append(tone)
+    save("flatline", np.concatenate(parts))
+
+def shatter():
+    """Klirrendes Glas: heller Rauschstoß und mehrere abklingende, hohe Glöckchen."""
+    d = 0.9; tt = t(d)
+    x = sos(rng.standard_normal(len(tt)), "bandpass", [2500, 9000], 2) * np.exp(-tt * 14) * 1.4
+    for k, f in enumerate((2637, 3136, 3951, 4699, 5588)):
+        t0 = 0.02 + 0.045 * k
+        m = tt > t0
+        x[m] += np.sin(2 * np.pi * f * (tt[m] - t0)) * np.exp(-(tt[m] - t0) * 9) * 0.22
+    x += np.sin(2 * np.pi * 120 * tt) * np.exp(-tt * 30) * 0.4
+    save("shatter", np.tanh(x) * 0.8)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter): f()
     print(sorted(os.listdir(OUT)))

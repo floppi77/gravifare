@@ -87,6 +87,8 @@ except ImportError:
 def main():
     d = json.load(open("data/voice_lines.json"))
     d["d0"] = {"de": {"r%d" % n: v[0] for n, v in sorted(L.items())}, "en": {"r%d" % n: v[1] for n, v in sorted(L.items())}}
+    d["d0"]["de"]["patient_lost"] = "Patient verloren. Das wird teuer."
+    d["d0"]["en"]["patient_lost"] = "Patient lost. That will be expensive."
     json.dump(d, open("data/voice_lines.json", "w"), indent=1, ensure_ascii=False)
     missing = [n for n in range(2, 100) if n not in L]
     print("Zeilen:", len(L), "fehlend:", missing)

@@ -203,5 +203,7 @@
  "MSG_MEDICAL": "Medical transport! Fly gently – any damage is dangerous",
  "MSG_BEAM_WARN": "Plasma beam charging!",
  "MSG_HEAT": "Heat! The hull is glowing",
+ "HUD_PATIENT_LOST": "PATIENT LOST",
+ "MSG_PATIENT_LOST": "Patient lost! %s – penalty ¢%d",
  "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT"
 }

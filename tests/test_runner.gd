@@ -763,6 +763,7 @@ func _test_fragile_and_meteors() -> void:
 	var price := r.prospect()
 	r._ride_hit({"amount": 5.0})
 	check(r.actor == null and r.missed == 1 and r.pen_ride == 0.0, "Beschädigung an Bord: zerbrechlicher Fahrgast weg, Auftrag verpasst")
+	check(r.log.any(func(e): return e.type == "patient_lost" and float(e.fee) > 0.0), "Patient verloren: Ereignis mit Strafbetrag für Bild und Ton")
 	check(r.missed_fees >= price - 1.0 and r.missed_fees > float(lvl.jobs[0].fare) * Tuning.MISSED_FEE_FACTOR, "Verlorener Krankenpatient kostet den aktuellen Preis (¢%d von ¢%d)" % [int(r.missed_fees), int(price)])
 	check(r.log.any(func(e): return e.type == "fragile_broke") and r.log.any(func(e): return e.type == "job_missed"), "Ereignisse fragile_broke und job_missed werden gemeldet")
 	var r2 := Run.new()

@@ -79,6 +79,8 @@ func _ready() -> void:
 		if ua.begins_with("--skip-time="):          # Dev: Spielzeit vorspulen (Taxi bleibt stehen), z. B. für Screenshots von Meteoriten
 			for i in int(float(ua.substr(12)) / Tuning.TICK):
 				run.step(Vector2.ZERO, false)
+	if OS.get_cmdline_user_args().has("--debug-patient-lost"):      # Dev: „Patient verloren“-Effekt ansehen
+		_patient_lost({"name": "Mika", "fee": 123.0})
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--debug-complete"):
@@ -449,6 +451,17 @@ func _attendant(key: String, cooldown := 0.0) -> void:
 	Sfx.play_voice("t0", key)
 	hud.subtitle(tr("SPK_ATTENDANT"), Sfx.line_text("t0", key), 2.4)
 
+## Patient verloren – deutlich in Bild und Ton: roter Blitz, EKG mit Nulllinie, Dauerton, Meldung der Zentrale, Wackeln, Rumble.
+func _patient_lost(e: Dictionary) -> void:
+	hud.patient_lost(e.name, int(e.fee))
+	_add_shake(4.0)
+	Haptics.pulse(0.8, 0.9, 0.5)
+	Sfx.play("shatter", -4.0)
+	get_tree().create_timer(0.45, true, false, true).timeout.connect(func(): Sfx.play("flatline", -3.0))
+	get_tree().create_timer(2.0, true, false, true).timeout.connect(func():
+		Sfx.play_voice("d0", "patient_lost")
+		hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "patient_lost"), 2.8))
+
 func _end_slowmo() -> void:
 	slowmo_left = 0.0
 	Engine.time_scale = 1.0
@@ -523,11 +536,11 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play("warn", -4.0)
 			Haptics.pulse(0.15, 0.2, 0.2)
 		"fragile_broke":
-			hud.flash_message(tr("MSG_FRAGILE_BROKE") % e.name, 3.0)
-			Sfx.play_voice(e.voice, "angry")
-			Sfx.play("hit", -6.0)
-			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
+			Sfx.play_voice(e.voice, "hard")
+			Sfx.play("shatter", -2.0)
 			Haptics.pulse(0.3, 0.3, 0.15)
+		"patient_lost":
+			_patient_lost(e)
 		"job_missed":
 			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
 		"ejected":

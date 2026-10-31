@@ -232,6 +232,7 @@ func _extra_break(ex: Dictionary) -> void:
 	a.pay_info = {}
 	log.append({"type": "fragile_broke", "voice": a.voice_key(), "name": a.pname})
 	log.append({"type": "job_missed", "name": a.pname, "fee": fee})
+	log.append({"type": "patient_lost", "name": a.pname, "fee": fee})
 	a.vanish_hurt(sim.pos.x, sim.pos.y)
 	leavers.append(a)
 	extras.erase(ex)
@@ -413,6 +414,8 @@ func _lose_job(pname: String, extra_fee := 0.0) -> void:
 	missed += 1
 	missed_fees += fee
 	log.append({"type": "job_missed", "name": pname, "fee": fee})
+	if bool(jobs[job_index].get("fragile", false)):
+		log.append({"type": "patient_lost", "name": pname, "fee": fee})
 	job_index += 1
 	job_clock = 0.0
 	respawn_keep_clock = false

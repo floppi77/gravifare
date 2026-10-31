@@ -203,5 +203,7 @@
  "MSG_MEDICAL": "Krankentransport! Sanft fliegen – jede Beschädigung ist gefährlich",
  "MSG_BEAM_WARN": "Plasmastrahl lädt auf!",
  "MSG_HEAT": "Hitze! Die Hülle glüht",
+ "HUD_PATIENT_LOST": "PATIENT VERLOREN",
+ "MSG_PATIENT_LOST": "Patient verloren! %s – Strafe ¢%d",
  "HUD_TAG_FRAGILE": "+ KRANKENTRANSPORT"
 }

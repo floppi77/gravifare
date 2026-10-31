@@ -129,7 +129,8 @@
    "r96": "Nur noch wenige Level, Taxi sieben.",
    "r97": "Der Rand wird enger. Dein Können nicht.",
    "r98": "Das vorletzte Level. Atme tief durch.",
-   "r99": "Letztes Level. Zeig, was du kannst, Taxi sieben."
+   "r99": "Letztes Level. Zeig, was du kannst, Taxi sieben.",
+   "patient_lost": "Patient verloren. Das wird teuer."
   },
   "en": {
    "r2": "Fuel stop ahead: land, refuel, pay. Prices fluctuate.",
@@ -228,7 +229,8 @@
    "r96": "Only a few levels left, Taxi seven.",
    "r97": "The edge grows narrow. Your skill does not.",
    "r98": "The second to last level. Take a deep breath.",
-   "r99": "Final level. Show them what you've got, Taxi seven."
+   "r99": "Final level. Show them what you've got, Taxi seven.",
+   "patient_lost": "Patient lost. That will be expensive."
   }
  }
 }
