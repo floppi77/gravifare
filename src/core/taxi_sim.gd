@@ -167,6 +167,20 @@ func _mover_push() -> void:
 		if m.kind == "beam":                 # Strahl schiebt nicht, er verbrennt nur (solange man darin ist)
 			_beam_burn()
 			continue
+		if m.kind == "meteor":
+			# Meteoriten schlagen ein und prallen ab: kurzer Stoß nach unten, Schaden, danach fällt der Brocken ohne das Taxi weiter
+			if float(m.get("hit_until", -1.0)) > time:
+				continue
+			m["hit_until"] = time + float(m.fall) + 0.3
+			vel.y = maxf(vel.y, 95.0)
+			if state == State.LANDED:
+				state = State.FLYING
+				landed_pad = {}
+				air_t = 0.0
+				air_path = 0.0
+			mover_cd = 0.0
+			_mover_damage("meteor")
+			return
 		var opts := [[box.end.x - r.position.x, Vector2(-1, 0)], [r.end.x - box.position.x, Vector2(1, 0)],
 			[box.end.y - r.position.y, Vector2(0, -1)], [r.end.y - box.position.y, Vector2(0, 1)]]
 		var best: Array = opts[0]

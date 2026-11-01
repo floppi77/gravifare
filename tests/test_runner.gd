@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -130,7 +130,7 @@ func _test_bot_solves_levels() -> void:
 		for j in rr.jobs:
 			inc += float(j.fare) * rr.job_mult(j) * Tuning.satisfaction_factor(Tuning.SAT_FLOOR)
 		var cost: float = float(r.fuel_burned) * (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
-		check(inc >= cost, "%s: Fahrpreise bei 25 %% Zufriedenheit (¢%d) decken den Sprit des Autopiloten (¢%d)" % [lvl.id, int(inc), int(cost)])
+		check(inc >= cost, "%s: Fahrpreise bei 55 %% Zufriedenheit (¢%d) decken den Sprit des Autopiloten (¢%d)" % [lvl.id, int(inc), int(cost)])
 		check(r.complete and r.hull > 90.0 and r.delivered >= r.jobs - 1, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.delivered, r.jobs, r.reason])
 
 func _test_level_rules() -> void:
@@ -533,16 +533,19 @@ func _test_wrong_pad_rules() -> void:
 func _test_campaign_save() -> void:
 	var sv: Node = load("res://src/core/save.gd").new()
 	sv.path = "user://test_save_campaign.json"
+	sv.slot = 1
 	_rm(sv.path)
 	sv.set_campaign({"level": "s1_05", "lives": 3, "fuel": 60.0, "credits": 420.0, "seed": 123, "carry": {}})
 	var sv2: Node = load("res://src/core/save.gd").new()
 	sv2.path = sv.path
+	sv2.slot = 1
 	sv2.load_save()
 	var c: Dictionary = sv2.campaign()
 	check(c.get("level", "") == "s1_05" and int(c.get("lives", 0)) == 3 and float(c.get("credits", 0)) == 420.0, "Feldzug (Level, Leben, Credits) wird gespeichert und geladen")
 	sv2.clear_campaign()
 	var sv3: Node = load("res://src/core/save.gd").new()
 	sv3.path = sv.path
+	sv3.slot = 1
 	sv3.load_save()
 	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht den gespeicherten Feldzug")
 	_rm(sv.path)
@@ -1271,9 +1274,15 @@ func _test_job_rules_and_difficulty() -> void:
 		check(exit_only_last, "%s: nur der letzte Auftrag führt zum Ausgang" % lvl.id)
 		var m := LevelMetrics.analyze(lvl)
 		check(m.solvable, "%s: Route planbar (Korridor %.0f px)" % [lvl.id, m.clearance])
-		check(m.score >= prev_score, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
-		prev_score = m.score
-		prev_id = lvl.id
+		# Lückenfüller (spätere Plätze der Sektoren 7–9, nachträglich ergänzt) dürfen auf gleicher Schwierigkeitsstufe liegen: bis 14 Punkte
+		# unter dem bisherigen Höchstwert; alle anderen Level steigen strikt.
+		var filler: bool = (lvl.sector == 7 and lvl.index >= 9) or (lvl.sector == 8 and lvl.index >= 9) or (lvl.sector == 9 and lvl.index >= 8)
+		if filler:
+			check(m.score >= prev_score - 14.0, "Schwierigkeit (Lückenfüller): %s %.1f ≥ %s %.1f − 14" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
+		else:
+			check(m.score >= prev_score, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
+			prev_score = m.score
+			prev_id = lvl.id
 
 func _taxi_over(r: Run, x: float, y: float, vy: float) -> void:
 	r.sim.state = TaxiSim.State.FLYING
@@ -1809,7 +1818,7 @@ func _test_medals() -> void:
 		sum_par += float(j.par)
 		if String(j.to) != "exit":
 			money_t += float(j.fare) * r.job_mult(j)
-	check(absf(r.time_target() - (sum_par * 1.2 + 10.0)) < 0.01 and absf(r.money_target() - money_t) < 0.01, "Medaillen-Ziele: Zeit %.0f s, Einkommen ¢%.0f aus den Auftragsdaten" % [r.time_target(), r.money_target()])
+	check(absf(r.time_target() - (sum_par + Tuning.TARGET_SLACK_PER_JOB * float(r.jobs.size()))) < 0.01 and absf(r.money_target() - money_t) < 0.01, "Medaillen-Ziele: Zeit %.0f s, Einkommen ¢%.0f aus den Auftragsdaten" % [r.time_target(), r.money_target()])
 	r.level_time = r.time_target() - 1.0
 	r.earned = r.money_target() * 1.2
 	r.best_streak = 3
@@ -1839,6 +1848,7 @@ func _rm(path: String) -> void:
 func _test_save_robust() -> void:
 	var sv: Node = load("res://src/core/save.gd").new()
 	sv.path = "user://test_save.json"
+	sv.slot = 1
 	_rm(sv.path)
 	var f := FileAccess.open(sv.path, FileAccess.WRITE)
 	f.store_string("{ defekt [[[")
@@ -1859,12 +1869,194 @@ func _test_save_robust() -> void:
 	check(int(sv.data.stats.credits_total) == 110, "Verdiente Credits summieren sich (%d)" % int(sv.data.stats.credits_total))
 	var sv2: Node = load("res://src/core/save.gd").new()
 	sv2.path = sv.path
+	sv2.slot = 1
 	sv2.load_save()
 	check(sv2.is_completed("s1_01") and sv2.best_time("s1_01") == 60.0, "Speichern und Neuladen (Fortschritt bleibt nach Neustart)")
 	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and (Save.DEBUG_UNLOCK_ALL or not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2)), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers (Debug: alles frei)")
 	_rm(sv.path)
 	sv.free()
 	sv2.free()
+
+func _test_save_slots() -> void:
+	var sv: Node = load("res://src/core/save.gd").new()
+	sv.slot_prefix = "user://test_slot_"
+	sv.legacy_path = "user://gibt_es_nicht.json"
+	for n in 4:
+		_rm(sv.slot_path(n))
+	sv.dev_session = false
+	check(sv.slot == 0 and not sv.slot_exists(1) and not sv.slot_summary(1).exists, "Speicherplätze: anfangs keiner gewählt, alle frei")
+	sv.write()
+	check(not sv.slot_exists(1), "Ohne gewählten Platz wird nichts geschrieben")
+	sv.select_slot(1)
+	sv.complete_level("s1_01", 60.0, 100.0, 50.0, {"time": true, "clean": false, "pro": false}, 300)
+	sv.select_slot(2)
+	check(sv.data.completed.is_empty() and sv.slot == 2, "Platz 2 startet leer, unabhängig von Platz 1")
+	sv.complete_level("s1_01", 50.0, 100.0, 50.0, {"time": true, "clean": true, "pro": false}, 200)
+	sv.complete_level("s1_02", 55.0, 100.0, 50.0, {"time": false, "clean": false, "pro": false}, 100)
+	sv.select_slot(1)
+	check(sv.data.completed.size() == 1 and sv.best_time("s1_01") == 60.0, "Platz 1 behält seinen eigenen Fortschritt")
+	var s2: Dictionary = sv.slot_summary(2)
+	check(s2.exists and s2.levels == 2 and s2.score == 300, "Platz-Übersicht: Level %d, Punkte %d" % [s2.levels, s2.score])
+	sv.set_campaign({"level": "s1_03", "lives": 3, "credits": 420.0, "fuel": 50.0})
+	check(sv.slot_summary(1).credits == 420 and sv.slot_summary(1).lives == 3, "Platz-Übersicht zeigt laufenden Feldzug (Credits, Leben)")
+	sv.delete_slot(1)
+	check(sv.slot == 0 and not sv.slot_exists(1) and sv.slot_exists(2), "Löschen gibt Platz 1 frei und lässt Platz 2 unberührt")
+	sv.select_slot(1)
+	check(sv.data.completed.is_empty() and sv.campaign().is_empty(), "Gelöschter Platz beginnt wieder leer")
+	for n in 4:
+		_rm(sv.slot_path(n))
+	sv.free()
+
+class FakeGame extends Node:
+	var paused := false
+	var lives := 5
+	func tutorial_set_lives(n: int) -> void:
+		lives = n
+	func tutorial_finish() -> void:
+		pass
+	func tutorial_speak(_key: String) -> Dictionary:
+		return {"len": 0.2, "text": "x"}
+	func tutorial_voice_pause(_p: bool) -> void:
+		pass
+	func tutorial_narrating() -> bool:
+		return false
+	func tutorial_mark_done() -> void:
+		pass
+
+class FakeSpot extends Control:
+	var spots: Array = []
+	var text := ""
+	func set_spots(l: Array) -> void:
+		spots = l
+	func say(_who: String, txt: String) -> void:
+		text = txt
+
+## Tutorial: Das Skript läuft vom Willkommen bis zum Tor durch, wenn der Spieler die geforderten Handlungen ausführt (simuliert).
+func _test_tutorial_script() -> void:
+	var lvl := LevelData.load_file("res://data/tutorial/tutorial.json")
+	check(lvl != null and lvl.tutorial and lvl.pads.has("F") and lvl.pads.has("L") and lvl.pads.has("1") and lvl.pads.has("2") and lvl.pads.has("3") and not lvl.pumps.is_empty(), "Tutorial-Level: Pads 1–3, Tankstelle mit Zapfsäule und Lebensstation vorhanden")
+	var r := Run.new()
+	r.start(lvl, 100.0, 0.0, 5)
+	var game := FakeGame.new()
+	var spot := FakeSpot.new()
+	var tut := Tutorial.new()
+	tut.setup(game, r, null, spot, null)
+	var seen: Array = []
+	var guard := 0
+	while tut.idx < tut.steps.size() and guard < 4000:
+		guard += 1
+		var key := String(tut.steps[tut.idx].key)
+		if seen.is_empty() or seen[seen.size() - 1] != key:
+			seen.append(key)
+		match key:
+			"tut_gear_in":
+				r.sim.gear_cmd = false
+				check(not tut.locked, "Tutorial: Steuerung ist ab dem Einfahren des Fahrwerks frei")
+			"tut_fly":
+				tut.flags["course_done"] = true
+			"tut_gear":
+				r.sim.gear_cmd = true
+			"tut_fuel_low", "tut_refuel", "tut_credit":
+				if key == "tut_fuel_low" and tut.t < 0.2:
+					check(r.sim.fuel <= 22.5, "Tutorial: Tank wird für die Tankstellen-Übung abgesenkt (%.0f)" % r.sim.fuel)
+				r.sim.state = TaxiSim.State.LANDED
+				r.sim.landed_pad = lvl.pads["F"]
+				if key == "tut_credit":
+					r.sim.fuel = 100.0
+			"tut_hard":
+				tut.on_event({"type": "destroyed"})
+			"tut_soft":
+				r.sim.state = TaxiSim.State.FLYING
+				tut.on_event({"type": "landed", "pad": "3", "vy": 10.0, "vx": 0.0})
+			"tut_job":
+				tut.on_event({"type": "boarded", "job": 0, "voice": "f0", "name": "Mika", "dest": "3"})
+			"tut_pay":
+				tut.on_event({"type": "delivered", "extra": false, "job": 0, "pay": 50.0, "voice": "f0", "name": "Mika"})
+			"tut_extra":
+				tut.on_event({"type": "boarded", "job": -1, "voice": "m0", "name": "Ugo", "dest": "1", "extra": true})
+			"tut_extra_dest":
+				tut.on_event({"type": "delivered", "extra": true, "job": -1, "pay": 20.0, "voice": "m0", "name": "Ugo"})
+			"tut_life":
+				tut.on_event({"type": "life_bought", "lives": 5, "price": 1000.0})
+			"tut_exit":
+				r.exit_open = true
+		tut._process(0.5)
+	check(tut.idx >= tut.steps.size(), "Tutorial-Skript läuft bis zum Ende durch (%d Schritte)" % seen.size())
+	check(seen.has("tut_soft_ok") and seen.has("tut_crash_ok") and seen.has("tut_credit") and seen.has("tut_price"), "Tutorial: Zerstörung wird erklärt, dann sanfte Landung, Gutschrift und Preiswechsel")
+	check(r.prices_frozen and r.money >= 50.0, "Tutorial: Spritpreis bleibt nach dem scripted Wechsel fest, Gutschrift erhalten")
+	check(r.money >= Tuning.LIFE_PRICE and r.lives == 4, "Tutorial: Übungsgeld und Leben für die Lebensstation gesetzt")
+	var vl: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/voice_lines.json"))
+	for st in tut.steps:
+		var k := String(st.key)
+		if k == "tut_soft_react":
+			continue
+		check(String(vl.i0.de.get(k, "")) != "" and String(vl.i0.en.get(k, "")) != "", "Tutorial-Zeile %s hat deutschen und englischen Text" % k)
+		check(ResourceLoader.exists("res://assets/audio/voice/de/i0_%s.ogg" % k) and ResourceLoader.exists("res://assets/audio/voice/en/i0_%s.ogg" % k), "Tutorial-Zeile %s hat Sprachclips (de/en)" % k)
+	tut.free()
+	game.free()
+	spot.free()
+	# Sperre: Mika steigt nicht ein, solange das Skript es nicht erlaubt
+	var r2 := Run.new()
+	r2.start(lvl, 100.0, 0.0, 5)
+	r2.pickup_locked = true
+	r2.sim.pos = Vector2(float(lvl.pads["2"].center), float(lvl.pads["2"].row) * Tuning.TILE - 12.0)
+	for i in 600:
+		r2.step(Vector2(0, 0.1), true)
+	var boarded_locked: bool = r2.phase != Run.Phase.WAITING
+	check(not boarded_locked, "Tutorial-Sperre: wartender Fahrgast steigt nicht ein, solange pickup_locked gilt")
+	# Zusatzfahrgast: erscheint am vorgegebenen Pad mit vorgegebenem Ziel, steigt erst nach der Freigabe ein
+	var r3 := Run.new()
+	r3.start(lvl, 100.0, 0.0, 5)
+	r3.actor = null
+	r3.pickup_locked = true
+	r3.extras_enabled = true
+	r3.extra_locked = true
+	r3._spawn_extra("2", "1")
+	var ex_ok: bool = r3.extras.size() == 1 and String(r3.extras[0].job.from) == "2" and String(r3.extras[0].job.to) == "1"
+	check(ex_ok, "Tutorial: Zusatzfahrgast erscheint an Plattform 2 mit Ziel 1")
+	r3.sim.state = TaxiSim.State.LANDED
+	r3.sim.landed_pad = lvl.pads["2"]
+	r3.sim.pos = Vector2(float(lvl.pads["2"].center), float(lvl.pads["2"].row) * Tuning.TILE - 12.0)
+	for i in 400:
+		r3.step(Vector2.ZERO, true)
+	var waited: bool = r3.extras.size() == 1 and int(r3.extras[0].state) == Run.ES.WAIT
+	r3.extra_locked = false
+	for i in 400:
+		r3.step(Vector2.ZERO, true)
+	var boarded: bool = r3.extras.size() == 1 and int(r3.extras[0].state) in [Run.ES.BOARD, Run.ES.CARRY]
+	check(waited and boarded, "Tutorial: Zusatzfahrgast wartet gesperrt und steigt nach der Freigabe ein")
+	r3.prices_frozen = true
+	var p0 := r3.fuel_price()
+	r3.step(Vector2.ZERO, true)
+	r3.force_price_change()
+	check(absf(r3.fuel_price() - p0) >= Tuning.PRICE_MIN_STEP - 0.001 or r3.fuel_price() != p0, "Tutorial: Preiswechsel auf Befehl (%.2f → %.2f)" % [p0, r3.fuel_price()])
+
+## Einspieler: jedes Demo läuft komplett durch, das Taxi bleibt im Bild und überlebt; Sprache (de/en) und Titel sind vorhanden.
+func _test_intro_demos() -> void:
+	var idx = JSON.parse_string(FileAccess.get_file_as_string("res://data/intros/index.json"))
+	var vl: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/voice_lines.json"))
+	check(typeof(idx) == TYPE_DICTIONARY and idx.size() >= 18, "Einspieler: Index mit %d Leveln" % (idx.size() if typeof(idx) == TYPE_DICTIONARY else 0))
+	var seen := {}
+	for n in idx:
+		var k := String(idx[n])
+		if seen.has(k):
+			continue
+		seen[k] = true
+		var d := IntroDemo.new()
+		check(d.setup(k), "Einspieler %s: lädt" % k)
+		var ok := true
+		var min_hull := 100.0
+		while d.t < d.length:
+			d.step(1.0 / 30.0)
+			min_hull = minf(min_hull, d.run.sim.hull)
+			var p := d.run.sim.pos
+			if p.x < 20.0 or p.x > 620.0 or p.y < 20.0 or p.y > 340.0:
+				ok = false
+		check(ok and min_hull > 20.0 and d.run.sim.state != TaxiSim.State.DESTROYED, "Einspieler %s: Taxi bleibt im Bild und überlebt (Hülle min. %.0f)" % [k, min_hull])
+		var title: Dictionary = d.data.get("title", {})
+		check(String(title.get("de", "")) != "" and String(title.get("en", "")) != "", "Einspieler %s: Titel de/en" % k)
+		check(String(vl.i0.de.get("vid_" + k, "")) != "" and String(vl.i0.en.get("vid_" + k, "")) != "", "Einspieler %s: Text de/en" % k)
+		check(ResourceLoader.exists("res://assets/audio/voice/de/i0_vid_%s.ogg" % k) and ResourceLoader.exists("res://assets/audio/voice/en/i0_vid_%s.ogg" % k), "Einspieler %s: Sprachclips de/en" % k)
 
 func _test_settings_robust() -> void:
 	var st: Node = load("res://src/core/settings.gd").new()

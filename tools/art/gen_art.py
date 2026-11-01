@@ -586,17 +586,19 @@ def flags():
         for i in range(13):
             if i % 2 == 0:
                 d.rectangle([0, int(i * H / 13), W, int((i + 1) * H / 13) - 1], fill=hexc("#b22234"))
-        # Sternenfeld (vereinfacht) unten rechts, damit es in der sichtbaren Hälfte liegt
-        d.rectangle([W - 54, H - 40, W, H], fill=hexc("#3c3b6e"))
+        # Sternenfeld (vereinfacht) oben links (aufrecht) – diese Ecke liegt in der sichtbaren Hälfte
+        d.rectangle([0, 0, 54, 40], fill=hexc("#3c3b6e"))
         for r in range(4):
             for c in range(5):
-                cx, cy = W - 48 + c * 10 + (5 if r % 2 else 0), H - 34 + r * 9
+                cx, cy = 5 + c * 10 + (5 if r % 2 and c < 4 else 0), 5 + r * 9
+                if r % 2 and c == 4:
+                    continue
                 d.rectangle([cx, cy, cx + 2, cy + 2], fill=hexc("#ffffff"))
         return im
     uk, us = union_jack(), stars_and_stripes()
     yy, xx = np.mgrid[0:H, 0:W]
     upper_left = (xx / W + yy / H) < 1.0
-    en = Image.fromarray(np.where(upper_left[:, :, None], np.array(uk), np.array(us)).astype(np.uint8))
+    en = Image.fromarray(np.where(upper_left[:, :, None], np.array(us), np.array(uk)).astype(np.uint8))          # USA oben links (aufrecht), Union Jack unten rechts
     d = ImageDraw.Draw(en); d.line([W, 0, 0, H], fill=hexc("#0c0f24"), width=2)
     finish(en, "flag_en.png")
 

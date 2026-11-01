@@ -353,14 +353,20 @@ def existing_layouts(skip_sector=None, skip_levels=()):
 FLOOR_PREV = {3: 113.2}        # Höchster Score des Vorgängersektors (S2-11); für Sektor 4+ aus tools/sector_scores.json
 
 
+TOL = 0.0           # --tol=<x>: Lückenfüller dürfen bis x Punkte unter dem Sektor-Höchstwert liegen (gleiche Schwierigkeitsstufe genügt)
+
+
 def floor_of(sector):
     if "--extend" in sys.argv:
-        return max(json.load(open("tools/sector_scores.json"))[str(sector)]) + 0.3
+        return max(json.load(open("tools/sector_scores.json"))[str(sector)]) + 0.3 - TOL
     f = FLOOR_PREV.get(sector)
     if f is None:
         sc = json.load(open("tools/sector_scores.json"))
         f = max(sc[str(sector - 1)])
     return f + 0.3
+
+
+CEIL = 1e9          # --ceil=<score>: höchster erlaubter Score (Lückenfüller müssen unter dem Nachfolger-Level bleiben)
 
 
 def dp_points(slots, pts, ramp):
@@ -371,6 +377,8 @@ def dp_points(slots, pts, ramp):
     for i in slots:
         cur = {}
         for sc, key in pts.get(i, []):
+            if sc > CEIL:
+                continue
             best = None
             for pk, (cost, ps, _) in prev.items():
                 if ps + 0.25 <= sc + 1e-9:
@@ -394,9 +402,14 @@ def dp_points(slots, pts, ramp):
 def main():
     sector = int(sys.argv[1])
     K = 8 if sector >= 5 else 5
+    global CEIL, TOL
     for a_ in sys.argv:
+        if a_.startswith("--tol="):
+            TOL = float(a_[6:])
         if a_.startswith("--k="):
             K = int(a_[4:])
+        if a_.startswith("--ceil="):
+            CEIL = float(a_[7:])
     extend = "--extend" in sys.argv          # bestehende Level behalten, nur die Slots 8–11 ergänzen
     slots = [8, 9, 10, 11] if extend else list(range(1, 12))
     for a_ in sys.argv:
@@ -516,8 +529,8 @@ def main():
     for n, i in enumerate(keep_slots, start_idx):
         v, nn = plan[i]
         r = info[(i, plan[i])]
-        times = r["times"] + [30.0]
-        pars = [int(round(1.3 * t + 8)) for t in times]
+        times = r["times"] + [22.0]
+        pars = [max(10, int(round(0.85 * t))) for t in times]
         d2, _ = make_level(sector, i, v, nn, pars[: 8], idx=n)
         fn = "data/levels/s%d_%02d.json" % (sector, n)
         json.dump(d2, open(fn, "w"), indent=1, ensure_ascii=False)

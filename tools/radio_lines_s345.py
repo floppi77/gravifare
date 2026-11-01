@@ -54,7 +54,7 @@ L345[70] = ("Leitstelle. Verkehr, Wind und ein Magnet. Die Zentrale schaut zu.",
 L345[71] = ("Güterbahn. Ein Patient wartet zwischen den Frachtern, flieg sanft.", "Freight line. A patient waits between the freighters, fly gently.")
 L345[72] = ("Expresslinie. Die Fahrzeuge sind heute besonders eilig.", "Express line. The vehicles are in an extra hurry today.")
 L345[73] = ("Transitring. Noch ein Patient, noch ein Takt, du schaffst das.", "Transit ring. Another patient, another beat, you can do this.")
-L345[74] = ("Zentralknoten. Letzter Knoten, danach wird es dunkel.", "Central hub. Last hub level, after that it gets dark.")
+L345[74] = ("Zentralknoten. Noch zwei Knoten, halte die Spur.", "Central hub. Two more hubs to go, keep your lane.")
 # ---- Sektor 8 Schattenring (78–85)
 L345[80] = ("Peilung. Verkehr in der Dunkelheit, die Fahrzeuge leuchten, und ein Patient wartet.", "Bearing. Traffic in the dark, the vehicles glow, and a patient is waiting.")
 L345[82] = ("Sensorfeld. Wind, Magnet und Verkehr im Dunkeln. Eine Lebensstation hilft dir.", "Sensor field. Wind, magnet and traffic in the dark. A life station helps you.")

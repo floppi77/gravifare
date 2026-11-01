@@ -17,6 +17,7 @@ var radio_speaker := ""
 var radio_text := ""
 var radio_t0 := 2.15
 var radio_len := 3.0
+var radio_age := 0.0              # Sekunden seit Beginn des Funkspruchs (unabhängig von der Flugzeit: Text bleibt, bis die Sprache zu Ende ist)
 var skip_hint := ""
 var space_bg: Texture2D = preload("res://assets/art/space_bg.png")
 var taxi_tex: Texture2D = Cosmetics.paint_texture()
@@ -114,11 +115,24 @@ func _draw_taxi(a: float) -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func _draw_radio() -> void:
-	var ra := smooth((t - radio_t0) / 0.35) * (1.0 - smooth((t - minf(radio_t0 + radio_len, 5.5)) / 0.35))
+	var ra := smooth(radio_age / 0.35) * (1.0 - smooth((radio_age - radio_len) / 0.35))
 	if ra > 0.003 and radio_text != "":
 		var col := Color(0.55, 0.95, 0.9, ra)
-		draw_string(Fonts.ui, Vector2(0, 252), "[ %s ]" % radio_speaker, HORIZONTAL_ALIGNMENT_CENTER, 640, 8, Color(0.4, 0.8, 0.75, ra * 0.9))
-		draw_string(Fonts.ui, Vector2(0, 264), radio_text, HORIZONTAL_ALIGNMENT_CENTER, 640, 11, col)
+		draw_string(Fonts.ui, Vector2(0, 244), "[ %s ]" % radio_speaker, HORIZONTAL_ALIGNMENT_CENTER, 640, 8, Color(0.4, 0.8, 0.75, ra * 0.9))
+		# lange Sprüche umbrechen (höchstens 580 px breit)
+		var lines: Array = []
+		var line := ""
+		for word in radio_text.split(" "):
+			var cand := word if line == "" else line + " " + word
+			if Fonts.ui.get_string_size(cand, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x > 580.0 and line != "":
+				lines.append(line)
+				line = word
+			else:
+				line = cand
+		if line != "":
+			lines.append(line)
+		for i in lines.size():
+			draw_string(Fonts.ui, Vector2(0, 258 + 13 * i), lines[i], HORIZONTAL_ALIGNMENT_CENTER, 640, 11, col)
 
 func _draw_titles(a: float) -> void:
 	_draw_radio()

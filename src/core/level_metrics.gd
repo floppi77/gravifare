@@ -18,7 +18,7 @@ extends RefCounted
 ## (Gefahren 3,0 · Mechaniken 12), die Folge steigt ab dort je Sektor neu an. Der Zuschlag steht für das, was Spielende aus den
 ## früheren Sektoren beherrschen müssen.
 const SECTOR_BONUS_FROM := 5
-const SECTOR_BONUS := 25.0
+const SECTOR_BONUS := 32.0
 
 const MAX_MARGIN := 48.0
 const STEP := 4.0

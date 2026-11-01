@@ -89,16 +89,18 @@ const PUMP_BOOM_DELAY := 0.7
 const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
 
 # Belohnungen: Auftrags-Fahrpreise sinken ab Level 5 (Zusatzfahrgäste werden nötig, um im Plus zu bleiben)
+const FARE_SCALE_EARLY := 1.0
 const FARE_SCALE_LATE := 0.22
+const TARGET_SLACK_PER_JOB := 3.0    # Zeitziel: Summe der Richtzeiten + 3 s je Auftrag (Wartezeit zwischen den Fahrgästen)
 const FARE_SCALE_FROM := 5
-const EXTRA_FARE_FACTOR := 1.0       # Zusatzfahrgäste zahlen nach dem unskalierten Durchschnitt der Auftragspreise
+const EXTRA_FARE_FACTOR := 0.4       # Zusatzfahrgäste zahlen einen Bruchteil des unskalierten Durchschnitts der Auftragspreise (Untergrenze: Mindest-Fahrpreis)
 
 static func fare_scale(level_no: int) -> float:
-	return 1.0 if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
+	return FARE_SCALE_EARLY if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
 
-# Mindest-Fahrpreis: Bei guter Flugweise bleibt jeder Fahrgast bis hinunter zu 25 % Zufriedenheit profitabel.
+# Mindest-Fahrpreis: Bei ordentlicher Flugweise (ab 55 % Zufriedenheit ≈ Richtzeit) bleibt jeder Fahrgast profitabel. (Früher 25 % – das trieb die Einnahmen auf > 10000 Credits in Level 10.)
 # Zufriedenheit = Zeitfaktor normiert zwischen PAY_MIN (0 %) und PAY_MAX (100 %); der Spritverbrauch wird aus der Strecke geschätzt.
-const SAT_FLOOR := 0.25
+const SAT_FLOOR := 0.55
 const FUEL_PER_PX := 0.040           # Treibstoffeinheiten je px Flugstrecke inkl. Anflug-Umwege (am Autopiloten kalibriert, der eher mehr verbraucht als ein guter Pilot)
 const PICKUP_FACTOR := 1.6           # Anflug zum Fahrgast zählt zur Fahrt dazu (Mehrfaches der Fahrstrecke)
 const PROFIT_MARGIN := 1.25
@@ -138,6 +140,7 @@ const EXTRA_PATIENCE_MIN := 20.0     # Geduld in Sekunden
 const EXTRA_PATIENCE_MAX := 34.0
 const MAIN_PATIENCE_MIN := 45.0      # Auftrags-Fahrgäste warten länger, gehen aber auch (Ersatz-Fahrgast erscheint)
 const MAIN_PATIENCE_MAX := 70.0
+const MAIN_PATIENCE_FLOOR := 90.0    # Auftrags-Fahrgäste warten mindestens so lange (Sekunden)
 const NEXT_SPAWN_MIN := 2.5          # Pause nach dem Absetzen, bis der nächste Auftrags-Fahrgast erscheint
 const NEXT_SPAWN_MAX := 6.0
 

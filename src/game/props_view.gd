@@ -141,6 +141,8 @@ func _draw_zones() -> void:
 		match String(z.kind):
 			"wind":
 				_draw_wind(z, on)
+			"magnet":
+				_draw_magnet(z, on)
 			"heat":
 				_draw_heat(z, on)
 			"gravity":
@@ -532,13 +534,26 @@ func _draw_meteor(m: Dictionary) -> void:
 	var a0 := Vector2(float(m.x) + float(m.w) * 0.5, float(m.y) + float(m.h) * 0.5)
 	var a1 := a0 + Vector2(float(m.ax), float(m.ay))
 	if eta > 0.0 and eta <= float(m.warn):
-		var blink := 0.35 + 0.35 * (0.5 + 0.5 * sin(t * 14.0))
+		# Vorwarnung: pulsierendes rotes Band über die ganze Bahn, laufende Pfeile, helle Kanten und ein großes Warndreieck am Anfang
 		var k := 1.0 - eta / float(m.warn)
-		for i in 10:
-			var f := float(i) / 9.0
-			var p := a0.lerp(a1, f)
-			draw_rect(Rect2(p.x - 1.0, p.y - 1.0, 2.0, 2.0), Color(1.0, 0.35, 0.25, blink * (0.4 + 0.6 * k)))
-		draw_colored_polygon(PackedVector2Array([a0 + Vector2(-3, -2), a0 + Vector2(3, -2), a0 + Vector2(0, 5)]), Color(1.0, 0.4, 0.3, blink + 0.2))
+		var lr: Rect2 = level.lane_rect(m)
+		var pulse := 0.5 + 0.5 * sin(t * (7.0 + 12.0 * k))
+		draw_rect(lr, Color(1.0, 0.2, 0.15, (0.10 + 0.22 * pulse) * (0.5 + 0.5 * k)))
+		draw_line(lr.position, Vector2(lr.position.x, lr.end.y), Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), 1.2)
+		draw_line(Vector2(lr.end.x, lr.position.y), lr.end, Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), 1.2)
+		var horiz := lr.size.x > lr.size.y
+		var dirw := (a1 - a0).normalized()
+		var span := a0.distance_to(a1)
+		for i in int(maxf(span / 26.0, 1.0)):
+			var u := fposmod(t * 70.0 + float(i) * 26.0, maxf(span, 1.0))
+			var p := a0 + dirw * u
+			var nrm := Vector2(-dirw.y, dirw.x)
+			draw_polyline(PackedVector2Array([p - dirw * 3.0 + nrm * 4.0, p + dirw * 2.0, p - dirw * 3.0 - nrm * 4.0]), Color(1.0, 0.5, 0.35, 0.35 + 0.5 * pulse), 1.4)
+		var tp := a0 - dirw * 9.0
+		draw_colored_polygon(PackedVector2Array([tp + Vector2(0, -7), tp + Vector2(7, 6), tp + Vector2(-7, 6)]), Color(1.0, 0.82, 0.15, 0.55 + 0.45 * pulse))
+		draw_polyline(PackedVector2Array([tp + Vector2(0, -7), tp + Vector2(7, 6), tp + Vector2(-7, 6), tp + Vector2(0, -7)]), Color(0.45, 0.05, 0.05, 0.95), 1.2)
+		draw_rect(Rect2(tp.x - 0.7, tp.y - 3.0, 1.4, 5.0), Color(0.45, 0.05, 0.05, 0.95))
+		draw_rect(Rect2(tp.x - 0.7, tp.y + 3.0, 1.4, 1.4), Color(0.45, 0.05, 0.05, 0.95))
 		return
 	var r: Rect2 = m.rect
 	if r.position.x < LevelData.OFFSCREEN * 0.5:
@@ -576,29 +591,18 @@ func _draw_meteor(m: Dictionary) -> void:
 
 ## Beleuchtete Wartehütte: warmes Fensterlicht, Halo und ein Lichtfleck auf der Plattform. Wartet dort ein Fahrgast, leuchtet sie heller
 ## und flackert leicht; sonst brennt ein gedämpftes Licht.
+## Ampellampe auf dem Dach des Wartehäuschens: rot = niemand wartet, grün (pulsierend) = Fahrgast wartet.
 func _light_shelter(sh: Rect2, id: String) -> void:
-	var waiting := false
-	if run.actor != null and String(run.actor.pad.id) == id and run.actor.state in [PassengerActor.S.WAITING, PassengerActor.S.EMERGING, PassengerActor.S.TO_TAXI]:
-		waiting = true
-	for ex in run.extras:
-		if String(ex.job.from) == id and int(ex.state) == Run.ES.WAIT:
-			waiting = true
-	var k := 1.0 if waiting else 0.55
-	var fl := 1.0 + (0.06 * sin(t * 9.0 + sh.position.x) if waiting else 0.0)
-	var c := sh.get_center()
-	# Halo (weiche Scheiben)
-	for i in 6:
-		var f := float(i + 1) / 6.0
-		draw_circle(c + Vector2(0.0, 1.0), 6.0 + 22.0 * f, Color(1.0, 0.8, 0.4, 0.06 * k * (1.0 - f * 0.55) * fl))
-	# Fensterlicht (die beiden Scheiben links und rechts der Tür)
-	var win := Color(1.0, 0.86, 0.45, 0.62 * k * fl)
-	draw_rect(Rect2(sh.position.x + sh.size.x * 0.08, sh.position.y + sh.size.y * 0.34, sh.size.x * 0.24, sh.size.y * 0.38), win)
-	draw_rect(Rect2(sh.position.x + sh.size.x * 0.68, sh.position.y + sh.size.y * 0.34, sh.size.x * 0.24, sh.size.y * 0.38), win)
-	# Lichtfleck auf der Plattform vor der Tür
-	var floor_y := sh.end.y
-	for i in 3:
-		var f := 1.0 - float(i) * 0.3
-		draw_rect(Rect2(c.x - 9.0 * f, floor_y - 0.8 + float(i) * 0.35, 18.0 * f, 1.0), Color(1.0, 0.85, 0.45, 0.22 * k * fl))
+	var waiting := run.passenger_waiting_at(id)
+	var c := Vector2(sh.get_center().x, sh.position.y - 5.5)
+	var col := Color(0.3, 1.0, 0.45) if waiting else Color(1.0, 0.22, 0.2)
+	var pulse := 0.85 + 0.15 * sin(t * 8.0) if waiting else 0.7 + 0.1 * sin(t * 2.0)
+	draw_rect(Rect2(c.x - 1.0, c.y + 1.0, 2.0, 2.5), Color("#0c0f24"))              # Mast
+	draw_rect(Rect2(c.x - 2.2, c.y - 2.2, 4.4, 4.4), Color("#0c0f24"))              # Gehäuse
+	draw_circle(c, 6.5, Color(col.r, col.g, col.b, 0.10 * pulse))                    # Schein
+	draw_circle(c, 4.0, Color(col.r, col.g, col.b, 0.16 * pulse))
+	draw_circle(c, 1.8, Color(col.r, col.g, col.b, pulse))                           # Lampe
+	draw_circle(c + Vector2(-0.5, -0.5), 0.6, Color(1.0, 1.0, 1.0, 0.8 * pulse))     # Glanzpunkt
 
 ## Krankenhaus-Plattform: weißes Schild mit rotem Kreuz über dem Unterstand und ein rot blinkendes Rundumlicht.
 func _draw_hospital_sign(p: Dictionary, y: float) -> void:
@@ -878,7 +882,7 @@ func _draw_pumps() -> void:
 		var pivot: Vector2 = Vector2(r.position.x + 8.0, top + 11.3) + drops[stage]
 		var flick := 1.0 if stage < 2 else (0.55 + 0.45 * absf(sin(t * 23.0)))
 		draw_set_transform(pivot, rots[stage], Vector2.ONE)
-		draw_texture_rect(pump_head_tex, Rect2(-8, -11.3, 16, 12), false, Color(1, 1, 1, 1))
+		draw_texture_rect(pump_head_tex, Rect2(-11, -14.5, 22, 16), false, Color(1, 1, 1, 1))          # Kopf größer: auch Preise wie 15.26 passen hinein
 		# Anzeige: Preis (farbig nach Preisniveau) bzw. Fehlermeldung bei Stufe 3
 		var pf := run.fuel_price()
 		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
@@ -889,9 +893,9 @@ func _draw_pumps() -> void:
 			txt = "ERR"
 			col = Color("#ff4d6d")
 		col.a = flick
-		draw_string(font, Vector2(-8, -4.1), txt, HORIZONTAL_ALIGNMENT_CENTER, 16, 6, col)
+		draw_string(font, Vector2(-11, -4.3), txt, HORIZONTAL_ALIGNMENT_CENTER, 22, 5, col)
 		if pump_flash > 0.0:
-			draw_rect(Rect2(-5.0, -8.0, 10.0, 5.2), Color(1, 1, 1, pump_flash * 0.55))
+			draw_rect(Rect2(-7.0, -9.5, 14.0, 6.0), Color(1, 1, 1, pump_flash * 0.55))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		if stage >= 2:      # Funken am beschädigten Kopf
 			var k := int(t * 18.0)

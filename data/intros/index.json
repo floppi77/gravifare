@@ -1,0 +1,20 @@
+{
+ "8": "spikes",
+ "14": "doors",
+ "34": "magnet_pull",
+ "35": "magnet_push",
+ "37": "magnet_pulse",
+ "45": "heat",
+ "47": "heat_pulse",
+ "56": "wind",
+ "57": "gravity",
+ "58": "wind_gust",
+ "23": "debris",
+ "25": "moving_pad",
+ "27": "hospital",
+ "29": "meteors",
+ "33": "slider",
+ "46": "beam",
+ "67": "traffic",
+ "78": "dark"
+}

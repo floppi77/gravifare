@@ -39,6 +39,11 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(MenuKit.button(tr("MENU_RESTART"), func():
 		game._set_paused(false)
 		game.load_level(game.level_path)))
+	var ck: String = game.level_clip_key()
+	if ck != "":
+		box.add_child(MenuKit.button(tr("MENU_CLIP"), func():
+			game._set_paused(false)
+			game.start_clip(ck)))
 	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), func():
 		_clear()
 		in_sub = true

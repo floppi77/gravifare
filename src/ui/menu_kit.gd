@@ -106,7 +106,7 @@ static func slider_row(label: String, value: float, on_change: Callable) -> HBox
 ## Flaggenknopf für die Sprachwahl (kein Text). Gewählte Sprache: goldener Rahmen; Fokus: weißer Rahmen.
 static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callable) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(54, 38)
+	b.custom_minimum_size = Vector2(40, 26)
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_ALL
 	# Flagge als zentriertes Kind (Button-Icons sitzen nicht mittig im Rahmen)
@@ -116,10 +116,10 @@ static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callabl
 	flag.stretch_mode = TextureRect.STRETCH_SCALE
 	flag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	flag.set_anchors_preset(Control.PRESET_CENTER)
-	flag.offset_left = -20.0
-	flag.offset_right = 20.0
-	flag.offset_top = -13.33
-	flag.offset_bottom = 13.33
+	flag.offset_left = -14.0
+	flag.offset_right = 14.0
+	flag.offset_top = -9.33
+	flag.offset_bottom = 9.33
 	flag.modulate = Color(1, 1, 1, 1.0 if selected else 0.62)
 	b.add_child(flag)
 	var normal := StyleBoxFlat.new()
@@ -155,6 +155,21 @@ static func flag_row(on_select: Callable) -> HBoxContainer:
 			on_select.call(code))
 		fb.set_meta("lang", code)
 		flags.add_child(fb)
+	# Links/Rechts (Pfeiltasten, Stick, Steuerkreuz) wechselt zwischen den Flaggen
+	var fbs := flags.get_children()
+	for i in fbs.size():
+		var me: Button = fbs[i]
+		me.gui_input.connect(func(ev: InputEvent):
+			var step := 0
+			if ev.is_action_pressed("ui_right"):
+				step = 1
+			elif ev.is_action_pressed("ui_left"):
+				step = -1
+			if step != 0:
+				var j := clampi(i + step, 0, fbs.size() - 1)
+				if j != i:
+					(fbs[j] as Button).grab_focus()
+				me.accept_event())
 	return flags
 
 static func title(text: String, size := 16) -> Label:

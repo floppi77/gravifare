@@ -87,6 +87,14 @@ except ImportError:
 def main():
     d = json.load(open("data/voice_lines.json"))
     d["d0"] = {"de": {"r%d" % n: v[0] for n, v in sorted(L.items())}, "en": {"r%d" % n: v[1] for n, v in sorted(L.items())}}
+    try:
+        from tutorial_lines import T, V
+        d["i0"] = {"de": {}, "en": {}}              # Fluglehrer (Tutorial, Einspieler): eigene Stimme
+        for k, v in list(T.items()) + list(V.items()):
+            d["i0"]["de"][k] = v[0]
+            d["i0"]["en"][k] = v[1]
+    except ImportError:
+        pass
     d["d0"]["de"]["patient_lost"] = "Patient verloren. Das wird teuer."
     d["d0"]["en"]["patient_lost"] = "Patient lost. That will be expensive."
     json.dump(d, open("data/voice_lines.json", "w"), indent=1, ensure_ascii=False)

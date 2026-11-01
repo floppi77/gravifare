@@ -33,6 +33,11 @@ var arrive_prev := Vector2.ZERO
 @onready var fx: Node2D = $World/Fx
 @onready var trans: Control = $Trans/Root
 var dark: Control
+var tutorial: Tutorial = null          # Tutorial-Regie (nur im Tutorial-Level)
+var spot: Control = null
+var clip: IntroClip = null              # laufender Einspieler (Erklärvideo zu neuen Spielelementen)
+var clip_pending := ""                 # Einspieler, der nach Funkspruch/Ankunft startet
+var clip_delay := 0.0
 var script_inputs: Array = []
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
@@ -96,6 +101,11 @@ func _ready() -> void:
 		run.sim.state = TaxiSim.State.FLYING
 		run.sim.landed_pad = {}
 		run.sim.pos = run.level.exit_rect().get_center()
+	_queue_clip(0.9)                           # Szenenstart (Menü): Einspieler nach kurzer Pause; bei Übergangsflügen in _end_transition
+	for ua3 in OS.get_cmdline_user_args():
+		if ua3.begins_with("--clip="):           # Dev: Einspieler sofort zeigen
+			clip_pending = ua3.substr(7)
+			clip_delay = 0.3
 	if OS.get_cmdline_user_args().has("--debug-open-exit"):
 		run.exit_open = true
 		run.level.exit_open = true
@@ -163,6 +173,153 @@ func load_level(path: String) -> void:
 	completion_saved = false
 	_setup_camera()
 	bg.setup(lvl)
+	_setup_tutorial(lvl)
+
+## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
+func tutorial_speak(key: String) -> Dictionary:
+	var text := Sfx.line_text("i0", key)
+	var spoke := Sfx.play_voice("i0", key)
+	var length := Sfx.voice_player.stream.get_length() if spoke and Sfx.voice_player.stream != null else maxf(2.5, float(text.length()) * 0.07)
+	Sfx.narration_until = Time.get_ticks_msec() + int((length + 0.4) * 1000.0)
+	return {"len": length, "text": text}
+
+func tutorial_voice_stop() -> void:
+	Sfx.voice_player.stop()
+	Sfx.narration_until = 0
+
+func tutorial_ping() -> void:
+	Sfx.play("perfect", -6.0)
+
+func tutorial_voice_pause(p: bool) -> void:
+	Sfx.voice_player.stream_paused = p
+
+func tutorial_narrating() -> bool:
+	return Time.get_ticks_msec() < Sfx.narration_until
+
+func tutorial_mark_done() -> void:
+	Save.data["tutorial_done"] = true
+	Save.write()
+
+func tutorial_set_lives(n: int) -> void:
+	Flow.lives = n
+
+## Tutorial beendet: weiter ins erste Level (neuer Spielstand) oder zurück ins Menü.
+func tutorial_finish() -> void:
+	Sfx.set_thrust(0.0, 0.0)
+	if Flow.tutorial_next != "":
+		var nxt: String = Flow.tutorial_next
+		Flow.tutorial_next = ""
+		Flow.start_campaign(nxt)
+	else:
+		Flow.to_menu()
+
+# ---------------------------------------------------------------- Einspieler (Erklärvideos zu neuen Spielelementen)
+## Name des Einspielers dieses Levels (data/intros/index.json: Levelnummer → Name), "" wenn es keinen gibt.
+func level_clip_key() -> String:
+	if run.level.tutorial:
+		return ""
+	var f := FileAccess.open("res://data/intros/index.json", FileAccess.READ)
+	var idx = JSON.parse_string(f.get_as_text()) if f != null else null
+	if typeof(idx) != TYPE_DICTIONARY:
+		return ""
+	return String(idx.get(str(run.level.number), ""))
+
+## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
+func _queue_clip(delay: float) -> void:
+	if not Settings.values.hints:
+		return
+	var k := level_clip_key()
+	var seen: Array = Save.data.get("seen_clips", [])
+	if k == "" or seen.has(k):
+		return
+	clip_pending = k
+	clip_delay = delay
+
+## Einspieler abspielen (pausiert das Spiel); `force` ignoriert „schon gesehen“ (Wiederholung, Dev-Flag).
+func start_clip(k: String) -> void:
+	if clip != null:
+		return
+	var seen: Array = Save.data.get("seen_clips", [])
+	if not seen.has(k):
+		seen.append(k)
+		Save.data["seen_clips"] = seen
+		Save.write()
+	var layer := CanvasLayer.new()
+	layer.layer = 12
+	add_child(layer)
+	var c := IntroClip.new()
+	layer.add_child(c)
+	if not c.start(self, k):
+		layer.queue_free()
+		return
+	clip = c
+	paused = true
+	Sfx.set_thrust(0.0, 0.0)
+	Haptics.stop()
+	Music.duck(-8.0)
+	c.finished.connect(func():
+		clip = null
+		layer.queue_free()
+		paused = false
+		Music.duck(0.0))
+
+func _clip_tick(delta: float) -> void:
+	if clip_pending == "" or clip != null or paused or trans_t >= 0.0 or run.result != Run.Result.RUNNING:
+		return
+	if Sfx.voice_player.playing:
+		return                      # erst den Funkspruch zu Ende hören
+	clip_delay -= delta
+	if clip_delay <= 0.0:
+		var k := clip_pending
+		clip_pending = ""
+		start_clip(k)
+
+## Beleuchtungs-Ebene (Spotlight) bei Bedarf anlegen: Tutorial und Respawn-Hinweis.
+func _ensure_spot() -> void:
+	if spot != null:
+		return
+	var sl := CanvasLayer.new()
+	sl.layer = 11                                          # über dem HUD, unter Pausemenü-Ebene
+	add_child(sl)
+	spot = Control.new()
+	spot.set_script(load("res://src/game/spot_view.gd"))
+	sl.add_child(spot)
+
+var focus_t := 0.0                 # Restzeit des Respawn-Spots (Bildschirm dunkel bis auf das neue Taxi)
+
+## Nach einem verlorenen Taxi: kurz alles abdunkeln bis auf das neue Taxi, damit der Blick es findet.
+func _respawn_focus() -> void:
+	if run.level.tutorial:
+		return
+	_ensure_spot()
+	focus_t = 0.6
+
+func _focus_tick(delta: float) -> void:
+	if spot == null or tutorial != null:
+		return
+	if focus_t > 0.0:
+		focus_t -= delta
+		var center := cam.get_screen_center_position()
+		spot.fade_speed = 7.0
+		spot.set_spots([Rect2(run.sim.pos - center + Vector2(320.0, 180.0) - Vector2(30, 26), Vector2(60, 52))])
+		if focus_t <= 0.0:
+			spot.set_spots([])
+	elif spot.amount <= 0.01:
+		spot.fade_speed = 2.6
+
+## Tutorial-Level: Beleuchtungs-Ebene und Regie anlegen (bei Neustart frisch).
+func _setup_tutorial(lvl: LevelData) -> void:
+	if tutorial != null:
+		tutorial.queue_free()
+		tutorial = null
+	if not lvl.tutorial:
+		return
+	_ensure_spot()
+	spot.set_spots([])
+	spot.say("", "")
+	tutorial = Tutorial.new()
+	add_child(tutorial)
+	tutorial.setup(self, run, hud, spot, cam)
 
 func _setup_camera() -> void:
 	var sz := run.level.pixel_size()
@@ -237,7 +394,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			load_level(level_path)
 	elif event.is_action_pressed("gear") and not paused and Controls.gear_toggle:
-		gear_on = not gear_on
+		if tutorial == null or not tutorial.locked:
+			gear_on = not gear_on
 
 func _physics_process(_delta: float) -> void:
 	if paused:
@@ -254,6 +412,9 @@ func _physics_process(_delta: float) -> void:
 		gear_on = cmd[1]
 	if not Controls.gear_toggle:
 		gear_on = Input.is_action_pressed("gear")
+	if tutorial != null and tutorial.locked:
+		v = Vector2.ZERO                       # Tutorial: erst erklären, dann fliegen
+		gear_on = run.sim.gear_cmd             # … und das Fahrwerk bleibt, wie es ist
 	if not script_inputs.is_empty():
 		var cmd: Dictionary = script_inputs.pop_front()
 		v = cmd.v
@@ -284,6 +445,10 @@ func _physics_process(_delta: float) -> void:
 		_on_event(e)
 	cam.global_position = _cam_target()
 	_cam_feel()
+	if run.result == Run.Result.COMPLETE and not completion_saved and run.level.tutorial:
+		completion_saved = true
+		Sfx.set_thrust(0.0, 0.0)
+		tutorial.complete()
 	if run.result == Run.Result.COMPLETE and not completion_saved:
 		completion_saved = true
 		Save.note_max("best_streak", run.best_streak)
@@ -350,6 +515,15 @@ func _field_feedback() -> void:
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
 	## Der Fahrgast an Bord ist verloren und wartet erneut an seinem Abholpad, neues Taxi am Startpad.
+	if run.level.tutorial:                      # Flugschule: neues Taxi ohne Verlust
+		run.respawn_after_crash()
+		gear_on = run.sim.gear_cmd
+		restart_timer = 0.0
+		taxi.sync_state()
+		taxi.reset_physics_interpolation()
+		cam.global_position = _cam_target()
+		cam.reset_physics_interpolation()
+		return
 	Flow.lives -= 1
 	if Flow.lives <= 0:
 		Flow.lives = 0
@@ -365,6 +539,7 @@ func _lose_life() -> void:
 	taxi.reset_physics_interpolation()
 	cam.global_position = _cam_target()
 	cam.reset_physics_interpolation()
+	_respawn_focus()
 	for e in run.log:
 		_on_event(e)
 
@@ -392,7 +567,7 @@ func _music_tick() -> void:
 var _hint_ticks := 0
 func _hint_tick() -> void:
 	_hint_ticks += 1
-	if _hint_ticks % 30 != 0 or not Settings.values.hints or paused or trans_t >= 0.0:
+	if _hint_ticks % 30 != 0 or not Settings.values.hints or paused or trans_t >= 0.0 or run.level.tutorial:
 		return
 	var s := run.sim
 	var dev := Controls.last_device
@@ -470,6 +645,8 @@ func _passenger_reaction(e: Dictionary) -> void:
 
 ## Tankwart: schimpft bei Berührungen der Säule, kommentiert Preiswechsel (höchstens alle 14 s).
 func _attendant(key: String, cooldown := 0.0) -> void:
+	if run.level.tutorial:
+		return                                  # im Tutorial spricht nur der Fluglehrer
 	var now := Time.get_ticks_msec() / 1000.0
 	if cooldown > 0.0:
 		if now < attendant_cd:
@@ -499,6 +676,8 @@ func _exit_tree() -> void:
 	Haptics.stop()
 
 func _on_event(e: Dictionary) -> void:
+	if tutorial != null:
+		tutorial.on_event(e)
 	match e.type:
 		"perfect":
 			hud.flash_message(tr("MSG_PERFECT") % e.streak, 1.4)
@@ -660,6 +839,8 @@ func _on_event(e: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Levelwechsel
 func _process(delta: float) -> void:
+	_clip_tick(delta)
+	_focus_tick(delta)
 	if run.result == Run.Result.RUNNING and not paused and trans_t < 0.0:
 		Save.add_playtime(delta / maxf(Engine.time_scale, 0.05))
 	if slowmo_left > 0.0:
@@ -668,7 +849,13 @@ func _process(delta: float) -> void:
 			_end_slowmo()
 	if trans_t < 0.0:
 		return
-	trans_t += delta
+	if radio_played:
+		radio_age += delta
+		trans.radio_age = radio_age
+	# Läuft der Funkspruch noch, wartet der Flug kurz vor der Ankunft, bis Text und Sprache zu Ende sind (nichts wird abgeschnitten)
+	var hold: bool = radio_played and radio_age < trans.radio_len + 0.6 and trans_t > TV.T_IN - 0.4 and trans_t < TV.T_IN
+	if not hold:
+		trans_t += delta
 	trans.t = trans_t
 	if not radio_played and trans_t >= 2.15 and trans_t < TV.T_IN:
 		radio_played = true
@@ -681,6 +868,7 @@ func _process(delta: float) -> void:
 		_end_transition()
 
 var radio_played := false
+var radio_age := 0.0              # Sekunden seit Beginn des Funkspruchs (läuft auch, wenn der Flug darauf wartet)
 
 ## Funkspruch der Zentrale während der Weltraumfahrt: ein eigener Spruch je Level; wird dort etwas Neues eingeführt,
 ## bezieht er sich darauf, sonst ist es Plauderei.
@@ -715,6 +903,8 @@ func _begin_transition() -> void:
 	arriving = false
 	trans_t = 0.0
 	radio_played = false
+	radio_age = 0.0
+	trans.radio_age = 0.0
 	Music.duck(-13.0)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--trans-t="):      # Dev: Zeitachse an beliebiger Stelle starten (Screenshots)
@@ -781,6 +971,7 @@ func _release_carried() -> void:
 	run.release_carried(c)
 
 func _end_transition() -> void:
+	_queue_clip(0.5)
 	run.level.doors_forced_open = false
 	run.level.movers_ignore = false
 	Music.duck(0.0)

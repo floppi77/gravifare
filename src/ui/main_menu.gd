@@ -21,7 +21,9 @@ func _ready() -> void:
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
 	add_child(box)
-	if OS.get_cmdline_user_args().has("--levels"):      # Dev: direkt die Levelauswahl zeigen
+	if Save.slot == 0 or OS.get_cmdline_user_args().has("--slots"):      # Dev: --slots zeigt die Platzwahl
+		show_slots()                                    # Spielstand wählen (beim Start)
+	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen
 		show_levels()
 	else:
 		show_main()
@@ -63,16 +65,34 @@ func show_main(focus_lang := "") -> void:
 				Flow.start_campaign(id)))
 	box.add_child(MenuKit.button(tr("MENU_PLAY"), func():
 		Save.clear_campaign()
-		Flow.start_campaign(ids[0] if not ids.is_empty() else id)))
+		var first: String = ids[0] if not ids.is_empty() else id
+		if bool(Save.data.get("tutorial_done", false)):
+			Flow.start_campaign(first)
+		else:
+			Flow.start_tutorial(first)))               # neuer Spielstand: erst die Flugschule, danach Level 1
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
-	box.add_child(MenuKit.button(tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")))
-	box.add_child(MenuKit.button(tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")))
-	box.add_child(MenuKit.button(tr("MENU_OPTIONS"), show_options))
-	box.add_child(MenuKit.button(tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")))
-	box.add_child(MenuKit.button(tr("MENU_QUIT"), func(): get_tree().quit()))
+	box.add_child(MenuKit.button(tr("MENU_TUTORIAL"), func(): Flow.start_tutorial("")))
+	# Nebenmenüs kompakt in zwei Spalten, damit Menü und Flaggen auf den Bildschirm passen
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 3)
+	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	for entry in [
+			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
+			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
+			[tr("MENU_OPTIONS"), show_options],
+			[tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
+			[tr("SLOT_CURRENT") % Save.slot, show_slots],
+			[tr("MENU_QUIT"), func(): get_tree().quit()]]:
+		var sb := MenuKit.button(entry[0], entry[1])
+		sb.custom_minimum_size = Vector2(62, 18)
+		sb.add_theme_font_size_override("font_size", 7)
+		grid.add_child(sb)
+	box.add_child(grid)
 	# Sprachwahl: zwei Flaggen ohne Text unter dem Menü
 	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 8)
+	gap.custom_minimum_size = Vector2(0, 3)
 	box.add_child(gap)
 	box.add_child(MenuKit.flag_row(func(code): show_main(code)))
 	_focus_first(focus_lang)
@@ -122,12 +142,59 @@ func show_levels() -> void:
 	box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
 	_focus_first()
 
+## Drei unabhängige Spielstände: Auswahl, Löschen mit Rückfrage. Beim Start ohne Abbrechen (erst wählen), später mit „Zurück“.
+func show_slots() -> void:
+	_clear()
+	box.add_child(MenuKit.title(tr("SLOT_TITLE")))
+	for n in range(1, Save.SLOTS + 1):
+		var info: Dictionary = Save.slot_summary(n)
+		var row := HBoxContainer.new()
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_theme_constant_override("separation", 3)
+		var label := ""
+		if info.exists:
+			var secs: int = info.seconds
+			label = "%d  ·  " % n + tr("SLOT_INFO") % [info.levels, "%d:%02d h" % [secs / 3600, (secs % 3600) / 60], info.score]
+		else:
+			label = "%d  ·  " % n + tr("SLOT_EMPTY")
+		var b := MenuKit.button(label, func():
+			Save.select_slot(n)
+			show_main())
+		b.custom_minimum_size = Vector2(196 if info.exists else 224, 22)
+		if n == Save.slot:
+			b.text += "  ◄"
+		row.add_child(b)
+		if info.exists:
+			var d := MenuKit.button("✕", func(): show_slot_delete(n))
+			d.custom_minimum_size = Vector2(24, 22)
+			d.tooltip_text = tr("SLOT_DELETE")
+			row.add_child(d)
+		box.add_child(row)
+	if Save.slot != 0:
+		box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
+	_focus_first()
+
+func show_slot_delete(n: int) -> void:
+	_clear()
+	box.add_child(MenuKit.title(tr("SLOT_CONFIRM") % n))
+	var sub := Label.new()
+	sub.text = tr("SLOT_CONFIRM_SUB")
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.custom_minimum_size = Vector2(220, 0)
+	box.add_child(sub)
+	box.add_child(MenuKit.button(tr("SLOT_NO"), show_slots))
+	box.add_child(MenuKit.button(tr("SLOT_YES"), func():
+		Save.delete_slot(n)
+		show_slots()))
+	_focus_first()
+
 func show_options() -> void:
 	_clear()
 	box.add_child(MenuKit.options_panel(show_main, show_options))
 	_focus_first()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and box.get_child_count() > 0:
+	if event.is_action_pressed("ui_cancel") and box.get_child_count() > 0 and Save.slot != 0:
 		show_main()
 		get_viewport().set_input_as_handled()

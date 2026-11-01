@@ -32,8 +32,26 @@ func resolve_level(arg: String) -> String:
 		return id if ids.has(id) else a
 	return a
 
+const TUTORIAL_ID := "tutorial"
+var tutorial_next := ""                 # nach dem Tutorial: Level, in das es übergeht ("" = zurück ins Menü)
+
 func level_path(id: String) -> String:
+	if id == TUTORIAL_ID:
+		return "res://data/tutorial/tutorial.json"
 	return "res://data/levels/%s.json" % id
+
+func in_tutorial() -> bool:
+	return current_level == TUTORIAL_ID
+
+## Tutorial starten (eigener Mini-Lauf mit vollen Leben/Tank, ohne Speicherstand-Eingriff). `next_id`: Level danach, "" = Menü.
+func start_tutorial(next_id := "") -> void:
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	run_seed = randi() % 1000000
+	tutorial_next = next_id
+	start_level(TUTORIAL_ID)
 
 ## Neuer Lauf: volle Leben, voller Tank, keine Credits – ab dem gewählten Level.
 func start_campaign(id: String) -> void:

@@ -16,6 +16,7 @@ var lost_name := ""
 var lost_fee := 0
 const LOST_TOTAL := 4.6
 var hint_text := ""
+var gauge_override: Array = []      # Tutorial: Landeanzeige zeigt vorgegebene Anteile (Wert / Grenze) statt der echten Werte
 var hint_t := 0.0
 var result := {}
 var result_age := 0.0            # Sekunden seit Anzeige der Ergebnisansicht
@@ -63,7 +64,7 @@ func _bar(x: float, y: float, w: float, h: float, frac: float, col: Color, label
 
 ## Das HUD liegt nur in den Randstreifen: oben auf der Felsreihe 0 (y 0–16), unten unter der Bodenreihe (y 336–360).
 ## Dazwischen liegt das reine Spielfeld – nichts überdeckt Plattformen, Hindernisse oder Fahrgäste. Frei bleibt
-## x 296–344 oben (Torschild).
+## x 296–344 oben (Torschild). Rechts vom Tor: Level und Name, Pflichtfahrgäste (x/y), Spritpreis; ganz rechts die Landeanzeige.
 const TOP_Y := 0.0
 const BOT_Y := 337.0
 
@@ -97,16 +98,18 @@ func _draw() -> void:
 			pcol = Color("#ff4d6d")
 		if price_flash > 0.0:
 			pcol = pcol.lerp(Color.WHITE, price_flash)
-		draw_string(font, Vector2(348, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 70, 8, pcol)
+		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	draw_string(font, Vector2(420, 12), "%d/99  %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_LEFT, 120, 8, Color("#c4d0ff"))
-	draw_string(font, Vector2(540, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 24, 9, Color.WHITE)
+	draw_string(font, Vector2(350, 12), lname if run.level.tutorial else "%d/99  %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_LEFT, 108, 8, Color("#c4d0ff"))
+	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei dünne Balken
 	var gx := 580.0
 	var rows := [[tr("HUD_VY"), s.vel.y, Tuning.LAND_VY], [tr("HUD_VX"), absf(s.vel.x), Tuning.LAND_VX], [tr("HUD_TILT"), rad_to_deg(absf(s.tilt)), rad_to_deg(Tuning.LAND_TILT)]]
 	for i in rows.size():
 		var v: float = rows[i][1]
 		var lim: float = rows[i][2]
+		if gauge_override.size() == rows.size():
+			v = float(gauge_override[i]) * lim
 		var ratio: float = clampf(v / lim, 0.0, 2.0)
 		var col := Color("#5dff9a") if ratio <= 0.7 else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
 		var gy := 3.0 + i * 4.0

@@ -35,7 +35,7 @@
    "from": "6",
    "to": "1",
    "fare": 130,
-   "par": 51,
+   "par": 28,
    "passenger": "Mika",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "2",
    "to": "5",
    "fare": 140,
-   "par": 50,
+   "par": 27,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "3",
    "to": "1",
    "fare": 150,
-   "par": 22,
+   "par": 10,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -59,7 +59,7 @@
    "from": "4",
    "to": "1",
    "fare": 160,
-   "par": 25,
+   "par": 11,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -67,7 +67,7 @@
    "from": "5",
    "to": "1",
    "fare": 170,
-   "par": 41,
+   "par": 22,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "5",
    "to": "1",
    "fare": 180,
-   "par": 27,
+   "par": 12,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -83,7 +83,7 @@
    "from": "2",
    "to": "exit",
    "fare": 190,
-   "par": 47,
+   "par": 10,
    "passenger": "Nora",
    "gender": "f"
   }

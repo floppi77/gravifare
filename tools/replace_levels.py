@@ -43,13 +43,20 @@ def score_of(path):
     return r[path]["score"]
 
 
-def replace(n, K=14):
+TOL = 0.0            # --tol=<x>: Fenster um x Punkte weiten (Lückenfüller auf gleicher Schwierigkeitsstufe)
+FROM = 0             # --from=<Level>: rezeptgebend ist dieses Level (Konfiguration, Score), der neue Grundriss kommt an die Stelle des Zielslots
+
+
+def replace(n, K=40):
     sector, idx, fn = level_file(n)
-    old = json.load(open(fn))
-    s0 = score_of(fn)
+    src_fn = level_file(FROM)[2] if FROM else fn
+    old = json.load(open(src_fn))
+    if FROM and os.path.exists(fn):
+        old["name"] = json.load(open(fn))["name"]                 # der Zielslot behält seinen Namen
+    s0 = score_of(src_fn)
     prev = next((level_file(m)[2] for m in range(n - 1, 0, -1) if os.path.exists(level_file(m)[2])), None)
     lo = score_of(prev) if prev else 0.0
-    nxt = next((level_file(m)[2] for m in range(n + 1, 100) if os.path.exists(level_file(m)[2])), None)
+    nxt = None if FROM else next((level_file(m)[2] for m in range(n + 1, 100) if os.path.exists(level_file(m)[2])), None)
     hi = score_of(nxt) if nxt else 1e9
     c = cfg_from_level(old)
     others = bs.existing_layouts(skip_sector=None, skip_levels=(n,))
@@ -91,7 +98,7 @@ def replace(n, K=14):
     for p, (v, k, d) in meta.items():
         if bs.valid(d, res2.get(p)):
             pts.append((res2[p]["score"], v, k, 0))
-    inside = [q for q in pts if lo + 0.05 < q[0] < hi - 0.05]
+    inside = [q for q in pts if lo - TOL + 0.05 < q[0] < hi + TOL - 0.05]
     if not inside:
         print("  kein Punkt im Fenster (Bereich %.1f–%.1f)" % (min((q[0] for q in pts), default=0), max((q[0] for q in pts), default=0)))
         return False
@@ -101,19 +108,27 @@ def replace(n, K=14):
     d["name"] = old["name"]
     p = bs.write_cand(d, "rep%d_final_pre" % n)
     r = bs.run_eval([p])[p]
-    times = r["times"] + [30.0]
-    pars = [int(round(1.3 * t + 8)) for t in times][: len(d["jobs"])]
+    times = r["times"] + [22.0]
+    pars = [max(10, int(round(0.85 * t))) for t in times][: len(d["jobs"])]
     d2, _ = bs.make_level(sector, idx, v, k, pars, idx, cfgo=c)
     d2["name"] = old["name"]
+    d2["index"] = idx
+    d2["id"] = "S%d-%02d" % (sector, idx)
     json.dump(d2, open(fn, "w"), indent=1, ensure_ascii=False)
     r2 = bs.run_eval([fn])[fn]
     ok = bs.valid(d2, r2)
     print("  ersetzt: Score %.1f (vorher %.1f), gültig=%s" % (r2["score"], s0, ok), flush=True)
-    if not ok:
+    if not ok and not FROM:
         json.dump(old, open(fn, "w"), indent=1, ensure_ascii=False)
     return ok
 
 
 if __name__ == "__main__":
     for a in sys.argv[1:]:
-        replace(int(a))
+        if a.startswith("--tol="):
+            TOL = float(a[6:])
+        if a.startswith("--from="):
+            FROM = int(a[7:])
+    for a in sys.argv[1:]:
+        if not a.startswith("--"):
+            replace(int(a))

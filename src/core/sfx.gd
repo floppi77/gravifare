@@ -82,7 +82,11 @@ func set_volume(bus: String, linear: float) -> void:
 
 ## Fahrgast-Sprachzeile abspielen (Datei: voice/<sprache>/<stimme>_<zeile>.ogg). Fehlt sie, bleibt es beim
 ## Untertitel – das Spiel funktioniert vollständig ohne Sprachdateien.
+var narration_until := 0       # ms-Zeitpunkt, bis zu dem eine Erzählerstimme (Tutorial, Einspieler) läuft: Fahrgast-Zurufe schweigen
+
 func play_voice(voice: String, line: String) -> bool:
+	if voice != "d0" and voice != "i0" and Time.get_ticks_msec() < narration_until:
+		return false
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	var path := "res://assets/audio/voice/%s/%s_%s.ogg" % [lang, voice, line]
 	if not ResourceLoader.exists(path):

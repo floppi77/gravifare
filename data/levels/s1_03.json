@@ -35,7 +35,7 @@
    "from": "2",
    "to": "3",
    "fare": 70,
-   "par": 24,
+   "par": 18,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "1",
    "to": "2",
    "fare": 60,
-   "par": 40,
+   "par": 28,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "3",
    "to": "exit",
    "fare": 100,
-   "par": 14,
+   "par": 10,
    "passenger": "Lena",
    "gender": "f"
   }

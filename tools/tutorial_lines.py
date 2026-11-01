@@ -1,0 +1,103 @@
+"""Sprechertexte des Tutorials (Stimme "d0", Schlüssel tut_*) und der Einspieler für neue Spielelemente (Schlüssel vid_*).
+Aufruf über tools/radio_lines.py (schreibt data/voice_lines.json)."""
+
+T = {}
+T["tut_welcome"] = ("Willkommen in der Flugschule, Taxi sieben! Ich erkläre dir alles, während du fliegst. Deine Aufgabe: Fahrgäste abholen und sicher zu ihrem Ziel bringen.",
+                    "Welcome to flight school, Taxi seven! I will explain everything while you fly. Your job: pick up passengers and bring them safely to their destination.")
+T["tut_hud_fuel"] = ("Oben links siehst du deinen Tank. Jede Düse verbraucht Sprit. Ist er leer, ist dein Taxi verloren.",
+                     "Top left is your fuel tank. Every thruster burns fuel. When it is empty, your taxi is lost.")
+T["tut_hud_hull"] = ("Daneben die Hülle. Aufpralle und Hindernisse beschädigen sie. Bei null ist das Taxi zerstört.",
+                     "Next to it is your hull. Impacts and obstacles damage it. At zero the taxi is destroyed.")
+T["tut_hud_money"] = ("Hier dein Geld in Credits, und daneben deine Leben. Fünf Taxis hast du, mehr gibt es nie.",
+                      "Here is your money in credits, and next to it your lives. You have five taxis, never more.")
+T["tut_hud_level"] = ('Rechts vom Tor siehst du das Level und seinen Namen. Daneben zählt, wie viele Pflichtfahrgäste du schon befördert hast und wie viele es insgesamt gibt.',
+                      'To the right of the gate you see the level and its name. Next to it counts how many mandatory passengers you have delivered and how many there are in total.')
+T["tut_hud_gauge"] = ('Ganz rechts die Landeanzeige: wie schnell du sinkst, wie schnell du seitlich fliegst und wie schief du stehst. Bleiben alle drei Balken unter der weißen Marke, landest du sicher.',
+                      'At the far right is the landing gauge: how fast you sink, how fast you move sideways and how tilted you are. Keep all three bars below the white mark and you land safely.')
+T["tut_fly"] = ("Los geht's! Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
+                "Let's go! Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.")
+T["tut_fly_ok"] = ("Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
+                   "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.")
+T["tut_gear"] = ("Vor jeder Landung fährst du das Fahrwerk aus. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.",
+                 "Extend the landing gear before every landing. The taxi then flies slower and more precisely. Extend it now.")
+T["tut_fuel_low"] = ("Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
+                     "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.")
+T["tut_refuel"] = ('Solange du hier stehst, tankst du. Bis fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.',
+                   'While you sit here, you refuel. Up to thirty-five percent the station refuels for free in an emergency. Never bump the pump: after three touches it explodes.')
+T["tut_landing"] = ('Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt die Hülle Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.',
+                    'Now for landing. If you land slowly and level, all is well. If you are faster, the hull takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.')
+T["tut_hard"] = ('Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird. Hier kostet das nichts.',
+                 'Try it: dive down with full power and land so hard that the taxi is destroyed. Here it costs nothing.')
+T["tut_job"] = ('Jetzt zum Geschäft. Unten steht dein Auftrag: Mika wartet an Plattform zwei. Der Stern über ihr zeigt: Mika ist ein Pflichtfahrgast. Pflichtfahrgäste sind die Aufträge des Levels, am Anfang zwei oder drei, später bis zu neun. Hast du alle befördert, öffnet sich das Tor. Lande bei Mika mit ausgefahrenem Fahrwerk und warte, bis sie einsteigt.',
+                'Now to business. At the bottom is your job: Mika is waiting at platform two. The star above her shows that Mika is a mandatory passenger. Mandatory passengers are the jobs of the level, two or three at first, later up to nine. Deliver them all and the gate opens. Land next to Mika with your gear out and wait for her to board.')
+T["tut_pay"] = ("Bring sie zu Plattform drei. Je schneller du bist, desto mehr zahlt sie, der Betrag unten rechts tickt herunter. Weiche Landungen in Folge geben einen Bonus.",
+                "Take her to platform three. The faster you are, the more she pays; the amount at the bottom right ticks down. Soft landings in a row earn a bonus.")
+T["tut_delivered"] = ("Das war dein erster Fahrpreis. Gut gemacht!", "That was your first fare. Well done!")
+T["tut_extra"] = ('Funkruf! Neben den Pflichtfahrgästen rufen optionale Fahrgäste an, hier an Plattform zwei. Sie sind freiwillig und bringen Extrageld, doch dein Taxi hat nur einen Sitz, und sie warten nicht ewig. Flieg hin und nimm den Gast mit.',
+                  'Radio call! Besides the mandatory passengers, optional ones call in, here at platform two. They are voluntary and bring extra money, but your taxi has only one seat, and they will not wait forever. Fly over and take the guest along.')
+T["tut_life"] = ("Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+                 "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.")
+T["tut_exit"] = ("Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
+                 "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.")
+T["tut_gate"] = ("Das Tor ist offen. Flieg hindurch!", "The gate is open. Fly through it!")
+T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.',
+                      'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')
+T["tut_gear_in"] = ('Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Fahrwerkstaste ein: Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Fahr es jetzt ein.',
+                    'Your landing gear is still extended. To take off, retract it with the gear button: retracted, the taxi flies fast; extended, slow and precise. Retract it now.')
+T["tut_credit"] = ('Darüber kostet der Sprit Geld. Ich schreibe dir fünfzig Credits gut, tank also ruhig voll.',
+                   'Above that, fuel costs money. I am crediting you fifty credits, so go ahead and fill up.')
+T["tut_price"] = ('Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.',
+                  'The fuel price changes regularly, just like it did a moment ago. Keep an eye on the display at the top. In flight school I will leave it alone from now on.')
+T["tut_crash_ok"] = ('Zerstört! Normalerweise kostet dich das ein Leben, und ein Fahrgast an Bord ist verloren. Hier bekommst du sofort ein neues Taxi.',
+                     'Destroyed! Normally that costs you a life, and a passenger on board is lost. Here you get a new taxi right away.')
+T["tut_soft"] = ('Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend.',
+                 'And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly.')
+T["tut_soft_ok"] = ('Wunderbar sanft! Weiche, gerade Landungen in Folge bringen dir einen Bonus auf den Fahrpreis.',
+                    'Wonderfully gentle! Soft, level landings in a row earn you a bonus on the fare.')
+T["tut_soft_meh"] = ('Das ging, war aber noch nicht weich. Je langsamer du aufsetzt, desto besser. Weiche, gerade Landungen in Folge bringen dir einen Bonus.',
+                     'That worked, but it was not soft yet. The slower you touch down, the better. Soft, level landings in a row earn you a bonus.')
+T["tut_extra_dest"] = ('Das Ziel des Gastes leuchtet jetzt auf. Bring den Gast dorthin.',
+                       "The guest's destination is lit up now. Take the guest there.")
+T["tut_done"] = ("Geschafft! Du bist bereit für den Dienst. Viel Erfolg da draußen, Taxi sieben.",
+                 "Done! You are ready for duty. Good luck out there, Taxi seven.")
+T["tut_crash"] = ("Autsch. Keine Sorge, in der Flugschule bekommst du sofort ein neues Taxi.",
+                  "Ouch. Do not worry, in flight school you get a new taxi right away.")
+
+# ---- Einspieler (data/intros/index.json: Levelnummer -> Name); Stimme "i0" (Fluglehrer), Schlüssel vid_<name>
+V = {}
+V["vid_spikes"] = ("Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung kostet dich dreißig Hülle, egal wie langsam du bist. Halte Abstand.",
+                   "Spikes. They sit on rocks and platforms. Every touch costs you thirty hull, no matter how slowly you fly. Keep your distance.")
+V["vid_doors"] = ("Schleusentore öffnen und schließen im festen Takt. Warte, bis das Tor offen ist, und flieg zügig hindurch. Schließt es auf dir, wirst du hinausgeschleudert und verlierst Hülle.",
+                  "Lock gates open and close on a fixed beat. Wait until the gate is open and fly through quickly. If it closes on you, you get thrown out and lose hull.")
+V["vid_debris"] = ("Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Eine Berührung kostet fünfzehn Hülle.",
+                   "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch costs fifteen hull.")
+V["vid_moving_pad"] = ("Fahrende Plattformen gleiten auf Schienen. Fliege über sie, passe dein Tempo an und lande im Tempo der Plattform. Das Taxi fährt mit.",
+                       "Moving pads glide on rails. Fly over one, match its speed and land at the pad's own pace. The taxi rides along.")
+V["vid_hospital"] = ("Krankentransport: Der Patient liegt auf einer Trage und muss ins Krankenhaus. Jede Beschädigung ist gefährlich. Geht er verloren, kostet das den aktuellen Fahrpreis. Fliege besonders sanft.",
+                     "Medical transport: the patient lies on a stretcher and must go to the hospital. Any damage is dangerous. If the patient is lost, it costs you the current fare. Fly extra gently.")
+V["vid_meteors"] = ("Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer kostet zwanzig Hülle.",
+                    "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit costs twenty hull.")
+V["vid_slider"] = ("Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und kosten dreißig Hülle. Passiere sie, wenn sie weit genug weg sind.",
+                   "Sliders are big, heavy blocks. They crush anything caught between them and a wall and cost thirty hull. Pass them when they are far enough away.")
+V["vid_magnet_pull"] = ("Magnetfelder ziehen dein Taxi zum Kern. Je näher, desto stärker. Steuere rechtzeitig dagegen, sonst landest du im Zentrum.",
+                        "Magnetic fields pull your taxi toward the core. The closer, the stronger. Steer against it in time, or you end up in the center.")
+V["vid_magnet_push"] = ("Abstoßende Magnete schieben dich fort. Du kommst kaum in die Nähe des Kerns. Nutze den Schub, um dich wegtragen zu lassen.",
+                        "Repelling magnets push you away. You barely get near the core. Use the push to be carried away.")
+V["vid_magnet_pulse"] = ("Manche Magnete schalten im Takt an und aus. Der Ring um den Kern zeigt dir, wann sie aktiv sind. Flieg durch, wenn sie ruhen.",
+                         "Some magnets switch on and off on a beat. The ring around the core shows when they are active. Fly through while they rest.")
+V["vid_heat"] = ("Hitzezonen glühen. Wer darin fliegt, verliert laufend Hülle. Flieg schnell hindurch oder, besser, um sie herum.",
+                 "Heat zones glow. Anyone flying inside constantly loses hull. Fly through quickly or, better, around them.")
+V["vid_beam"] = ("Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl verlierst du Hülle. Warte, bis er erlischt, und flieg dann hindurch.",
+                 "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam you lose hull. Wait until it goes out, then fly through.")
+V["vid_heat_pulse"] = ("Lavablasen kühlen im Takt ab und glühen wieder auf. Sind sie dunkel, kannst du gefahrlos hindurch. Achte auf den Takt.",
+                       "Lava blobs cool down on a beat and glow up again. When they are dark you can pass safely. Watch the beat.")
+V["vid_wind"] = ("Strömungen schieben dein Taxi in eine Richtung. Die Schlieren zeigen dir, wohin. Gleiche mit Gegenschub aus.",
+                 "Currents push your taxi in one direction. The streaks show you which way. Compensate with counter thrust.")
+V["vid_gravity"] = ("Schwerkraftzonen verändern dein Gewicht. In der leichten Zone steigst du von selbst, in der schweren sinkst du. Korrigiere den Schub entsprechend.",
+                    "Gravity zones change your weight. In the light zone you rise on your own, in the heavy zone you sink. Adjust your thrust accordingly.")
+V["vid_wind_gust"] = ("Böen sind Strömungen, die im Takt an- und ausgehen. Warte die Pause ab oder rechne mit dem Stoß.",
+                      "Gusts are currents that switch on and off on a beat. Wait for the pause or expect the push.")
+V["vid_traffic"] = ("Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Eine Kollision kostet achtzehn Hülle. Warte eine Lücke ab und kreuze die Bahn.",
+                    "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision costs eighteen hull. Wait for a gap and cross the lane.")
+V["vid_dark"] = ("Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
+                 "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.")

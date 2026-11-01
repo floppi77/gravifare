@@ -219,5 +219,21 @@
  "RES_H_BALANCE": "BALANCE",
  "RES_H_SCORE": "SCORE",
  "RES_BEST_SCORE": "Best %d",
- "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT"
+ "HUD_TAG_FRAGILE": "+ MEDICAL TRANSPORT",
+ "MENU_SLOTS": "Switch save slot",
+ "SLOT_TITLE": "Choose save slot",
+ "SLOT_EMPTY": "Empty – new game",
+ "SLOT_INFO": "%d levels · %s · %d points",
+ "SLOT_DELETE": "Delete",
+ "SLOT_CONFIRM": "Delete save slot %d?",
+ "SLOT_CONFIRM_SUB": "Progress, credits and garage of this slot will be lost.",
+ "SLOT_YES": "Yes, delete",
+ "SLOT_NO": "Cancel",
+ "SLOT_CURRENT": "Save slot %d",
+ "MENU_TUTORIAL": "Tutorial",
+ "SPK_INSTRUCTOR": "Flight instructor",
+ "CLIP_NEW": "New",
+ "CLIP_TAG": "BRIEFING",
+ "CLIP_SKIP": "Enter: skip",
+ "MENU_CLIP": "Watch briefing"
 }

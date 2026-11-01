@@ -26,6 +26,7 @@ var exit_open := false      # Laufzeitzustand; geschlossenes Tor ist fest
 var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
 var raw := {}
+var tutorial := false            # Tutorial-Level (data/tutorial/tutorial.json): Geduld unbegrenzt, Zusatzfahrgäste nur auf Befehl des Skripts
 ## Bewegliche Tore (Zeichen "a".."e" im Raster, Parameter im JSON unter "doors"): öffnen und schließen im festen Takt.
 ## Geschlossen sind sie fest wie Fels. Schließt ein Tor, während das Taxi darin ist, nimmt es Schaden und wird zur nächsten Seite hinausgeschleudert (TaxiSim).
 const DOOR_CHARS := "abcde"
@@ -56,6 +57,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	var l := LevelData.new()
 	l.raw = d
 	l.id = d.get("id", "")
+	l.tutorial = bool(d.get("tutorial", false))
 	l.sector = int(d.get("sector", 1))
 	l.index = int(d.get("index", 1))
 	l.number = (l.sector - 1) * 11 + l.index

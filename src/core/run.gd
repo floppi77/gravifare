@@ -41,6 +41,9 @@ var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
 var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in den Unterstand
 var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
 var spawn_timer := 0.0
+var extra_locked := false      # Tutorial: Zusatzfahrgast steigt erst ein, wenn das Skript es erlaubt
+var prices_frozen := false     # Tutorial: Spritpreis ändert sich nicht von selbst
+var pickup_locked := false     # Tutorial: Auftragsfahrgäste steigen (noch) nicht ein, neue erscheinen nicht
 var spawn_wait := false
 var level_time := 0.0              # Levelzeit (läuft auch nach Verlust eines Lebens weiter) – Takt der Preiswechsel
 var price_rng := RandomNumberGenerator.new()
@@ -151,7 +154,7 @@ func _spawn_actor(instant: bool) -> void:
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
 	main_wait = 0.0
-	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), par_of(job) * 1.5)      # lange Wege: mehr Geduld
+	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), Tuning.MAIN_PATIENCE_FLOOR)      # unabhängig von der Richtzeit (sonst ändern neue Richtzeiten den Ablauf)
 	if not respawn_keep_clock:
 		job_clock = 0.0
 	respawn_keep_clock = false
@@ -268,6 +271,15 @@ func level_score() -> int:
 	var med := medals()
 	var stars := int(med.time) + int(med.clean) + int(med.pro)
 	return int(round(net + 150.0 * stars + 2.0 * maxf(0.0, time_target() - level_time) + 10.0 * perfect_count))
+
+## Wartet an dieser Plattform gerade ein Fahrgast (Auftrag oder Zusatz)? Steuert das Hüttenlicht.
+func passenger_waiting_at(id: String) -> bool:
+	if actor != null and String(actor.pad.id) == id and actor.state in [PassengerActor.S.WAITING, PassengerActor.S.EMERGING, PassengerActor.S.TO_TAXI]:
+		return true
+	for ex in extras:
+		if String(ex.job.from) == id and int(ex.state) == ES.WAIT:
+			return true
+	return false
 
 ## Zielplattform eines wartenden Fahrgasts ("1".."9" oder "exit"), "" wenn unbekannt.
 func dest_of(a: PassengerActor) -> String:
@@ -568,7 +580,7 @@ func _step_actors(dt: float) -> void:
 		spawn_timer -= dt
 		if spawn_timer <= 0.0:
 			spawn_wait = true
-	if spawn_wait:
+	if spawn_wait and not pickup_locked:
 		# Neue Fahrgäste erscheinen nie auf dem Pad, auf dem das Taxi gerade steht
 		var nj := current_job()
 		var blocked: bool = (sim.state == TaxiSim.State.LANDED and not nj.is_empty() and sim.landed_pad.id == String(nj.from)) \
@@ -580,7 +592,7 @@ func _step_actors(dt: float) -> void:
 		actor.step(dt)
 		if actor.state == PassengerActor.S.WAITING and phase == Phase.WAITING:
 			main_wait += dt
-			if main_wait >= main_patience and actor.can_be_hit():
+			if main_wait >= main_patience and actor.can_be_hit() and not level.tutorial:
 				_miss_job()
 				return
 		for e in actor.events:
@@ -641,7 +653,7 @@ func _service_pad(dt: float) -> void:
 		return
 	match phase:
 		Phase.WAITING:
-			if pad.id == String(job.from) and actor != null and actor.state == PassengerActor.S.WAITING and not extra_busy():
+			if pad.id == String(job.from) and actor != null and actor.state == PassengerActor.S.WAITING and not extra_busy() and not pickup_locked:
 				actor.board(sim.pos.x)
 				phase = Phase.BOARDING
 				phase_timer = 0.0
@@ -786,8 +798,18 @@ func _roll_price(old: float) -> float:
 	var up := old + Tuning.PRICE_MIN_STEP
 	return snappedf(up if up <= level.fuel_price_max else old - Tuning.PRICE_MIN_STEP, 0.01)
 
+## Tutorial: Preiswechsel sofort auslösen (löst das Ereignis price_changed aus).
+func force_price_change() -> void:
+	var old := price_base
+	price_base = _roll_price(old)
+	if level.pads.has("F"):
+		log.append({"type": "price_changed", "price": fuel_price(), "up": price_base > old})
+
 func _update_prices(dt: float) -> void:
 	level_time += dt
+	if prices_frozen:
+		price_next_t += dt
+		return
 	if refuel_tick or station_down():     # beim Tanken und bei defekter Station ändert sich der Preis nie (Wechsel wird verschoben)
 		price_next_t += dt
 		return
@@ -809,7 +831,9 @@ func _check_pump(dt: float) -> void:
 		return
 	var body := Rect2(sim.pos.x - Tuning.HULL_HALF.x - 1.2, sim.pos.y - Tuning.HULL_HALF.y - 1.2, Tuning.HULL_HALF.x * 2.0 + 2.4, Tuning.HULL_HALF.y * 2.0 + Tuning.GEAR_LEN * sim.gear + 2.4)
 	for pm in level.pumps:
-		if body.intersects(pm.rect):
+		var pr: Rect2 = pm.rect
+		var head := Rect2(pr.position.x + pr.size.x * 0.5 - 11.0, pr.end.y - 35.2, 22.0, 16.0)          # breiterer Kopf mit der Preisanzeige
+		if body.intersects(pr) or body.intersects(head):
 			pump_touches += 1
 			pump_cd = Tuning.PUMP_TOUCH_COOLDOWN
 			log.append({"type": "pump_touched", "stage": pump_touches, "price": fuel_price()})
@@ -818,13 +842,13 @@ func _check_pump(dt: float) -> void:
 			return
 
 # ---------------------------------------------------------------- Medaillen (je Level, dauerhaft gespeichert)
-## Zielwerte: Zeit = 1,2 × Summe der Richtzeiten + 10 s; Einkommen = Summe der Fahrpreise (mit Streckenzuschlag) der
+## Zielwerte: Zeit = Summe der Richtzeiten + 3 s je Auftrag (Richtzeit ≈ 0,85 × Zeit des Autopiloten, also Tempo eines guten Piloten); Einkommen = Summe der Fahrpreise (mit Streckenzuschlag) der
 ## normalen Aufträge (ohne Ausgangs-Fahrgast, der erst im nächsten Level bezahlt wird).
 func time_target() -> float:
 	var sum_par := 0.0
 	for j in jobs:
 		sum_par += par_of(j)
-	return sum_par * 1.2 + 10.0
+	return sum_par + Tuning.TARGET_SLACK_PER_JOB * float(jobs.size())
 
 func money_target() -> float:
 	var sum := 0.0
@@ -844,7 +868,11 @@ func medals() -> Dictionary:
 
 # ---------------------------------------------------------------- Zusatzfahrgäste (ab Level 5)
 func extras_active() -> bool:
-	return extras_enabled and Tuning.extra_slots(level.number) > 0
+	return extras_enabled and extra_slots() > 0
+
+## Gleichzeitig wartende Zusatzfahrgäste: im Tutorial genau einer (nur auf Befehl des Skripts), sonst nach Levelnummer.
+func extra_slots() -> int:
+	return 1 if level.tutorial else Tuning.extra_slots(level.number)
 
 func extra_busy() -> bool:
 	return not _extra_aboard().is_empty() or extras.any(func(e): return int(e.state) == ES.BOARD)
@@ -874,7 +902,8 @@ func extra_prospect(e: Dictionary) -> float:
 func extra_factor(e: Dictionary) -> float:
 	return Tuning.time_factor(float(e.clock), par_of(e.job))
 
-func _spawn_extra() -> void:
+## Zusatzfahrgast erscheinen lassen; `force_from`/`force_to` (Tutorial) legen Abhol- und Zielpad fest.
+func _spawn_extra(force_from := "", force_to := "") -> void:
 	var cands: Array = []
 	for id in level.pads:
 		if not level.is_passenger_pad(id):
@@ -890,6 +919,8 @@ func _spawn_extra() -> void:
 			continue
 		cands.append(id)
 	cands.sort()
+	if force_from != "" and level.pads.has(force_from):
+		cands = [force_from]
 	if cands.is_empty():
 		return
 	var from_id: String = cands[flow_rng.randi() % cands.size()]
@@ -901,6 +932,8 @@ func _spawn_extra() -> void:
 	if dests.is_empty():
 		return
 	var to_id: String = dests[flow_rng.randi() % dests.size()]
+	if force_to != "" and level.pads.has(force_to):
+		to_id = force_to
 	var medical: bool = level.pads.has("H") and flow_rng.randf() < 0.35          # manche Zusatzfahrgäste sind Krankenpatienten (Ziel Krankenhaus)
 	if medical:
 		to_id = "H"
@@ -945,7 +978,7 @@ func _step_extras(dt: float) -> void:
 		var waiting := extras.filter(func(e): return int(e.state) == ES.WAIT).size()
 		if extra_timer <= 0.0:
 			extra_timer = flow_rng.randf_range(Tuning.EXTRA_EVERY_MIN, Tuning.EXTRA_EVERY_MAX)
-			if waiting < Tuning.extra_slots(level.number):
+			if waiting < extra_slots():
 				_spawn_extra()
 	for e in extras.duplicate():
 		var a: PassengerActor = e.actor
@@ -1027,7 +1060,7 @@ func _service_extras() -> void:
 	if main_here:
 		return
 	var w: Variant = _extra_at(String(pad.id))
-	if w != null and w.actor.state == PassengerActor.S.WAITING:
+	if w != null and w.actor.state == PassengerActor.S.WAITING and not extra_locked:
 		w.actor.board(sim.pos.x)
 		w.state = ES.BOARD
 		w.pen_pick = Tuning.landing_penalty(last_vy)

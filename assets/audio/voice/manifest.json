@@ -853,44 +853,44 @@
    "seconds": 5.8
   },
   "de/d0_r56": {
-   "text": "Gezeitenorbit. Strömungen und wechselnde Schwerkraft, oben und unten sind Ansichtssache.",
-   "seconds": 6.54
+   "text": "Gezeitenorbit. Neu: Strömungen. Unsichtbare Gezeiten schieben dein Taxi.",
+   "seconds": 6.92
   },
   "de/d0_r57": {
-   "text": "Hier ziehen die Gezeiten an allem, sogar an deiner Kaffeetasse.",
-   "seconds": 4.4
+   "text": "Neu: Schwerkraftzonen. Mal wird alles leichter, mal schwerer.",
+   "seconds": 4.92
   },
   "de/d0_r58": {
    "text": "Springflut. Neu: Böen, Strömungen, die im Takt an- und ausgehen. Und ein Patient wartet.",
    "seconds": 7.42
   },
   "de/d0_r59": {
-   "text": "Ein Funkloch voraus. Falls du mich nicht hörst: alles gut.",
-   "seconds": 5.8
+   "text": "Ebbe. Zwei Strömungen und eine Schwerkraftzone. Der Kaffee bleibt hoffentlich im Becher.",
+   "seconds": 6.28
   },
   "de/d0_r60": {
    "text": "Sechzig Level. Die Zentrale ist stolz auf dich.",
    "seconds": 4.5
   },
   "de/d0_r61": {
-   "text": "Die Tankpreise tanzen mit den Gezeiten. Beobachte die Anzeige.",
-   "seconds": 4.28
+   "text": "Strudel. Ein Patient im Sog, flieg sanft und halte den Kurs.",
+   "seconds": 4.56
   },
   "de/d0_r62": {
-   "text": "Ein Fahrgast fragt, ob man hier schwimmen darf. Nein.",
-   "seconds": 4.68
+   "text": "Sturmflut. Drei Strömungen, zwei Schwerkraftzonen und eine Lebensstation zum Durchatmen.",
+   "seconds": 7.11
   },
   "de/d0_r63": {
-   "text": "Gegenstrom voraus, aber du kennst ja deine Düsen.",
-   "seconds": 3.88
+   "text": "Gezeitenmeister. Die Gezeiten fordern alles, was du gelernt hast.",
+   "seconds": 4.36
   },
   "de/d0_r64": {
-   "text": "Der Kapitän der Orbitalfähre grüßt dich mit der Hupe.",
-   "seconds": 3.24
+   "text": "Orbitalsog. Die Lebensstation ist in Reichweite, nutze sie.",
+   "seconds": 5.24
   },
   "de/d0_r65": {
-   "text": "Bald ist das Wasser hinter dir. Halte noch durch.",
-   "seconds": 5.16
+   "text": "Mahlstrom. Ein Patient wartet mitten in den Gezeiten.",
+   "seconds": 5.08
   },
   "de/d0_r66": {
    "text": "Letztes Level der Gezeiten. Gleich geht es zum Knotenpunkt.",
@@ -925,20 +925,20 @@
    "seconds": 4.76
   },
   "de/d0_r74": {
-   "text": "Zentralknoten. Letzter Knoten, danach wird es dunkel.",
-   "seconds": 6.04
+   "text": "Zentralknoten. Noch zwei Knoten, halte die Spur.",
+   "seconds": 3.8
   },
   "de/d0_r75": {
-   "text": "Transitring. Noch ein Patient, noch ein Takt, du schaffst das.",
-   "seconds": 4.76
+   "text": "Die Station vermisst dein Lächeln. Und die Rechnung.",
+   "seconds": 3.72
   },
   "de/d0_r76": {
-   "text": "Zentralknoten. Fast am Ende des Knotens, halte die Spur.",
-   "seconds": 4.76
+   "text": "Fast am Ende des Knotens. Halte die Spur.",
+   "seconds": 3.46
   },
   "de/d0_r77": {
-   "text": "Abschlussbahnhof. Letzter Knoten, danach wird es dunkel. Ein Patient wartet.",
-   "seconds": 6.83
+   "text": "Letzter Knoten. Danach wird es dunkel.",
+   "seconds": 3.08
   },
   "de/d0_r78": {
    "text": "Schattenring. Neu: Dunkelheit. Nur Taxi, Plattformen und Tor leuchten, den Rest erahnst du nur.",
@@ -1113,44 +1113,44 @@
    "seconds": 5.8
   },
   "en/d0_r56": {
-   "text": "Tidal Orbit. Currents and shifting gravity; up and down are a matter of opinion.",
-   "seconds": 5.24
+   "text": "Tidal Orbit. New: currents. Invisible tides push your taxi around.",
+   "seconds": 7.16
   },
   "en/d0_r57": {
-   "text": "Tides pull at everything here, even your coffee cup.",
-   "seconds": 3.8
+   "text": "New: gravity zones. Sometimes everything gets lighter, sometimes heavier.",
+   "seconds": 5.0
   },
   "en/d0_r58": {
    "text": "Spring tide. New: gusts, currents that switch on and off on a beat. And a patient is waiting.",
    "seconds": 6.92
   },
   "en/d0_r59": {
-   "text": "A radio dead zone ahead. If you cannot hear me: all good.",
-   "seconds": 5.64
+   "text": "Ebb. Two currents and a gravity zone. Hopefully the coffee stays in the cup.",
+   "seconds": 5.24
   },
   "en/d0_r60": {
    "text": "Sixty levels. Dispatch is proud of you.",
    "seconds": 3.8
   },
   "en/d0_r61": {
-   "text": "Fuel prices dance with the tides. Watch the display.",
-   "seconds": 4.09
+   "text": "Whirlpool. A patient in the undertow, fly gently and hold your course.",
+   "seconds": 5.0
   },
   "en/d0_r62": {
-   "text": "A passenger asks if one may swim here. No.",
-   "seconds": 4.2
+   "text": "Storm surge. Three currents, two gravity zones and a life station to catch your breath.",
+   "seconds": 5.08
   },
   "en/d0_r63": {
-   "text": "Counter current ahead, but you know your thrusters.",
-   "seconds": 2.84
+   "text": "Tide master. The tides demand everything you have learned.",
+   "seconds": 4.2
   },
   "en/d0_r64": {
-   "text": "The orbital ferry captain greets you with the horn.",
-   "seconds": 3.0
+   "text": "Orbital pull. The life station is within reach, use it.",
+   "seconds": 4.44
   },
   "en/d0_r65": {
-   "text": "The water is almost behind you. Hold on a little longer.",
-   "seconds": 4.12
+   "text": "Maelstrom. A patient is waiting in the middle of the tides.",
+   "seconds": 3.88
   },
   "en/d0_r66": {
    "text": "Last tidal level. Next stop: the hub.",
@@ -1185,20 +1185,20 @@
    "seconds": 4.84
   },
   "en/d0_r74": {
-   "text": "Central hub. Last hub level, after that it gets dark.",
-   "seconds": 4.2
+   "text": "Central hub. Two more hubs to go, keep your lane.",
+   "seconds": 3.48
   },
   "en/d0_r75": {
-   "text": "Transit ring. Another patient, another beat, you can do this.",
-   "seconds": 4.84
+   "text": "The station misses your smile. And the invoice.",
+   "seconds": 3.88
   },
   "en/d0_r76": {
-   "text": "Central hub. Almost at the end of the hub, keep your lane.",
-   "seconds": 4.44
+   "text": "Nearly out of the hub. Keep your lane.",
+   "seconds": 3.56
   },
   "en/d0_r77": {
-   "text": "Terminal station. Last hub level, after that it gets dark. A patient is waiting.",
-   "seconds": 5.96
+   "text": "Last hub level. After that it gets dark.",
+   "seconds": 3.4
   },
   "en/d0_r78": {
    "text": "Shadow Ring. New: darkness. Only taxi, platforms and gate are lit, the rest you can only guess.",
@@ -1591,6 +1591,630 @@
   "en/d0_r55": {
    "text": "Solar zenith. Last level of the forge, then come the tides.",
    "seconds": 6.12
+  },
+  "de/d0_tut_welcome": {
+   "text": "Willkommen in der Flugschule, Taxi sieben! Ich erkläre dir alles, während du fliegst. Deine Aufgabe: Fahrgäste abholen und sicher zu ihrem Ziel bringen.",
+   "seconds": 9.4
+  },
+  "de/d0_tut_hud_fuel": {
+   "text": "Oben links siehst du deinen Tank. Jede Düse verbraucht Sprit. Ist er leer, ist dein Taxi verloren.",
+   "seconds": 7.38
+  },
+  "de/d0_tut_hud_hull": {
+   "text": "Daneben die Hülle. Aufpralle und Hindernisse beschädigen sie. Bei null ist das Taxi zerstört.",
+   "seconds": 6.84
+  },
+  "de/d0_tut_hud_money": {
+   "text": "Hier dein Geld in Credits, und daneben deine Leben. Fünf Taxis hast du, mehr gibt es nie.",
+   "seconds": 8.4
+  },
+  "de/d0_tut_hud_level": {
+   "text": "In der Mitte stehen Level und Name. Rechts daneben zählt, wie viele Pflichtfahrgäste du schon befördert hast und wie viele es insgesamt gibt.",
+   "seconds": 7.72
+  },
+  "de/d0_tut_hud_gauge": {
+   "text": "Ganz rechts die Landeanzeige: Sinkgeschwindigkeit, Seitentempo und Neigung. Bleiben alle Balken unter der weißen Marke, landest du sicher.",
+   "seconds": 11.84
+  },
+  "de/d0_tut_hud_task": {
+   "text": "Unten steht dein aktueller Auftrag, und rechts, was die Fahrt gerade einbringt. Der Betrag sinkt, je länger du brauchst.",
+   "seconds": 8.03
+  },
+  "de/d0_tut_fly": {
+   "text": "Los geht's! Steuere die Düsen mit dem Stick oder den Tasten. Heb ab und flieg eine Runde.",
+   "seconds": 5.96
+  },
+  "de/d0_tut_fly_ok": {
+   "text": "Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
+   "seconds": 10.25
+  },
+  "de/d0_tut_gear": {
+   "text": "Vor jeder Landung fährst du das Fahrwerk aus. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.",
+   "seconds": 8.28
+  },
+  "de/d0_tut_fuel_low": {
+   "text": "Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
+   "seconds": 7.89
+  },
+  "de/d0_tut_refuel": {
+   "text": "Solange du stehst, tankst du. Das kostet Credits, der Preis oben schwankt. Unter fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.",
+   "seconds": 16.33
+  },
+  "de/d0_tut_landing": {
+   "text": "Jetzt zur Landung. Du landest sicher, wenn du langsamer als achtundvierzig Pixel pro Sekunde sinkst und gerade bleibst. Schneller richtet Schaden an, ab hundertfünfzig ist das Taxi sofort zerstört.",
+   "seconds": 13.15
+  },
+  "de/d0_tut_hard": {
+   "text": "Probier es aus: Lande auf Plattform drei absichtlich hart und sieh dir die Hülle an. Hier passiert nichts Schlimmes.",
+   "seconds": 8.46
+  },
+  "de/d0_tut_hard_dmg": {
+   "text": "Siehst du? Die Hülle ist gesunken. Jeder Hüllenpunkt kostet dich am Levelende Reparaturgeld. Ich flicke dich jetzt wieder zusammen.",
+   "seconds": 8.56
+  },
+  "de/d0_tut_hard_soft": {
+   "text": "Das war eine weiche Landung, sehr schön. Schneller würde die Hülle beschädigen, und Reparaturen kosten Geld. Merk dir das.",
+   "seconds": 9.56
+  },
+  "de/d0_tut_job": {
+   "text": "Jetzt zum Geschäft. Mika wartet an Plattform zwei, der Pfeil zeigt dir den Weg. Lande dort mit ausgefahrenem Fahrwerk und warte, bis sie einsteigt.",
+   "seconds": 9.63
+  },
+  "de/d0_tut_mandatory": {
+   "text": "Mika ist ein Pflichtfahrgast. Pflichtfahrgäste sind die Aufträge des Levels. Am Anfang hast du zwei oder drei, später bis zu neun. Hast du alle befördert, öffnet sich das Tor.",
+   "seconds": 13.09
+  },
+  "de/d0_tut_pay": {
+   "text": "Bring sie zu Plattform drei. Je schneller du bist, desto mehr zahlt sie, der Betrag unten rechts tickt herunter. Weiche Landungen in Folge geben einen Bonus.",
+   "seconds": 12.76
+  },
+  "de/d0_tut_delivered": {
+   "text": "Das war dein erster Fahrpreis. Gut gemacht!",
+   "seconds": 3.56
+  },
+  "de/d0_tut_extra": {
+   "text": "Funkruf! Neben den Pflichtfahrgästen rufen ab Level fünf auch optionale Fahrgäste an. Sie sind freiwillig und bringen Extrageld. Aber du hast nur einen Sitz, und sie warten nicht ewig.",
+   "seconds": 12.79
+  },
+  "de/d0_tut_life": {
+   "text": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+   "seconds": 15.11
+  },
+  "de/d0_tut_exit": {
+   "text": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
+   "seconds": 10.42
+  },
+  "de/d0_tut_gate": {
+   "text": "Das Tor ist offen. Flieg hindurch!",
+   "seconds": 2.92
+  },
+  "de/d0_tut_done": {
+   "text": "Geschafft! Du bist bereit für den Dienst. Viel Erfolg da draußen, Taxi sieben.",
+   "seconds": 5.32
+  },
+  "de/d0_tut_crash": {
+   "text": "Autsch. Keine Sorge, in der Flugschule bekommst du sofort ein neues Taxi.",
+   "seconds": 6.43
+  },
+  "en/d0_tut_welcome": {
+   "text": "Welcome to flight school, Taxi seven! I will explain everything while you fly. Your job: pick up passengers and bring them safely to their destination.",
+   "seconds": 10.87
+  },
+  "en/d0_tut_hud_fuel": {
+   "text": "Top left is your fuel tank. Every thruster burns fuel. When it is empty, your taxi is lost.",
+   "seconds": 7.16
+  },
+  "en/d0_tut_hud_hull": {
+   "text": "Next to it is your hull. Impacts and obstacles damage it. At zero the taxi is destroyed.",
+   "seconds": 6.92
+  },
+  "en/d0_tut_hud_money": {
+   "text": "Here is your money in credits, and next to it your lives. You have five taxis, never more.",
+   "seconds": 7.43
+  },
+  "en/d0_tut_hud_level": {
+   "text": "In the middle you see the level and its name. Right next to it counts how many mandatory passengers you have delivered and how many there are in total.",
+   "seconds": 9.64
+  },
+  "en/d0_tut_hud_gauge": {
+   "text": "At the far right is the landing gauge: sink rate, sideways speed and tilt. Keep all bars below the white mark and you land safely.",
+   "seconds": 8.92
+  },
+  "en/d0_tut_hud_task": {
+   "text": "At the bottom is your current job, and on the right what the ride currently pays. The amount drops the longer you take.",
+   "seconds": 5.96
+  },
+  "en/d0_tut_fly": {
+   "text": "Let's go! Steer the thrusters with the stick or the keys. Lift off and fly a lap.",
+   "seconds": 6.87
+  },
+  "en/d0_tut_fly_ok": {
+   "text": "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.",
+   "seconds": 7.4
+  },
+  "en/d0_tut_gear": {
+   "text": "Extend the landing gear before every landing. The taxi then flies slower and more precisely. Extend it now.",
+   "seconds": 8.28
+  },
+  "en/d0_tut_fuel_low": {
+   "text": "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.",
+   "seconds": 7.32
+  },
+  "en/d0_tut_refuel": {
+   "text": "While you sit here, you refuel. It costs credits, and the price at the top changes. Below thirty-five percent the station refuels for free in an emergency. Never bump the pump: after three touches it explodes.",
+   "seconds": 17.14
+  },
+  "en/d0_tut_landing": {
+   "text": "Now for landing. You land safely if you sink slower than forty-eight pixels per second and stay level. Faster does damage, and above one hundred fifty the taxi is destroyed at once.",
+   "seconds": 13.8
+  },
+  "en/d0_tut_hard": {
+   "text": "Try it: land hard on platform three on purpose and watch your hull. Nothing bad can happen here.",
+   "seconds": 7.08
+  },
+  "en/d0_tut_hard_dmg": {
+   "text": "See? The hull dropped. Every hull point costs you repair money at the end of a level. I will patch you up again now.",
+   "seconds": 8.04
+  },
+  "en/d0_tut_hard_soft": {
+   "text": "That was a soft landing, very nice. Faster would damage the hull, and repairs cost money. Remember that.",
+   "seconds": 7.08
+  },
+  "en/d0_tut_job": {
+   "text": "Now to business. Mika is waiting at platform two, the arrow shows the way. Land there with your gear out and wait for her to board.",
+   "seconds": 9.24
+  },
+  "en/d0_tut_mandatory": {
+   "text": "Mika is a mandatory passenger. Mandatory passengers are the jobs of the level. You start with two or three, later up to nine. Deliver them all and the gate opens.",
+   "seconds": 11.24
+  },
+  "en/d0_tut_pay": {
+   "text": "Take her to platform three. The faster you are, the more she pays; the amount at the bottom right ticks down. Soft landings in a row earn a bonus.",
+   "seconds": 9.64
+  },
+  "en/d0_tut_delivered": {
+   "text": "That was your first fare. Well done!",
+   "seconds": 2.76
+  },
+  "en/d0_tut_extra": {
+   "text": "Radio call! Besides the mandatory passengers, optional ones start calling from level five. They are voluntary and bring extra money. But you have only one seat, and they will not wait forever.",
+   "seconds": 14.2
+  },
+  "en/d0_tut_life": {
+   "text": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
+   "seconds": 14.76
+  },
+  "en/d0_tut_exit": {
+   "text": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
+   "seconds": 8.92
+  },
+  "en/d0_tut_gate": {
+   "text": "The gate is open. Fly through it!",
+   "seconds": 2.28
+  },
+  "en/d0_tut_done": {
+   "text": "Done! You are ready for duty. Good luck out there, Taxi seven.",
+   "seconds": 5.88
+  },
+  "en/d0_tut_crash": {
+   "text": "Ouch. Do not worry, in flight school you get a new taxi right away.",
+   "seconds": 5.16
+  },
+  "de/i0_tut_welcome": {
+   "text": "Willkommen in der Flugschule, Taxi sieben! Ich erkläre dir alles, während du fliegst. Deine Aufgabe: Fahrgäste abholen und sicher zu ihrem Ziel bringen.",
+   "seconds": 10.54
+  },
+  "de/i0_tut_hud_fuel": {
+   "text": "Oben links siehst du deinen Tank. Jede Düse verbraucht Sprit. Ist er leer, ist dein Taxi verloren.",
+   "seconds": 7.02
+  },
+  "de/i0_tut_hud_hull": {
+   "text": "Daneben die Hülle. Aufpralle und Hindernisse beschädigen sie. Bei null ist das Taxi zerstört.",
+   "seconds": 6.38
+  },
+  "de/i0_tut_hud_money": {
+   "text": "Hier dein Geld in Credits, und daneben deine Leben. Fünf Taxis hast du, mehr gibt es nie.",
+   "seconds": 8.28
+  },
+  "de/i0_tut_hud_level": {
+   "text": "Rechts vom Tor siehst du das Level und seinen Namen. Daneben zählt, wie viele Pflichtfahrgäste du schon befördert hast und wie viele es insgesamt gibt.",
+   "seconds": 10.58
+  },
+  "de/i0_tut_hud_gauge": {
+   "text": "Ganz rechts die Landeanzeige: wie schnell du sinkst, wie schnell du seitlich fliegst und wie schief du stehst. Bleiben alle drei Balken unter der weißen Marke, landest du sicher.",
+   "seconds": 10.32
+  },
+  "de/i0_tut_fly": {
+   "text": "Los geht's! Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
+   "seconds": 17.85
+  },
+  "de/i0_tut_fly_ok": {
+   "text": "Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
+   "seconds": 9.02
+  },
+  "de/i0_tut_gear": {
+   "text": "Vor jeder Landung fährst du das Fahrwerk aus. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.",
+   "seconds": 9.78
+  },
+  "de/i0_tut_fuel_low": {
+   "text": "Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
+   "seconds": 5.82
+  },
+  "de/i0_tut_refuel": {
+   "text": "Solange du hier stehst, tankst du. Bis fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.",
+   "seconds": 11.6
+  },
+  "de/i0_tut_landing": {
+   "text": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt die Hülle Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
+   "seconds": 20.26
+  },
+  "de/i0_tut_hard": {
+   "text": "Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird. Hier kostet das nichts.",
+   "seconds": 10.45
+  },
+  "de/i0_tut_hard_dmg": {
+   "text": "Siehst du? Die Hülle ist gesunken. Jeder Hüllenpunkt kostet dich am Levelende Reparaturgeld. Ich flicke dich jetzt wieder zusammen.",
+   "seconds": 9.22
+  },
+  "de/i0_tut_hard_soft": {
+   "text": "Das war eine weiche Landung, sehr schön. Schneller würde die Hülle beschädigen, und Reparaturen kosten Geld. Merk dir das.",
+   "seconds": 9.23
+  },
+  "de/i0_tut_job": {
+   "text": "Jetzt zum Geschäft. Unten steht dein Auftrag: Mika wartet an Plattform zwei. Der Stern über ihr zeigt: Mika ist ein Pflichtfahrgast. Pflichtfahrgäste sind die Aufträge des Levels, am Anfang zwei oder drei, später bis zu neun. Hast du alle befördert, öffnet sich das Tor. Lande bei Mika mit ausgefahrenem Fahrwerk und warte, bis sie einsteigt.",
+   "seconds": 25.04
+  },
+  "de/i0_tut_mandatory": {
+   "text": "Mika ist ein Pflichtfahrgast. Pflichtfahrgäste sind die Aufträge des Levels. Am Anfang hast du zwei oder drei, später bis zu neun. Hast du alle befördert, öffnet sich das Tor.",
+   "seconds": 12.42
+  },
+  "de/i0_tut_pay": {
+   "text": "Bring sie zu Plattform drei. Je schneller du bist, desto mehr zahlt sie, der Betrag unten rechts tickt herunter. Weiche Landungen in Folge geben einen Bonus.",
+   "seconds": 12.22
+  },
+  "de/i0_tut_delivered": {
+   "text": "Das war dein erster Fahrpreis. Gut gemacht!",
+   "seconds": 3.18
+  },
+  "de/i0_tut_extra": {
+   "text": "Funkruf! Neben den Pflichtfahrgästen rufen optionale Fahrgäste an, hier an Plattform zwei. Sie sind freiwillig und bringen Extrageld, doch dein Taxi hat nur einen Sitz, und sie warten nicht ewig. Flieg hin und nimm den Gast mit.",
+   "seconds": 15.06
+  },
+  "de/i0_tut_life": {
+   "text": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+   "seconds": 18.39
+  },
+  "de/i0_tut_exit": {
+   "text": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
+   "seconds": 9.52
+  },
+  "de/i0_tut_gate": {
+   "text": "Das Tor ist offen. Flieg hindurch!",
+   "seconds": 3.26
+  },
+  "de/i0_tut_done": {
+   "text": "Geschafft! Du bist bereit für den Dienst. Viel Erfolg da draußen, Taxi sieben.",
+   "seconds": 5.02
+  },
+  "de/i0_tut_crash": {
+   "text": "Autsch. Keine Sorge, in der Flugschule bekommst du sofort ein neues Taxi.",
+   "seconds": 4.7
+  },
+  "en/i0_tut_welcome": {
+   "text": "Welcome to flight school, Taxi seven! I will explain everything while you fly. Your job: pick up passengers and bring them safely to their destination.",
+   "seconds": 9.66
+  },
+  "en/i0_tut_hud_fuel": {
+   "text": "Top left is your fuel tank. Every thruster burns fuel. When it is empty, your taxi is lost.",
+   "seconds": 7.02
+  },
+  "en/i0_tut_hud_hull": {
+   "text": "Next to it is your hull. Impacts and obstacles damage it. At zero the taxi is destroyed.",
+   "seconds": 5.98
+  },
+  "en/i0_tut_hud_money": {
+   "text": "Here is your money in credits, and next to it your lives. You have five taxis, never more.",
+   "seconds": 6.04
+  },
+  "en/i0_tut_hud_level": {
+   "text": "To the right of the gate you see the level and its name. Next to it counts how many mandatory passengers you have delivered and how many there are in total.",
+   "seconds": 9.26
+  },
+  "en/i0_tut_hud_gauge": {
+   "text": "At the far right is the landing gauge: how fast you sink, how fast you move sideways and how tilted you are. Keep all three bars below the white mark and you land safely.",
+   "seconds": 10.78
+  },
+  "en/i0_tut_fly": {
+   "text": "Let's go! Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.",
+   "seconds": 13.74
+  },
+  "en/i0_tut_fly_ok": {
+   "text": "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.",
+   "seconds": 7.34
+  },
+  "en/i0_tut_gear": {
+   "text": "Extend the landing gear before every landing. The taxi then flies slower and more precisely. Extend it now.",
+   "seconds": 8.38
+  },
+  "en/i0_tut_fuel_low": {
+   "text": "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.",
+   "seconds": 7.66
+  },
+  "en/i0_tut_refuel": {
+   "text": "While you sit here, you refuel. Up to thirty-five percent the station refuels for free in an emergency. Never bump the pump: after three touches it explodes.",
+   "seconds": 10.0
+  },
+  "en/i0_tut_landing": {
+   "text": "Now for landing. If you land slowly and level, all is well. If you are faster, the hull takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
+   "seconds": 15.1
+  },
+  "en/i0_tut_hard": {
+   "text": "Try it: dive down with full power and land so hard that the taxi is destroyed. Here it costs nothing.",
+   "seconds": 7.9
+  },
+  "en/i0_tut_hard_dmg": {
+   "text": "See? The hull dropped. Every hull point costs you repair money at the end of a level. I will patch you up again now.",
+   "seconds": 8.46
+  },
+  "en/i0_tut_hard_soft": {
+   "text": "That was a soft landing, very nice. Faster would damage the hull, and repairs cost money. Remember that.",
+   "seconds": 7.9
+  },
+  "en/i0_tut_job": {
+   "text": "Now to business. At the bottom is your job: Mika is waiting at platform two. The star above her shows that Mika is a mandatory passenger. Mandatory passengers are the jobs of the level, two or three at first, later up to nine. Deliver them all and the gate opens. Land next to Mika with your gear out and wait for her to board.",
+   "seconds": 21.26
+  },
+  "en/i0_tut_mandatory": {
+   "text": "Mika is a mandatory passenger. Mandatory passengers are the jobs of the level. You start with two or three, later up to nine. Deliver them all and the gate opens.",
+   "seconds": 12.22
+  },
+  "en/i0_tut_pay": {
+   "text": "Take her to platform three. The faster you are, the more she pays; the amount at the bottom right ticks down. Soft landings in a row earn a bonus.",
+   "seconds": 9.18
+  },
+  "en/i0_tut_delivered": {
+   "text": "That was your first fare. Well done!",
+   "seconds": 2.62
+  },
+  "en/i0_tut_extra": {
+   "text": "Radio call! Besides the mandatory passengers, optional ones call in, here at platform two. They are voluntary and bring extra money, but your taxi has only one seat, and they will not wait forever. Fly over and take the guest along.",
+   "seconds": 15.34
+  },
+  "en/i0_tut_life": {
+   "text": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
+   "seconds": 14.22
+  },
+  "en/i0_tut_exit": {
+   "text": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
+   "seconds": 9.4
+  },
+  "en/i0_tut_gate": {
+   "text": "The gate is open. Fly through it!",
+   "seconds": 2.22
+  },
+  "en/i0_tut_done": {
+   "text": "Done! You are ready for duty. Good luck out there, Taxi seven.",
+   "seconds": 5.26
+  },
+  "en/i0_tut_crash": {
+   "text": "Ouch. Do not worry, in flight school you get a new taxi right away.",
+   "seconds": 5.18
+  },
+  "de/i0_vid_spikes": {
+   "text": "Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung kostet dich dreißig Hülle, egal wie langsam du bist. Halte Abstand.",
+   "seconds": 10.46
+  },
+  "de/i0_vid_doors": {
+   "text": "Schleusentore öffnen und schließen im festen Takt. Warte, bis das Tor offen ist, und flieg zügig hindurch. Schließt es auf dir, wirst du hinausgeschleudert und verlierst Hülle.",
+   "seconds": 12.71
+  },
+  "de/i0_vid_debris": {
+   "text": "Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Eine Berührung kostet fünfzehn Hülle.",
+   "seconds": 11.75
+  },
+  "de/i0_vid_moving_pad": {
+   "text": "Fahrende Plattformen gleiten auf Schienen. Fliege über sie, passe dein Tempo an und lande im Tempo der Plattform. Das Taxi fährt mit.",
+   "seconds": 9.22
+  },
+  "de/i0_vid_hospital": {
+   "text": "Krankentransport: Der Patient liegt auf einer Trage und muss ins Krankenhaus. Jede Beschädigung ist gefährlich. Geht er verloren, kostet das den aktuellen Fahrpreis. Fliege besonders sanft.",
+   "seconds": 14.58
+  },
+  "de/i0_vid_meteors": {
+   "text": "Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer kostet zwanzig Hülle.",
+   "seconds": 10.41
+  },
+  "de/i0_vid_slider": {
+   "text": "Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und kosten dreißig Hülle. Passiere sie, wenn sie weit genug weg sind.",
+   "seconds": 12.22
+  },
+  "de/i0_vid_magnet_pull": {
+   "text": "Magnetfelder ziehen dein Taxi zum Kern. Je näher, desto stärker. Steuere rechtzeitig dagegen, sonst landest du im Zentrum.",
+   "seconds": 7.73
+  },
+  "de/i0_vid_magnet_push": {
+   "text": "Abstoßende Magnete schieben dich fort. Du kommst kaum in die Nähe des Kerns. Nutze den Schub, um dich wegtragen zu lassen.",
+   "seconds": 8.46
+  },
+  "de/i0_vid_magnet_pulse": {
+   "text": "Manche Magnete schalten im Takt an und aus. Der Ring um den Kern zeigt dir, wann sie aktiv sind. Flieg durch, wenn sie ruhen.",
+   "seconds": 10.02
+  },
+  "de/i0_vid_heat": {
+   "text": "Hitzezonen glühen. Wer darin fliegt, verliert laufend Hülle. Flieg schnell hindurch oder, besser, um sie herum.",
+   "seconds": 10.69
+  },
+  "de/i0_vid_beam": {
+   "text": "Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl verlierst du Hülle. Warte, bis er erlischt, und flieg dann hindurch.",
+   "seconds": 12.63
+  },
+  "de/i0_vid_heat_pulse": {
+   "text": "Lavablasen kühlen im Takt ab und glühen wieder auf. Sind sie dunkel, kannst du gefahrlos hindurch. Achte auf den Takt.",
+   "seconds": 10.76
+  },
+  "de/i0_vid_wind": {
+   "text": "Strömungen schieben dein Taxi in eine Richtung. Die Schlieren zeigen dir, wohin. Gleiche mit Gegenschub aus.",
+   "seconds": 7.76
+  },
+  "de/i0_vid_gravity": {
+   "text": "Schwerkraftzonen verändern dein Gewicht. In der leichten Zone steigst du von selbst, in der schweren sinkst du. Korrigiere den Schub entsprechend.",
+   "seconds": 12.17
+  },
+  "de/i0_vid_wind_gust": {
+   "text": "Böen sind Strömungen, die im Takt an- und ausgehen. Warte die Pause ab oder rechne mit dem Stoß.",
+   "seconds": 6.48
+  },
+  "de/i0_vid_traffic": {
+   "text": "Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Eine Kollision kostet achtzehn Hülle. Warte eine Lücke ab und kreuze die Bahn.",
+   "seconds": 11.71
+  },
+  "de/i0_vid_dark": {
+   "text": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
+   "seconds": 14.33
+  },
+  "en/i0_vid_spikes": {
+   "text": "Spikes. They sit on rocks and platforms. Every touch costs you thirty hull, no matter how slowly you fly. Keep your distance.",
+   "seconds": 9.26
+  },
+  "en/i0_vid_doors": {
+   "text": "Lock gates open and close on a fixed beat. Wait until the gate is open and fly through quickly. If it closes on you, you get thrown out and lose hull.",
+   "seconds": 8.94
+  },
+  "en/i0_vid_debris": {
+   "text": "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch costs fifteen hull.",
+   "seconds": 8.06
+  },
+  "en/i0_vid_moving_pad": {
+   "text": "Moving pads glide on rails. Fly over one, match its speed and land at the pad's own pace. The taxi rides along.",
+   "seconds": 7.42
+  },
+  "en/i0_vid_hospital": {
+   "text": "Medical transport: the patient lies on a stretcher and must go to the hospital. Any damage is dangerous. If the patient is lost, it costs you the current fare. Fly extra gently.",
+   "seconds": 11.26
+  },
+  "en/i0_vid_meteors": {
+   "text": "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit costs twenty hull.",
+   "seconds": 9.42
+  },
+  "en/i0_vid_slider": {
+   "text": "Sliders are big, heavy blocks. They crush anything caught between them and a wall and cost thirty hull. Pass them when they are far enough away.",
+   "seconds": 9.74
+  },
+  "en/i0_vid_magnet_pull": {
+   "text": "Magnetic fields pull your taxi toward the core. The closer, the stronger. Steer against it in time, or you end up in the center.",
+   "seconds": 8.38
+  },
+  "en/i0_vid_magnet_push": {
+   "text": "Repelling magnets push you away. You barely get near the core. Use the push to be carried away.",
+   "seconds": 6.7
+  },
+  "en/i0_vid_magnet_pulse": {
+   "text": "Some magnets switch on and off on a beat. The ring around the core shows when they are active. Fly through while they rest.",
+   "seconds": 8.06
+  },
+  "en/i0_vid_heat": {
+   "text": "Heat zones glow. Anyone flying inside constantly loses hull. Fly through quickly or, better, around them.",
+   "seconds": 8.69
+  },
+  "en/i0_vid_beam": {
+   "text": "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam you lose hull. Wait until it goes out, then fly through.",
+   "seconds": 10.22
+  },
+  "en/i0_vid_heat_pulse": {
+   "text": "Lava blobs cool down on a beat and glow up again. When they are dark you can pass safely. Watch the beat.",
+   "seconds": 6.54
+  },
+  "en/i0_vid_wind": {
+   "text": "Currents push your taxi in one direction. The streaks show you which way. Compensate with counter thrust.",
+   "seconds": 7.25
+  },
+  "en/i0_vid_gravity": {
+   "text": "Gravity zones change your weight. In the light zone you rise on your own, in the heavy zone you sink. Adjust your thrust accordingly.",
+   "seconds": 8.46
+  },
+  "en/i0_vid_wind_gust": {
+   "text": "Gusts are currents that switch on and off on a beat. Wait for the pause or expect the push.",
+   "seconds": 5.74
+  },
+  "en/i0_vid_traffic": {
+   "text": "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision costs eighteen hull. Wait for a gap and cross the lane.",
+   "seconds": 9.34
+  },
+  "en/i0_vid_dark": {
+   "text": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.",
+   "seconds": 10.38
+  },
+  "de/i0_tut_hud_price": {
+   "text": "Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.",
+   "seconds": 6.54
+  },
+  "de/i0_tut_gear_in": {
+   "text": "Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Fahrwerkstaste ein: Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Fahr es jetzt ein.",
+   "seconds": 13.11
+  },
+  "de/i0_tut_credit": {
+   "text": "Darüber kostet der Sprit Geld. Ich schreibe dir fünfzig Credits gut, tank also ruhig voll.",
+   "seconds": 6.93
+  },
+  "de/i0_tut_price": {
+   "text": "Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.",
+   "seconds": 9.58
+  },
+  "de/i0_tut_crash_ok": {
+   "text": "Zerstört! Normalerweise kostet dich das ein Leben, und ein Fahrgast an Bord ist verloren. Hier bekommst du sofort ein neues Taxi.",
+   "seconds": 8.94
+  },
+  "de/i0_tut_soft": {
+   "text": "Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend.",
+   "seconds": 6.78
+  },
+  "de/i0_tut_soft_ok": {
+   "text": "Wunderbar sanft! Weiche, gerade Landungen in Folge bringen dir einen Bonus auf den Fahrpreis.",
+   "seconds": 6.48
+  },
+  "de/i0_tut_soft_meh": {
+   "text": "Das ging, war aber noch nicht weich. Je langsamer du aufsetzt, desto besser. Weiche, gerade Landungen in Folge bringen dir einen Bonus.",
+   "seconds": 13.17
+  },
+  "de/i0_tut_extra_dest": {
+   "text": "Das Ziel des Gastes leuchtet jetzt auf. Bring den Gast dorthin.",
+   "seconds": 4.86
+  },
+  "en/i0_tut_hud_price": {
+   "text": "And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.",
+   "seconds": 6.54
+  },
+  "en/i0_tut_gear_in": {
+   "text": "Your landing gear is still extended. To take off, retract it with the gear button: retracted, the taxi flies fast; extended, slow and precise. Retract it now.",
+   "seconds": 9.5
+  },
+  "en/i0_tut_credit": {
+   "text": "Above that, fuel costs money. I am crediting you fifty credits, so go ahead and fill up.",
+   "seconds": 5.26
+  },
+  "en/i0_tut_price": {
+   "text": "The fuel price changes regularly, just like it did a moment ago. Keep an eye on the display at the top. In flight school I will leave it alone from now on.",
+   "seconds": 9.5
+  },
+  "en/i0_tut_crash_ok": {
+   "text": "Destroyed! Normally that costs you a life, and a passenger on board is lost. Here you get a new taxi right away.",
+   "seconds": 7.02
+  },
+  "en/i0_tut_soft": {
+   "text": "And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly.",
+   "seconds": 7.9
+  },
+  "en/i0_tut_soft_ok": {
+   "text": "Wonderfully gentle! Soft, level landings in a row earn you a bonus on the fare.",
+   "seconds": 5.98
+  },
+  "en/i0_tut_soft_meh": {
+   "text": "That worked, but it was not soft yet. The slower you touch down, the better. Soft, level landings in a row earn you a bonus.",
+   "seconds": 8.62
+  },
+  "en/i0_tut_extra_dest": {
+   "text": "The guest's destination is lit up now. Take the guest there.",
+   "seconds": 4.22
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
@@ -1620,6 +2244,10 @@
    "instruct": "Eine Disponentin Mitte vierzig mit ruhiger, souveräner, leicht ironischer Stimme und klarer Aussprache, wie über Funk. Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache.",
    "seed": 606
   },
+  "de/i0": {
+   "instruct": "Ein Mann Mitte dreißig mit tiefer, ruhiger, warmer Baritonstimme, entspannt und freundlich. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.",
+   "seed": 303
+  },
   "en/f0": {
    "instruct": "A young woman with a clear, warm, cheerful voice, medium pitch, upbeat and friendly, a little playful. Native English speaker with a neutral accent.",
    "seed": 101
@@ -1643,6 +2271,10 @@
   "en/d0": {
    "instruct": "A dispatcher woman in her forties with a calm, composed, slightly ironic voice and clear diction, as over a radio. Native English speaker with a neutral accent.",
    "seed": 606
+  },
+  "en/i0": {
+   "instruct": "A man in his mid-thirties with a deep, calm, warm baritone voice, relaxed and friendly, casual delivery. Native English speaker with a neutral accent.",
+   "seed": 303
   }
  }
 }

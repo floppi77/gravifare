@@ -219,5 +219,21 @@
  "RES_H_BALANCE": "KONTOSTAND",
  "RES_H_SCORE": "PUNKTE",
  "RES_BEST_SCORE": "Best %d",
- "HUD_TAG_FRAGILE": "+ KRANKENTRANSPORT"
+ "HUD_TAG_FRAGILE": "+ KRANKENTRANSPORT",
+ "MENU_SLOTS": "Spielstand wechseln",
+ "SLOT_TITLE": "Spielstand wählen",
+ "SLOT_EMPTY": "Leer – neues Spiel",
+ "SLOT_INFO": "%d Level · %s · %d Punkte",
+ "SLOT_DELETE": "Löschen",
+ "SLOT_CONFIRM": "Spielstand %d löschen?",
+ "SLOT_CONFIRM_SUB": "Fortschritt, Credits und Garage dieses Platzes gehen verloren.",
+ "SLOT_YES": "Ja, löschen",
+ "SLOT_NO": "Abbrechen",
+ "SLOT_CURRENT": "Spielstand %d",
+ "MENU_TUTORIAL": "Tutorial",
+ "SPK_INSTRUCTOR": "Fluglehrer",
+ "CLIP_NEW": "Neu",
+ "CLIP_TAG": "EINSPIELER",
+ "CLIP_SKIP": "Enter: überspringen",
+ "MENU_CLIP": "Einspieler ansehen"
 }
