@@ -90,7 +90,7 @@ func _build() -> void:
 		{"key": "tut_refuel", "spots": func(): return [_fuel_rect(), R_FUEL],
 			"wait": func(): return run.sim.fuel >= 35.0 or not _landed_on("F"), "timeout": 12.0},
 		{"key": "tut_credit", "enter": _enter_credit, "spots": func(): return [R_MONEY, R_FUEL],
-			"wait": func(): return run.sim.fuel >= 92.0 or not _landed_on("F"), "timeout": 30.0},
+			"wait": func(): return run.sim.fuel >= 92.0 or not _landed_on("F") or run.money < 1.0, "timeout": 30.0},          # Guthaben aufgebraucht: weiter
 		{"key": "tut_price", "enter": _enter_price, "spots": func(): return [R_PRICE, _fuel_rect()]},
 		{"key": "tut_landing", "spots": func(): return [R_GAUGE, R_HULL], "gauge": true},
 		{"key": "tut_hard", "enter": func(): flags["crashed"] = false,
