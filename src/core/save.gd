@@ -65,7 +65,9 @@ func slot_summary(n: int) -> Dictionary:
 	info["levels"] = d.completed.size()
 	var sc := 0
 	for id in d.completed:
-		sc += int(d.completed[id].get("score", 0))
+		var entry = d.completed[id]
+		if entry is Dictionary:                       # handeditierte/defekte Einträge dürfen die Platzwahl nicht abstürzen lassen
+			sc += int(entry.get("score", 0))
 	info["score"] = sc
 	var st = d.get("stats", {})
 	info["seconds"] = int(float(st.get("play_seconds", 0.0))) if st is Dictionary else 0
@@ -99,8 +101,11 @@ func load_save() -> void:
 		if not data.has("cosmetics"):
 			data["cosmetics"] = {"paint": "std", "sticker": "none", "challenge": false}
 	else:
-		DirAccess.rename_absolute(path, path + ".bad")
-		push_warning("Speicherstand defekt – gesichert als save.json.bad")
+		var bad := path + ".bad"
+		if FileAccess.file_exists(bad):               # frühere Sicherung nicht überschreiben
+			bad = "%s.bad%d" % [path, int(Time.get_unix_time_from_system())]
+		DirAccess.rename_absolute(path, bad)
+		push_warning("Speicherstand defekt – gesichert als " + bad.get_file())
 
 func write() -> void:
 	if dev_session or slot == 0:

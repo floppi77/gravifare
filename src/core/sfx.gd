@@ -57,16 +57,36 @@ func _loop_player(name: String) -> AudioStreamPlayer:
 		p.play()
 	return p
 
+## Effekte mit leichter Tonhöhen-/Lautstärke-Variation (gegen den „Maschinengewehr“-Effekt bei häufigen Geräuschen).
+const VARY := {"land": 0.05, "hit": 0.07, "coin": 0.04, "board": 0.05, "price_tick": 0.04, "pump_hit": 0.06, "gear": 0.04, "near_miss": 0.03}
+## Wichtige Effekte werden nie verdrängt, wenn alle Kanäle belegt sind.
+const KEEP := ["crash", "pump_boom", "shatter", "splat", "exit", "flatline", "scream_f", "scream_m", "perfect"]
+var _steal := 0
+
 func play(name: String, volume_db := 0.0) -> void:
 	var s: AudioStream = streams.get(name)
 	if s == null:
 		return
+	var slot: AudioStreamPlayer = null
 	for p in pool:
 		if not p.playing:
-			p.stream = s
-			p.volume_db = volume_db
-			p.play()
+			slot = p
+			break
+	if slot == null:
+		for i in pool.size():                        # alle belegt: einen unwichtigen Kanal reihum verdrängen statt den Ton still zu verwerfen
+			var cand: AudioStreamPlayer = pool[(_steal + i) % pool.size()]
+			if not bool(cand.get_meta("keep", false)):
+				slot = cand
+				_steal = (_steal + i + 1) % pool.size()
+				break
+		if slot == null:
 			return
+	var v: float = VARY.get(name, 0.0)
+	slot.stream = s
+	slot.pitch_scale = 1.0 + randf_range(-v, v) if v > 0.0 else 1.0
+	slot.volume_db = volume_db + (randf_range(-v, v) * 20.0 if v > 0.0 else 0.0)
+	slot.set_meta("keep", KEEP.has(name))
+	slot.play()
 
 ## main/side 0..1; wird jeden Tick vom Spiel gesetzt (0 = still).
 func set_thrust(main: float, side: float) -> void:

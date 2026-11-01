@@ -27,6 +27,7 @@ var planets: Array[Texture2D] = [preload("res://assets/art/planet_1.png"), prelo
 const PLANET_SCHEDULE := [[0.6, 72.0, 128.0, 0, 62.0], [2.7, 250.0, 192.0, 1, 95.0], [4.3, 118.0, 64.0, 2, 80.0]]
 var stars: Array = []
 var scroll := 0.0
+const Stage := preload("res://src/core/stage.gd")      # Ränder bei Ultrawide/hohen Fenstern: Weltraum füllt alles, Texte bleiben auf 640×360
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -63,7 +64,8 @@ func _draw() -> void:
 	if t < 0.0 or a <= 0.002:
 		return
 	var white := Color(1, 1, 1, a)
-	draw_texture_rect(space_bg, Rect2(0, 0, 640, 360), false, white)
+	var m := Stage.margin(self)
+	draw_texture_rect(space_bg, Rect2(-m, Stage.view(self)), false, white)
 	_draw_planets(a)
 	_draw_stars(a)
 	if t >= T_OUT - 0.4 and t < T_IN + 0.6:
@@ -76,8 +78,10 @@ func _draw_stars(a: float) -> void:
 	for s in stars:
 		var layer: int = s[2]
 		var factor: float = [0.25, 0.6, 1.4][layer]
-		var x := fposmod(float(s[0]) - scroll * factor, 640.0)
-		var y: float = float(s[1])
+		var vs := Stage.view(self)
+		var m := Stage.margin(self)
+		var x := fposmod(float(s[0]) * vs.x / 640.0 - scroll * factor, vs.x) - m.x
+		var y: float = float(s[1]) * vs.y / 360.0 - m.y
 		var c: Color = cols[layer]
 		c.a = a * (0.55 + 0.45 * float(s[3]))
 		var size: float = [0.67, 1.0, 1.33][layer]
@@ -88,16 +92,18 @@ func _draw_stars(a: float) -> void:
 
 func _draw_planets(a: float) -> void:
 	for p in PLANET_SCHEDULE:
-		var x: float = 700.0 - (t - float(p[0])) * float(p[4])
+		var mx := Stage.margin(self).x
+		var x: float = 700.0 + mx - (t - float(p[0])) * float(p[4])
 		var sz: float = p[2]
-		if x < -sz or x > 720.0:
+		if x < -sz - mx or x > 720.0 + mx:
 			continue
 		draw_texture_rect(planets[int(p[3])], Rect2(roundf(x * 3.0) / 3.0 - sz * 0.5, float(p[1]) - sz * 0.5, sz, sz), false, Color(1, 1, 1, a))
 
 func _draw_taxi(a: float) -> void:
 	var u := smooth((t - (T_OUT - 0.4)) / 1.5)           # Einflug von links
 	var leave := pow(maxf(0.0, (t - 5.0) / 0.9), 2.0)       # Beschleunigung nach rechts am Ende
-	var x := lerpf(-70.0, 215.0, u) + leave * 520.0
+	var mx := Stage.margin(self).x
+	var x := lerpf(-70.0 - mx, 215.0, u) + leave * (520.0 + mx)
 	var y := 176.0 + sin(t * 1.9) * 6.0 - leave * 10.0
 	var rot := 0.12 + sin(t * 1.3) * 0.03 + leave * 0.12
 	draw_set_transform(Vector2(x, y), rot, Vector2.ONE)

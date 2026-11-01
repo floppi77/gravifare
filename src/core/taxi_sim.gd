@@ -288,8 +288,10 @@ func _move_axis_x(dt: float) -> void:
 		# an Kante heranschieben
 		var dir := signf(vel.x) * -1.0
 		var step_px := 0.25
-		while not level.box_hits_solid(Vector2(pos.x + dir * step_px, pos.y), Tuning.HULL_HALF) and step_px < 8.0:
+		var moved := 0.0
+		while not level.box_hits_solid(Vector2(pos.x + dir * step_px, pos.y), Tuning.HULL_HALF) and moved < 8.0:
 			pos.x += dir * step_px
+			moved += step_px
 	else:
 		pos.x = nx
 

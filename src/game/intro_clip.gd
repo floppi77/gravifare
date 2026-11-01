@@ -32,7 +32,8 @@ func start(g: Node, k: String) -> bool:
 	demo = IntroDemo.new()
 	if not demo.setup(k):
 		return false
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)       # feste 640×360-Fläche; die CanvasLayer verschiebt sie in die Mitte (siehe game.gd)
+	size = VIEW
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	var tt: Dictionary = demo.data.get("title", {})
@@ -81,6 +82,7 @@ func _build_view() -> void:
 	taxi_node.material = unlit
 	world.add_child(taxi_node)
 	cam = Camera2D.new()
+	cam.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS      # sonst Warnung wegen Physik-Interpolation
 	var focus: Array = demo.data.get("focus", [320, 180])
 	cam.position = Vector2(float(focus[0]), float(focus[1]))
 	var z := float(demo.data.get("zoom", 1.5))
@@ -150,7 +152,8 @@ func _draw() -> void:
 		return
 	var f := fade
 	var hud := Fonts.hud
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.03, 0.62 * f))
+	var mg := (get_viewport_rect().size - VIEW) * 0.5
+	draw_rect(Rect2(-mg, get_viewport_rect().size), Color(0.0, 0.0, 0.03, 0.62 * f))
 	# Rahmen des Bildschirms
 	var r := SCREEN
 	draw_rect(r.grow(7.0), Color(0.02, 0.03, 0.09, 0.95 * f))

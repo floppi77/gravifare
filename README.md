@@ -1,9 +1,9 @@
 # GraviFare (Arbeitstitel)
 
-2D-Arcade-Schwebetaxi in Godot 4.7: Trägheit, Schwerkraft, präzise Landungen, 99 handgestaltete Level in 9 Sektoren.
+2D-Arcade-Schwebetaxi in Godot 4.7: Trägheit, Schwerkraft, präzise Landungen, 99 Level in 9 Sektoren (Sektor 3–5 prozedural erzeugt und per Bot geprüft, Rest per Skript/ASCII-Raster).
 Geistiger Nachfolger des Genres „Flugtaxi“ – eigene Welt, eigene Level, eigene Grafik und Klänge.
 
-**Stand:** Meilenstein M1 abgeschlossen, M2 (Vertical Slice) in Arbeit: 3 Level mit Schwierigkeitsmetrik, 5 Leben, Fahrgäste mit Wartebereichen und Sprachausgabe (DE/EN), zeitabhängige Bezahlung, Levelwechsel-Sequenz, Licht/Normal-Maps/Partikel, animiertes Menü, Sprachwahl per Flagge. Siehe [DESIGN.md](DESIGN.md) und [TESTING.md](TESTING.md).
+**Stand:** Meilenstein M4: alle 99 Level in 9 Sektoren (Level 1–99), Tutorial („Flugschule“), 3 Speicherplätze, Medaillen und Punkte, Garage, DE/EN mit Sprachausgabe, 21 Musikthemen mit 3 Schichten, Licht/Normal-Maps/Partikel, Gamepad und freie Tastenbelegung. Siehe [DESIGN.md](DESIGN.md), [LEVELS.md](LEVELS.md) und [TESTING.md](TESTING.md). Eine QA-Prüfung (2026-11-01) und ihre Maßnahmen stehen in DESIGN.md („Runde 25“).
 Der Titel ist vorläufig; vor einer Veröffentlichung ist eine Markenprüfung (DE/EU) nötig. Eine Lizenz für das eigene Spiel ist **nicht** festgelegt.
 
 ## Starten

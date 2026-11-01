@@ -51,13 +51,15 @@ func setup(r: Run, c: Camera2D) -> void:
 		mat.set_shader_parameter("dark", r.level.dark)
 
 func _screen(world: Vector2) -> Vector2:
-	var center := cam.get_screen_center_position() if cam != null else Vector2(320, 180)
-	return world - center + Vector2(320.0, 180.0)
+	var half := get_viewport_rect().size * 0.5
+	var center := cam.get_screen_center_position() if cam != null else half
+	return world - center + half
 
 func _process(_d: float) -> void:
 	if run == null or not visible:
 		return
 	var lv := run.level
+	mat.set_shader_parameter("size", get_viewport_rect().size)
 	var lights := PackedVector3Array()
 	var tp := _screen(run.sim.pos)
 	lights.append(Vector3(tp.x, tp.y, 72.0 + 3.0 * sin(Time.get_ticks_msec() * 0.011)))

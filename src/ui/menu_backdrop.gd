@@ -16,6 +16,8 @@ var meteors: Array = []
 var meteor_timer := 2.0
 var hero_t := -4.0
 var rng := RandomNumberGenerator.new()
+var _wf := 1.0                    # Breitenfaktor (Ultrawide > 1): Sterne, Verkehr und Kacheln verteilen sich über die ganze Breite
+var _oy := 0.0                    # Versatz nach unten bei höheren Fenstern (Skyline bleibt unten)
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -36,14 +38,14 @@ func _process(delta: float) -> void:
 	hero_t += delta
 	for c in cars:
 		c.x += c.v * delta
-		if c.v > 0.0 and c.x > 700.0:
+		if c.v > 0.0 and c.x > 700.0 * _wf:
 			c.x = -40.0
 		elif c.v < 0.0 and c.x < -60.0:
-			c.x = 690.0
+			c.x = 690.0 * _wf
 	meteor_timer -= delta
 	if meteor_timer <= 0.0:
 		meteor_timer = rng.randf_range(2.5, 6.5)
-		meteors.append({"x": rng.randf_range(120.0, 640.0), "y": rng.randf_range(10.0, 110.0), "age": 0.0})
+		meteors.append({"x": rng.randf_range(120.0, 640.0 * _wf), "y": rng.randf_range(10.0, 110.0), "age": 0.0})
 	for m in meteors:
 		m.age += delta
 	meteors = meteors.filter(func(m): return m.age < 0.9)
@@ -52,8 +54,12 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var full := Rect2(0, 0, 640, 360)
-	draw_texture_rect(far, full, false)
+	_wf = maxf(size.x, 640.0) / 640.0
+	_oy = maxf(size.y - 360.0, 0.0)
+	var cover := maxf(size.x / 640.0, size.y / 360.0)
+	var fw := 640.0 * cover
+	var fh := 360.0 * cover
+	draw_texture_rect(far, Rect2((size.x - fw) * 0.5, (size.y - fh) * 0.5, fw, fh), false)
 	# ziehender Nebel (zwei Kopien, additiv wirkend durch geringe Deckkraft)
 	_tiled(nebula, 2.2, 0.22)
 	_draw_stars()
@@ -72,10 +78,11 @@ func _draw_stars() -> void:
 		var a := 0.25 + 0.75 * tw
 		var sz: float = float(s[3]) * 0.67
 		var c := Color(0.85, 0.9, 1.0, a)
-		draw_rect(Rect2(float(s[0]), float(s[1]), sz, sz), c)
+		var sx := float(s[0]) * _wf
+		draw_rect(Rect2(sx, float(s[1]), sz, sz), c)
 		if sz > 1.2 and tw > 0.85:       # kurzes Funkeln als Kreuz
-			draw_rect(Rect2(float(s[0]) - 1.5, float(s[1]) + sz * 0.3, sz + 3.0, 0.5), Color(c.r, c.g, c.b, a * 0.6))
-			draw_rect(Rect2(float(s[0]) + sz * 0.3, float(s[1]) - 1.5, 0.5, sz + 3.0), Color(c.r, c.g, c.b, a * 0.6))
+			draw_rect(Rect2(sx - 1.5, float(s[1]) + sz * 0.3, sz + 3.0, 0.5), Color(c.r, c.g, c.b, a * 0.6))
+			draw_rect(Rect2(sx + sz * 0.3, float(s[1]) - 1.5, 0.5, sz + 3.0), Color(c.r, c.g, c.b, a * 0.6))
 
 func _draw_meteors() -> void:
 	for m in meteors:
@@ -91,14 +98,14 @@ func _tiled(tex: Texture2D, speed: float, alpha: float) -> void:
 	var off := fmod(t * speed, 1280.0)
 	var base := int(floor(off / 640.0))
 	var x0 := -(off - base * 640.0)
-	for k in 2:
+	for k in int(ceil(size.x / 640.0)) + 1:
 		var flip := (base + k) % 2 == 1
 		var x := roundf((x0 + k * 640.0) * 3.0) / 3.0
 		if flip:
-			draw_set_transform(Vector2(x + 640.0, 0), 0.0, Vector2(-1, 1))
+			draw_set_transform(Vector2(x + 640.0, _oy), 0.0, Vector2(-1, 1))
 			draw_texture_rect(tex, Rect2(0, 0, 640, 360), false, Color(1, 1, 1, alpha))
 		else:
-			draw_set_transform(Vector2(x, 0), 0.0, Vector2.ONE)
+			draw_set_transform(Vector2(x, _oy), 0.0, Vector2.ONE)
 			draw_texture_rect(tex, Rect2(0, 0, 640, 360), false, Color(1, 1, 1, alpha))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
@@ -109,8 +116,10 @@ func _haze(y0: float, a: float, phase: float) -> void:
 	var drift := sin(t * 0.15 + phase) * 16.0
 	var c0 := Color(0.45, 0.32, 0.65, 0.0)
 	var c1 := Color(0.45, 0.32, 0.65, a)
-	draw_polygon(PackedVector2Array([Vector2(-20 + drift, y0), Vector2(660 + drift, y0), Vector2(660 + drift, y0 + 45), Vector2(-20 + drift, y0 + 45)]), PackedColorArray([c0, c0, c1, c1]))
-	draw_polygon(PackedVector2Array([Vector2(-20 + drift, y0 + 45), Vector2(660 + drift, y0 + 45), Vector2(660 + drift, y0 + 90), Vector2(-20 + drift, y0 + 90)]), PackedColorArray([c1, c1, c0, c0]))
+	y0 += _oy
+	var xr := size.x + 20.0
+	draw_polygon(PackedVector2Array([Vector2(-20 + drift, y0), Vector2(xr + drift, y0), Vector2(xr + drift, y0 + 45), Vector2(-20 + drift, y0 + 45)]), PackedColorArray([c0, c0, c1, c1]))
+	draw_polygon(PackedVector2Array([Vector2(-20 + drift, y0 + 45), Vector2(xr + drift, y0 + 45), Vector2(xr + drift, y0 + 90), Vector2(-20 + drift, y0 + 90)]), PackedColorArray([c1, c1, c0, c0]))
 
 ## Ferner Verkehr: kleine, dunkle Taxi-Silhouetten mit Positionslichtern; front = vor der nahen Skyline.
 func _draw_cars(front: bool) -> void:
@@ -134,7 +143,7 @@ func _draw_hero() -> void:
 	if hero_t < 0.0 or hero_t > 9.0:
 		return
 	var k := hero_t / 9.0
-	var x := lerpf(-50.0, 700.0, k)
+	var x := lerpf(-50.0, 700.0 * _wf, k)
 	var y := 96.0 + sin(k * TAU * 1.5) * 10.0
 	draw_set_transform(Vector2(x, y), 0.14 * cos(k * TAU * 1.5), Vector2.ONE)
 	for i in 22:

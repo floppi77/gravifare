@@ -22,6 +22,8 @@ class Preview extends Control:
 		if st != null:
 			draw_texture_rect(st, Rect2(c.x - 32.5, c.y - 10.5, 20, 20), false)
 
+const Stage := preload("res://src/core/stage.gd")
+var stage: Control                # zentrierte 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
 var preview: Preview
 var info: Label
 var buttons: Array = []
@@ -42,16 +44,17 @@ func _ready() -> void:
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
+	stage = Stage.make(self)
 	var title := MenuKit.title(tr("MENU_GARAGE"), 36)
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	title.offset_top = 6
-	add_child(title)
+	stage.add_child(title)
 	preview = Preview.new()
 	preview.position = Vector2(220, 40)
 	preview.size = Vector2(200, 90)
 	preview.paint = Cosmetics.selected("paint")
 	preview.sticker = Cosmetics.selected("sticker")
-	add_child(preview)
+	stage.add_child(preview)
 	_column("paint", 20.0, tr("GARAGE_PAINT"))
 	_column("sticker", 450.0, tr("GARAGE_STICKER"))
 	info = Label.new()
@@ -59,7 +62,7 @@ func _ready() -> void:
 	info.size = Vector2(640, 14)
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.add_theme_color_override("font_color", Color("#ffe14a"))
-	add_child(info)
+	stage.add_child(info)
 	var challenge := MenuKit.button("", func(): pass)
 	var cref := func(): challenge.text = tr("GARAGE_CHALLENGE") + ": " + tr("ON" if Cosmetics.challenge() else "OFF")
 	cref.call()
@@ -68,11 +71,11 @@ func _ready() -> void:
 		cref.call())
 	challenge.position = Vector2(220, 300)
 	challenge.custom_minimum_size = Vector2(200, 18)
-	add_child(challenge)
+	stage.add_child(challenge)
 	var back := MenuKit.button(tr("MENU_BACK"), func(): Flow.to_menu())
 	back.position = Vector2(270, 324)
 	back.custom_minimum_size = Vector2(100, 18)
-	add_child(back)
+	stage.add_child(back)
 	await get_tree().process_frame
 	if not buttons.is_empty():
 		buttons[0].grab_focus()
@@ -114,7 +117,7 @@ func _column(kind: String, x: float, head: String) -> void:
 					preview.sticker = it.id)
 		col.add_child(b)
 		buttons.append(b)
-	add_child(col)
+	stage.add_child(col)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

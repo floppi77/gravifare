@@ -52,5 +52,5 @@ func _draw() -> void:
 		var a := clampf(minf((cy - 10.0) / 40.0, (350.0 - cy) / 40.0), 0.0, 1.0)
 		col.a = a
 		if cy > -20.0 and cy < 380.0:
-			draw_string(fnt, Vector2(0, cy + _row_h(kind) * 0.6), txt, HORIZONTAL_ALIGNMENT_CENTER, 640, sz, col)
+			draw_string(fnt, Vector2(0, cy + _row_h(kind) * 0.6), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, sz, col)
 		cy += _row_h(kind)

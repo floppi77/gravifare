@@ -16,7 +16,7 @@ Status: **99 von 99 Leveln vorhanden** (alle Sektoren komplett). Erzeuger: `tool
 | 89–99 (Sektor 9) | **9** | 9 | Finale |
 Mehr als **9 Passagierpads** sind nicht geplant (Pads sind Ziffern 1–9; das Tankpad „F“ und die Lebens-Station „L“ zählen nicht mit). **Lebens-Station** (`L`, kleine Plattform, alle 5 Level: 5, 10, 15, 20 … 95): Landen mit ≥ ¢1000 kauft nach 1,2 s ein Leben, höchstens 5.
 
-## Geplante Hindernisse und Neuerungen je Sektor (Stand: Planung, nur Sektor 1–2 gebaut)
+## Geplante Hindernisse und Neuerungen je Sektor (ursprüngliche Planung; gebaut sind alle 99 Level, Details siehe Sektortabelle unten)
 | Sektor | Neue Hindernisse / Mechaniken | Passagierpads | Weitere Neuerungen (schrittweise) |
 |---|---|---|---|
 | 1 Sternenhafen (1–11) | Dornen, Engstellen, Schächte, Tanken | 3–4 | Zusatzfahrgäste ab 5 |

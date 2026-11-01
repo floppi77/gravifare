@@ -261,15 +261,17 @@ func _gauge(on: bool) -> void:
 ## Welt-Rechtecke werden in Bildschirmkoordinaten umgerechnet (HUD-Rechtecke liegen schon dort).
 func _to_screen(list: Array) -> Array:
 	var out: Array = []
-	var center := cam.get_screen_center_position() if cam != null else Vector2(320, 180)
+	var half := cam.get_viewport_rect().size * 0.5 if cam != null else Vector2(320, 180)
+	var hud_off := (half * 2.0 - Vector2(640, 360)) * 0.5            # HUD-Ebene liegt zentriert auf der 640×360-Fläche
+	var center := cam.get_screen_center_position() if cam != null else half
 	for r in list:
 		var rr: Rect2 = r
 		if rr.size.x <= 0.0:
 			continue
 		if rr in HUD_RECTS:
-			out.append(rr)
+			out.append(Rect2(rr.position + hud_off, rr.size))
 		else:
-			out.append(Rect2(rr.position - center + Vector2(320.0, 180.0), rr.size))
+			out.append(Rect2(rr.position - center + half, rr.size))
 	return out
 
 ## Parcours: durchflogene Tore wechseln auf Rot, das nächste wird grün; nach dem letzten ist der Parcours geschafft.

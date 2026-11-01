@@ -38,16 +38,18 @@ func _process(_d: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var full := Rect2(0, 0, 640, 360)
+	var vs := get_viewport_rect().size
+	var full := Rect2(0, 0, vs.x, vs.y)
 	var cam := get_viewport().get_camera_2d()
 	var off := Vector2.ZERO
 	if cam != null and lvl != null:
 		off = cam.get_screen_center_position() - Vector2(320, 180)
 	if full_img != null:
-		var w := 640.0 * ZOOM
-		var h := 360.0 * ZOOM
-		var x := -(w - 640.0) * 0.5 - roundf(off.x * PARALLAX * 3.0) / 3.0
-		var y := -(h - 360.0) * 0.5 - roundf(off.y * PARALLAX * 3.0) / 3.0
+		var cover := maxf(vs.x / 640.0, vs.y / 360.0)           # Ultrawide/hohe Fenster: Bild füllt die ganze Fläche (Zuschnitt oben/unten bzw. seitlich)
+		var w := 640.0 * ZOOM * cover
+		var h := 360.0 * ZOOM * cover
+		var x := -(w - vs.x) * 0.5 - roundf(off.x * PARALLAX * 3.0) / 3.0
+		var y := -(h - vs.y) * 0.5 - roundf(off.y * PARALLAX * 3.0) / 3.0
 		draw_texture_rect(full_img, Rect2(x, y, w, h), false)
 		draw_rect(full, Color(0.02, 0.03, 0.09, dim))
 		return

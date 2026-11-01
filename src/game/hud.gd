@@ -27,6 +27,12 @@ var font: Font = Fonts.hud
 func bind(r: Run) -> void:
 	run = r
 
+## Gesamte sichtbare Fläche in den Koordinaten dieses Controls (die 640×360-Fläche liegt bei Ultrawide/hohen Fenstern zentriert):
+## Abdunklungen sollen bis zum Fensterrand reichen.
+func _full_rect() -> Rect2:
+	var vs := get_viewport_rect().size
+	return Rect2(-(vs - size) * 0.5, vs)
+
 func flash_message(text: String, seconds := 2.0) -> void:
 	message = text
 	message_t = seconds
@@ -177,11 +183,13 @@ func _draw() -> void:
 		var rem := tr("HUD_MAIN_WAITING") % [job.get("passenger", "?"), job.get("to", "") if run.phase == Run.Phase.CARRYING else job.get("from", "")]
 		_fit_text(font, Vector2(340, row_b), rem, 296.0, 8, Color("#ffd24a"), HORIZONTAL_ALIGNMENT_RIGHT)
 	if game_over:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.6))
+		draw_rect(_full_rect(), Color(0, 0, 0, 0.6))
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_GAME_OVER"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 28, Color("#ff4d6d"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 20), tr("HUD_RUN_CREDITS") + ": ¢ %d" % int(run.money), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 40), tr("HUD_GAME_OVER_HINT"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.FAILED:
+		draw_rect(Rect2(size.x * 0.5 - 130.0, size.y * 0.45 - 21.0, 260.0, 46.0), Color(0.03, 0.04, 0.1, 0.8))      # Unterlage: Text bleibt auf jedem Hintergrund lesbar
+		draw_rect(Rect2(size.x * 0.5 - 130.0, size.y * 0.45 - 21.0, 260.0, 1.0), Color("#ff4d6d"))
 		draw_string(font, Vector2(0, size.y * 0.45), tr("HUD_OUT_OF_FUEL") if run.fuel_fail else tr("HUD_CRASHED"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 16, Color("#ff4d6d"))
 		draw_string(font, Vector2(0, size.y * 0.45 + 16), tr("HUD_LAST_LIFE") if Flow.lives <= 1 else tr("HUD_LIFE_LOST") % (Flow.lives - 1), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.COMPLETE and result.is_empty():
@@ -191,7 +199,7 @@ func _draw() -> void:
 	if run.result == Run.Result.COMPLETE and not result.is_empty():
 		_draw_result()
 	if paused:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
+		draw_rect(_full_rect(), Color(0, 0, 0, 0.55))
 
 ## Text, der in `width` passen muss: Schriftgröße schrumpft bis 6 px, damit nichts abgeschnitten wird oder überläuft.
 func _fit_text(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color, align: int) -> void:

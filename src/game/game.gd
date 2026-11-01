@@ -7,12 +7,16 @@ var run := Run.new()
 var paused := false
 var gear_on := false
 var restart_timer := 0.0
+var assist: Node2D
+const RESTART_CONFIRM_MS := 2000
+var restart_armed_until := 0           # Zeitpunkt (ms), bis zu dem ein zweiter Neustart-Druck gilt
 var cam_off := Vector2.ZERO
 var shake := 0.0
 var near_cd := 0.0
 var slowmo_left := 0.0
 var completion_saved := false
 const TV := preload("res://src/game/transition_view.gd")
+const Stage := preload("res://src/core/stage.gd")
 var replay: Replay = null              # Aufzeichnung des laufenden Levels (Replay-Fundament)
 var arrive_path := PackedVector2Array()   # hindernisfreier Einflug-Pfad (Pathing.arrival_path)
 var trans_t := -1.0              # Zeitachse des Levelwechsels (siehe transition_view.gd), < 0 = inaktiv
@@ -50,7 +54,13 @@ func _ready() -> void:
 	unlit.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
 	props.material = unlit
 	taxi.material = unlit
+	assist = Node2D.new()                      # Landeassistent am Taxi (siehe landing_assist.gd)
+	assist.set_script(load("res://src/game/landing_assist.gd"))
+	assist.material = unlit
+	world.add_child(assist)
 	_setup_look()
+	_fit_layers()
+	get_viewport().size_changed.connect(_fit_layers)
 	load_level(level_path)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--debug-input="):
@@ -70,6 +80,8 @@ func _ready() -> void:
 		debug_input = Vector2(0, 0)
 		taxi.sync_state()
 		taxi.reset_physics_interpolation()
+		assist.sync_state()
+		assist.reset_physics_interpolation()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--debug-pump="):          # Dev: Zapfsäule auf Schadensstufe N setzen (3 = Explosion)
 			run.pump_touches = int(a.substr(13))
@@ -110,6 +122,12 @@ func _ready() -> void:
 		run.exit_open = true
 		run.level.exit_open = true
 		props.door = 1.0
+
+## HUD und Überblendung liegen auf der zentrierten 640×360-Fläche; breitere/höhere Fenster zeigen links/rechts bzw. oben/unten nur den Hintergrund.
+func _fit_layers() -> void:
+	var m := Stage.margin(self)
+	$Hud.offset = m
+	$Trans.offset = m
 
 ## Bildcharakter: HDR-Bloom auf Lichter/Abgase/Neon, leichte Farbkorrektur und Vignette für Tiefe.
 func _setup_look() -> void:
@@ -161,8 +179,11 @@ func load_level(path: String) -> void:
 	props.setup(run)
 	fx.setup(run)
 	taxi.bind(run.sim)
+	assist.bind(run)
 	taxi.sync_state()
 	taxi.reset_physics_interpolation()
+	assist.sync_state()
+	assist.reset_physics_interpolation()
 	hud.bind(run)
 	if autopilot != null:
 		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
@@ -246,6 +267,7 @@ func start_clip(k: String) -> void:
 		Save.write()
 	var layer := CanvasLayer.new()
 	layer.layer = 12
+	layer.offset = Stage.margin(self)
 	add_child(layer)
 	var c := IntroClip.new()
 	layer.add_child(c)
@@ -301,7 +323,7 @@ func _focus_tick(delta: float) -> void:
 		focus_t -= delta
 		var center := cam.get_screen_center_position()
 		spot.fade_speed = 7.0
-		spot.set_spots([Rect2(run.sim.pos - center + Vector2(320.0, 180.0) - Vector2(30, 26), Vector2(60, 52))])
+		spot.set_spots([Rect2(run.sim.pos - center + Stage.view(self) * 0.5 - Vector2(30, 26), Vector2(60, 52))])
 		if focus_t <= 0.0:
 			spot.set_spots([])
 	elif spot.amount <= 0.01:
@@ -333,7 +355,7 @@ func _setup_camera() -> void:
 	cam.reset_physics_interpolation()
 
 func _cam_target() -> Vector2:
-	var view := Vector2(640, 360)
+	var view := Stage.view(self)
 	var sz := run.level.pixel_size()
 	var p := run.sim.pos
 	return Vector2(
@@ -368,6 +390,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
 		if run.result == Run.Result.RUNNING:
 			_set_paused(not paused)
+		elif run.result == Run.Result.FAILED and not hud.game_over:
+			pass        # Absturz-Sequenz läuft: nicht ins Menü springen (sonst ließe sich das verlorene Leben über „Fortsetzen“ zurückholen)
 		else:
 			Flow.to_menu()
 		get_viewport().set_input_as_handled()
@@ -391,7 +415,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("restart"):
 		if run.result == Run.Result.FAILED:
 			_lose_life()
+		elif run.result == Run.Result.RUNNING and not run.level.tutorial and Time.get_ticks_msec() > restart_armed_until:
+			# freiwilliger Neustart mitten im Level: erst nach zweitem Druck (R liegt direkt neben E = Rauswerfen)
+			restart_armed_until = Time.get_ticks_msec() + RESTART_CONFIRM_MS
+			var rk := "kb" if Controls.last_device == "keyboard" else "pad"
+			hud.flash_message(tr("MSG_RESTART_CONFIRM") % Controls.slot_label("restart", rk, 0), RESTART_CONFIRM_MS / 1000.0)
 		else:
+			restart_armed_until = 0
 			load_level(level_path)
 	elif event.is_action_pressed("gear") and not paused and Controls.gear_toggle:
 		if tutorial == null or not tutorial.locked:
@@ -435,6 +465,7 @@ func _physics_process(_delta: float) -> void:
 	else:
 		warn_cd = 0.0
 	taxi.sync_state()
+	assist.sync_state()
 	if run.result == Run.Result.RUNNING:
 		Haptics.thrust(taxi.flame_main + absf(taxi.flame_side) * 0.5)
 		_check_near_miss()
@@ -460,9 +491,14 @@ func _physics_process(_delta: float) -> void:
 		var score := run.level_score()
 		hud.result["score"] = score
 		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
-		Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
+		# Ohne eine einzige Beförderung (z. B. Leerlauf bis zum Countdown) zählt das Level nicht als geschafft.
+		var counted := run.delivered > 0 or run.extras_delivered > 0
+		if counted:
+			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
+		else:
+			hud.flash_message(tr("MSG_NOT_COUNTED"), 4.0)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
-		if not Save.dev_session:
+		if counted and not Save.dev_session:
 			Replay.save_if_best(replay.to_dict())
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
@@ -523,6 +559,8 @@ func _lose_life() -> void:
 		restart_timer = 0.0
 		taxi.sync_state()
 		taxi.reset_physics_interpolation()
+		assist.sync_state()
+		assist.reset_physics_interpolation()
 		cam.global_position = _cam_target()
 		cam.reset_physics_interpolation()
 		return
@@ -539,6 +577,8 @@ func _lose_life() -> void:
 	restart_timer = 0.0
 	taxi.sync_state()
 	taxi.reset_physics_interpolation()
+	assist.sync_state()
+	assist.reset_physics_interpolation()
 	cam.global_position = _cam_target()
 	cam.reset_physics_interpolation()
 	_respawn_focus()
@@ -935,6 +975,8 @@ func _begin_arrival() -> void:
 	arrive_prev = arrive_start
 	_arrival_tick()
 	taxi.reset_physics_interpolation()
+	assist.sync_state()
+	assist.reset_physics_interpolation()
 
 func _arrival_tick() -> void:
 	if not arriving or arrive_done:
@@ -987,3 +1029,5 @@ func _end_transition() -> void:
 	arriving = false
 	Sfx.set_thrust(0.0, 0.0)
 	taxi.reset_physics_interpolation()
+	assist.sync_state()
+	assist.reset_physics_interpolation()

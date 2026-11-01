@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1866,6 +1866,9 @@ func _rm(path: String) -> void:
 	for suffix in ["", ".bad", ".tmp"]:
 		if FileAccess.file_exists(path + suffix):
 			DirAccess.remove_absolute(path + suffix)
+	for fn in DirAccess.get_files_at(path.get_base_dir()):          # zeitgestempelte Zusatz-Sicherungen (.bad<Zeit>) mit aufräumen
+		if fn.begins_with(path.get_file() + ".bad"):
+			DirAccess.remove_absolute(path.get_base_dir() + "/" + fn)
 
 func _test_save_robust() -> void:
 	var sv: Node = load("res://src/core/save.gd").new()
@@ -1877,6 +1880,16 @@ func _test_save_robust() -> void:
 	f.close()
 	sv.load_save()
 	check(sv.data.completed.is_empty() and FileAccess.file_exists(sv.path + ".bad"), "Defekter Speicherstand: Standard geladen, Original als .bad gesichert")
+	# zweiter Defekt: die erste Sicherung bleibt erhalten, es entsteht eine weitere
+	f = FileAccess.open(sv.path, FileAccess.WRITE)
+	f.store_string("{ nochmal defekt [[[")
+	f.close()
+	sv.load_save()
+	var baks := 0
+	for fn in DirAccess.get_files_at("user://"):
+		if fn.begins_with("test_save.json.bad"):
+			baks += 1
+	check(baks >= 2, "Zweiter Defekt überschreibt die erste Sicherung nicht (%d Sicherungen)" % baks)
 	_rm(sv.path)
 	f = FileAccess.open(sv.path, FileAccess.WRITE)
 	f.store_string(JSON.stringify({"completed": "kaputt"}))
@@ -1921,6 +1934,10 @@ func _test_save_slots() -> void:
 	check(s2.exists and s2.levels == 2 and s2.score == 300, "Platz-Übersicht: Level %d, Punkte %d" % [s2.levels, s2.score])
 	sv.set_campaign({"level": "s1_03", "lives": 3, "credits": 420.0, "fuel": 50.0})
 	check(sv.slot_summary(1).credits == 420 and sv.slot_summary(1).lives == 3, "Platz-Übersicht zeigt laufenden Feldzug (Credits, Leben)")
+	var hand := FileAccess.open(sv.slot_path(3), FileAccess.WRITE)          # handeditierter Eintrag mit falschem Typ darf die Platzwahl nicht abstürzen lassen
+	hand.store_string(JSON.stringify({"completed": {"s1_01": 5, "s1_02": {"score": 40}}}))
+	hand.close()
+	check(sv.slot_summary(3).exists and sv.slot_summary(3).score == 40, "Platz-Übersicht übersteht Einträge mit falschem Typ")
 	sv.delete_slot(1)
 	check(sv.slot == 0 and not sv.slot_exists(1) and sv.slot_exists(2), "Löschen gibt Platz 1 frei und lässt Platz 2 unberührt")
 	sv.select_slot(1)
@@ -2107,3 +2124,30 @@ func _test_settings_robust() -> void:
 	check(int(st.values.fps_cap) == 144 and not st.values.has("unbekannt"), "Gültige Werte werden übernommen, unbekannte Schlüssel ignoriert")
 	_rm(st.path)
 	st.free()
+
+func _test_assist_and_audio_options() -> void:
+	var st: Node = load("res://src/core/settings.gd").new()
+	st.path = "user://test_settings2.cfg"
+	_rm(st.path)
+	check(st.values.master == 1.0 and st.values.landing_assist == true, "Neue Optionen: Gesamtlautstärke 100 %, Landeassistent an")
+	var cf := ConfigFile.new()
+	cf.set_value("settings", "master", 4.0)
+	cf.set_value("settings", "landing_assist", false)
+	cf.save(st.path)
+	st.load_settings()
+	check(st.values.master == 1.0 and st.values.landing_assist == false, "Gesamtlautstärke wird begrenzt, Assistent-Schalter wird gespeichert")
+	_rm(st.path)
+	st.free()
+	var assist: GDScript = load("res://src/game/landing_assist.gd")
+	check(assist.tone(0.5) == assist.GREEN and assist.tone(0.9) == assist.YELLOW and assist.tone(1.2) == assist.RED, "Landeassistent: Farbstufen grün/gelb/rot an 70 %/100 % der Grenze")
+	# Konstanten über die Skript-Map lesen (ein direkter Zugriff „Sfx.VARY“ würde sfx.gd schon beim Kompilieren des Testläufers laden, bevor die Autoloads stehen)
+	var cm: Dictionary = root.get_node("Sfx").get_script().get_script_constant_map()
+	var names_ok: bool = cm.has("VARY") and cm.has("KEEP") and cm.has("NAMES")
+	if names_ok:
+		for k in cm.VARY:
+			names_ok = names_ok and cm.NAMES.has(k)
+		for k in cm.KEEP:
+			names_ok = names_ok and cm.NAMES.has(k)
+	check(names_ok, "Effekt-Variation und Schutzliste nennen nur vorhandene Effekte")
+	var stage: GDScript = load("res://src/core/stage.gd")
+	check(stage.SIZE == Vector2(640, 360), "Spielfläche ist 640×360")

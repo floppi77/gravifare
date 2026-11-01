@@ -1,6 +1,8 @@
 extends Control
 ## Hauptmenü: Weiter/Spielen, Levelauswahl, Optionen, Beenden. Vollständig per Tastatur und Gamepad bedienbar.
 
+const Stage := preload("res://src/core/stage.gd")
+
 var box: VBoxContainer
 
 func _ready() -> void:
@@ -12,6 +14,7 @@ func _ready() -> void:
 	var backdrop := Control.new()
 	backdrop.set_script(load("res://src/ui/menu_backdrop.gd"))
 	add_child(backdrop)
+	var stage := Stage.make(self)             # Menü bleibt auf der zentrierten 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
 	box = VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
 	box.offset_left = 16.0
@@ -20,7 +23,7 @@ func _ready() -> void:
 	box.grow_horizontal = Control.GROW_DIRECTION_END
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
-	add_child(box)
+	stage.add_child(box)
 	if Save.slot == 0 or OS.get_cmdline_user_args().has("--slots"):      # Dev: --slots zeigt die Platzwahl
 		show_slots()                                    # Spielstand wählen (beim Start)
 	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen

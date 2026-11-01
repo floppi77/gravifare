@@ -89,7 +89,7 @@ func _draw() -> void:
 	var lines := _wrap(f, sub_text, w - 16.0, fs)
 	var h := 6.0 + float(lines.size()) * 11.0 + 8.0
 	var x := size.x * 0.5 - w * 0.5
-	var y := 334.0 - h
+	var y := size.y * 0.5 + 154.0 - h          # 334 px auf der zentrierten 640×360-Fläche
 	draw_rect(Rect2(x - 1.0, y - 1.0, w + 2.0, h + 2.0), Color(0.02, 0.03, 0.09, 0.55 * sub_a))
 	draw_rect(Rect2(x, y, w, h), Color(0.04, 0.06, 0.16, 0.88 * sub_a))
 	draw_rect(Rect2(x, y, w, 1.0), Color(1.0, 0.88, 0.58, 0.55 * sub_a))

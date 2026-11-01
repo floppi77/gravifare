@@ -54,6 +54,7 @@ func show_root() -> void:
 func show_audio() -> void:
 	_clear()
 	add_child(MenuKit.title(tr("OPT_CAT_AUDIO")))
+	add_child(MenuKit.slider_row(tr("OPT_MASTER"), Settings.values.master, func(x): Settings.set_value("master", x)))
 	add_child(MenuKit.slider_row(tr("OPT_MUSIC"), Settings.values.music, func(x): Settings.set_value("music", x)))
 	add_child(MenuKit.slider_row(tr("OPT_SFX"), Settings.values.sfx, func(x): Settings.set_value("sfx", x)))
 	add_child(MenuKit.slider_row(tr("OPT_VOICE"), Settings.values.voice, func(x): Settings.set_value("voice", x)))
@@ -117,6 +118,7 @@ func show_game() -> void:
 			show_game())
 	add_child(lang)
 	add_child(_toggle("OPT_HINTS", "hints"))
+	add_child(_toggle("OPT_ASSIST", "landing_assist"))
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
 
