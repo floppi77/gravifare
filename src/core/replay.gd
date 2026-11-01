@@ -4,7 +4,9 @@ extends RefCounted
 ## Eingaben je Tick vollständig bestimmt, weil Run/TaxiSim deterministisch sind. Gespeichert wird lauflängenkodiert
 ## (RLE) als JSON; `play()` rechnet einen Lauf headless nach und liefert das Ergebnis (Verifikation, später Geist).
 
-const VERSION := 1
+const VERSION := 2            # 2: mit Geist-Spur und Werkstatt-Werten
+const TRACE_HZ := 10.0        # Positionen je Sekunde für die Geisterfahrt
+const TRACE_FIELDS := 3       # x, y, Neigung
 const DIR := "user://replays/"
 
 var level_id := ""
@@ -17,6 +19,8 @@ var runs: Array = []          # [Anzahl Ticks, qx, qy, gear(0/1)]
 var events: Array = []        # [Tick, "respawn"]
 var ticks := 0
 var result: Dictionary = {}
+var trace: Array = []         # flach: x, y, Neigung je Abtastung
+var mods: Dictionary = {}     # Werkstatt-Einbauten des Laufs
 
 ## Eingaben werden auf 1/127 gerundet, damit Aufzeichnung und Wiedergabe exakt dieselben Werte rechnen.
 static func quantize(v: Vector2) -> Vector2:
@@ -33,6 +37,13 @@ func begin(id: String, run_seed: int, fuel_in: float, credits_in: float, carry_i
 	events.clear()
 	ticks = 0
 	result = {}
+	trace = []
+	mods = {}
+
+## Position für den Geist merken; das Spiel ruft es je Tick.
+func sample(p: Vector2, tilt: float) -> void:
+	if ticks % int(120.0 / TRACE_HZ) == 1:
+		trace.append_array([snappedf(p.x, 0.1), snappedf(p.y, 0.1), snappedf(tilt, 0.01)])
 
 func add(v: Vector2, gear: bool) -> void:
 	var qx := roundi(clampf(v.x, -1.0, 1.0) * 127.0)
@@ -55,13 +66,14 @@ func finish(res: Dictionary) -> void:
 
 func to_dict() -> Dictionary:
 	return {"v": VERSION, "level": level_id, "seed": seed, "fuel": fuel, "credits": credits, "carry": carry, "extras": extras,
-		"ticks": ticks, "runs": runs, "events": events, "result": result}
+		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods}
 
 ## Rechnet einen Lauf nach. Rückgabe: {complete, time, money, earned, delivered, ticks}.
 static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
 	var r := Run.new()
 	r.extras_enabled = bool(d.get("extras", true))
 	r.start(lvl, float(d.get("fuel", -1.0)), float(d.get("credits", 0.0)), int(d.get("seed", -1)))
+	r.sim.apply_mods(d.get("mods", {}))
 	var carry_d: Dictionary = d.get("carry", {})
 	if not carry_d.is_empty():
 		r.release_carried(carry_d)
@@ -97,7 +109,7 @@ static func save_if_best(d: Dictionary) -> bool:
 	var p := path_for(String(d.level))
 	if FileAccess.file_exists(p):
 		var old = JSON.parse_string(FileAccess.get_file_as_string(p))
-		if typeof(old) == TYPE_DICTIONARY and float(old.get("result", {}).get("time", 1e9)) <= float(d.result.time):
+		if typeof(old) == TYPE_DICTIONARY and int(old.get("v", 0)) == VERSION and float(old.get("result", {}).get("time", 1e9)) <= float(d.result.time):
 			return false
 	var f := FileAccess.open(p + ".tmp", FileAccess.WRITE)
 	if f == null:

@@ -16,3 +16,5 @@ Levelwechsel-Sequenz: A/Enter/B/Esc/Start überspringen die Weltraumfahrt.
 
 **Neustart mitten im Level** braucht einen zweiten Druck (R / Back) innerhalb von 2 Sekunden. **Landeassistent:** Mit ausgefahrenem Fahrwerk über einer Plattform erscheint neben dem Taxi ein Feld mit Symbol, Grenzmarke und Haken/Warnzeichen; abschaltbar unter Optionen → Spiel. Die Gamepad-Belegung wurde nicht verändert.
 
+
+**Werkstatt, Nachtschicht:** Beide im Hauptmenü. Der Geist der Bestzeit lässt sich unter Optionen → Spiel abschalten.

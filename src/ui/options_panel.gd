@@ -137,6 +137,7 @@ func show_game() -> void:
 	add_child(lang)
 	add_child(_toggle("OPT_HINTS", "hints"))
 	add_child(_toggle("OPT_ASSIST", "landing_assist"))
+	add_child(_toggle("OPT_GHOST", "ghost"))
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
 

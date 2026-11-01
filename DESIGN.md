@@ -266,3 +266,9 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Level**: S2-07/S2-08 gespiegelt und getauscht (waren fast Dubletten von S2-03/S2-05; die Karten weichen damit von `tools/make_s2.py` ab). Sektor 9 ist nur noch in den letzten drei Leveln dunkel. Auftrags-Fahrgäste wechseln je Level den Namen (`PassengerActor.rotated_name`), außer im Tutorial.
 - **Ton**: Raumklang je Sektor (`tools/audio/gen_ambience.py`), weiche Musik-Überblendung, Spitzen der Effekte auf -1 dBFS (`limit_sfx.py`), Sprachclips auf -20…-16 LUFS (`level_voice.py`), Serien-Landungen klingen höher, Spannungsschicht ab 15 s Restzeit.
 - **Offen**: F-14 (Export), F-19 (Altlasten), F-20 (Metrik) gehören zu Phase E; Game-Over-Wiederholung und Musikdynamik sind nicht umgesetzt.
+
+## Runde 27: Phase D (2026-11-01, nicht freigegeben/committet)
+- **Planetengravitation**: `Tuning.SECTOR_GRAVITY`. Nur Sektor 4 (0,9 g) ist umgesetzt: In Sektor 5, 6, 8 und 9 kippten schon kleine Änderungen (±4–20 %) einzelne Level im Autopilot-Test. Dort erst nach Neuaufbau der Level mit `build_sector.py`. Der Levelwechsel nennt die Schwerkraft.
+- **Werkstatt** (`src/core/workshop.gd`, `src/ui/workshop_view.gd`): drei Einbauten mit je drei Stufen (2.000/6.000/15.000 Credits aus dem laufenden Feldzug), je Speicherplatz dauerhaft: Sparsame Düsen, Panzerhülle, Weiches Fahrwerk. Bot und Tests fliegen ohne Einbauten.
+- **Geisterfahrt** (`src/game/ghost_view.gd`, `Replay.trace`, Version 2): Das Taxi der Bestzeit fliegt halbtransparent mit, Option „Geist der Bestzeit“. Ältere Replays haben keine Spur und werden beim nächsten Abschluss ersetzt.
+- **Nachtschicht** (`Flow.start_shift`, `Run.shift_jobs`): Zufallsaufträge auf geschafften Karten, 3 bis 7 Fahrten je Karte, bis alle Leben weg sind. Zählt nur als `stats.shift_best`, nie für Feldzug, Medaillen oder Bestzeiten.

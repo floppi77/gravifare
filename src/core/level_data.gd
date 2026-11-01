@@ -66,7 +66,7 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.height = l.rows.size()
 	for r in l.rows:
 		l.width = maxi(l.width, String(r).length())
-	l.gravity = float(d.get("gravity", Tuning.GRAVITY))
+	l.gravity = float(d.get("gravity", Tuning.sector_gravity(l.sector)))
 	l.jobs = d.get("jobs", [])
 	l.par_time = float(d.get("par_time", 90.0))
 	l.start_fuel = float(d.get("start_fuel", Tuning.FUEL_MAX))

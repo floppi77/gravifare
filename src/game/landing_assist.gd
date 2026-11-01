@@ -91,7 +91,7 @@ func _draw_window(s: TaxiSim, pad: Dictionary, a: float) -> void:
 
 ## Feld neben dem Taxi: Symbol der kritischsten Achse, Balken mit Grenzmarke, Haken/Warnzeichen.
 func _draw_chip(s: TaxiSim, a: float) -> void:
-	var rs := [maxf(s.vel.y, 0.0) / Tuning.LAND_VY, absf(s.vel.x) / Tuning.LAND_VX, absf(s.tilt) / Tuning.LAND_TILT]
+	var rs := [maxf(s.vel.y, 0.0) / s.land_vy, absf(s.vel.x) / Tuning.LAND_VX, absf(s.tilt) / Tuning.LAND_TILT]
 	var worst := 0
 	for i in 3:
 		if rs[i] > rs[worst]:

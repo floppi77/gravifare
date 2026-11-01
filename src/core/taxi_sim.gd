@@ -25,6 +25,9 @@ var heat_cd := 0.0
 var beam_cd := 0.0
 var air_t := 0.0             # Flugzeit seit dem letzten Abheben (für „perfekte Landung“)
 var air_path := 0.0          # zurückgelegte Strecke seit dem letzten Abheben (px)
+var burn_k := 1.0            # Werkstatt: Verbrauchsfaktor, Aufprallschaden-Faktor, erlaubte Sinkrate
+var damage_k := 1.0
+var land_vy := Tuning.LAND_VY
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -61,6 +64,12 @@ func setup(lvl: LevelData) -> void:
 			state = State.LANDED
 			landed_pad = pad
 			break
+
+## Werkstatt-Einbauten anwenden ({burn, damage, land_vy}, siehe Workshop.mods_for).
+func apply_mods(m: Dictionary) -> void:
+	burn_k = float(m.get("burn", 1.0))
+	damage_k = float(m.get("damage", 1.0))
+	land_vy = float(m.get("land_vy", Tuning.LAND_VY))
 
 ## Wirksame Düsenstärken und Dämpfung: gleiten vom Reisemodus (Fahrwerk drin) zum Feinmodus (draußen).
 ## Tor schließt auf dem Taxi: Schaden, und das Taxi wird zur nächstgelegenen freien Seite hinausgeschleudert.
@@ -224,7 +233,7 @@ func foot_points() -> Array[Vector2]:
 
 ## Landesicherheit 0..1 für das HUD (1 = sicher). Nur aussagekräftig mit Fahrwerk.
 func landing_margin() -> float:
-	var m_vy := 1.0 - clampf(vel.y / Tuning.LAND_VY, 0.0, 2.0)
+	var m_vy := 1.0 - clampf(vel.y / land_vy, 0.0, 2.0)
 	var m_vx := 1.0 - clampf(absf(vel.x) / Tuning.LAND_VX, 0.0, 2.0)
 	var m_t := 1.0 - clampf(absf(tilt) / Tuning.LAND_TILT, 0.0, 2.0)
 	return clampf(minf(m_vy, minf(m_vx, m_t)), -1.0, 1.0)
@@ -277,7 +286,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	acc.y -= up_power() * up
 	acc.y += down_power() * down
 	acc.x += side_power() * side
-	fuel = maxf(0.0, fuel - dt * (Tuning.BURN_UP * up + Tuning.BURN_DOWN * down + Tuning.BURN_SIDE * absf(side)))
+	fuel = maxf(0.0, fuel - dt * burn_k * (Tuning.BURN_UP * up + Tuning.BURN_DOWN * down + Tuning.BURN_SIDE * absf(side)))
 
 	vel += acc * dt
 	vel *= maxf(0.0, 1.0 - drag() * dt)
@@ -340,7 +349,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 	var speed_x := absf(vel.x - pad_vx)
 	var tilt_in := absf(tilt)
 	var on_pad: bool = hit_l and hit_r and not pad_l.is_empty() and not pad_r.is_empty() and pad_l.id == pad_r.id
-	var ok := gear_extended() and on_pad and speed_y <= Tuning.LAND_VY \
+	var ok := gear_extended() and on_pad and speed_y <= land_vy \
 		and speed_x <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
 	if ok:
 		var surf_y: float = pad_l.row * Tuning.TILE
@@ -375,7 +384,7 @@ func _impact(speed: float) -> void:
 		events.append({"type": "destroyed", "instant": true})
 		return
 	var k := (speed - Tuning.IMPACT_SAFE) / (Tuning.CRASH_SPEED - Tuning.IMPACT_SAFE)
-	var dmg := Tuning.HULL_MAX * pow(k, Tuning.DAMAGE_EXP)
+	var dmg := Tuning.HULL_MAX * pow(k, Tuning.DAMAGE_EXP) * damage_k
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": speed})
 	if hull <= 0.0:

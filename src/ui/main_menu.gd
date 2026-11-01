@@ -93,6 +93,8 @@ func show_main(focus_lang := "") -> void:
 	grid.add_theme_constant_override("v_separation", 3)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	for entry in [
+			[tr("MENU_SHIFT"), func(): Flow.start_shift()],
+			[tr("MENU_WORKSHOP"), func(): get_tree().change_scene_to_file("res://src/ui/workshop.tscn")],
 			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
 			[tr("MENU_OPTIONS"), show_options],

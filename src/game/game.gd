@@ -43,6 +43,7 @@ var clip: IntroClip = null              # laufender Einspieler (Erklärvideo zu 
 var clip_pending := ""                 # Einspieler, der nach Funkspruch/Ankunft startet
 var clip_delay := 0.0
 var script_inputs: Array = []
+var ghost: Node2D = null
 var entry_carry := {}                  # Ausgangs-Fahrgast, der in diesem Level ausgestiegen ist (für den Neustart)
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
@@ -170,10 +171,17 @@ func load_level(path: String) -> void:
 	if lvl == null:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
+	if Flow.shift:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = Flow.run_seed + Flow.shift_maps * 131
+		lvl.jobs = Run.shift_jobs(lvl, Flow.shift_maps, rng)
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
 	run.lives = Flow.lives
+	var mods := Workshop.mods(Save.data)
+	run.sim.apply_mods(mods)
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
+	replay.mods = mods
 	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
 	Sfx.play_ambient(lvl.sector)
@@ -196,6 +204,7 @@ func load_level(path: String) -> void:
 	assist.sync_state()
 	assist.reset_physics_interpolation()
 	hud.bind(run)
+	_setup_ghost(lvl)
 	if autopilot != null:
 		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
 		autopilot = Bot.new(run)
@@ -206,6 +215,16 @@ func load_level(path: String) -> void:
 	_setup_camera()
 	bg.setup(lvl)
 	_setup_tutorial(lvl)
+
+## Geisterfahrt: Taxi der eigenen Bestzeit mitfliegen lassen (abschaltbar; nicht im Tutorial, in der Nachtschicht oder im Dev-Autopilot).
+func _setup_ghost(lvl: LevelData) -> void:
+	if ghost == null:
+		ghost = Node2D.new()
+		ghost.set_script(load("res://src/game/ghost_view.gd"))
+		world.add_child(ghost)
+		world.move_child(ghost, taxi.get_index())
+	var best := {} if lvl.tutorial or Flow.shift or autopilot != null or not Settings.values.ghost else Replay.load_best(lvl.id)
+	ghost.bind(run, best.get("trace", []))
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
 func tutorial_speak(key: String) -> Dictionary:
@@ -258,7 +277,7 @@ func level_clip_key() -> String:
 
 ## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
 func _queue_clip(delay: float) -> void:
-	if not Settings.values.hints:
+	if not Settings.values.hints or Flow.shift:
 		return
 	var k := level_clip_key()
 	var seen: Array = Save.data.get("seen_clips", [])
@@ -470,6 +489,7 @@ func _physics_process(_delta: float) -> void:
 	if run.result == Run.Result.RUNNING:
 		replay.add(v, gear_on)
 	run.step(v, gear_on)
+	replay.sample(run.sim.pos, run.sim.tilt)
 	if run.sim.gear_cmd != gear_before:
 		Sfx.play("gear")
 	Sfx.set_thrust(taxi.flame_main if run.result == Run.Result.RUNNING else 0.0, absf(taxi.flame_side))
@@ -509,6 +529,10 @@ func _physics_process(_delta: float) -> void:
 		var score := run.level_score() if counted else 0
 		hud.result["score"] = score
 		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
+		if Flow.shift:
+			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schicht-Bestleistung
+			Flow.shift_fares += run.delivered + run.extras_delivered
+			Flow.shift_maps += 1
 		if counted:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
@@ -583,7 +607,10 @@ func _lose_life() -> void:
 	if Flow.lives <= 0:
 		Flow.lives = 0
 		hud.game_over = true
-		if not Flow.practice:
+		if Flow.shift:
+			hud.shift_total = Flow.shift_fares + run.delivered + run.extras_delivered
+			Flow.finish_shift(run.delivered + run.extras_delivered)
+		elif not Flow.practice:
 			Save.clear_campaign()
 		return
 	if not Flow.practice:
@@ -980,6 +1007,10 @@ func _begin_transition() -> void:
 	trans.title_sector = tr("TRANS_SECTOR") % [nl.sector, tr("SECTOR_%d" % nl.sector)]
 	trans.title_level = tr("TRANS_LEVEL") % [(nl.sector - 1) * 11 + nl.index, nl.names.get(lang, nl.id)]
 	trans.info = tr("TRANS_FARES") % int(run.money)
+	if nl.gravity != Tuning.GRAVITY:
+		trans.info += "  ·  " + tr("TRANS_GRAVITY") % (nl.gravity / Tuning.GRAVITY)
+	if Flow.shift:
+		trans.info = tr("TRANS_SHIFT") % Flow.shift_fares
 	trans.skip_hint = tr("TRANS_SKIP")
 	arriving = false
 	trans_t = 0.0
@@ -1001,6 +1032,8 @@ func _begin_arrival() -> void:
 	arrive_done = false
 	Flow.current_level = next_id
 	level_path = Flow.level_path(next_id)
+	if Flow.shift:
+		Flow.shift_next = Flow._pick_shift_map(next_id)
 	load_level(level_path)
 	run.level.doors_forced_open = true      # beim Einflug stehen bewegliche Tore offen
 	run.level.movers_ignore = true          # … und Trümmer sind ausgeblendet (sie erscheinen mit dem Spielstart)

@@ -9,6 +9,7 @@ var sub_text := ""
 var sub_t := 0.0
 var paused := false
 var game_over := false
+var shift_total := -1            # Nachtschicht: Ergebnis der Schicht (Fahrgäste)
 var price_flash := 0.0
 var lost_t := 0.0                # Restzeit der „Patient verloren“-Anzeige
 var lost_age := 99.0
@@ -106,12 +107,12 @@ func _draw() -> void:
 			pcol = pcol.lerp(Color.WHITE, price_flash)
 		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	_fit_text(font, Vector2(366, 12), lname if run.level.tutorial else "%d/99  %s" % [run.level.number, lname], 92.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	_fit_text(font, Vector2(366, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift else "%d/99  %s" % [run.level.number, lname]), 92.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
 	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size() - run.missed], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei beschriftete Balken (weiße Marke = Grenze der sicheren Landung)
 	var gx := 598.0
 	var gw := 39.0
-	var rows := [[tr("HUD_VY"), s.vel.y, Tuning.LAND_VY], [tr("HUD_VX"), absf(s.vel.x), Tuning.LAND_VX], [tr("HUD_TILT"), rad_to_deg(absf(s.tilt)), rad_to_deg(Tuning.LAND_TILT)]]
+	var rows := [[tr("HUD_VY"), s.vel.y, run.sim.land_vy], [tr("HUD_VX"), absf(s.vel.x), Tuning.LAND_VX], [tr("HUD_TILT"), rad_to_deg(absf(s.tilt)), rad_to_deg(Tuning.LAND_TILT)]]
 	for i in rows.size():
 		var v: float = rows[i][1]
 		var lim: float = rows[i][2]
@@ -186,7 +187,10 @@ func _draw() -> void:
 	if game_over:
 		draw_rect(_full_rect(), Color(0, 0, 0, 0.6))
 		draw_string(font, Vector2(0, size.y * 0.42), tr("HUD_GAME_OVER"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 28, Color("#ff4d6d"))
-		draw_string(font, Vector2(0, size.y * 0.42 + 20), tr("HUD_RUN_CREDITS") + ": ¢ %d" % int(run.money), HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
+		var over_line := tr("HUD_RUN_CREDITS") + ": ¢ %d" % int(run.money)
+		if shift_total >= 0:
+			over_line = tr("HUD_SHIFT_RESULT") % [shift_total, int(Save.data.stats.get("shift_best", 0))]
+		draw_string(font, Vector2(0, size.y * 0.42 + 20), over_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 40), tr("HUD_GAME_OVER_HINT"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.FAILED:
 		draw_rect(Rect2(size.x * 0.5 - 130.0, size.y * 0.45 - 21.0, 260.0, 46.0), Color(0.03, 0.04, 0.1, 0.8))      # Unterlage: Text bleibt auf jedem Hintergrund lesbar

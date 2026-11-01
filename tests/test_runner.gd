@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_gravity", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1767,6 +1767,66 @@ func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()
 	e.physical_keycode = code
 	return e
+
+func _test_sector_gravity() -> void:
+	check(LevelData.load_file("res://data/levels/s1_01.json").gravity == Tuning.GRAVITY, "Sektor 1 nutzt die Standard-Schwerkraft")
+	check(LevelData.load_file("res://data/levels/s4_01.json").gravity < Tuning.GRAVITY, "Sektor 4 hat eine eigene Planetengravitation")
+	check(Tuning.GEAR_THRUST_UP > float(Tuning.SECTOR_GRAVITY.values().max()) * 1.3, "Mit Fahrwerk bleibt überall genug Schub zum Steigen")
+
+func _test_workshop_mods() -> void:
+	var m := Workshop.mods_for({"jets": 3, "hull": 3, "gear": 3})
+	check(m.burn < 1.0 and m.damage < 1.0 and m.land_vy > Tuning.LAND_VY, "Werkstatt-Stufen wirken")
+	var base := Workshop.mods_for({})
+	check(base.burn == 1.0 and base.damage == 1.0 and base.land_vy == Tuning.LAND_VY, "Ohne Einbauten bleibt das Taxi unverändert")
+	var a := TaxiSim.new()
+	a.setup(_lvl())
+	a.apply_mods(m)
+	a.hull = 100.0
+	a._impact(100.0)
+	var b := TaxiSim.new()
+	b.setup(_lvl())
+	b._impact(100.0)
+	check(a.hull > b.hull, "Panzerhülle senkt Aufprallschaden (%.0f gegen %.0f)" % [a.hull, b.hull])
+	a.setup(_lvl())
+	check(a.land_vy == m.land_vy, "Einbauten überstehen den Respawn")
+
+func _test_replay_trace() -> void:
+	var rep := Replay.new()
+	rep.begin("x", -1, -1.0, 0.0, {}, false)
+	for i in 240:
+		rep.add(Vector2.ZERO, false)
+		rep.sample(Vector2(float(i), 0), 0.0)
+	check(rep.trace.size() == int(Replay.TRACE_HZ) * 2 * Replay.TRACE_FIELDS, "Geist-Spur tastet mit %.0f Hz ab (%d Werte)" % [Replay.TRACE_HZ, rep.trace.size()])
+
+func _test_workshop_buy() -> void:
+	var d := {"campaign": {"level": "s1_05", "credits": 2500.0}}
+	check(Workshop.buy(d, "jets") and Workshop.level_of(d, "jets") == 1 and d.campaign.credits == 500.0, "Kauf zieht Credits vom Feldzug ab")
+	check(not Workshop.buy(d, "hull"), "Zu wenig Credits: kein Kauf")
+	check(not Workshop.buy({"campaign": {}}, "gear"), "Ohne Feldzug: kein Kauf")
+
+func _test_shift_jobs() -> void:
+	var bad := []
+	var flown := 0
+	for f in DirAccess.open("res://data/levels").get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash(f)
+		var jobs := Run.shift_jobs(lvl, 2, rng)
+		lvl.jobs = jobs
+		var ok: bool = String(jobs[jobs.size() - 1].to) == "exit"
+		for i in range(1, jobs.size()):
+			ok = ok and String(jobs[i].from) != String(jobs[i - 1].to)
+		for j in jobs:
+			ok = ok and lvl.is_passenger_pad(String(j.from)) and String(j.from) != String(j.to)
+		if not ok:
+			bad.append(f)
+		if f.ends_with("_05.json"):
+			flown += 1
+			var r := Bot.fly_level(lvl, 600.0, Tuning.MIN_START_FUEL)
+			check(r.complete, "Nachtschicht: Autopilot fliegt Zufallsaufträge auf %s (%.0f s, %s)" % [lvl.id, r.time, r.reason])
+	check(bad.is_empty() and flown >= 9, "Nachtschicht-Aufträge sind gültig %s" % str(bad.slice(0, 4)))
 
 func _test_exit_hurry_and_extras() -> void:
 	var lvl := LevelData.load_file("res://data/levels/s2_01.json")

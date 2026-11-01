@@ -275,5 +275,22 @@
  "FINALE_PERFECT": "Perfekte Landungen",
  "FINALE_CRASHES": "Taxis verschrottet",
  "FINALE_IDEA": "Eine Idee von floppi",
- "FINALE_NEXT": "A / Enter: Abspann"
+ "FINALE_NEXT": "A / Enter: Abspann",
+ "MENU_WORKSHOP": "Werkstatt",
+ "MENU_SHIFT": "Nachtschicht",
+ "SHIFT_TAG": "Nachtschicht",
+ "WS_CREDITS": "Feldzug-Credits: ¢ %d",
+ "WS_NO_CAMPAIGN": "Einbauten gibt es nur mit einem laufenden Feldzug",
+ "WS_MAX": "Voll ausgebaut",
+ "WS_JETS": "Sparsame Düsen",
+ "WS_JETS_DESC": "Weniger Spritverbrauch: je Stufe 6 %",
+ "WS_HULL": "Panzerhülle",
+ "WS_HULL_DESC": "Weniger Schaden bei Aufprall: je Stufe 8 %. Sofortzerstörung bleibt.",
+ "WS_GEAR": "Weiches Fahrwerk",
+ "WS_GEAR_DESC": "Landet auch etwas schneller sicher: je Stufe 3 Sinkrate mehr",
+ "OPT_GHOST": "Geist der Bestzeit",
+ "STAT_SHIFT": "Beste Nachtschicht (Fahrgäste)",
+ "HUD_SHIFT_RESULT": "Schicht: %d Fahrgäste · Bestwert %d",
+ "TRANS_GRAVITY": "Schwerkraft %.1f g",
+ "TRANS_SHIFT": "Fahrgäste in dieser Schicht: %d"
 }

@@ -158,6 +158,31 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	pending_log.clear()
 	_spawn_actor(true)
 
+## Nachtschicht: zufällige Auftragskette auf einer Karte, mit jeder geschafften Karte länger (3 bis 7 Fahrten), zuletzt der Ausgangs-Fahrgast.
+static func shift_jobs(lvl: LevelData, maps_done: int, rng: RandomNumberGenerator) -> Array:
+	var ids: Array = lvl.pads.keys().filter(func(id): return lvl.is_passenger_pad(id))
+	ids.sort()
+	var out: Array = []
+	if ids.size() < 2:
+		return lvl.jobs
+	var start_pad: Dictionary = {}
+	for dy in range(0, 3):
+		start_pad = lvl.pad_at_foot(lvl.spawn + Vector2(0, dy * Tuning.TILE))
+		if not start_pad.is_empty():
+			break
+	var prev_to := String(start_pad.get("id", ""))         # nie auf dem Pad erscheinen, auf dem das Taxi gerade steht
+	var n := mini(3 + maps_done, 7)
+	for i in n + 1:
+		var froms := ids.filter(func(id): return id != prev_to)
+		var from_id: String = froms[rng.randi() % froms.size()]
+		var tos := ids.filter(func(id): return id != from_id)
+		var to_id: String = tos[rng.randi() % tos.size()] if i < n else "exit"
+		var gender := "f" if rng.randf() < 0.5 else "m"
+		out.append({"from": from_id, "to": to_id, "fare": 60, "par": snappedf(14.0 + LevelMetrics.leg_length(lvl, from_id, to_id) / 38.0, 1.0),
+			"passenger": PassengerActor.rotated_name(rng.randi() % 99, i, gender), "gender": gender})
+		prev_to = to_id
+	return out
+
 func _spawn_actor(instant: bool) -> void:
 	var job := current_job()
 	if job.is_empty():

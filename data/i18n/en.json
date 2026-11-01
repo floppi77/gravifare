@@ -275,5 +275,22 @@
  "FINALE_PERFECT": "Perfect landings",
  "FINALE_CRASHES": "Taxis wrecked",
  "FINALE_IDEA": "An idea by floppi",
- "FINALE_NEXT": "A / Enter: credits"
+ "FINALE_NEXT": "A / Enter: credits",
+ "MENU_WORKSHOP": "Workshop",
+ "MENU_SHIFT": "Night shift",
+ "SHIFT_TAG": "Night shift",
+ "WS_CREDITS": "Campaign credits: ¢ %d",
+ "WS_NO_CAMPAIGN": "Upgrades need a running campaign",
+ "WS_MAX": "Fully upgraded",
+ "WS_JETS": "Efficient jets",
+ "WS_JETS_DESC": "Less fuel burn: 6% per stage",
+ "WS_HULL": "Armored hull",
+ "WS_HULL_DESC": "Less impact damage: 8% per stage. Instant destruction stays.",
+ "WS_GEAR": "Soft landing gear",
+ "WS_GEAR_DESC": "Lands safely a little faster: 3 more sink rate per stage",
+ "OPT_GHOST": "Best-time ghost",
+ "STAT_SHIFT": "Best night shift (passengers)",
+ "HUD_SHIFT_RESULT": "Shift: %d passengers · best %d",
+ "TRANS_GRAVITY": "Gravity %.1f g",
+ "TRANS_SHIFT": "Passengers this shift: %d"
 }

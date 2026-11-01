@@ -11,6 +11,10 @@ var entry_fuel := Tuning.FUEL_MAX       # Sprit bei Levelbeginn (auch Wiederholu
 var entry_credits := 0.0
 var carry_passenger := {}               # Fahrgast, der ins nächste Level mitfährt
 var run_seed := 0                       # Zufalls-Seed des Laufs (Spritpreise): je Lauf neu, je Level/Neustart reproduzierbar
+var shift := false                      # Nachtschicht (Endlosmodus): zählt nur die eigene Bestleistung, kein Feldzug, keine Medaillen
+var shift_fares := 0                    # bisher beförderte Fahrgäste dieser Schicht
+var shift_maps := 0                     # abgeschlossene Karten dieser Schicht
+var shift_next := ""
 var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keinen Feldzug (Medaillen und Bestzeiten zählen)
 
 func level_ids() -> Array:
@@ -53,6 +57,7 @@ func start_tutorial(next_id := "") -> void:
 	carry_passenger = {}
 	run_seed = randi() % 1000000
 	practice = false
+	shift = false
 	tutorial_next = next_id
 	start_level(TUTORIAL_ID)
 
@@ -64,6 +69,7 @@ func start_campaign(id: String) -> void:
 	carry_passenger = {}
 	run_seed = randi() % 1000000
 	practice = false
+	shift = false
 	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
 	start_level(id)
 
@@ -78,7 +84,39 @@ func start_selected(id: String) -> void:
 	carry_passenger = {}
 	run_seed = randi() % 1000000
 	practice = true
+	shift = false
 	start_level(id)
+
+## Nachtschicht: zufällige Aufträge auf bereits geflogenen Karten, bis alle Leben weg sind. Ziel: möglichst viele Fahrgäste.
+func start_shift() -> void:
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	run_seed = randi() % 1000000
+	practice = true
+	shift = true
+	shift_fares = 0
+	shift_maps = 0
+	var first := _pick_shift_map("")
+	shift_next = _pick_shift_map(first)
+	start_level(first)
+
+## Nächste Karte: nur Level, die schon geschafft sind (mindestens Sektor 1).
+func _pick_shift_map(avoid: String) -> String:
+	var pool: Array = Save.data.completed.keys().filter(func(id): return level_ids().has(id) and id != avoid)
+	if pool.is_empty():
+		pool = level_ids().slice(0, 11).filter(func(id): return id != avoid)
+	return pool[randi() % pool.size()]
+
+## Ende der Schicht (Game Over oder Hauptmenü): Bestwert sichern.
+func finish_shift(extra_fares: int) -> void:
+	if not shift:
+		return
+	shift_fares += extra_fares
+	Save.note_max("shift_best", shift_fares)
+	Save.write()
+	shift = false
 
 ## Gespeicherten Feldzug fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keiner vorhanden ist.
 func resume_campaign() -> bool:
@@ -91,6 +129,7 @@ func resume_campaign() -> bool:
 	carry_passenger = c.get("carry", {}) if c.get("carry", {}) is Dictionary else {}
 	run_seed = int(c.get("seed", 0))
 	practice = false
+	shift = false
 	start_level(String(c.level))
 	return true
 
@@ -100,11 +139,16 @@ func start_level(id: String) -> void:
 	get_tree().change_scene_to_file(GAME)
 
 func next_level_id() -> String:
+	if shift:
+		return shift_next
 	var ids := level_ids()
 	var i := ids.find(current_level)
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
+	var g := get_tree().current_scene
+	if shift and g != null and "run" in g:
+		finish_shift(g.run.delivered + g.run.extras_delivered)      # Schicht abgebrochen: Bestwert trotzdem sichern
 	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)

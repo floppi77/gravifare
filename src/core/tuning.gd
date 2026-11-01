@@ -7,6 +7,7 @@ const TICK := 1.0 / 120.0
 
 # Flugphysik
 const GRAVITY := 90.0            # px/s², Standard (Level darf überschreiben)
+const SECTOR_GRAVITY := {4: 80.0}     # Planetengravitation; alle anderen Sektoren nutzen GRAVITY (weitere Sektoren erst nach Neuaufbau ihrer Level, die Bot-Lösbarkeit hängt daran)
 const THRUST_UP := 230.0         # Hauptdüse, px/s²
 const THRUST_DOWN := 110.0       # Bremsdüse nach unten
 const THRUST_SIDE := 125.0       # Seitendüsen
@@ -94,6 +95,9 @@ const FARE_SCALE_LATE := 0.22
 const TARGET_SLACK_PER_JOB := 3.0    # Zeitziel: Summe der Richtzeiten + 3 s je Auftrag (Wartezeit zwischen den Fahrgästen)
 const FARE_SCALE_FROM := 5
 const EXTRA_FARE_FACTOR := 0.4       # Zusatzfahrgäste zahlen einen Bruchteil des unskalierten Durchschnitts der Auftragspreise (Untergrenze: Mindest-Fahrpreis)
+
+static func sector_gravity(sector: int) -> float:
+	return float(SECTOR_GRAVITY.get(sector, GRAVITY))
 
 static func fare_scale(level_no: int) -> float:
 	return FARE_SCALE_EARLY if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
