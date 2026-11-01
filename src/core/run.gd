@@ -577,17 +577,19 @@ func _squash_actor() -> void:
 	actor = null
 	var n := int(job.get("squashed", 0)) + 1
 	job["squashed"] = n
-	var new_pad := _pick_new_pad(job, String(old.pad.id), n)
-	var ident := PassengerActor.pick_identity(level.id, job_index, n, String(job.get("passenger", "")))
-	job["from"] = new_pad
-	job["passenger"] = ident.name
-	job["gender"] = ident.gender
-	job["look"] = ident.look
+	var new_pad := String(old.pad.id)
+	if not level.tutorial:                    # Tutorial: dieselbe Person am selben Pad, das Skript nennt sie beim Namen
+		new_pad = _pick_new_pad(job, new_pad, n)
+		var ident := PassengerActor.pick_identity(level.id, job_index, n, String(job.get("passenger", "")))
+		job["from"] = new_pad
+		job["passenger"] = ident.name
+		job["gender"] = ident.gender
+		job["look"] = ident.look
 	spawn_timer = SQUASH_RESPAWN_DELAY
 	spawn_wait = false
 	respawn_keep_clock = true
 	phase = Phase.WAITING
-	log.append({"type": "replacement", "pad": new_pad, "name": ident.name})
+	log.append({"type": "replacement", "pad": new_pad, "name": String(job.get("passenger", ""))})
 
 ## Anderes Passagierpad als das des Vorfalls und das Zielpad; deterministisch je Level/Auftrag/Versuch.
 func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:

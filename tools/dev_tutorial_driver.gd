@@ -95,6 +95,6 @@ func _process(delta: float) -> void:
 		"tut_life":
 			if not (s.state == TaxiSim.State.LANDED and String(s.landed_pad.get("id", "")) == "L"):
 				_land("L")
-		"tut_exit":
+		"tut_countdown":
 			if g.run.actor != null and not (s.state == TaxiSim.State.LANDED and String(s.landed_pad.get("id", "")) == "1"):
 				_land("1")

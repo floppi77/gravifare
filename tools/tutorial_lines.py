@@ -14,8 +14,8 @@ T["tut_hud_level"] = ('Rechts vom Tor siehst du das Level und seinen Namen. Dane
                       'To the right of the gate you see the level and its name. Next to it counts how many mandatory passengers you have delivered and how many there are in total.')
 T["tut_hud_gauge"] = ('Ganz rechts die Landeanzeige: wie schnell du sinkst, wie schnell du seitlich fliegst und wie schief du stehst. Bleiben alle drei Balken unter der weißen Marke, landest du sicher.',
                       'At the far right is the landing gauge: how fast you sink, how fast you move sideways and how tilted you are. Keep all three bars below the white mark and you land safely.')
-T["tut_fly"] = ("Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
-                "Let's go! You steer with W, A, S and D, or with the left stick. Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.")
+T["tut_fly"] = ("Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt einmal im Uhrzeigersinn durch die grünen Kreise.",
+                "Let's go! You steer with W, A, S and D, or with the left stick. Now fly once clockwise through the green circles.")
 T["tut_fly_ok"] = ("Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
                    "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.")
 T["tut_gear"] = ('Vor jeder Landung fährst du das Fahrwerk wieder aus, mit der Leertaste oder der A-Taste. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.',
@@ -35,12 +35,20 @@ T["tut_pay"] = ("Bring sie zu Plattform drei. Je schneller du bist, desto mehr z
 T["tut_delivered"] = ("Das war dein erster Fahrpreis. Gut gemacht!", "That was your first fare. Well done!")
 T["tut_extra"] = ('Funkruf! Neben den Pflichtfahrgästen rufen optionale Fahrgäste an, hier an Plattform zwei. Sie sind freiwillig und bringen Extrageld, doch dein Taxi hat nur einen Sitz, und sie warten nicht ewig. Flieg hin und nimm den Gast mit.',
                   'Radio call! Besides the mandatory passengers, optional ones call in, here at platform two. They are voluntary and bring extra money, but your taxi has only one seat, and they will not wait forever. Fly over and take the guest along.')
-T["tut_life"] = ("Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
-                 "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.")
+T["tut_life"] = ("Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben. Du kannst höchstens fünf Leben besitzen. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+                 "The pink platform is a life station. Land there with a thousand credits and you buy an extra life. You can have five lives at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.")
 T["tut_exit"] = ("Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
                  "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.")
 T["tut_countdown"] = ('Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.',
                        'Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.')
+T['tut_eject_again'] = ('Halt, den Gast solltest du nicht abliefern, sondern rauswerfen! Hier kommt der Nächste, an Plattform drei. Nimm ihn mit und wirf ihn mit E oder der Y-Taste raus.',
+    'Hold on, you were supposed to throw that guest out, not deliver them! Here comes the next one, at platform three. Pick them up and eject them with E or the Y button.')
+T['tut_extra2_again'] = ('Der Gast ist weg. An Plattform drei wartet ein neuer. Nimm ihn mit, die Übung kommt gleich.',
+    'That guest is gone. A new one is waiting at platform three. Pick them up, the exercise comes right after.')
+T['tut_main_again'] = ('Mika ist nicht angekommen. Sie wartet wieder an Plattform zwei. Hol sie ab und bring sie diesmal heil ans Ziel.',
+    'Mika did not make it. She is waiting at platform two again. Pick her up and get her there safely this time.')
+T['tut_pump_fix'] = ('Die Zapfsäule ist hin! Ich lasse sie gleich reparieren, aber berühr sie bitte nicht noch mal.',
+    'The pump is wrecked! I will have it repaired right away, but please do not touch it again.')
 T["tut_gate"] = ("Das Tor ist offen. Flieg hindurch!", "The gate is open. Fly through it!")
 T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.',
                       'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')

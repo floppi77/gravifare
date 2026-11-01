@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -2116,6 +2116,12 @@ class FakeGame extends Node:
 		return {"len": 0.2, "text": "x"}
 	func tutorial_voice_pause(_p: bool) -> void:
 		pass
+	func tutorial_voice_stop() -> void:
+		pass
+	func tutorial_ping() -> void:
+		pass
+	func tutorial_line(_key: String) -> String:
+		return "x"
 	func tutorial_narrating() -> bool:
 		return false
 	func tutorial_mark_done() -> void:
@@ -2131,6 +2137,56 @@ class FakeSpot extends Control:
 		text = txt
 
 ## Tutorial: Das Skript läuft vom Willkommen bis zum Tor durch, wenn der Spieler die geforderten Handlungen ausführt (simuliert).
+## Tutorial bleibt lösbar, wenn der Spieler anders handelt als angesagt.
+func _test_tutorial_recovers() -> void:
+	var lvl := LevelData.load_file("res://data/tutorial/tutorial.json")
+	var r := Run.new()
+	r.start(lvl, 100.0, 0.0, 5)
+	var game := FakeGame.new()
+	var spot := FakeSpot.new()
+	var tut := Tutorial.new()
+	tut.setup(game, r, null, spot, null)
+	var goto := func(key: String):
+		for i in tut.steps.size():
+			if String(tut.steps[i].key) == key:
+				tut.idx = i - 1
+				tut._next()
+				return
+	# Abzuwerfender Gast wird abgeliefert: Meldung, neuer Gast, Schritt beginnt von vorn
+	goto.call("tut_extra2")
+	check(r.extras.size() == 1, "Tutorial: zweiter Gast erscheint")
+	goto.call("tut_eject")
+	tut.on_event({"type": "dropped", "extra": true, "job": -1, "name": "Ina"})
+	r.extras.clear()
+	tut._process(0.1)
+	check(String(tut.steps[tut.idx].key) == "tut_extra2" and r.extras.size() == 1, "Tutorial: abgelieferter Gast führt zurück zur Übung")
+	# Mika verloren: Auftrag beginnt von vorn
+	goto.call("tut_pay")
+	r.job_index = 1
+	r.actor = null
+	tut.on_event({"type": "job_missed", "name": "Mika", "fee": 0.0})
+	tut._process(0.1)
+	check(String(tut.steps[tut.idx].key) == "tut_job" and r.job_index == 0 and r.actor != null, "Tutorial: verlorene Mika wartet wieder")
+	# Warten überspringt keinen Schritt mehr
+	goto.call("tut_hard")
+	tut.flags["crashed"] = false
+	for i in 40:
+		tut._process(30.0)
+	check(String(tut.steps[tut.idx].key) == "tut_hard", "Tutorial: Zeitablauf erinnert, überspringt aber nicht")
+	# Lebensstation bleibt bezahlbar
+	goto.call("tut_life")
+	r.money = 0.0
+	tut._process(0.1)
+	check(r.money >= Tuning.LIFE_PRICE, "Tutorial: Lebensstation bleibt bezahlbar")
+	# Getroffener Fahrgast kommt am selben Pad wieder
+	var r2 := Run.new()
+	r2.start(lvl, 100.0, 0.0, 5)
+	r2._squash_actor()
+	check(String(r2.current_job().from) == "2" and String(r2.current_job().passenger) == "Mika", "Tutorial: getroffener Fahrgast bleibt dieselbe Person am selben Pad")
+	tut.free()
+	game.free()
+	spot.free()
+
 func _test_tutorial_script() -> void:
 	var lvl := LevelData.load_file("res://data/tutorial/tutorial.json")
 	check(lvl != null and lvl.tutorial and lvl.pads.has("F") and lvl.pads.has("L") and lvl.pads.has("1") and lvl.pads.has("2") and lvl.pads.has("3") and not lvl.pumps.is_empty(), "Tutorial-Level: Pads 1–3, Tankstelle mit Zapfsäule und Lebensstation vorhanden")
@@ -2160,7 +2216,7 @@ func _test_tutorial_script() -> void:
 					check(r.sim.fuel <= 22.5, "Tutorial: Tank wird für die Tankstellen-Übung abgesenkt (%.0f)" % r.sim.fuel)
 				r.sim.state = TaxiSim.State.LANDED
 				r.sim.landed_pad = lvl.pads["F"]
-				if key == "tut_credit":
+				if key != "tut_fuel_low":
 					r.sim.fuel = 100.0
 			"tut_hard":
 				tut.on_event({"type": "destroyed"})
@@ -2181,7 +2237,7 @@ func _test_tutorial_script() -> void:
 				tut.on_event({"type": "ejected", "voice": "f0", "name": "Ina", "lethal": false})
 			"tut_life":
 				tut.on_event({"type": "life_bought", "lives": 5, "price": 1000.0})
-			"tut_exit":
+			"tut_countdown":
 				r.exit_open = true
 		tut._process(0.5)
 	check(tut.idx >= tut.steps.size(), "Tutorial-Skript läuft bis zum Ende durch (%d Schritte)" % seen.size())

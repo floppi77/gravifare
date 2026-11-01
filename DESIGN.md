@@ -279,3 +279,12 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Sprache**: Die Zentrale überdeckt keine Fahrgast-Rufe mehr und wird nicht überdeckt: „Hey Taxi“ folgt nach `exit_start` (`pending_call`).
 - **Tutorial**: 500 statt 50 Credits, Fahrgäste steigen erst nach der Erklärung ein (`after_speech`), B/U überspringt Texte (Aktion `text_skip`, fest belegt). `tut_soft` nennt die Landeplatte.
 - **Levelauswahl**: echte Vorschaubilder (`assets/art/levels/`, `tools/make_level_shots.sh`, nach Level- oder Grafikänderungen neu erzeugen), noch nicht geschaffte Level unscharf.
+
+## Runde 29: Tutorial abgesichert
+Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutorial._watch`, läuft jedes Bild). Zeitlimits überspringen nichts mehr, sie blenden die Aufgabe wieder ein (`_remind`).
+- **Rauswurf-Übung**: Wird der Gast abgeliefert oder geht er verloren, erklärt der Fluglehrer das (`tut_eject_again`, `tut_extra2_again`), ein neuer Gast erscheint, weiter geht es erst nach dem Rauswurf.
+- **Mika**: Absturz oder Rauswurf starten den Auftrag neu (`tut_main_again`). Getroffene Fahrgäste kommen im Tutorial als dieselbe Person am selben Pad wieder.
+- **Erster optionaler Gast**: Geht er verloren, entfällt der Zielschritt.
+- **Tanken**: Der Tank bleibt für die Übung niedrig, auch nach einem Ersatztaxi; Tanken lässt sich nicht mehr durch Abheben abkürzen. Eine explodierte Säule wird nach 3 s repariert (`tut_pump_fix`).
+- **Lebensstation**: bleibt bezahlbar, und ein Platz ist frei.
+- **R/Back**: wirkt im Tutorial nur nach einem Absturz; Neustart bewusst über das Pausenmenü. Beim Verlassen wird die Stimme gestoppt und entsperrt (sonst blieb sie nach „Pause → Hauptmenü“ dauerhaft stumm).

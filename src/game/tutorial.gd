@@ -64,6 +64,9 @@ func setup(g: Node, r: Run, h: Control, sp: Control, c: Camera2D) -> void:
 	_next()
 
 func _exit_tree() -> void:
+	if game != null and is_instance_valid(game):       # verlässt man das Tutorial aus der Pause: Stimme nicht angehalten zurücklassen
+		game.call("tutorial_voice_pause", false)
+		game.call("tutorial_voice_stop")
 	if gates != null and is_instance_valid(gates):
 		gates.queue_free()
 	if hud != null and is_instance_valid(hud):
@@ -89,9 +92,9 @@ func _build() -> void:
 			"spots": func(): return [_fuel_rect()],
 			"wait": func(): return _landed_on("F"), "timeout": 120.0},
 		{"key": "tut_refuel", "spots": func(): return [_fuel_rect(), R_FUEL],
-			"wait": func(): return run.sim.fuel >= 35.0 or not _landed_on("F"), "timeout": 12.0},
+			"wait": func(): return run.sim.fuel >= 35.0, "timeout": 25.0},
 		{"key": "tut_credit", "enter": _enter_credit, "spots": func(): return [R_MONEY, R_FUEL],
-			"wait": func(): return run.sim.fuel >= 92.0 or not _landed_on("F") or run.money < 1.0, "timeout": 30.0},          # Guthaben aufgebraucht: weiter
+			"wait": func(): return run.sim.fuel >= 92.0 or run.money < 1.0, "timeout": 30.0},          # Guthaben aufgebraucht: weiter
 		{"key": "tut_price", "enter": _enter_price, "spots": func(): return [R_PRICE, _fuel_rect()]},
 		{"key": "tut_landing", "spots": func(): return [R_GAUGE, R_HULL], "gauge": true},
 		{"key": "tut_hard", "enter": func(): flags["crashed"] = false,
@@ -110,12 +113,12 @@ func _build() -> void:
 		{"key": "tut_extra", "enter": _enter_extra, "spots": func(): return [_extra_rect()],
 			"after_speech": func(): run.extra_locked = false,
 			"wait": func(): return flags.get("boarded_extra", false) or flags.get("extra_done", false), "timeout": 150.0},
-		{"key": "tut_extra_dest", "spots": func(): return [_extra_dest_rect()],
+		{"key": "tut_extra_dest", "spots": func(): return [_extra_dest_rect()], "skip_if": func(): return flags.get("extra_gone", false),
 			"wait": func(): return flags.get("extra_done", false), "timeout": 150.0, "after": _drop_waiting_extras},
 		{"key": "tut_extra2", "enter": _enter_extra2, "spots": func(): return [_extra_rect()],
 			"after_speech": func(): run.extra_locked = false,
 			"wait": func(): return flags.get("boarded_extra", false), "timeout": 150.0},
-		{"key": "tut_eject", "wait": func(): return flags.get("ejected", false), "timeout": 150.0},
+		{"key": "tut_eject", "enter": _enter_eject, "wait": func(): return flags.get("ejected", false) or run.ejected > int(flags.get("ejected0", 0)), "timeout": 60.0},
 		{"key": "tut_eject_ok", "after": _drop_waiting_extras},
 		{"key": "tut_life", "enter": _give_life_money, "spots": func(): return [_pad_rect("L"), R_LIVES],
 			"wait": func(): return flags.get("life_bought", false), "timeout": 90.0},
@@ -142,12 +145,20 @@ func _enter_price() -> void:
 
 ## Mika erscheint erst jetzt und tritt aus ihrem Häuschen; einsteigen darf sie erst, wenn die Erklärung zu Ende ist.
 func _enter_job() -> void:
+	run.pickup_locked = true
+	run.spawn_locked = false                  # wird sie getroffen, erscheint sie wieder; beim Einsteigen schließt die Sperre
 	if run.actor == null:
 		run._spawn_actor(false)
 
 func _enter_delivered() -> void:
 	flags["extra_done"] = false
+	flags["extra_gone"] = false
 	flags["boarded_extra"] = false
+
+func _enter_eject() -> void:
+	flags["ejected"] = false
+	flags["guest_dropped"] = false
+	flags["ejected0"] = run.ejected
 
 func _enter_exit() -> void:
 	run.pickup_locked = true                  # Odo steigt erst nach der Erklärung des Countdowns ein
@@ -172,6 +183,7 @@ func _enter_extra2() -> void:
 	run._spawn_extra("3", "2")
 
 func _give_life_money() -> void:
+	flags["life_bought"] = false
 	run.lives = mini(run.lives, 4)             # nach der Zerstörung ist ohnehin ein Leben weniger; sonst vier, damit ein Kauf möglich ist
 	game.call("tutorial_set_lives", run.lives)
 	run.money = maxf(run.money, Tuning.LIFE_PRICE)
@@ -195,13 +207,82 @@ func _next() -> void:
 	wait_t = 0.0
 	gap_t = 0.0
 	var st: Dictionary = steps[idx]
+	if st.has("skip_if") and (st.skip_if as Callable).call():
+		_next()
+		return
+	st.erase("_speech_done")
 	var key := String(st.key)
 	if key == "tut_soft_react":
 		key = "tut_soft_ok" if flags.get("soft_ok", false) else "tut_soft_meh"
 		st["key"] = key
 	if st.has("enter"):
 		(st.enter as Callable).call()
-	_speak(key)
+	_speak(String(flags.get("retry_key", key)))
+	flags.erase("retry_key")
+
+## Zurück zu einem Schritt, statt hängen zu bleiben; `speak_key` erklärt, was schiefging.
+func _retry(step_key: String, speak_key: String) -> void:
+	for i in steps.size():
+		if String(steps[i].key) == step_key:
+			idx = i - 1
+			flags["retry_key"] = speak_key
+			_next()
+			return
+
+## Mika ist unterwegs verloren gegangen (Absturz, Rauswurf): Der Auftrag beginnt von vorn.
+func _restore_main() -> void:
+	flags["main_lost"] = false
+	flags["boarded_main"] = false
+	run.job_index = 0
+	run.phase = Run.Phase.WAITING
+	run.actor = null
+	run.spawn_timer = 0.0
+	run.spawn_wait = false
+	run.missed = 0
+
+## Läuft jedes Bild: hält das Skript lösbar, egal was der Spieler tut. Jede Warte-Bedingung muss erreichbar bleiben.
+func _watch(delta: float) -> void:
+	if run.result != Run.Result.RUNNING:
+		return
+	if float(flags.get("pump_t", 0.0)) > 0.0:     # explodierte Zapfsäule: im Unterricht wird sie repariert, sonst könnte man nicht mehr tanken
+		flags["pump_t"] = float(flags.pump_t) - delta
+		if float(flags.pump_t) <= 0.0:
+			run.pump_touches = 0
+			run.pump_broken = false
+			run.pump_warned = false
+			run.pump_cd = 2.0
+			flags["pump_say"] = true
+	if flags.get("pump_say", false) and not bool(game.call("tutorial_narrating")):
+		flags["pump_say"] = false
+		_speak("tut_pump_fix")
+	match _key():
+		"tut_fuel_low":
+			if run.sim.fuel > 30.0 and not _landed_on("F"):
+				run.sim.fuel = 22.0               # neues Taxi nach einem Absturz: Die Tankübung soll trotzdem stattfinden
+		"tut_job", "tut_pay":
+			if flags.get("main_lost", false):
+				_restore_main()
+				_retry("tut_job", "tut_main_again")
+		"tut_extra", "tut_extra_dest":
+			if run.extras.is_empty() and not flags.get("extra_done", false):
+				flags["extra_done"] = true        # optionaler Gast ist weg (Absturz, Treffer, Geduld, Rauswurf): nichts bleibt offen
+				flags["extra_gone"] = true
+		"tut_extra2":
+			if run.extras.is_empty():
+				_retry("tut_extra2", "tut_extra2_again")
+		"tut_eject":
+			if run.extras.is_empty() and run.ejected <= int(flags.get("ejected0", 0)) and not flags.get("ejected", false):
+				_retry("tut_extra2", "tut_eject_again" if flags.get("guest_dropped", false) else "tut_extra2_again")
+		"tut_life":
+			run.money = maxf(run.money, Tuning.LIFE_PRICE)       # Tanken oder ein Ersatztaxi dürfen die Übung nicht verhindern
+			if run.lives >= Tuning.MAX_LIVES:
+				run.lives = Tuning.MAX_LIVES - 1
+				game.call("tutorial_set_lives", run.lives)
+
+## Lange nichts passiert: Aufgabe wieder einblenden (statt den Schritt still zu überspringen).
+func _remind(st: Dictionary) -> void:
+	game.call("tutorial_ping")
+	spot.say(tr("SPK_INSTRUCTOR"), String(game.call("tutorial_line", String(st.key))))
 
 func _speak(key: String) -> void:
 	var info: Dictionary = game.call("tutorial_speak", key)        # spielt den Clip, liefert Länge und Text (Untertitel)
@@ -227,6 +308,9 @@ func _process(delta: float) -> void:
 	game.call("tutorial_voice_pause", paused)
 	if paused:
 		return
+	_watch(delta)
+	if idx >= steps.size():
+		return
 	var st: Dictionary = steps[idx]
 	t += delta
 	_tick_gates()
@@ -247,10 +331,12 @@ func _process(delta: float) -> void:
 	if waiting:
 		wait_t += delta
 		var done: bool = (st.wait as Callable).call()
-		if not done and wait_t < float(st.get("timeout", 60.0)):
+		if not done:
+			if wait_t >= float(st.get("timeout", 60.0)):
+				wait_t = 0.0
+				_remind(st)
 			return
-		if done:
-			waiting = false
+		waiting = false
 	gap_t += delta
 	if gap_t >= float(st.get("gap", 0.7)):
 		spot.say("", "")
@@ -322,6 +408,7 @@ func on_event(e: Dictionary) -> void:
 				flags["boarded_extra"] = true
 			else:
 				flags["boarded_main"] = true
+				run.spawn_locked = true       # Odo kommt erst im Schritt „Ausgang“
 		"delivered":
 			if bool(e.get("extra", false)):
 				flags["extra_done"] = true
@@ -332,9 +419,14 @@ func on_event(e: Dictionary) -> void:
 			for ex in run.extras:
 				ex["patience"] = 120.0
 				ex["patience_max"] = 120.0
-		"extra_left":
-			if _key() in ["tut_extra", "tut_extra_dest"]:
-				flags["extra_done"] = true
+		"dropped":
+			if bool(e.get("extra", false)) and _key() == "tut_eject":
+				flags["guest_dropped"] = true
+		"job_missed":
+			if _key() in ["tut_job", "tut_pay"]:
+				flags["main_lost"] = true
+		"pump_exploded":
+			flags["pump_t"] = 3.0
 		"ejected":
 			flags["ejected"] = true
 		"life_bought":

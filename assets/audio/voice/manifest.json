@@ -1825,8 +1825,8 @@
    "seconds": 10.3
   },
   "de/i0_tut_fly": {
-   "text": "Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
-   "seconds": 15.34
+   "text": "Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt einmal im Uhrzeigersinn durch die grünen Kreise.",
+   "seconds": 8.46
   },
   "de/i0_tut_fly_ok": {
    "text": "Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
@@ -1881,8 +1881,8 @@
    "seconds": 13.33
   },
   "de/i0_tut_life": {
-   "text": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
-   "seconds": 14.14
+   "text": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben. Du kannst höchstens fünf Leben besitzen. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+   "seconds": 14.7
   },
   "de/i0_tut_exit": {
    "text": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
@@ -1925,8 +1925,8 @@
    "seconds": 10.16
   },
   "en/i0_tut_fly": {
-   "text": "Let's go! You steer with W, A, S and D, or with the left stick. Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.",
-   "seconds": 17.57
+   "text": "Let's go! You steer with W, A, S and D, or with the left stick. Now fly once clockwise through the green circles.",
+   "seconds": 7.59
   },
   "en/i0_tut_fly_ok": {
    "text": "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.",
@@ -1981,8 +1981,8 @@
    "seconds": 15.0
   },
   "en/i0_tut_life": {
-   "text": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
-   "seconds": 12.3
+   "text": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life. You can have five lives at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
+   "seconds": 12.14
   },
   "en/i0_tut_exit": {
    "text": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
@@ -2375,6 +2375,38 @@
   "en/i0_tut_countdown": {
    "text": "Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.",
    "seconds": 15.48
+  },
+  "de/i0_tut_eject_again": {
+   "text": "Halt, den Gast solltest du nicht abliefern, sondern rauswerfen! Hier kommt der Nächste, an Plattform drei. Nimm ihn mit und wirf ihn mit E oder der Y-Taste raus.",
+   "seconds": 10.22
+  },
+  "en/i0_tut_eject_again": {
+   "text": "Hold on, you were supposed to throw that guest out, not deliver them! Here comes the next one, at platform three. Pick them up and eject them with E or the Y button.",
+   "seconds": 9.65
+  },
+  "de/i0_tut_extra2_again": {
+   "text": "Der Gast ist weg. An Plattform drei wartet ein neuer. Nimm ihn mit, die Übung kommt gleich.",
+   "seconds": 5.65
+  },
+  "en/i0_tut_extra2_again": {
+   "text": "That guest is gone. A new one is waiting at platform three. Pick them up, the exercise comes right after.",
+   "seconds": 6.51
+  },
+  "de/i0_tut_main_again": {
+   "text": "Mika ist nicht angekommen. Sie wartet wieder an Plattform zwei. Hol sie ab und bring sie diesmal heil ans Ziel.",
+   "seconds": 6.37
+  },
+  "en/i0_tut_main_again": {
+   "text": "Mika did not make it. She is waiting at platform two again. Pick her up and get her there safely this time.",
+   "seconds": 6.52
+  },
+  "de/i0_tut_pump_fix": {
+   "text": "Die Zapfsäule ist hin! Ich lasse sie gleich reparieren, aber berühr sie bitte nicht noch mal.",
+   "seconds": 5.34
+  },
+  "en/i0_tut_pump_fix": {
+   "text": "The pump is wrecked! I will have it repaired right away, but please do not touch it again.",
+   "seconds": 5.13
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

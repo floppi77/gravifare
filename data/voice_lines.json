@@ -257,7 +257,7 @@
    "tut_hud_money": "Hier dein Geld in Credits, und daneben deine Leben. Fünf Taxis hast du, mehr gibt es nie.",
    "tut_hud_level": "Rechts vom Tor siehst du das Level und seinen Namen. Daneben zählt, wie viele Pflichtfahrgäste du schon befördert hast und wie viele es insgesamt gibt.",
    "tut_hud_gauge": "Ganz rechts die Landeanzeige: wie schnell du sinkst, wie schnell du seitlich fliegst und wie schief du stehst. Bleiben alle drei Balken unter der weißen Marke, landest du sicher.",
-   "tut_fly": "Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
+   "tut_fly": "Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt einmal im Uhrzeigersinn durch die grünen Kreise.",
    "tut_fly_ok": "Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
    "tut_gear": "Vor jeder Landung fährst du das Fahrwerk wieder aus, mit der Leertaste oder der A-Taste. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.",
    "tut_fuel_low": "Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
@@ -268,7 +268,7 @@
    "tut_pay": "Bring sie zu Plattform drei. Je schneller du bist, desto mehr zahlt sie, der Betrag unten rechts tickt herunter. Weiche Landungen in Folge geben einen Bonus.",
    "tut_delivered": "Das war dein erster Fahrpreis. Gut gemacht!",
    "tut_extra": "Funkruf! Neben den Pflichtfahrgästen rufen optionale Fahrgäste an, hier an Plattform zwei. Sie sind freiwillig und bringen Extrageld, doch dein Taxi hat nur einen Sitz, und sie warten nicht ewig. Flieg hin und nimm den Gast mit.",
-   "tut_life": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
+   "tut_life": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben. Du kannst höchstens fünf Leben besitzen. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
    "tut_exit": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
    "tut_countdown": "Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.",
    "tut_gate": "Das Tor ist offen. Flieg hindurch!",
@@ -303,7 +303,11 @@
    "vid_gravity": "Schwerkraftzonen verändern dein Gewicht. In der leichten Zone steigst du von selbst, in der schweren sinkst du. Korrigiere den Schub entsprechend.",
    "vid_wind_gust": "Böen sind Strömungen, die im Takt an- und ausgehen. Warte die Pause ab oder rechne mit dem Stoß.",
    "vid_traffic": "Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Eine Kollision kostet achtzehn Hülle. Warte eine Lücke ab und kreuze die Bahn.",
-   "vid_dark": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg."
+   "vid_dark": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
+   "tut_eject_again": "Halt, den Gast solltest du nicht abliefern, sondern rauswerfen! Hier kommt der Nächste, an Plattform drei. Nimm ihn mit und wirf ihn mit E oder der Y-Taste raus.",
+   "tut_extra2_again": "Der Gast ist weg. An Plattform drei wartet ein neuer. Nimm ihn mit, die Übung kommt gleich.",
+   "tut_main_again": "Mika ist nicht angekommen. Sie wartet wieder an Plattform zwei. Hol sie ab und bring sie diesmal heil ans Ziel.",
+   "tut_pump_fix": "Die Zapfsäule ist hin! Ich lasse sie gleich reparieren, aber berühr sie bitte nicht noch mal."
   },
   "en": {
    "tut_welcome": "Welcome to flight school, Taxi seven! I will explain everything while you fly. Your job: pick up passengers and bring them safely to their destination.",
@@ -312,7 +316,7 @@
    "tut_hud_money": "Here is your money in credits, and next to it your lives. You have five taxis, never more.",
    "tut_hud_level": "To the right of the gate you see the level and its name. Next to it counts how many mandatory passengers you have delivered and how many there are in total.",
    "tut_hud_gauge": "At the far right is the landing gauge: how fast you sink, how fast you move sideways and how tilted you are. Keep all three bars below the white mark and you land safely.",
-   "tut_fly": "Let's go! You steer with W, A, S and D, or with the left stick. Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.",
+   "tut_fly": "Let's go! You steer with W, A, S and D, or with the left stick. Now fly once clockwise through the green circles.",
    "tut_fly_ok": "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.",
    "tut_gear": "Before every landing you extend the landing gear again, with the space bar or the A button. The taxi then flies slower and more precisely. Extend it now.",
    "tut_fuel_low": "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.",
@@ -323,7 +327,7 @@
    "tut_pay": "Take her to platform three. The faster you are, the more she pays; the amount at the bottom right ticks down. Soft landings in a row earn a bonus.",
    "tut_delivered": "That was your first fare. Well done!",
    "tut_extra": "Radio call! Besides the mandatory passengers, optional ones call in, here at platform two. They are voluntary and bring extra money, but your taxi has only one seat, and they will not wait forever. Fly over and take the guest along.",
-   "tut_life": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
+   "tut_life": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life. You can have five lives at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
    "tut_exit": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
    "tut_countdown": "Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.",
    "tut_gate": "The gate is open. Fly through it!",
@@ -358,7 +362,11 @@
    "vid_gravity": "Gravity zones change your weight. In the light zone you rise on your own, in the heavy zone you sink. Adjust your thrust accordingly.",
    "vid_wind_gust": "Gusts are currents that switch on and off on a beat. Wait for the pause or expect the push.",
    "vid_traffic": "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision costs eighteen hull. Wait for a gap and cross the lane.",
-   "vid_dark": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way."
+   "vid_dark": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.",
+   "tut_eject_again": "Hold on, you were supposed to throw that guest out, not deliver them! Here comes the next one, at platform three. Pick them up and eject them with E or the Y button.",
+   "tut_extra2_again": "That guest is gone. A new one is waiting at platform three. Pick them up, the exercise comes right after.",
+   "tut_main_again": "Mika did not make it. She is waiting at platform two again. Pick her up and get her there safely this time.",
+   "tut_pump_fix": "The pump is wrecked! I will have it repaired right away, but please do not touch it again."
   }
  }
 }

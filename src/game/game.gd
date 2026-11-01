@@ -237,6 +237,9 @@ func tutorial_speak(key: String) -> Dictionary:
 	Sfx.narration_until = Time.get_ticks_msec() + int((length + 0.4) * 1000.0)
 	return {"len": length, "text": text}
 
+func tutorial_line(key: String) -> String:
+	return Sfx.line_text("i0", key)
+
 func tutorial_voice_stop() -> void:
 	Sfx.voice_player.stop()
 	Sfx.narration_until = 0
@@ -365,6 +368,7 @@ func _focus_tick(delta: float) -> void:
 ## Tutorial-Level: Beleuchtungs-Ebene und Regie anlegen (bei Neustart frisch).
 func _setup_tutorial(lvl: LevelData) -> void:
 	if tutorial != null:
+		tutorial.game = null                  # beim Neustart nicht die Stimme der neuen Regie abschneiden
 		tutorial.queue_free()
 		tutorial = null
 	if not lvl.tutorial:
@@ -451,7 +455,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				replay.events.pop_back()          # nichts passiert: auch nicht aufzeichnen
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("restart"):
-		if run.result == Run.Result.FAILED:
+		if run.level.tutorial and run.result != Run.Result.FAILED:
+			pass                                  # Tutorial: R startet nicht die ganze Flugschule neu (bewusst geht das über das Pausenmenü)
+		elif run.result == Run.Result.FAILED:
 			_lose_life()
 		elif run.result == Run.Result.RUNNING and not run.level.tutorial and Time.get_ticks_msec() > restart_armed_until:
 			# freiwilliger Neustart mitten im Level: erst nach zweitem Druck (R liegt direkt neben E = Rauswerfen)
