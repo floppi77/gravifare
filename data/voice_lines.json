@@ -5,14 +5,20 @@
    "hard": "Aua!",
    "bored": "Das dauert mir zu lange, tschüss!",
    "wrong_pad": "Das ist die falsche Plattform!",
-   "bumpy": "Fahr doch vorsichtiger!"
+   "bumpy": "Fahr doch vorsichtiger!",
+   "hurry_1": "Beeil dich!",
+   "hurry_2": "Schneller, bitte!",
+   "hurry_3": "Die Zeit läuft ab!"
   },
   "en": {
    "soft": "Wow, smooth!",
    "hard": "Ouch!",
    "bored": "Too slow, I'm out of here!",
    "wrong_pad": "That's the wrong platform!",
-   "bumpy": "Careful, please!"
+   "bumpy": "Careful, please!",
+   "hurry_1": "Hurry up!",
+   "hurry_2": "Faster, please!",
+   "hurry_3": "We're running out of time!"
   }
  },
  "t0": {
@@ -131,7 +137,11 @@
    "r97": "Der Rand wird enger. Dein Können nicht.",
    "r98": "Das vorletzte Level. Atme tief durch.",
    "r99": "Letztes Level. Zeig, was du kannst, Taxi sieben.",
-   "patient_lost": "Patient verloren. Das wird teuer."
+   "patient_lost": "Patient verloren. Das wird teuer.",
+   "exit_start": "Letzter Fahrgast des Levels. Die Uhr läuft, Taxi sieben.",
+   "exit_hurry": "Taxi sieben, die Zeit wird knapp!",
+   "finale_1": "Taxi sieben, hier Zentrale. Das war die letzte Fahrt. Alle neunundneunzig Level, und der Hausmeister spricht wieder mit dir.",
+   "finale_2": "Stell das Taxi ab. Feierabend. Der Kaffee geht heute auf die Zentrale."
   },
   "en": {
    "r2": "Fuel stop ahead: land, refuel, pay. Prices fluctuate.",
@@ -232,7 +242,11 @@
    "r97": "The edge grows narrow. Your skill does not.",
    "r98": "The second to last level. Take a deep breath.",
    "r99": "Final level. Show them what you've got, Taxi seven.",
-   "patient_lost": "Patient lost. That will be expensive."
+   "patient_lost": "Patient lost. That will be expensive.",
+   "exit_start": "Last passenger of the level. The clock is running, Taxi seven.",
+   "exit_hurry": "Taxi seven, time is getting short!",
+   "finale_1": "Taxi seven, this is dispatch. That was the last ride. All ninety-nine levels, and the caretaker is talking to you again.",
+   "finale_2": "Park the taxi. Shift over. Coffee is on dispatch today."
   }
  },
  "i0": {
@@ -256,6 +270,7 @@
    "tut_extra": "Funkruf! Neben den Pflichtfahrgästen rufen optionale Fahrgäste an, hier an Plattform zwei. Sie sind freiwillig und bringen Extrageld, doch dein Taxi hat nur einen Sitz, und sie warten nicht ewig. Flieg hin und nimm den Gast mit.",
    "tut_life": "Die rosa Plattform ist eine Lebensstation. Landest du dort mit tausend Credits, kaufst du ein Zusatzleben, höchstens fünf. In den ersten vierzig Leveln gibt es sie alle fünf Level, später seltener. Zum Üben leihe ich dir das Geld.",
    "tut_exit": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
+   "tut_countdown": "Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.",
    "tut_gate": "Das Tor ist offen. Flieg hindurch!",
    "tut_hud_price": "Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.",
    "tut_gear_in": "Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Leertaste ein, am Controller mit der A-Taste. Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Drück die Taste jetzt.",
@@ -310,6 +325,7 @@
    "tut_extra": "Radio call! Besides the mandatory passengers, optional ones call in, here at platform two. They are voluntary and bring extra money, but your taxi has only one seat, and they will not wait forever. Fly over and take the guest along.",
    "tut_life": "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.",
    "tut_exit": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
+   "tut_countdown": "Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.",
    "tut_gate": "The gate is open. Fly through it!",
    "tut_hud_price": "And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.",
    "tut_gear_in": "Your landing gear is still extended. To take off, retract it with the space bar, or the A button on a controller. Retracted, the taxi flies fast; extended, slow and precise. Press the button now.",

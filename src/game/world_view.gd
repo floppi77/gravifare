@@ -8,16 +8,19 @@ const PX := 1.0 / 3.0                 # ein Bildschirmpixel bei 1080p in Weltein
 var level: LevelData
 var run: Run
 var tiles_tex: Texture2D
+var look := SectorLook.of(1)
 
 func _ready() -> void:
-	var ct := CanvasTexture.new()
-	ct.diffuse_texture = load("res://assets/art/tiles_s1.png")
-	ct.normal_texture = load("res://assets/art/tiles_s1_n.png")
-	tiles_tex = ct
+	pass
 
 func setup(r: Run) -> void:
 	run = r
 	level = r.level
+	look = SectorLook.of(level.sector)
+	var ct := CanvasTexture.new()
+	ct.diffuse_texture = SectorLook.tiles(level.sector)
+	ct.normal_texture = load("res://assets/art/tiles_s1_n.png")
+	tiles_tex = ct
 	queue_redraw()
 
 func _process(_delta: float) -> void:
@@ -63,11 +66,11 @@ func _draw() -> void:
 	level.doors_ignore = false
 
 func _draw_world() -> void:
-	var edge := Color("#7f8fe0")
-	var edge_hi := Color("#c4d0ff")
-	var shadow := Color("#0c0f24")
+	var edge: Color = look.edge
+	var edge_hi: Color = look.hi
+	var shadow: Color = look.shade
 	# Pass 1: weicher Schlagschatten der Felsmasse auf den Hintergrund (versetzt nach rechts unten)
-	var sh := Color(0.02, 0.02, 0.08, 0.34)
+	var sh := Color(0.01, 0.015, 0.03, 0.6)
 	for cy in level.height:
 		for cx in level.width:
 			if level.is_solid_cell(cx, cy) and (not level.is_solid_cell(cx + 1, cy) or not level.is_solid_cell(cx, cy + 1) or not level.is_solid_cell(cx + 1, cy + 1)):

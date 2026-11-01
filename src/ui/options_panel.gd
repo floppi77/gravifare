@@ -5,6 +5,7 @@ extends VBoxContainer
 
 var back: Callable
 var rebuild: Callable
+var page := "root"
 var listen := {}
 var listen_since := 0
 var note := ""
@@ -13,6 +14,18 @@ var note_label: Label
 func _init(back_cb: Callable = Callable(), rebuild_cb: Callable = Callable()) -> void:
 	back = back_cb
 	rebuild = rebuild_cb
+
+## Eine Ebene zurück (B/Esc): Unterseite → Übersicht → vorheriger Bildschirm.
+func go_back() -> void:
+	match page:
+		"root":
+			if back.is_valid():
+				back.call()
+		"bindings":
+			note = ""
+			show_controls()
+		_:
+			show_root()
 
 func _ready() -> void:
 	alignment = BoxContainer.ALIGNMENT_CENTER
@@ -42,6 +55,7 @@ func _toggle(label_key: String, setting: String, on_change := Callable()) -> But
 	return b
 
 func show_root() -> void:
+	page = "root"
 	_clear()
 	add_child(MenuKit.title(tr("MENU_OPTIONS")))
 	add_child(MenuKit.button(tr("OPT_CAT_AUDIO"), show_audio))
@@ -52,6 +66,7 @@ func show_root() -> void:
 	_focus()
 
 func show_audio() -> void:
+	page = "audio"
 	_clear()
 	add_child(MenuKit.title(tr("OPT_CAT_AUDIO")))
 	add_child(MenuKit.slider_row(tr("OPT_MASTER"), Settings.values.master, func(x): Settings.set_value("master", x)))
@@ -63,6 +78,7 @@ func show_audio() -> void:
 	_focus()
 
 func show_controls() -> void:
+	page = "controls"
 	_clear()
 	add_child(MenuKit.title(tr("OPT_CAT_CONTROLS")))
 	add_child(MenuKit.button(tr("OPT_BINDINGS"), show_bindings))
@@ -81,6 +97,7 @@ func show_controls() -> void:
 	_focus()
 
 func show_display() -> void:
+	page = "display"
 	_clear()
 	add_child(MenuKit.title(tr("OPT_CAT_DISPLAY")))
 	add_child(_toggle("OPT_FULLSCREEN", "fullscreen"))
@@ -102,6 +119,7 @@ func show_display() -> void:
 	_focus()
 
 func show_game() -> void:
+	page = "game"
 	_clear()
 	add_child(MenuKit.title(tr("OPT_CAT_GAME")))
 	var lang := MenuKit.button("", func(): pass)
@@ -124,6 +142,7 @@ func show_game() -> void:
 
 # ------------------------------------------------------------------ Belegung
 func show_bindings() -> void:
+	page = "bindings"
 	_clear()
 	listen = {}
 	add_child(MenuKit.title(tr("OPT_BINDINGS")))

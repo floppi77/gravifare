@@ -4,6 +4,8 @@ extends Node
 ## Fehlen Dateien, bleibt es still (Spiel läuft weiter).
 
 var player: AudioStreamPlayer
+var fade_out: AudioStreamPlayer
+const FADE_S := 1.6
 var current := ""
 var target_db: Array = [0.0, -80.0, -80.0]
 var cur_db: Array = [-80.0, -80.0, -80.0]
@@ -16,6 +18,9 @@ func _ready() -> void:
 	player = AudioStreamPlayer.new()
 	player.bus = "Music"
 	add_child(player)
+	fade_out = AudioStreamPlayer.new()
+	fade_out.bus = "Music"
+	add_child(fade_out)
 
 ## Thema für eine Levelnummer (1..99): wechselt alle 5 Level (t00 = Level 1–5 … t19 = Level 96–99).
 static func theme_for_level(level_no: int) -> String:
@@ -37,7 +42,16 @@ func play_theme(theme: String) -> void:
 	current = theme
 	cur_db = [-40.0, -80.0, -80.0]
 	target_db = [0.0, -80.0, -80.0]
+	if player.playing:                    # altes Thema läuft auf dem zweiten Spieler kurz aus (weicher Übergang)
+		var old := player
+		player = fade_out
+		fade_out = old
+		var tw := create_tween()
+		tw.tween_property(old, "volume_db", -50.0, FADE_S)
+		tw.tween_callback(old.stop)
+		tw.tween_property(old, "volume_db", 0.0, 0.0)
 	player.stream = st
+	player.volume_db = 0.0
 	player.play()
 
 ## B = Bewegung (Arpeggio/Lead), C = Spannung (Drums, Riser).

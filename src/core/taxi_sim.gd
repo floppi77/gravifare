@@ -47,6 +47,8 @@ func setup(lvl: LevelData) -> void:
 	air_path = 0.0
 	lvl.clock = 0.0
 	lvl.update_movers(0.0, true)
+	for m in lvl.movers:
+		m.erase("hit_until")               # Treffersperre der Meteoriten gilt in Simulationszeit, die hier neu beginnt
 	events.clear()
 	# Steht unter dem Startpunkt ein Pad, beginnt das Taxi sicher gelandet.
 	for dy in range(0, 3):
@@ -69,10 +71,14 @@ func _door_crush() -> void:
 	var off := Vector2(0, Tuning.GEAR_LEN * gear * 0.5)
 	if not level.hits_closed_door(pos + off, half):
 		return
+	_crush_out(off, half)
+
+## Gequetscht (Tor, oder Mover drückt gegen Fels): Schaden, und das Taxi wird zur nächstgelegenen freien Seite hinausgeschleudert.
+func _crush_out(off: Vector2, half: Vector2) -> void:
 	var best_d := 999
 	var best_dir := Vector2.ZERO
 	for dir in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1), Vector2(0, 1)]:
-		for d in range(1, 49):
+		for d in range(1, 65):
 			var p: Vector2 = pos + dir * float(d)
 			if not level.box_hits_solid(p + off, half):
 				if d < best_d:
@@ -183,10 +189,16 @@ func _mover_push() -> void:
 			return
 		var opts := [[box.end.x - r.position.x, Vector2(-1, 0)], [r.end.x - box.position.x, Vector2(1, 0)],
 			[box.end.y - r.position.y, Vector2(0, -1)], [r.end.y - box.position.y, Vector2(0, 1)]]
-		var best: Array = opts[0]
+		var best: Array = []
 		for o in opts:
-			if o[0] < best[0] - 0.001:
+			if level.box_hits_cells(pos + (o[1] as Vector2) * (float(o[0]) + 0.6), Tuning.HULL_HALF):
+				continue                     # dorthin steht Fels im Weg: nie ins Gestein schieben
+			if best.is_empty() or o[0] < best[0] - 0.001:
 				best = o
+		if best.is_empty():                  # zwischen Mover und Fels eingeklemmt: Quetschung wie beim Tor
+			mover_cd = Tuning.MOVER_COOLDOWN
+			_crush_out(Vector2.ZERO, Tuning.HULL_HALF)
+			return
 		pos += (best[1] as Vector2) * (float(best[0]) + 0.6)
 		vel = (m.vel as Vector2) * (0.3 if m.kind == "meteor" else 1.0) + (best[1] as Vector2) * 30.0      # Meteoriten streifen nur
 		if state == State.LANDED:
@@ -352,8 +364,8 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		vel.x *= 0.6
 
 func _impact(speed: float) -> void:
-	## Balance: bis 70 px/s harmlos; danach Hüllenschaden, der mit der Geschwindigkeit überproportional
-	## steigt; ab 170 px/s ist das Taxi sofort zerstört.
+	## Balance: bis IMPACT_SAFE harmlos; danach Hüllenschaden, der mit der Geschwindigkeit überproportional
+	## steigt; ab CRASH_SPEED ist das Taxi sofort zerstört.
 	if speed <= Tuning.IMPACT_SAFE:
 		return
 	if speed >= Tuning.CRASH_SPEED:

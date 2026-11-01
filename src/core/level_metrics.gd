@@ -19,6 +19,7 @@ extends RefCounted
 ## früheren Sektoren beherrschen müssen.
 const SECTOR_BONUS_FROM := 5
 const SECTOR_BONUS := 32.0
+const FINAL_SECTOR_BONUS := 12.0     # Sektor 9 ist nur in den letzten drei Leveln dunkel: Ausgleich für den fehlenden Dunkelheit-Anteil
 
 const MAX_MARGIN := 48.0
 const STEP := 4.0
@@ -124,7 +125,7 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var features := clampf(float((lvl.raw.get("mechanics", []) as Array).size()), 0.0, 12.0)
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
-		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + 12.0 * lvl.dark + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)),
+		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + 12.0 * lvl.dark + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)) + (FINAL_SECTOR_BONUS if lvl.sector >= 9 else 0.0),
 		"solvable": clearance > 0.0,
 	}
 

@@ -58,10 +58,15 @@ func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 		fade = 0.0
 	target_x = p.wait_x
 
-const NAMES_F := ["Mika", "Ines", "Lena", "Nora", "Pia", "Yuki"]
-const NAMES_M := ["Odo", "Jonas", "Ben", "Tarek", "Finn", "Leo"]
+const NAMES_F := ["Mika", "Ines", "Lena", "Nora", "Pia", "Yuki", "Amara", "Sofia", "Tess", "Zoe", "Mara"]
+const NAMES_M := ["Odo", "Jonas", "Ben", "Tarek", "Finn", "Leo", "Kofi", "Emil", "Ravi", "Hugo", "Milan"]
 
 ## Deterministische neue Identität (Ersatz-Fahrgast): gleicher Level/Auftrag/Versuch ergibt immer dieselbe Person.
+## Name eines Auftrags-Fahrgasts: wechselt je Level und Auftrag (die Leveldaten nennen sonst fast immer dieselben Personen).
+static func rotated_name(level_no: int, job_index: int, gender: String) -> String:
+	var names: Array = NAMES_F if gender == "f" else NAMES_M
+	return names[absi(level_no * 7 + job_index * 3) % names.size()]
+
 static func pick_identity(level_id: String, job_index: int, attempt: int, old_name: String) -> Dictionary:
 	var h := absi(("%s:%d:%d" % [level_id, job_index, attempt]).hash())
 	var gender := "f" if h % 2 == 0 else "m"

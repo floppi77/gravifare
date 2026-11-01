@@ -4,6 +4,9 @@ extends Control
 const Stage := preload("res://src/core/stage.gd")
 
 var box: VBoxContainer
+var stage: Control
+var version: Label
+var screen: Control = null
 
 func _ready() -> void:
 	Music.play_theme("menu")
@@ -14,7 +17,7 @@ func _ready() -> void:
 	var backdrop := Control.new()
 	backdrop.set_script(load("res://src/ui/menu_backdrop.gd"))
 	add_child(backdrop)
-	var stage := Stage.make(self)             # Menü bleibt auf der zentrierten 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
+	stage = Stage.make(self)                  # Menü bleibt auf der zentrierten 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
 	box = VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
 	box.offset_left = 16.0
@@ -24,6 +27,8 @@ func _ready() -> void:
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
 	stage.add_child(box)
+	version = MenuKit.version_label()
+	stage.add_child(version)
 	if Save.slot == 0 or OS.get_cmdline_user_args().has("--slots"):      # Dev: --slots zeigt die Platzwahl
 		show_slots()                                    # Spielstand wählen (beim Start)
 	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen
@@ -51,6 +56,7 @@ func _next_open_level() -> String:
 	return ids[0] if not ids.is_empty() else ""
 
 func show_main(focus_lang := "") -> void:
+	_hide_screen()
 	_clear()
 	var mt := Control.new()
 	mt.set_script(load("res://src/ui/menu_title.gd"))
@@ -66,13 +72,18 @@ func show_main(focus_lang := "") -> void:
 		box.add_child(MenuKit.button(tr("MENU_CONTINUE"), func():
 			if not Flow.resume_campaign():
 				Flow.start_campaign(id)))
-	box.add_child(MenuKit.button(tr("MENU_PLAY"), func():
+	var start_new := func():
 		Save.clear_campaign()
 		var first: String = ids[0] if not ids.is_empty() else id
 		if bool(Save.data.get("tutorial_done", false)):
 			Flow.start_campaign(first)
 		else:
-			Flow.start_tutorial(first)))               # neuer Spielstand: erst die Flugschule, danach Level 1
+			Flow.start_tutorial(first)                 # neuer Spielstand: erst die Flugschule, danach Level 1
+	box.add_child(MenuKit.button(tr("MENU_PLAY"), func():
+		if Save.campaign().is_empty():
+			start_new.call()
+		else:
+			show_new_confirm(start_new)))
 	box.add_child(MenuKit.button(tr("MENU_LEVELS"), show_levels))
 	box.add_child(MenuKit.button(tr("MENU_TUTORIAL"), func(): Flow.start_tutorial("")))
 	# Nebenmenüs kompakt in zwei Spalten, damit Menü und Flaggen auf den Bildschirm passen
@@ -117,87 +128,63 @@ func _slide_in() -> void:
 
 var _slid := false
 
+## Levelauswahl, Spielstände: eigene Vollbild-Ansichten auf der 640×360-Fläche; das Spaltenmenü ist dann ausgeblendet.
+func _show_screen(c: Control) -> void:
+	_clear()
+	box.visible = false
+	version.visible = c is SlotSelect
+	if screen != null:
+		screen.queue_free()
+	screen = c
+	stage.add_child(c)
+
+func _hide_screen() -> void:
+	if screen != null:
+		screen.queue_free()
+		screen = null
+	box.visible = true
+	version.visible = true
+
 func show_levels() -> void:
-	_clear()
-	box.add_child(MenuKit.title(tr("MENU_LEVELS")))
-	var ids := Flow.level_ids()
-	# Bei 99 Leveln scrollt die Auswahl (Maus, Stick/Pfeiltasten folgen dem Fokus), die Seite bleibt niedrig
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 226)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.follow_focus = true
-	box.add_child(scroll)
-	var grid := GridContainer.new()
-	grid.columns = 8
-	grid.add_theme_constant_override("h_separation", 3)
-	grid.add_theme_constant_override("v_separation", 3)
-	scroll.add_child(grid)
-	for i in ids.size():
-		var lvl := LevelData.load_file(Flow.level_path(ids[i]))
-		var b := MenuKit.button("%02d" % (lvl.number if lvl else i + 1), func(): Flow.start_campaign(ids[i]))
-		b.custom_minimum_size = Vector2(62, 20)
-		if Save.is_completed(ids[i]):
-			var mm := Save.medals_of(ids[i])
-			b.text += " " + ("★" if mm.time else "☆") + ("★" if mm.clean else "☆") + ("★" if mm.pro else "☆")
-		b.disabled = not Save.is_unlocked(ids, i)
-		b.tooltip_text = lvl.names.get(TranslationServer.get_locale().substr(0, 2), lvl.id) if lvl else ids[i]
-		grid.add_child(b)
-	box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
-	_focus_first()
+	var ls := LevelSelect.new()
+	ls.back = show_main
+	_show_screen(ls)
 
-## Drei unabhängige Spielstände: Auswahl, Löschen mit Rückfrage. Beim Start ohne Abbrechen (erst wählen), später mit „Zurück“.
+## Drei unabhängige Spielstände als Disketten; beim Start ohne Abbrechen (erst wählen), später mit „Zurück“.
 func show_slots() -> void:
-	_clear()
-	box.add_child(MenuKit.title(tr("SLOT_TITLE")))
-	for n in range(1, Save.SLOTS + 1):
-		var info: Dictionary = Save.slot_summary(n)
-		var row := HBoxContainer.new()
-		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		row.add_theme_constant_override("separation", 3)
-		var label := ""
-		if info.exists:
-			var secs: int = info.seconds
-			label = "%d  ·  " % n + tr("SLOT_INFO") % [info.levels, "%d:%02d h" % [secs / 3600, (secs % 3600) / 60], info.score]
-		else:
-			label = "%d  ·  " % n + tr("SLOT_EMPTY")
-		var b := MenuKit.button(label, func():
-			Save.select_slot(n)
-			show_main())
-		b.custom_minimum_size = Vector2(196 if info.exists else 224, 22)
-		if n == Save.slot:
-			b.text += "  ◄"
-		row.add_child(b)
-		if info.exists:
-			var d := MenuKit.button("✕", func(): show_slot_delete(n))
-			d.custom_minimum_size = Vector2(24, 22)
-			d.tooltip_text = tr("SLOT_DELETE")
-			row.add_child(d)
-		box.add_child(row)
-	if Save.slot != 0:
-		box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
-	_focus_first()
+	var ss := SlotSelect.new()
+	ss.chosen = func(n: int):
+		Save.select_slot(n)
+		show_main()
+	ss.back = show_main if Save.slot != 0 else Callable()
+	_show_screen(ss)
 
-func show_slot_delete(n: int) -> void:
+## Neues Spiel bei laufendem Feldzug: erst nachfragen, der Fortschritt des Laufs geht sonst verloren.
+func show_new_confirm(start: Callable) -> void:
 	_clear()
-	box.add_child(MenuKit.title(tr("SLOT_CONFIRM") % n))
+	box.add_child(MenuKit.title(tr("MENU_NEW_CONFIRM")))
 	var sub := Label.new()
-	sub.text = tr("SLOT_CONFIRM_SUB")
+	sub.text = tr("MENU_NEW_CONFIRM_SUB")
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size = Vector2(220, 0)
 	box.add_child(sub)
-	box.add_child(MenuKit.button(tr("SLOT_NO"), show_slots))
-	box.add_child(MenuKit.button(tr("SLOT_YES"), func():
-		Save.delete_slot(n)
-		show_slots()))
+	box.add_child(MenuKit.button(tr("SLOT_NO"), show_main))
+	box.add_child(MenuKit.button(tr("MENU_NEW_YES"), start))
 	_focus_first()
 
 func show_options() -> void:
 	_clear()
-	box.add_child(MenuKit.options_panel(show_main, show_options))
+	options = MenuKit.options_panel(show_main, show_options)
+	box.add_child(options)
 	_focus_first()
 
+var options: OptionsPanel = null
+
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and box.get_child_count() > 0 and Save.slot != 0:
-		show_main()
+	if event.is_action_pressed("ui_cancel") and Save.slot != 0 and screen == null:      # Levelauswahl und Spielstände behandeln B/Esc selbst
 		get_viewport().set_input_as_handled()
+		if options != null and is_instance_valid(options) and options.is_inside_tree():
+			options.go_back()                         # eine Ebene zurück
+		elif box.get_child_count() > 0:
+			show_main()

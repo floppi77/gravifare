@@ -38,7 +38,7 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(MenuKit.button(tr("MENU_RESUME"), func(): game._set_paused(false)))
 	box.add_child(MenuKit.button(tr("MENU_RESTART"), func():
 		game._set_paused(false)
-		game.load_level(game.level_path)))
+		game.restart_level()))
 	var ck: String = game.level_clip_key()
 	if ck != "":
 		box.add_child(MenuKit.button(tr("MENU_CLIP"), func():
@@ -57,12 +57,16 @@ func show_main(focus_lang := "") -> void:
 	_focus_first(focus_lang)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and not event.is_action_pressed("pause"):
+	if in_sub and (event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")):     # Esc/Start gehen hier eine Ebene zurück, wie B
 		get_viewport().set_input_as_handled()
-		if in_sub:
-			show_main()
+		var panel := box.get_child(0) as OptionsPanel if box.get_child_count() > 0 else null
+		if panel != null:
+			panel.go_back()
 		else:
-			game._set_paused(false)
+			show_main()
+	elif event.is_action_pressed("ui_cancel") and not event.is_action_pressed("pause"):
+		get_viewport().set_input_as_handled()
+		game._set_paused(false)
 
 func _reopen_options() -> void:
 	_clear()

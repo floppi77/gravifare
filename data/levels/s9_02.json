@@ -111,10 +111,8 @@
   "gusts",
   "magnets",
   "attract_fields",
-  "life_station",
-  "darkness"
+  "life_station"
  ],
- "dark": 0.74,
  "movers": [
   {
    "kind": "vehicle",

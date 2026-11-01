@@ -114,10 +114,8 @@
   "gusts",
   "magnets",
   "attract_fields",
-  "medical",
-  "darkness"
+  "medical"
  ],
- "dark": 0.76,
  "movers": [
   {
    "kind": "debris",

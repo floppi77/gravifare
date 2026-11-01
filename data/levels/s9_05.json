@@ -115,10 +115,8 @@
   "magnets",
   "pulsing_fields",
   "repel_fields",
-  "attract_fields",
-  "darkness"
+  "attract_fields"
  ],
- "dark": 0.82,
  "movers": [
   {
    "kind": "debris",

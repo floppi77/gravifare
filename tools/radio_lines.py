@@ -97,6 +97,8 @@ def main():
         pass
     d["d0"]["de"]["patient_lost"] = "Patient verloren. Das wird teuer."
     d["d0"]["en"]["patient_lost"] = "Patient lost. That will be expensive."
+    d["d0"]["de"].update({"exit_start": 'Letzter Fahrgast des Levels. Die Uhr läuft, Taxi sieben.', "exit_hurry": 'Taxi sieben, die Zeit wird knapp!', "finale_1": 'Taxi sieben, hier Zentrale. Das war die letzte Fahrt. Alle neunundneunzig Level, und der Hausmeister spricht wieder mit dir.', "finale_2": 'Stell das Taxi ab. Feierabend. Der Kaffee geht heute auf die Zentrale.'})
+    d["d0"]["en"].update({"exit_start": 'Last passenger of the level. The clock is running, Taxi seven.', "exit_hurry": 'Taxi seven, time is getting short!', "finale_1": 'Taxi seven, this is dispatch. That was the last ride. All ninety-nine levels, and the caretaker is talking to you again.', "finale_2": 'Park the taxi. Shift over. Coffee is on dispatch today.'})
     json.dump(d, open("data/voice_lines.json", "w"), indent=1, ensure_ascii=False)
     missing = [n for n in range(2, 100) if n not in L]
     print("Zeilen:", len(L), "fehlend:", missing)

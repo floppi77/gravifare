@@ -109,10 +109,8 @@
   "spikes",
   "traffic",
   "magnets",
-  "attract_fields",
-  "darkness"
+  "attract_fields"
  ],
- "dark": 0.72,
  "movers": [
   {
    "kind": "vehicle",

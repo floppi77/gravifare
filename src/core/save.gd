@@ -128,6 +128,12 @@ func set_campaign(c: Dictionary) -> void:
 	data["campaign"] = c
 	write()
 
+## Leben sofort sichern, damit „Fortsetzen“ ein verlorenes Leben nicht zurückholt.
+func note_campaign_lives(n: int) -> void:
+	if not campaign().is_empty():
+		data.campaign["lives"] = n
+		write()
+
 func clear_campaign() -> void:
 	if not data.get("campaign", {}).is_empty():
 		data["campaign"] = {}

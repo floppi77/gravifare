@@ -165,7 +165,8 @@ func _draw() -> void:
 			var f := run.live_factor()
 			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
 			draw_string(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 182, 10, fc)
-	var row_b := BOT_Y + 22.0
+	var row_b := BOT_Y + 21.0
+	draw_rect(Rect2(2, BOT_Y + 14.0, 636, 9.0), Color(0.05, 0.06, 0.15, 0.78))      # Unterlage: die Zeile bleibt auf jedem Hintergrund lesbar
 	# Untere Zeile: links Steuerungshinweis (bzw. gesprochener Untertitel/Hinweis), rechts alle Meldungen des Spiels
 	if sub_t > 0.0:
 		var line := "%s: %s" % [sub_speaker, sub_text]
@@ -175,7 +176,7 @@ func _draw() -> void:
 		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
 		_fit_text(Fonts.ui, Vector2(8, row_b), hint_text, 330.0, 8, Color(0.8, 1.0, 0.95, ha), HORIZONTAL_ALIGNMENT_LEFT)
 	else:
-		draw_string(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), HORIZONTAL_ALIGNMENT_LEFT, 330, 7, Color("#8a93c9"))
+		draw_string(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), HORIZONTAL_ALIGNMENT_LEFT, 330, 7, Color("#b4bcea"))
 	if message_t > 0.0:
 		var ma := clampf(message_t / 0.4, 0.0, 1.0)
 		_fit_text(font, Vector2(340, row_b), message, 296.0, 9, Color(1.0, 0.95, 0.7, ma), HORIZONTAL_ALIGNMENT_RIGHT)
@@ -256,7 +257,11 @@ func _draw_result() -> void:
 	draw_rect(Rect2(px, py, pw, 38.0), Color(0.1, 0.22, 0.2, 0.95))
 	draw_rect(Rect2(px, py + 38.0, pw, 1.0), Color("#5dff9a"))
 	draw_rect(Rect2(px, py, pw, ph), Color("#3a4580"), false, 0.8)
-	draw_string(font, Vector2(px, py + 19.0), tr("HUD_COMPLETE"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#5dff9a"))
+	var counted: bool = result.get("counted", true)
+	if not counted:
+		draw_rect(Rect2(px, py, pw, 38.0), Color(0.26, 0.14, 0.08, 0.95))
+		draw_rect(Rect2(px, py + 38.0, pw, 1.0), Color("#ffb02e"))
+	draw_string(font, Vector2(px, py + 19.0), tr("HUD_COMPLETE") if counted else tr("RES_NOT_COUNTED"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#5dff9a") if counted else Color("#ffb02e"))
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
 	draw_string(ui, Vector2(px, py + 33.0), "Level %d · %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
 	# Medaillen als drei Karten
@@ -286,7 +291,9 @@ func _draw_result() -> void:
 	draw_rect(Rect2(tx - 0.5, bar_y - 3.0, 1.5, 11.0), Color.WHITE)
 	draw_string(ui, Vector2(lx, py + 148.0), tr("RES_TARGET") % int(result.target), HORIZONTAL_ALIGNMENT_LEFT, colw, 9, Color("#a9b8ff"))
 	var best_line := tr("RES_NEW_BEST") if (float(result.best) <= 0.0 or float(result.time) < float(result.best)) else tr("RES_BEST") % int(result.best)
-	draw_string(ui, Vector2(lx, py + 161.0), best_line, HORIZONTAL_ALIGNMENT_LEFT, colw, 9, Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else Color("#8a93c9"))
+	if not counted:
+		best_line = tr("MSG_NOT_COUNTED")
+	_fit_text(ui, Vector2(lx, py + 161.0), best_line, colw, 9, Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else Color("#8a93c9"), HORIZONTAL_ALIGNMENT_LEFT)
 	draw_rect(Rect2(px + pw * 0.5 - 0.5, py + 92.0, 1.0, 76.0), Color("#232a52"))
 	draw_string(ui, Vector2(rx, py + 100.0), tr("RES_H_EARNED"), HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#7c86bb"))
 	draw_string(font, Vector2(rx, py + 120.0), "¢ %d" % int(result.earned), HORIZONTAL_ALIGNMENT_LEFT, colw, 18, Color("#ffe14a"))

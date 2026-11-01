@@ -43,6 +43,7 @@ var clip: IntroClip = null              # laufender Einspieler (Erklärvideo zu 
 var clip_pending := ""                 # Einspieler, der nach Funkspruch/Ankunft startet
 var clip_delay := 0.0
 var script_inputs: Array = []
+var entry_carry := {}                  # Ausgangs-Fahrgast, der in diesem Level ausgestiegen ist (für den Neustart)
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
 
@@ -62,6 +63,9 @@ func _ready() -> void:
 	_fit_layers()
 	get_viewport().size_changed.connect(_fit_layers)
 	load_level(level_path)
+	_release_carried()                         # Fortsetzen: Der gespeicherte Ausgangs-Fahrgast steigt aus und zahlt (sonst ginge sein Fahrpreis verloren)
+	if Flow.practice:
+		hud.flash_message(tr("MSG_PRACTICE"), 4.0)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--debug-input="):
 			var xy := a.substr(14).split(",")
@@ -155,6 +159,12 @@ func _setup_look() -> void:
 	layer.add_child(rect)
 	add_child(layer)
 
+## Level neu starten: Der Ausgangs-Fahrgast des Vorlevels steigt erneut aus, sein Fahrpreis geht durch den Neustart nicht verloren.
+func restart_level() -> void:
+	load_level(level_path)
+	Flow.carry_passenger = entry_carry
+	_release_carried()
+
 func load_level(path: String) -> void:
 	var lvl := LevelData.load_file(path)
 	if lvl == null:
@@ -166,6 +176,7 @@ func load_level(path: String) -> void:
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
 	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
+	Sfx.play_ambient(lvl.sector)
 	gear_on = run.sim.gear_cmd
 	if dark == null:
 		var dl := CanvasLayer.new()
@@ -384,6 +395,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		# Levelwechsel: A/Enter/B/Esc überspringen die Sequenz bis zum Einblenden; sonst keine Eingabe
 		if (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")) and trans_t < TV.T_IN - 0.01:
 			trans_t = TV.T_IN - 0.001
+			radio_played = true
+			radio_age = 1.0e6                  # die Warte-Bedingung in _process darf nicht greifen
+			Sfx.voice_player.stop()
 			Sfx.stop_long()
 		get_viewport().set_input_as_handled()
 		return
@@ -400,8 +414,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
 		if Flow.next_level_id() != "":
 			_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
+		elif hud.result.get("counted", false):
+			Flow.to_finale()        # letztes Level geschafft: Finale und Abspann
 		else:
-			Flow.to_menu()          # letztes Level: zurück ins Menü
+			Flow.to_menu()
 		get_viewport().set_input_as_handled()
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept"):
@@ -422,7 +438,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			hud.flash_message(tr("MSG_RESTART_CONFIRM") % Controls.slot_label("restart", rk, 0), RESTART_CONFIRM_MS / 1000.0)
 		else:
 			restart_armed_until = 0
-			load_level(level_path)
+			restart_level()
 	elif event.is_action_pressed("gear") and not paused and Controls.gear_toggle:
 		if tutorial == null or not tutorial.locked:
 			gear_on = not gear_on
@@ -484,26 +500,25 @@ func _physics_process(_delta: float) -> void:
 		completion_saved = true
 		Save.note_max("best_streak", run.best_streak)
 		var prev_best := Save.best_time(Flow.current_level)
-		var med := run.medals()
-		hud.result = {"time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
-		hud.result_age = 0.0
-		hud.next_exists = Flow.next_level_id() != ""
-		var score := run.level_score()
-		hud.result["score"] = score
-		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
 		# Ohne eine einzige Beförderung (z. B. Leerlauf bis zum Countdown) zählt das Level nicht als geschafft.
 		var counted := run.delivered > 0 or run.extras_delivered > 0
+		var med := run.medals() if counted else {"time": false, "clean": false, "pro": false}
+		hud.result = {"counted": counted, "time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
+		hud.result_age = 0.0
+		hud.next_exists = Flow.next_level_id() != ""
+		var score := run.level_score() if counted else 0
+		hud.result["score"] = score
+		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
 		if counted:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
-		else:
-			hud.flash_message(tr("MSG_NOT_COUNTED"), 4.0)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
 		if counted and not Save.dev_session:
 			Replay.save_if_best(replay.to_dict())
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() == "":
-			Save.clear_campaign()
+			if not Flow.practice:
+				Save.clear_campaign()
 		elif autopilot != null:
 			_begin_transition()                  # Autopilot-Läufe (Dev) laufen ohne Bestätigung weiter
 	if run.result == Run.Result.FAILED and not hud.game_over:
@@ -550,7 +565,7 @@ func _field_feedback() -> void:
 
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
-	## Der Fahrgast an Bord ist verloren und wartet erneut an seinem Abholpad, neues Taxi am Startpad.
+	## Der Fahrgast an Bord ist verloren, neues Taxi am Startpad.
 	if run.level.tutorial:                      # Flugschule: ein Leben weniger (nie unter 1), damit die Lebensstation später etwas zu tun hat
 		Flow.lives = maxi(1, Flow.lives - 1)
 		run.respawn_after_crash()
@@ -568,8 +583,11 @@ func _lose_life() -> void:
 	if Flow.lives <= 0:
 		Flow.lives = 0
 		hud.game_over = true
-		Save.clear_campaign()
+		if not Flow.practice:
+			Save.clear_campaign()
 		return
+	if not Flow.practice:
+		Save.note_campaign_lives(Flow.lives)
 	replay.mark_respawn()
 	run.respawn_after_crash()
 	run.lives = Flow.lives
@@ -582,8 +600,6 @@ func _lose_life() -> void:
 	cam.global_position = _cam_target()
 	cam.reset_physics_interpolation()
 	_respawn_focus()
-	for e in run.log:
-		_on_event(e)
 
 ## Kamera-Gefühl: leichter Vorausblick in Flugrichtung, Wackeln bei Treffern. Bei „Weniger Bewegung“ aus.
 func _cam_feel() -> void:
@@ -602,7 +618,7 @@ func _music_tick() -> void:
 		return
 	var s := run.sim
 	var drive := run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF or run.exit_open or s.vel.length() > 70.0
-	var danger := s.fuel < 25.0 or s.hull < 45.0 or near_cd > 3.0 or run.pump_boom_t >= 0.0
+	var danger := s.fuel < 25.0 or s.hull < 45.0 or near_cd > 3.0 or run.pump_boom_t >= 0.0 or (run.exit_countdown > 0.0 and run.exit_countdown <= 15.0)
 	Music.set_layers(drive, danger)
 
 ## Tutorial-Hinweise (einmalig je Profil, abschaltbar, laufen nach 7 s von selbst aus).
@@ -723,7 +739,7 @@ func _on_event(e: Dictionary) -> void:
 	match e.type:
 		"perfect":
 			hud.flash_message(tr("MSG_PERFECT") % e.streak, 1.4)
-			Sfx.play("perfect", -4.0)
+			Sfx.play("perfect", -4.0, 1.0 + 0.06 * float(mini(int(e.streak), Tuning.COMBO_MAX) - 1))      # jede weitere perfekte Landung klingt höher
 			Haptics.pulse(0.1, 0.25, 0.1)
 			Save.count_event("perfect_landings")
 			Save.note_max("best_streak", int(e.streak))
@@ -858,6 +874,23 @@ func _on_event(e: Dictionary) -> void:
 		"carried_thanks":
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+		"exit_countdown":
+			hud.flash_message(tr("MSG_EXIT_COUNTDOWN"), 3.0)
+			Sfx.play("warn", -6.0)
+			if not run.level.tutorial:
+				Sfx.play_voice("d0", "exit_start")
+				hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "exit_start"), 2.4)
+		"exit_hurry":
+			Sfx.play("warn", -8.0)
+			Haptics.pulse(0.15, 0.1, 0.12)
+			if e.voice != "":
+				Sfx.play_voice(e.voice, "hurry_%d" % e.n)
+				hud.subtitle(e.name, Sfx.line_text("passenger_extra", "hurry_%d" % e.n), 1.8)
+			else:
+				Sfx.play_voice("d0", "exit_hurry")
+				hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "exit_hurry"), 1.8)
+		"spawn_blocked":
+			hud.flash_message(tr("MSG_MAKE_ROOM"), 3.0)
 		"exit_timeout":
 			hud.flash_message(tr("MSG_EXIT_TIMEOUT") % int(e.fee), 4.0)
 			Sfx.play("hit", -4.0)
@@ -937,7 +970,9 @@ func _begin_transition() -> void:
 	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)     # Sprit und Credits laufen mit
 	Flow.entry_credits = run.money
 	Flow.carry_passenger = run.carried
-	Save.set_campaign({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried})
+	entry_carry = {}
+	if not Flow.practice:
+		Save.set_campaign({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried})
 	if OS.get_cmdline_user_args().has("--debug-carry") and Flow.carry_passenger.is_empty():     # Dev: Ausgangs-Fahrgast simulieren
 		Flow.carry_passenger = {"name": "Odo", "look": 2, "gender": "m"}
 	var nl := LevelData.load_file(Flow.level_path(next_id))
@@ -1016,6 +1051,7 @@ func _arrival_tick() -> void:
 func _release_carried() -> void:
 	var c: Dictionary = Flow.carry_passenger
 	Flow.carry_passenger = {}
+	entry_carry = c
 	run.release_carried(c)
 
 func _end_transition() -> void:

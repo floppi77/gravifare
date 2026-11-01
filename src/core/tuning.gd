@@ -169,8 +169,9 @@ const LAND_PENALTY_MAX := 0.30
 const WRONG_PAD_PEN := 0.15      # Fahrpreisabzug je Landung an falscher Plattform mit Fahrgast an Bord
 const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast an Bord
 const RIDE_PEN_MAX := 0.5
-const EXIT_COUNTDOWN_MIN := 30.0       # Sekunden, die der letzte Pflichtfahrgast (will raus) Zeit lässt, bis das Level automatisch verlassen wird
-const EXIT_COUNTDOWN_PAR_FACTOR := 1.6   # lange Level bekommen mehr: 1,6 × Richtzeit des Ausgangs-Auftrags
+const EXIT_COUNTDOWN_MIN := 45.0       # Sekunden, die der letzte Pflichtfahrgast (will raus) Zeit lässt, bis das Level automatisch verlassen wird
+const EXIT_COUNTDOWN_PAR_FACTOR := 2.2   # lange Level bekommen mehr: 2,2 × Richtzeit des Ausgangs-Auftrags
+const EXIT_HURRY_AT := [20.0, 10.0, 5.0]  # Restsekunden, bei denen der letzte Fahrgast zur Eile drängt
 const EXIT_TIMEOUT_FEE_FACTOR := 1.2     # Strafzahlung bei Zeitablauf: 120 % des Fahrpreises des Ausgangs-Fahrgasts
 const MISSED_FEE_FACTOR := 0.35   # Abzug für einen verpassten Pflichtfahrgast: Anteil des (unskalierten) Fahrpreises
 # Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis

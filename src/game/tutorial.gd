@@ -4,7 +4,7 @@ extends Node
 ## Deutsch und Englisch), beleuchtet den erklärten Bereich (SpotView, kein Rahmen) und wartet danach – falls nötig – auf eine Handlung.
 ## Das Tutorial greift nur über Run-Felder ein (Tankstand, Credits, Zusatzfahrgast, Sperren) und schreibt keinen Spielstand außer „fertig“.
 ## Reihenfolge: Anzeigen erklären (Taxi gesperrt) → Fahrwerk einfahren → Parcours durch Tore → Fahrwerk, Tanken (Sprit, Preis) →
-## Landung (hart bis zur Zerstörung, dann sanft) → Pflichtfahrgast → optionaler Fahrgast → Lebensstation → Ausgangsfahrgast und Tor.
+## Landung (hart bis zur Zerstörung, dann sanft) → Pflichtfahrgast → optionaler Fahrgast → Lebensstation → Ausgangsfahrgast, Exit-Countdown und Tor.
 
 var game: Node
 var run: Run
@@ -35,7 +35,8 @@ const R_PRICE := Rect2(492, 1, 84, 14)
 const R_GAUGE := Rect2(574, 1, 64, 15)
 const R_TASK := Rect2(2, 335, 440, 16)
 const R_FARE := Rect2(446, 335, 192, 16)
-const HUD_RECTS := [R_FUEL, R_HULL, R_MONEY, R_LIVES, R_LEVEL, R_COUNT, R_PRICE, R_GAUGE, R_TASK, R_FARE]
+const R_TIMER := Rect2(264, 49, 112, 17)
+const HUD_RECTS := [R_FUEL, R_HULL, R_MONEY, R_LIVES, R_LEVEL, R_COUNT, R_PRICE, R_GAUGE, R_TASK, R_FARE, R_TIMER]
 
 ## Parcours (Mittelpunkte in Weltpixeln): links an der Lebensplattform hoch, oben nach rechts, runter zur Zwei, zurück zur Eins.
 const COURSE := [Vector2(44, 214), Vector2(44, 118), Vector2(150, 46), Vector2(400, 64), Vector2(548, 118), Vector2(528, 232), Vector2(330, 236), Vector2(150, 236)]
@@ -117,7 +118,8 @@ func _build() -> void:
 		{"key": "tut_eject_ok", "after": _drop_waiting_extras},
 		{"key": "tut_life", "enter": _give_life_money, "spots": func(): return [_pad_rect("L"), R_LIVES],
 			"wait": func(): return flags.get("life_bought", false), "timeout": 90.0},
-		{"key": "tut_exit", "enter": _enter_exit, "spots": func(): return [_pad_rect("1"), _gate_rect()],
+		{"key": "tut_exit", "enter": _enter_exit, "spots": func(): return [_pad_rect("1"), _gate_rect()]},
+		{"key": "tut_countdown", "enter": _enter_countdown, "spots": func(): return [R_TIMER],
 			"wait": func(): return run.exit_open, "timeout": 180.0},
 		{"key": "tut_gate", "spots": func(): return [_gate_rect()]},
 	]
@@ -149,6 +151,10 @@ func _enter_delivered() -> void:
 func _enter_exit() -> void:
 	run.pickup_locked = false
 	run.spawn_locked = false                  # jetzt darf Odo erscheinen (letzter Pflichtfahrgast)
+
+## Exit-Countdown vorführen: Er läuft sichtbar und drängelt, hat in der Flugschule aber keine Folgen (Run beginnt ihn von vorn).
+func _enter_countdown() -> void:
+	run.exit_countdown = Tuning.EXIT_COUNTDOWN_MIN
 
 ## Optionaler Fahrgast an Plattform 2 mit Ziel 1; er steigt erst ein, wenn die Erklärung zu Ende gesprochen ist.
 func _enter_extra() -> void:

@@ -12,6 +12,7 @@ const STEP_OUT_TIME := 0.5
 const CALL_RANGE := 150.0
 const CALL_COOLDOWN := 12.0
 const SQUASH_RESPAWN_DELAY := 2.4
+const SPAWN_HINT_AFTER := 2.5
 
 var level: LevelData
 var jobs: Array = []        # Arbeitskopie der Aufträge (Ersatz-Fahrgäste ändern Pad/Person, nie die Leveldaten)
@@ -41,10 +42,12 @@ var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
 var leavers: Array = []                # abgelieferte Fahrgäste auf dem Weg in den Unterstand
 var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfährt {name, look, gender}
 var spawn_timer := 0.0
+var spawn_block_t := 0.0       # so lange blockiert das Taxi schon das Pad des nächsten Fahrgasts
 var extra_locked := false      # Tutorial: Zusatzfahrgast steigt erst ein, wenn das Skript es erlaubt
 var prices_frozen := false     # Tutorial: Spritpreis ändert sich nicht von selbst
 var pickup_locked := false     # Tutorial: Auftragsfahrgäste steigen (noch) nicht ein
 var spawn_locked := false      # Tutorial: neue Auftragsfahrgäste erscheinen nicht von selbst
+var exit_timed_out := false    # Level endete durch Zeitablauf am Tor, nicht durch den Einflug
 var exit_countdown := -1.0     # Sekunden bis zum erzwungenen Levelende, sobald der letzte Pflichtfahrgast erschienen ist (-1 = nicht gestartet)
 var spawn_wait := false
 var level_time := 0.0              # Levelzeit (läuft auch nach Verlust eines Lebens weiter) – Takt der Preiswechsel
@@ -87,6 +90,9 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	level = lvl
 	jobs = lvl.jobs.duplicate(true)
 	var fscale := Tuning.fare_scale(lvl.number)
+	for i in jobs.size():
+		if not lvl.tutorial:
+			jobs[i]["passenger"] = PassengerActor.rotated_name(lvl.number, i, String(jobs[i].get("gender", "f")))      # abwechslungsreiche Namen; Stimme und Aussehen bleiben
 	for j in jobs:
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
 		j["fare"] = maxf(float(j.fare), min_fare(lvl, j))
@@ -118,6 +124,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	carried = {}
 	spawn_timer = 0.0
 	spawn_wait = false
+	spawn_block_t = 0.0
 	respawn_keep_clock = false
 	squashes = 0
 	extras.clear()
@@ -147,6 +154,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	extra_timer = flow_rng.randf_range(Tuning.EXTRA_FIRST_MIN, Tuning.EXTRA_FIRST_MAX)
 	actor = null
 	exit_countdown = -1.0
+	exit_timed_out = false
+	pending_log.clear()
 	_spawn_actor(true)
 
 func _spawn_actor(instant: bool) -> void:
@@ -163,6 +172,7 @@ func _spawn_actor(instant: bool) -> void:
 	respawn_keep_clock = false
 	if is_exit_job(job) and exit_countdown < 0.0 and not level.tutorial:
 		exit_countdown = maxf(Tuning.EXIT_COUNTDOWN_MIN, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR)      # der letzte Pflichtfahrgast will raus: Zeit läuft
+		pending_log.append({"type": "exit_countdown"})
 
 func current_job() -> Dictionary:
 	return jobs[job_index] if job_index < jobs.size() else {}
@@ -262,6 +272,7 @@ func min_fare(lvl: LevelData, job: Dictionary) -> float:
 
 ## Countdown abgelaufen: Das Level wird automatisch verlassen; der letzte Pflichtfahrgast ist verloren, dazu eine Strafzahlung.
 func _exit_timeout() -> void:
+	exit_timed_out = true
 	var fee := 0.0
 	if not jobs.is_empty():
 		var lj: Dictionary = jobs[jobs.size() - 1]
@@ -383,14 +394,26 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	_check_squash()
 	_service_pad(dt)
 	_service_life(dt)
-	if exit_countdown > 0.0:
+	if exit_countdown > 0.0 and _extra_aboard().is_empty():      # solange ein Zusatzfahrgast mitfährt, kann der letzte Fahrgast nicht einsteigen: Uhr hält an
+		var before := exit_countdown
 		exit_countdown -= dt
+		_hurry(before)
 		if exit_countdown <= 0.0:
-			exit_countdown = 0.0
-			_exit_timeout()
-			return
+			if level.tutorial:           # Flugschule: Die Uhr beginnt ohne Folgen von vorn
+				exit_countdown = Tuning.EXIT_COUNTDOWN_MIN
+			else:
+				exit_countdown = 0.0
+				_exit_timeout()
+				return
 	if exit_open and sim.in_exit(level.exit_cells):
 		_finish_level()
+
+## Der letzte Fahrgast drängt bei festen Restzeiten zur Eile; ist er (noch) nicht zu sehen, meldet sich die Zentrale.
+func _hurry(before: float) -> void:
+	for i in Tuning.EXIT_HURRY_AT.size():
+		var at: float = Tuning.EXIT_HURRY_AT[i]
+		if before > at and exit_countdown <= at:
+			log.append({"type": "exit_hurry", "n": i + 1, "voice": actor.voice_key() if actor != null else "", "name": actor.pname if actor != null else ""})
 
 ## Lebens-Station („L“-Pad, alle 5 Level): Landen mit genug Credits kauft nach kurzer Zeit ein Leben (höchstens 5).
 func _service_life(dt: float) -> void:
@@ -621,7 +644,12 @@ func _step_actors(dt: float) -> void:
 			or (not nj.is_empty() and _extra_at(String(nj.from)) != null)
 		if not blocked:
 			spawn_wait = false
+			spawn_block_t = 0.0
 			_spawn_actor(false)
+		else:
+			spawn_block_t += dt
+			if spawn_block_t >= SPAWN_HINT_AFTER and spawn_block_t - dt < SPAWN_HINT_AFTER:
+				log.append({"type": "spawn_blocked"})      # sonst wartet man auf dem Pad auf jemanden, der nie erscheint
 	if actor != null:
 		actor.step(dt)
 		if actor.state == PassengerActor.S.WAITING and phase == Phase.WAITING:
@@ -764,8 +792,7 @@ func _deliver(job: Dictionary) -> void:
 		spawn_timer = flow_rng.randf_range(Tuning.NEXT_SPAWN_MIN, Tuning.NEXT_SPAWN_MAX)
 
 ## Taxi zerstört (Leben verloren): Das Level läuft weiter, nichts wird neu gestartet. Der Fahrgast an Bord ist verloren
-## (kein Geld) und wartet – derselbe Fahrgast – erneut an seinem Abholpad. Erledigtes bleibt erledigt. Neues Taxi
-## am Startpad mit Mindest-Sprit (35 %) bzw. dem Rest-Sprit, falls mehr.
+## (der Auftrag gilt als verpasst), Erledigtes bleibt erledigt. Neues Taxi am Startpad mit vollem Tank.
 func respawn_after_crash() -> void:
 	var log_start := log.size()
 	_respawn_after_crash()
@@ -891,12 +918,12 @@ func money_target() -> float:
 			sum += float(j.get("fare", 50)) * job_mult(j)
 	return sum
 
-## ⏱ Zeit: im Zeitziel · ♥ Sauber: kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Hüllenschaden ·
+## ⏱ Zeit: im Zeitziel, kein Pflichtfahrgast verpasst · ♥ Sauber: kein Pflichtfahrgast verpasst, kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Hüllenschaden ·
 ## ★ Meister: ≥ 110 % des Einkommensziels und mindestens Serie 2.
 func medals() -> Dictionary:
 	return {
-		"time": level_time <= time_target(),
-		"clean": respawns == 0 and squashes == 0 and ejected == 0 and pump_touches == 0 and damage_taken <= 10.0,
+		"time": level_time <= time_target() and missed == 0,
+		"clean": missed == 0 and respawns == 0 and squashes == 0 and ejected == 0 and pump_touches == 0 and damage_taken <= 10.0,
 		"pro": earned >= money_target() * 1.1 and best_streak >= 2,
 	}
 
@@ -1006,7 +1033,7 @@ func _spawn_extra(force_from := "", force_to := "") -> void:
 func _step_extras(dt: float) -> void:
 	if not extras_active():
 		return
-	var main_done := job_index >= jobs.size() or exit_open or (not current_job().is_empty() and is_exit_job(current_job()) and phase != Phase.WAITING)
+	var main_done := job_index >= jobs.size() or exit_open or is_exit_job(current_job())      # während des Exit-Countdowns keine neuen Zusatzfahrgäste
 	if not main_done:
 		extra_timer -= dt
 		var waiting := extras.filter(func(e): return int(e.state) == ES.WAIT).size()

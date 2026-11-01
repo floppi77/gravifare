@@ -21,6 +21,7 @@ var waiting_spawn := false
 var was_blocked := false        # zuletzt wegen Tor/Hindernis geschwebt: danach vom aktuellen Ort neu planen
 var last_pos := Vector2.ZERO
 var fail_reason := ""
+var fly_margin := MARGIN
 
 func _init(r: Run) -> void:
 	run = r
@@ -77,13 +78,22 @@ func decide() -> Array:
 			for c in level.exit_cells:
 				sum += _cell_center(c)
 			var goal: Vector2 = sum / level.exit_cells.size()
-			path = Pathing.plan(level, sim.pos, goal, MARGIN)
+			path = _plan(goal)
 		else:
 			var pad: Dictionary = level.pads[tgt_pad_id]
-			path = Pathing.plan(level, sim.pos, Pathing.hover_point(level, pad, MARGIN), MARGIN)
+			path = _plan(Pathing.hover_point(level, pad, MARGIN))
 		if path.is_empty():
 			fail_reason = "kein Pfad zu " + key
 	return _fly(tgt_pad_id, heading_exit)
+
+## Route mit Sicherheitsabstand; an Engstellen (z. B. neben Hitzezonen vor dem Tor) notfalls mit weniger Rand.
+func _plan(goal: Vector2) -> Array[Vector2]:
+	for m in [MARGIN, 5.5, 4.0, 3.0]:
+		var p := Pathing.plan(level, run.sim.pos, goal, m)
+		if not p.is_empty():
+			fly_margin = m
+			return p
+	return []
 
 func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	var sim := run.sim
@@ -92,7 +102,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		return [_accel_to_input(-sim.vel / 0.3 + sim.vel * sim.drag()), false]
 	var gear := false
 	# nächsten Wegpunkt per Sichtlinie wählen
-	while path.size() > 1 and (sim.pos.distance_to(path[0]) < 10.0 or Pathing.line_free(level, sim.pos, path[1], MARGIN)):
+	while path.size() > 1 and (sim.pos.distance_to(path[0]) < 10.0 or Pathing.line_free(level, sim.pos, path[1], fly_margin)):
 		path.pop_front()
 	var wp: Vector2 = path[0] if not path.is_empty() else sim.pos
 	var last := path.size() <= 1
@@ -265,6 +275,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 		"time": r.sim.time, "fuel_left": r.sim.fuel, "fuel_burned": burned, "hull": r.sim.hull,
 		"delivered": r.delivered, "jobs": lvl.jobs.size(), "money": r.money, "job_times": r.job_times,
 		"reason": reason if reason != "" else bot.fail_reason,
+		"timed_out": r.exit_timed_out,
 	}
 	if rep != null:
 		rep.finish({"complete": out.complete, "time": r.level_time, "money": r.money, "earned": r.earned, "delivered": r.delivered})

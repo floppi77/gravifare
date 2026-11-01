@@ -2239,6 +2239,142 @@
   "en/i0_tut_eject_ok": {
    "text": "Peace and quiet on board, and the rating suffers only a little. Remember: throwing someone out earns no money, but sometimes peace and quiet is priceless.",
    "seconds": 8.81
+  },
+  "de/f0_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 1.02
+  },
+  "de/f0_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.02
+  },
+  "de/f0_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.26
+  },
+  "de/f1_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.86
+  },
+  "de/f1_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.74
+  },
+  "de/f1_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 2.94
+  },
+  "de/m0_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 1.1
+  },
+  "de/m0_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.26
+  },
+  "de/m0_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.23
+  },
+  "de/m1_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.97
+  },
+  "de/m1_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.73
+  },
+  "de/m1_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.54
+  },
+  "de/d0_exit_start": {
+   "text": "Letzter Fahrgast des Levels. Die Uhr läuft, Taxi sieben.",
+   "seconds": 4.44
+  },
+  "de/d0_exit_hurry": {
+   "text": "Taxi sieben, die Zeit wird knapp!",
+   "seconds": 2.6
+  },
+  "de/d0_finale_1": {
+   "text": "Taxi sieben, hier Zentrale. Das war die letzte Fahrt. Alle neunundneunzig Level, und der Hausmeister spricht wieder mit dir.",
+   "seconds": 10.52
+  },
+  "de/d0_finale_2": {
+   "text": "Stell das Taxi ab. Feierabend. Der Kaffee geht heute auf die Zentrale.",
+   "seconds": 5.04
+  },
+  "de/i0_tut_countdown": {
+   "text": "Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.",
+   "seconds": 17.19
+  },
+  "en/f0_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.86
+  },
+  "en/f0_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.1
+  },
+  "en/f0_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.26
+  },
+  "en/f1_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 1.02
+  },
+  "en/f1_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.9
+  },
+  "en/f1_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.58
+  },
+  "en/m0_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.94
+  },
+  "en/m0_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.94
+  },
+  "en/m0_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.5
+  },
+  "en/m1_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 1.05
+  },
+  "en/m1_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 2.11
+  },
+  "en/m1_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.6
+  },
+  "en/d0_exit_start": {
+   "text": "Last passenger of the level. The clock is running, Taxi seven.",
+   "seconds": 4.04
+  },
+  "en/d0_exit_hurry": {
+   "text": "Taxi seven, time is getting short!",
+   "seconds": 2.44
+  },
+  "en/d0_finale_1": {
+   "text": "Taxi seven, this is dispatch. That was the last ride. All ninety-nine levels, and the caretaker is talking to you again.",
+   "seconds": 8.68
+  },
+  "en/d0_finale_2": {
+   "text": "Park the taxi. Shift over. Coffee is on dispatch today.",
+   "seconds": 4.12
+  },
+  "en/i0_tut_countdown": {
+   "text": "Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.",
+   "seconds": 15.48
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

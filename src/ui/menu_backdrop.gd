@@ -5,7 +5,8 @@ extends Control
 var far: Texture2D = preload("res://assets/art/bg_s1_far.png")
 var mid: Texture2D = preload("res://assets/art/bg_s1_mid.png")
 var near: Texture2D = preload("res://assets/art/bg_s1_near.png")
-var nebula: Texture2D = preload("res://assets/art/space_bg.png")
+var art: Texture2D = preload("res://assets/art/bg_s1.png")
+var shade := GradientTexture2D.new()
 var taxi: Texture2D = Cosmetics.paint_texture()
 var sticker: Texture2D = Cosmetics.sticker_texture()
 var t := 0.0
@@ -23,9 +24,15 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	still = Settings.values.reduce_motion
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0.02, 0.03, 0.1, 0.74))
+	grad.set_color(1, Color(0.02, 0.03, 0.1, 0.0))
+	shade.gradient = grad
+	shade.width = 256
+	shade.height = 4
 	rng.seed = 424242
 	for i in 90:
-		stars.append([rng.randf() * 640.0, rng.randf() * 240.0, rng.randf() * TAU, rng.randf_range(0.8, 2.2), rng.randf_range(0.6, 2.2)])
+		stars.append([rng.randf() * 640.0, rng.randf() * 120.0, rng.randf() * TAU, rng.randf_range(0.8, 2.2), rng.randf_range(0.6, 2.2)])
 	for i in 7:
 		var d := rng.randf()
 		var dir := 1.0 if rng.randf() < 0.5 else -1.0
@@ -59,17 +66,14 @@ func _draw() -> void:
 	var cover := maxf(size.x / 640.0, size.y / 360.0)
 	var fw := 640.0 * cover
 	var fh := 360.0 * cover
-	draw_texture_rect(far, Rect2((size.x - fw) * 0.5, (size.y - fh) * 0.5, fw, fh), false)
-	# ziehender Nebel (zwei Kopien, additiv wirkend durch geringe Deckkraft)
-	_tiled(nebula, 2.2, 0.22)
+	var sway := sin(t * 0.05) * 6.0 * cover        # langsames Schwenken über das Bild
+	draw_texture_rect(art, Rect2((size.x - fw * 1.06) * 0.5 + sway, (size.y - fh * 1.06) * 0.5, fw * 1.06, fh * 1.06), false)
+	draw_texture_rect(shade, Rect2(0, 0, size.x * 0.6, size.y), false)      # links dunkler: Menü bleibt lesbar
 	_draw_stars()
 	_draw_meteors()
 	_draw_cars(false)
-	_skyline(mid, 1.4, 0.86)
-	_haze(215.0, 0.3, 0.0)
-	_skyline(near, 3.6, 1.0)
+	_haze(240.0, 0.16, 0.0)
 	_draw_cars(true)
-	_haze(262.0, 0.2, 1.9)
 	_draw_hero()
 
 func _draw_stars() -> void:

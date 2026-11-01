@@ -14,15 +14,15 @@
   [
    "head",
    {
-	"de": "Spielidee & Auftrag",
-	"en": "Concept & direction"
+	"de": "Spielidee",
+	"en": "Concept"
    }
   ],
   [
    "line",
    {
-	"de": "Der Auftraggeber – Ideen, Tests, Geschmack",
-	"en": "The client – ideas, playtests, taste"
+	"de": "floppi – Ideen, Tests, Geschmack",
+	"en": "floppi – ideas, playtests, taste"
    }
   ],
   [
@@ -44,6 +44,20 @@
    {
 	"de": "erzeugt mit Claude Code (Anthropic)",
 	"en": "created with Claude Code (Anthropic)"
+   }
+  ],
+  [
+   "head",
+   {
+	"de": "Hintergründe & Logo",
+	"en": "Backgrounds & logo"
+   }
+  ],
+  [
+   "line",
+   {
+	"de": "KI-generiert mit ChatGPT Astra 6.0",
+	"en": "AI-generated with ChatGPT Astra 6.0"
    }
   ],
   [

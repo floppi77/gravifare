@@ -1,6 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
+const VERSION := "0.9.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
@@ -10,6 +11,7 @@ var entry_fuel := Tuning.FUEL_MAX       # Sprit bei Levelbeginn (auch Wiederholu
 var entry_credits := 0.0
 var carry_passenger := {}               # Fahrgast, der ins nächste Level mitfährt
 var run_seed := 0                       # Zufalls-Seed des Laufs (Spritpreise): je Lauf neu, je Level/Neustart reproduzierbar
+var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keinen Feldzug (Medaillen und Bestzeiten zählen)
 
 func level_ids() -> Array:
 	var ids: Array = []
@@ -50,6 +52,7 @@ func start_tutorial(next_id := "") -> void:
 	entry_credits = 0.0
 	carry_passenger = {}
 	run_seed = randi() % 1000000
+	practice = false
 	tutorial_next = next_id
 	start_level(TUTORIAL_ID)
 
@@ -60,6 +63,21 @@ func start_campaign(id: String) -> void:
 	entry_credits = 0.0
 	carry_passenger = {}
 	run_seed = randi() % 1000000
+	practice = false
+	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
+	start_level(id)
+
+## Start aus der Levelauswahl: Läuft ein Feldzug, wird es ein Übungsflug (der Feldzug bleibt unberührt), sonst beginnt ab hier ein neuer Feldzug.
+func start_selected(id: String) -> void:
+	if Save.campaign().is_empty():
+		start_campaign(id)
+		return
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	run_seed = randi() % 1000000
+	practice = true
 	start_level(id)
 
 ## Gespeicherten Feldzug fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keiner vorhanden ist.
@@ -72,6 +90,7 @@ func resume_campaign() -> bool:
 	entry_credits = maxf(0.0, float(c.get("credits", 0.0)))
 	carry_passenger = c.get("carry", {}) if c.get("carry", {}) is Dictionary else {}
 	run_seed = int(c.get("seed", 0))
+	practice = false
 	start_level(String(c.level))
 	return true
 
@@ -89,7 +108,15 @@ func to_menu() -> void:
 	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)
+	Sfx.stop_ambient()
 	get_tree().change_scene_to_file(MENU)
+
+## Nach Level 99: Finale, danach Abspann.
+func to_finale() -> void:
+	Save.write()
+	Sfx.set_thrust(0.0, 0.0)
+	Sfx.stop_ambient()
+	get_tree().change_scene_to_file("res://src/ui/finale.tscn")
 
 ## Entwicklungshilfe: --shot=<png> --frames=<n> macht nach n Frames einen Screenshot und beendet;
 ## --press=<aktion>@<frame> löst eine Eingabeaktion aus (z. B. pause@20).

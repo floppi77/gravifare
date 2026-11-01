@@ -614,6 +614,18 @@ func box_hits_solid(center: Vector2, half: Vector2) -> bool:
 				return true
 	return false
 
+## Wie box_hits_solid, aber nur das feste Raster (ohne Mover).
+func box_hits_cells(center: Vector2, half: Vector2) -> bool:
+	var x0 := floori((center.x - half.x) / Tuning.TILE)
+	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
+	var y0 := floori((center.y - half.y) / Tuning.TILE)
+	var y1 := floori((center.y + half.y - 0.001) / Tuning.TILE)
+	for cy in range(y0, y1 + 1):
+		for cx in range(x0, x1 + 1):
+			if is_solid_cell(cx, cy):
+				return true
+	return false
+
 func box_hits_char(center: Vector2, half: Vector2, ch: String) -> bool:
 	var x0 := floori((center.x - half.x) / Tuning.TILE)
 	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)

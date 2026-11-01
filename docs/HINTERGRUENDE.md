@@ -13,11 +13,11 @@
 | 7 Transitknoten | `bg_s7.png` | Goldene Wolkenstadt (07) | 58 % |
 | 8 Schattenring | `bg_s8.png` | Leuchtender Urwald (04) | 30 % |
 | 9 Singularitätsrand | `bg_s9.png` | Rand der Singularität (10) | 12 % |
-| (Reserve) | `bg_menu.png` | Bernsteinwüste (02), noch nicht verwendet | – |
+| Finale | `bg_menu.png` | Bernsteinwüste (02) | – |
 
-Die Zuordnung steht (Dateinamen) in dieser Tabelle, die Abdunklung in `DIM` in `src/game/backdrop.gd`. Zum Tauschen einfach die Datei überschreiben und einmal `godot --headless --import` ausführen. Dev-Flag `--bg=N` zeigt den Hintergrund eines anderen Sektors.
+Die Zuordnung steht (Dateinamen) in dieser Tabelle, die Abdunklung in `DIM` in `src/game/backdrop.gd` (wirkt zu 55 %), Sättigung, Kontrast und Dunst in `src/game/sector_look.gd`. Zum Tauschen einfach die Datei überschreiben und einmal `godot --headless --import` ausführen. Dev-Flag `--bg=N` zeigt den Hintergrund eines anderen Sektors.
 
-Fehlt `bg_sN.png`, greift der alte Dreiebenen-Aufbau `bg_sN_far/mid/near.png` (nur Sektor 1 hat ihn noch; das Hauptmenü nutzt ihn).
+Fehlt `bg_sN.png`, greift der alte Dreiebenen-Aufbau `bg_sN_far/mid/near.png` (nur Sektor 1 hat ihn noch). Das Hauptmenü nutzt `bg_s1.png`.
 
 Das Logo liegt als `assets/art/logo.png` (zugeschnitten, RGBA) und ersetzt im Hauptmenü die Textüberschrift.
 

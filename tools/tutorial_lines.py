@@ -39,6 +39,8 @@ T["tut_life"] = ("Die rosa Plattform ist eine Lebensstation. Landest du dort mit
                  "The pink platform is a life station. Land there with a thousand credits and you buy an extra life, five at most. In the first forty levels there is one every fifth level, later less often. I will lend you the money to practice.")
 T["tut_exit"] = ("Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
                  "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.")
+T["tut_countdown"] = ('Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.',
+                       'Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.')
 T["tut_gate"] = ("Das Tor ist offen. Flieg hindurch!", "The gate is open. Fly through it!")
 T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.',
                       'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')

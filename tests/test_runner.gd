@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -131,7 +131,7 @@ func _test_bot_solves_levels() -> void:
 			inc += float(j.fare) * rr.job_mult(j) * Tuning.satisfaction_factor(Tuning.SAT_FLOOR)
 		var cost: float = float(r.fuel_burned) * (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
 		check(inc >= cost, "%s: Fahrpreise bei 55 %% Zufriedenheit (¢%d) decken den Sprit des Autopiloten (¢%d)" % [lvl.id, int(inc), int(cost)])
-		check(r.complete and r.hull > 90.0 and r.delivered >= r.jobs - 1, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.delivered, r.jobs, r.reason])
+		check(r.complete and not r.timed_out and r.hull > 90.0 and r.delivered >= r.jobs - 1, "Autopilot löst %s ab Mindest-Sprit %d%% (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(Tuning.MIN_START_FUEL), r.time, r.hull, r.delivered, r.jobs, r.reason])
 
 func _test_level_rules() -> void:
 	var dir := DirAccess.open("res://data/levels")
@@ -237,7 +237,7 @@ func _test_no_respawn_after_delivery() -> void:
 	var r := Run.new()
 	r.start(lvl)
 	var bot := Bot.new(r)
-	var first_name := String(lvl.jobs[0].passenger)
+	var first_name := String(r.jobs[0].passenger)
 	var checked := false
 	for i in 60000:
 		var cmd := bot.decide()
@@ -1767,6 +1767,73 @@ func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()
 	e.physical_keycode = code
 	return e
+
+func _test_exit_hurry_and_extras() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s2_01.json")
+	var r := Run.new()
+	r.start(lvl, 100.0, 100.0, 1)
+	r.job_index = r.jobs.size() - 1
+	r.actor = null
+	r._spawn_actor(true)
+	check(r.exit_countdown >= Tuning.EXIT_COUNTDOWN_MIN, "Countdown läuft mit dem letzten Fahrgast")
+	r.step(Vector2.ZERO, true)
+	check(r.log.any(func(e): return e.type == "exit_countdown"), "Start des Countdowns wird gemeldet")
+	r.exit_countdown = 20.01
+	var heard := 0
+	for i in 8:
+		r.step(Vector2.ZERO, true)
+		heard += r.log.filter(func(e): return e.type == "exit_hurry").size()
+	check(heard == 1, "Fahrgast drängt bei 20 s genau einmal")
+	var extra_t := r.extra_timer
+	r.extra_timer = 0.0
+	r.extras_enabled = true
+	for i in 3:
+		r.step(Vector2.ZERO, true)
+	check(r.extras.is_empty(), "Während des Countdowns erscheinen keine neuen Zusatzfahrgäste (%.1f)" % extra_t)
+	r.extras.append({"job": {"to": "1", "from": "2", "fare": 50.0, "par": 20.0}, "actor": PassengerActor.new(), "state": Run.ES.CARRY, "clock": 0.0, "pen_pick": 0.0, "timer": 0.0})
+	var cd := r.exit_countdown
+	r.step(Vector2.ZERO, true)
+	check(is_equal_approx(cd, r.exit_countdown), "Mit Zusatzfahrgast an Bord hält die Uhr an")
+
+## Fahrende Plattform drückt ein schwebendes Taxi an die Wand (Level 39): nie im Fels, Quetschung schleudert es hinaus.
+func _test_mover_never_buries_taxi() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s4_06.json")
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(lvl, 100.0, 1000.0, 3)
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.landed_pad = {}
+	var pad: Dictionary = lvl.movers.filter(func(m): return m.kind == "pad")[0]
+	r.sim.pos = Vector2(26.0, float(pad.y) + 8.0)
+	var buried := 0.0
+	for i in 40 * 120:
+		r.step(Vector2(0, -90.0 / 230.0), false)
+		if r.result != Run.Result.RUNNING:
+			break
+		if lvl.box_hits_cells(r.sim.pos, Tuning.HULL_HALF - Vector2(0.5, 0.5)):
+			buried += Tuning.TICK
+	check(buried < 0.1, "Plattform schiebt das Taxi nicht in den Fels (%.2f s im Fels)" % buried)
+
+func _test_respawn_events_once() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s3_05.json")
+	var r := Run.new()
+	r.start(lvl, 100.0, 1000.0, 1)
+	r.respawn_after_crash()
+	check(r.pending_log.any(func(e): return e.type == "cost"), "Respawn-Ereignisse kommen über den nächsten Tick")
+
+func _test_medals_need_all_jobs() -> void:
+	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
+	var r := Run.new()
+	r.start(lvl, 100.0, 500.0, 3)
+	r.delivered = 1
+	r.missed = 2
+	r.level_time = 10.0
+	var m := r.medals()
+	check(not m.time and not m.clean, "Verpasste Pflichtfahrgäste: keine Zeit- und keine Sauber-Medaille")
+
+func _test_practice_keeps_campaign() -> void:
+	var src := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(src.contains("if not Flow.practice:\n\t\tSave.set_campaign") and src.contains("if not Flow.practice:\n\t\t\tSave.clear_campaign"), "Übungsflüge schreiben und löschen keinen Feldzug")
 
 func _test_controls_remap() -> void:
 	var c: Node = load("res://src/core/controls.gd").new()

@@ -172,6 +172,29 @@ static func flag_row(on_select: Callable) -> HBoxContainer:
 				me.accept_event())
 	return flags
 
+## Abdunklung über den Menühintergrund, reicht auf breiten Fenstern bis zum Rand.
+static func dim_rect(alpha: float) -> ColorRect:
+	var r := ColorRect.new()
+	r.color = Color(0.02, 0.03, 0.1, alpha)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.position = Vector2(-2000, -2000)
+	r.size = Vector2(4640, 4360)
+	return r
+
+## Spielversion, klein unten rechts auf der 640×360-Fläche.
+static func version_label() -> Label:
+	var l := Label.new()
+	l.text = "v" + Flow.VERSION
+	l.add_theme_font_size_override("font_size", 8)
+	l.add_theme_color_override("font_color", Color("#c9cfee"))
+	l.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.1, 0.9))
+	l.add_theme_constant_override("outline_size", 2)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.position = Vector2(590, 344)
+	l.size = Vector2(44, 12)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return l
+
 static func title(text: String, size := 16) -> Label:
 	var l := Label.new()
 	l.text = text

@@ -63,7 +63,7 @@ const VARY := {"land": 0.05, "hit": 0.07, "coin": 0.04, "board": 0.05, "price_ti
 const KEEP := ["crash", "pump_boom", "shatter", "splat", "exit", "flatline", "scream_f", "scream_m", "perfect"]
 var _steal := 0
 
-func play(name: String, volume_db := 0.0) -> void:
+func play(name: String, volume_db := 0.0, pitch := 1.0) -> void:
 	var s: AudioStream = streams.get(name)
 	if s == null:
 		return
@@ -83,7 +83,7 @@ func play(name: String, volume_db := 0.0) -> void:
 			return
 	var v: float = VARY.get(name, 0.0)
 	slot.stream = s
-	slot.pitch_scale = 1.0 + randf_range(-v, v) if v > 0.0 else 1.0
+	slot.pitch_scale = pitch * (1.0 + randf_range(-v, v) if v > 0.0 else 1.0)
 	slot.volume_db = volume_db + (randf_range(-v, v) * 20.0 if v > 0.0 else 0.0)
 	slot.set_meta("keep", KEEP.has(name))
 	slot.play()
@@ -116,6 +116,40 @@ func play_voice(voice: String, line: String) -> bool:
 	voice_player.play()
 	Music.duck_timed(-6.0, stream.get_length() + 0.25)     # Musik leiser, solange gesprochen wird
 	return true
+
+## Raumklang des Sektors: leise Schleife unter dem Spiel; wechselt mit weicher Blende.
+var amb_player: AudioStreamPlayer
+var _amb := 0
+
+func play_ambient(sector: int) -> void:
+	if sector == _amb:
+		return
+	_amb = sector
+	var s: AudioStream = _load("res://assets/audio/sfx/amb_s%d.wav" % sector)
+	if s == null:
+		return
+	if amb_player == null:
+		amb_player = AudioStreamPlayer.new()
+		amb_player.bus = "SFX"
+		add_child(amb_player)
+	if s is AudioStreamWAV:
+		s = s.duplicate()
+		s.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		s.loop_begin = 0
+		s.loop_end = int(s.data.size() / 2)
+	amb_player.stream = s
+	amb_player.volume_db = -50.0
+	amb_player.play()
+	create_tween().tween_property(amb_player, "volume_db", AMB_DB, 2.0)
+
+func stop_ambient() -> void:
+	_amb = 0
+	if amb_player != null and amb_player.playing:
+		var tw := create_tween()
+		tw.tween_property(amb_player, "volume_db", -50.0, 0.6)
+		tw.tween_callback(amb_player.stop)
+
+const AMB_DB := -17.0
 
 ## Langer Einzelklang (Levelwechsel-Flug); stop_long() bricht ihn z. B. beim Überspringen ab.
 func play_long(name: String, volume_db := 0.0) -> void:

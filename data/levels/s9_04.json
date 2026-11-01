@@ -113,10 +113,8 @@
   "currents",
   "gusts",
   "magnets",
-  "attract_fields",
-  "darkness"
+  "attract_fields"
  ],
- "dark": 0.78,
  "movers": [
   {
    "kind": "debris",

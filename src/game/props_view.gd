@@ -79,8 +79,8 @@ func _draw_pads() -> void:
 		for x in poles:
 			draw_rect(Rect2(x, y - 18, 1, 18), Color("#0c0f24"))
 			draw_rect(Rect2(x + PX, y - 18, PX * 2, 18), Color("#4a5596"))
-			# Dreieckiger Wimpel mit der Plattformzahl, weht leicht und zeigt zur Padmitte
-			var dir := 1.0 if x < cxm else -1.0
+			# Dreieckiger Wimpel mit der Plattformzahl, weht leicht und zeigt nach außen (die Mitte gehört Fahrgast und Preisschild)
+			var dir := -1.0 if x < cxm else 1.0
 			var top := y - 19.0
 			var tip := Vector2(x + 0.5 + dir * 19.0, top + 6.5 + sin(t * 3.0 + x) * 0.9)
 			var tri := PackedVector2Array([Vector2(x + 0.5, top), Vector2(x + 0.5, top + 13.0), tip])

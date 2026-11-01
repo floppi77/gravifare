@@ -5,7 +5,7 @@ var text := "GRAVIFARE"
 var font_size := 50
 var t := 0.0
 var logo: Texture2D = load("res://assets/art/logo.png") if ResourceLoader.exists("res://assets/art/logo.png") else null
-const LOGO_W := 130.0
+const LOGO_W := 190.0
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(300, (LOGO_W * float(logo.get_height()) / float(logo.get_width()) + 4.0) if logo != null else font_size + 12)

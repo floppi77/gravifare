@@ -4,6 +4,7 @@ extends Control
 
 ## Abdunklung je Sektor (0 = Originalbild, 1 = schwarz): helle Bilder brauchen mehr, damit Cyan/Orange/Gelb lesbar bleibt.
 const DIM := {1: 0.30, 2: 0.46, 3: 0.30, 4: 0.30, 5: 0.22, 6: 0.22, 7: 0.58, 8: 0.30, 9: 0.12}
+const TONE_CODE := "shader_type canvas_item;\nuniform float sat = 1.0;\nuniform float con = 1.0;\nuniform vec3 fog = vec3(0.0);\nuniform float amt = 0.0;\nvoid fragment() {\n\tvec4 t = texture(TEXTURE, UV) * COLOR;\n\tvec3 c = t.rgb;\n\tfloat g = dot(c, vec3(0.3, 0.59, 0.11));\n\tc = mix(vec3(g), c, sat);\n\tc = mix(vec3(0.5), c, con);\n\tCOLOR = vec4(mix(c, fog, amt), t.a);\n}\n"
 const ZOOM := 1.06             # Bild etwas größer als der Schirm, damit der Parallax keine Ränder zeigt
 const PARALLAX := 0.05
 
@@ -23,7 +24,19 @@ func setup(l: LevelData) -> void:
 			n = int(a.substr(5))
 	var fp := "res://assets/art/bg_s%d.png" % n
 	full_img = load(fp) if ResourceLoader.exists(fp) else null
-	dim = float(DIM.get(n, 0.3))
+	var lk := SectorLook.of(n)
+	dim = float(DIM.get(n, 0.3)) * 0.55                 # der Tonwert (Shader unten) übernimmt einen Teil der Abdunklung
+	if material == null:
+		var sh := Shader.new()
+		sh.code = TONE_CODE
+		material = ShaderMaterial.new()
+		material.shader = sh
+		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR     # das Bild wird nicht ganzzahlig skaliert: weich statt ungleichmäßiger Pixel, tritt zugleich zurück
+	var fog: Color = lk.fog
+	material.set_shader_parameter("sat", lk.sat)
+	material.set_shader_parameter("con", lk.con)
+	material.set_shader_parameter("fog", Vector3(fog.r, fog.g, fog.b))
+	material.set_shader_parameter("amt", lk.amt)
 	far = _tex(n, "far")
 	mid = _tex(n, "mid")
 	near = _tex(n, "near")
@@ -50,8 +63,7 @@ func _draw() -> void:
 		var h := 360.0 * ZOOM * cover
 		var x := -(w - vs.x) * 0.5 - roundf(off.x * PARALLAX * 3.0) / 3.0
 		var y := -(h - vs.y) * 0.5 - roundf(off.y * PARALLAX * 3.0) / 3.0
-		draw_texture_rect(full_img, Rect2(x, y, w, h), false)
-		draw_rect(full, Color(0.02, 0.03, 0.09, dim))
+		draw_texture_rect(full_img, Rect2(x, y, w, h), false, Color(1.0 - dim, 1.0 - dim, 1.0 - dim))
 		return
 	draw_texture_rect(far, full, false)
 	_layer(mid, off, 0.08, 0.86)
