@@ -13,6 +13,7 @@ var sub_text := ""
 var sub_speaker := ""
 var sub_a := 0.0                  # Einblendung der Tafel
 var sub_want := 0.0
+var hint := false                 # Hinweis rechts in der Tafel (Überspringen)
 
 const SHADER := """
 shader_type canvas_item;
@@ -94,6 +95,9 @@ func _draw() -> void:
 	draw_rect(Rect2(x, y, w, h), Color(0.04, 0.06, 0.16, 0.88 * sub_a))
 	draw_rect(Rect2(x, y, w, 1.0), Color(1.0, 0.88, 0.58, 0.55 * sub_a))
 	draw_string(Fonts.hud, Vector2(x + 8.0, y + 7.5), sub_speaker.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 6, Color(1.0, 0.88, 0.58, sub_a))
+	if hint:
+		var key := "U" if Controls.last_device == "keyboard" else "B"
+		draw_string(Fonts.hud, Vector2(x + w - 148.0, y + 7.5), tr("TUT_SKIP") % key, HORIZONTAL_ALIGNMENT_RIGHT, 140, 6, Color(0.75, 0.8, 1.0, 0.85 * sub_a))
 	for i in lines.size():
 		draw_string(f, Vector2(x + 8.0, y + 17.0 + float(i) * 11.0), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.95, 0.97, 1.0, sub_a))
 

@@ -18,3 +18,6 @@ Levelwechsel-Sequenz: A/Enter/B/Esc/Start überspringen die Weltraumfahrt.
 
 
 **Werkstatt, Nachtschicht:** Beide im Hauptmenü. Der Geist der Bestzeit lässt sich unter Optionen → Spiel abschalten.
+
+**Tutorial:** B (Gamepad) oder U (Tastatur) überspringt den laufenden Text.
+**Landen:** Nur die helle Landeplatte auf dem Pad zählt; beide Kufen müssen darauf stehen.

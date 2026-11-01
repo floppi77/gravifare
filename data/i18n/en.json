@@ -153,7 +153,7 @@
  "STAT_TIME": "Play time",
  "HINT_START": "Thrust: %s. Passengers wait at the numbered pads.",
  "HINT_GEAR": "Extend the landing gear (%s) before you land.",
- "HINT_LANDING": "Keep the gauges at the top right in the green: slow, level, straight.",
+ "HINT_LANDING": "Land on the bright plate and keep the gauges green: slow, straight, level.",
  "HINT_PASSENGER": "The faster you arrive, the more you earn – land close to the shelter!",
  "HINT_FUEL": "Low on fuel: land on the T pad. The price is on the pump – don't ram it!",
  "HINT_EXIT": "Gate open! Fly through it with your passenger.",
@@ -292,5 +292,8 @@
  "STAT_SHIFT": "Best night shift (passengers)",
  "HUD_SHIFT_RESULT": "Shift: %d passengers · best %d",
  "TRANS_GRAVITY": "Gravity %.1f g",
- "TRANS_SHIFT": "Passengers this shift: %d"
+ "TRANS_SHIFT": "Passengers this shift: %d",
+ "MSG_BAD_PLATE": "Only the bright landing plate counts!",
+ "TUT_SKIP": "%s: skip text",
+ "LVL_UNKNOWN": "Still unknown"
 }

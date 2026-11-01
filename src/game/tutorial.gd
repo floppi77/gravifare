@@ -29,7 +29,7 @@ const R_FUEL := Rect2(2, 2, 70, 12)
 const R_HULL := Rect2(73, 2, 70, 12)
 const R_MONEY := Rect2(145, 1, 56, 14)
 const R_LIVES := Rect2(202, 1, 60, 14)
-const R_LEVEL := Rect2(364, 1, 96, 14)
+const R_LEVEL := Rect2(372, 1, 88, 14)
 const R_COUNT := Rect2(458, 1, 34, 14)
 const R_PRICE := Rect2(492, 1, 84, 14)
 const R_GAUGE := Rect2(574, 1, 64, 15)
@@ -102,6 +102,7 @@ func _build() -> void:
 			"wait": func(): return flags.get("land3", false), "timeout": 240.0},
 		{"key": "tut_soft_react"},
 		{"key": "tut_job", "enter": _enter_job, "spots": func(): return [_pad_rect("2"), R_TASK],
+			"after_speech": func(): run.pickup_locked = false,
 			"wait": func(): return flags.get("boarded_main", false), "timeout": 180.0},
 		{"key": "tut_pay", "spots": func(): return [R_FARE, _pad_rect("3")],
 			"wait": func(): return flags.get("delivered_main", false), "timeout": 180.0},
@@ -120,6 +121,7 @@ func _build() -> void:
 			"wait": func(): return flags.get("life_bought", false), "timeout": 90.0},
 		{"key": "tut_exit", "enter": _enter_exit, "spots": func(): return [_pad_rect("1"), _gate_rect()]},
 		{"key": "tut_countdown", "enter": _enter_countdown, "spots": func(): return [R_TIMER],
+			"after_speech": func(): run.pickup_locked = false,
 			"wait": func(): return run.exit_open, "timeout": 180.0},
 		{"key": "tut_gate", "spots": func(): return [_gate_rect()]},
 	]
@@ -133,14 +135,13 @@ func _enter_course() -> void:
 		gates.start()
 
 func _enter_credit() -> void:
-	run.money += 50.0                         # ab 35 % kostet Sprit Geld: kleines Startguthaben für die Übung
+	run.money += 500.0                        # ab 35 % kostet Sprit Geld: Guthaben reicht in der Übung zum Volltanken
 
 func _enter_price() -> void:
 	run.force_price_change()                  # ein einziger, sichtbarer Preiswechsel; danach bleibt der Preis fest (prices_frozen)
 
-## Mika erscheint erst jetzt: Sie tritt aus ihrem Häuschen, die Fahrgastsperre fällt.
+## Mika erscheint erst jetzt und tritt aus ihrem Häuschen; einsteigen darf sie erst, wenn die Erklärung zu Ende ist.
 func _enter_job() -> void:
-	run.pickup_locked = false
 	if run.actor == null:
 		run._spawn_actor(false)
 
@@ -149,7 +150,7 @@ func _enter_delivered() -> void:
 	flags["boarded_extra"] = false
 
 func _enter_exit() -> void:
-	run.pickup_locked = false
+	run.pickup_locked = true                  # Odo steigt erst nach der Erklärung des Countdowns ein
 	run.spawn_locked = false                  # jetzt darf Odo erscheinen (letzter Pflichtfahrgast)
 
 ## Exit-Countdown vorführen: Er läuft sichtbar und drängelt, hat in der Flugschule aber keine Folgen (Run beginnt ihn von vorn).
@@ -205,7 +206,19 @@ func _next() -> void:
 func _speak(key: String) -> void:
 	var info: Dictionary = game.call("tutorial_speak", key)        # spielt den Clip, liefert Länge und Text (Untertitel)
 	speak_len = float(info.len)
+	spot.hint = true
 	spot.say(tr("SPK_INSTRUCTOR"), String(info.text))
+
+## B/U überspringt den laufenden Text: Es geht sofort weiter, als wäre er zu Ende gesprochen.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("text_skip") or game == null or finished or game.paused or idx < 0 or idx >= steps.size() or t >= speak_len + 0.15:
+		return
+	get_viewport().set_input_as_handled()
+	game.call("tutorial_voice_stop")
+	t = speak_len + 0.15
+	gap_t = 99.0
+	if steps[idx].has("wait"):
+		spot.say("", "")                      # die Aufgabe steht weiter unten im Auftrag; die Tafel gibt die Sicht frei
 
 func _process(delta: float) -> void:
 	if game == null or finished or idx < 0 or idx >= steps.size():
@@ -337,6 +350,7 @@ func on_event(e: Dictionary) -> void:
 ## Level geschafft: Schlusswort, dann Übergang (nächstes Level oder Menü).
 func complete() -> void:
 	finished = true
+	spot.hint = false
 	spot.set_spots([])
 	_gauge(false)
 	var info: Dictionary = game.call("tutorial_speak", "tut_done")

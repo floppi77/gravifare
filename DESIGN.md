@@ -272,3 +272,10 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Werkstatt** (`src/core/workshop.gd`, `src/ui/workshop_view.gd`): drei Einbauten mit je drei Stufen (2.000/6.000/15.000 Credits aus dem laufenden Feldzug), je Speicherplatz dauerhaft: Sparsame Düsen, Panzerhülle, Weiches Fahrwerk. Bot und Tests fliegen ohne Einbauten.
 - **Geisterfahrt** (`src/game/ghost_view.gd`, `Replay.trace`, Version 2): Das Taxi der Bestzeit fliegt halbtransparent mit, Option „Geist der Bestzeit“. Ältere Replays haben keine Spur und werden beim nächsten Abschluss ersetzt.
 - **Nachtschicht** (`Flow.start_shift`, `Run.shift_jobs`): Zufallsaufträge auf geschafften Karten, 3 bis 7 Fahrten je Karte, bis alle Leben weg sind. Zählt nur als `stats.shift_best`, nie für Feldzug, Medaillen oder Bestzeiten.
+
+## Runde 28: Rückmeldungen nach Phase D
+- **Landeplatte**: Nur die helle, leicht erhöhte Platte auf dem Pad zählt (Fläche des bisherigen Landefensters, beide Kufen darauf, `TaxiSim._touch_down`, `props_view._draw_plate`). Daneben gibt es keine Landung, die Meldung ist `MSG_BAD_PLATE`.
+- **Beinahe-Treffer**: ab 75 px/s und bis 6 px Abstand, auch an Movern: Zoom bis 12 % aufs Taxi, Zeitlupe 60 % für 0,4 s, alle 4 s möglich, aus bei „Weniger Bewegung“.
+- **Sprache**: Die Zentrale überdeckt keine Fahrgast-Rufe mehr und wird nicht überdeckt: „Hey Taxi“ folgt nach `exit_start` (`pending_call`).
+- **Tutorial**: 500 statt 50 Credits, Fahrgäste steigen erst nach der Erklärung ein (`after_speech`), B/U überspringt Texte (Aktion `text_skip`, fest belegt). `tut_soft` nennt die Landeplatte.
+- **Levelauswahl**: echte Vorschaubilder (`assets/art/levels/`, `tools/make_level_shots.sh`, nach Level- oder Grafikänderungen neu erzeugen), noch nicht geschaffte Level unscharf.

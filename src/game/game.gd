@@ -112,6 +112,8 @@ func _ready() -> void:
 			dark.setup(run, cam)
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
+	if OS.get_cmdline_user_args().has("--no-hud"):      # Dev: Bild ohne HUD (Vorschaubilder der Levelauswahl)
+		$Hud.visible = false
 	if OS.get_cmdline_user_args().has("--debug-complete"):
 		run.exit_open = true
 		run.level.exit_open = true
@@ -210,6 +212,7 @@ func load_level(path: String) -> void:
 		autopilot = Bot.new(run)
 	hud.paused = false
 	paused = false
+	near_z = 0.0
 	restart_timer = 0.0
 	completion_saved = false
 	_setup_camera()
@@ -510,6 +513,10 @@ func _physics_process(_delta: float) -> void:
 		_field_feedback()
 	for e in run.log:
 		_on_event(e)
+	if not pending_call.is_empty() and Time.get_ticks_msec() >= Sfx.narration_until:
+		var pc := pending_call
+		pending_call = {}
+		_on_event(pc)
 	cam.global_position = _cam_target()
 	_cam_feel()
 	if run.result == Run.Result.COMPLETE and not completion_saved and run.level.tutorial:
@@ -632,10 +639,15 @@ func _lose_life() -> void:
 func _cam_feel() -> void:
 	if Settings.values.reduce_motion or trans_t >= 0.0:
 		cam.offset = Vector2.ZERO
+		cam.zoom = Vector2.ONE
 		return
 	cam_off = cam_off.lerp((run.sim.vel * 0.03).limit_length(4.0), 0.06)
 	shake = maxf(0.0, shake - 0.05)
-	cam.offset = cam_off + Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake
+	near_z = move_toward(near_z, 1.0 if slowmo_left > 0.0 else 0.0, 0.03)
+	var z := 1.0 + NEAR_ZOOM * TV.smooth(near_z)
+	cam.zoom = Vector2(z, z)
+	var to_taxi := (run.sim.pos - cam.global_position) * (1.0 - 1.0 / z)      # Zoom auf das Taxi zu, nicht auf die Bildmitte
+	cam.offset = cam_off + to_taxi + Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake
 
 ## Musik-Schichten: B (Bewegung) mit Fahrgast an Bord/offenem Tor/Tempo, C (Spannung) bei wenig Sprit, Schaden, Beinahe-Treffer.
 var _music_ticks := 0
@@ -688,21 +700,29 @@ func _add_shake(amp: float) -> void:
 	if not Settings.values.reduce_motion:
 		shake = maxf(shake, amp)
 
-## Beinahe-Treffer: schnell an einer Wand vorbei (≤ 4 px Abstand, kein Kontakt) löst eine kurze Zeitlupe aus.
+## Beinahe-Treffer: zügig an einem Hindernis vorbei (kein Kontakt) löst einen kurzen Kamerazoom mit leichter Zeitlupe aus.
+const NEAR_SPEED := 75.0
+const NEAR_GAP := 6.0
+const NEAR_ZOOM := 0.12
+var near_z := 0.0
+
 func _check_near_miss() -> void:
 	near_cd = maxf(0.0, near_cd - Tuning.TICK)
 	var s := run.sim
-	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < 110.0 or Settings.values.reduce_motion or trans_t >= 0.0:
+	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < NEAR_SPEED or Settings.values.reduce_motion or trans_t >= 0.0:
 		return
 	var lv := run.level
-	if lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(4, 4)) and not lv.box_hits_solid(s.pos, Tuning.HULL_HALF):
-		near_cd = 5.0
-		slowmo_left = 0.5
-		Engine.time_scale = 0.4
-		AudioServer.playback_speed_scale = 0.85
-		Sfx.play("near_miss", -2.0)
-		Haptics.pulse(0.2, 0.2, 0.1)
-		hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
+	if lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(NEAR_GAP, NEAR_GAP)) and not lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(0.5, 0.5)):
+		_near_miss_fx()
+
+func _near_miss_fx() -> void:
+	near_cd = 4.0
+	slowmo_left = 0.4
+	Engine.time_scale = 0.6
+	AudioServer.playback_speed_scale = 0.92
+	Sfx.play("near_miss", -2.0)
+	Haptics.pulse(0.2, 0.2, 0.1)
+	hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
 
 ## Neu freigeschaltete Lackierungen/Aufkleber melden (Toast + Ton).
 func _check_unlocks() -> void:
@@ -713,6 +733,7 @@ func _check_unlocks() -> void:
 
 var voice_cd := 0.0
 var attendant_cd := 0.0
+var pending_call := {}
 ## Fahrgast an Bord kommentiert die Landung: weich = „Wow, sanft!“, hart = „Aua!“ (höchstens alle 8 s).
 func _passenger_reaction(e: Dictionary) -> void:
 	if run.actor == null or run.phase != Run.Phase.CARRYING or Time.get_ticks_msec() / 1000.0 < voice_cd:
@@ -782,6 +803,9 @@ func _on_event(e: Dictionary) -> void:
 				_add_shake(1.2)
 		"liftoff": taxi.burst_puff(1.0)
 		"call":
+			if not run.level.tutorial and Time.get_ticks_msec() < Sfx.narration_until:
+				pending_call = e                  # spricht gerade die Zentrale: Ruf danach nachholen
+				return
 			Sfx.play_voice(e.voice, "call")
 			hud.subtitle(e.name, tr("VOICE_CALL"))
 		"boarded":
@@ -904,9 +928,10 @@ func _on_event(e: Dictionary) -> void:
 		"exit_countdown":
 			hud.flash_message(tr("MSG_EXIT_COUNTDOWN"), 3.0)
 			Sfx.play("warn", -6.0)
-			if not run.level.tutorial:
-				Sfx.play_voice("d0", "exit_start")
-				hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "exit_start"), 2.4)
+			if not run.level.tutorial and Sfx.play_voice("d0", "exit_start"):
+				var ms := int((Sfx.voice_player.stream.get_length() + 0.3) * 1000.0)
+				Sfx.narration_until = Time.get_ticks_msec() + ms            # Fahrgast-Zurufe warten, bis die Zentrale fertig ist
+				hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "exit_start"), float(ms) / 1000.0)
 		"exit_hurry":
 			Sfx.play("warn", -8.0)
 			Haptics.pulse(0.15, 0.1, 0.12)
@@ -940,6 +965,7 @@ func _on_event(e: Dictionary) -> void:
 			match e.reason:
 				"gear": hud.flash_message(tr("MSG_BAD_GEAR"))
 				"pos": hud.flash_message(tr("MSG_BAD_POS"))
+				"plate": hud.flash_message(tr("MSG_BAD_PLATE"))
 				"speed": hud.flash_message(tr("MSG_BAD_SPEED"))
 				"tilt": hud.flash_message(tr("MSG_BAD_TILT"))
 

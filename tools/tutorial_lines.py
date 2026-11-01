@@ -46,14 +46,14 @@ T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, t
                       'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')
 T["tut_gear_in"] = ('Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Leertaste ein, am Controller mit der A-Taste. Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Drück die Taste jetzt.',
                     'Your landing gear is still extended. To take off, retract it with the space bar, or the A button on a controller. Retracted, the taxi flies fast; extended, slow and precise. Press the button now.')
-T["tut_credit"] = ('Darüber kostet der Sprit Geld. Ich schreibe dir fünfzig Credits gut, tank also ruhig voll.',
-                   'Above that, fuel costs money. I am crediting you fifty credits, so go ahead and fill up.')
+T["tut_credit"] = ('Darüber kostet der Sprit Geld. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.',
+                   'Above that, fuel costs money. I am crediting you five hundred credits, so go ahead and fill up.')
 T["tut_price"] = ('Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.',
                   'The fuel price changes regularly, just like it did a moment ago. Keep an eye on the display at the top. In flight school I will leave it alone from now on.')
 T["tut_crash_ok"] = ('Zerstört! Normalerweise kostet dich das ein Leben, und ein Fahrgast an Bord ist verloren. Hier bekommst du sofort ein neues Taxi.',
                      'Destroyed! Normally that costs you a life, and a passenger on board is lost. Here you get a new taxi right away.')
-T["tut_soft"] = ('Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend.',
-                 'And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly.')
+T["tut_soft"] = ('Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend. Es zählt nur die helle Landeplatte, beide Kufen müssen darauf stehen.',
+                 'And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly. Only the bright landing plate counts, both skids must be on it.')
 T["tut_soft_ok"] = ('Wunderbar sanft! Weiche, gerade Landungen in Folge bringen dir einen Bonus auf den Fahrpreis.',
                     'Wonderfully gentle! Soft, level landings in a row earn you a bonus on the fare.')
 T["tut_soft_meh"] = ('Das ging, war aber noch nicht weich. Je langsamer du aufsetzt, desto besser. Weiche, gerade Landungen in Folge bringen dir einen Bonus.',

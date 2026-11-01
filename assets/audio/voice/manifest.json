@@ -2153,8 +2153,8 @@
    "seconds": 11.42
   },
   "de/i0_tut_credit": {
-   "text": "Darüber kostet der Sprit Geld. Ich schreibe dir fünfzig Credits gut, tank also ruhig voll.",
-   "seconds": 6.14
+   "text": "Darüber kostet der Sprit Geld. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.",
+   "seconds": 5.82
   },
   "de/i0_tut_price": {
    "text": "Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.",
@@ -2165,8 +2165,8 @@
    "seconds": 7.99
   },
   "de/i0_tut_soft": {
-   "text": "Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend.",
-   "seconds": 7.9
+   "text": "Und jetzt andersherum: Lande auf Plattform drei so sanft wie möglich, mit ausgefahrenem Fahrwerk und langsam sinkend. Es zählt nur die helle Landeplatte, beide Kufen müssen darauf stehen.",
+   "seconds": 11.26
   },
   "de/i0_tut_soft_ok": {
    "text": "Wunderbar sanft! Weiche, gerade Landungen in Folge bringen dir einen Bonus auf den Fahrpreis.",
@@ -2189,8 +2189,8 @@
    "seconds": 13.08
   },
   "en/i0_tut_credit": {
-   "text": "Above that, fuel costs money. I am crediting you fifty credits, so go ahead and fill up.",
-   "seconds": 5.1
+   "text": "Above that, fuel costs money. I am crediting you five hundred credits, so go ahead and fill up.",
+   "seconds": 5.96
   },
   "en/i0_tut_price": {
    "text": "The fuel price changes regularly, just like it did a moment ago. Keep an eye on the display at the top. In flight school I will leave it alone from now on.",
@@ -2201,8 +2201,8 @@
    "seconds": 6.84
   },
   "en/i0_tut_soft": {
-   "text": "And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly.",
-   "seconds": 6.22
+   "text": "And now the other way around: land on platform three as gently as you can, with the gear out and sinking slowly. Only the bright landing plate counts, both skids must be on it.",
+   "seconds": 10.45
   },
   "en/i0_tut_soft_ok": {
    "text": "Wonderfully gentle! Soft, level landings in a row earn you a bonus on the fare.",

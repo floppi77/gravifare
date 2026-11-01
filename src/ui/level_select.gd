@@ -102,8 +102,7 @@ func _open(n: int) -> void:
 func _show(lvl: LevelData, id: String, i: int) -> void:
 	if lvl == null:
 		return
-	preview.level = lvl
-	preview.queue_redraw()
+	preview.show_level(id, Save.is_completed(id))
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	info_name.text = "%d · %s" % [lvl.number, lvl.names.get(lang, lvl.id)]
 	var line := tr("LVL_JOBS") % lvl.jobs.size()

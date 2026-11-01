@@ -349,7 +349,9 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 	var speed_x := absf(vel.x - pad_vx)
 	var tilt_in := absf(tilt)
 	var on_pad: bool = hit_l and hit_r and not pad_l.is_empty() and not pad_r.is_empty() and pad_l.id == pad_r.id
-	var ok := gear_extended() and on_pad and speed_y <= land_vy \
+	# Gültig ist nur die Landeplatte: Beide Füße stehen darauf, wenn die Rumpfmitte im Landefenster liegt.
+	var on_plate: bool = on_pad and pos.x >= float(pad_l.get("land_lo", pad_l.x0)) - 0.5 and pos.x <= float(pad_l.get("land_hi", pad_l.x1)) + 0.5
+	var ok := gear_extended() and on_plate and speed_y <= land_vy \
 		and speed_x <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
 	if ok:
 		var surf_y: float = pad_l.row * Tuning.TILE
@@ -360,7 +362,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		landed_pad = pad_l
 		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y, "vx": speed_x, "tilt": tilt_in, "air_t": air_t, "air_path": air_path})
 	else:
-		var reason := "pos" if not on_pad else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > Tuning.LAND_TILT else "speed"))
+		var reason := "pos" if not on_pad else ("plate" if not on_plate else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > Tuning.LAND_TILT else "speed")))
 		events.append({"type": "bad_landing", "reason": reason})
 		_impact(maxf(speed_y, absf(vel.x)) * 1.2)
 		# aus der Wand/Plattform herausheben und zurückfedern

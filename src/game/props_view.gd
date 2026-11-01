@@ -91,6 +91,7 @@ func _draw_pads() -> void:
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
 			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
 			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
+		var plate := _draw_plate(p, y, col)
 		if p.life:
 			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.LIFE_PRICE)
 		if p.get("hospital", false):
@@ -99,11 +100,26 @@ func _draw_pads() -> void:
 			var pulse := 0.5 + 0.5 * sin(t * 6.0)
 			var c2 := Color("#ffe14a")
 			c2.a = 0.55 + 0.45 * pulse
-			draw_rect(Rect2(p.x0, y - PX * 2, p.x1 - p.x0, PX * 2), c2)
+			draw_rect(Rect2(plate.position.x, y - 1.0 - PX * 2, plate.size.x, PX * 2), c2)
 			var ay: float = y - 30 - 3.0 * sin(t * 5.0)
 			var tri := PackedVector2Array([Vector2(cxm - 5, ay), Vector2(cxm + 5, ay), Vector2(cxm, ay + 7)])
 			draw_colored_polygon(tri, Color("#ffe14a"))
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
+
+## Landeplatte: kleine Erhebung auf dem Pad, nur dort zählt eine Landung (TaxiSim._touch_down). Der Rest des Pads liegt optisch tiefer.
+func _draw_plate(p: Dictionary, y: float, col: Color) -> Rect2:
+	var x0: float = float(p.get("land_lo", p.x0)) - Tuning.FOOT_X
+	var x1: float = float(p.get("land_hi", p.x1)) + Tuning.FOOT_X
+	var sunk := Color(0.02, 0.03, 0.09, 0.62)
+	if x0 > float(p.x0):
+		draw_rect(Rect2(p.x0, y, x0 - float(p.x0), 2.0), sunk)
+	if x1 < float(p.x1):
+		draw_rect(Rect2(x1, y, float(p.x1) - x1, 2.0), sunk)
+	draw_rect(Rect2(x0, y - 1.0, x1 - x0, 1.0 + PX), col.lightened(0.55))
+	draw_rect(Rect2(x0, y - 1.0, x1 - x0, PX), Color.WHITE)
+	draw_rect(Rect2(x0, y - 1.0, PX * 2, 1.0 + PX * 3), Color("#0c0f24"))
+	draw_rect(Rect2(x1 - PX * 2, y - 1.0, PX * 2, 1.0 + PX * 3), Color("#0c0f24"))
+	return Rect2(x0, y - 1.0, x1 - x0, 1.0)
 
 ## Bewegliche Tore (Schleusen): geschlossen = Schott mit Warnstreifen und roter Lampe, offen = grüner Rahmen,
 ## kurz vor dem Schließen blinkt der Rahmen gelb.

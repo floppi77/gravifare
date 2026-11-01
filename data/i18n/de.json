@@ -153,7 +153,7 @@
  "STAT_TIME": "Spielzeit",
  "HINT_START": "Schub: %s. Fahrgäste warten an den nummerierten Pads.",
  "HINT_GEAR": "Fahrwerk ausfahren (%s), bevor du landest.",
- "HINT_LANDING": "Halte die Anzeigen oben rechts im Grünen: langsam, gerade, waagerecht.",
+ "HINT_LANDING": "Lande auf der hellen Platte und halte die Anzeigen im Grünen: langsam, gerade, waagerecht.",
  "HINT_PASSENGER": "Je schneller du ankommst, desto mehr verdienst du – lande nah am Häuschen!",
  "HINT_FUEL": "Sprit knapp: lande auf dem T-Pad. Der Preis steht an der Säule – nicht rammen!",
  "HINT_EXIT": "Tor offen! Fliege mit deinem Fahrgast hindurch.",
@@ -292,5 +292,8 @@
  "STAT_SHIFT": "Beste Nachtschicht (Fahrgäste)",
  "HUD_SHIFT_RESULT": "Schicht: %d Fahrgäste · Bestwert %d",
  "TRANS_GRAVITY": "Schwerkraft %.1f g",
- "TRANS_SHIFT": "Fahrgäste in dieser Schicht: %d"
+ "TRANS_SHIFT": "Fahrgäste in dieser Schicht: %d",
+ "MSG_BAD_PLATE": "Nur die helle Landeplatte zählt!",
+ "TUT_SKIP": "%s: Text überspringen",
+ "LVL_UNKNOWN": "Noch unbekannt"
 }
