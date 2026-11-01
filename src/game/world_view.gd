@@ -105,3 +105,4 @@ func _draw_world() -> void:
 				_tile(5, cx, cy)
 			elif (c >= "1" and c <= "9") or c == "H":
 				_tile(4, cx, cy)
+	WorldDecor.draw(self, level)

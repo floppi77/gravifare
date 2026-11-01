@@ -4,7 +4,9 @@ Aufruf: python3 tools/art/gen_sector_tiles.py"""
 import colorsys
 from PIL import Image
 
-KEEP = (4, 5, 6)
+KEEP = (5, 6)
+PAD = 4
+PAD_TOP = 15        # Oberkante des Pads (Pixel im Tile) bleibt in der Funktionsfarbe
 # Sektor: Farbton (0..1), Sättigungsfaktor, Helligkeitsfaktor
 LOOK = {2: (0.80, 0.85, 0.95), 3: (0.075, 0.90, 0.95), 4: (0.55, 0.45, 1.05), 5: (0.02, 0.60, 0.72),
         6: (0.47, 0.75, 0.85), 7: (0.11, 0.55, 1.10), 8: (0.32, 0.50, 0.70), 9: (0.70, 0.40, 0.62)}
@@ -17,6 +19,8 @@ for sector, (hue, sat, val) in LOOK.items():
         if x // 48 in KEEP:
             continue
         for y in range(im.height):
+            if x // 48 == PAD and y < PAD_TOP:
+                continue
             r, g, b, a = px[x, y]
             h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
             if 0.5 < h < 0.78:          # das Blau des Grundmaterials; Lichter und Gelb bleiben

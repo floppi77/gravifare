@@ -44,6 +44,7 @@ var clip_pending := ""                 # Einspieler, der nach Funkspruch/Ankunft
 var clip_delay := 0.0
 var script_inputs: Array = []
 var ghost: Node2D = null
+var ambient: Node2D = null
 var entry_carry := {}                  # Ausgangs-Fahrgast, der in diesem Level ausgestiegen ist (für den Neustart)
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
@@ -198,6 +199,11 @@ func load_level(path: String) -> void:
 	dark.setup(run, cam)
 	world_tiles.setup(run)
 	props.setup(run)
+	if ambient == null:
+		ambient = Node2D.new()
+		ambient.set_script(load("res://src/game/ambient_view.gd"))
+		world.add_child(ambient)
+	ambient.setup(lvl)
 	fx.setup(run)
 	taxi.bind(run.sim)
 	assist.bind(run)

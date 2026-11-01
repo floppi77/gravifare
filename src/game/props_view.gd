@@ -91,6 +91,7 @@ func _draw_pads() -> void:
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
 			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
 			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
+		_pad_glow(p, y, col)
 		var plate := _draw_plate(p, y, col)
 		if p.life:
 			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.LIFE_PRICE)
@@ -105,6 +106,17 @@ func _draw_pads() -> void:
 			var tri := PackedVector2Array([Vector2(cxm - 5, ay), Vector2(cxm + 5, ay), Vector2(cxm, ay + 7)])
 			draw_colored_polygon(tri, Color("#ffe14a"))
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
+
+## Lichtschein über der Plattform: Sie leuchtet in den Raum, und das Auge findet sie schneller.
+func _pad_glow(p: Dictionary, y: float, col: Color) -> void:
+	var x0: float = p.x0
+	var w: float = float(p.x1) - x0
+	var bands := 10
+	for i in bands:
+		var k := float(i) / float(bands)
+		var h := 3.0
+		var inset := k * 9.0
+		draw_rect(Rect2(x0 + inset, y - float(i + 1) * h, w - inset * 2.0, h), Color(col.r, col.g, col.b, 0.2 * (1.0 - k) * (1.0 - k)))
 
 ## Landeplatte: kleine Erhebung auf dem Pad, nur dort zählt eine Landung (TaxiSim._touch_down). Der Rest des Pads liegt optisch tiefer.
 func _draw_plate(p: Dictionary, y: float, col: Color) -> Rect2:

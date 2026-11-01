@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1693,7 +1693,7 @@ func _test_streak_bonus() -> void:
 	check(not ev.is_empty() and ev.has("vx") and ev.has("tilt"), "Landeereignis enthält Seitengeschwindigkeit und Neigung")
 
 func _test_music_assets() -> void:
-	var themes := ["menu"]
+	var themes := ["menu", "finale"]
 	for i in 20:
 		themes.append("t%02d" % i)
 	var ok_all := true
@@ -1710,7 +1710,7 @@ func _test_music_assets() -> void:
 		if lens.size() == 3:
 			if absf(lens[0] - lens[1]) > 0.06 or absf(lens[0] - lens[2]) > 0.06 or lens[0] < 45.0:
 				lens_ok = false
-	check(ok_all, "Alle 21 Musikthemen (Menü + 20 Level-Themen) haben drei Schichten (A/B/C)")
+	check(ok_all, "Alle Musikthemen (Menü, 20 Level-Themen, Finale) haben drei Schichten (A/B/C)")
 	var mus = load("res://src/core/music.gd")
 	check(mus.theme_for_level(1) == "t00" and mus.theme_for_level(5) == "t00" and mus.theme_for_level(6) == "t01" and mus.theme_for_level(99) == "t19", "Thema wechselt alle 5 Level")
 	check(lens_ok, "Schichten eines Themas sind gleich lang (synchron loopbar, ≥ 45 s)")
@@ -1767,6 +1767,16 @@ func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()
 	e.physical_keycode = code
 	return e
+
+func _test_sector_look() -> void:
+	for n in range(1, 10):
+		var l := SectorLook.of(n)
+		check(l.rim is Color and SectorLook.tiles(n) != null, "Sektor %d hat Material und Kantenlicht" % n)
+	var ids := ["s1_01", "s4_06", "s9_11"]
+	for id in ids:
+		var lvl := LevelData.load_file("res://data/levels/%s.json" % id)
+		var dep := WorldDecor._depths(lvl)
+		check(dep.size() == lvl.width * lvl.height, "%s: Felstiefe für jede Zelle berechnet" % id)
 
 func _test_sector_gravity() -> void:
 	check(LevelData.load_file("res://data/levels/s1_01.json").gravity == Tuning.GRAVITY, "Sektor 1 nutzt die Standard-Schwerkraft")

@@ -16,10 +16,13 @@ const LOOKS := {
 	9: {"edge": "#7a78c0", "hi": "#cfceff", "shade": "#07071a", "sat": 0.85, "con": 0.85, "fog": "#08061a", "amt": 0.12},
 }
 
+## Licht der Umgebung auf den Felskanten: nimmt die Stimmung des Hintergrunds auf.
+const RIM := {1: "#ff9a6a", 2: "#e08aff", 3: "#ffb060", 4: "#8affd0", 5: "#ff7a30", 6: "#60d8ff", 7: "#ffe0a0", 8: "#60ffb0", 9: "#ffa060"}
+
 ## Werte eines Sektors als Farben; unbekannte Sektoren nutzen Sektor 1.
 static func of(sector: int) -> Dictionary:
 	var l: Dictionary = LOOKS.get(sector, LOOKS[1])
-	return {"edge": Color(l.edge), "hi": Color(l.hi), "shade": Color(l.shade), "sat": l.sat, "con": l.con, "fog": Color(l.fog), "amt": l.amt}
+	return {"edge": Color(l.edge), "hi": Color(l.hi), "shade": Color(l.shade), "sat": l.sat, "con": l.con, "fog": Color(l.fog), "amt": l.amt, "rim": Color(RIM.get(sector, "#ffffff"))}
 
 static func tiles(sector: int) -> Texture2D:
 	var p := "res://assets/art/tiles_s%d.png" % sector

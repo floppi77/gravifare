@@ -6,7 +6,8 @@ var scroll_y := 380.0
 var lang := "de"
 
 func _ready() -> void:
-	Music.play_theme("menu")
+	if Music.current != "finale":             # nach dem Finale läuft dessen Thema durch den Abspann weiter
+		Music.play_theme("menu")
 	Music.set_layers(true, false)
 	Music.duck(0.0)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

@@ -11,7 +11,7 @@ var spoken := 0
 var rows: Array = []
 
 func _ready() -> void:
-	Music.play_theme("menu")
+	Music.play_theme("finale")
 	Music.set_layers(true, false)
 	Music.duck(-6.0)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

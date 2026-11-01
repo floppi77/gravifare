@@ -10,7 +10,7 @@
 | Nunito (Untertitel, Funk-/Fließtext) | github.com/google/fonts (ofl/nunito), © 2014 The Nunito Project Authors | SIL OFL 1.1 (`assets/fonts/nunito/OFL.txt`) | variabel, Gewicht 600 | ja | in Benutzung |
 | Silkscreen, Pixelify Sans | Google Fonts | OFL 1.1 | – | nein | **bewertet, nicht eingebunden** (Silkscreen: sehr klein und nur Versalien; Pixelify: breit) |
 | Raumklang `amb_s1–s9` | eigene Synthese `tools/audio/gen_ambience.py` | eigene Arbeit | – | ja | in Benutzung |
-| Musik (21 Themen × 3 Schichten, OGG, SID-Klang) | eigene Synthese `tools/audio/gen_music_sid.py` | eigene Arbeit | – | ja | in Benutzung |
+| Musik (22 Themen × 3 Schichten, OGG, Klang von C64-SID und Amiga-Paula) | eigene Synthese und Komposition `tools/audio/gen_music.py`, `music_score.py`; alle Instrumente selbst erzeugt, keine Fremdsamples | eigene Arbeit | – | ja | in Benutzung |
 | VSCO 2 CE / VCSL | GitHub sgossner | CC0-1.0 laut Repo (Unterbestände prüfen) | – | ja | **noch nicht eingebunden** |
 | Qwen3-TTS-12Hz-1.7B-VoiceDesign (Entwicklungswerkzeug, nicht im Spiel) | huggingface.co/Qwen | Apache-2.0 (Modellkarte per API geprüft, 2026-10-30) | – | nur die erzeugten OGG-Clips `assets/audio/voice/` | in Benutzung |
 | qwen-tts 0.1.1 (Python-Paket, Entwicklungswerkzeug) | PyPI | Apache-2.0 | – | nein | in Benutzung |

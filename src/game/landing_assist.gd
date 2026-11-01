@@ -51,8 +51,6 @@ func _draw() -> void:
 	var s := run.sim
 	if s.state == TaxiSim.State.DESTROYED:
 		return
-	if run.level.has_traffic():
-		_draw_marker()
 	if s.state != TaxiSim.State.FLYING or s.gear < 0.5 or not Settings.values.landing_assist:
 		return
 	var pad := _pad_below(s)
@@ -135,10 +133,3 @@ func _draw_chip(s: TaxiSim, a: float) -> void:
 	draw_rect(Rect2(bx, by, bw, 2.0), Color(0.16, 0.2, 0.4, a))
 	draw_rect(Rect2(bx, by, bw * minf(r / 2.0, 1.0), 2.0), col)
 	draw_rect(Rect2(bx + bw * 0.5 - 0.33, by - 1.0, 0.67, 4.0), Color(1, 1, 1, a))
-
-## Eigenes Taxi in Leveln mit Fremdverkehr: goldene Marke über dem Rumpf, die sanft pulsiert.
-func _draw_marker() -> void:
-	var by := -14.0 + sin(t * 4.0) * 1.0
-	var pts := PackedVector2Array([Vector2(-3.5, by - 4.0), Vector2(3.5, by - 4.0), Vector2(0.0, by + 1.0)])
-	draw_colored_polygon(PackedVector2Array([Vector2(-4.5, by - 5.0), Vector2(4.5, by - 5.0), Vector2(0.0, by + 2.4)]), Color(0.03, 0.04, 0.1, 0.85))
-	draw_colored_polygon(pts, Color("#ffe14a"))

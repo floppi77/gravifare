@@ -288,3 +288,11 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Tanken**: Der Tank bleibt für die Übung niedrig, auch nach einem Ersatztaxi; Tanken lässt sich nicht mehr durch Abheben abkürzen. Eine explodierte Säule wird nach 3 s repariert (`tut_pump_fix`).
 - **Lebensstation**: bleibt bezahlbar, und ein Platz ist frei.
 - **R/Back**: wirkt im Tutorial nur nach einem Absturz; Neustart bewusst über das Pausenmenü. Beim Verlassen wird die Stimme gestoppt und entsperrt (sonst blieb sie nach „Pause → Hauptmenü“ dauerhaft stumm).
+
+## Runde 30: Soundtrack neu, Taxi-Marke entfernt
+- **Soundtrack** (`tools/audio/gen_music.py`, Noten in `music_score.py`, ersetzt `gen_music_sid.py`): 22 Stücke, von Hand notiert statt zufällig. Sektorweise eigener Stil: Sternenhafen heller SID, Neon-Schluchten Amiga-Synthpop, Schrottgürtel Industrial, Magnetfeld kalt und langsam, Solarschmiede Metal, Gezeitenorbit Echo und E-Piano, Transitknoten Funk/Fusion, Schattenring karg, Singularitätsrand orchestral; dazu `finale` (Titelmelodie in groß).
+- **SID-Technik**: Tabellen im 50-Hz-Takt, 12-Bit-Oszillatoren mit UND-Wellenformen, Hard-Sync, Ringmodulation, 8-Bit-Hüllkurve, resonantes Filter mit 50-Hz-Registern.
+- **Paula-Technik**: selbst erzeugte Instrumente (u. a. Slap-Bass, Gitarren-Akkorde, Streicher- und Chor-Akkorde als Samples) auf 8 Bit und 11–22 kHz reduziert, Wiedergabe ohne Interpolation, Stereo-Verteilung, analoger Ausgangsfilter, Echo über verzögerte Spuren.
+- **Schichten**: A = Bass, Schlagzeug, Harmonie (läuft immer, keine Dauer-Arpeggien mehr), B = Melodie, C = Spannung (Arpeggio, Becken, Zusatzschläge). Alle Stücke auf -15,5 LUFS angeglichen, Kanäle automatisch ausbalanciert, stereo, 44,1 kHz.
+- **Taxi-Marke** in Leveln mit Verkehr entfernt.
+- **Grafik**: Plattformkörper im Sektor-Material (nur die leuchtende Oberkante, Tankpad und Dornen behalten ihre Funktionsfarben, `tools/art/gen_sector_tiles.py`), Umgebungslicht auf Felskanten und Schatten an Unterseiten (`SectorLook.RIM`), Felsmassen werden nach innen dunkler, Oberflächendetails je Sektor (`src/game/world_decor.gd`, bewusst flach und gedämpft, damit nichts wie ein Hindernis wirkt), Lichtschein über Plattformen (`props_view._pad_glow`), leise Teilchen je Sektor (`src/game/ambient_view.gd`, stehen bei „Weniger Bewegung“ still). Vorschaubilder neu erzeugt.
