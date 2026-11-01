@@ -26,8 +26,8 @@ def boost_spikes(g, n):
             placed += 1
 
 
-FINAL = {"S2-01": "S2-01", "S2-02": "S2-02", "S2-06": "S2-03", "S2-11": "S2-04", "S2-10": "S2-05", "S2-04": "S2-06",
-         "S2-05": "S2-07", "S2-07": "S2-08", "S2-03": "S2-09", "S2-08": "S2-10", "S2-09": "S2-11"}   # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
+FINAL = {"S2-01": "S2-01", "S2-02": "S2-02", "S2-06": "S2-03", "S2-11": "S2-04", "S2-10": "S2-05", "S2-04": "S2-10",
+         "S2-05": "S2-07", "S2-07": "S2-08", "S2-03": "S2-09", "S2-08": "S2-06", "S2-09": "S2-11"}   # Entwurfsschlüssel -> endgültige ID (nach gemessener Schwierigkeit)
 
 
 def make(ident, idx, de, en, g, jobs, **extra):
@@ -110,12 +110,11 @@ g = Grid()
 g.rect("#", 1, 20, 38, 20)
 g.rect("#", 8, 1, 9, 19); g.rect("b", 8, 17, 9, 18)
 g.rect("#", 30, 1, 31, 19); g.rect("a", 30, 17, 31, 18)
-g.pad("2", 2, 6, 19)
 g.pad("4", 32, 37, 19)
 g.pad("1", 12, 18, 19)
 g.rect("#", 20, 13, 25, 19); g.pad("3", 20, 24, 12)
 g.rect("#", 10, 10, 15, 11); g.pad("F", 10, 15, 9); g.rect("P", 10, 7, 10, 8)
-g.rect("#", 1, 6, 5, 7)
+g.rect("#", 1, 6, 5, 7); g.pad("2", 1, 5, 5, support=False)
 g.gate()
 g.put("S", 15, 18)
 make("S2-04", 4, "Doppelschleuse", "Twin Locks", g,

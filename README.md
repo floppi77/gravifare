@@ -3,7 +3,7 @@
 2D-Arcade-Schwebetaxi in Godot 4.7: Trägheit, Schwerkraft, präzise Landungen, 99 Level in 9 Sektoren (Sektor 3–5 prozedural erzeugt und per Bot geprüft, Rest per Skript/ASCII-Raster).
 Geistiger Nachfolger des Genres „Flugtaxi“ – eigene Welt, eigene Level, eigene Grafik und Klänge.
 
-**Stand:** Meilenstein M4: alle 99 Level in 9 Sektoren (Level 1–99), Tutorial („Flugschule“), 3 Speicherplätze, Medaillen und Punkte, Garage, DE/EN mit Sprachausgabe, 22 Musikthemen mit 3 Schichten (C64- und Amiga-Klang), Licht/Normal-Maps/Partikel, Gamepad und freie Tastenbelegung. Siehe [DESIGN.md](DESIGN.md), [LEVELS.md](LEVELS.md) und [TESTING.md](TESTING.md). QA-Prüfungen (2026-11-01) und ihre Maßnahmen stehen in DESIGN.md („Runde 25“ und „Runde 26“).
+**Stand:** Meilenstein M4: alle 99 Level in 9 Sektoren (Level 1–99), Tutorial („Flugschule“), 3 Speicherplätze, Medaillen und Punkte, Garage, DE/EN mit Sprachausgabe, 22 Musikthemen mit 3 Schichten (C64- und Amiga-Klang) und Musikplayer, Licht/Normal-Maps/Partikel, Gamepad und freie Tastenbelegung. Siehe [DESIGN.md](DESIGN.md), [LEVELS.md](LEVELS.md) und [TESTING.md](TESTING.md). QA-Prüfungen (2026-11-01) und ihre Maßnahmen stehen in DESIGN.md (ab „Runde 25“). Ein Linux-Testbuild entsteht mit `tools/export_linux.sh`.
 Der Titel ist vorläufig; vor einer Veröffentlichung ist eine Markenprüfung (DE/EU) nötig. Eine Lizenz für das eigene Spiel ist **nicht** festgelegt.
 
 ## Starten
@@ -13,6 +13,9 @@ godot --path . -- --level=s1_01                 # bestimmtes Level (data/levels/
 godot --headless -s tests/test_runner.gd        # Tests
 godot --headless -s tools/run_bot.gd            # Autopilot fliegt alle Level
 python3 tools/art/gen_art.py                    # Pixel-Art neu erzeugen
+tools/export_linux.sh                           # Linux-Build nach build/linux/ (mit Lizenztexten)
+tools/make_level_shots.sh                       # Vorschaubilder der Levelauswahl
+tools/make_sector_sheets.sh                     # Sektor-Übersichten docs/levels/sektor_<n>.jpg
 ```
 Nach frischem Checkout einmal `godot --headless --import` ausführen (baut den Klassen-Cache).
 

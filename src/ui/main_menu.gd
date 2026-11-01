@@ -1,5 +1,5 @@
 extends Control
-## Hauptmenü: Weiter/Spielen, Levelauswahl, Optionen, Beenden. Vollständig per Tastatur und Gamepad bedienbar.
+## Hauptmenü: Weiter/Spielen, Levelauswahl, Musik, Optionen, Beenden. Vollständig per Tastatur und Gamepad bedienbar.
 
 const Stage := preload("res://src/core/stage.gd")
 
@@ -33,6 +33,8 @@ func _ready() -> void:
 		show_slots()                                    # Spielstand wählen (beim Start)
 	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen
 		show_levels()
+	elif OS.get_cmdline_user_args().has("--music"):     # Dev: direkt den Musikplayer zeigen
+		show_music()
 	else:
 		show_main()
 
@@ -97,15 +99,13 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_WORKSHOP"), func(): get_tree().change_scene_to_file("res://src/ui/workshop.tscn")],
 			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
+			[tr("MENU_MUSIC"), show_music],
 			[tr("MENU_OPTIONS"), show_options],
 			[tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
-			[tr("SLOT_CURRENT") % Save.slot, show_slots],
-			[tr("MENU_QUIT"), func(): get_tree().quit()]]:
-		var sb := MenuKit.button(entry[0], entry[1])
-		sb.custom_minimum_size = Vector2(62, 18)
-		sb.add_theme_font_size_override("font_size", 7)
-		grid.add_child(sb)
+			[tr("SLOT_CURRENT") % Save.slot, show_slots]]:
+		grid.add_child(_small_button(entry[0], entry[1]))
 	box.add_child(grid)
+	box.add_child(_small_button(tr("MENU_QUIT"), func(): get_tree().quit()))
 	# Sprachwahl: zwei Flaggen ohne Text unter dem Menü
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 3)
@@ -113,6 +113,12 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(MenuKit.flag_row(func(code): show_main(code)))
 	_focus_first(focus_lang)
 	_slide_in()
+
+func _small_button(text: String, cb: Callable) -> Button:
+	var sb := MenuKit.button(text, cb)
+	sb.custom_minimum_size = Vector2(62, 18)
+	sb.add_theme_font_size_override("font_size", 7)
+	return sb
 
 ## Menüeinträge gleiten nacheinander von links ein (nur beim ersten Aufbau, nicht bei „Weniger Bewegung“).
 func _slide_in() -> void:
@@ -151,6 +157,14 @@ func show_levels() -> void:
 	var ls := LevelSelect.new()
 	ls.back = show_main
 	_show_screen(ls)
+
+func show_music() -> void:
+	var mr := MusicRoom.new()
+	mr.back = func():
+		Music.play_theme("menu")
+		Music.set_layers(true, false)
+		show_main()
+	_show_screen(mr)
 
 ## Drei unabhängige Spielstände als Disketten; beim Start ohne Abbrechen (erst wählen), später mit „Zurück“.
 func show_slots() -> void:

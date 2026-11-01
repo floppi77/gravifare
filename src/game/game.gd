@@ -356,7 +356,7 @@ func _respawn_focus() -> void:
 	if run.level.tutorial:
 		return
 	_ensure_spot()
-	focus_t = 0.6
+	focus_t = 1.0 if run.level.dark > 0.0 else 0.6       # im Dunkeln braucht der Blick länger
 
 func _focus_tick(delta: float) -> void:
 	if spot == null or tutorial != null:
@@ -714,7 +714,7 @@ func _add_shake(amp: float) -> void:
 
 ## Beinahe-Treffer: zügig an einem Hindernis vorbei (kein Kontakt) löst einen kurzen Kamerazoom mit leichter Zeitlupe aus.
 const NEAR_SPEED := 75.0
-const NEAR_GAP := 6.0
+const NEAR_GAP := 3.0
 const NEAR_ZOOM := 0.12
 var near_z := 0.0
 

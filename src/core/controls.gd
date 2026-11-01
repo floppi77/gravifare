@@ -252,4 +252,8 @@ func hint_text(device: String) -> String:
 	if kind == "pad" and thrust[0].begins_with("Stick") and thrust[1].begins_with("Stick"):
 		th = "Stick"
 	var key := "HUD_HINT_KB" if kind == "kb" else "HUD_HINT_PAD_DYN"
-	return tr(key) % [th, slot_label("gear", kind, 0), slot_label("eject", kind, 0), slot_label("restart", kind, 0)]
+	return safe_format(tr(key), [th, slot_label("gear", kind, 0), slot_label("eject", kind, 0), slot_label("restart", kind, 0)])
+
+## Passt die Platzhalterzahl einer Sprachdatei nicht, bleibt der Hinweis lesbar statt mit einer Fehlermeldung abzubrechen.
+static func safe_format(fmt: String, args: Array) -> String:
+	return fmt % args if fmt.count("%s") == args.size() else " · ".join(args)

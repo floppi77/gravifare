@@ -242,7 +242,7 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Level 76** („Umsteigebahnhof“) per `replace_levels.py --from=74 --tol=14` erzeugt; damit alle 99 Level vorhanden.
 
 ## Runde 25: QA-Audit (2026-11-01) – Maßnahmen Phase A bis C
-- **Bildherkunft**: Hintergründe `bg_s1–9`, `bg_menu` sind mit „ChatGPT Astra 6.0“ KI-generiert (Angabe des Entwicklers); eingetragen in `THIRD_PARTY_LICENSES.md`, `CREDITS.md`, `docs/HINTERGRUENDE.md`. **Offen vor Veröffentlichung:** Nutzungsbedingungen/Rechtslage prüfen, Herkunft von `logo.png` nachtragen. `DEBUG_UNLOCK_ALL` bleibt bewusst an.
+- **Bildherkunft**: Hintergründe `bg_s1–9`, `bg_menu` sind mit „ChatGPT Astra 6.0“ KI-generiert (Angabe des Entwicklers); eingetragen in `THIRD_PARTY_LICENSES.md`, `CREDITS.md`, `docs/HINTERGRUENDE.md`. Laut Entwickler sind die Bilder und `logo.png` frei verwendbar und stehen unter keiner Lizenz. `DEBUG_UNLOCK_ALL` bleibt bewusst an.
 - **Ultrawide/Fenstermaße**: Stretch-Aspekt `expand`. Die Spielfläche bleibt 640×360 (alle Level sind Einzelbild-Level) und liegt zentriert; Hintergrund, Dunkelheit, Tutorial-Licht, Levelwechsel (Weltraum) und Abdunklungen füllen die Ränder, HUD, Pause, Einspieler und Menüs sitzen auf der zentrierten Fläche (`src/core/stage.gd`: `Stage.margin()`, `Stage.make()`). Geprüft per Screenshot bei 2560×1080 (21:9) und 1920×1200 (16:10); 3440×1440 war auf dem Testrechner nicht darstellbar (Fenster wird auf die Bildschirmbreite begrenzt).
 - **Leerlauf**: Ein Level ohne einzige Beförderung (Exit-Countdown läuft ab) gilt nicht mehr als geschafft (kein Speichern von Abschluss/Bestzeit/Replay; Hinweis `MSG_NOT_COUNTED`); die Kampagne geht trotzdem weiter.
 - **Neustart (R/Back) mitten im Level** verlangt einen zweiten Druck innerhalb von 2 s (`MSG_RESTART_CONFIRM`); im Tutorial und nach Absturz/Abschluss unverändert; „Level neu starten“ im Pausenmenü bleibt eine bewusste Menüwahl. **Esc/Start während der Absturz-Sequenz** wird ignoriert (kein Leben-Zurückholen über das Menü).
@@ -250,7 +250,7 @@ Taste **E** / Gamepad **Y** (frei belegbar; Neustart wanderte auf **Back**, alte
 - **Landeassistent** (`src/game/landing_assist.gd`, Option „Landeassistent“ im Spielmenü): mit ausgefahrenem Fahrwerk über einer Plattform zeigt ein Feld am Taxi die kritischste Achse (Sinkrate/Seitentempo/Neigung) mit Grenzmarke und Haken bzw. blinkendem Warnzeichen (Form und Farbe), dazu auf der Plattform das freie Landefenster samt Lotmarke. Die Ecken-Anzeige bleibt. In Leveln mit Fremdverkehr trägt das eigene Taxi eine goldene Marke.
 - **HUD**: „TAXI VERLOREN“ liegt auf einer Unterlage; Pause/Game-Over-Abdunklung reicht bis zum Fensterrand.
 - **Ton**: Gesamtlautstärke-Regler (Master); leichte Tonhöhen-/Lautstärke-Variation bei häufigen Effekten (`Sfx.VARY`); sind alle 8 Effektkanäle belegt, wird ein unwichtiger Kanal verdrängt statt den Ton zu verwerfen (`Sfx.KEEP` schützt Absturz, Explosion u. a.).
-- **Bewusst nicht umgesetzt**: Angleichen des Hintergrund-Stils (Geschmacksfrage, braucht Sichtung/Entscheidung), Export-Preset (der Dev-Autoload `_mcp_game_helper` müsste für Release entfernt werden), Level-Umbau (Phase D/E).
+- **Bewusst nicht umgesetzt**: Angleichen des Hintergrund-Stils (Geschmacksfrage, braucht Sichtung/Entscheidung), Export-Preset (seit Runde 31 vorhanden), Level-Umbau (Phase D/E).
 
 
 ## Runde 26: Zweites QA-Audit (2026-11-01) – Phase A bis C
@@ -296,3 +296,15 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Schichten**: A = Bass, Schlagzeug, Harmonie (läuft immer, keine Dauer-Arpeggien mehr), B = Melodie, C = Spannung (Arpeggio, Becken, Zusatzschläge). Alle Stücke auf -15,5 LUFS angeglichen, Kanäle automatisch ausbalanciert, stereo, 44,1 kHz.
 - **Taxi-Marke** in Leveln mit Verkehr entfernt.
 - **Grafik**: Plattformkörper im Sektor-Material (nur die leuchtende Oberkante, Tankpad und Dornen behalten ihre Funktionsfarben, `tools/art/gen_sector_tiles.py`), Umgebungslicht auf Felskanten und Schatten an Unterseiten (`SectorLook.RIM`), Felsmassen werden nach innen dunkler, Oberflächendetails je Sektor (`src/game/world_decor.gd`, bewusst flach und gedämpft, damit nichts wie ein Hindernis wirkt), Lichtschein über Plattformen (`props_view._pad_glow`), leise Teilchen je Sektor (`src/game/ambient_view.gd`, stehen bei „Weniger Bewegung“ still). Vorschaubilder neu erzeugt.
+
+## Runde 31: Rückmeldungen, Musikplayer, Linux-Build
+- **Falsche Plattform**: Ein Hüpfer beim Abheben (kurzer Stick-Ausschlag, Taxi sackt zurück) zählte als neue Landung und löste zweites Meckern samt Abzug aus. Dieselbe Plattform zählt erst nach einem echten Flug wieder (`Run._flown`).
+- **Knapp vorbei**: Abstand von 6 auf 3 px halbiert.
+- **Level 17/21**: Doppelschleuse: Pad 2 von unten links auf den Vorsprung links oben verschoben, Richtzeiten angepasst. Danach Level 17 und 21 getauscht, samt Funkspruch und Sprachdateien (`r17`, `r21`). Neonfinale ist jetzt Level 17, Doppelschleuse Level 21. Festlegung von floppi: Level 21 ist schwerer als Level 17. Die Reihenfolge ist damit gesetzt; die Metrik-Regel „Schwierigkeit steigt“ nimmt beide Level aus, weil die Nachbarn 18 und 22 sonst unter ihnen lägen.
+- **Musikplayer** (`src/ui/music_room.gd`, `src/core/track_list.gd`): alle 22 Stücke mit allen Schichten, thematische Titel (`MUSIC_*`). Sektorstücke frei mit einem geschafften Level des Sektors, Finale mit Level 99, Hauptmenü immer. `DEBUG_UNLOCK_ALL` gibt alles frei.
+- **Musik-Blende**: Beim schnellen Themenwechsel stoppte eine laufende Blende den neuen Spieler; sie wird jetzt abgebrochen.
+- **Levelauswahl**: Mit `DEBUG_UNLOCK_ALL` sind alle Vorschaubilder scharf.
+- **Übersichten**: `docs/levels/sektor_<n>.jpg` (je 11 Level, Nummer und Name im Bild, dunkle Level aufgehellt) ersetzen die alten Einzelbilder von Sektor 1 bis 3. `docs/.gdignore` hält den Ordner aus dem Import.
+- **Export**: `export_presets.cfg` (Linux) und `tools/export_linux.sh`. Exportiert aus einer Kopie ohne `addons/`, `tools/`, `tests/`, `docs/`, entfernt die Editor-Anbindung aus der kopierten `project.godot`, prüft das Ergebnis und legt Lizenztexte bei. `addons/godot_ai/` steht in `.gitignore`; die Einträge in der lokalen `project.godot` schreibt das Plugin selbst und dürfen nicht committet werden.
+- **Absicherung**: `Controls.safe_format` fängt eine falsche Platzhalterzahl im HUD-Hinweis ab, die Tests prüfen beide Sprachen.
+- **Offen**: Mit `DEBUG_UNLOCK_ALL` an ist jeder Build ein Testbuild, M6 ist damit noch nicht abgenommen.

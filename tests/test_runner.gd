@@ -514,6 +514,45 @@ func _test_wrong_pad_rules() -> void:
 	r.log.clear()
 	r._check_wrong_pad(other)
 	check(absf(r.pen_ride - Tuning.WRONG_PAD_PEN) < 0.001 and r.log.any(func(e): return e.type == "wrong_pad"), "Landung an falscher Plattform: Fahrgast meckert, Fahrpreis sinkt")
+	# Hüpfer beim Abheben (kurzer Stick-Ausschlag, Taxi sackt zurück): dieselbe Landung, kein zweites Meckern
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.pos = Vector2(float(lvl.pads[other].center) + 6.0, float(lvl.pads[other].row * Tuning.TILE) - Tuning.GEAR_LEN - Tuning.HULL_HALF.y - 2.0)
+	r.sim.vel = Vector2.ZERO
+	r.sim.air_t = 0.0
+	r.sim.air_path = 0.0
+	r.sim.gear = 1.0
+	var complaints := 0
+	for i in 240:
+		r.step(Vector2.ZERO, true)
+		complaints += r.log.filter(func(e): return e.type == "wrong_pad").size()
+		if r.sim.state == TaxiSim.State.LANDED:
+			break
+	check(complaints == 0 and absf(r.pen_ride - Tuning.WRONG_PAD_PEN) < 0.001, "Hüpfer beim Abheben: kein zweites Meckern, kein zweiter Abzug")
+	r.log.clear()
+	r._check_wrong_pad(other, true)
+	check(r.log.any(func(e): return e.type == "wrong_pad"), "Nach echtem Flug zählt dieselbe Plattform wieder als falsch")
+	var cs: Script = load("res://src/core/controls.gd")
+	# Musikplayer: Freischaltung
+	var tr_all := TrackList.all()
+	check(tr_all.size() == 22, "Musikplayer listet alle 22 Stücke")
+	var by := func(th: String) -> Dictionary: return tr_all.filter(func(t): return t.theme == th)[0]
+	for t in tr_all:
+		check(ResourceLoader.exists("res://assets/audio/music/%s_A.ogg" % t.theme), "Musikstück vorhanden: %s" % t.theme)
+	check(TrackList.unlocked(by.call("menu"), {}, false), "Menü-Thema ist immer frei")
+	check(not TrackList.unlocked(by.call("t02"), {}, false) and TrackList.unlocked(by.call("t02"), {"s2_04": {}}, false), "Sektor-Thema: frei mit einem Level des Sektors")
+	check(not TrackList.unlocked(by.call("t02"), {"s1_11": {}}, false), "Level anderer Sektoren schalten kein Thema frei")
+	check(not TrackList.unlocked(by.call("finale"), {"s9_10": {}}, false) and TrackList.unlocked(by.call("finale"), {"s9_11": {}}, false), "Finale: frei mit Level 99")
+	check(TrackList.unlocked(by.call("finale"), {}, true), "Debug schaltet alles frei")
+	for lang in ["de", "en"]:
+		var names: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		var titles := {}
+		for t in tr_all:
+			titles[String(names.get("MUSIC_%s" % String(t.theme).to_upper(), ""))] = true
+		check(titles.size() == 22 and not titles.has(""), "Musiktitel %s: alle 22 vorhanden und verschieden" % lang)
+	check(cs.safe_format("%s + %s", ["A", "B"]) == "A + B" and cs.safe_format("%s", ["A", "B"]) == "A · B", "Hinweistext: falsche Platzhalterzahl bricht nicht ab")
+	for lang in ["de", "en"]:
+		var strings: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		check(String(strings.HUD_HINT_KB).count("%s") == 4 and String(strings.HUD_HINT_PAD_DYN).count("%s") == 4, "Hinweistexte %s: je vier Platzhalter" % lang)
 	# Ausgangs-Fahrgast
 	var r2 := Run.new()
 	r2.extras_enabled = false
@@ -1276,7 +1315,8 @@ func _test_job_rules_and_difficulty() -> void:
 		check(m.solvable, "%s: Route planbar (Korridor %.0f px)" % [lvl.id, m.clearance])
 		# Lückenfüller (spätere Plätze der Sektoren 7–9, nachträglich ergänzt) dürfen auf gleicher Schwierigkeitsstufe liegen: bis 14 Punkte
 		# unter dem bisherigen Höchstwert; alle anderen Level steigen strikt.
-		var filler: bool = (lvl.sector == 7 and lvl.index >= 9) or (lvl.sector == 8 and lvl.index >= 9) or (lvl.sector == 9 and lvl.index >= 8)
+		# Level 17 und 21 stehen auf Wunsch von Hand an ihrem Platz und gelten ebenso als Ausnahme.
+		var filler: bool = (lvl.sector == 7 and lvl.index >= 9) or (lvl.sector == 8 and lvl.index >= 9) or (lvl.sector == 9 and lvl.index >= 8) or lvl.id in ["S2-06", "S2-10"]
 		if filler:
 			check(m.score >= prev_score - 14.0, "Schwierigkeit (Lückenfüller): %s %.1f ≥ %s %.1f − 14" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
 		else:

@@ -1,6 +1,6 @@
 # Hintergrundbilder
 
-**Stand:** Jeder Sektor hat ein ganzes Hintergrundbild `assets/art/bg_sN.png` (1920 × 1080, PNG, deckend). Die Bilder wurden mit „ChatGPT Astra 6.0“ KI-generiert (Pixel-Art-Look; Angabe des Entwicklers, 2026-11-01; Lizenz/Nutzungsrechte siehe THIRD_PARTY_LICENSES.md, Prüfung vor Veröffentlichung offen) und werden im Spiel auf 1,06-fach vergrößert, leicht mit der Kamera verschoben (Parallax 5 %) und je Sektor abgedunkelt, damit Plattformen, Fahrgäste und Hindernisse lesbar bleiben.
+**Stand:** Jeder Sektor hat ein ganzes Hintergrundbild `assets/art/bg_sN.png` (1920 × 1080, PNG, deckend). Die Bilder wurden mit „ChatGPT Astra 6.0“ KI-generiert (Pixel-Art-Look; Angabe des Entwicklers, 2026-11-01; keine Lizenz, frei verwendbar, siehe THIRD_PARTY_LICENSES.md) und werden im Spiel auf 1,06-fach vergrößert, leicht mit der Kamera verschoben (Parallax 5 %) und je Sektor abgedunkelt, damit Plattformen, Fahrgäste und Hindernisse lesbar bleiben.
 
 | Sektor | Datei | Motiv (Quelldatei) | Abdunklung |
 |---|---|---|---|

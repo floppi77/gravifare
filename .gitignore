@@ -12,3 +12,5 @@ exports/
 __pycache__/
 .venv/
 scratch/
+# Editor-Anbindung (Godot AI): nur lokal, nie im Spiel
+addons/godot_ai/

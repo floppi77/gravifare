@@ -82,6 +82,7 @@ var missed := 0                   # Pflichtfahrgäste, die nicht befördert wurd
 var missed_fees := 0.0
 var ejected := 0                  # rausgeworfene Fahrgäste (Sauber-Medaille entfällt)
 var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
+var wrong_pad_last := ""          # zuletzt bemeckerte Plattform (ein Hüpfer beim Abheben ist noch dieselbe Landung)
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
 var taxi_fees := 0.0              # Ersatztaxis in diesem Level
@@ -233,11 +234,14 @@ func _aboard_dest() -> String:
 	return "" if j.is_empty() else String(j.to)       # "exit" für den Ausgangs-Fahrgast: jede Landung ist falsch
 
 ## Landung an einer falschen Plattform mit Fahrgast an Bord: Fahrgast meckert, Fahrpreis sinkt eine Stufe.
-func _check_wrong_pad(pad_id: String) -> void:
+func _check_wrong_pad(pad_id: String, flown := true) -> void:
 	var a := aboard_actor()
 	var dest := _aboard_dest()
 	if a == null or dest == "" or pad_id == dest or level.pads[pad_id].fuel or level.pads[pad_id].life or pad_id == String(a.pad.id):
 		return              # Zielpad, Tankpad und das Abholpad (Nachsetzen nach dem Abheben) sind nie „falsch“
+	if not flown and pad_id == wrong_pad_last:
+		return              # kurzer Stick-Ausschlag: Taxi hebt ab und sackt zurück, kein zweites Meckern
+	wrong_pad_last = pad_id
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.WRONG_PAD_PEN)
 	log.append({"type": "wrong_pad", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.WRONG_PAD_PEN * 100.0))})
 
@@ -399,7 +403,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		if e.type == "landed":
 			last_vy = e.vy
 			_evaluate_landing(e)
-			_check_wrong_pad(String(e.pad))
+			_check_wrong_pad(String(e.pad), _flown(e))
 		elif e.type == "bad_landing":
 			_break_streak()
 		elif e.type == "damage":
@@ -606,7 +610,7 @@ func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 
 ## Perfekte Landung = weich (≤ 22 px/s), kaum seitlich (≤ 12 px/s), waagerecht (≤ 4°). Serie bis +30 % Fahrpreis.
 func _evaluate_landing(e: Dictionary) -> void:
-	var flown: bool = float(e.get("air_t", 99.0)) >= Tuning.PERFECT_MIN_AIR and float(e.get("air_path", 999.0)) >= Tuning.PERFECT_MIN_PATH
+	var flown := _flown(e)
 	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
 	if flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
@@ -616,6 +620,10 @@ func _evaluate_landing(e: Dictionary) -> void:
 		log.append({"type": "perfect", "streak": streak})
 	else:
 		_break_streak()
+
+## Echter Flug seit dem Abheben, kein Hüpfer auf der Stelle.
+func _flown(e: Dictionary) -> bool:
+	return float(e.get("air_t", 99.0)) >= Tuning.PERFECT_MIN_AIR and float(e.get("air_path", 999.0)) >= Tuning.PERFECT_MIN_PATH
 
 func _break_streak() -> void:
 	if streak >= 2:
