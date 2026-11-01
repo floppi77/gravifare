@@ -4,9 +4,9 @@
  "HUD_PICKUP": "Pick up %s at pad %s",
  "HUD_DELIVER": "Take %s to pad %s",
  "HUD_GO_EXIT": "All rides done – fly to the EXIT!",
- "HUD_VY": "V↓",
- "HUD_VX": "V↔",
- "HUD_TILT": "TLT",
+ "HUD_VY": "DROP",
+ "HUD_VX": "SIDE",
+ "HUD_TILT": "TILT",
  "HUD_HINT_PAD": "WASD/arrows thrust · Space gear · E eject · R restart · Esc pause",
  "HUD_HINT_PAD_PAD": "Stick/D-pad thrust · A gear · Y eject · Back restart · Start pause",
  "HUD_CRASHED": "TAXI LOST",
@@ -235,5 +235,11 @@
  "CLIP_NEW": "New",
  "CLIP_TAG": "BRIEFING",
  "CLIP_SKIP": "Enter: skip",
- "MENU_CLIP": "Watch briefing"
+ "MENU_CLIP": "Watch briefing",
+ "MSG_EXIT_TIMEOUT": "Time is up! You are pulled out of the level, penalty ¢%d",
+ "HUD_EXIT_TIMER": "EXIT in %d s",
+ "COSM_REQ_STARS_TIME": "1st star (time) on all %d levels",
+ "COSM_REQ_STARS_CLEAN": "2nd star (clean) on all %d levels",
+ "COSM_REQ_STARS_PRO": "3rd star (master) on all %d levels",
+ "COSM_REQ_STARS_ALL": "All three stars on all %d levels"
 }

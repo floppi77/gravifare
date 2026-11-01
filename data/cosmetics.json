@@ -89,8 +89,8 @@
 	"en": "Gold"
    },
    "unlock": {
-	"stat": "levels_done",
-	"min": 11
+	"stat": "stars_all",
+	"min": 0
    }
   },
   {
@@ -122,8 +122,8 @@
 	"en": "Star"
    },
    "unlock": {
-	"stat": "perfect_landings",
-	"min": 5
+	"stat": "stars_time",
+	"min": 0
    }
   },
   {
@@ -134,8 +134,8 @@
 	"en": "Bolt"
    },
    "unlock": {
-	"stat": "best_streak",
-	"min": 3
+	"stat": "stars_clean",
+	"min": 0
    }
   },
   {
@@ -170,8 +170,8 @@
 	"en": "Crown"
    },
    "unlock": {
-	"stat": "levels_done",
-	"min": 22
+	"stat": "stars_pro",
+	"min": 0
    }
   }
  ]

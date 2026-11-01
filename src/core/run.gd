@@ -43,7 +43,9 @@ var carried: Dictionary = {}           # Fahrgast, der ins nächste Level mitfä
 var spawn_timer := 0.0
 var extra_locked := false      # Tutorial: Zusatzfahrgast steigt erst ein, wenn das Skript es erlaubt
 var prices_frozen := false     # Tutorial: Spritpreis ändert sich nicht von selbst
-var pickup_locked := false     # Tutorial: Auftragsfahrgäste steigen (noch) nicht ein, neue erscheinen nicht
+var pickup_locked := false     # Tutorial: Auftragsfahrgäste steigen (noch) nicht ein
+var spawn_locked := false      # Tutorial: neue Auftragsfahrgäste erscheinen nicht von selbst
+var exit_countdown := -1.0     # Sekunden bis zum erzwungenen Levelende, sobald der letzte Pflichtfahrgast erschienen ist (-1 = nicht gestartet)
 var spawn_wait := false
 var level_time := 0.0              # Levelzeit (läuft auch nach Verlust eines Lebens weiter) – Takt der Preiswechsel
 var price_rng := RandomNumberGenerator.new()
@@ -144,6 +146,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	flow_rng.seed = price_rng.seed + 17 + (seed if seed >= 0 else 0)
 	extra_timer = flow_rng.randf_range(Tuning.EXTRA_FIRST_MIN, Tuning.EXTRA_FIRST_MAX)
 	actor = null
+	exit_countdown = -1.0
 	_spawn_actor(true)
 
 func _spawn_actor(instant: bool) -> void:
@@ -158,6 +161,8 @@ func _spawn_actor(instant: bool) -> void:
 	if not respawn_keep_clock:
 		job_clock = 0.0
 	respawn_keep_clock = false
+	if is_exit_job(job) and exit_countdown < 0.0 and not level.tutorial:
+		exit_countdown = maxf(Tuning.EXIT_COUNTDOWN_MIN, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR)      # der letzte Pflichtfahrgast will raus: Zeit läuft
 
 func current_job() -> Dictionary:
 	return jobs[job_index] if job_index < jobs.size() else {}
@@ -254,6 +259,29 @@ func min_fare(lvl: LevelData, job: Dictionary) -> float:
 	var cost := length * Tuning.PICKUP_FACTOR * Tuning.FUEL_PER_PX * avg_price * wait
 	var mult := LevelMetrics.leg_mult(lvl, String(job.from), to_id)
 	return ceilf(cost * Tuning.PROFIT_MARGIN / (Tuning.satisfaction_factor(Tuning.SAT_FLOOR) * mult) / 5.0) * 5.0
+
+## Countdown abgelaufen: Das Level wird automatisch verlassen; der letzte Pflichtfahrgast ist verloren, dazu eine Strafzahlung.
+func _exit_timeout() -> void:
+	var fee := 0.0
+	if not jobs.is_empty():
+		var lj: Dictionary = jobs[jobs.size() - 1]
+		fee = snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.EXIT_TIMEOUT_FEE_FACTOR, 1.0)
+	log.append({"type": "exit_timeout", "fee": fee})
+	for ex in extras.duplicate():
+		extras.erase(ex)
+	var who := ""
+	if actor != null:
+		who = actor.pname
+		actor.squash()
+		leavers.append(actor)
+		actor = null
+	if job_index < jobs.size():
+		_lose_job(who, fee)
+	else:
+		var paid := minf(fee, money)
+		money -= paid
+		missed_fees += paid
+	_finish_level()
 
 ## Ausgangs-Fahrgast des Vorlevels steigt auf der Startplattform aus und geht zum Unterstand (Zahlung bei Ankunft).
 func release_carried(c: Dictionary) -> void:
@@ -355,6 +383,12 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	_check_squash()
 	_service_pad(dt)
 	_service_life(dt)
+	if exit_countdown > 0.0:
+		exit_countdown -= dt
+		if exit_countdown <= 0.0:
+			exit_countdown = 0.0
+			_exit_timeout()
+			return
 	if exit_open and sim.in_exit(level.exit_cells):
 		_finish_level()
 
@@ -580,7 +614,7 @@ func _step_actors(dt: float) -> void:
 		spawn_timer -= dt
 		if spawn_timer <= 0.0:
 			spawn_wait = true
-	if spawn_wait and not pickup_locked:
+	if spawn_wait and not spawn_locked:
 		# Neue Fahrgäste erscheinen nie auf dem Pad, auf dem das Taxi gerade steht
 		var nj := current_job()
 		var blocked: bool = (sim.state == TaxiSim.State.LANDED and not nj.is_empty() and sim.landed_pad.id == String(nj.from)) \
@@ -763,15 +797,15 @@ func _respawn_after_crash() -> void:
 	last_vy = 0.0
 	streak = 0
 	if lost:
+		# Pflichtfahrgast mit dem Taxi verloren: der Auftrag gilt als verpasst (Strafe, ein Pflichtfahrgast weniger).
+		# War es der letzte (Ausgangs-)Fahrgast, bleibt das Tor offen.
 		pen_ride = 0.0
-		log.append({"type": "passenger_lost", "name": actor.pname, "pad": String(current_job().get("from", ""))})
+		var lost_name: String = actor.pname
+		log.append({"type": "passenger_lost", "name": lost_name, "pad": String(current_job().get("from", ""))})
 		actor = null
 		pen_pick = 0.0
 		pen_drop = 0.0
-		job_clock = 0.0
-		respawn_keep_clock = false
-		spawn_timer = SQUASH_RESPAWN_DELAY
-		spawn_wait = false
+		_lose_job(lost_name)
 	elif actor != null and phase == Phase.BOARDING:
 		actor.abort_board()
 	phase = Phase.WAITING

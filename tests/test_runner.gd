@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_intro_demos", "_test_settings_robust", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1428,15 +1428,37 @@ func _test_crash_continues_level() -> void:
 	check(r.result == Run.Result.FAILED, "Absturz = Taxi verloren")
 	r.respawn_after_crash()
 	check(r.result == Run.Result.RUNNING and r.sim.state == TaxiSim.State.LANDED and r.sim.hull == Tuning.HULL_MAX, "Neues Taxi, Level läuft weiter")
-	check(r.job_index == lvl.jobs.size() - 1 and r.delivered == lvl.jobs.size() - 1 and absf(r.money - maxf(0.0, 55.0 - Tuning.replacement_fee(lvl.number))) < 0.01, "Erledigtes bleibt erledigt, kein Geld für den verlorenen Fahrgast (Ersatztaxi kostet)")
-	check(not r.exit_open and not lvl.exit_open, "Tor schließt sich wieder, bis der Fahrgast erneut an Bord ist")
+	check(r.job_index == lvl.jobs.size() and r.delivered == lvl.jobs.size() - 1 and r.missed == 1 and r.money >= 0.0 and r.money < 55.0, "Mit dem Taxi verlorener Pflichtfahrgast gilt als verpasst (Strafe, ein Pflichtfahrgast weniger): Geld ¢%.0f" % r.money)
+	check(r.exit_open and lvl.exit_open, "Der verlorene Fahrgast war der letzte: das Tor bleibt offen")
 	check(r.sim.fuel >= Tuning.FUEL_MAX - 0.01, "Neues Taxi startet mit vollem Tank (%.0f)" % r.sim.fuel)
-	check(r.actor == null and String(r.current_job().passenger) == lost_name and String(r.current_job().from) == String(last.from), "Derselbe Fahrgast (%s) wartet wieder an seinem Abholpad %s" % [lost_name, String(last.from)])
-	for i in 60:
-		r.step(Vector2(0, -1), true)                      # abheben (Startpad = Abholpad: Spawn ist bis dahin blockiert)
-	for i in int(4.0 / Tuning.TICK):
-		r.step(Vector2(0, -0.39), false)
-	check(r.actor != null and r.actor.pname == lost_name, "Er tritt wieder aus dem Unterstand (verschwunden nur im Spiel, nicht im Auftrag)")
+	check(r.actor == null and r.current_job().is_empty(), "Kein Ersatz für den verlorenen Pflichtfahrgast (%s)" % lost_name)
+	# Mitten im Level: der verlorene Fahrgast zählt als verpasst, der nächste erscheint
+	var r2 := Run.new()
+	r2.start(lvl)
+	_land_on(r2, String(lvl.jobs[0].from))
+	for i in 600:
+		r2.step(Vector2.ZERO, true)
+	check(r2.phase == Run.Phase.CARRYING, "Erster Fahrgast an Bord")
+	r2.sim.hull = 0.0
+	r2.sim.state = TaxiSim.State.DESTROYED
+	r2.step(Vector2.ZERO, true)
+	r2.respawn_after_crash()
+	check(r2.missed == 1 and r2.job_index == 1 and r2.missed_fees > 0.0 or r2.money == 0.0, "Mitten im Level verlorener Pflichtfahrgast: verpasst, nächster Auftrag folgt")
+
+## Exit-Countdown: Sobald der letzte Pflichtfahrgast erscheint, läuft die Zeit; danach wird das Level verlassen und es kostet.
+func _test_exit_countdown() -> void:
+	var lvl := _lvl()
+	var r := Run.new()
+	r.start(lvl)
+	check(r.exit_countdown < 0.0, "Countdown läuft nicht, solange der letzte Pflichtfahrgast noch nicht erschienen ist")
+	r.job_index = lvl.jobs.size() - 1
+	r.money = 500.0
+	r._spawn_actor(true)
+	check(r.exit_countdown >= Tuning.EXIT_COUNTDOWN_MIN, "Countdown startet mit dem letzten Pflichtfahrgast (%.0f s)" % r.exit_countdown)
+	r.exit_countdown = 0.05
+	for i in 20:
+		r.step(Vector2.ZERO, true)
+	check(r.result == Run.Result.COMPLETE and r.missed_fees > 0.0 and r.money < 500.0, "Zeit abgelaufen: Level wird verlassen, Strafe ¢%.0f" % r.missed_fees)
 
 func _test_min_window_ramp() -> void:
 	check(Tuning.min_land_window(1) == Tuning.LAND_WINDOW_EARLY and Tuning.min_land_window(3) == Tuning.LAND_WINDOW_EARLY, "Level 1–3: Mindest-Landefenster %.0f px" % Tuning.LAND_WINDOW_EARLY)
@@ -1715,14 +1737,14 @@ func _test_cosmetics_data() -> void:
 				free_paint = true
 		else:
 			var key := "COSM_REQ_" + String(it.unlock.stat).to_upper()
-			if not de.has(key) or not en.has(key) or not Cosmetics_STATS.has(it.unlock.stat) or int(it.unlock.min) < 1:
+			if not de.has(key) or not en.has(key) or not Cosmetics_STATS.has(it.unlock.stat) or (int(it.unlock.min) < 1 and not String(it.unlock.stat).begins_with("stars_")):
 				unlock_ok = false
 	check(ids.size() == items.size(), "Kosmetik-IDs sind eindeutig (%d Einträge)" % items.size())
 	check(tex_ok, "Zu jeder Lackierung/jedem Aufkleber gibt es eine Grafik")
 	check(names_ok, "Alle Kosmetik-Namen sind zweisprachig")
 	check(unlock_ok and free_paint, "Freischaltbedingungen haben gültige Statistik und Übersetzung; ein Standardtaxi ist frei")
 
-const Cosmetics_STATS := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions"]
+const Cosmetics_STATS := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all"]
 
 func _test_voice_lines_complete() -> void:
 	var f := FileAccess.open("res://data/voice_lines.json", FileAccess.READ)
@@ -1976,6 +1998,10 @@ func _test_tutorial_script() -> void:
 				tut.on_event({"type": "boarded", "job": -1, "voice": "m0", "name": "Ugo", "dest": "1", "extra": true})
 			"tut_extra_dest":
 				tut.on_event({"type": "delivered", "extra": true, "job": -1, "pay": 20.0, "voice": "m0", "name": "Ugo"})
+			"tut_extra2":
+				tut.on_event({"type": "boarded", "job": -1, "voice": "f0", "name": "Ina", "dest": "2", "extra": true})
+			"tut_eject":
+				tut.on_event({"type": "ejected", "voice": "f0", "name": "Ina", "lethal": false})
 			"tut_life":
 				tut.on_event({"type": "life_bought", "lives": 5, "price": 1000.0})
 			"tut_exit":

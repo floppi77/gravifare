@@ -29,10 +29,10 @@ const R_FUEL := Rect2(2, 2, 70, 12)
 const R_HULL := Rect2(73, 2, 70, 12)
 const R_MONEY := Rect2(145, 1, 56, 14)
 const R_LIVES := Rect2(202, 1, 60, 14)
-const R_LEVEL := Rect2(348, 1, 112, 14)
+const R_LEVEL := Rect2(364, 1, 96, 14)
 const R_COUNT := Rect2(458, 1, 34, 14)
 const R_PRICE := Rect2(492, 1, 84, 14)
-const R_GAUGE := Rect2(576, 1, 62, 14)
+const R_GAUGE := Rect2(574, 1, 64, 15)
 const R_TASK := Rect2(2, 335, 440, 16)
 const R_FARE := Rect2(446, 335, 192, 16)
 const HUD_RECTS := [R_FUEL, R_HULL, R_MONEY, R_LIVES, R_LEVEL, R_COUNT, R_PRICE, R_GAUGE, R_TASK, R_FARE]
@@ -47,7 +47,8 @@ func setup(g: Node, r: Run, h: Control, sp: Control, c: Camera2D) -> void:
 	spot = sp
 	cam = c
 	run.extra_timer = 1.0e9             # Zusatzfahrgäste erscheinen nur auf Befehl des Skripts
-	run.pickup_locked = true            # kein Fahrgast, bis das Skript erklärt, wie man ihn abholt
+	run.pickup_locked = true            # kein Fahrgast steigt ein, bis das Skript erklärt, wie man ihn abholt
+	run.spawn_locked = true             # und es erscheint keiner von selbst (Odo erst am Ende)
 	run.prices_frozen = true            # der Spritpreis ändert sich nur auf Befehl des Skripts
 	run.actor = null                    # Mika erscheint erst im Schritt tut_job
 	if g.has_node("World"):
@@ -90,7 +91,7 @@ func _build() -> void:
 			"wait": func(): return run.sim.fuel >= 35.0 or not _landed_on("F"), "timeout": 12.0},
 		{"key": "tut_credit", "enter": _enter_credit, "spots": func(): return [R_MONEY, R_FUEL],
 			"wait": func(): return run.sim.fuel >= 92.0 or not _landed_on("F"), "timeout": 30.0},
-		{"key": "tut_price", "enter": _enter_price, "spots": func(): return [R_PRICE]},
+		{"key": "tut_price", "enter": _enter_price, "spots": func(): return [R_PRICE, _fuel_rect()]},
 		{"key": "tut_landing", "spots": func(): return [R_GAUGE, R_HULL], "gauge": true},
 		{"key": "tut_hard", "enter": func(): flags["crashed"] = false,
 			"wait": func(): return flags.get("crashed", false), "timeout": 240.0},
@@ -109,9 +110,14 @@ func _build() -> void:
 			"wait": func(): return flags.get("boarded_extra", false) or flags.get("extra_done", false), "timeout": 150.0},
 		{"key": "tut_extra_dest", "spots": func(): return [_extra_dest_rect()],
 			"wait": func(): return flags.get("extra_done", false), "timeout": 150.0, "after": _drop_waiting_extras},
+		{"key": "tut_extra2", "enter": _enter_extra2, "spots": func(): return [_extra_rect()],
+			"after_speech": func(): run.extra_locked = false,
+			"wait": func(): return flags.get("boarded_extra", false), "timeout": 150.0},
+		{"key": "tut_eject", "wait": func(): return flags.get("ejected", false), "timeout": 150.0},
+		{"key": "tut_eject_ok", "after": _drop_waiting_extras},
 		{"key": "tut_life", "enter": _give_life_money, "spots": func(): return [_pad_rect("L"), R_LIVES],
 			"wait": func(): return flags.get("life_bought", false), "timeout": 90.0},
-		{"key": "tut_exit", "enter": func(): run.pickup_locked = false, "spots": func(): return [_pad_rect("1"), _gate_rect()],
+		{"key": "tut_exit", "enter": _enter_exit, "spots": func(): return [_pad_rect("1"), _gate_rect()],
 			"wait": func(): return run.exit_open, "timeout": 180.0},
 		{"key": "tut_gate", "spots": func(): return [_gate_rect()]},
 	]
@@ -139,7 +145,10 @@ func _enter_job() -> void:
 func _enter_delivered() -> void:
 	flags["extra_done"] = false
 	flags["boarded_extra"] = false
-	run.pickup_locked = true                  # Odo erscheint erst am Ende
+
+func _enter_exit() -> void:
+	run.pickup_locked = false
+	run.spawn_locked = false                  # jetzt darf Odo erscheinen (letzter Pflichtfahrgast)
 
 ## Optionaler Fahrgast an Plattform 2 mit Ziel 1; er steigt erst ein, wenn die Erklärung zu Ende gesprochen ist.
 func _enter_extra() -> void:
@@ -147,9 +156,17 @@ func _enter_extra() -> void:
 	run.extra_locked = true
 	run._spawn_extra("2", "1")
 
+## Zweiter optionaler Gast (Plattform 3 → 2): wird mitgenommen und dann rausgeworfen.
+func _enter_extra2() -> void:
+	flags["boarded_extra"] = false
+	flags["ejected"] = false
+	run.extras_enabled = true
+	run.extra_locked = true
+	run._spawn_extra("3", "2")
+
 func _give_life_money() -> void:
-	run.lives = 4
-	game.call("tutorial_set_lives", 4)
+	run.lives = mini(run.lives, 4)             # nach der Zerstörung ist ohnehin ein Leben weniger; sonst vier, damit ein Kauf möglich ist
+	game.call("tutorial_set_lives", run.lives)
 	run.money = maxf(run.money, Tuning.LIFE_PRICE)
 
 ## Zusatzfahrgast, der nach der Übung noch wartet, geht ohne Folgen (nichts bleibt für später liegen).
@@ -297,6 +314,8 @@ func on_event(e: Dictionary) -> void:
 		"extra_left":
 			if _key() in ["tut_extra", "tut_extra_dest"]:
 				flags["extra_done"] = true
+		"ejected":
+			flags["ejected"] = true
 		"life_bought":
 			flags["life_bought"] = true
 		"destroyed":

@@ -4,9 +4,9 @@
  "HUD_PICKUP": "%s abholen an Pad %s",
  "HUD_DELIVER": "%s zu Pad %s bringen",
  "HUD_GO_EXIT": "Alle Fahrten erledigt – ab zum AUSGANG!",
- "HUD_VY": "V↓",
- "HUD_VX": "V↔",
- "HUD_TILT": "NEI",
+ "HUD_VY": "SINK",
+ "HUD_VX": "SEIT",
+ "HUD_TILT": "NEIG",
  "HUD_HINT_PAD": "WASD/Pfeile Schub · Leertaste Fahrwerk · E Rauswerfen · R Neustart · Esc Pause",
  "HUD_HINT_PAD_PAD": "Stick/Steuerkreuz Schub · A Fahrwerk · Y Rauswerfen · Back Neustart · Start Pause",
  "HUD_CRASHED": "TAXI VERLOREN",
@@ -235,5 +235,11 @@
  "CLIP_NEW": "Neu",
  "CLIP_TAG": "EINSPIELER",
  "CLIP_SKIP": "Enter: überspringen",
- "MENU_CLIP": "Einspieler ansehen"
+ "MENU_CLIP": "Einspieler ansehen",
+ "MSG_EXIT_TIMEOUT": "Zeit abgelaufen! Das Level wird verlassen, Strafe ¢%d",
+ "HUD_EXIT_TIMER": "AUSGANG in %d s",
+ "COSM_REQ_STARS_TIME": "Bei allen %d Leveln den 1. Stern (Zeit)",
+ "COSM_REQ_STARS_CLEAN": "Bei allen %d Leveln den 2. Stern (sauber)",
+ "COSM_REQ_STARS_PRO": "Bei allen %d Leveln den 3. Stern (Meister)",
+ "COSM_REQ_STARS_ALL": "Bei allen %d Leveln alle drei Sterne"
 }

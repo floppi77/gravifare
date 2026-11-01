@@ -515,8 +515,10 @@ func _field_feedback() -> void:
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
 	## Der Fahrgast an Bord ist verloren und wartet erneut an seinem Abholpad, neues Taxi am Startpad.
-	if run.level.tutorial:                      # Flugschule: neues Taxi ohne Verlust
+	if run.level.tutorial:                      # Flugschule: ein Leben weniger (nie unter 1), damit die Lebensstation später etwas zu tun hat
+		Flow.lives = maxi(1, Flow.lives - 1)
 		run.respawn_after_crash()
+		run.lives = Flow.lives
 		gear_on = run.sim.gear_cmd
 		restart_timer = 0.0
 		taxi.sync_state()
@@ -816,6 +818,10 @@ func _on_event(e: Dictionary) -> void:
 		"carried_thanks":
 			Sfx.play_voice(e.voice, "thanks")
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+		"exit_timeout":
+			hud.flash_message(tr("MSG_EXIT_TIMEOUT") % int(e.fee), 4.0)
+			Sfx.play("hit", -4.0)
+			_add_shake(2.0)
 		"exit_open":
 			hud.flash_message(tr("MSG_EXIT_OPEN"))
 			Sfx.play("exit")

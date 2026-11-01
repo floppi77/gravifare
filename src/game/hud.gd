@@ -100,10 +100,11 @@ func _draw() -> void:
 			pcol = pcol.lerp(Color.WHITE, price_flash)
 		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	draw_string(font, Vector2(350, 12), lname if run.level.tutorial else "%d/99  %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_LEFT, 108, 8, Color("#c4d0ff"))
-	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
-	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei dünne Balken
-	var gx := 580.0
+	_fit_text(font, Vector2(366, 12), lname if run.level.tutorial else "%d/99  %s" % [run.level.number, lname], 92.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size() - run.missed], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
+	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei beschriftete Balken (weiße Marke = Grenze der sicheren Landung)
+	var gx := 598.0
+	var gw := 39.0
 	var rows := [[tr("HUD_VY"), s.vel.y, Tuning.LAND_VY], [tr("HUD_VX"), absf(s.vel.x), Tuning.LAND_VX], [tr("HUD_TILT"), rad_to_deg(absf(s.tilt)), rad_to_deg(Tuning.LAND_TILT)]]
 	for i in rows.size():
 		var v: float = rows[i][1]
@@ -112,11 +113,20 @@ func _draw() -> void:
 			v = float(gauge_override[i]) * lim
 		var ratio: float = clampf(v / lim, 0.0, 2.0)
 		var col := Color("#5dff9a") if ratio <= 0.7 else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
-		var gy := 3.0 + i * 4.0
-		draw_rect(Rect2(gx - 0.5, gy - 0.5, 57, 3.6), Color("#0c0f24"))
-		draw_rect(Rect2(gx, gy, 56, 2.6), Color("#2a3266"))
-		draw_rect(Rect2(gx, gy, 56.0 * minf(ratio / 2.0, 1.0), 2.6), col)
-		draw_rect(Rect2(gx + 27.5, gy - 0.5, 1, 3.6), Color.WHITE)
+		var gy := 1.6 + i * 4.8
+		draw_string(font, Vector2(576, gy + 3.6), String(rows[i][0]), HORIZONTAL_ALIGNMENT_LEFT, 22, 5, Color("#aab6e8"))
+		draw_rect(Rect2(gx - 0.5, gy - 0.5, gw + 1, 4.0), Color("#0c0f24"))
+		draw_rect(Rect2(gx, gy, gw, 3.0), Color("#2a3266"))
+		draw_rect(Rect2(gx, gy, gw * minf(ratio / 2.0, 1.0), 3.0), col)
+		draw_rect(Rect2(gx + gw * 0.5 - 0.5, gy - 0.5, 1, 4.0), Color.WHITE)
+	# Countdown des letzten Pflichtfahrgasts: unter dem Tor, ab 10 s rot blinkend
+	if run.exit_countdown > 0.0 and run.result == Run.Result.RUNNING:
+		var cd := run.exit_countdown
+		var urgent := cd <= 10.0
+		var ccol := Color("#ff4d6d") if (urgent and blink) else (Color("#ffb02e") if urgent else Color("#ffe14a"))
+		draw_rect(Rect2(266, 51, 108, 13), Color(0.05, 0.06, 0.15, 0.85))
+		draw_rect(Rect2(266, 51, 108, 13), ccol, false, 0.8)
+		draw_string(font, Vector2(266, 61), tr("HUD_EXIT_TIMER") % int(ceilf(cd)), HORIZONTAL_ALIGNMENT_CENTER, 108, 9, ccol)
 	# ---------------- unterer Streifen: Auftrag (oben) und Hinweise/Untertitel (unten)
 	var job := run.current_job()
 	var txt := ""

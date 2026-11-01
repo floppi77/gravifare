@@ -893,7 +893,7 @@ func _draw_pumps() -> void:
 			txt = "ERR"
 			col = Color("#ff4d6d")
 		col.a = flick
-		draw_string(font, Vector2(-11, -4.3), txt, HORIZONTAL_ALIGNMENT_CENTER, 22, 5, col)
+		draw_string(font, Vector2(-11, -4.3), txt, HORIZONTAL_ALIGNMENT_RIGHT, 17.6, 5, col)          # rechtsbündig im Display (kleiner Rand zum rechten Rahmen)
 		if pump_flash > 0.0:
 			draw_rect(Rect2(-7.0, -9.5, 14.0, 6.0), Color(1, 1, 1, pump_flash * 0.55))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

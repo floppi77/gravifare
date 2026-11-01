@@ -2,7 +2,9 @@ extends Node
 ## Autoload "Cosmetics": Lackierungen und Aufkleber (nur Optik, kein Einfluss auf das Spiel), Freischaltungen
 ## über Spielstatistiken (data/cosmetics.json). „Standardtaxi erzwingen“ = Challenge-Look.
 
-const STAT_NAMES := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions"]
+const STAT_NAMES := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all"]
+## Stern-Freischaltungen: „bei allen Leveln“ den 1. (Zeit), 2. (Sauber), 3. (Meister) oder alle drei Sterne (Mindestwert 0 = alle Level)
+const STAR_STATS := {"stars_time": "time", "stars_clean": "clean", "stars_pro": "pro"}
 var items: Array = []
 var _tex_cache := {}
 
@@ -18,10 +20,33 @@ func item(id: String) -> Dictionary:
 			return it
 	return {}
 
+func total_levels() -> int:
+	var n := 0
+	var dir := DirAccess.open("res://data/levels")
+	if dir != null:
+		for f in dir.get_files():
+			if f.ends_with(".json"):
+				n += 1
+	return n
+
 func stat_value(stat: String) -> int:
 	if stat == "levels_done":
 		return Save.data.completed.size()
+	if stat == "stars_all" or STAR_STATS.has(stat):
+		var n := 0
+		for id in Save.data.completed:
+			var m: Dictionary = Save.data.completed[id].get("medals", {})
+			if stat == "stars_all":
+				n += 1 if (m.get("time", false) and m.get("clean", false) and m.get("pro", false)) else 0
+			else:
+				n += 1 if m.get(STAR_STATS[stat], false) else 0
+		return n
 	return int(Save.data.stats.get(stat, 0))
+
+## Benötigter Wert: bei Stern-Freischaltungen alle Level des Spiels, sonst der Wert aus den Daten.
+func required(it: Dictionary) -> int:
+	var st := String(it.unlock.stat)
+	return total_levels() if (st == "stars_all" or STAR_STATS.has(st)) else int(it.unlock.min)
 
 func is_unlocked(id: String) -> bool:
 	var it := item(id)
@@ -34,14 +59,15 @@ func is_unlocked(id: String) -> bool:
 func requirement_text(it: Dictionary) -> String:
 	if it.unlock == null:
 		return ""
-	return tr("COSM_REQ_" + String(it.unlock.stat).to_upper()) % int(it.unlock.min) + "  (%d / %d)" % [mini(stat_value(it.unlock.stat), int(it.unlock.min)), int(it.unlock.min)]
+	var need := required(it)
+	return tr("COSM_REQ_" + String(it.unlock.stat).to_upper()) % need + "  (%d / %d)" % [mini(stat_value(it.unlock.stat), need), need]
 
 ## Prüft alle Bedingungen und schaltet neue Items frei; Rückgabe: Liste der neu freigeschalteten Items.
 func check_unlocks() -> Array:
 	var fresh: Array = []
 	var unlocked: Array = Save.data.get("unlocked", [])
 	for it in items:
-		if it.unlock != null and not unlocked.has(it.id) and stat_value(it.unlock.stat) >= int(it.unlock.min):
+		if it.unlock != null and not unlocked.has(it.id) and stat_value(it.unlock.stat) >= required(it):
 			unlocked.append(it.id)
 			fresh.append(it)
 	if not fresh.is_empty():

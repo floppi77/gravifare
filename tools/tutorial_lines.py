@@ -14,12 +14,12 @@ T["tut_hud_level"] = ('Rechts vom Tor siehst du das Level und seinen Namen. Dane
                       'To the right of the gate you see the level and its name. Next to it counts how many mandatory passengers you have delivered and how many there are in total.')
 T["tut_hud_gauge"] = ('Ganz rechts die Landeanzeige: wie schnell du sinkst, wie schnell du seitlich fliegst und wie schief du stehst. Bleiben alle drei Balken unter der weißen Marke, landest du sicher.',
                       'At the far right is the landing gauge: how fast you sink, how fast you move sideways and how tilted you are. Keep all three bars below the white mark and you land safely.')
-T["tut_fly"] = ("Los geht's! Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
-                "Let's go! Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.")
+T["tut_fly"] = ("Los geht's! Du steuerst mit W, A, S und D oder mit dem linken Stick. Flieg jetzt den Parcours: immer durch das grüne Tor, die roten folgen danach. Erst links an der Lebensplattform vorbei nach oben, dann oben nach rechts, runter zur Zwei und zurück rüber zur Eins.",
+                "Let's go! You steer with W, A, S and D, or with the left stick. Fly the course now: always through the green gate, the red ones come later. First up past the life platform on the left, then across the top to the right, down to platform two and back over to one.")
 T["tut_fly_ok"] = ("Gut gemacht. Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Gleite lieber, statt dauernd zu schieben.",
                    "Well done. Gravity constantly pulls you down, and thrust burns fuel. Glide instead of pushing all the time.")
-T["tut_gear"] = ("Vor jeder Landung fährst du das Fahrwerk aus. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.",
-                 "Extend the landing gear before every landing. The taxi then flies slower and more precisely. Extend it now.")
+T["tut_gear"] = ('Vor jeder Landung fährst du das Fahrwerk wieder aus, mit der Leertaste oder der A-Taste. Dann fliegt das Taxi langsamer und genauer. Fahr es jetzt aus.',
+                 'Before every landing you extend the landing gear again, with the space bar or the A button. The taxi then flies slower and more precisely. Extend it now.')
 T["tut_fuel_low"] = ("Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
                      "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.")
 T["tut_refuel"] = ('Solange du hier stehst, tankst du. Bis fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.',
@@ -42,8 +42,8 @@ T["tut_exit"] = ("Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang.
 T["tut_gate"] = ("Das Tor ist offen. Flieg hindurch!", "The gate is open. Fly through it!")
 T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, tanke also möglichst dann, wenn er niedrig ist.',
                       'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')
-T["tut_gear_in"] = ('Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Fahrwerkstaste ein: Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Fahr es jetzt ein.',
-                    'Your landing gear is still extended. To take off, retract it with the gear button: retracted, the taxi flies fast; extended, slow and precise. Retract it now.')
+T["tut_gear_in"] = ('Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Leertaste ein, am Controller mit der A-Taste. Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Drück die Taste jetzt.',
+                    'Your landing gear is still extended. To take off, retract it with the space bar, or the A button on a controller. Retracted, the taxi flies fast; extended, slow and precise. Press the button now.')
 T["tut_credit"] = ('Darüber kostet der Sprit Geld. Ich schreibe dir fünfzig Credits gut, tank also ruhig voll.',
                    'Above that, fuel costs money. I am crediting you fifty credits, so go ahead and fill up.')
 T["tut_price"] = ('Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.',
@@ -58,6 +58,12 @@ T["tut_soft_meh"] = ('Das ging, war aber noch nicht weich. Je langsamer du aufse
                      'That worked, but it was not soft yet. The slower you touch down, the better. Soft, level landings in a row earn you a bonus.')
 T["tut_extra_dest"] = ('Das Ziel des Gastes leuchtet jetzt auf. Bring den Gast dorthin.',
                        "The guest's destination is lit up now. Take the guest there.")
+T["tut_extra2"] = ('Noch ein Funkruf! Dieser Quälgeist an Plattform drei hat sich schon die ganze Wartezeit beschwert und weiß natürlich alles besser. Flieg hin und lade ihn ein.',
+                   'Another radio call! This pain in the neck at platform three has been complaining the whole time and of course knows better. Fly over and pick them up.')
+T["tut_eject"] = ('Und schon geht das Gemecker los: zu schnell, zu wackelig, zu teuer. Dafür gibt es die Rauswurf-Taste: E auf der Tastatur, Y am Controller. Steht das Taxi am Boden, landet der Gast weich und schimpft nur. Aus großer Höhe überlebt er das nicht, und das gibt Ärger mit der Zentrale. Bei Pflichtfahrgästen kostet es obendrein Strafe. Zur Feier des Tages: Wirf ihn jetzt raus!',
+                  'And there it goes, the complaining: too fast, too wobbly, too expensive. That is what the eject button is for: E on the keyboard, Y on a controller. If the taxi is on the ground, the guest lands softly and just grumbles. From a great height they will not survive, and that means trouble with dispatch. For mandatory passengers it also costs you a penalty. In honor of the occasion: throw them out now!')
+T["tut_eject_ok"] = ('Ruhe an Bord, und die Bewertung leidet nur ein bisschen. Merke dir: Rauswerfen bringt kein Geld, aber manchmal ist Ruhe unbezahlbar.',
+                     'Peace and quiet on board, and the rating suffers only a little. Remember: throwing someone out earns no money, but sometimes peace and quiet is priceless.')
 T["tut_done"] = ("Geschafft! Du bist bereit für den Dienst. Viel Erfolg da draußen, Taxi sieben.",
                  "Done! You are ready for duty. Good luck out there, Taxi seven.")
 T["tut_crash"] = ("Autsch. Keine Sorge, in der Flugschule bekommst du sofort ein neues Taxi.",
