@@ -1,0 +1,167 @@
+# Release-Build in der CI: aus einem Tag (v*) entstehen die Spieldateien für Linux,
+# Windows und macOS. Dazu kommen SHA256SUMS.txt und signierte Herkunftsnachweise
+# (Build Provenance über Sigstore).
+#   - Das Tag muss zur Versionsnummer in export_presets.cfg passen.
+#   - Godot und die Exportvorlagen werden gegen die SHA-512-Summen des Godot-Projekts geprüft.
+#   - Linux-Datei startet zur Probe ohne Fenster; die Mac-App wird auf Aufbau geprüft.
+#   - Ohne Release entsteht ein Entwurf mit automatischen Release Notes, den man vor der
+#     Veröffentlichung prüft. Bei einem Entwurf werden die Dateien ersetzt.
+#   - Veröffentlichte Releases sind unveränderlich: Der Lauf bricht dann gleich zu Beginn
+#     mit einer klaren Meldung ab, statt erst beim Hochladen zu scheitern.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Vorhandenes Tag, z. B. v0.4.1'
+        required: true
+
+permissions: {}
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Bauen, prüfen, veröffentlichen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      GODOT_VERSION: 4.7.2
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+
+      # Tag und Versionsnummer der Mac-App müssen übereinstimmen (v0.6.0 ↔ 0.6.0).
+      - name: Version prüfen
+        run: |
+          want="${TAG#v}"
+          for key in short_version version; do
+            have=$(sed -n "s/^application\/${key}=\"\(.*\)\"$/\1/p" export_presets.cfg)
+            echo "application/${key}=${have}"
+            test "$have" = "$want" || { echo "Version in export_presets.cfg ($have) passt nicht zum Tag $TAG"; exit 1; }
+          done
+
+      - name: Release-Zustand prüfen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          draft=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null || echo none)
+          case "$draft" in
+            none)  echo "Kein Release zu $TAG vorhanden: es entsteht ein neuer Entwurf." ;;
+            true)  echo "Entwurf zu $TAG vorhanden: die Dateien werden ersetzt." ;;
+            *)     echo "::error::$TAG ist bereits veröffentlicht und unveränderlich. Für Korrekturen eine neue Version taggen (z. B. v0.6.1)."
+                   exit 1 ;;
+          esac
+
+      - name: Godot und Exportvorlagen laden (SHA-512 geprüft)
+        run: |
+          cd "$RUNNER_TEMP"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          editor="Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          templates="Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          curl -fsSLO "$base/SHA512-SUMS.txt"
+          for f in "$editor.zip" "$templates"; do
+            curl -fsSLO "$base/$f"
+            grep -F "  $f" SHA512-SUMS.txt | sha512sum -c -
+          done
+          unzip -q "$editor.zip"
+          sudo install -m 755 "$editor" /usr/local/bin/godot
+          dest="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$dest"
+          unzip -q "$templates" -d tpl
+          mv tpl/templates/* "$dest/"
+          godot --version
+
+      # tools/export_release.sh importiert die Assets selbst, exportiert aus einer Kopie ohne
+      # Entwicklungsdateien und packt je Plattform ein ZIP mit Lizenztexten samt SHA256SUMS.txt.
+      - name: Exportieren
+        run: |
+          tools/export_release.sh "${TAG#v}"
+          mkdir dist
+          cp build/release/*.zip dist/
+
+      - name: Dateien prüfen
+        run: |
+          for f in dist/*-linux-x86_64.zip dist/*-windows-x86_64.zip dist/*-macos-universal.zip; do
+            test -f "$f" || { echo "Fehlt: $f"; exit 1; }
+            python3 -c "import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None; assert any(n.endswith('licenses/GODOT_LICENSE.txt') for n in z.namelist()), 'Lizenztexte fehlen'" "$f"
+          done
+          python3 -c "import sys, zipfile; n = zipfile.ZipFile(sys.argv[1]).namelist(); assert any('GraviFare.app/Contents/MacOS/' in x for x in n), 'Mac-App unvollständig'" dist/*-macos-universal.zip
+          mkdir probe
+          unzip -q dist/*-linux-x86_64.zip -d probe
+          chmod +x probe/gravifare.x86_64
+          probe/gravifare.x86_64 --headless --audio-driver Dummy --quit-after 240
+
+      - name: Prüfsummen
+        working-directory: dist
+        run: |
+          sha256sum *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      # Artefakt-Attestierungen stehen für private Repositories nur mit GitHub Enterprise
+      # zur Verfügung; die Bedingung hält den Build lauffähig, falls das je wieder so ist.
+      - name: Herkunftsnachweis (Build Provenance)
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/*.zip
+
+      - name: Release anlegen oder aktualisieren
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          draft=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null || echo none)
+          if [ "$draft" = "true" ]; then
+            gh release upload "$TAG" dist/* --clobber
+          elif [ "$draft" = "false" ]; then
+            echo "::error::$TAG wurde während des Builds veröffentlicht; Dateien bleiben unverändert."
+            exit 1
+          else
+            gh release create "$TAG" dist/* --draft --verify-tag --generate-notes \
+              --notes-file .github/release-notes.md --title "GraviFare $TAG"
+          fi
+
+      # VirusTotal: läuft nur, wenn das Repository-Secret VT_API_KEY gesetzt ist.
+      # Achtung: hochgeladene Dateien teilt VirusTotal mit Sicherheitsanbietern.
+      - name: VirusTotal-Schlüssel vorhanden?
+        id: vt
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: echo "enabled=$([ -n "$VT_API_KEY" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: VirusTotal-Prüfung
+        id: virustotal
+        if: ${{ steps.vt.outputs.enabled == 'true' }}
+        uses: crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2 # v5.0.0
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            dist/*.zip
+          request_rate: 4
+      - name: VirusTotal-Links in die Release Notes
+        if: ${{ steps.vt.outputs.enabled == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ANALYSIS: ${{ steps.virustotal.outputs.analysis }}
+        run: |
+          {
+            gh release view "$TAG" --json body --jq .body
+            printf '\n\n### VirusTotal\n\n'
+            echo "$ANALYSIS" | tr ',' '\n' | sed -E 's#^(dist/)?([^=]+)=(.*)$#- [\2](\3)#'
+          } > notes.md
+          gh release edit "$TAG" --notes-file notes.md

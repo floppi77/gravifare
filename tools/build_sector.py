@@ -2,12 +2,12 @@
 Aufruf (Projektwurzel):  python3 tools/build_sector.py 3|4|5 [--dry]
 Ablauf: je Slot K Kandidaten (andere Seeds) -> Bot-Lauf + Metrik (tools/batch_eval.gd) -> bester Kandidat -> Dornenzahl so
 justieren, dass die Metrik dem Ziel des Slots entspricht (monotone Schwierigkeit) -> Pars aus den Bot-Zeiten -> data/levels."""
-import sys, os, json, random, subprocess, copy, glob, concurrent.futures as cf
+import sys, os, json, random, subprocess, copy, glob, tempfile, concurrent.futures as cf
 sys.path.insert(0, "tools")
 import procgen
 from levelparts import *
 
-CAND = "/tmp/claude-1000/cand"
+CAND = os.path.join(tempfile.gettempdir(), "gravifare_cand")
 os.makedirs(CAND, exist_ok=True)
 
 NAMES = {

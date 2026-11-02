@@ -25,7 +25,7 @@ G
 LIC=$ABS/stage/licenses
 mkdir -p "$LIC"
 godot --headless --path "$WORK" -s "$WORK/_license.gd" -- "$LIC/GODOT_LICENSE.txt" >/dev/null 2>&1
-cp THIRD_PARTY_LICENSES.md CREDITS.md "$LIC/"
+cp LICENSE LICENSE-ASSETS.md THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.md CREDITS.md "$LIC/"
 for d in assets/fonts/*/; do
 	cp "$d/OFL.txt" "$LIC/$(basename "$d")_OFL.txt"
 done

@@ -43,7 +43,9 @@ def chunks(text: str, limit=280):
 
 def speak(url, voice, text, seed):
     body = json.dumps({"text": text, "voice": voice, "split": False, "seed": seed}).encode()
-    return urllib.request.urlopen(urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}), timeout=300).read()
+    if not url.startswith("http://127.0.0.1:"):          # nur der lokale drama-Server
+        raise ValueError("nur lokale Server erlaubt: " + url)
+    return urllib.request.urlopen(urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}), timeout=300).read()  # nosec B310 (Schema oben geprüft)
 
 def render(url, lang, entry, seed):
     parts = []

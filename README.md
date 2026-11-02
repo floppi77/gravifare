@@ -9,6 +9,12 @@ Ein Schwebetaxi-Arcadespiel in Godot 4.7 – Trägheit, Schwerkraft, präzise La
 A hover-taxi arcade game in Godot 4.7 – inertia, gravity, precise landings.</p>
 
 <p align="center">
+  <a href="https://github.com/floppi77/gravifare/actions/workflows/regression.yml"><img src="https://github.com/floppi77/gravifare/actions/workflows/regression.yml/badge.svg" alt="Regression"></a>
+  <a href="https://github.com/floppi77/gravifare/actions/workflows/security.yml"><img src="https://github.com/floppi77/gravifare/actions/workflows/security.yml/badge.svg" alt="Sicherheit / Security"></a>
+  <a href="https://ko-fi.com/floppi77"><img src="https://img.shields.io/badge/Ko--fi-floppi77-FF5E5B?logo=ko-fi&amp;logoColor=white" alt="Ko-fi"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/floppi77/gravifare/releases/latest"><b>⬇ Download (Windows · Linux · macOS)</b></a>
 </p>
 
@@ -79,8 +85,8 @@ Weitere Hinweise und Entwickler-Aufrufe stehen weiter unten und in [DESIGN.md](D
 ## Herkunft und Lizenzen
 
 Die Hintergrundbilder und das Logo wurden mit ChatGPT Astra 6.0 erzeugt. Die Sprecherstimmen sind künstlich: Fahrgäste, Tankwart und Zentrale
-mit Qwen3-TTS (Apache-2.0), die Fluglehrer-Stimme im Tutorial **Built with Fish Audio** (Drama 3). Fremdbestandteile: [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md),
-[CREDITS.md](CREDITS.md). Der Titel ist vorläufig; eine Lizenz für Code und Inhalte ist noch **nicht** festgelegt – bis dahin gilt: alle Rechte vorbehalten.
+mit Qwen3-TTS (Apache-2.0), die Fluglehrer-Stimme im Tutorial **Built with Fish Audio** (Drama 3). Fremdbestandteile: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md),
+[CREDITS.md](CREDITS.md). Der Titel ist vorläufig. **Lizenz:** frei für nicht-kommerzielle Zwecke – Code unter [PolyForm Noncommercial 1.0.0](LICENSE), Inhalte (Grafik, Musik, Stimmen, Level) unter [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 
 ---
 
@@ -148,8 +154,8 @@ tools/export_release.sh                  # packages for Linux, Windows, macOS in
 ## Provenance and licences
 
 Background images and logo were generated with ChatGPT Astra 6.0. All voices are synthetic: passengers, fuel attendant and dispatch use Qwen3-TTS (Apache-2.0),
-the flight instructor in the tutorial is **Built with Fish Audio** (Drama 3). Third-party material: [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [CREDITS.md](CREDITS.md).
-The title is provisional; no licence for code and content has been chosen yet – until then all rights are reserved.
+the flight instructor in the tutorial is **Built with Fish Audio** (Drama 3). Third-party material: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [CREDITS.md](CREDITS.md).
+The title is provisional. **Licence:** free for non-commercial use – code under [PolyForm Noncommercial 1.0.0](LICENSE), content (art, music, voices, levels) under [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 
 ---
 
