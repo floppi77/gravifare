@@ -1,6 +1,7 @@
 class_name Workshop
 extends RefCounted
-## Werkstatt: dauerhafte, kleine Verbesserungen des Taxis je Speicherplatz, bezahlt mit den Credits des laufenden Feldzugs.
+## Werkstatt: kleine Verbesserungen des Taxis je Speicherplatz, bezahlt mit den Credits des laufenden Flugs. Einkaufen lässt sich nur beim Halt
+## nach jedem Sektor (src/game/workshop_bay.gd); ein Game Over nimmt alle Einbauten wieder heraus.
 ## Bewusst bescheiden: Das Spiel bleibt ohne Einbauten vollständig lösbar (der Autopilot prüft ohne sie).
 
 const MAX_LEVEL := 3
@@ -9,6 +10,10 @@ const ITEMS := ["jets", "hull", "gear"]
 const JETS_STEP := 0.06      # Spritverbrauch je Stufe
 const HULL_STEP := 0.08      # Aufprallschaden je Stufe
 const GEAR_STEP := 3.0       # erlaubte Sinkrate (px/s) je Stufe
+
+## Halt in der Werkstatt nach dem letzten Level eines Sektors, außer nach Level 99.
+static func due(level_number: int) -> bool:
+	return level_number % 11 == 0 and level_number < 99
 
 ## `data` ist der Speicherstand (Save.data): reine Daten, damit die Klasse auch in Tests ohne Autoloads läuft.
 static func level_of(data: Dictionary, id: String) -> int:
@@ -26,22 +31,16 @@ static func mods(data: Dictionary) -> Dictionary:
 		levels[id] = level_of(data, id)
 	return mods_for(levels)
 
-static func credits(data: Dictionary) -> float:
-	var c = data.get("campaign", {})
-	return float(c.get("credits", 0.0)) if c is Dictionary else 0.0
-
 static func price(data: Dictionary, id: String) -> int:
 	var l := level_of(data, id)
 	return PRICES[l] if l < MAX_LEVEL else 0
 
-## Kauf der nächsten Stufe; zieht die Credits vom gespeicherten Feldzug ab (der Aufrufer speichert). false, wenn es nicht geht.
-static func buy(data: Dictionary, id: String) -> bool:
+## Kauf der nächsten Stufe mit `credits` (Kasse des laufenden Flugs). Gibt die Credits danach zurück, -1, wenn es nicht geht; der Aufrufer speichert.
+static func buy(data: Dictionary, id: String, credits: float) -> float:
 	var l := level_of(data, id)
-	var c = data.get("campaign", {})
-	if l >= MAX_LEVEL or not (c is Dictionary) or not c.has("level") or credits(data) < float(PRICES[l]):
-		return false
+	if l >= MAX_LEVEL or credits < float(PRICES[l]):
+		return -1.0
 	if not (data.get("workshop") is Dictionary):
 		data["workshop"] = {}
 	data.workshop[id] = l + 1
-	c["credits"] = credits(data) - float(PRICES[l])
-	return true
+	return credits - float(PRICES[l])

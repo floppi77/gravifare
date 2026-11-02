@@ -35,7 +35,7 @@
    "from": "7",
    "to": "2",
    "fare": 160,
-   "par": 41,
+   "par": 33,
    "passenger": "Mika",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "1",
    "to": "2",
    "fare": 170,
-   "par": 24,
+   "par": 23,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "3",
    "to": "4",
    "fare": 180,
-   "par": 82,
+   "par": 66,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -59,7 +59,7 @@
    "from": "5",
    "to": "4",
    "fare": 190,
-   "par": 17,
+   "par": 14,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -67,7 +67,7 @@
    "from": "1",
    "to": "2",
    "fare": 200,
-   "par": 13,
+   "par": 23,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "7",
    "to": "6",
    "fare": 210,
-   "par": 28,
+   "par": 22,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -83,7 +83,7 @@
    "from": "7",
    "to": "3",
    "fare": 220,
-   "par": 13,
+   "par": 23,
    "passenger": "Nora",
    "gender": "f"
   },
@@ -111,108 +111,52 @@
    "path": [
     [
      0.5,
-     13.5
+     15.5
+    ],
+    [
+     7.5,
+     15.5
+    ],
+    [
+     7.5,
+     7.5
     ],
     [
      39.5,
-     13.5
+     7.5
     ]
    ],
    "w": 2,
    "h": 1,
-   "speed": 40.0,
+   "speed": 56.0,
    "phase": 0.0,
-   "paint": 0
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     0.5,
-     13.5
-    ],
-    [
-     39.5,
-     13.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 5.73,
-   "paint": 1
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     0.5,
-     13.5
-    ],
-    [
-     39.5,
-     13.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 11.47,
-   "paint": 2
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     39.5,
-     7.5
-    ],
-    [
-     0.5,
-     7.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 0.0,
-   "paint": 1
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     39.5,
-     7.5
-    ],
-    [
-     0.5,
-     7.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 5.73,
-   "paint": 2
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     39.5,
-     7.5
-    ],
-    [
-     0.5,
-     7.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 11.47,
    "paint": 3
+  },
+  {
+   "kind": "vehicle",
+   "path": [
+    [
+     0.5,
+     15.5
+    ],
+    [
+     7.5,
+     15.5
+    ],
+    [
+     7.5,
+     7.5
+    ],
+    [
+     39.5,
+     7.5
+    ]
+   ],
+   "w": 2,
+   "h": 1,
+   "speed": 56.0,
+   "phase": 7.29,
+   "paint": 0
   }
  ],
  "zones": [

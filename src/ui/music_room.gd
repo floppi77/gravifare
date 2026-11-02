@@ -1,7 +1,7 @@
 class_name MusicRoom
 extends Control
 ## Musikplayer im Hauptmenü: spielt alle freigeschalteten Stücke mit allen drei Schichten. Gesperrte Stücke nennen die Bedingung;
-## mit Save.DEBUG_UNLOCK_ALL ist alles wählbar. Bestätigen spielt oder stoppt, LB/RB bzw. Bild auf/ab wechselt den Titel, B/Esc geht zurück.
+## im Debug-Modus ist alles wählbar. Bestätigen spielt oder stoppt, LB/RB bzw. Bild auf/ab wechselt den Titel, B/Esc geht zurück.
 
 const ROW := Vector2(236, 19)
 const LEFT := 78.0
@@ -69,7 +69,7 @@ func _row(t: Dictionary) -> Button:
 	return b
 
 func _is_open(t: Dictionary) -> bool:
-	return TrackList.unlocked(t, Save.data.completed, Save.DEBUG_UNLOCK_ALL)
+	return TrackList.unlocked(t, Save.ever_completed(), Save.debug)
 
 func _name(t: Dictionary) -> String:
 	return tr("MUSIC_%s" % String(t.theme).to_upper())

@@ -7,6 +7,8 @@ var box: VBoxContainer
 var stage: Control
 var version: Label
 var screen: Control = null
+var code := CodeEntry.new("marvin")
+var notice: Label
 
 func _ready() -> void:
 	Music.play_theme("menu")
@@ -29,6 +31,11 @@ func _ready() -> void:
 	stage.add_child(box)
 	version = MenuKit.version_label()
 	stage.add_child(version)
+	notice = MenuKit.title("", 12)
+	notice.position = Vector2(0, 4)
+	notice.size = Vector2(640, 16)
+	notice.modulate.a = 0.0
+	stage.add_child(notice)
 	if Save.slot == 0 or OS.get_cmdline_user_args().has("--slots"):      # Dev: --slots zeigt die Platzwahl
 		show_slots()                                    # Spielstand wählen (beim Start)
 	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen
@@ -96,16 +103,20 @@ func show_main(focus_lang := "") -> void:
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	for entry in [
 			[tr("MENU_SHIFT"), func(): Flow.start_shift()],
-			[tr("MENU_WORKSHOP"), func(): get_tree().change_scene_to_file("res://src/ui/workshop.tscn")],
 			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
 			[tr("MENU_MUSIC"), show_music],
 			[tr("MENU_OPTIONS"), show_options],
 			[tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
-			[tr("SLOT_CURRENT") % Save.slot, show_slots]]:
+			[tr("SLOT_CURRENT") % Save.slot, show_slots],
+			[tr("MENU_QUIT"), func(): get_tree().quit()]]:
 		grid.add_child(_small_button(entry[0], entry[1]))
+	grid.get_child(0).disabled = not Save.shift_unlocked(ids)     # Nachtschicht: erst nach allen Leveln
 	box.add_child(grid)
-	box.add_child(_small_button(tr("MENU_QUIT"), func(): get_tree().quit()))
+	if Save.debug:
+		box.add_child(MenuKit.button(tr("DEBUG_LEAVE"), func():
+			Flow.set_debug(false)
+			show_main()))
 	# Sprachwahl: zwei Flaggen ohne Text unter dem Menü
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 3)
@@ -196,6 +207,21 @@ func show_options() -> void:
 	_focus_first()
 
 var options: OptionsPanel = null
+
+## Unsichtbarer Debug-Schalter: nur im Hauptmenü, nach der Speicherstandwahl.
+func _input(event: InputEvent) -> void:
+	if not (event is InputEventKey) or not event.pressed or event.echo or event.unicode == 0:
+		return
+	if screen != null or Save.slot == 0 or Save.debug or not code.feed(char(event.unicode), Time.get_ticks_msec()):
+		return
+	Flow.set_debug(true)
+	Sfx.play("exit", -4.0)
+	show_main()
+	notice.text = tr("DEBUG_ON")
+	notice.modulate.a = 1.0
+	var tw := create_tween()
+	tw.tween_interval(3.0)
+	tw.tween_property(notice, "modulate:a", 0.0, 0.6)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and Save.slot != 0 and screen == null:      # Levelauswahl und Spielstände behandeln B/Esc selbst

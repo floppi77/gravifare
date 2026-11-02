@@ -24,8 +24,8 @@ T["tut_fuel_low"] = ("Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der ora
                      "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.")
 T["tut_refuel"] = ('Solange du hier stehst, tankst du. Bis fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.',
                    'While you sit here, you refuel. Up to thirty-five percent the station refuels for free in an emergency. Never bump the pump: after three touches it explodes.')
-T["tut_landing"] = ('Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt die Hülle Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.',
-                    'Now for landing. If you land slowly and level, all is well. If you are faster, the hull takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.')
+T["tut_landing"] = ('Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.',
+                    'Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.')
 T["tut_hard"] = ('Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird. Hier kostet das nichts.',
                  'Try it: dive down with full power and land so hard that the taxi is destroyed. Here it costs nothing.')
 T["tut_job"] = ('Jetzt zum Geschäft. Unten steht dein Auftrag: Mika wartet an Plattform zwei. Der Stern über ihr zeigt: Mika ist ein Pflichtfahrgast. Pflichtfahrgäste sind die Aufträge des Levels, am Anfang zwei oder drei, später bis zu neun. Hast du alle befördert, öffnet sich das Tor. Lande bei Mika mit ausgefahrenem Fahrwerk und warte, bis sie einsteigt.',
@@ -81,30 +81,30 @@ T["tut_crash"] = ("Autsch. Keine Sorge, in der Flugschule bekommst du sofort ein
 
 # ---- Einspieler (data/intros/index.json: Levelnummer -> Name); Stimme "i0" (Fluglehrer), Schlüssel vid_<name>
 V = {}
-V["vid_spikes"] = ("Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung kostet dich dreißig Hülle, egal wie langsam du bist. Halte Abstand.",
-                   "Spikes. They sit on rocks and platforms. Every touch costs you thirty hull, no matter how slowly you fly. Keep your distance.")
-V["vid_doors"] = ("Schleusentore öffnen und schließen im festen Takt. Warte, bis das Tor offen ist, und flieg zügig hindurch. Schließt es auf dir, wirst du hinausgeschleudert und verlierst Hülle.",
-                  "Lock gates open and close on a fixed beat. Wait until the gate is open and fly through quickly. If it closes on you, you get thrown out and lose hull.")
-V["vid_debris"] = ("Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Eine Berührung kostet fünfzehn Hülle.",
-                   "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch costs fifteen hull.")
+V["vid_spikes"] = ("Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung beschädigt dein Taxi, egal wie langsam du bist. Halte Abstand.",
+                   "Spikes. They sit on rocks and platforms. Every touch damages your taxi, no matter how slowly you fly. Keep your distance.")
+V["vid_doors"] = ("Schiebetore fahren im Takt von beiden Seiten zu, bleiben kurz geschlossen und öffnen wieder. Warte, bis das Tor offen ist, und flieg zügig hindurch. Erwischt es dich, wirst du hinausgeschleudert, und dein Taxi nimmt Schaden.",
+                  "Sliding gates close from both sides on a fixed beat, stay shut briefly and open again. Wait until the gate is open and fly through quickly. If it catches you, you get thrown out and your taxi takes damage.")
+V["vid_debris"] = ("Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Bei einer Berührung nimmt dein Taxi Schaden.",
+                   "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch damages your taxi.")
 V["vid_moving_pad"] = ("Fahrende Plattformen gleiten auf Schienen. Fliege über sie, passe dein Tempo an und lande im Tempo der Plattform. Das Taxi fährt mit.",
                        "Moving pads glide on rails. Fly over one, match its speed and land at the pad's own pace. The taxi rides along.")
 V["vid_hospital"] = ("Krankentransport: Der Patient liegt auf einer Trage und muss ins Krankenhaus. Jede Beschädigung ist gefährlich. Geht er verloren, kostet das den aktuellen Fahrpreis. Fliege besonders sanft.",
                      "Medical transport: the patient lies on a stretcher and must go to the hospital. Any damage is dangerous. If the patient is lost, it costs you the current fare. Fly extra gently.")
-V["vid_meteors"] = ("Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer kostet zwanzig Hülle.",
-                    "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit costs twenty hull.")
-V["vid_slider"] = ("Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und kosten dreißig Hülle. Passiere sie, wenn sie weit genug weg sind.",
-                   "Sliders are big, heavy blocks. They crush anything caught between them and a wall and cost thirty hull. Pass them when they are far enough away.")
+V["vid_meteors"] = ("Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer beschädigt dein Taxi.",
+                    "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit damages your taxi.")
+V["vid_slider"] = ("Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und beschädigen dein Taxi schwer. Passiere sie, wenn sie weit genug weg sind.",
+                   "Sliders are big, heavy blocks. They crush anything caught between them and a wall and badly damage your taxi. Pass them when they are far enough away.")
 V["vid_magnet_pull"] = ("Magnetfelder ziehen dein Taxi zum Kern. Je näher, desto stärker. Steuere rechtzeitig dagegen, sonst landest du im Zentrum.",
                         "Magnetic fields pull your taxi toward the core. The closer, the stronger. Steer against it in time, or you end up in the center.")
 V["vid_magnet_push"] = ("Abstoßende Magnete schieben dich fort. Du kommst kaum in die Nähe des Kerns. Nutze den Schub, um dich wegtragen zu lassen.",
                         "Repelling magnets push you away. You barely get near the core. Use the push to be carried away.")
 V["vid_magnet_pulse"] = ("Manche Magnete schalten im Takt an und aus. Der Ring um den Kern zeigt dir, wann sie aktiv sind. Flieg durch, wenn sie ruhen.",
                          "Some magnets switch on and off on a beat. The ring around the core shows when they are active. Fly through while they rest.")
-V["vid_heat"] = ("Hitzezonen glühen. Wer darin fliegt, verliert laufend Hülle. Flieg schnell hindurch oder, besser, um sie herum.",
-                 "Heat zones glow. Anyone flying inside constantly loses hull. Fly through quickly or, better, around them.")
-V["vid_beam"] = ("Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl verlierst du Hülle. Warte, bis er erlischt, und flieg dann hindurch.",
-                 "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam you lose hull. Wait until it goes out, then fly through.")
+V["vid_heat"] = ("Hitzezonen glühen. Solange du darin fliegst, nimmt dein Taxi laufend Schaden. Flieg schnell hindurch oder, besser, um sie herum.",
+                 "Heat zones glow. As long as you fly inside, your taxi keeps taking damage. Fly through quickly or, better, around them.")
+V["vid_beam"] = ("Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl nimmt dein Taxi Schaden. Warte, bis er erlischt, und flieg dann hindurch.",
+                 "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam your taxi takes damage. Wait until it goes out, then fly through.")
 V["vid_heat_pulse"] = ("Lavablasen kühlen im Takt ab und glühen wieder auf. Sind sie dunkel, kannst du gefahrlos hindurch. Achte auf den Takt.",
                        "Lava blobs cool down on a beat and glow up again. When they are dark you can pass safely. Watch the beat.")
 V["vid_wind"] = ("Strömungen schieben dein Taxi in eine Richtung. Die Schlieren zeigen dir, wohin. Gleiche mit Gegenschub aus.",
@@ -113,7 +113,7 @@ V["vid_gravity"] = ("Schwerkraftzonen verändern dein Gewicht. In der leichten Z
                     "Gravity zones change your weight. In the light zone you rise on your own, in the heavy zone you sink. Adjust your thrust accordingly.")
 V["vid_wind_gust"] = ("Böen sind Strömungen, die im Takt an- und ausgehen. Warte die Pause ab oder rechne mit dem Stoß.",
                       "Gusts are currents that switch on and off on a beat. Wait for the pause or expect the push.")
-V["vid_traffic"] = ("Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Eine Kollision kostet achtzehn Hülle. Warte eine Lücke ab und kreuze die Bahn.",
-                    "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision costs eighteen hull. Wait for a gap and cross the lane.")
+V["vid_traffic"] = ("Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Bei einer Kollision nimmt dein Taxi Schaden. Warte eine Lücke ab und kreuze die Bahn.",
+                    "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision damages your taxi. Wait for a gap and cross the lane.")
 V["vid_dark"] = ("Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
                  "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.")

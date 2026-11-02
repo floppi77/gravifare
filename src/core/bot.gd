@@ -30,6 +30,12 @@ func _init(r: Run) -> void:
 func _cell_center(c: Vector2i) -> Vector2:
 	return Vector2(c.x * Tuning.TILE + 8.0, c.y * Tuning.TILE + 8.0)
 
+func _near_spikes(p: Vector2) -> bool:
+	return level.box_hits_char(p, Tuning.HULL_HALF + Vector2(5, 5), "^")
+
+func _unsafe_wait(p: Vector2) -> bool:
+	return _near_spikes(p) or level.heat_at(p, level.clock)
+
 func _accel_to_input(a_des: Vector2) -> Vector2:
 	# a_des: gewünschte Beschleunigung (px/s²). Rückgabe: Eingabevektor.
 	var sim := run.sim
@@ -47,6 +53,9 @@ func decide() -> Array:
 	var sim := run.sim
 	var tgt_pad_id := run.target_pad()
 	var refuel_trip := level.pads.has("F") and not run.station_down() and sim.fuel < (REFUEL_BELOW_DOORS if (level.has_doors() or level.has_movers()) else REFUEL_BELOW) and run.phase != Run.Phase.BOARDING and run.phase != Run.Phase.DROPOFF
+	if refuel_trip and level.has_doors() and sim.fuel > 13.0 and level.pads.has(tgt_pad_id):       # kurz vor dem Ziel erst abliefern
+		var p: Dictionary = level.pads[tgt_pad_id]
+		refuel_trip = sim.pos.distance_to(Vector2(float(p.center), float(p.row) * Tuning.TILE)) > 160.0
 	if refuel_trip:
 		tgt_pad_id = "F"
 	var heading_exit := tgt_pad_id == "" and run.exit_open
@@ -154,6 +163,11 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 				# Frühestmögliche Ankunft (Höchsttempo) bis späteste Ankunft (aktuelles Tempo) + Durchflugzeit muss offen sein
 				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
+		for ch in inside:                                    # Tor schließt gleich: aus den Flügeln heraus, zur näheren Seite
+			if level.door_time_to_close(ch, level.clock) < 1.0:
+				var out := level.door_escape(sim.pos, Tuning.HULL_HALF)
+				if out != Vector2.ZERO:
+					v_des = out.normalized() * 60.0
 	if level.has_movers():
 		# Trümmer/Schieber: Bahn des Taxis (Anfahrt auf die Wunschgeschwindigkeit) gegen die vorhergesagten Hindernisse prüfen
 		# und bei drohendem Treffer schweben und warten
@@ -216,11 +230,18 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 				level.movers_ignore = true
 				var wall := level.box_hits_solid(sim.pos + cand * 24.0, Tuning.HULL_HALF + Vector2(4, 4))
 				level.movers_ignore = prev_ig
-				if wall:
+				if wall or _near_spikes(sim.pos + cand * 24.0):
 					continue
 				if not level.movers_collide_traj(sim.pos, sim.vel, cand * 55.0, ehalf, level.clock, 0.8):
 					v_des = cand * 55.0
 					break
+	if v_des == Vector2.ZERO and sim.state == TaxiSim.State.FLYING and _unsafe_wait(sim.pos):      # beim Warten nicht an Dornen oder in Hitze schweben
+		for k in 16:
+			var cand := Vector2.RIGHT.rotated(float(k) * PI / 8.0)
+			var reach := 14.0 + 10.0 * float(k % 3)
+			if not _unsafe_wait(sim.pos + cand * reach) and not level.box_hits_solid(sim.pos + cand * reach, Tuning.HULL_HALF + Vector2(2, 2)):
+				v_des = cand * 45.0
+				break
 	var blocked_now := v_des_before != Vector2.ZERO and v_des == Vector2.ZERO
 	if was_blocked and not blocked_now and v_des != Vector2.ZERO:
 		goal_key = ""                       # nach dem Warten (Absinken, Drift) neu planen

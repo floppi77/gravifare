@@ -102,6 +102,17 @@ func start_shift() -> void:
 	shift_next = _pick_shift_map(first)
 	start_level(first)
 
+## Debug-Modus ein- oder ausschalten (bleibt über einen Neustart erhalten).
+func set_debug(on: bool) -> void:
+	Save.debug = on
+	Settings.set_value("debug", on)
+
+## Game Over im Feldzug: zurück an den Anfang des Sektors. Gibt das Level zurück, mit dem es weitergeht.
+func lose_sector(sector: int) -> LevelData:
+	var first := "s%d_01" % sector
+	Save.lose_sector(sector, first, randi() % 1000000)
+	return LevelData.load_file(level_path(first))
+
 ## Nächste Karte: nur Level, die schon geschafft sind (mindestens Sektor 1).
 func _pick_shift_map(avoid: String) -> String:
 	var pool: Array = Save.data.completed.keys().filter(func(id): return level_ids().has(id) and id != avoid)
@@ -170,6 +181,7 @@ var _presses: Array = []
 var _frame := 0
 
 func _ready() -> void:
+	Save.debug = Settings.values.debug
 	for a in OS.get_cmdline_user_args():
 		if a == "--dump-input":
 			for act in ["ui_accept", "ui_cancel", "ui_up", "ui_down", "gear", "pause"]:

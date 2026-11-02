@@ -51,7 +51,7 @@
    "from": "2",
    "to": "5",
    "fare": 170,
-   "par": 98,
+   "par": 104,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -67,7 +67,7 @@
    "from": "6",
    "to": "5",
    "fare": 190,
-   "par": 26,
+   "par": 47,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "4",
    "to": "6",
    "fare": 200,
-   "par": 12,
+   "par": 10,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -123,10 +123,10 @@
  "zones": [
   {
    "kind": "magnet",
-   "cx": 3.5,
+   "cx": 15.5,
    "cy": 4.5,
    "r": 4.95685424949238,
-   "k": 90
+   "k": 70
   },
   {
    "kind": "wind",

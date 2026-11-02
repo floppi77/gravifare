@@ -63,22 +63,14 @@ func _ready() -> void:
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.add_theme_color_override("font_color", Color("#ffe14a"))
 	stage.add_child(info)
-	var challenge := MenuKit.button("", func(): pass)
-	var cref := func(): challenge.text = tr("GARAGE_CHALLENGE") + ": " + tr("ON" if Cosmetics.challenge() else "OFF")
-	cref.call()
-	challenge.pressed.connect(func():
-		Cosmetics.set_challenge(not Cosmetics.challenge())
-		cref.call())
-	challenge.position = Vector2(220, 300)
-	challenge.custom_minimum_size = Vector2(200, 18)
-	stage.add_child(challenge)
 	var back := MenuKit.button(tr("MENU_BACK"), func(): Flow.to_menu())
 	back.position = Vector2(270, 324)
 	back.custom_minimum_size = Vector2(100, 18)
 	stage.add_child(back)
 	await get_tree().process_frame
-	if not buttons.is_empty():
-		buttons[0].grab_focus()
+	for b in buttons:
+		if b.get_meta("id") == Cosmetics.selected("paint"):
+			b.grab_focus()
 
 func _column(kind: String, x: float, head: String) -> void:
 	var col := VBoxContainer.new()
@@ -96,7 +88,9 @@ func _column(kind: String, x: float, head: String) -> void:
 		var b := Button.new()
 		b.focus_mode = Control.FOCUS_ALL
 		b.custom_minimum_size = Vector2(170, 18)
-		b.text = ("◆ " if Cosmetics.selected(kind) == it.id else "") + (nm if unlocked else "🔒 " + nm)
+		b.set_meta("id", it.id)
+		b.set_meta("label", nm if unlocked else "🔒 " + nm)
+		b.set_meta("kind", kind)
 		b.add_theme_font_size_override("font_size", 9)
 		if not unlocked:
 			b.add_theme_color_override("font_color", Color("#6a729c"))
@@ -104,20 +98,25 @@ func _column(kind: String, x: float, head: String) -> void:
 			if unlocked:
 				Cosmetics.select(kind, it.id)
 				Sfx.play("ui_ok")
-				get_tree().reload_current_scene()
+				_mark()
+				info.text = nm + "  ✔"
 			else:
 				Sfx.play("warn", -6.0))
 		b.focus_entered.connect(func():
 			Sfx.play("ui_move", -6.0)
 			info.text = (Cosmetics.requirement_text(it) if not unlocked else (nm + "  ✔" if Cosmetics.selected(kind) == it.id else nm))
-			if unlocked:
-				if kind == "paint":
-					preview.paint = it.id
-				else:
-					preview.sticker = it.id)
+			# Vorschau zeigt das fokussierte Teil, die andere Spalte bleibt wie gewählt
+			preview.paint = it.id if unlocked and kind == "paint" else Cosmetics.selected("paint")
+			preview.sticker = it.id if unlocked and kind == "sticker" else Cosmetics.selected("sticker"))
 		col.add_child(b)
 		buttons.append(b)
 	stage.add_child(col)
+	_mark()
+
+## Gewählte Teile mit ◆ kennzeichnen.
+func _mark() -> void:
+	for b in buttons:
+		b.text = ("◆ " if Cosmetics.selected(b.get_meta("kind")) == b.get_meta("id") else "") + b.get_meta("label")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

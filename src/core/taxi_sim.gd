@@ -80,7 +80,12 @@ func _door_crush() -> void:
 	var off := Vector2(0, Tuning.GEAR_LEN * gear * 0.5)
 	if not level.hits_closed_door(pos + off, half):
 		return
-	_crush_out(off, half)
+	var out := level.door_escape(pos + off, half)
+	if out == Vector2.ZERO:
+		_crush_out(off, half)
+		return
+	pos += out
+	_crush_hit(out.normalized())
 
 ## Gequetscht (Tor, oder Mover drückt gegen Fels): Schaden, und das Taxi wird zur nächstgelegenen freien Seite hinausgeschleudert.
 func _crush_out(off: Vector2, half: Vector2) -> void:
@@ -98,7 +103,10 @@ func _crush_out(off: Vector2, half: Vector2) -> void:
 		best_dir = Vector2(0, -1)
 		best_d = 12
 	pos += best_dir * float(best_d + 1)
-	vel = best_dir * Tuning.DOOR_EJECT_SPEED
+	_crush_hit(best_dir)
+
+func _crush_hit(dir: Vector2) -> void:
+	vel = dir * Tuning.DOOR_EJECT_SPEED
 	tilt = 0.0
 	if state == State.LANDED:
 		state = State.FLYING
@@ -396,7 +404,7 @@ func _impact(speed: float) -> void:
 
 ## Dornen: fester Zusatzschaden je Berührung (nicht tempoabhängig), mit kurzer Sperre gegen Mehrfachzählung.
 func _spikes(box_center: Vector2) -> void:
-	if state != State.DESTROYED and level.box_hits_char(box_center, Tuning.HULL_HALF, "^"):
+	if state != State.DESTROYED and (level.box_hits_char(box_center, Tuning.HULL_HALF, "^") or level.box_hits_pad_spikes(box_center, Tuning.HULL_HALF)):
 		_spike_hit()
 
 func _spike_hit() -> void:

@@ -59,7 +59,7 @@
    "from": "1",
    "to": "7",
    "fare": 170,
-   "par": 31,
+   "par": 32,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -145,8 +145,8 @@
   },
   {
    "kind": "heat",
-   "x": 4,
-   "y": 14,
+   "x": 28,
+   "y": 3,
    "w": 3,
    "h": 2,
    "period": 9.0,

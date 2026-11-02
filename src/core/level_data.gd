@@ -27,10 +27,13 @@ var par_time := 90.0
 var start_fuel := Tuning.FUEL_MAX
 var raw := {}
 var tutorial := false            # Tutorial-Level (data/tutorial/tutorial.json): Geduld unbegrenzt, Zusatzfahrgäste nur auf Befehl des Skripts
-## Bewegliche Tore (Zeichen "a".."e" im Raster, Parameter im JSON unter "doors"): öffnen und schließen im festen Takt.
-## Geschlossen sind sie fest wie Fels. Schließt ein Tor, während das Taxi darin ist, nimmt es Schaden und wird zur nächsten Seite hinausgeschleudert (TaxiSim).
+## Schiebetore (Zeichen "a".."e" im Raster, Parameter im JSON unter "doors"): Zwei Flügel fahren im festen Takt von beiden Seiten zu, bleiben kurz
+## geschlossen und fahren wieder auf: senkrecht in Wänden, waagerecht in Böden. Die Flügel sind fest wie Fels. Treffen sie das Taxi im Tor, nimmt es Schaden
+## und wird zur nächsten Seite hinausgeschleudert (TaxiSim).
 const DOOR_CHARS := "abcde"
-var doors := {}                  # Zeichen -> {cells: Array[Vector2i], period, open, phase}
+const DOOR_CLOSE := 1.7          # Sekunden, die ein Tor zum Schließen braucht
+const DOOR_OPEN := 1.2           # … und zum Öffnen
+var doors := {}                  # Zeichen -> {cells: Array[Vector2i], gates: [{rect: Rect2 (px), vertical: bool}], period, open, phase}; open = Dauer ganz offen
 var clock := 0.0                 # Simulationszeit (setzt TaxiSim), bestimmt den Torzustand
 var doors_ignore := false        # Planung/Zeichnen: Tore gelten als offen
 var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
@@ -214,6 +217,27 @@ func _scan_doors(params: Dictionary) -> void:
 					var p: Dictionary = params.get(c, {})
 					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0))}
 				doors[c].cells.append(Vector2i(x, y))
+	for c in doors:
+		doors[c]["gates"] = _door_gates(c)
+
+## Zusammenhängende Torzellen als Rechteck; Flügel fahren senkrecht, wenn über und unter dem Tor Wand steht (Durchflug waagerecht).
+func _door_gates(ch: String) -> Array:
+	var out: Array = []
+	var left: Array = doors[ch].cells.duplicate()
+	while not left.is_empty():
+		var todo: Array = [left.pop_back()]
+		var r := Rect2i(todo[0], Vector2i.ONE)
+		while not todo.is_empty():
+			var p: Vector2i = todo.pop_back()
+			r = r.merge(Rect2i(p, Vector2i.ONE))
+			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if left.has(p + d):
+					left.erase(p + d)
+					todo.append(p + d)
+		var above := cell(r.position.x, r.position.y - 1) != "."
+		var below := cell(r.position.x, r.end.y) != "."
+		out.append({"rect": Rect2(Vector2(r.position) * Tuning.TILE, Vector2(r.size) * Tuning.TILE), "vertical": above and below})
+	return out
 
 ## Passagierpad (weder Tank-, Lebens-Station noch Krankenhaus; das Krankenhaus „H“ ist nur Ziel von Krankentransporten).
 func is_passenger_pad(id: String) -> bool:
@@ -310,7 +334,7 @@ func _scan_movers(list: Array) -> void:
 			"ay": float(d.get("dy", 0)) * Tuning.TILE, "period": maxf(float(d.get("period", 8.0)), 0.5), "phase": float(d.get("phase", 0.0)),
 			"shape": String(d.get("shape", "line")), "pad": String(d.get("pad", "")),
 			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0)),
-			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0)), "paint": int(d.get("paint", d.get("tint", 0)))}
+			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0)), "paint": int(d.get("paint", d.get("tint", 0))), "spikes": bool(d.get("spikes", false))}
 		if kind == "vehicle":
 			m["w"] = 26.0                         # Trefferfläche passend zum Rumpf des Taxi-Sprites (32 × 20 px), etwas kleiner als die Grafik
 			m["h"] = 12.0
@@ -484,7 +508,7 @@ func movers_hit_box(center: Vector2, half: Vector2) -> bool:
 		return false
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.kind != "beam" and m.rect.intersects(box):          # Plasmastrahlen sind nicht fest: man fliegt hindurch (und verbrennt)
+		if m.kind != "beam" and (m.rect.intersects(box) or (m.spikes and pad_spike_rect(m).intersects(box))):          # Plasmastrahlen sind nicht fest: man fliegt hindurch (und verbrennt)
 			return true
 	return false
 
@@ -538,6 +562,30 @@ func door_is_open(ch: String, t: float) -> bool:
 	var d: Dictionary = doors.get(ch, {})
 	return doors_forced_open or d.is_empty() or fposmod(t + float(d.phase), float(d.period)) < float(d.open)
 
+## Öffnung des Tors: 1 = ganz offen, 0 = geschlossen. Im Takt: offen, schließen, kurz geschlossen, öffnen.
+func door_gap(ch: String, t: float) -> float:
+	var d: Dictionary = doors.get(ch, {})
+	if doors_forced_open or d.is_empty():
+		return 1.0
+	var m := fposmod(t + float(d.phase), float(d.period))
+	var shut := float(d.open) + DOOR_CLOSE
+	var shut_end := maxf(float(d.period) - DOOR_OPEN, shut)
+	if m < float(d.open):
+		return 1.0
+	if m < shut:
+		return 1.0 - (m - float(d.open)) / DOOR_CLOSE
+	return 0.0 if m < shut_end else (m - shut_end) / (float(d.period) - shut_end)
+
+## Die beiden Flügel eines Tors bei Öffnung `gap`.
+static func door_leaves(gate: Dictionary, gap: float) -> Array:
+	var r: Rect2 = gate.rect
+	var f := (1.0 - gap) * 0.5
+	if gate.vertical:
+		var h := r.size.y * f
+		return [Rect2(r.position, Vector2(r.size.x, h)), Rect2(r.position.x, r.end.y - h, r.size.x, h)]
+	var w := r.size.x * f
+	return [Rect2(r.position, Vector2(w, r.size.y)), Rect2(r.end.x - w, r.position.y, w, r.size.y)]
+
 ## Ist das Tor im gesamten Zeitfenster [t0, t0 + length] offen? (Bot: erst losfliegen, wenn die Passage reicht.)
 func door_open_window(ch: String, t0: float, length: float) -> bool:
 	var t := t0
@@ -571,27 +619,43 @@ func door_time_to_close(ch: String, t: float) -> float:
 	var m := fposmod(t + float(d.phase), float(d.period))
 	return maxf(0.0, float(d.open) - m) if m < float(d.open) else 0.0
 
-func _door_cell_closed(cx: int, cy: int, c: String) -> bool:
-	return not (doors_ignore or door_is_open(c, clock))
+func _door_cell_closed(c: String) -> bool:
+	return not doors_ignore and door_gap(c, clock) <= 0.0
 
+## Berührt die Box einen Torflügel?
 func hits_closed_door(center: Vector2, half: Vector2) -> bool:
-	if doors.is_empty():
+	if doors.is_empty() or doors_ignore:
 		return false
-	var x0 := floori((center.x - half.x) / Tuning.TILE)
-	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
-	var y0 := floori((center.y - half.y) / Tuning.TILE)
-	var y1 := floori((center.y + half.y - 0.001) / Tuning.TILE)
-	for cy in range(y0, y1 + 1):
-		for cx in range(x0, x1 + 1):
-			var c := cell(cx, cy)
-			if DOOR_CHARS.contains(c) and c != "" and not door_is_open(c, clock):
-				return true
+	var box := Rect2(center - half, half * 2.0)
+	for ch in doors:
+		var gap := door_gap(ch, clock)
+		if gap >= 1.0:
+			continue
+		for gate in doors[ch].gates:
+			for leaf in door_leaves(gate, gap):
+				if box.intersects(leaf):
+					return true
 	return false
+
+## Weg aus dem Tor für eine Box, die die Flügel treffen: quer zu ihrer Fahrrichtung zur näheren freien Seite, ganz aus dem Tor heraus. Null, wenn beide Seiten belegt sind.
+func door_escape(center: Vector2, half: Vector2) -> Vector2:
+	var box := Rect2(center - half, half * 2.0)
+	for ch in doors:
+		for gate in doors[ch].gates:
+			var r: Rect2 = gate.rect
+			if not box.intersects(r):
+				continue
+			var a := Vector2(r.position.x - half.x - 1.0 - center.x, 0.0) if gate.vertical else Vector2(0.0, r.position.y - half.y - 1.0 - center.y)
+			var b := Vector2(r.end.x + half.x + 1.0 - center.x, 0.0) if gate.vertical else Vector2(0.0, r.end.y + half.y + 1.0 - center.y)
+			for out in ([a, b] if a.length() <= b.length() else [b, a]):
+				if not box_hits_solid(center + out, half):
+					return out
+	return Vector2.ZERO
 
 func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
 	if c != "" and DOOR_CHARS.contains(c):
-		return _door_cell_closed(cx, cy, c)
+		return _door_cell_closed(c)
 	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or c == "H" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:
@@ -599,10 +663,12 @@ func is_solid_at(p: Vector2) -> bool:
 		for m in movers:
 			if m.kind != "beam" and m.rect.has_point(p):
 				return true
+	if hits_closed_door(p, Vector2(0.01, 0.01)):
+		return true
 	return is_solid_cell(floori(p.x / Tuning.TILE), floori(p.y / Tuning.TILE))
 
 func box_hits_solid(center: Vector2, half: Vector2) -> bool:
-	if movers_hit_box(center, half):
+	if movers_hit_box(center, half) or hits_closed_door(center, half):
 		return true
 	var x0 := floori((center.x - half.x) / Tuning.TILE)
 	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
@@ -616,6 +682,8 @@ func box_hits_solid(center: Vector2, half: Vector2) -> bool:
 
 ## Wie box_hits_solid, aber nur das feste Raster (ohne Mover).
 func box_hits_cells(center: Vector2, half: Vector2) -> bool:
+	if hits_closed_door(center, half):
+		return true
 	var x0 := floori((center.x - half.x) / Tuning.TILE)
 	var x1 := floori((center.x + half.x - 0.001) / Tuning.TILE)
 	var y0 := floori((center.y - half.y) / Tuning.TILE)
@@ -624,6 +692,20 @@ func box_hits_cells(center: Vector2, half: Vector2) -> bool:
 		for cx in range(x0, x1 + 1):
 			if is_solid_cell(cx, cy):
 				return true
+	return false
+
+## Dornen an der Unterseite fahrender Plattformen (Mover "pad" mit "spikes": true).
+const PAD_SPIKE_H := 7.0
+
+func pad_spike_rect(m: Dictionary) -> Rect2:
+	var r: Rect2 = m.rect
+	return Rect2(r.position.x, r.end.y, r.size.x, PAD_SPIKE_H)
+
+func box_hits_pad_spikes(center: Vector2, half: Vector2) -> bool:
+	var box := Rect2(center - half, half * 2.0)
+	for m in movers:
+		if m.spikes and not movers_ignore and box.intersects(pad_spike_rect(m)):
+			return true
 	return false
 
 func box_hits_char(center: Vector2, half: Vector2, ch: String) -> bool:

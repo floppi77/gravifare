@@ -181,17 +181,24 @@ static func dim_rect(alpha: float) -> ColorRect:
 	r.size = Vector2(4640, 4360)
 	return r
 
-## Spielversion, klein unten rechts auf der 640×360-Fläche.
+## Copyright und Spielversion, klein unten rechts auf der 640×360-Fläche.
 static func version_label() -> Label:
 	var l := Label.new()
-	l.text = "v" + Flow.VERSION
+	l.text = "© 2026 / floppi   v" + Flow.VERSION
 	l.add_theme_font_size_override("font_size", 8)
 	l.add_theme_color_override("font_color", Color("#c9cfee"))
 	l.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.1, 0.9))
 	l.add_theme_constant_override("outline_size", 2)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.position = Vector2(590, 344)
-	l.size = Vector2(44, 12)
+	l.anchor_left = 1.0                # an der Ecke verankert: Eine feste Größe vor dem Einhängen würde mit der Standardschrift gemessen
+	l.anchor_right = 1.0
+	l.anchor_top = 1.0
+	l.anchor_bottom = 1.0
+	l.offset_left = -166.0
+	l.offset_right = -6.0
+	l.offset_top = -16.0
+	l.offset_bottom = -4.0
+	l.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	return l
 

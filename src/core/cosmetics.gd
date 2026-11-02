@@ -80,29 +80,20 @@ func selected(kind: String) -> String:
 	var id: String = c.get(kind, "std" if kind == "paint" else "none")
 	return id if is_unlocked(id) else ("std" if kind == "paint" else "none")
 
-func challenge() -> bool:
-	return bool(Save.data.get("cosmetics", {}).get("challenge", false))
-
 func select(kind: String, id: String) -> void:
 	var c: Dictionary = Save.data.get("cosmetics", {})
 	c[kind] = id
 	Save.data["cosmetics"] = c
 	Save.write()
 
-func set_challenge(on: bool) -> void:
-	var c: Dictionary = Save.data.get("cosmetics", {})
-	c["challenge"] = on
-	Save.data["cosmetics"] = c
-	Save.write()
-
 func paint_texture(id := "") -> Texture2D:
 	if id == "":
-		id = "std" if challenge() else selected("paint")
+		id = selected("paint")
 	return _tex("res://assets/art/taxi_%s.png" % id)
 
 func sticker_texture(id := "") -> Texture2D:
 	if id == "":
-		id = "none" if challenge() else selected("sticker")
+		id = selected("sticker")
 	if id == "none":
 		return null
 	return _tex("res://assets/art/sticker_%s.png" % id)

@@ -35,7 +35,7 @@
    "from": "5",
    "to": "7",
    "fare": 180,
-   "par": 25,
+   "par": 20,
    "passenger": "Mika",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "6",
    "to": "7",
    "fare": 190,
-   "par": 31,
+   "par": 25,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "1",
    "to": "7",
    "fare": 200,
-   "par": 14,
+   "par": 12,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -59,7 +59,7 @@
    "from": "1",
    "to": "2",
    "fare": 210,
-   "par": 35,
+   "par": 28,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -75,7 +75,7 @@
    "from": "5",
    "to": "2",
    "fare": 230,
-   "par": 13,
+   "par": 10,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -83,7 +83,7 @@
    "from": "1",
    "to": "4",
    "fare": 240,
-   "par": 32,
+   "par": 58,
    "passenger": "Nora",
    "gender": "f"
   },
@@ -91,7 +91,7 @@
    "from": "3",
    "to": "6",
    "fare": 250,
-   "par": 23,
+   "par": 24,
    "passenger": "Tarek",
    "gender": "m"
   },
@@ -145,54 +145,52 @@
    "path": [
     [
      0.5,
-     10.5
+     6.5
+    ],
+    [
+     24.5,
+     6.5
+    ],
+    [
+     24.5,
+     9.5
     ],
     [
      39.5,
-     10.5
+     9.5
     ]
    ],
    "w": 2,
    "h": 1,
-   "speed": 40.0,
+   "speed": 56.0,
    "phase": 0.0,
-   "paint": 0
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     0.5,
-     10.5
-    ],
-    [
-     39.5,
-     10.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 5.73,
-   "paint": 1
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     0.5,
-     10.5
-    ],
-    [
-     39.5,
-     10.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 40.0,
-   "phase": 11.47,
    "paint": 2
+  },
+  {
+   "kind": "vehicle",
+   "path": [
+    [
+     0.5,
+     6.5
+    ],
+    [
+     24.5,
+     6.5
+    ],
+    [
+     24.5,
+     9.5
+    ],
+    [
+     39.5,
+     9.5
+    ]
+   ],
+   "w": 2,
+   "h": 1,
+   "speed": 56.0,
+   "phase": 6.57,
+   "paint": 3
   }
  ],
  "zones": [

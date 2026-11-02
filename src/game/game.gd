@@ -126,6 +126,8 @@ func _ready() -> void:
 		if ua3.begins_with("--clip="):           # Dev: Einspieler sofort zeigen
 			clip_pending = ua3.substr(7)
 			clip_delay = 0.3
+	if OS.get_cmdline_user_args().has("--debug-bay"):        # Dev: Werkstatt nach dem Sektor sofort zeigen
+		_open_bay.call_deferred()
 	if OS.get_cmdline_user_args().has("--debug-open-exit"):
 		run.exit_open = true
 		run.level.exit_open = true
@@ -423,6 +425,8 @@ func _set_paused(on: bool) -> void:
 		pause_menu = null
 
 func _unhandled_input(event: InputEvent) -> void:
+	if bay != null:
+		return
 	if trans_t >= 0.0:
 		# Levelwechsel: A/Enter/B/Esc überspringen die Sequenz bis zum Einblenden; sonst keine Eingabe
 		if (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")) and trans_t < TV.T_IN - 0.01:
@@ -434,23 +438,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("pause"):
+		get_viewport().set_input_as_handled()     # vor einem möglichen Szenenwechsel
 		if run.result == Run.Result.RUNNING:
 			_set_paused(not paused)
 		elif run.result == Run.Result.FAILED and not hud.game_over:
 			pass        # Absturz-Sequenz läuft: nicht ins Menü springen (sonst ließe sich das verlorene Leben über „Fortsetzen“ zurückholen)
 		else:
 			Flow.to_menu()
-		get_viewport().set_input_as_handled()
 	elif paused:
 		return
 	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
+		get_viewport().set_input_as_handled()     # vor einem Szenenwechsel: danach hat der Knoten keinen Viewport mehr
 		if Flow.next_level_id() != "":
-			_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
+			if Workshop.due(run.level.number) and not Flow.shift:
+				_open_bay()         # Sektor geschafft: erst in die Werkstatt
+			else:
+				_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
 		elif hud.result.get("counted", false):
 			Flow.to_finale()        # letztes Level geschafft: Finale und Abspann
 		else:
 			Flow.to_menu()
-		get_viewport().set_input_as_handled()
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept"):
 			Flow.to_menu()
@@ -630,7 +637,7 @@ func _lose_life() -> void:
 			hud.shift_total = Flow.shift_fares + run.delivered + run.extras_delivered
 			Flow.finish_shift(run.delivered + run.extras_delivered)
 		elif not Flow.practice:
-			Save.clear_campaign()
+			hud.over_level = Flow.lose_sector(run.level.sector).number
 		return
 	if not Flow.practice:
 		Save.note_campaign_lives(Flow.lives)
@@ -1030,14 +1037,38 @@ func _play_radio() -> void:
 	trans.radio_len = length
 	hud.subtitle(tr("SPK_DISPATCH"), txt, length + 0.6)        # läuft unter dem Overlay weiter und erscheint beim Einblenden
 
-func _begin_transition() -> void:
+## Stand für das nächste Level festhalten: Sprit, Credits und Ausgangs-Fahrgast laufen mit.
+func _store_progress() -> void:
 	next_id = Flow.next_level_id()
-	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)     # Sprit und Credits laufen mit
+	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)
 	Flow.entry_credits = run.money
 	Flow.carry_passenger = run.carried
 	entry_carry = {}
 	if not Flow.practice:
 		Save.set_campaign({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried})
+
+## Werkstatt nach dem Sektor: liegt über allem; verlässt das Taxi sie, beginnt der Levelwechsel direkt im Weltraum.
+func _open_bay() -> void:
+	_store_progress()
+	Music.duck(-8.0)
+	var layer := CanvasLayer.new()
+	layer.layer = 13
+	bay = WorkshopBay.new()
+	bay.sector = run.level.sector
+	bay.wallet = run.money
+	bay.leave = func():
+		run.money = bay.wallet
+		bay = null
+		_begin_transition()
+		trans_t = TV.T_OUT
+		trans.t = trans_t
+	layer.add_child(bay)
+	add_child(layer)
+
+var bay: WorkshopBay = null
+
+func _begin_transition() -> void:
+	_store_progress()
 	if OS.get_cmdline_user_args().has("--debug-carry") and Flow.carry_passenger.is_empty():     # Dev: Ausgangs-Fahrgast simulieren
 		Flow.carry_passenger = {"name": "Odo", "look": 2, "gender": "m"}
 	var nl := LevelData.load_file(Flow.level_path(next_id))

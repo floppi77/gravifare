@@ -793,8 +793,8 @@
    "seconds": 5.79
   },
   "de/d0_r8": {
-   "text": "Achtung, Dornen! Jede Berührung kostet dreißig Hülle.",
-   "seconds": 4.36
+   "text": "Achtung, Dornen! Bei jeder Berührung nimmt dein Taxi Schaden.",
+   "seconds": 4.04
   },
   "de/d0_r9": {
    "text": "Nadelspitzen. Hetz dich nicht, aber trödel auch nicht.",
@@ -817,8 +817,8 @@
    "seconds": 4.76
   },
   "de/d0_r14": {
-   "text": "Neu: Schleusentore. Sie schließen im Takt, lass dich nicht einsperren.",
-   "seconds": 5.64
+   "text": "Neu: Schiebetore. Sie schließen im Takt, lass dich nicht einsperren.",
+   "seconds": 5.53
   },
   "de/d0_r15": {
    "text": "Zwei Schleusen hintereinander. Zähl den Takt mit.",
@@ -1053,8 +1053,8 @@
    "seconds": 3.88
   },
   "en/d0_r8": {
-   "text": "Watch out, spikes! Every touch costs thirty hull.",
-   "seconds": 3.64
+   "text": "Watch out, spikes! Every touch damages your taxi.",
+   "seconds": 4.06
   },
   "en/d0_r9": {
    "text": "Needle points. Do not rush, but do not dawdle either.",
@@ -1077,8 +1077,8 @@
    "seconds": 4.92
   },
   "en/d0_r14": {
-   "text": "New: lock gates. They close on a beat, do not get trapped.",
-   "seconds": 5.48
+   "text": "New: sliding gates. They close on a beat, do not get trapped.",
+   "seconds": 5.72
   },
   "en/d0_r15": {
    "text": "Two locks in a row. Count the beat.",
@@ -1321,8 +1321,8 @@
    "seconds": 1.54
   },
   "de/d0_r23": {
-   "text": "Schrottgürtel. Trümmer driften durchs Feld, jede Berührung kostet Hülle.",
-   "seconds": 4.52
+   "text": "Schrottgürtel. Trümmer driften durchs Feld, bei jeder Berührung nimmt dein Taxi Schaden.",
+   "seconds": 6.81
   },
   "de/d0_r24": {
    "text": "Die Kranbahn ist heute gut besucht. Halte Abstand zu den Brocken.",
@@ -1409,8 +1409,8 @@
    "seconds": 5.48
   },
   "de/d0_r45": {
-   "text": "Solarschmiede. Neu: Hitzezonen. Wer darin fliegt, glüht, und die Hülle schmilzt.",
-   "seconds": 7.8
+   "text": "Solarschmiede. Neu: Hitzezonen. Wer darin fliegt, glüht, und sein Taxi nimmt Schaden.",
+   "seconds": 7.84
   },
   "de/d0_r46": {
    "text": "Neu: Plasmastrahlen. Sie laden kurz auf, dann brennen sie. Warte den Takt ab.",
@@ -1437,8 +1437,8 @@
    "seconds": 5.13
   },
   "en/d0_r23": {
-   "text": "Scrap Belt. Debris drifts through the field, every touch costs hull.",
-   "seconds": 4.76
+   "text": "Scrap Belt. Debris drifts through the field, every touch damages your taxi.",
+   "seconds": 5.88
   },
   "en/d0_r24": {
    "text": "The crane track is busy today. Keep your distance from the chunks.",
@@ -1525,8 +1525,8 @@
    "seconds": 5.88
   },
   "en/d0_r45": {
-   "text": "Solar forge. New: heat zones. Whoever flies inside glows, and the hull melts.",
-   "seconds": 8.12
+   "text": "Solar forge. New: heat zones. Whoever flies inside glows, and the taxi takes damage.",
+   "seconds": 7.88
   },
   "en/d0_r46": {
    "text": "New: plasma beams. They charge briefly, then burn. Wait for the beat.",
@@ -1845,8 +1845,8 @@
    "seconds": 11.34
   },
   "de/i0_tut_landing": {
-   "text": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt die Hülle Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
-   "seconds": 11.98
+   "text": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
+   "seconds": 13.42
   },
   "de/i0_tut_hard": {
    "text": "Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird. Hier kostet das nichts.",
@@ -1945,8 +1945,8 @@
    "seconds": 9.93
   },
   "en/i0_tut_landing": {
-   "text": "Now for landing. If you land slowly and level, all is well. If you are faster, the hull takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
-   "seconds": 11.92
+   "text": "Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
+   "seconds": 13.36
   },
   "en/i0_tut_hard": {
    "text": "Try it: dive down with full power and land so hard that the taxi is destroyed. Here it costs nothing.",
@@ -2001,16 +2001,16 @@
    "seconds": 4.4
   },
   "de/i0_vid_spikes": {
-   "text": "Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung kostet dich dreißig Hülle, egal wie langsam du bist. Halte Abstand.",
-   "seconds": 7.5
+   "text": "Dornen. Sie sitzen auf Felsen und Plattformen. Jede Berührung beschädigt dein Taxi, egal wie langsam du bist. Halte Abstand.",
+   "seconds": 7.34
   },
   "de/i0_vid_doors": {
-   "text": "Schleusentore öffnen und schließen im festen Takt. Warte, bis das Tor offen ist, und flieg zügig hindurch. Schließt es auf dir, wirst du hinausgeschleudert und verlierst Hülle.",
-   "seconds": 9.81
+   "text": "Schiebetore fahren im Takt von beiden Seiten zu, bleiben kurz geschlossen und öffnen wieder. Warte, bis das Tor offen ist, und flieg zügig hindurch. Erwischt es dich, wirst du hinausgeschleudert, und dein Taxi nimmt Schaden.",
+   "seconds": 13.34
   },
   "de/i0_vid_debris": {
-   "text": "Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Eine Berührung kostet fünfzehn Hülle.",
-   "seconds": 8.7
+   "text": "Trümmerstücke schweben auf festen Bahnen. Beobachte ihren Rhythmus und flieg durch, wenn die Bahn frei ist. Bei einer Berührung nimmt dein Taxi Schaden.",
+   "seconds": 9.26
   },
   "de/i0_vid_moving_pad": {
    "text": "Fahrende Plattformen gleiten auf Schienen. Fliege über sie, passe dein Tempo an und lande im Tempo der Plattform. Das Taxi fährt mit.",
@@ -2021,12 +2021,12 @@
    "seconds": 12.06
   },
   "de/i0_vid_meteors": {
-   "text": "Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer kostet zwanzig Hülle.",
-   "seconds": 9.74
+   "text": "Meteoriten stürzen auf festen Bahnen herab. Die Bahn blinkt, bevor sie fallen. Bleib fern, bis der Stein vorbei ist. Ein Treffer beschädigt dein Taxi.",
+   "seconds": 9.1
   },
   "de/i0_vid_slider": {
-   "text": "Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und kosten dreißig Hülle. Passiere sie, wenn sie weit genug weg sind.",
-   "seconds": 9.9
+   "text": "Schieber sind große, schwere Blöcke. Sie quetschen alles, was zwischen ihnen und einer Wand bleibt, und beschädigen dein Taxi schwer. Passiere sie, wenn sie weit genug weg sind.",
+   "seconds": 10.22
   },
   "de/i0_vid_magnet_pull": {
    "text": "Magnetfelder ziehen dein Taxi zum Kern. Je näher, desto stärker. Steuere rechtzeitig dagegen, sonst landest du im Zentrum.",
@@ -2041,12 +2041,12 @@
    "seconds": 7.5
   },
   "de/i0_vid_heat": {
-   "text": "Hitzezonen glühen. Wer darin fliegt, verliert laufend Hülle. Flieg schnell hindurch oder, besser, um sie herum.",
-   "seconds": 6.93
+   "text": "Hitzezonen glühen. Solange du darin fliegst, nimmt dein Taxi laufend Schaden. Flieg schnell hindurch oder, besser, um sie herum.",
+   "seconds": 7.81
   },
   "de/i0_vid_beam": {
-   "text": "Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl verlierst du Hülle. Warte, bis er erlischt, und flieg dann hindurch.",
-   "seconds": 8.86
+   "text": "Plasmastrahlen laden kurz auf und brennen dann. Das Blinken warnt dich. Im Strahl nimmt dein Taxi Schaden. Warte, bis er erlischt, und flieg dann hindurch.",
+   "seconds": 9.74
   },
   "de/i0_vid_heat_pulse": {
    "text": "Lavablasen kühlen im Takt ab und glühen wieder auf. Sind sie dunkel, kannst du gefahrlos hindurch. Achte auf den Takt.",
@@ -2065,24 +2065,24 @@
    "seconds": 5.57
   },
   "de/i0_vid_traffic": {
-   "text": "Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Eine Kollision kostet achtzehn Hülle. Warte eine Lücke ab und kreuze die Bahn.",
-   "seconds": 9.64
+   "text": "Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Bei einer Kollision nimmt dein Taxi Schaden. Warte eine Lücke ab und kreuze die Bahn.",
+   "seconds": 10.67
   },
   "de/i0_vid_dark": {
    "text": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
    "seconds": 9.82
   },
   "en/i0_vid_spikes": {
-   "text": "Spikes. They sit on rocks and platforms. Every touch costs you thirty hull, no matter how slowly you fly. Keep your distance.",
-   "seconds": 7.84
+   "text": "Spikes. They sit on rocks and platforms. Every touch damages your taxi, no matter how slowly you fly. Keep your distance.",
+   "seconds": 8.4
   },
   "en/i0_vid_doors": {
-   "text": "Lock gates open and close on a fixed beat. Wait until the gate is open and fly through quickly. If it closes on you, you get thrown out and lose hull.",
-   "seconds": 8.85
+   "text": "Sliding gates close from both sides on a fixed beat, stay shut briefly and open again. Wait until the gate is open and fly through quickly. If it catches you, you get thrown out and your taxi takes damage.",
+   "seconds": 11.67
   },
   "en/i0_vid_debris": {
-   "text": "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch costs fifteen hull.",
-   "seconds": 7.07
+   "text": "Debris drifts along fixed paths. Watch its rhythm and fly through when the path is clear. A touch damages your taxi.",
+   "seconds": 6.83
   },
   "en/i0_vid_moving_pad": {
    "text": "Moving pads glide on rails. Fly over one, match its speed and land at the pad's own pace. The taxi rides along.",
@@ -2093,12 +2093,12 @@
    "seconds": 11.15
   },
   "en/i0_vid_meteors": {
-   "text": "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit costs twenty hull.",
-   "seconds": 8.47
+   "text": "Meteors plunge down fixed lanes. The lane flashes before they fall. Stay clear until the rock has passed. A hit damages your taxi.",
+   "seconds": 8.63
   },
   "en/i0_vid_slider": {
-   "text": "Sliders are big, heavy blocks. They crush anything caught between them and a wall and cost thirty hull. Pass them when they are far enough away.",
-   "seconds": 8.16
+   "text": "Sliders are big, heavy blocks. They crush anything caught between them and a wall and badly damage your taxi. Pass them when they are far enough away.",
+   "seconds": 9.36
   },
   "en/i0_vid_magnet_pull": {
    "text": "Magnetic fields pull your taxi toward the core. The closer, the stronger. Steer against it in time, or you end up in the center.",
@@ -2113,12 +2113,12 @@
    "seconds": 6.27
   },
   "en/i0_vid_heat": {
-   "text": "Heat zones glow. Anyone flying inside constantly loses hull. Fly through quickly or, better, around them.",
-   "seconds": 6.63
+   "text": "Heat zones glow. As long as you fly inside, your taxi keeps taking damage. Fly through quickly or, better, around them.",
+   "seconds": 7.03
   },
   "en/i0_vid_beam": {
-   "text": "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam you lose hull. Wait until it goes out, then fly through.",
-   "seconds": 8.38
+   "text": "Plasma beams charge briefly, then burn. The flashing warns you. Inside the beam your taxi takes damage. Wait until it goes out, then fly through.",
+   "seconds": 9.34
   },
   "en/i0_vid_heat_pulse": {
    "text": "Lava blobs cool down on a beat and glow up again. When they are dark you can pass safely. Watch the beat.",
@@ -2137,8 +2137,8 @@
    "seconds": 5.18
   },
   "en/i0_vid_traffic": {
-   "text": "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision costs eighteen hull. Wait for a gap and cross the lane.",
-   "seconds": 8.21
+   "text": "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision damages your taxi. Wait for a gap and cross the lane.",
+   "seconds": 8.69
   },
   "en/i0_vid_dark": {
    "text": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.",

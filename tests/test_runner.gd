@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -532,6 +532,51 @@ func _test_wrong_pad_rules() -> void:
 	r._check_wrong_pad(other, true)
 	check(r.log.any(func(e): return e.type == "wrong_pad"), "Nach echtem Flug zählt dieselbe Plattform wieder als falsch")
 	var cs: Script = load("res://src/core/controls.gd")
+	check(Workshop.due(11) and Workshop.due(88) and not Workshop.due(99) and not Workshop.due(12), "Werkstatt nach jedem Sektor, nicht nach Level 99")
+	var ce := CodeEntry.new("marvin")
+	var feed := func(text: String, step_ms: int) -> bool:
+		var done := false
+		for i in text.length():
+			done = ce.feed(text[i], 1000 + i * step_ms) or done
+		return done
+	check(feed.call("MaRvIn", 100), "Code: Groß- und Kleinschreibung egal")
+	check(not feed.call("marvin", 700), "Code: nach 3 Sekunden ungültig")
+	check(not feed.call("marxin", 100), "Code: Tippfehler zählt nicht")
+	check(feed.call("mmarvin", 100), "Code: Neuanfang nach falschem Buchstaben")
+	# Game Over im Feldzug
+	var sv3: Node = load("res://src/core/save.gd").new()
+	sv3.path = "user://test_save_over.json"
+	sv3.data.completed = {"s1_11": {}, "s2_01": {}, "s2_09": {}}
+	sv3.data["workshop"] = {"jets": 2}
+	sv3.data["campaign"] = {"level": "s2_10", "credits": 5000.0}
+	sv3.lose_sector(2, "s2_01", 7)
+	check(sv3.data.completed.has("s1_11") and not sv3.data.completed.has("s2_01") and not sv3.data.completed.has("s2_09"), "Game Over: Sektor weg, frühere Sektoren bleiben")
+	check(sv3.data.campaign.level == "s2_01" and float(sv3.data.campaign.credits) == 0.0 and sv3.data.workshop.is_empty(), "Game Over: Sektoranfang, keine Credits, keine Einbauten")
+	check(sv3.ever_completed().has("s2_09"), "Game Over: Freischaltungen bleiben")
+	check(not sv3.shift_unlocked(["s1_11", "s2_10"]) and sv3.shift_unlocked(["s1_11", "s2_01"]), "Nachtschicht erst nach allen Leveln")
+	sv3.debug = true
+	check(sv3.shift_unlocked(["s9_11"]), "Debug gibt die Nachtschicht frei")
+	DirAccess.remove_absolute("user://test_save_over.json")
+	sv3.free()
+	# Schiebetore
+	var ld := LevelData.load_file("res://data/levels/s2_03.json")
+	var dk: String = ld.doors.keys()[0]
+	var dd: Dictionary = ld.doors[dk]
+	var shut_t := float(dd.open) + LevelData.DOOR_CLOSE + 0.1 - float(dd.phase)
+	check(ld.door_gap(dk, -float(dd.phase) + 0.1) == 1.0 and ld.door_gap(dk, shut_t) == 0.0, "Schiebetor: offen und geschlossen im Takt")
+	var half_t := float(dd.open) + LevelData.DOOR_CLOSE * 0.5 - float(dd.phase)
+	check(absf(ld.door_gap(dk, half_t) - 0.5) < 0.01, "Schiebetor: fährt gleichmäßig zu")
+	var gate: Dictionary = dd.gates[0]
+	check(not gate.vertical, "Tor im Boden: Flügel fahren waagerecht")
+	var c0: Vector2 = (gate.rect as Rect2).get_center()
+	ld.clock = half_t
+	check(not ld.hits_closed_door(c0, Vector2(4, 4)) and ld.hits_closed_door((gate.rect as Rect2).position + Vector2(4, 4), Vector2(4, 4)), "Halb geschlossen: Mitte frei, Rand blockiert")
+	ld.clock = shut_t
+	check(ld.hits_closed_door(c0, Vector2(4, 4)) and ld.is_solid_at(c0), "Geschlossen: Tor ist fest")
+	var wall := LevelData.load_file("res://data/levels/s2_10.json")
+	for ch in wall.doors:
+		for g in wall.doors[ch].gates:
+			check(g.vertical, "Tor in der Wand: Flügel fahren senkrecht")
 	# Musikplayer: Freischaltung
 	var tr_all := TrackList.all()
 	check(tr_all.size() == 22, "Musikplayer listet alle 22 Stücke")
@@ -638,9 +683,9 @@ func _test_doors() -> void:
 	s.state = TaxiSim.State.FLYING
 	s.pos = Vector2(120.0, 80.0)
 	s.vel = Vector2.ZERO
-	for i in int(2.5 / Tuning.TICK):
-		s.step(Vector2(1, -0.39), false)
-	check(s.pos.x < 10.0 * Tuning.TILE and s.time < 3.0, "Geschlossenes Tor ist fest (x=%.0f)" % s.pos.x)
+	lv.clock = 1.75                    # Takt: bei t = 0 schließend, um 1,75 ganz zu
+	check(lv.box_hits_solid(Vector2(10.5 * Tuning.TILE, 80.0), Tuning.HULL_HALF), "Geschlossenes Tor ist fest")
+	s.time = 3.0                       # Tor ganz offen
 	var crossed := false
 	for i in int(2.4 / Tuning.TICK):
 		s.step(Vector2(1, -0.39), false)
@@ -653,13 +698,15 @@ func _test_doors() -> void:
 	s2.state = TaxiSim.State.FLYING
 	s2.pos = Vector2(10.0 * Tuning.TILE + 8.0, 80.0)
 	s2.vel = Vector2.ZERO
-	s2.time = 5.95                     # Tor ist offen und schließt bei t = 6
+	s2.time = 5.95                     # Tor ist offen und beginnt bei t = 6 zu schließen
 	var crushed := false
-	for i in 20:
+	for i in int(2.0 / Tuning.TICK):
 		s2.step(Vector2(0, -0.39), false)
 		for e in s2.events:
 			if e.type == "damage" and e.get("crush", false):
 				crushed = true
+		if crushed:
+			break
 	check(crushed and s2.hull <= 100.0 - Tuning.DOOR_CRUSH_DAMAGE + 0.01, "Tor schließt auf dem Taxi: Schaden (%.0f Hülle)" % s2.hull)
 	check(absf(s2.pos.x - (10.0 * Tuning.TILE + 8.0)) >= 14.0 and s2.state != TaxiSim.State.DESTROYED and not lv.box_hits_solid(s2.pos, Tuning.HULL_HALF), "…und wird zur nächsten Seite hinausgeschleudert (x=%.0f)" % s2.pos.x)
 	# Planung ignoriert Tore (Bot wartet davor)
@@ -966,6 +1013,65 @@ func _test_force_zones_apart() -> void:
 				if _zone_overlap(forces[i], forces[j]):
 					bad.append("%s (Level %d)" % [lv.id, lv.number])
 	check(bad.is_empty() and total > 20, "Kraftzonen überlappen sich in keinem Level (%d Zonen geprüft) %s" % [total, str(bad.slice(0, 3))])
+
+## Fremde Fahrzeuge fliegen nie durch Haltestellen (Plattform mit Hütte, wartendem Fahrgast und gelandetem Taxi), und ihre Tunnelöffnungen halten Abstand.
+func _test_traffic_avoids_stations() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	var bad: Array = []
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		var zones: Array = []
+		for id in lv.pads:
+			var p: Dictionary = lv.pads[id]
+			var ax := float(p.get("dx", 0.0)) if not p.get("moving", false) else 0.0
+			var x0 := float(p.x0) - 8.0
+			var x1 := float(p.x1) + 8.0
+			for m in lv.movers:
+				if m.kind == "pad" and m.pad == id:
+					x0 = float(m.x) - float(m.ax) - 8.0
+					x1 = float(m.x) + float(m.w) + float(m.ax) + 8.0
+			zones.append(Rect2(x0, (float(p.row) - 2.0) * Tuning.TILE, x1 - x0, 2.0 * Tuning.TILE))
+		for m in lv.movers:
+			if m.kind != "vehicle":
+				continue
+			var pts: PackedVector2Array = m.pts
+			for i in range(pts.size() - 1):
+				var horiz := absf(pts[i + 1].x - pts[i].x) >= absf(pts[i + 1].y - pts[i].y)
+				var half := Vector2(13, 6) if horiz else Vector2(6, 13)
+				var n := int(pts[i].distance_to(pts[i + 1]) / 4.0) + 1
+				for k in n + 1:
+					var c := pts[i].lerp(pts[i + 1], float(k) / float(n))
+					for z in zones:
+						if (z as Rect2).intersects(Rect2(c - half, half * 2.0)) and not bad.has(lv.id):
+							bad.append(lv.id)
+			for e in [pts[0], pts[pts.size() - 1]]:
+				for z in zones:
+					var zr: Rect2 = z
+					var gap := Vector2(maxf(maxf(zr.position.x - e.x, e.x - zr.end.x), 0.0), maxf(maxf(zr.position.y - e.y, e.y - zr.end.y), 0.0))
+					if gap.length() < 0.5 * Tuning.TILE and not bad.has(lv.id + " Öffnung"):
+						bad.append(lv.id + " Öffnung")
+	check(bad.is_empty(), "Fahrzeugrouten meiden Haltestellen %s" % str(bad))
+	# Sinnvolle Routen: lang, quer durchs Level, kein kurzer Haken am Ein- oder Ausgang
+	var short: Array = []
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		for m in lv.movers:
+			if m.kind != "vehicle":
+				continue
+			var pts: PackedVector2Array = m.pts
+			var box := Rect2(pts[0], Vector2.ZERO)
+			for q in pts:
+				box = box.expand(q)
+			var first := pts[0].distance_to(pts[1])
+			var last := pts[pts.size() - 2].distance_to(pts[pts.size() - 1])
+			if float(m.total) < 24.0 * Tuning.TILE or (box.size.x < 15.0 * Tuning.TILE and box.size.y < 12.0 * Tuning.TILE) or first < 5.0 * Tuning.TILE or last < 5.0 * Tuning.TILE:
+				if not short.has(lv.id):
+					short.append(lv.id)
+	check(short.is_empty(), "Fahrzeugrouten führen quer durchs Level %s" % str(short))
 
 func _test_traffic() -> void:
 	var rows: Array = []
@@ -1313,14 +1419,9 @@ func _test_job_rules_and_difficulty() -> void:
 		check(exit_only_last, "%s: nur der letzte Auftrag führt zum Ausgang" % lvl.id)
 		var m := LevelMetrics.analyze(lvl)
 		check(m.solvable, "%s: Route planbar (Korridor %.0f px)" % [lvl.id, m.clearance])
-		# Lückenfüller (spätere Plätze der Sektoren 7–9, nachträglich ergänzt) dürfen auf gleicher Schwierigkeitsstufe liegen: bis 14 Punkte
-		# unter dem bisherigen Höchstwert; alle anderen Level steigen strikt.
-		# Level 17 und 21 stehen auf Wunsch von Hand an ihrem Platz und gelten ebenso als Ausnahme.
-		var filler: bool = (lvl.sector == 7 and lvl.index >= 9) or (lvl.sector == 8 and lvl.index >= 9) or (lvl.sector == 9 and lvl.index >= 8) or lvl.id in ["S2-06", "S2-10"]
-		if filler:
-			check(m.score >= prev_score - 14.0, "Schwierigkeit (Lückenfüller): %s %.1f ≥ %s %.1f − 14" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
-		else:
-			check(m.score >= prev_score, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
+		# Die Level sind von Hand nachgearbeitet (Festlegung floppi): Der Trend muss steigen, einzelne Level dürfen bis 14 Punkte unter dem bisherigen Höchstwert liegen.
+		check(m.score >= prev_score - 14.0, "Schwierigkeit steigt: %s %.1f ≥ %s %.1f − 14" % [lvl.id, m.score, prev_id, maxf(prev_score, 0.0)])
+		if m.score > prev_score:
 			prev_score = m.score
 			prev_id = lvl.id
 
@@ -1849,10 +1950,9 @@ func _test_replay_trace() -> void:
 	check(rep.trace.size() == int(Replay.TRACE_HZ) * 2 * Replay.TRACE_FIELDS, "Geist-Spur tastet mit %.0f Hz ab (%d Werte)" % [Replay.TRACE_HZ, rep.trace.size()])
 
 func _test_workshop_buy() -> void:
-	var d := {"campaign": {"level": "s1_05", "credits": 2500.0}}
-	check(Workshop.buy(d, "jets") and Workshop.level_of(d, "jets") == 1 and d.campaign.credits == 500.0, "Kauf zieht Credits vom Feldzug ab")
-	check(not Workshop.buy(d, "hull"), "Zu wenig Credits: kein Kauf")
-	check(not Workshop.buy({"campaign": {}}, "gear"), "Ohne Feldzug: kein Kauf")
+	var d := {}
+	check(Workshop.buy(d, "jets", 2500.0) == 500.0 and Workshop.level_of(d, "jets") == 1, "Kauf zieht die Credits ab")
+	check(Workshop.buy(d, "hull", 500.0) < 0.0 and Workshop.level_of(d, "hull") == 0, "Zu wenig Credits: kein Kauf")
 
 func _test_landing_plate() -> void:
 	var lvl := LevelData.load_file("res://data/levels/s1_01.json")
@@ -1975,7 +2075,7 @@ func _test_medals_need_all_jobs() -> void:
 
 func _test_practice_keeps_campaign() -> void:
 	var src := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(src.contains("if not Flow.practice:\n\t\tSave.set_campaign") and src.contains("if not Flow.practice:\n\t\t\tSave.clear_campaign"), "Übungsflüge schreiben und löschen keinen Feldzug")
+	check(src.contains("if not Flow.practice:\n\t\tSave.set_campaign") and src.contains("elif not Flow.practice:\n\t\t\thud.over_level = Flow.lose_sector"), "Übungsflüge schreiben und löschen keinen Feldzug")
 
 func _test_controls_remap() -> void:
 	var c: Node = load("res://src/core/controls.gd").new()
@@ -2116,7 +2216,7 @@ func _test_save_robust() -> void:
 	sv2.slot = 1
 	sv2.load_save()
 	check(sv2.is_completed("s1_01") and sv2.best_time("s1_01") == 60.0, "Speichern und Neuladen (Fortschritt bleibt nach Neustart)")
-	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and (Save.DEBUG_UNLOCK_ALL or not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2)), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers (Debug: alles frei)")
+	check(sv2.is_unlocked(["s1_01", "s1_02"], 1) and (not sv2.is_unlocked(["s1_01", "s1_02", "s1_03"], 2)), "Freischaltung: Nachfolger erst nach Abschluss des Vorgängers (Debug: alles frei)")
 	_rm(sv.path)
 	sv.free()
 	sv2.free()

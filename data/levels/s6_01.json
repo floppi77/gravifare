@@ -75,7 +75,7 @@
    "from": "1",
    "to": "2",
    "fare": 200,
-   "par": 15,
+   "par": 27,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -83,7 +83,7 @@
    "from": "6",
    "to": "3",
    "fare": 210,
-   "par": 19,
+   "par": 15,
    "passenger": "Nora",
    "gender": "f"
   },
@@ -99,7 +99,9 @@
  "mechanics": [
   "chicane",
   "spikes",
-  "currents"
+  "currents",
+  "magnets",
+  "repel_fields"
  ],
  "zones": [
   {
@@ -110,6 +112,13 @@
    "h": 19,
    "ax": 0,
    "ay": 55
+  },
+  {
+   "kind": "magnet",
+   "cx": 23.5,
+   "cy": 6.5,
+   "r": 6.0,
+   "k": -110
   }
  ]
 }

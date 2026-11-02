@@ -3,8 +3,8 @@
  "sector": 1,
  "index": 1,
  "name": {
-  "de": "Schleusentore",
-  "en": "Lock gates"
+  "de": "Schiebetore",
+  "en": "Sliding gates"
  },
  "map": [
   "########################################",
@@ -69,8 +69,8 @@
    }
   ],
   "title": {
-   "de": "Schleusentore",
-   "en": "Lock gates"
+   "de": "Schiebetore",
+   "en": "Sliding gates"
   }
  }
 }

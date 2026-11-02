@@ -43,7 +43,7 @@
    "from": "5",
    "to": "6",
    "fare": 140,
-   "par": 26,
+   "par": 34,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -67,7 +67,7 @@
    "from": "5",
    "to": "2",
    "fare": 170,
-   "par": 13,
+   "par": 14,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "1",
    "to": "3",
    "fare": 180,
-   "par": 17,
+   "par": 14,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -120,8 +120,8 @@
   },
   {
    "kind": "magnet",
-   "cx": 36.5,
-   "cy": 15.5,
+   "cx": 16.5,
+   "cy": 12.5,
    "r": 4.3,
    "k": -120
   }

@@ -12,7 +12,7 @@ var dev_session := false
 var data := _default_data()
 
 static func _default_data() -> Dictionary:
-	return {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none", "challenge": false}, "campaign": {}}
+	return {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none"}, "campaign": {}}
 
 var slot_prefix := "user://save_"      # Tests weichen auf eigene Dateien aus
 
@@ -99,7 +99,7 @@ func load_save() -> void:
 		if not (data.get("campaign") is Dictionary):
 			data["campaign"] = {}
 		if not data.has("cosmetics"):
-			data["cosmetics"] = {"paint": "std", "sticker": "none", "challenge": false}
+			data["cosmetics"] = {"paint": "std", "sticker": "none"}
 	else:
 		var bad := path + ".bad"
 		if FileAccess.file_exists(bad):               # frühere Sicherung nicht überschreiben
@@ -179,8 +179,34 @@ func note_max(key: String, value: int) -> void:
 func count_event(key: String, n := 1) -> void:
 	data.stats[key] = int(data.stats.get(key, 0)) + n
 
-## Ein Level ist frei, wenn es das erste ist oder sein Vorgänger abgeschlossen wurde.
-const DEBUG_UNLOCK_ALL := true       # TEMPORÄR (Debug): alle Level in der Levelauswahl frei – vor der Veröffentlichung auf false setzen
+## Debug-Modus (im Hauptmenü per Code ein- und abschaltbar, Settings.values.debug): alles frei.
+var debug := false
 
+## Ein Level ist frei, wenn es das erste ist oder sein Vorgänger abgeschlossen wurde.
 func is_unlocked(ids: Array, i: int) -> bool:
-	return DEBUG_UNLOCK_ALL or i == 0 or is_completed(ids[i - 1]) or is_completed(ids[i])
+	return debug or i == 0 or is_completed(ids[i - 1]) or is_completed(ids[i])
+
+## Jemals geschaffte Level: bleiben auch nach einem Game Over gültig (Musik, Nachtschicht).
+func ever_completed() -> Dictionary:
+	var out: Dictionary = data.get("ever", {}).duplicate()
+	out.merge(data.completed)
+	return out
+
+## Nachtschicht: erst, wenn alle Level einmal geschafft wurden.
+func shift_unlocked(ids: Array) -> bool:
+	var done := ever_completed()
+	return debug or ids.all(func(id): return done.has(id))
+
+## Game Over im Feldzug: Der Fortschritt des Sektors geht verloren, die Einbauten der Werkstatt und alle Credits auch.
+## Weiter geht es mit `first_level`, dem ersten Level des Sektors.
+func lose_sector(sector: int, first_level: String, run_seed: int) -> void:
+	var ever: Dictionary = data.get("ever", {})
+	var prefix := "s%d_" % sector
+	for id in data.completed.keys():
+		ever[id] = true
+		if String(id).begins_with(prefix):
+			data.completed.erase(id)
+	data["ever"] = ever
+	data["workshop"] = {}
+	data["campaign"] = {"level": first_level, "lives": Tuning.START_LIVES, "fuel": Tuning.FUEL_MAX, "credits": 0.0, "seed": run_seed, "carry": {}}
+	write()

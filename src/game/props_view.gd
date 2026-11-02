@@ -140,21 +140,49 @@ func _draw_doors() -> void:
 		return
 	for ch in level.doors:
 		var d: Dictionary = level.doors[ch]
-		var open := level.door_is_open(ch, level.clock)
+		var gap := level.door_gap(ch, level.clock)
 		var ttc := level.door_time_to_close(ch, level.clock)
-		var warn := open and ttc > 0.0 and ttc < 1.3 and int(t * 8.0) % 2 == 0
-		for c in d.cells:
-			var r := Rect2(c.x * T, c.y * T, T, T)
-			if open:
-				var rc := Color("#ffd24a") if warn else Color(0.36, 1.0, 0.6, 0.55)
-				draw_rect(r.grow(-0.6), rc, false, 0.8)
+		var warn := gap >= 1.0 and ttc > 0.0 and ttc < 1.3 and int(t * 8.0) % 2 == 0
+		var lamp := Color("#ffd24a") if warn else (Color(0.36, 1.0, 0.6, 0.8) if gap >= 1.0 else Color("#ff4d6d"))
+		for gate in d.gates:
+			_draw_slide_gate(gate, gap, lamp)
+
+## Schiebetor: zwei Flügel mit Warnstreifen, die Streifen laufen mit der Vorderkante; Schienen und Lampen zeigen den Zustand auch bei offenem Tor.
+func _draw_slide_gate(gate: Dictionary, gap: float, lamp: Color) -> void:
+	var r: Rect2 = gate.rect
+	var vert: bool = gate.vertical
+	var leaves := LevelData.door_leaves(gate, gap)
+	for i in leaves.size():
+		var leaf: Rect2 = leaves[i]
+		if leaf.size.x <= 0.0 or leaf.size.y <= 0.0:
+			continue
+		draw_rect(leaf, Color("#161c45"))
+		var along := leaf.size.y if vert else leaf.size.x
+		var u := 0.0
+		var n := 0
+		while u < along:                                      # Streifen von der Vorderkante aus
+			var w := minf(3.0, along - u)
+			var col := Color("#ffc23a") if n % 2 == 0 else Color("#0c0f24")
+			if vert:
+				draw_rect(Rect2(leaf.position.x + 1.0, leaf.end.y - u - w if i == 0 else leaf.position.y + u, leaf.size.x - 2.0, w), col)
 			else:
-				draw_rect(r, Color("#161c45"))
-				for i in 4:
-					var yy := r.position.y + 1.5 + i * 3.8
-					draw_rect(Rect2(r.position.x + 1.0, yy, T - 2.0, 1.8), Color("#ffc23a") if i % 2 == 0 else Color("#0c0f24"))
-				draw_rect(r.grow(-0.4), Color("#7f8fe0"), false, 0.8)
-				draw_rect(Rect2(r.position.x + T * 0.5 - 1.0, r.position.y + T * 0.5 - 1.0, 2.0, 2.0), Color("#ff4d6d") if int(t * 3.0) % 2 == 0 else Color("#7a2438"))
+				draw_rect(Rect2(leaf.end.x - u - w if i == 0 else leaf.position.x + u, leaf.position.y + 1.0, w, leaf.size.y - 2.0), col)
+			u += 3.0
+			n += 1
+		draw_rect(leaf, Color("#7f8fe0"), false, 0.8)
+		if vert:
+			draw_rect(Rect2(leaf.position.x, leaf.end.y - 1.0 if i == 0 else leaf.position.y, leaf.size.x, 1.0), Color("#e8ecff"))
+		else:
+			draw_rect(Rect2(leaf.end.x - 1.0 if i == 0 else leaf.position.x, leaf.position.y, 1.0, leaf.size.y), Color("#e8ecff"))
+	# Schienen an den Seiten, Lampen an den Enden
+	for k in 2:
+		var q := float(k)
+		if vert:
+			draw_rect(Rect2(r.position.x + q * (r.size.x - 1.0), r.position.y, 1.0, r.size.y), Color(0.5, 0.58, 0.85, 0.7))
+			draw_rect(Rect2(r.position.x + r.size.x * 0.5 - 2.0, r.position.y + q * (r.size.y - 1.5) , 4.0, 1.5), lamp)
+		else:
+			draw_rect(Rect2(r.position.x, r.position.y + q * (r.size.y - 1.0), r.size.x, 1.0), Color(0.5, 0.58, 0.85, 0.7))
+			draw_rect(Rect2(r.position.x + q * (r.size.x - 1.5), r.position.y + r.size.y * 0.5 - 2.0, 1.5, 4.0), lamp)
 
 ## Bewegliche Hindernisse: Trümmer (zerklüfteter Brocken mit orangem Warnrand), Schieber (Block mit Warnstreifen) und
 ## fahrende Landeplattformen (Platte auf Schiene mit leuchtender Landefläche; der Unterstand fährt mit).
@@ -458,6 +486,13 @@ func _draw_movers_main() -> void:
 			for i in int(r.size.x / 16.0):
 				draw_rect(Rect2(r.position.x + 3.0 + i * 16.0, r.position.y + 9.0, 10.0, 2.0), Color("#0c0f24"))
 			draw_rect(r, Color("#7f8fe0"), false, 0.8)
+			if m.spikes:
+				var sr := level.pad_spike_rect(m)
+				var sx := sr.position.x
+				while sx < sr.end.x - 1.0:
+					draw_colored_polygon(PackedVector2Array([Vector2(sx, sr.position.y), Vector2(sx + 8.0, sr.position.y), Vector2(sx + 4.0, sr.end.y)]), Color("#ff6f91"))
+					draw_line(Vector2(sx + 4.0, sr.position.y), Vector2(sx + 4.0, sr.end.y - 1.0), Color("#ffe0e8"), 0.7)
+					sx += 8.0
 			continue
 		var col := Color("#3b3f5e") if m.kind == "debris" else Color("#232a52")
 		draw_rect(r, col)

@@ -10,6 +10,7 @@ var sub_t := 0.0
 var paused := false
 var game_over := false
 var shift_total := -1            # Nachtschicht: Ergebnis der Schicht (Fahrgäste)
+var over_level := 0              # Game Over im Feldzug: Level, mit dem es weitergeht
 var price_flash := 0.0
 var lost_t := 0.0                # Restzeit der „Patient verloren“-Anzeige
 var lost_age := 99.0
@@ -190,6 +191,8 @@ func _draw() -> void:
 		var over_line := tr("HUD_RUN_CREDITS") + ": ¢ %d" % int(run.money)
 		if shift_total >= 0:
 			over_line = tr("HUD_SHIFT_RESULT") % [shift_total, int(Save.data.stats.get("shift_best", 0))]
+		elif over_level > 0:
+			over_line = tr("HUD_OVER_SECTOR") % over_level
 		draw_string(font, Vector2(0, size.y * 0.42 + 20), over_line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("#ffe14a"))
 		draw_string(font, Vector2(0, size.y * 0.42 + 40), tr("HUD_GAME_OVER_HINT"), HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color.WHITE)
 	elif run.result == Run.Result.FAILED:

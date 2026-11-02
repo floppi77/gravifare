@@ -35,7 +35,7 @@
    "from": "4",
    "to": "5",
    "fare": 180,
-   "par": 13,
+   "par": 12,
    "passenger": "Mika",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "6",
    "to": "H",
    "fare": 237,
-   "par": 22,
+   "par": 23,
    "passenger": "Odo",
    "gender": "m",
    "fragile": true
@@ -60,7 +60,7 @@
    "from": "3",
    "to": "2",
    "fare": 210,
-   "par": 41,
+   "par": 33,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -76,7 +76,7 @@
    "from": "1",
    "to": "7",
    "fare": 230,
-   "par": 26,
+   "par": 21,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -84,7 +84,7 @@
    "from": "1",
    "to": "2",
    "fare": 240,
-   "par": 12,
+   "par": 22,
    "passenger": "Nora",
    "gender": "f"
   },
@@ -92,7 +92,7 @@
    "from": "1",
    "to": "6",
    "fare": 250,
-   "par": 13,
+   "par": 10,
    "passenger": "Tarek",
    "gender": "m"
   },
@@ -146,16 +146,24 @@
    "path": [
     [
      39.5,
-     12.5
+     3.5
+    ],
+    [
+     27.5,
+     3.5
+    ],
+    [
+     27.5,
+     5.5
     ],
     [
      0.5,
-     12.5
+     5.5
     ]
    ],
    "w": 2,
    "h": 1,
-   "speed": 48.0,
+   "speed": 56.0,
    "phase": 0.0,
    "paint": 0
   },
@@ -164,36 +172,26 @@
    "path": [
     [
      39.5,
-     12.5
+     3.5
+    ],
+    [
+     27.5,
+     3.5
+    ],
+    [
+     27.5,
+     5.5
     ],
     [
      0.5,
-     12.5
+     5.5
     ]
    ],
    "w": 2,
    "h": 1,
-   "speed": 48.0,
-   "phase": 4.78,
+   "speed": 56.0,
+   "phase": 6.43,
    "paint": 1
-  },
-  {
-   "kind": "vehicle",
-   "path": [
-    [
-     39.5,
-     12.5
-    ],
-    [
-     0.5,
-     12.5
-    ]
-   ],
-   "w": 2,
-   "h": 1,
-   "speed": 48.0,
-   "phase": 9.56,
-   "paint": 2
   }
  ],
  "zones": [

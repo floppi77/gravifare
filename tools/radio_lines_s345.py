@@ -1,7 +1,7 @@
 """Funksprüche für Sektor 3–5 (Level 23–55); passend zu den tatsächlich gebauten Leveln (siehe LEVELS.md)."""
 L345 = {}
 # ---- Sektor 3 Schrottgürtel (23–33)
-L345[23] = ("Schrottgürtel. Trümmer driften durchs Feld, jede Berührung kostet Hülle.", "Scrap Belt. Debris drifts through the field, every touch costs hull.")
+L345[23] = ("Schrottgürtel. Trümmer driften durchs Feld, bei jeder Berührung nimmt dein Taxi Schaden.", "Scrap Belt. Debris drifts through the field, every touch damages your taxi.")
 L345[24] = ("Die Kranbahn ist heute gut besucht. Halte Abstand zu den Brocken.", "The crane track is busy today. Keep your distance from the chunks.")
 L345[25] = ("Neu: fahrende Landeplattformen auf Schienen. Lande im Tempo der Plattform.", "New: moving landing pads on rails. Land at the pad's own speed.")
 L345[26] = ("Das Trümmerfeld meldet dichten Verkehr. Fliege vorausschauend.", "The debris field reports heavy traffic. Fly ahead of the chunks.")
@@ -25,7 +25,7 @@ L345[42] = ("Rettungsfeld. Ein Patient im Magnetfeld, flieg besonders sanft.", "
 L345[43] = ("Magnetträger. Die Plattformen fahren, die Felder auch.", "Magnet carriers. The platforms move, and so do the fields.")
 L345[44] = ("Magnetmeister. Letztes Level im Magnetfeld, danach wird es heiß.", "Magnet master. Last level in the magnetic field, then it gets hot.")
 # ---- Sektor 5 Solarschmiede (45–54; Level 55 folgt)
-L345[45] = ("Solarschmiede. Neu: Hitzezonen. Wer darin fliegt, glüht, und die Hülle schmilzt.", "Solar forge. New: heat zones. Whoever flies inside glows, and the hull melts.")
+L345[45] = ("Solarschmiede. Neu: Hitzezonen. Wer darin fliegt, glüht, und sein Taxi nimmt Schaden.", "Solar forge. New: heat zones. Whoever flies inside glows, and the taxi takes damage.")
 L345[46] = ("Neu: Plasmastrahlen. Sie laden kurz auf, dann brennen sie. Warte den Takt ab.", "New: plasma beams. They charge briefly, then burn. Wait for the beat.")
 L345[47] = ("Hitzewelle. Neu: Lavablasen, die im Takt erlöschen und wieder aufglühen.", "Heat wave. New: lava blobs that cool down and glow up again on a beat.")
 L345[48] = ("Taktgeber. Heiß, getaktet und mit einer Lebensstation zum Aufatmen.", "Pacemaker. Hot, timed, and with a life station to catch your breath.")

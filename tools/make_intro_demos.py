@@ -147,7 +147,7 @@ def doors():
     put(r, 20, 3, 20, 8, "#")
     put(r, 20, 9, 20, 12, "a")
     put(r, 20, 13, 20, 19, "#")
-    return level("doors", r, ("Schleusentore", "Lock gates"), {
+    return level("doors", r, ("Schiebetore", "Sliding gates"), {
         "focus": [320, 184], "zoom": 1.5, "length": 9.5, "start": [200, 176],
         "script": [{"t": 0, "mode": "hover", "p": [200, 176]}, {"t": 3.1, "mode": "go", "p": [450, 176], "speed": 80}]},
         doors={"a": {"period": 6.0, "open": 3.0, "phase": 3.0}})

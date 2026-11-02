@@ -43,7 +43,7 @@
    "from": "2",
    "to": "7",
    "fare": 190,
-   "par": 25,
+   "par": 22,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "1",
    "to": "4",
    "fare": 200,
-   "par": 26,
+   "par": 28,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -59,7 +59,7 @@
    "from": "3",
    "to": "6",
    "fare": 210,
-   "par": 40,
+   "par": 32,
    "passenger": "Jonas",
    "gender": "m"
   },
@@ -67,7 +67,7 @@
    "from": "4",
    "to": "1",
    "fare": 220,
-   "par": 28,
+   "par": 37,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "3",
    "to": "4",
    "fare": 230,
-   "par": 17,
+   "par": 14,
    "passenger": "Ben",
    "gender": "m"
   },
@@ -83,7 +83,7 @@
    "from": "5",
    "to": "4",
    "fare": 240,
-   "par": 46,
+   "par": 77,
    "passenger": "Nora",
    "gender": "f"
   },
@@ -91,7 +91,7 @@
    "from": "1",
    "to": "4",
    "fare": 250,
-   "par": 41,
+   "par": 35,
    "passenger": "Tarek",
    "gender": "m"
   },
@@ -99,7 +99,7 @@
    "from": "6",
    "to": "exit",
    "fare": 260,
-   "par": 19,
+   "par": 30,
    "passenger": "Mika",
    "gender": "f"
   }
@@ -127,8 +127,8 @@
  "movers": [
   {
    "kind": "debris",
-   "x": 4,
-   "y": 12,
+   "x": 2,
+   "y": 16,
    "w": 2,
    "h": 1,
    "dx": 1,
@@ -240,42 +240,6 @@
    "phase": 10.3
   },
   {
-   "kind": "slider",
-   "x": 27,
-   "y": 4,
-   "w": 2,
-   "h": 3,
-   "dx": 0,
-   "dy": 2,
-   "period": 8.3,
-   "phase": 4.2,
-   "shape": "line"
-  },
-  {
-   "kind": "slider",
-   "x": 21,
-   "y": 6,
-   "w": 2,
-   "h": 3,
-   "dx": 0,
-   "dy": 2,
-   "period": 6.4,
-   "phase": 6.4,
-   "shape": "line"
-  },
-  {
-   "kind": "slider",
-   "x": 28,
-   "y": 4,
-   "w": 2,
-   "h": 3,
-   "dx": 0,
-   "dy": 2,
-   "period": 7.5,
-   "phase": 4.0,
-   "shape": "line"
-  },
-  {
    "kind": "meteor",
    "x": 24,
    "y": 1,
@@ -300,18 +264,6 @@
    "warn": 2.0,
    "period": 22.0,
    "phase": 4.2
-  },
-  {
-   "kind": "debris",
-   "x": 27,
-   "y": 5,
-   "w": 1,
-   "h": 2,
-   "dx": 0,
-   "dy": 2,
-   "period": 7.4,
-   "phase": 0.9,
-   "shape": "line"
   },
   {
    "kind": "debris",
@@ -350,30 +302,6 @@
    "phase": 1.9
   },
   {
-   "kind": "debris",
-   "x": 28,
-   "y": 5,
-   "w": 1,
-   "h": 2,
-   "dx": 0,
-   "dy": 2,
-   "period": 7.0,
-   "phase": 2.9,
-   "shape": "line"
-  },
-  {
-   "kind": "debris",
-   "x": 28,
-   "y": 5,
-   "w": 1,
-   "h": 2,
-   "dx": 0,
-   "dy": 2,
-   "period": 7.0,
-   "phase": 4.2,
-   "shape": "line"
-  },
-  {
    "kind": "meteor",
    "x": 27,
    "y": 1,
@@ -399,39 +327,27 @@
    "shape": "line"
   },
   {
-   "kind": "debris",
-   "x": 29,
-   "y": 5,
-   "w": 1,
-   "h": 2,
-   "dx": 0,
-   "dy": 2,
-   "period": 7.9,
-   "phase": 1.5,
-   "shape": "line"
-  },
-  {
-   "kind": "debris",
-   "x": 29,
+   "kind": "slider",
+   "x": 24,
    "y": 4,
-   "w": 1,
+   "w": 2,
    "h": 2,
    "dx": 0,
    "dy": 2,
-   "period": 8.6,
-   "phase": 2.9,
+   "period": 8.0,
+   "phase": 0.0,
    "shape": "line"
   },
   {
-   "kind": "debris",
+   "kind": "slider",
    "x": 30,
-   "y": 5,
-   "w": 1,
+   "y": 4,
+   "w": 2,
    "h": 2,
    "dx": 0,
    "dy": 2,
-   "period": 7.4,
-   "phase": 1.9,
+   "period": 8.0,
+   "phase": 4.0,
    "shape": "line"
   }
  ],
