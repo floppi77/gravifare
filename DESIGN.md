@@ -340,3 +340,4 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Leben kaufen**: 1000 Credits in Sektor 1, je weiterem Sektor 200 mehr (`Tuning.life_price`, Sektor 9: 2600). Das Schild an der Lebensstation zeigt den jeweiligen Preis.
 - **Respawn-Licht**: Nach einem verlorenen Taxi bleibt der Lichtkegel auf dem neuen Taxi, bis es wieder etwas tut (Schub, Fahrwerk, Abheben), statt für 0,6/1,0 s.
 - **Controller-Brummen (Nachtrag)**: Aufnahmen mit dem Autopiloten (Trailer) liefen als zweiter Godot-Prozess; Godot unter Linux findet angeschlossene Controller systemweit, die Aufnahmen konnten also den echten Controller zum Vibrieren bringen. Die Aufnahmen laufen jetzt mit `vibration=0`.
+- **Release ohne Spielstände**: `tools/export_release.sh` bricht ab, wenn ein Paket Spielstände, Einstellungen, Läufe oder Temporärdateien enthält (diese liegen nur unter `user://`, nie im Projekt).

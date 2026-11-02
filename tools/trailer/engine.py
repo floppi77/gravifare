@@ -81,7 +81,7 @@ class Shot:
     zoom: Zoom (Zahl oder [(u, z)]); cam: 'follow' (Taxi), 'fix' oder None; at: Taxi-Position im Bild (0..1);
     grade: (Sättigung, Kontrast, (r, g, b)-Faktoren); bloom, ca: Stärke; shake: Pixel."""
     def __init__(self, clip, src, dur, t0=0.0, speed=1.0, zoom=1.0, cam="follow", at=(0.5, 0.5), fix=(960, 540), grade=(1.08, 1.06, (1, 1, 1)),
-                 bloom=0.35, ca=0.6, shake=0.0, nearest=True, sigma=0.45, trace=None, lead=0.0):
+                 bloom=0.35, ca=0.6, shake=0.0, nearest=True, sigma=0.45, trace=None, lead=0.0, fix_to=None):
         self.__dict__.update(locals())
         del self.__dict__["self"]
         self.trace_obj = Trace(f"{CLIPS}/{trace or clip}.trace", sigma) if cam == "follow" else None
@@ -118,6 +118,9 @@ class Shot:
                 cy = py - (self.at[1] - 0.5) * ch
             else:
                 cx, cy = self.fix
+                if self.fix_to is not None:
+                    k = min(max(u / max(self.dur, 1e-6), 0.0), 1.0)
+                    cx, cy = cx + (self.fix_to[0] - cx) * k, cy + (self.fix_to[1] - cy) * k
             if self.shake:
                 cx += np.sin(u * 91.0) * self.shake + np.sin(u * 57.0 + 1) * self.shake * 0.6
                 cy += np.sin(u * 83.0 + 2) * self.shake + np.sin(u * 61.0) * self.shake * 0.6

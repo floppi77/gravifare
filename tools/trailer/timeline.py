@@ -122,10 +122,15 @@ class Timeline:
                 hi = mid
         return (lo + hi) / 2
 
+    def pre(self, clip):
+        """Aufnahmen ohne Bedienfeld gibt es je Sprache (en_n_…, en_trans); die mit Bedienfeld heißen h_… und h_en_…."""
+        return "en_" + clip if self.lang == "en" and (clip.startswith("n_") or clip == "trans") else clip
+
     def landing(self, clip, n, dur, frac=0.7, speed=1.0, zoom=2.0, **kw):
-        """Ausschnitt, in dem die n-te Landung bei Anteil `at` der Dauer passiert."""
+        """Ausschnitt, in dem die n-te Landung bei Anteil `frac` der Dauer passiert."""
+        clip = self.pre(clip)
         land, _ = events(clip)
-        lt = land[n]
+        lt = land[min(n, len(land) - 1)]       # die Aufnahmen je Sprache können sich um eine Landung unterscheiden
         src = max(lt - dur * speed * frac, 0.0)
         return Shot(clip, src, dur, speed=speed, zoom=zoom, **kw)
 
@@ -244,7 +249,7 @@ def build(lang):
     # ---------- Akt 1: Einleitung (Balken, düster) ----------
     tl.bars_spec += [(0.0, 0.0, 150, 150), (D, D + 0.3, 150, 0)]
     tl.fades.append((0.0, 1.6, 0.0, 1.0))
-    tl.add(Shot(tl.pre("trans"), 5.45, 2 * BAR, speed=0.5, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(1250, 480), bloom=0.55, grade=(1.1, 1.1, (0.95, 0.97, 1.05))), sfx_land=False)
+    tl.add(Shot(tl.pre("trans"), 1.2, 2 * BAR, speed=0.8, zoom=1.5, cam="fix", fix=(640, 420), fix_to=(1280, 420), nearest=False, bloom=0.55, grade=(1.1, 1.1, (0.95, 0.97, 1.05))), sfx_land=False)
     tl.text("gravity", 0.9, 2 * BAR - 0.15, size=165, cy=540, kind="drift")
     first = events(tl.pre("n_s1_01"))[0][0]
     tl.add(Shot(tl.pre("n_s1_01"), first - 2 * BAR * 0.8 * 0.8, 2 * BAR, speed=0.8, zoom=[(0, 2.4), (2 * BAR, 3.0)], at=(0.5, 0.62), grade=(1.1, 1.1, (0.97, 0.98, 1.04))))
@@ -288,7 +293,7 @@ def build(lang):
     # zweite Hälfte
     mont([(H + "s3_09", 0)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
     mont([(H + "s5_03", 1)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
-    tl.add(Shot(tl.pre("trans"), 5.5, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
+    tl.add(Shot(tl.pre("trans"), 6.0, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
     tl.text("land", 20 * BAR, 21 * BAR, size=170, kind="slam"); hit(20 * BAR, 0.5, 0.8, False)
     mont([("n_s9_05", 0)], BAR)
     tl.text("fuel", 21 * BAR, 22 * BAR, size=170, kind="slam"); hit(21 * BAR, 0.5, 0.8, False)

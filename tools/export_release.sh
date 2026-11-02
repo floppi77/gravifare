@@ -64,5 +64,17 @@ build Linux gravifare.x86_64 "GraviFare-$VER-linux-x86_64.zip"
 build Windows gravifare.exe "GraviFare-$VER-windows-x86_64.zip"
 build macOS GraviFare.zip "GraviFare-$VER-macos-universal.zip"
 rm -rf "$ABS/stage"
+# Sicherheitsnetz: keine Spielstände, Einstellungen oder Läufe im Paket (die liegen sonst nur unter user://)
+python3 -I - "$ABS" <<'P'
+import glob, re, sys, zipfile
+bad = []
+for f in glob.glob(sys.argv[1] + "/*.zip"):
+	for n in zipfile.ZipFile(f).namelist():
+		if re.search(r"save_\d|\.sav$|settings\.cfg|controls\.cfg|replays|\.bad|\.tmp$|user_data", n, re.I):
+			bad.append(f + ": " + n)
+if bad:
+	sys.exit("Spielstanddaten im Paket:\n" + "\n".join(bad))
+print("Pakete enthalten keine Spielstände.")
+P
 (cd "$OUT" && sha256sum *.zip > SHA256SUMS.txt)
 ls -la "$OUT"
