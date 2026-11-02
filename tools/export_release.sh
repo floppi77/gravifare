@@ -8,11 +8,24 @@ VER=${1:-$(sed -n 's/^application\/short_version="\(.*\)"$/\1/p' export_presets.
 OUT=build/release
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
-rsync -a --exclude .git --exclude .venv --exclude build --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
+rsync -a --exclude .git --exclude .venv --exclude build --exclude scratch --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
 sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^$/d' "$WORK/project.godot"
 sed -i 's|^\[rendering\]$|[rendering]\n\ntextures/vram_compression/import_etc2_astc=true|' "$WORK/project.godot"      # macOS (universal/arm64) verlangt ASTC, nur in der Exportkopie
 rm -rf "$OUT"
 mkdir -p "$OUT/stage"
+# Windows-Icon: Godot trägt es per rcedit (unter Linux über Wine) in die Exe ein. rcedit wird geprüft geladen und
+# in einer eigenen Editor-Konfiguration eingetragen, die Einstellungen des Nutzers bleiben unberührt.
+RCEDIT_SHA256=3e7801db1a5edbec91b49a24a094aad776cb4515488ea5a4ca2289c400eade2a
+RCEDIT=${RCEDIT:-$HOME/.cache/gravifare/rcedit-x64.exe}
+if ! { [ -f "$RCEDIT" ] && echo "$RCEDIT_SHA256  $RCEDIT" | sha256sum -c - >/dev/null 2>&1; }; then
+	mkdir -p "$(dirname "$RCEDIT")"
+	curl -fsSL -o "$RCEDIT" https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
+	echo "$RCEDIT_SHA256  $RCEDIT" | sha256sum -c - >/dev/null || { echo "rcedit: Prüfsumme stimmt nicht" >&2; exit 1; }
+fi
+command -v wine >/dev/null || { echo "Wine fehlt (für das Windows-Icon nötig)" >&2; exit 1; }
+export XDG_CONFIG_HOME="$WORK/.cfg"
+mkdir -p "$XDG_CONFIG_HOME/godot"
+printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/windows/rcedit = "%s"\nexport/windows/wine = "%s"\n' "$RCEDIT" "$(command -v wine)" > "$XDG_CONFIG_HOME/godot/editor_settings-4.7.tres"
 ABS=$(pwd)/$OUT
 godot --headless --path "$WORK" --import >/dev/null 2>&1 || true
 

@@ -3,6 +3,7 @@
 # (Build Provenance über Sigstore).
 #   - Das Tag muss zur Versionsnummer in export_presets.cfg passen.
 #   - Godot und die Exportvorlagen werden gegen die SHA-512-Summen des Godot-Projekts geprüft.
+#   - Das Windows-Icon wird per rcedit unter Wine eingetragen.
 #   - Linux-Datei startet zur Probe ohne Fenster; die Mac-App wird auf Aufbau geprüft.
 #   - Ohne Release entsteht ein Entwurf mit automatischen Release Notes, den man vor der
 #     Veröffentlichung prüft. Bei einem Entwurf werden die Dateien ersetzt.
@@ -84,6 +85,15 @@ jobs:
           unzip -q "$templates" -d tpl
           mv tpl/templates/* "$dest/"
           godot --version
+
+      # Das Windows-Icon trägt Godot per rcedit (unter Linux über Wine) in die Exe ein; das Skript lädt
+      # rcedit selbst und prüft die Prüfsumme.
+      - name: Wine installieren
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq wine64
+          sudo ln -sf "$(command -v wine64 || echo /usr/lib/wine/wine64)" /usr/local/bin/wine
+          wine --version
 
       # tools/export_release.sh importiert die Assets selbst, exportiert aus einer Kopie ohne
       # Entwicklungsdateien und packt je Plattform ein ZIP mit Lizenztexten samt SHA256SUMS.txt.
