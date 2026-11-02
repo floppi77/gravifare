@@ -89,10 +89,15 @@ def main():
     d["d0"] = {"de": {"r%d" % n: v[0] for n, v in sorted(L.items())}, "en": {"r%d" % n: v[1] for n, v in sorted(L.items())}}
     try:
         from tutorial_lines import T, V
+        old_i0 = d.get("i0", {})
         d["i0"] = {"de": {}, "en": {}}              # Fluglehrer (Tutorial, Einspieler): eigene Stimme
         for k, v in list(T.items()) + list(V.items()):
             d["i0"]["de"][k] = v[0]
             d["i0"]["en"][k] = v[1]
+        for k in json.load(open("tools/audio/drama_tutorial.json", encoding="utf-8")):      # Tutorial-Stimme Drama 3: Untertitel schreibt gen_voice_drama.py (Ziffern statt Zahlwörter)
+            for lang in ("de", "en"):
+                if k in old_i0.get(lang, {}):
+                    d["i0"][lang][k] = old_i0[lang][k]
     except ImportError:
         pass
     d["d0"]["de"]["patient_lost"] = "Patient verloren. Das wird teuer."

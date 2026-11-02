@@ -1,0 +1,431 @@
+{
+ "tut_welcome": {
+  "variante": "warm",
+  "de": {
+   "spoken": "Willkommen in der Flugschule, Taxi sieben! Ich erkläre dir alles, was du wissen musst, um deine Fahrgäste abzuholen und sicher an ihr Ziel zu bringen.",
+   "direction": "[warm und ermutigend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Welcome to flight school, Taxi seven! I will explain everything you need to know to pick up your passengers and bring them safely to their destination.",
+   "direction": "[warm and encouraging, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_fuel": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Oben links siehst du deine Tankfüllung. Jede Lenkbewegung verbraucht Treibstoff. Ist er leer, verlierst du ein Taxi.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "At the top left you see your tank level. Every steering move burns fuel. When it is empty, you lose a taxi.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_hull": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Rechts daneben die Hülle. Stößt du an, wird sie beschädigt. Bei null ist dein Taxi zerstört.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Next to it is your hull. If you hit something, it takes damage. At zero, your taxi is destroyed.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_money": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Daneben stehen deine Credits und deine Taxis. Mehr als fünf Taxis kannst du nicht besitzen.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Next to that are your credits and your taxis. You can never own more than five taxis.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_level": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Rechts vom Tor siehst du das aktuelle Level. Daneben die Anzeige der transportierten und vorhandenen Pflichtfahrgäste.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "To the right of the gate you see the current level. Next to it, the number of mandatory passengers delivered and the total.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_price": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Treibstoffpreise schwanken, [humorvoll] das kennst du sicher. [ruhig, freundlich] Tanke möglichst dann, wenn der Preis niedrig ist.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Fuel prices fluctuate, [humorous] as you surely know. [calm, friendly] Refuel when the price is low.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_hud_gauge": {
+  "variante": "erklaerend",
+  "de": {
+   "spoken": "Ganz rechts ist deine Landeanzeige. Sinkrate, Seitenbeschleunigung und Neigung. Bleiben alle Balken unter der weißen Marke, landest du sicher.",
+   "direction": "[langsam und deutlich, erklärend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Far right is your landing gauge. Sink rate, sideways speed and tilt. If all bars stay below the white mark, you land safely.",
+   "direction": "[slow and clear, explanatory, like an experienced flight instructor]"
+  }
+ },
+ "tut_gear_in": {
+  "variante": "erklaerend",
+  "de": {
+   "spoken": "Um das Fahrwerk einzufahren, drücke die A-Taste am Controller oder die Leertaste. Eingefahren fliegt dein Taxi schnell, ausgefahren langsam und genau.",
+   "direction": "[langsam und deutlich, erklärend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "To retract the landing gear, press the A button on the controller or the space bar. Retracted, your taxi flies fast; extended, slow and precise.",
+   "direction": "[slow and clear, explanatory, like an experienced flight instructor]"
+  }
+ },
+ "tut_fly": {
+  "variante": "lebhaft",
+  "de": {
+   "spoken": "Los geht's! Steuere mit dem linken Stick oder mit W, A, S und D. Fliege im Uhrzeigersinn durch die grünen Kreise.",
+   "direction": "[lebhaft und zügig, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Let's go! Steer with the left stick or with W, A, S and D. Fly clockwise through the green circles.",
+   "direction": "[lively and brisk, like an experienced flight instructor]"
+  }
+ },
+ "tut_fly_ok": {
+  "variante": "lobend",
+  "de": {
+   "spoken": "Gut gemacht! Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Versuche zu gleiten.",
+   "direction": "[begeistert, anerkennend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Well done! Gravity constantly pulls you down, and thrust costs fuel. Try to glide.",
+   "direction": "[enthusiastic, appreciative, like an experienced flight instructor]"
+  }
+ },
+ "tut_gear": {
+  "variante": "erklaerend",
+  "de": {
+   "spoken": "Vor jeder Landung fährst du das Fahrwerk wieder aus, damit fliegt dein Taxi langsam und genau. Probier es aus!",
+   "direction": "[langsam und deutlich, erklärend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Before every landing, extend the landing gear again, so your taxi flies slow and precise. Try it!",
+   "direction": "[slow and clear, explanatory, like an experienced flight instructor]"
+  }
+ },
+ "tut_fuel_low": {
+  "variante": "dringlich",
+  "de": {
+   "spoken": "Oh nein! Dein Tank ist fast leer! Flieg zur Tankstelle, der orangefarbenen Plattform mit der Zapfsäule, und lande.",
+   "direction": "[dringlich, angespannt, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Oh no! Your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land.",
+   "direction": "[urgent, tense, like an experienced flight instructor]"
+  }
+ },
+ "tut_refuel": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Solange du hier stehst und Credits besitzt, tankst du. Bis fünfunddreißig Prozent geht das aufs Haus. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "As long as you stand here and have credits, you refuel. Up to thirty-five percent it is on the house. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_pump_fix": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Die Zapfsäule ist hin! Ich lasse sie gleich reparieren, aber berühr sie bitte nicht noch mal.",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The pump is wrecked! I will have it repaired right away, but please do not touch it again.",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_credit": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Über fünfunddreißig Prozent kostet dich das Tanken Credits. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Above thirty-five percent, refueling costs you credits. I will credit you five hundred credits, so go ahead and fill up.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_price": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Der Spritpreis ändert sich regelmäßig, wie im echten Leben. Achte oben auf die Anzeige oder auf die Zapfsäule. Im Flugunterricht bleibt er jetzt fix.",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The fuel price changes regularly, just like in real life. Watch the display at the top, or the pump. During flight training it stays fixed now.",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_landing": {
+  "variante": "ernst",
+  "de": {
+   "spoken": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
+   "direction": "[ernst und eindringlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
+   "direction": "[serious and insistent, like an experienced flight instructor]"
+  }
+ },
+ "tut_hard": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird.",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Try it: dive down with full power and land so hard that the taxi is destroyed.",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_crash": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "<emphasis>Autsch</emphasis>, aber keine Sorge. Du bekommst schon bald ein neues Taxi.",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "<emphasis>Ouch</emphasis>, but don't worry. You will get a new taxi soon.",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_crash_ok": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Zerstört! Ein Taxi weniger. Hättest du einen Fahrgast an Bord, wäre er jetzt verloren.",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Destroyed! One taxi less. If you had a passenger on board, he would be lost now.",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_soft": {
+  "variante": "erklaerend",
+  "de": {
+   "spoken": "Nun lande sanft auf Plattform drei. Beide Kufen müssen auf der hellen Landeplattform stehen.",
+   "direction": "[langsam und deutlich, erklärend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Now land gently on platform three. Both skids must stand on the bright landing pad.",
+   "direction": "[slow and clear, explanatory, like an experienced flight instructor]"
+  }
+ },
+ "tut_soft_ok": {
+  "variante": "lobend",
+  "de": {
+   "spoken": "Wunderbar sanft! Weiche, gerade Landungen in Folge bringen dir einen Bonus auf den Fahrpreis.",
+   "direction": "[begeistert, anerkennend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Wonderfully gentle! Soft, level landings in a row earn you a bonus on the fare.",
+   "direction": "[enthusiastic, appreciative, like an experienced flight instructor]"
+  }
+ },
+ "tut_soft_meh": {
+  "variante": "warm",
+  "de": {
+   "spoken": "Das ging, war aber noch nicht weich. Je langsamer du aufsetzt, desto besser. Weiche, gerade Landungen in Folge bringen dir einen Bonus.",
+   "direction": "[warm und ermutigend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "That worked, but it was not soft yet. The slower you touch down, the better. Soft, level landings in a row earn you a bonus.",
+   "direction": "[warm and encouraging, like an experienced flight instructor]"
+  }
+ },
+ "tut_job": {
+  "variante": "erklaerend",
+  "de": {
+   "spoken": "Jetzt zum Geschäft! Mika wartet an Plattform zwei. Der Stern über ihr zeigt an, dass Mika ein Pflichtfahrgast ist. Hast du alle Pflichtfahrgäste eines Levels befördert, öffnet sich das Tor oben in der Mitte. Lande bei Mika und warte, bis sie einsteigt.",
+   "direction": "[langsam und deutlich, erklärend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Now to business! Mika is waiting at platform two. The star above her shows that Mika is a mandatory passenger. Once you have delivered all mandatory passengers of a level, the gate at the top center opens. Land next to Mika and wait until she gets in.",
+   "direction": "[slow and clear, explanatory, like an experienced flight instructor]"
+  }
+ },
+ "tut_main_again": {
+  "variante": "warm",
+  "de": {
+   "spoken": "Mika ist nicht angekommen. Sie wartet wieder an Plattform zwei. Hol sie ab und bring sie diesmal heil ans Ziel.",
+   "direction": "[warm und ermutigend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Mika did not make it. She is waiting at platform two again. Pick her up and get her there safely this time.",
+   "direction": "[warm and encouraging, like an experienced flight instructor]"
+  }
+ },
+ "tut_pay": {
+  "variante": "betont",
+  "de": {
+   "spoken": "Bring sie zu Plattform drei. Je <emphasis>schneller</emphasis> du bist, desto <emphasis>mehr</emphasis> zahlt sie. Der Betrag unten rechts tickt herunter. <emphasis>Weiche</emphasis> Landungen in Folge geben einen Bonus.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Take her to platform three. The <emphasis>faster</emphasis> you are, the <emphasis>more</emphasis> she pays. The amount at the bottom right ticks down. <emphasis>Soft</emphasis> landings in a row give you a bonus.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_delivered": {
+  "variante": "lobend",
+  "de": {
+   "spoken": "Das war dein erstes Einkommen. Gut gemacht!",
+   "direction": "[begeistert, anerkennend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "That was your first income. Well done!",
+   "direction": "[enthusiastic, appreciative, like an experienced flight instructor]"
+  }
+ },
+ "tut_extra": {
+  "variante": "lebhaft",
+  "de": {
+   "spoken": "Neben Pflichtfahrgästen rufen auch optionale Fahrgäste an. Sie zu transportieren ist freiwillig, bringt aber Einkommen! Doch dein Taxi hat nur einen Sitz, und die Gäste warten nicht ewig. Flieg hin und nimm den Gast mit.",
+   "direction": "[lebhaft und zügig, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Besides mandatory passengers, optional passengers call in too. Transporting them is voluntary, but it brings income! But your taxi has only one seat, and the guests will not wait forever. Fly over and take the guest along.",
+   "direction": "[lively and brisk, like an experienced flight instructor]"
+  }
+ },
+ "tut_extra_dest": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Das Ziel des Gastes leuchtet jetzt auf. Bring den Gast dorthin.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The guest's destination is lit up now. Take the guest there.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_extra2": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Noch ein Funkruf! Dieser Quälgeist an Plattform drei hat sich schon die ganze Wartezeit beschwert und weiß natürlich alles besser. Flieg hin und lade ihn ein.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Another radio call! This pain in the neck at platform three has been complaining the whole time and of course knows better. Fly over and pick them up.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_extra2_again": {
+  "variante": "warm",
+  "de": {
+   "spoken": "Der Gast ist weg. An Plattform drei wartet ein neuer.",
+   "direction": "[warm und ermutigend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The guest is gone. A new one is waiting at platform three.",
+   "direction": "[warm and encouraging, like an experienced flight instructor]"
+  }
+ },
+ "tut_eject": {
+  "variante": "trocken",
+  "de": {
+   "spoken": "Und schon geht das Gemecker los: zu schnell, zu wackelig, zu teuer. Dafür gibt es die Rauswurf-Taste: E auf der Tastatur, Y am Controller. Steht das Taxi am Boden, landet der Gast weich und schimpft nur. Aus großer Höhe überlebt er das nicht. Bei Pflichtfahrgästen kostet es obendrein Strafe. Zur Feier des Tages: Wirf ihn jetzt raus!",
+   "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "And already the complaining starts: too fast, too shaky, too expensive. That is what the eject key is for: E on the keyboard, Y on the controller. If the taxi is on the ground, the guest lands softly and just grumbles. From a great height, he will not survive it. For mandatory passengers it also costs a penalty. To celebrate the day: throw him out now!",
+   "direction": "[dry, slightly ironic, like an experienced flight instructor]"
+  }
+ },
+ "tut_eject_again": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Halt, den Gast solltest du nicht abliefern, sondern rauswerfen! Hier kommt der Nächste. Nimm ihn mit und wirf ihn mit E oder Y am Controller raus.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Stop, you should not deliver this guest, you should throw him out! Here comes the next one. Take him along and throw him out with E, or Y on the controller.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_eject_ok": {
+  "variante": "lobend",
+  "de": {
+   "spoken": "Ruhe an Bord, und die Bewertung leidet nur ein bisschen. Merke dir: Rauswerfen bringt kein Geld, aber manchmal ist es trotzdem gewinnbringender.",
+   "direction": "[begeistert, anerkennend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Peace on board, and the rating suffers only a little. Remember: throwing out earns no money, but sometimes it is still more profitable.",
+   "direction": "[enthusiastic, appreciative, like an experienced flight instructor]"
+  }
+ },
+ "tut_life": {
+  "variante": "warm",
+  "de": {
+   "spoken": "Die rosa Plattform ist eine Taxistation. Doch nicht jedes Level besitzt eine! Landest du dort, kannst du für je tausend Credits ein Taxi kaufen, maximal fünf. Ich schenke dir Credits, kaufe jetzt ein weiteres Taxi.",
+   "direction": "[warm und ermutigend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The pink platform is a taxi station. But not every level has one! If you land there, you can buy a taxi for a thousand credits each, five at most. I will give you credits, now buy another taxi.",
+   "direction": "[warm and encouraging, like an experienced flight instructor]"
+  }
+ },
+ "tut_exit": {
+  "variante": "ruhig",
+  "de": {
+   "spoken": "Zum Schluss wartet Odo an Plattform eins. Er will zum Ausgang. Ist der letzte Pflichtfahrgast an Bord, fliegst du mit ihm durch das Tor oben.",
+   "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Finally, Odo is waiting at platform one. He wants to go to the exit. With the last mandatory passenger aboard, fly through the gate at the top with him.",
+   "direction": "[calm, friendly, like an experienced flight instructor]"
+  }
+ },
+ "tut_countdown": {
+  "variante": "dringlich",
+  "de": {
+   "spoken": "Pass auf die Uhr unter dem Tor auf! Sobald der letzte Pflichtfahrgast erscheint, läuft der Countdown. Ist er abgelaufen, verlässt du das Level automatisch, der Fahrgast ist weg, und du zahlst eine Strafe. Hier in der Flugschule passiert dir nichts, aber wenn dein Fahrgast drängelt, solltest du dich beeilen.",
+   "direction": "[dringlich, angespannt, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Watch the clock below the gate! As soon as the last mandatory passenger appears, the countdown starts. When it runs out, you leave the level automatically, the passenger is gone, and you pay a penalty. Here in flight school nothing happens, but when your passenger gets pushy, hurry up.",
+   "direction": "[urgent, tense, like an experienced flight instructor]"
+  }
+ },
+ "tut_gate": {
+  "variante": "lebhaft",
+  "de": {
+   "spoken": "Das Tor ist offen. Flieg hindurch!",
+   "direction": "[lebhaft und zügig, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "The gate is open. Fly through it!",
+   "direction": "[lively and brisk, like an experienced flight instructor]"
+  }
+ },
+ "tut_done": {
+  "variante": "lobend",
+  "de": {
+   "spoken": "Geschafft! Du bist bereit für den Dienst. Viel Erfolg da draußen, Taxi sieben.",
+   "direction": "[begeistert, anerkennend, wie ein erfahrener Fluglehrer]"
+  },
+  "en": {
+   "spoken": "Done! You are ready for duty. Good luck out there, Taxi seven.",
+   "direction": "[enthusiastic, appreciative, like an experienced flight instructor]"
+  }
+ }
+}

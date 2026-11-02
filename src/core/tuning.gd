@@ -92,6 +92,7 @@ const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
 # Belohnungen: Auftrags-Fahrpreise sinken ab Level 5 (Zusatzfahrgäste werden nötig, um im Plus zu bleiben)
 const FARE_SCALE_EARLY := 1.0
 const FARE_SCALE_LATE := 0.22
+const INCOME_FACTOR := 0.8          # Einkommen im ganzen Spiel (Auftrags- und Zusatzfahrpreise), nach Skalierung und Mindest-Fahrpreis
 const TARGET_SLACK_PER_JOB := 3.0    # Zeitziel: Summe der Richtzeiten + 3 s je Auftrag (Wartezeit zwischen den Fahrgästen)
 const FARE_SCALE_FROM := 5
 const EXTRA_FARE_FACTOR := 0.4       # Zusatzfahrgäste zahlen einen Bruchteil des unskalierten Durchschnitts der Auftragspreise (Untergrenze: Mindest-Fahrpreis)

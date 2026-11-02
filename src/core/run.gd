@@ -96,7 +96,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 			jobs[i]["passenger"] = PassengerActor.rotated_name(lvl.number, i, String(jobs[i].get("gender", "f")))      # abwechslungsreiche Namen; Stimme und Aussehen bleiben
 	for j in jobs:
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
-		j["fare"] = maxf(float(j.fare), min_fare(lvl, j))
+		j["fare"] = snappedf(maxf(float(j.fare), min_fare(lvl, j)) * Tuning.INCOME_FACTOR, 1.0)
 	sim.setup(lvl)
 	if fuel_in >= 0.0:
 		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
@@ -1053,7 +1053,7 @@ func _spawn_extra(force_from := "", force_to := "") -> void:
 	var base_fare := maxf(35.0, snappedf(fare_sum / maxf(float(fare_n), 1.0) * 0.7 * Tuning.EXTRA_FARE_FACTOR, 5.0))
 	var dist: float = absf(float(level.pads[from_id].center) - float(level.pads[to_id].center)) + absf(float(level.pads[from_id].row) - float(level.pads[to_id].row)) * Tuning.TILE
 	var probe := {"from": from_id, "to": to_id}
-	base_fare = maxf(base_fare, min_fare(level, probe))
+	base_fare = snappedf(maxf(base_fare, min_fare(level, probe)) * Tuning.INCOME_FACTOR, 1.0)
 	var job := {"from": from_id, "to": to_id, "fare": base_fare, "par": snappedf(14.0 + dist / 38.0, 1.0),
 		"passenger": ident.name, "gender": ident.gender, "look": ident.look}
 	if medical:

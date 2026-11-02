@@ -5,7 +5,7 @@ extends RefCounted
 ## Bewusst bescheiden: Das Spiel bleibt ohne Einbauten vollständig lösbar (der Autopilot prüft ohne sie).
 
 const MAX_LEVEL := 3
-const PRICES := [2000, 6000, 15000]
+const PRICES := [2700, 8000, 20000]
 const ITEMS := ["jets", "hull", "gear"]
 const JETS_STEP := 0.06      # Spritverbrauch je Stufe
 const HULL_STEP := 0.08      # Aufprallschaden je Stufe

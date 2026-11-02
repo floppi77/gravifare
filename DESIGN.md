@@ -324,3 +324,8 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Autopilot**: verlässt ein schließendes Tor zur näheren Seite, schwebt beim Warten nicht an Dornen oder in Hitze, liefert bei Toren kurz vor dem Ziel erst ab, statt tanken zu fliegen.
 - **Schwierigkeitsregel**: Die Level sind von Hand nachgearbeitet; der Test verlangt einen steigenden Trend, einzelne Level dürfen bis 14 Punkte unter dem bisherigen Höchstwert liegen.
 
+
+## Runde 33: Tutorial-Stimme Drama 3, Einkommen und Werkstatt
+- **Tutorial-Stimme**: Alle 39 Tutorial-Zeilen (DE/EN) neu mit Fish Audio Drama 3 (FP8, lokal über drama-rs) erzeugt – eine Stimme je Sprache, Regieanweisungen in `tools/audio/drama_tutorial.json`, Erzeugung mit `tools/audio/gen_voice_drama.py`. Fahrgastsätze, Funksprüche und die Einspieler (`vid_*`) bleiben Qwen3-TTS (daher dort noch eine andere Stimme). Untertitel zeigen Zahlen als Ziffern („Plattform 2“, „Taxi 7“). `tut_life` neu formuliert (Taxistation, 1000 Credits je Taxi, maximal 5). „Built with Fish Audio“ in den Credits.
+- **Einkommen −20 %**: `Tuning.INCOME_FACTOR = 0.8` auf Auftrags- und Zusatzfahrpreise, nach Skalierung und Mindest-Fahrpreis.
+- **Werkstatt +⅓**: Preise 2700 / 8000 / 20000 (vorher 2000 / 6000 / 15000).
