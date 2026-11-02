@@ -10,6 +10,7 @@ const T_IN := 5.6
 const T_END := 7.6
 
 var t := -1.0
+var vt := -1.0                    # Anzeigezeit: läuft weiter, auch wenn die Zeitachse t auf den Funkspruch wartet (Taxi, Planeten und Sterne bleiben in Bewegung)
 var title_sector := ""
 var title_level := ""
 var info := ""
@@ -52,10 +53,13 @@ func overlay_alpha() -> float:
 
 func flight_speed() -> float:
 	## Sternscroll-Geschwindigkeit (Einheiten/s): beschleunigt beim Ausblenden, bremst vor dem Anflug.
-	return lerpf(30.0, 260.0, smooth(t / T_OUT)) * (1.0 - 0.75 * smooth((t - 5.0) / 1.4))
+	return lerpf(30.0, 260.0, smooth(vt / T_OUT)) * (1.0 - 0.75 * smooth((vt - 5.0) / 1.4))
 
 func _process(delta: float) -> void:
-	if t >= 0.0:
+	if t < 0.0:
+		vt = -1.0
+	else:
+		vt = maxf(vt + delta, t) if vt >= 0.0 else t          # nie hinter t (Überspringen springt vor), bleibt aber beim Warten nicht stehen
 		scroll += flight_speed() * delta
 		queue_redraw()
 
@@ -68,7 +72,7 @@ func _draw() -> void:
 	draw_texture_rect(space_bg, Rect2(-m, Stage.view(self)), false, white)
 	_draw_planets(a)
 	_draw_stars(a)
-	if t >= T_OUT - 0.4 and t < T_IN + 0.6:
+	if vt >= T_OUT - 0.4 and vt < T_IN + 0.3:
 		_draw_taxi(a)
 	_draw_titles(a)
 
@@ -93,27 +97,34 @@ func _draw_stars(a: float) -> void:
 func _draw_planets(a: float) -> void:
 	for p in PLANET_SCHEDULE:
 		var mx := Stage.margin(self).x
-		var x: float = 700.0 + mx - (t - float(p[0])) * float(p[4])
+		var x: float = 700.0 + mx - (vt - float(p[0])) * float(p[4])
 		var sz: float = p[2]
 		if x < -sz - mx or x > 720.0 + mx:
 			continue
 		draw_texture_rect(planets[int(p[3])], Rect2(roundf(x * 3.0) / 3.0 - sz * 0.5, float(p[1]) - sz * 0.5, sz, sz), false, Color(1, 1, 1, a))
 
+## Fortschritt 0..1 des Taxiflugs → Wegstrecke 0..1: Mindesttempo 55 % des Mittelwerts, nie Stillstand.
+static func taxi_path(p: float) -> float:
+	p = clampf(p, 0.0, 1.0)
+	return 0.55 * p + 0.45 * smooth(p)
+
 func _draw_taxi(a: float) -> void:
-	var u := smooth((t - (T_OUT - 0.4)) / 1.5)           # Einflug von links
-	var leave := pow(maxf(0.0, (t - 5.0) / 0.9), 2.0)       # Beschleunigung nach rechts am Ende
+	## Ein durchgehender Flug von links nach rechts über das ganze Bild: nie Stillstand (Mindesttempo 55 % des mittleren Tempos), am Ende etwas schneller.
+	var p := clampf((vt - (T_OUT - 0.4)) / (T_IN - (T_OUT - 0.4)), 0.0, 1.0)
+	var u := taxi_path(p)
+	var leave := clampf((p - 0.65) / 0.35, 0.0, 1.0)
 	var mx := Stage.margin(self).x
-	var x := lerpf(-70.0 - mx, 215.0, u) + leave * (520.0 + mx)
-	var y := 176.0 + sin(t * 1.9) * 6.0 - leave * 10.0
-	var rot := 0.12 + sin(t * 1.3) * 0.03 + leave * 0.12
+	var x := lerpf(-70.0 - mx, 735.0 + mx, u)
+	var y := 176.0 + sin(vt * 1.9) * 6.0 - leave * leave * 10.0
+	var rot := 0.12 + sin(vt * 1.3) * 0.03 + leave * 0.12
 	draw_set_transform(Vector2(x, y), rot, Vector2.ONE)
-	var flick := 0.7 + 0.3 * sin(t * 55.0)
-	var len := (26.0 + 18.0 * flick) * (0.8 + 0.5 * smooth(t / T_OUT) + leave)
+	var flick := 0.7 + 0.3 * sin(vt * 55.0)
+	var len := (26.0 + 18.0 * flick) * (0.8 + 0.5 * smooth(vt / T_OUT) + leave)
 	# Antriebsstrahl nach hinten (links), mit Kern
 	draw_colored_polygon(PackedVector2Array([Vector2(-31, -4), Vector2(-31, 4), Vector2(-31 - len, 0)]), Color(1.0, 0.5, 0.18, a * 0.9))
 	draw_colored_polygon(PackedVector2Array([Vector2(-31, -2), Vector2(-31, 2), Vector2(-31 - len * 0.55, 0)]), Color(1.0, 0.94, 0.65, a))
 	for i in 5:
-		var lx := -34.0 - len - float(i) * 26.0 - fmod(t * 90.0, 26.0)
+		var lx := -34.0 - len - float(i) * 26.0 - fmod(vt * 90.0, 26.0)
 		draw_rect(Rect2(lx, -7.0 + i * 3.4, 14.0 + i * 4.0, 0.67), Color(0.7, 0.85, 1.0, a * 0.35))
 	draw_texture_rect(taxi_tex, Rect2(-32, -20, 64, 40), false, Color(1, 1, 1, a))
 	if sticker_tex != null:

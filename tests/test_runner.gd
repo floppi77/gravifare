@@ -1960,6 +1960,16 @@ func _test_workshop_buy() -> void:
 	var d := {}
 	check(Workshop.buy(d, "jets", 3000.0) == 300.0 and Workshop.level_of(d, "jets") == 1, "Kauf zieht die Credits ab")
 	check(Workshop.buy(d, "hull", 300.0) < 0.0 and Workshop.level_of(d, "hull") == 0, "Zu wenig Credits: kein Kauf")
+	var fresh := {}
+	check(Workshop.price(fresh, "jets") == 2700 and Workshop.price(fresh, "jets", 1) == 2700, "Erste Werkstatt: Grundpreis")
+	check(Workshop.price(fresh, "jets", 2) == 2970 and Workshop.price(fresh, "hull", 3) == 3240 and Workshop.price(fresh, "gear", 8) == 4590, "Jede weitere Werkstatt: +270 (10 % des Grundpreises der ersten Stufe), linear")
+	check(Workshop.buy(fresh, "jets", 3000.0, 2) == 30.0 and Workshop.price(fresh, "jets", 2) == 8270, "Aufschlag gilt auch für die höheren Stufen (8000 + 270)")
+	check(Workshop.buy(fresh, "hull", 2800.0, 3) < 0.0 and Workshop.buy(fresh, "hull", 3240.0, 3) == 0.0, "Kauf in der dritten Werkstatt braucht den Preis mit Aufschlag")
+	var TV = load("res://src/game/transition_view.gd")
+	var slow := 9.0
+	for i in 100:
+		slow = minf(slow, (TV.taxi_path(float(i + 1) / 100.0) - TV.taxi_path(float(i) / 100.0)) * 100.0)
+	check(slow > 0.5 and absf(TV.taxi_path(1.0) - 1.0) < 1e-6, "Zwischensequenz: Taxi fliegt in einer Bewegung durch (Mindesttempo %.2f des Mittels, kein Stillstand)" % slow)
 
 func _test_landing_plate() -> void:
 	var lvl := LevelData.load_file("res://data/levels/s1_01.json")

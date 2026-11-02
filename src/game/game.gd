@@ -484,6 +484,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		if tutorial == null or not tutorial.locked:
 			gear_on = not gear_on
 
+## Stärke 0..1 des Schubbrummens: nur im Flug und nur für Schub über dem, was das Taxi zum Schweben braucht.
+## Schweben, kleine Korrekturen und ein Stick, der im Stand leicht ausschlägt, brummen nicht.
+func _thrust_rumble() -> float:
+	var s := run.sim
+	if s.state != TaxiSim.State.FLYING or s.fuel <= 0.0:
+		return 0.0
+	var hover := clampf(run.level.gravity / maxf(s.up_power(), 1.0), 0.0, 0.95)
+	var main := clampf((taxi.flame_main - hover - 0.15) / maxf(1.0 - hover - 0.15, 0.05), 0.0, 1.0)
+	var side := clampf((absf(taxi.flame_side) - 0.6) / 0.4, 0.0, 1.0) * 0.5
+	return maxf(main, side)
+
 func _physics_process(_delta: float) -> void:
 	if paused:
 		return
@@ -525,7 +536,7 @@ func _physics_process(_delta: float) -> void:
 	taxi.sync_state()
 	assist.sync_state()
 	if run.result == Run.Result.RUNNING:
-		Haptics.thrust(taxi.flame_main + absf(taxi.flame_side) * 0.5)
+		Haptics.thrust(_thrust_rumble())
 		_check_near_miss()
 		_music_tick()
 		_hint_tick()

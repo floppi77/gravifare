@@ -106,8 +106,8 @@ func _item_row(id: String) -> HBoxContainer:
 	desc.custom_minimum_size = Vector2(170, 0)
 	col.add_child(desc)
 	row.add_child(col)
-	var b := MenuKit.button(tr("WS_MAX") if l >= Workshop.MAX_LEVEL else "¢ %d" % Workshop.price(Save.data, id), func():
-		var rest := Workshop.buy(Save.data, id, wallet)
+	var b := MenuKit.button(tr("WS_MAX") if l >= Workshop.MAX_LEVEL else "¢ %d" % Workshop.price(Save.data, id, sector), func():
+		var rest := Workshop.buy(Save.data, id, wallet, sector)
 		if rest >= 0.0:
 			wallet = rest
 			Save.write()
