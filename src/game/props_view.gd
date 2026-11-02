@@ -54,7 +54,13 @@ func _draw() -> void:
 			draw_rect(m.rect, Color(1, 0.2, 0.2, 0.9), false, 0.6)
 		draw_rect(Rect2(run.sim.pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0), Color(0.3, 1, 0.3, 0.9), false, 0.6)
 
+var flags: Array = []
+var flags_level: LevelData = null
+
 func _draw_pads() -> void:
+	if flags_level != level or level.has_movers():
+		flags = level.pad_flags()
+		flags_level = level
 	var font := Fonts.hud
 	var target := run.marker_pad()
 	for id in level.pads:
@@ -72,15 +78,20 @@ func _draw_pads() -> void:
 			_light_shelter(shelter, id)
 			var rx := shelter.get_center().x
 			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
+		var label: String = tr("PAD_FUEL") if p.fuel else ("L" if p.life else id)
 		var poles: Array = [p.x0 + 2.0, p.x1 - 3.0]
 		if shelter.size.x > 0.0:
 			poles = [p.x1 - 3.0] if p.side < 0 else [p.x0 + 2.0]
-		var label: String = tr("PAD_FUEL") if p.fuel else ("L" if p.life else id)
 		for x in poles:
 			draw_rect(Rect2(x, y - 18, 1, 18), Color("#0c0f24"))
 			draw_rect(Rect2(x + PX, y - 18, PX * 2, 18), Color("#4a5596"))
-			# Dreieckiger Wimpel mit der Plattformzahl, weht leicht und zeigt nach außen (die Mitte gehört Fahrgast und Preisschild)
-			var dir := -1.0 if x < cxm else 1.0
+		for fl in flags:
+			if fl.id != id:
+				continue
+			var x: float = fl.x
+			# Dreieckiger Wimpel mit der Plattformzahl, weht leicht und zeigt nach außen (die Mitte gehört Fahrgast und Preisschild);
+			# Überschneidungen mit Nachbarplattformen löst LevelData.pad_flags
+			var dir: float = fl.dir
 			var top := y - 19.0
 			var tip := Vector2(x + 0.5 + dir * 19.0, top + 6.5 + sin(t * 3.0 + x) * 0.9)
 			var tri := PackedVector2Array([Vector2(x + 0.5, top), Vector2(x + 0.5, top + 13.0), tip])
@@ -94,7 +105,7 @@ func _draw_pads() -> void:
 		_pad_glow(p, y, col)
 		var plate := _draw_plate(p, y, col)
 		if p.life:
-			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.LIFE_PRICE)
+			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.life_price(level.sector))
 		if p.get("hospital", false):
 			_draw_hospital_sign(p, y)
 		if is_target:
@@ -814,7 +825,7 @@ func _draw_life_sign(cx: float, y: float, full: bool, can_pay: bool) -> void:
 	draw_circle(Vector2(cx - 2.2, hy), 2.6, hc)
 	draw_circle(Vector2(cx + 2.2, hy), 2.6, hc)
 	draw_colored_polygon(PackedVector2Array([Vector2(cx - 4.7, hy + 0.9), Vector2(cx + 4.7, hy + 0.9), Vector2(cx, hy + 6.4)]), hc)
-	draw_string(Fonts.hud, Vector2(cx - 14.0, hy + 15.0), "¢%d" % int(Tuning.LIFE_PRICE) if not full else "MAX", HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color("#ffe14a") if ok else Color("#8a7a80"))
+	draw_string(Fonts.hud, Vector2(cx - 14.0, hy + 15.0), "¢%d" % int(Tuning.life_price(level.sector)) if not full else "MAX", HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color("#ffe14a") if ok else Color("#8a7a80"))
 
 ## Sprechblase mit der Zielplattform (Zahl) bzw. Pfeil nach oben für den Ausgang, nachdem das „!“ verklungen ist.
 func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool) -> void:

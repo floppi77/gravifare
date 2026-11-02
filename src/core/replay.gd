@@ -98,15 +98,19 @@ static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
 	return {"complete": r.result == Run.Result.COMPLETE, "time": r.level_time, "money": r.money, "earned": r.earned,
 		"delivered": r.delivered, "ticks": tick}
 
-static func path_for(id: String) -> String:
-	return DIR + id + ".json"
+## Bestzeit-Läufe liegen je Speicherplatz (user://replays/s<Platz>/); ohne Platz (Tests, Altbestand) direkt in user://replays/.
+static func dir_for(slot := 0) -> String:
+	return DIR if slot <= 0 else DIR + "s%d/" % slot
+
+static func path_for(id: String, slot := 0) -> String:
+	return dir_for(slot) + id + ".json"
 
 ## Speichert den Lauf, wenn er schneller ist als der bisher gespeicherte (nur abgeschlossene Läufe).
-static func save_if_best(d: Dictionary) -> bool:
+static func save_if_best(d: Dictionary, slot := 0) -> bool:
 	if not bool(d.get("result", {}).get("complete", false)):
 		return false
-	DirAccess.make_dir_recursive_absolute(DIR)
-	var p := path_for(String(d.level))
+	DirAccess.make_dir_recursive_absolute(dir_for(slot))
+	var p := path_for(String(d.level), slot)
 	if FileAccess.file_exists(p):
 		var old = JSON.parse_string(FileAccess.get_file_as_string(p))
 		if typeof(old) == TYPE_DICTIONARY and int(old.get("v", 0)) == VERSION and float(old.get("result", {}).get("time", 1e9)) <= float(d.result.time):
@@ -119,8 +123,10 @@ static func save_if_best(d: Dictionary) -> bool:
 	DirAccess.rename_absolute(p + ".tmp", p)
 	return true
 
-static func load_best(id: String) -> Dictionary:
-	var p := path_for(id)
+static func load_best(id: String, slot := 0) -> Dictionary:
+	var p := path_for(id, slot)
+	if not FileAccess.file_exists(p) and slot == 1:
+		p = path_for(id)                 # Läufe von vor den Speicherplätzen gehören zu Platz 1
 	if not FileAccess.file_exists(p):
 		return {}
 	var d = JSON.parse_string(FileAccess.get_file_as_string(p))

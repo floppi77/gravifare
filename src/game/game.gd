@@ -234,7 +234,7 @@ func _setup_ghost(lvl: LevelData) -> void:
 		ghost.set_script(load("res://src/game/ghost_view.gd"))
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
-	var best := {} if lvl.tutorial or Flow.shift or autopilot != null or not Settings.values.ghost else Replay.load_best(lvl.id)
+	var best := {} if lvl.tutorial or Flow.shift or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	ghost.bind(run, best.get("trace", []))
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
@@ -351,25 +351,31 @@ func _ensure_spot() -> void:
 	spot.set_script(load("res://src/game/spot_view.gd"))
 	sl.add_child(spot)
 
-var focus_t := 0.0                 # Restzeit des Respawn-Spots (Bildschirm dunkel bis auf das neue Taxi)
+var focus_on := false              # Respawn-Spot: Bildschirm dunkel bis auf das neue Taxi, bis das Taxi wieder etwas tut
+var focus_gear := false
 
-## Nach einem verlorenen Taxi: kurz alles abdunkeln bis auf das neue Taxi, damit der Blick es findet.
+## Nach einem verlorenen Taxi: alles abdunkeln bis auf das neue Taxi, damit der Blick es findet. Das Licht bleibt, bis das Taxi
+## wieder etwas tut (Schub, Fahrwerk oder Abheben), nicht für eine feste Zeit.
 func _respawn_focus() -> void:
 	if run.level.tutorial:
 		return
 	_ensure_spot()
-	focus_t = 1.0 if run.level.dark > 0.0 else 0.6       # im Dunkeln braucht der Blick länger
+	focus_on = true
+	focus_gear = run.sim.gear_cmd
 
-func _focus_tick(delta: float) -> void:
+func _focus_tick(_delta: float) -> void:
 	if spot == null or tutorial != null:
 		return
-	if focus_t > 0.0:
-		focus_t -= delta
-		var center := cam.get_screen_center_position()
-		spot.fade_speed = 7.0
-		spot.set_spots([Rect2(run.sim.pos - center + Stage.view(self) * 0.5 - Vector2(30, 26), Vector2(60, 52))])
-		if focus_t <= 0.0:
+	if focus_on:
+		var acted := run.sim.state != TaxiSim.State.LANDED or run.sim.gear_cmd != focus_gear or Controls.thrust_vector().length() > 0.1 \
+			or debug_input != Vector2.INF or autopilot != null or run.result != Run.Result.RUNNING or trans_t >= 0.0
+		if acted:
+			focus_on = false
 			spot.set_spots([])
+		else:
+			var center := cam.get_screen_center_position()
+			spot.fade_speed = 7.0
+			spot.set_spots([Rect2(run.sim.pos - center + Stage.view(self) * 0.5 - Vector2(30, 26), Vector2(60, 52))])
 	elif spot.amount <= 0.01:
 		spot.fade_speed = 2.6
 
@@ -574,7 +580,7 @@ func _physics_process(_delta: float) -> void:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
 		if counted and not Save.dev_session:
-			Replay.save_if_best(replay.to_dict())
+			Replay.save_if_best(replay.to_dict(), Save.slot)
 		_check_unlocks()
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() == "":

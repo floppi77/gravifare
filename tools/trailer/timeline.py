@@ -244,10 +244,10 @@ def build(lang):
     # ---------- Akt 1: Einleitung (Balken, düster) ----------
     tl.bars_spec += [(0.0, 0.0, 150, 150), (D, D + 0.3, 150, 0)]
     tl.fades.append((0.0, 1.6, 0.0, 1.0))
-    tl.add(Shot("trans", 5.45, 2 * BAR, speed=0.5, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(1250, 480), bloom=0.55, grade=(1.1, 1.1, (0.95, 0.97, 1.05))), sfx_land=False)
+    tl.add(Shot(tl.pre("trans"), 5.45, 2 * BAR, speed=0.5, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(1250, 480), bloom=0.55, grade=(1.1, 1.1, (0.95, 0.97, 1.05))), sfx_land=False)
     tl.text("gravity", 0.9, 2 * BAR - 0.15, size=165, cy=540, kind="drift")
-    first = events("n_s1_01")[0][0]
-    tl.add(Shot("n_s1_01", first - 2 * BAR * 0.8 * 0.8, 2 * BAR, speed=0.8, zoom=[(0, 2.4), (2 * BAR, 3.0)], at=(0.5, 0.62), grade=(1.1, 1.1, (0.97, 0.98, 1.04))))
+    first = events(tl.pre("n_s1_01"))[0][0]
+    tl.add(Shot(tl.pre("n_s1_01"), first - 2 * BAR * 0.8 * 0.8, 2 * BAR, speed=0.8, zoom=[(0, 2.4), (2 * BAR, 3.0)], at=(0.5, 0.62), grade=(1.1, 1.1, (0.97, 0.98, 1.04))))
     tl.text("taxi7", 2 * BAR + 0.25, 4 * BAR - 0.2, size=120, cy=880, kind="fade", style=dict(fill=(240, 244, 255), glow=(90, 160, 255)))
     # Montage mit steigendem Tempo
     mont([("n_s3_09", 0)], BAR, speed=1.5)
@@ -288,7 +288,7 @@ def build(lang):
     # zweite Hälfte
     mont([(H + "s3_09", 0)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
     mont([(H + "s5_03", 1)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
-    tl.add(Shot("trans", 5.5, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
+    tl.add(Shot(tl.pre("trans"), 5.5, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
     tl.text("land", 20 * BAR, 21 * BAR, size=170, kind="slam"); hit(20 * BAR, 0.5, 0.8, False)
     mont([("n_s9_05", 0)], BAR)
     tl.text("fuel", 21 * BAR, 22 * BAR, size=170, kind="slam"); hit(21 * BAR, 0.5, 0.8, False)
@@ -307,7 +307,7 @@ def build(lang):
     # Finale: Zeitlupe, perfekte Landung
     F = 30 * BAR
     land_n = 1
-    clip = "n_s1_01"
+    clip = tl.pre("n_s1_01")
     lt = events(clip)[0][land_n]
     fin = Shot(clip, lt - 1.5, 2 * BAR, speed=[(0, 1.0), (0.8, 1.0), (1.4, 0.25), (2 * BAR, 0.25)], zoom=[(0, 2.0), (1.6, 3.4), (2 * BAR, 4.0)], at=(0.5, 0.6), sigma=0.3, bloom=0.6)
     t_fin = tl.cursor

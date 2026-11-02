@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1956,6 +1956,28 @@ func _test_replay_trace() -> void:
 		rep.sample(Vector2(float(i), 0), 0.0)
 	check(rep.trace.size() == int(Replay.TRACE_HZ) * 2 * Replay.TRACE_FIELDS, "Geist-Spur tastet mit %.0f Hz ab (%d Werte)" % [Replay.TRACE_HZ, rep.trace.size()])
 
+func _test_life_price_per_sector() -> void:
+	check(Tuning.life_price(1) == 1000.0 and Tuning.life_price(2) == 1200.0 and Tuning.life_price(9) == 2600.0, "Leben kaufen: 1000 Credits in Sektor 1, je Sektor 200 mehr (Sektor 9: %d)" % int(Tuning.life_price(9)))
+
+func _test_pad_flags() -> void:
+	var bad := []
+	for f in DirAccess.open("res://data/levels").get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var fl := lvl.pad_flags()
+		var ids := {}
+		for a in fl:
+			ids[a.id] = true
+		for id in lvl.pads:
+			if not ids.has(id):
+				bad.append("%s ohne Wimpel %s" % [lvl.id, id])
+		for i in fl.size():
+			for j in range(i + 1, fl.size()):
+				if fl[i].id != fl[j].id and fl[i].rect.intersects(fl[j].rect):
+					bad.append("%s: %s/%s" % [lvl.id, fl[i].id, fl[j].id])
+	check(bad.is_empty(), "Kein Plattformwimpel verdeckt einen anderen (z. B. S2-04, S2-05) %s" % str(bad.slice(0, 4)))
+
 func _test_workshop_buy() -> void:
 	var d := {}
 	check(Workshop.buy(d, "jets", 3000.0) == 300.0 and Workshop.level_of(d, "jets") == 1, "Kauf zieht die Credits ab")
@@ -1969,6 +1991,18 @@ func _test_workshop_buy() -> void:
 	var slow := 9.0
 	for i in 100:
 		slow = minf(slow, (TV.taxi_path(float(i + 1) / 100.0) - TV.taxi_path(float(i) / 100.0)) * 100.0)
+	var tv = TV.new()
+	tv.t = 6.5
+	tv._process(0.016)
+	tv.t = 6.5                          # Funkspruch wartet: t steht, die Anzeigezeit läuft weiter
+	tv._process(0.5)
+	check(tv.vt > 6.9, "Anzeigezeit läuft weiter, wenn die Zeitachse wartet (%.2f)" % tv.vt)
+	tv.t = -1.0
+	tv._process(0.016)
+	tv.t = 0.0                          # nächste Sequenz
+	tv._process(0.016)
+	check(tv.vt >= 0.0 and tv.vt < 0.1, "Nächste Zwischensequenz beginnt wieder bei 0 (%.2f)" % tv.vt)
+	tv.free()
 	check(slow > 0.5 and absf(TV.taxi_path(1.0) - 1.0) < 1e-6, "Zwischensequenz: Taxi fliegt in einer Bewegung durch (Mindesttempo %.2f des Mittels, kein Stillstand)" % slow)
 
 func _test_landing_plate() -> void:

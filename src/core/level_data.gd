@@ -276,6 +276,60 @@ func heat_hit_box(center: Vector2, half: Vector2) -> bool:
 			return true
 	return false
 
+## Wimpel der Plattformen (Zahl bzw. T/L auf dem Dreieck). Benachbarte Plattformen würden sich verdecken (z. B. die 3 unter dem Tankstellenwimpel):
+## dann entfällt der Wimpel der Service-Plattform an der zugewandten Seite (sie hat noch den anderen), sonst weht er nach innen, zuletzt entfällt er.
+## Rückgabe: [{id, x (Mast), dir (-1 links / 1 rechts), rect}]
+const FLAG_LEN := 19.0
+const FLAG_H := 13.0
+
+static func _flag_rect(x: float, dir: float, y: float) -> Rect2:
+	var x2 := x + 0.5 + dir * FLAG_LEN
+	return Rect2(minf(x + 0.5, x2), y - 19.0, FLAG_LEN, FLAG_H)
+
+func pad_flags() -> Array:
+	var out: Array = []
+	for id in pads:
+		var p: Dictionary = pads[id]
+		var y: float = float(p.row) * float(Tuning.TILE)
+		var shelter: Rect2 = p.get("shelter", Rect2())
+		var poles: Array = [float(p.x0) + 2.0, float(p.x1) - 3.0]
+		if shelter.size.x > 0.0:
+			poles = [float(p.x1) - 3.0] if int(p.side) < 0 else [float(p.x0) + 2.0]
+		for x in poles:
+			var dir := -1.0 if x < float(p.center) else 1.0
+			out.append({"id": id, "x": x, "dir": dir, "y": y, "service": bool(p.fuel) or bool(p.life), "rect": _flag_rect(x, dir, y)})
+	for _round in 8:
+		var hit := -1
+		for i in out.size():
+			for j in range(i + 1, out.size()):
+				if out[i].id != out[j].id and out[i].rect.intersects(out[j].rect):
+					# Opfer: Service-Plattform vor Fahrgastplattform, sonst der Wimpel mit weiter entferntem Mast
+					hit = i if (out[i].service and not out[j].service) or (out[i].service == out[j].service and absf(float(out[i].x) - float(pads[out[i].id].center)) > absf(float(out[j].x) - float(pads[out[j].id].center))) else j
+					break
+			if hit >= 0:
+				break
+		if hit < 0:
+			break
+		var v: Dictionary = out[hit]
+		var mates := 0
+		for f in out:
+			if f.id == v.id:
+				mates += 1
+		if mates > 1:
+			out.remove_at(hit)
+			continue
+		var flipped := _flag_rect(float(v.x), -float(v.dir), float(v.y))
+		var free := true
+		for f in out:
+			if f.id != v.id and f.rect.intersects(flipped):
+				free = false
+		if free and float(v.dir) == (-1.0 if float(v.x) < float(pads[v.id].center) else 1.0):
+			v["dir"] = -float(v.dir)
+			v["rect"] = flipped
+		else:
+			out.remove_at(hit)
+	return out
+
 func has_zones() -> bool:
 	return not zones.is_empty()
 

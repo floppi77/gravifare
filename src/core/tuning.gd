@@ -100,6 +100,9 @@ const EXTRA_FARE_FACTOR := 0.4       # Zusatzfahrgäste zahlen einen Bruchteil d
 static func sector_gravity(sector: int) -> float:
 	return float(SECTOR_GRAVITY.get(sector, GRAVITY))
 
+static func life_price(sector: int) -> float:
+	return LIFE_PRICE + LIFE_PRICE_STEP * float(maxi(sector - 1, 0))
+
 static func fare_scale(level_no: int) -> float:
 	return FARE_SCALE_EARLY if level_no < FARE_SCALE_FROM else FARE_SCALE_LATE
 
@@ -162,7 +165,8 @@ const EXIT_COUNTDOWN := 0.0
 # Kampagne: Leben, Sprit-Übernahme
 const START_LIVES := 5
 const MAX_LIVES := 5             # mehr als 5 Leben gibt es nie (auch nicht gekauft)
-const LIFE_PRICE := 1000.0       # Lebens-Station: ein Leben für 1000 Credits
+const LIFE_PRICE := 1000.0       # Lebens-Station: ein Leben für 1000 Credits (Sektor 1)
+const LIFE_PRICE_STEP := 200.0   # … und je Sektor 200 Credits mehr
 const LIFE_BUY_TIME := 1.2       # Sekunden Landezeit bis zum Kauf
 const MIN_START_FUEL := 35.0     # Mindestvorrat zu Levelbeginn (nie Sackgasse durch leeren Tank)
 

@@ -10,6 +10,7 @@ const T_IN := 5.6
 const T_END := 7.6
 
 var t := -1.0
+var last_t := -1.0
 var vt := -1.0                    # Anzeigezeit: läuft weiter, auch wenn die Zeitachse t auf den Funkspruch wartet (Taxi, Planeten und Sterne bleiben in Bewegung)
 var title_sector := ""
 var title_level := ""
@@ -59,9 +60,11 @@ func _process(delta: float) -> void:
 	if t < 0.0:
 		vt = -1.0
 	else:
-		vt = maxf(vt + delta, t) if vt >= 0.0 else t          # nie hinter t (Überspringen springt vor), bleibt aber beim Warten nicht stehen
+		var restarted := t < last_t - 0.001                       # neue Sequenz: Anzeigezeit beginnt wieder bei t
+		vt = maxf(vt + delta, t) if vt >= 0.0 and not restarted else t          # nie hinter t (Überspringen springt vor), bleibt aber beim Warten nicht stehen
 		scroll += flight_speed() * delta
 		queue_redraw()
+	last_t = t
 
 func _draw() -> void:
 	var a := overlay_alpha()

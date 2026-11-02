@@ -450,17 +450,17 @@ func _service_life(dt: float) -> void:
 		life_timer = 0.0
 		life_note = false
 		return
-	if lives >= Tuning.MAX_LIVES or money < Tuning.LIFE_PRICE:
+	if lives >= Tuning.MAX_LIVES or money < Tuning.life_price(level.sector):
 		if not life_note:
 			life_note = true
-			log.append({"type": "life_denied", "full": lives >= Tuning.MAX_LIVES, "price": Tuning.LIFE_PRICE})
+			log.append({"type": "life_denied", "full": lives >= Tuning.MAX_LIVES, "price": Tuning.life_price(level.sector)})
 		return
 	life_timer += dt
 	if life_timer >= Tuning.LIFE_BUY_TIME:
 		life_timer = 0.0
-		money -= Tuning.LIFE_PRICE
+		money -= Tuning.life_price(level.sector)
 		lives += 1
-		log.append({"type": "life_bought", "lives": lives, "price": Tuning.LIFE_PRICE})
+		log.append({"type": "life_bought", "lives": lives, "price": Tuning.life_price(level.sector)})
 
 ## Leerer Tank: Nach OUT_OF_FUEL_TIME Sekunden ist das Taxi verloren (Leben −1, neues Taxi mit vollem Tank) – es sei denn,
 ## es steht an einer funktionierenden Zapfsäule (dort tankt es notfalls kostenlos).

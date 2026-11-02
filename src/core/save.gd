@@ -82,6 +82,11 @@ func delete_slot(n: int) -> void:
 	for suffix in ["", ".tmp", ".bad"]:
 		if FileAccess.file_exists(slot_path(n) + suffix):
 			DirAccess.remove_absolute(slot_path(n) + suffix)
+	var rd := Replay.dir_for(n)                     # Bestzeit-Geister dieses Platzes gehen mit
+	if DirAccess.dir_exists_absolute(rd) and not dev_session and slot_prefix == "user://save_":
+		for f in DirAccess.get_files_at(rd):
+			DirAccess.remove_absolute(rd + f)
+		DirAccess.remove_absolute(rd)
 	if slot == n:
 		leave_slot()
 
