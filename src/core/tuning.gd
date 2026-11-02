@@ -146,9 +146,9 @@ const EXTRA_EVERY_MIN := 9.0         # Abstand zwischen zwei Zusatzfahrgästen
 const EXTRA_EVERY_MAX := 18.0
 const EXTRA_PATIENCE_MIN := 20.0     # Geduld in Sekunden
 const EXTRA_PATIENCE_MAX := 34.0
-const MAIN_PATIENCE_MIN := 45.0      # Auftrags-Fahrgäste warten länger, gehen aber auch (Ersatz-Fahrgast erscheint)
-const MAIN_PATIENCE_MAX := 70.0
-const MAIN_PATIENCE_FLOOR := 90.0    # Auftrags-Fahrgäste warten mindestens so lange (Sekunden)
+const MAIN_PATIENCE_MIN := 75.0      # Auftrags-Fahrgäste warten länger, gehen aber auch (Ersatz-Fahrgast erscheint)
+const MAIN_PATIENCE_MAX := 90.0
+const MAIN_PATIENCE_FLOOR := 75.0    # Auftrags-Fahrgäste warten mindestens so lange (Sekunden)
 const NEXT_SPAWN_MIN := 2.5          # Pause nach dem Absetzen, bis der nächste Auftrags-Fahrgast erscheint
 const NEXT_SPAWN_MAX := 6.0
 
@@ -171,9 +171,9 @@ const LIFE_BUY_TIME := 1.2       # Sekunden Landezeit bis zum Kauf
 const MIN_START_FUEL := 35.0     # Mindestvorrat zu Levelbeginn (nie Sackgasse durch leeren Tank)
 
 # Bezahlung: je schneller vom Erscheinen des Fahrgasts bis zum Ziel, desto mehr Credits
-const PAY_MAX := 1.6             # Faktor bei sofortiger Zustellung
+const PAY_MAX := 1.4             # Faktor bei sofortiger Zustellung
 const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
-const PAY_SLOPE := 0.6           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
+const PAY_SLOPE := 0.4           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
 const LAND_PENALTY_MAX := 0.30
 const WRONG_PAD_PEN := 0.15      # Fahrpreisabzug je Landung an falscher Plattform mit Fahrgast an Bord
 const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast an Bord
@@ -182,7 +182,11 @@ const EXIT_COUNTDOWN_MIN := 45.0       # Sekunden, die der letzte Pflichtfahrgas
 const EXIT_COUNTDOWN_PAR_FACTOR := 2.2   # lange Level bekommen mehr: 2,2 × Richtzeit des Ausgangs-Auftrags
 const EXIT_HURRY_AT := [20.0, 10.0, 5.0]  # Restsekunden, bei denen der letzte Fahrgast zur Eile drängt
 const EXIT_TIMEOUT_FEE_FACTOR := 1.2     # Strafzahlung bei Zeitablauf: 120 % des Fahrpreises des Ausgangs-Fahrgasts
-const MISSED_FEE_FACTOR := 0.35   # Abzug für einen verpassten Pflichtfahrgast: Anteil des (unskalierten) Fahrpreises
+const MISSED_FEE_BASE := 4.0      # Strafe für einen verlorenen Pflichtfahrgast (verpasst, gerammt, rausgeworfen): 4-facher Fahrpreis in Sektor 1 …
+const MISSED_FEE_STEP := 1.0      # … und je Sektor ein Vielfaches mehr (Sektor 2: 5-fach, Sektor 3: 6-fach, …)
+
+static func missed_fee_factor(sector: int) -> float:
+	return MISSED_FEE_BASE + MISSED_FEE_STEP * float(maxi(sector - 1, 0))
 # Serie perfekter Landungen: weich, geradeaus, waagerecht – jede weitere in Folge erhöht den Fahrpreis
 const PERFECT_MIN_AIR := 1.5     # Flugzeit seit dem Abheben, ab der eine Landung „perfekt“ zählen kann (kein Hüpfen auf der Stelle)
 const PERFECT_MIN_PATH := 40.0   # … und zurückgelegte Strecke (px)
@@ -191,13 +195,15 @@ const PERFECT_TILT := 0.07
 const COMBO_STEP := 0.05          # +5 % je Serienstufe
 const COMBO_MAX := 6              # höchstens +30 %
 const WALK_TIME_WEIGHT := 2.5    # Gehzeit zum Häuschen zählt 2,5-fach (nahes Landen lohnt spürbar)
-# Streckenzuschlag: lange/schwierige Fahrten zahlen bis zu +60 % (Länge, enger Korridor, kleines Ziel-Landefenster)
-const DIST_BONUS_LEN := 0.30
-const DIST_BONUS_NARROW := 0.20
-const DIST_BONUS_WINDOW := 0.10   # max. Abzug je harter Landung (Sinkrate = Limit)
+# Streckenzuschlag: lange/schwierige Fahrten zahlen bis zu +38 % (Länge, enger Korridor, kleines Ziel-Landefenster)
+const DIST_BONUS_LEN := 0.20
+const DIST_BONUS_NARROW := 0.12
+const DIST_BONUS_WINDOW := 0.06   # max. Abzug je harter Landung (Sinkrate = Limit)
 
-static func time_factor(t: float, par: float) -> float:
-	var ratio := t / maxf(par, 1.0)
+## `slope_k`: teure Fahrten verlieren schneller an Wert, billige langsamer (die Zeit läuft für sie schneller bzw. langsamer; siehe Run.price_slope).
+## Alle starten bei PAY_MAX; bei k = 1 liegt der Faktor bei der Richtzeit genau bei 1,0.
+static func time_factor(t: float, par: float, slope_k := 1.0) -> float:
+	var ratio := t / maxf(par, 1.0) * slope_k
 	return clampf(1.0 + (1.0 - ratio) * PAY_SLOPE, PAY_MIN, PAY_MAX)
 
 static func landing_penalty(vy: float) -> float:

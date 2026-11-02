@@ -25,7 +25,7 @@ const MAX_MARGIN := 48.0
 const STEP := 4.0
 static var _leg_cache := {}
 
-## Streckenzuschlag für eine Fahrt von Pad `from_id` nach Pad `to_id` (oder "exit"): 1,0 … 1,6.
+## Streckenzuschlag für eine Fahrt von Pad `from_id` nach Pad `to_id` (oder "exit"): 1,0 … 1,38.
 ## Länge der Flugroute, engster Korridor entlang der Route und Größe des Ziel-Landefensters (alles aus dem Layout).
 static func leg_mult(lvl: LevelData, from_id: String, to_id: String) -> float:
 	var key := "%s:%s>%s" % [lvl.id, from_id, to_id]

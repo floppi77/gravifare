@@ -38,6 +38,7 @@ func resolve_level(arg: String) -> String:
 		return id if ids.has(id) else a
 	return a
 
+const KOFI_URL := "https://ko-fi.com/floppi77"
 const TUTORIAL_ID := "tutorial"
 var tutorial_next := ""                 # nach dem Tutorial: Level, in das es übergeht ("" = zurück ins Menü)
 

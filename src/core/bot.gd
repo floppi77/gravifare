@@ -294,7 +294,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 		"complete": r.result == Run.Result.COMPLETE,
 		"failed": r.result == Run.Result.FAILED,
 		"time": r.sim.time, "fuel_left": r.sim.fuel, "fuel_burned": burned, "hull": r.sim.hull,
-		"delivered": r.delivered, "jobs": lvl.jobs.size(), "money": r.money, "job_times": r.job_times,
+		"delivered": r.delivered, "squashes": r.squashes, "jobs": lvl.jobs.size(), "money": r.money, "job_times": r.job_times,
 		"reason": reason if reason != "" else bot.fail_reason,
 		"timed_out": r.exit_timed_out,
 	}

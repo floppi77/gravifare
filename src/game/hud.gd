@@ -272,7 +272,7 @@ func _draw_result() -> void:
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
 	draw_string(ui, Vector2(px, py + 33.0), "Level %d · %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
 	# Medaillen als drei Karten
-	var items := [["time", tr("MEDAL_TIME")], ["clean", tr("MEDAL_CLEAN")], ["pro", tr("MEDAL_PRO")]]
+	var items := [["time", tr("MEDAL_TIME"), tr("MEDAL_TIME_D")], ["clean", tr("MEDAL_CLEAN"), tr("MEDAL_CLEAN_D")], ["pro", tr("MEDAL_PRO"), tr("MEDAL_PRO_D")]]
 	var cw := 112.0
 	var gap := (pw - 28.0 - cw * 3.0) / 2.0
 	for i in items.size():
@@ -281,8 +281,9 @@ func _draw_result() -> void:
 		var edge := Color("#ffd24a") if got else Color("#3a4580")
 		draw_rect(Rect2(cx, py + 48.0, cw, 34.0), Color(0.12, 0.14, 0.3, 0.9) if got else Color(0.07, 0.09, 0.2, 0.9))
 		draw_rect(Rect2(cx, py + 48.0, cw, 34.0), edge, false, 1.0 if got else 0.7)
-		_star(Vector2(cx + 20.0, py + 65.0), 9.0, Color("#ffd24a") if got else Color("#4a5280"), got)
-		draw_string(ui, Vector2(cx + 36.0, py + 69.0), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, cw - 40.0, 11, Color("#ffe9a0") if got else Color("#6a729f"))
+		_star(Vector2(cx + 20.0, py + 62.0), 9.0, Color("#ffd24a") if got else Color("#4a5280"), got)
+		draw_string(ui, Vector2(cx + 36.0, py + 66.0), items[i][1], HORIZONTAL_ALIGNMENT_LEFT, cw - 40.0, 11, Color("#ffe9a0") if got else Color("#6a729f"))
+		draw_string(ui, Vector2(cx + 6.0, py + 78.0), items[i][2], HORIZONTAL_ALIGNMENT_CENTER, cw - 12.0, 7, Color("#a9b8ff") if got else Color("#7c86bb"))
 	# linke Spalte: Zeit mit Balken, rechte Spalte: Einnahmen und Abzüge
 	var lx := px + 16.0
 	var rx := px + pw * 0.5 + 8.0

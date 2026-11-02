@@ -113,6 +113,10 @@ func show_main(focus_lang := "") -> void:
 		grid.add_child(_small_button(entry[0], entry[1]))
 	grid.get_child(0).disabled = not Save.shift_unlocked(ids)     # Nachtschicht: erst nach allen Leveln
 	box.add_child(grid)
+	var kofi := _small_button(tr("MENU_KOFI"), func(): OS.shell_open(Flow.KOFI_URL))      # per Gamepad wie jeder Eintrag anwählbar
+	kofi.custom_minimum_size = Vector2(128, 18)
+	kofi.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(kofi)
 	if Save.debug:
 		box.add_child(MenuKit.button(tr("DEBUG_LEAVE"), func():
 			Flow.set_debug(false)

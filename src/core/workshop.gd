@@ -6,7 +6,7 @@ extends RefCounted
 
 const MAX_LEVEL := 3
 const PRICES := [2700, 8000, 20000]       # Grundpreise der drei Stufen (erste Werkstatt)
-const STEP_FRACTION := 0.10               # jede weitere Werkstatt: alle Preise um 10 % des Grundpreises der ersten Stufe teurer (linear)
+const STEP_FRACTION := 0.10               # jede weitere Werkstatt: jede Stufe um 10 % ihres Grundpreises teurer (linear)
 const ITEMS := ["jets", "hull", "gear"]
 const JETS_STEP := 0.06      # Spritverbrauch je Stufe
 const HULL_STEP := 0.08      # Aufprallschaden je Stufe
@@ -32,13 +32,13 @@ static func mods(data: Dictionary) -> Dictionary:
 		levels[id] = level_of(data, id)
 	return mods_for(levels)
 
-## Aufschlag der Werkstatt nach `sector` (1 = erste Werkstatt, kein Aufschlag): 270 Credits je weiterer Werkstatt, auf jede Stufe.
-static func surcharge(sector: int) -> int:
-	return int(round(float(PRICES[0]) * STEP_FRACTION)) * maxi(sector - 1, 0)
+## Preisfaktor der Werkstatt nach `sector` (1 = erste Werkstatt): je weiterer Werkstatt +10 % des Grundpreises der jeweiligen Stufe (linear).
+static func price_factor(sector: int) -> float:
+	return 1.0 + STEP_FRACTION * float(maxi(sector - 1, 0))
 
 static func price(data: Dictionary, id: String, sector := 1) -> int:
 	var l := level_of(data, id)
-	return PRICES[l] + surcharge(sector) if l < MAX_LEVEL else 0
+	return int(round(float(PRICES[l]) * price_factor(sector))) if l < MAX_LEVEL else 0
 
 ## Kauf der nächsten Stufe mit `credits` (Kasse des laufenden Flugs). Gibt die Credits danach zurück, -1, wenn es nicht geht; der Aufrufer speichert.
 static func buy(data: Dictionary, id: String, credits: float, sector := 1) -> float:

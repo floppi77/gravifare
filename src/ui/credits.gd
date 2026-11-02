@@ -31,8 +31,23 @@ func _ready() -> void:
 	view.owner_scene = self
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(view)
+	var kofi := Button.new()                                   # Maus; per Gamepad (X) oder Taste K
+	kofi.text = tr("CREDITS_KOFI")
+	kofi.focus_mode = Control.FOCUS_NONE
+	kofi.add_theme_font_size_override("font_size", 8)
+	kofi.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	kofi.offset_left = -130.0
+	kofi.offset_top = -24.0
+	kofi.offset_right = -8.0
+	kofi.offset_bottom = -6.0
+	kofi.theme = MenuKit.make_theme()
+	kofi.pressed.connect(func(): OS.shell_open(Flow.KOFI_URL))
+	add_child(kofi)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_X) or (event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_K):
+		OS.shell_open(Flow.KOFI_URL)
+		return
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()   # vor dem Szenenwechsel, danach hat der Knoten keinen Viewport mehr
 		Flow.to_menu()

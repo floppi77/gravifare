@@ -42,6 +42,7 @@ var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 ## je Periode einmal von (x, y) um (dx, dy) Felder in "fall" Sekunden und ist sonst unsichtbar; "warn" Sekunden vorher
 ## blinkt seine Bahn). Bewegung nach der Simulationszeit.
 var movers: Array = []
+var meteor_seed := 0             # Meteoriten fallen je Fall auf einer anderen Bahn (zufällig je Lauf, reproduzierbar im Replay); setzt Run.start
 var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast schwarz); nur Taxi, Plattformen, Tor und leuchtende Gefahren sind beleuchtet
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 
@@ -396,6 +397,7 @@ func _scan_movers(list: Array) -> void:
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
 		if kind == "meteor":
+			m["x0"] = m.x                         # feste Bahn aus der Leveldatei, falls keine Spalte erlaubt ist
 			m["w"] = float(d.get("w", 1)) * Tuning.TILE
 			m["h"] = float(d.get("h", 1)) * Tuning.TILE
 			m["period"] = maxf(float(d.get("period", 20.0)), m.fall + 1.0)
@@ -416,6 +418,54 @@ func _mover_offset(m: Dictionary, t: float) -> Vector2:
 	return Vector2(float(m.ax) * s, float(m.ay) * s)
 
 const OFFSCREEN := -1000.0
+
+## Spalten (Felder), in denen ein Meteorit fallen darf: nie über einer Plattform (auch nicht über dem Fahrweg fahrender Plattformen),
+## oben frei und mit freier Fallstrecke. Gibt es keine, bleibt die Bahn aus dem Level (x).
+func meteor_columns(m: Dictionary) -> Array:
+	if m.has("cols"):
+		return m.cols
+	var blocked := {}
+	for pid in pads:
+		var p: Dictionary = pads[pid]
+		var x0 := float(p.x0)
+		var x1 := float(p.x1)
+		var b: Dictionary = p.get("base", {})
+		if not b.is_empty():
+			x0 = float(b.x0)
+			x1 = float(b.x1)
+		for mv in movers:
+			if mv.kind == "pad" and String(mv.pad) == String(pid):
+				x0 -= absf(float(mv.ax))
+				x1 += absf(float(mv.ax))
+		for c in range(int(floorf(x0 / Tuning.TILE)), int(ceilf(x1 / Tuning.TILE))):
+			blocked[c] = true
+	var cols: Array = []
+	var w_tiles := int(round(float(m.w) / Tuning.TILE))
+	var top := int(float(m.y) / Tuning.TILE)
+	var span := int(float(m.ay) / Tuning.TILE)
+	for c in range(1, 39):
+		var ok := true
+		for k in w_tiles:
+			if blocked.has(c + k) or cell(c + k, top) != ".":
+				ok = false
+		if not ok:
+			continue
+		var free := 0
+		for r in range(top, mini(top + span, 21)):
+			if cell(c, r) == ".":
+				free += 1
+		if free >= 6:
+			cols.append(c)
+	m["cols"] = cols
+	return cols
+
+## Bahn (linke x-Koordinate) des Falls mit der laufenden Nummer n.
+func meteor_x_for(m: Dictionary, idx: int, n: int) -> float:
+	var cols := meteor_columns(m)
+	if cols.is_empty():
+		return float(m.x0)
+	var h := absi(("%s:%d:%d:%d" % [id, meteor_seed, idx, n]).hash())
+	return float(cols[h % cols.size()]) * Tuning.TILE
 
 ## Meteor: Fortschritt 0..1 des laufenden Falls, -1 zwischen den Fällen.
 func meteor_progress(m: Dictionary, t: float) -> float:
@@ -530,7 +580,12 @@ func _finish_moving_pads() -> void:
 
 ## Setzt alle Mover auf die Zeit t (Simulationszeit); `reset` verwirft die Geschwindigkeit (Neustart).
 func update_movers(t: float, reset := false) -> void:
-	for m in movers:
+	for mi in movers.size():
+		var m: Dictionary = movers[mi]
+		if m.kind == "meteor":
+			var cyc := floorf((t + float(m.phase)) / float(m.period))
+			var falling := fposmod(t + float(m.phase), float(m.period)) < float(m.fall)
+			m["x"] = meteor_x_for(m, mi, int(cyc) + (0 if falling else 1))       # laufender bzw. nächster Fall
 		var old: Rect2 = m.rect
 		var r := _mover_rect(m, t)
 		m.vel = Vector2.ZERO if reset else (r.position - old.position) / Tuning.TICK

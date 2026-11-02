@@ -13,6 +13,7 @@ const CALL_RANGE := 150.0
 const CALL_COOLDOWN := 12.0
 const SQUASH_RESPAWN_DELAY := 2.4
 const SPAWN_HINT_AFTER := 2.5
+const SPAWN_RELOCATE_AFTER := 5.0
 
 var level: LevelData
 var jobs: Array = []        # Arbeitskopie der Aufträge (Ersatz-Fahrgäste ändern Pad/Person, nie die Leveldaten)
@@ -79,7 +80,8 @@ var life_timer := 0.0
 var life_note := false
 var refuel_tick := false          # in diesem Tick wurde getankt: Spritpreis bleibt dann unverändert
 var missed := 0                   # Pflichtfahrgäste, die nicht befördert wurden (Geduld abgelaufen)
-var missed_fees := 0.0
+var missed_fees := 0.0            # bezahlte Strafen (Ergebnisansicht)
+var missed_due := 0.0             # Strafen für verpasste/gerammte/rausgeworfene Pflichtfahrgäste: werden am Levelende abgezogen
 var ejected := 0                  # rausgeworfene Fahrgäste (Sauber-Medaille entfällt)
 var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
 var wrong_pad_last := ""          # zuletzt bemeckerte Plattform (ein Hüpfer beim Abheben ist noch dieselbe Landung)
@@ -90,6 +92,7 @@ var taxi_fees := 0.0              # Ersatztaxis in diesem Level
 func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> void:
 	level = lvl
 	jobs = lvl.jobs.duplicate(true)
+	price_ref = 0.0
 	var fscale := Tuning.fare_scale(lvl.number)
 	for i in jobs.size():
 		if not lvl.tutorial:
@@ -140,6 +143,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	missed = 0
 	ejected = 0
 	missed_fees = 0.0
+	missed_due = 0.0
 	repair_cost = 0.0
 	taxi_fees = 0.0
 	level_time = 0.0
@@ -148,6 +152,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	pump_boom_t = -1.0
 	pump_broken = false
 	pump_warned = false
+	lvl.meteor_seed = seed if seed >= 0 else absi(lvl.id.hash())
 	price_rng.seed = seed if seed >= 0 else absi(lvl.id.hash())      # reproduzierbar je Lauf/Level
 	price_base = snappedf(price_rng.randf_range(lvl.fuel_price_min, lvl.fuel_price_max), 0.01)
 	price_next_t = price_rng.randf_range(lvl.price_every.x, lvl.price_every.y)
@@ -318,9 +323,7 @@ func _exit_timeout() -> void:
 	if job_index < jobs.size():
 		_lose_job(who, fee)
 	else:
-		var paid := minf(fee, money)
-		money -= paid
-		missed_fees += paid
+		missed_due += fee
 	_finish_level()
 
 ## Ausgangs-Fahrgast des Vorlevels steigt auf der Startplattform aus und geht zum Unterstand (Zahlung bei Ankunft).
@@ -329,7 +332,8 @@ func release_carried(c: Dictionary) -> void:
 		return
 	var a := PassengerActor.new()
 	a.setup({"passenger": c.name, "gender": c.gender, "look": c.look}, sim.landed_pad, 0, true)
-	a.pay_info = c.get("pay_info", {})
+	a.pay_info = c.get("pay_info", {}).duplicate()
+	a.pay_info["carry"] = true               # bezahlt wird hier, gezählt hat er im Vorlevel
 	a.step_out(sim.pos.x, sim.landed_pad)
 	leavers.append(a)
 
@@ -378,7 +382,24 @@ func prospect() -> float:
 	var j := current_job()
 	if j.is_empty():
 		return 0.0
-	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j)) * combo_mult(streak)
+	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j), price_slope(j)) * combo_mult(streak)
+
+## Wie schnell der Fahrpreis mit der Zeit fällt: Je höher der Ausgangspreis gegenüber dem Durchschnitt des Levels, desto schneller sinkt er
+## (großzügige Fahrgäste kürzen schneller), wer wenig zahlt, zahlt länger wenig. 0,8 … 1,3.
+func price_slope(job: Dictionary) -> float:
+	if job.is_empty():
+		return 1.0
+	if price_ref <= 0.0:
+		var sum := 0.0
+		var n := 0
+		for j in jobs:
+			if not is_exit_job(j):
+				sum += float(j.get("fare", 50)) * job_mult(j)
+				n += 1
+		price_ref = maxf(sum / float(maxi(n, 1)), 1.0)
+	return clampf(0.6 + 0.4 * float(job.get("fare", 50)) * job_mult(job) / price_ref, 0.8, 1.3)
+
+var price_ref := 0.0
 
 func par_of(job: Dictionary) -> float:
 	return float(job.get("par", job.get("time_limit", 60)))
@@ -386,7 +407,7 @@ func par_of(job: Dictionary) -> float:
 ## Aktueller Zeitfaktor des laufenden Auftrags (für die HUD-Anzeige).
 func live_factor() -> float:
 	var j := current_job()
-	return Tuning.time_factor(job_clock, par_of(j)) if not j.is_empty() and actor != null else 1.0
+	return Tuning.time_factor(job_clock, par_of(j), price_slope(j)) if not j.is_empty() and actor != null else 1.0
 
 func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	log.clear()
@@ -507,10 +528,10 @@ func _miss_job() -> void:
 
 ## Gemeinsame Buchhaltung für einen nicht beförderten Pflichtauftrag (verpasst oder rausgeworfen).
 func _lose_job(pname: String, extra_fee := 0.0) -> void:
-	var fee := minf(maxf(snappedf(float(level.jobs[job_index].get("fare", 50)) * Tuning.MISSED_FEE_FACTOR, 1.0), snappedf(extra_fee, 1.0)), money)
-	money -= fee
+	var lj: Dictionary = jobs[job_index]
+	var fee := maxf(snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.missed_fee_factor(level.sector), 1.0), snappedf(extra_fee, 1.0))
 	missed += 1
-	missed_fees += fee
+	missed_due += fee                            # fällig am Levelende, nicht sofort
 	log.append({"type": "job_missed", "name": pname, "fee": fee})
 	if bool(jobs[job_index].get("fragile", false)):
 		log.append({"type": "patient_lost", "name": pname, "fee": fee})
@@ -579,16 +600,11 @@ func _squash_actor() -> void:
 	old.squash()
 	leavers.append(old)
 	actor = null
-	var n := int(job.get("squashed", 0)) + 1
-	job["squashed"] = n
-	var new_pad := String(old.pad.id)
-	if not level.tutorial:                    # Tutorial: dieselbe Person am selben Pad, das Skript nennt sie beim Namen
-		new_pad = _pick_new_pad(job, new_pad, n)
-		var ident := PassengerActor.pick_identity(level.id, job_index, n, String(job.get("passenger", "")))
-		job["from"] = new_pad
-		job["passenger"] = ident.name
-		job["gender"] = ident.gender
-		job["look"] = ident.look
+	if not level.tutorial:                    # gerammter Pflichtfahrgast geht: einer weniger, Strafe am Levelende (wie verpasst)
+		_lose_job(old.pname)
+		return
+	job["squashed"] = int(job.get("squashed", 0)) + 1
+	var new_pad := String(old.pad.id)         # Tutorial: dieselbe Person am selben Pad, das Skript nennt sie beim Namen
 	spawn_timer = SQUASH_RESPAWN_DELAY
 	spawn_wait = false
 	respawn_keep_clock = true
@@ -641,6 +657,10 @@ func _finish_level() -> void:
 		job_index += 1
 		actor = null
 	_settle_pending()
+	var due := minf(missed_due, money)           # Strafen für verlorene Pflichtfahrgäste
+	money -= due
+	missed_fees += due
+	missed_due = 0.0
 	repair_cost = minf(snappedf(minf(taxi_damage, Tuning.HULL_MAX) * Tuning.REPAIR_COST, 1.0), money)
 	if repair_cost > 0.0:
 		money -= repair_cost
@@ -685,6 +705,12 @@ func _step_actors(dt: float) -> void:
 			spawn_block_t += dt
 			if spawn_block_t >= SPAWN_HINT_AFTER and spawn_block_t - dt < SPAWN_HINT_AFTER:
 				log.append({"type": "spawn_blocked"})      # sonst wartet man auf dem Pad auf jemanden, der nie erscheint
+			if spawn_block_t >= SPAWN_RELOCATE_AFTER and not level.tutorial and sim.state == TaxiSim.State.LANDED and sim.landed_pad.id == String(nj.from):
+				var np := _pick_new_pad(nj, String(nj.from), 77)        # das Taxi steht auf dem Pad des nächsten Fahrgasts: er erscheint an einem anderen
+				if np != String(nj.from):
+					nj["from"] = np
+					spawn_block_t = 0.0
+					log.append({"type": "replacement", "pad": np, "name": String(nj.get("passenger", ""))})
 	if actor != null:
 		actor.step(dt)
 		if actor.state == PassengerActor.S.WAITING and phase == Phase.WAITING:
@@ -779,7 +805,7 @@ func _service_pad(dt: float) -> void:
 				_deliver(job)
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
-	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "base": base_clock,
+	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "slope": price_slope(job), "base": base_clock,
 		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff) * (1.0 - pen_ride), "combo": streak, "job": job_index, "name": String(job.get("passenger", ""))}
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
@@ -796,7 +822,7 @@ func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
 	if is_extra:
 		extra_earned += pay
 		extras_delivered += 1
-	else:
+	elif not bool(l.pay_info.get("carry", false)):
 		delivered += 1
 		job_times.append(total_time)
 	log.append({"type": "delivered", "extra": is_extra, "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname})
@@ -993,10 +1019,10 @@ func extra_of(a: PassengerActor) -> Dictionary:
 
 ## Voraussichtlicher Fahrpreis eines wartenden/aufgenommenen Zusatzfahrgasts (tickt mit der Zeit herunter).
 func extra_prospect(e: Dictionary) -> float:
-	return float(e.job.fare) * job_mult(e.job) * Tuning.time_factor(float(e.clock), par_of(e.job)) * combo_mult(streak)
+	return float(e.job.fare) * job_mult(e.job) * Tuning.time_factor(float(e.clock), par_of(e.job), price_slope(e.job)) * combo_mult(streak)
 
 func extra_factor(e: Dictionary) -> float:
-	return Tuning.time_factor(float(e.clock), par_of(e.job))
+	return Tuning.time_factor(float(e.clock), par_of(e.job), price_slope(e.job))
 
 ## Zusatzfahrgast erscheinen lassen; `force_from`/`force_to` (Tutorial) legen Abhol- und Zielpad fest.
 func _spawn_extra(force_from := "", force_to := "") -> void:

@@ -531,7 +531,9 @@ func _physics_process(_delta: float) -> void:
 	replay.sample(run.sim.pos, run.sim.tilt)
 	if run.sim.gear_cmd != gear_before:
 		Sfx.play("gear")
-	Sfx.set_thrust(taxi.flame_main if run.result == Run.Result.RUNNING else 0.0, absf(taxi.flame_side))
+	if bay == null:                          # in der Werkstatt steuert sie den Triebwerksklang selbst
+		var flying := run.result == Run.Result.RUNNING
+		Sfx.set_thrust(taxi.flame_main if flying else 0.0, absf(taxi.flame_side) if flying else 0.0)
 	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0:
 		warn_cd -= Tuning.TICK
 		if warn_cd <= 0.0:

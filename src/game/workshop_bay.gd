@@ -64,7 +64,6 @@ func _ready() -> void:
 	box.add_theme_constant_override("separation", 6)
 	panel.add_child(box)
 	_build("")
-	Sfx.set_thrust(0.6, 0.0)
 
 func _build(focus_id: String) -> void:
 	for c in box.get_children():
@@ -155,6 +154,8 @@ func _process(delta: float) -> void:
 			var u := _smooth(t / FLY_IN)
 			taxi_pos.y = lerpf(-40.0, LIFT_LOW - TAXI_H, u)
 			flame = 0.3 + 0.7 * (1.0 - u)
+			if t < FLY_IN:
+				Sfx.set_thrust(0.15 + 0.45 * (1.0 - u), 0.0)       # Bremsschub beim Einflug: klingt mit dem Landen ab (kein Dauerton)
 			hatch = 1.0 - _smooth((t - FLY_IN * 0.6) / 0.5)
 			if t >= FLY_IN and flame > 0.0:
 				flame = 0.0
@@ -170,8 +171,8 @@ func _process(delta: float) -> void:
 		S.OUT:
 			hatch = _smooth(t / 0.4)
 			var v := clampf((t - PANEL_T) / FLY_OUT, 0.0, 1.0)
-			if v > 0.0 and flame == 0.0:
-				Sfx.set_thrust(0.8, 0.0)
+			if v > 0.0:
+				Sfx.set_thrust(0.3 + 0.6 * v, 0.0)                  # Ausflug: Schub steigt mit der Fahrt
 			flame = 1.0 if v > 0.0 else 0.0
 			taxi_pos.y = lerpf(LIFT_HIGH - TAXI_H, -60.0, v * v)
 			if v >= 1.0:
