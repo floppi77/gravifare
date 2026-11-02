@@ -10,6 +10,7 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 rsync -a --exclude .git --exclude .venv --exclude build --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
 sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^$/d' "$WORK/project.godot"
+sed -i 's|^\[rendering\]$|[rendering]\n\ntextures/vram_compression/import_etc2_astc=true|' "$WORK/project.godot"      # macOS (universal/arm64) verlangt ASTC, nur in der Exportkopie
 rm -rf "$OUT"
 mkdir -p "$OUT/stage"
 ABS=$(pwd)/$OUT
