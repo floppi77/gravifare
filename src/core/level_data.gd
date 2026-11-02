@@ -255,7 +255,10 @@ func _scan_zones(list: Array) -> void:
 		var z := {"kind": String(d.get("kind", "wind")), "period": float(d.get("period", 0.0)), "on": float(d.get("on", 0.0)), "phase": float(d.get("phase", 0.0)),
 			"rect": Rect2(float(d.get("x", 0)) * Tuning.TILE, float(d.get("y", 0)) * Tuning.TILE, float(d.get("w", 1)) * Tuning.TILE, float(d.get("h", 1)) * Tuning.TILE),
 			"a": Vector2(float(d.get("ax", 0.0)), float(d.get("ay", 0.0))), "g": float(d.get("g", 1.0)), "k": float(d.get("k", 0.0)),
-			"center": Vector2(float(d.get("cx", 0.0)), float(d.get("cy", 0.0))) * Tuning.TILE, "r": float(d.get("r", 4.0)) * Tuning.TILE}
+			"center": Vector2(float(d.get("cx", 0.0)), float(d.get("cy", 0.0))) * Tuning.TILE, "r": float(d.get("r", 4.0)) * Tuning.TILE,
+			"cycle": bool(d.get("cycle", false))}
+		if z.cycle:
+			z["period"] = maxf(float(d.get("period", 16.0)), 4.0)       # Polwechsel: anziehend – aus – abstoßend – aus (je ein Viertel der Periode)
 		if z.kind == "magnet":
 			z["rect"] = Rect2(z.center - Vector2(z.r, z.r), Vector2(z.r, z.r) * 2.0)
 		zones.append(z)
@@ -335,7 +338,32 @@ func has_zones() -> bool:
 	return not zones.is_empty()
 
 func zone_active(z: Dictionary, t: float) -> bool:
+	if z.get("cycle", false):
+		return int(fposmod(t + float(z.phase), float(z.period)) / float(z.period) * 4.0) % 2 == 0
 	return float(z.period) <= 0.0 or fposmod(t + float(z.phase), float(z.period)) < float(z.on)
+
+## Viertel (0–3) und Fortschritt darin (0–1) eines Polwechsel-Magneten: 0 anziehend, 1 aus, 2 abstoßend, 3 aus.
+func zone_cycle(z: Dictionary, t: float) -> Vector2:
+	var q := fposmod(t + float(z.phase), float(z.period)) / float(z.period) * 4.0
+	var idx := floorf(q)
+	return Vector2(idx, q - idx)
+
+## Vorzeichen der Kraft des Magneten: +1 anziehend, -1 abstoßend; im ausgeschalteten Zustand die Polarität, die als Nächstes kommt.
+func zone_polarity(z: Dictionary, t: float) -> float:
+	if not z.get("cycle", false):
+		return 1.0 if float(z.k) > 0.0 else -1.0
+	var q := int(zone_cycle(z, t).x)
+	return 1.0 if q == 0 or q == 3 else -1.0
+
+## Aktuelle Stärke (mit Vorzeichen) der Magnetkraft: bei Polwechsel mit weichem Ein- und Ausblenden an den Viertelgrenzen.
+func zone_k(z: Dictionary, t: float) -> float:
+	if not z.get("cycle", false):
+		return float(z.k)
+	var c := zone_cycle(z, t)
+	if int(c.x) % 2 == 1:
+		return 0.0
+	var amp := smoothstep(0.0, 0.12, c.y) * (1.0 - smoothstep(0.88, 1.0, c.y))
+	return float(z.k) * (1.0 if int(c.x) == 0 else -1.0) * amp
 
 ## Zusätzliche Beschleunigung (px/s²) durch Zonen am Ort p zur Zeit t.
 func zone_accel(p: Vector2, t: float) -> Vector2:
@@ -352,7 +380,7 @@ func zone_accel(p: Vector2, t: float) -> Vector2:
 				var d: Vector2 = (z.center as Vector2) - p
 				var dist := d.length()
 				if dist < float(z.r) and dist > 2.0:
-					a += d / dist * float(z.k) * (1.0 - pow(dist / float(z.r), 2.0))
+					a += d / dist * zone_k(z, t) * (1.0 - pow(dist / float(z.r), 2.0))
 	return a
 
 ## Verkehr: Bahnabschnitt eines Fahrzeugpfads, in dem die Box liegt ({} sonst); "horizontal" sagt, wie der Abschnitt verläuft.

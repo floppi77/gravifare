@@ -625,7 +625,7 @@ func _field_feedback() -> void:
 			if not (z.rect as Rect2).has_point(run.sim.pos) or not run.level.zone_active(z, run.sim.time):
 				continue
 			if z.kind == "magnet":
-				key = "MSG_FIELD_PULL" if float(z.k) > 0.0 else "MSG_FIELD_PUSH"
+				key = "MSG_FIELD_PULL" if run.level.zone_k(z, run.sim.time) > 0.0 else "MSG_FIELD_PUSH"
 			elif z.kind == "wind":
 				key = "MSG_FIELD_WIND"
 			elif z.kind == "gravity":

@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -2012,6 +2012,33 @@ func _test_meteor_lanes() -> void:
 			varied = varied and (xs.size() >= 3 or lvl.meteor_columns(m).size() < 3)
 	check(levels >= 8 and bad.is_empty(), "Meteoriten fallen nie über einer Plattform (%d Meteoriten, Verstöße: %s)" % [levels, str(bad.slice(0, 3))])
 	check(varied, "Jeder Meteorit fällt auf wechselnden Bahnen (mindestens drei verschiedene in 40 Fällen)")
+
+func _test_pole_swap() -> void:
+	var rows: Array = []
+	for y in 22:
+		var row := ""
+		for x in 30:
+			row += "#" if (y == 0 or y == 21 or x == 0 or x == 29) else "."
+		rows.append(row)
+	var lv := LevelData.from_dict({"id": "T-POL", "sector": 4, "index": 1, "name": {"de": "t", "en": "t"}, "map": rows, "jobs": [],
+		"zones": [{"kind": "magnet", "cx": 10.5, "cy": 10.5, "r": 5.0, "k": 100, "cycle": true, "period": 16.0, "phase": 0.0}]})
+	var z: Dictionary = lv.zones[0]
+	var p := Vector2(10.5 * 16.0 + 40.0, 10.5 * 16.0)
+	var a0 := lv.zone_accel(p, 2.0).x          # erstes Viertel: anziehend (Magnet liegt links, Beschleunigung nach links)
+	var a1 := lv.zone_accel(p, 6.0).x          # zweites: aus
+	var a2 := lv.zone_accel(p, 10.0).x         # drittes: abstoßend
+	var a3 := lv.zone_accel(p, 14.0).x         # viertes: aus
+	var a4 := lv.zone_accel(p, 18.0).x         # wieder anziehend
+	check(a0 < -1.0 and a1 == 0.0 and a2 > 1.0 and a3 == 0.0 and a4 < -1.0, "Polwechsel-Magnet: anziehend – aus – abstoßend – aus – anziehend (%.1f %.1f %.1f %.1f %.1f)" % [a0, a1, a2, a3, a4])
+	check(lv.zone_active(z, 2.0) and not lv.zone_active(z, 6.0) and lv.zone_active(z, 10.0) and not lv.zone_active(z, 14.0), "Polwechsel: aktiv nur in den ungeraden Vierteln (an, aus, an, aus)")
+	check(lv.zone_polarity(z, 2.0) > 0.0 and lv.zone_polarity(z, 6.0) < 0.0 and lv.zone_polarity(z, 10.0) < 0.0 and lv.zone_polarity(z, 14.0) > 0.0, "Anzeige: im ausgeschalteten Zustand die kommende Polarität")
+	check(absf(lv.zone_k(z, 0.01)) < 5.0 and absf(lv.zone_k(z, 1.0 + 0.0)) > 99.0, "Weiches Ein- und Ausblenden an den Viertelgrenzen")
+	var n := 0
+	for f in DirAccess.open("res://data/levels").get_files():
+		if f.ends_with(".json"):
+			for zz in LevelData.load_file("res://data/levels/" + f).zones:
+				n += int(zz.get("cycle", false))
+	check(n >= 6, "Polwechsel-Magnete gibt es ab Level 40 (%d)" % n)
 
 func _test_life_price_per_sector() -> void:
 	check(Tuning.life_price(1) == 1000.0 and Tuning.life_price(2) == 1200.0 and Tuning.life_price(9) == 2600.0, "Leben kaufen: 1000 Credits in Sektor 1, je Sektor 200 mehr (Sektor 9: %d)" % int(Tuning.life_price(9)))

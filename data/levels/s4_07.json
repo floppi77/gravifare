@@ -96,7 +96,8 @@
   "pulsing_fields",
   "repel_fields",
   "attract_fields",
-  "life_station"
+  "life_station",
+  "pole_swap"
  ],
  "movers": [
   {
@@ -135,10 +136,10 @@
    "cx": 3.5,
    "cy": 4.5,
    "r": 5.0,
-   "k": -120,
-   "period": 9.0,
-   "on": 4.5,
-   "phase": 0.0
+   "k": 120,
+   "period": 16.0,
+   "phase": 0.0,
+   "cycle": true
   },
   {
    "kind": "magnet",
@@ -146,9 +147,9 @@
    "cy": 15.5,
    "r": 4.95685424949238,
    "k": 90,
-   "period": 7.0,
-   "on": 3.5,
-   "phase": 0.0
+   "period": 14.0,
+   "phase": 7.0,
+   "cycle": true
   }
  ]
 }

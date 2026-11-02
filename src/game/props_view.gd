@@ -284,6 +284,12 @@ func _draw_wind(z: Dictionary, on: bool) -> void:
 func _timer_arc(c: Vector2, z: Dictionary, rad: float) -> void:
 	if float(z.period) <= 0.0:
 		return
+	if z.get("cycle", false):
+		var cy: Vector2 = level.zone_cycle(z, level.clock)
+		var cols := [Color(1.0, 0.45, 0.55, 0.9), Color(1.0, 0.85, 0.3, 0.8), Color(0.4, 0.8, 1.0, 0.9), Color(1.0, 0.85, 0.3, 0.8)]
+		var on_now := int(cy.x) % 2 == 0
+		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((1.0 - cy.y) if on_now else cy.y), 28, cols[int(cy.x)], 1.6 if on_now else 1.2)
+		return
 	var p := fposmod(level.clock + float(z.phase), float(z.period))
 	var on_t := float(z.on)
 	if p < on_t:
@@ -375,14 +381,19 @@ func _scaled(poly: PackedVector2Array, c: Vector2, f: float) -> PackedVector2Arr
 func _draw_magnet(z: Dictionary, on: bool) -> void:
 	var c: Vector2 = z.center
 	var R: float = z.r
-	var attract := float(z.k) > 0.0
+	var attract := level.zone_polarity(z, level.clock) > 0.0
 	var hot := Color(1.0, 0.45, 0.55) if attract else Color(0.4, 0.8, 1.0)
 	var deep := Color(0.55, 0.12, 0.3) if attract else Color(0.1, 0.25, 0.6)
 	var al := 1.0 if on else 0.22
 	if float(z.period) > 0.0 and not on:
 		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
+		if z.get("cycle", false):
+			var cy: Vector2 = level.zone_cycle(z, level.clock)
+			left = (1.0 - cy.y) * float(z.period) * 0.25
 		if left < 1.2:
 			al = 0.22 + 0.7 * (0.5 + 0.5 * sin(t * 24.0)) * (1.0 - left / 1.2)         # kündigt das Einschalten an
+	elif z.get("cycle", false):
+		al = clampf(absf(level.zone_k(z, level.clock)) / maxf(absf(float(z.k)), 1.0), 0.3, 1.0)
 	# weiches Energiefeld (konzentrische Scheiben)
 	for i in 7:
 		var f := float(i + 1) / 7.0

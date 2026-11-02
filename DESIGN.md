@@ -354,3 +354,4 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Medaillen**: Unter den drei Sternen steht in einer kurzen Zeile, wie man sie bekommt.
 - **Programm-Icon**: `icon.png` (Fenster und Taskleiste), `icon.ico`/`icon.icns` in den Export-Presets.
 - **Level 36**: roter Magnet etwas tiefer (cy 14,0).
+- **Polwechsel-Magnete** (ab Level 40 „Polwechsel“): Zone `magnet` mit `"cycle": true` und `period`: je ein Viertel anziehend – aus – abstoßend – aus, mit weichem Ein- und Ausblenden (`LevelData.zone_k`). Die Darstellung zeigt im ausgeschalteten Zustand die kommende Polarität und einen Viertelring als Zeitmesser. Eingebaut in S4-07 (zwei), S4-10, S4-11, S5-11 und S9-05; S4-08 blieb bei normalen Pulsmagneten (der Autopilot rammte dort Fahrgäste).

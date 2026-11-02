@@ -96,7 +96,8 @@
   "magnets",
   "pulsing_fields",
   "repel_fields",
-  "attract_fields"
+  "attract_fields",
+  "pole_swap"
  ],
  "movers": [
   {
@@ -153,9 +154,9 @@
    "cy": 15.5,
    "r": 3.4231056256176604,
    "k": 120,
-   "period": 9.0,
-   "on": 4.5,
-   "phase": 2.0
+   "period": 16.0,
+   "phase": 0.0,
+   "cycle": true
   }
  ]
 }
