@@ -2563,6 +2563,2206 @@
    "seconds": 6.55,
    "engine": "drama3-fp8",
    "spoken": "The pump is wrecked! I will have it repaired right away, but please do not touch it again."
+  },
+  "de/f2_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_thanks": {
+   "text": "Danke!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_hard": {
+   "text": "Aua!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 1.19,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/f2_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.48,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_thanks": {
+   "text": "Danke!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_hard": {
+   "text": "Aua!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.51,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "de/f3_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_thanks": {
+   "text": "Danke!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_hard": {
+   "text": "Aua!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f4_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_thanks": {
+   "text": "Danke!",
+   "seconds": 0.83,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.47,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.5,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_hard": {
+   "text": "Aua!",
+   "seconds": 0.65,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.22,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f5_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_thanks": {
+   "text": "Danke!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_hard": {
+   "text": "Aua!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.97,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.32,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/f6_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.08,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_thanks": {
+   "text": "Danke!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_hard": {
+   "text": "Aua!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.23,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.28,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.37,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m2_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_thanks": {
+   "text": "Danke!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_hard": {
+   "text": "Aua!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "de/m3_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_thanks": {
+   "text": "Danke!",
+   "seconds": 0.65,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.19,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.28,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.33,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.29,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.32,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.24,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.19,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 2.55,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_hard": {
+   "text": "Aua!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "de/m4_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_call": {
+   "text": "Hey Taxi!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_thanks": {
+   "text": "Danke!",
+   "seconds": 0.65,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_hard": {
+   "text": "Aua!",
+   "seconds": 0.86,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "de/m5_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_call": {
+   "text": "Hey Taxi!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_thanks": {
+   "text": "Danke!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_1": {
+   "text": "Plattform eins, bitte!",
+   "seconds": 1.22,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_2": {
+   "text": "Plattform zwei, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_3": {
+   "text": "Plattform drei, bitte!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_4": {
+   "text": "Plattform vier, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_5": {
+   "text": "Plattform fünf, bitte!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_6": {
+   "text": "Plattform sechs, bitte!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_7": {
+   "text": "Plattform sieben, bitte!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_8": {
+   "text": "Plattform acht, bitte!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_9": {
+   "text": "Plattform neun, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_exit": {
+   "text": "Zum Ausgang, bitte!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_angry": {
+   "text": "Hey, Idiot!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_soft": {
+   "text": "Wow, sanft!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_hard": {
+   "text": "Aua!",
+   "seconds": 0.56,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_bored": {
+   "text": "Das dauert mir zu lange, tschüss!",
+   "seconds": 2.46,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_wrong_pad": {
+   "text": "Das ist die falsche Plattform!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_bumpy": {
+   "text": "Fahr doch vorsichtiger!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_dest_H": {
+   "text": "Zum Krankenhaus, bitte!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_hurry_1": {
+   "text": "Beeil dich!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_hurry_2": {
+   "text": "Schneller, bitte!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "de/m6_hurry_3": {
+   "text": "Die Zeit läuft ab!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_hard": {
+   "text": "Ouch!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.41,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f2_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_hard": {
+   "text": "Ouch!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "en/f3_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_thanks": {
+   "text": "Thanks!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_hard": {
+   "text": "Ouch!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "en/f4_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.32,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_hard": {
+   "text": "Ouch!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.51,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "en/f5_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_hard": {
+   "text": "Ouch!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.37,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "en/f6_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_call": {
+   "text": "Hey Taxi!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_hard": {
+   "text": "Ouch!",
+   "seconds": 0.65,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/m2_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_hard": {
+   "text": "Ouch!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "en/m3_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.23,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_hard": {
+   "text": "Ouch!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.46,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "en/m4_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_thanks": {
+   "text": "Thanks!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_hard": {
+   "text": "Ouch!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.46,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "en/m5_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_call": {
+   "text": "Hey Taxi!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_thanks": {
+   "text": "Thanks!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_1": {
+   "text": "Platform one, please!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_2": {
+   "text": "Platform two, please!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_3": {
+   "text": "Platform three, please!",
+   "seconds": 2.28,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_4": {
+   "text": "Platform four, please!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_5": {
+   "text": "Platform five, please!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_6": {
+   "text": "Platform six, please!",
+   "seconds": 2.28,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_7": {
+   "text": "Platform seven, please!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_8": {
+   "text": "Platform eight, please!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_9": {
+   "text": "Platform nine, please!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_exit": {
+   "text": "To the exit, please!",
+   "seconds": 1.52,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_angry": {
+   "text": "Hey, idiot!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_soft": {
+   "text": "Wow, smooth!",
+   "seconds": 2.51,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_hard": {
+   "text": "Ouch!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_bored": {
+   "text": "Too slow, I'm out of here!",
+   "seconds": 2.6,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_wrong_pad": {
+   "text": "That's the wrong platform!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_bumpy": {
+   "text": "Careful, please!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_dest_H": {
+   "text": "To the hospital, please!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_hurry_1": {
+   "text": "Hurry up!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_hurry_2": {
+   "text": "Faster, please!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "en/m6_hurry_3": {
+   "text": "We're running out of time!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

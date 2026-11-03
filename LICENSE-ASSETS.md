@@ -19,7 +19,7 @@ Der Programmcode steht unter der PolyForm Noncommercial License 1.0.0 (`LICENSE`
 ## Hinweis zu KI-erzeugten Inhalten
 
 Hintergrundbilder und Logo wurden mit ChatGPT Astra 6.0 erzeugt, die Sprachclips mit
-Qwen3-TTS (Apache-2.0) und, für den Fluglehrer im Tutorial, mit Fish Audio Drama 3
+Qwen3-TTS (Apache-2.0) und, für den Fluglehrer im Tutorial und zehn weitere Fahrgaststimmen, mit Fish Audio Drama 3
 (Fish Audio Community License, „Built with Fish Audio“). Soweit an solchen Ergebnissen
 nach geltendem Recht überhaupt Urheberrechte entstehen, gilt dafür diese Lizenz; die
 Nutzungsbedingungen der jeweiligen Werkzeuge bleiben unberührt. Siehe `CREDITS.md` und

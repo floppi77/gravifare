@@ -82,9 +82,18 @@ static func _default_look(g: String, index: int) -> int:
 	var m := [1, 2]
 	return (f if g == "f" else m)[index % 2]
 
+## Stimmen je Geschlecht: f0/f1, m0/m1 (Qwen3-TTS) und f2–f6, m2–m6 (Fish Audio Drama 3).
+const VOICES_F: Array[String] = ["f0", "f1", "f2", "f3", "f4", "f5", "f6"]
+const VOICES_M: Array[String] = ["m0", "m1", "m2", "m3", "m4", "m5", "m6"]
+
+static func voice_for(pname: String, look: int, gender: String) -> String:
+	## Wählt die Stimme aus Name, Figur und Geschlecht: je Fahrgast zufällig wirkend, aber stabil (auch beim Mitflug in den nächsten Level
+	## und nach „Fortsetzen“) und ohne Zufallszahlen der Simulation zu verbrauchen (Geister und Bots bleiben deterministisch).
+	var pool: Array[String] = VOICES_F if gender == "f" else VOICES_M
+	return pool[absi(("%s|%d|%s" % [pname, look, gender]).hash()) % pool.size()]
+
 func voice_key() -> String:
-	## Zwei Stimmen je Geschlecht (f0/f1, m0/m1), fest an die Figur gebunden.
-	return {0: "f0", 3: "f1", 1: "m0", 2: "m1"}.get(look, "f0" if gender == "f" else "m0")
+	return voice_for(pname, look, gender)
 
 ## Körper des Fahrgasts (für Kollision mit dem Taxi); nur ruhende/auftauchende Fahrgäste sind „treffbar“.
 func hit_rect() -> Rect2:

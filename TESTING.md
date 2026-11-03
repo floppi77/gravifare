@@ -38,6 +38,8 @@ Musik: `python3 tools/audio/gen_music.py [thema]` (22 Themen × 3 Schichten, Not
 | `python3 tools/make_*.py` | Level-Erzeuger (ASCII-Raster → `data/levels/*.json`), `tools/levelkit.py` als Hilfsmodul |
 | `python3 tools/audio/gen_music.py [thema]` | Musik neu erzeugen (SID und Paula), Noten in `tools/audio/music_score.py` |
 | `.venv/tts/bin/python tools/audio/gen_voice.py [--clip de/f0_call] [--validate]` | Sprachclips erzeugen (Validierung braucht ein lokales Whisper-Modell) |
+| `.venv/tts/bin/python tools/audio/gen_passenger_refs.py` und `gen_voice_drama_passengers.py` | zusätzliche Fahrgaststimmen f2–f6, m2–m6 (Referenzen mit Qwen, Zeilen mit Drama 3 über `drama serve`, Ablauf im Kopf des Skripts) |
+| `.venv/tts/bin/python tools/audio/voice_pitch.py` | mittlere Tonlage je Fahrgaststimme |
 
 **Replay-Fundament:** Jeder Lauf besteht aus Start-Parametern (Level, Seed, Sprit, Credits, mitfahrender Fahrgast) und den Eingaben je 120-Hz-Tick (auf 1/127 gerundet, lauflängenkodiert). `Replay.play()` rechnet ihn headless exakt nach (Test: Bot-Läufe S1-01/04/08 reproduzieren Zeit, Credits und Zustellungen). Im Spiel wird die Bestzeit je Level als `user://replays/<id>.json` gespeichert (nie bei Dev-/Autopilot-Läufen). Der Geist (Anzeige im Spiel) ist damit vorbereitet, aber noch nicht gebaut.
 **Punkte:** `Run.level_score()` = Netto-Einnahmen + 150 je Stern + 2 je Sekunde unter dem Zeitziel + 10 je perfekter Landung; Bestwert je Level im Speicherstand, Gesamtpunkte auf der Statistikseite.

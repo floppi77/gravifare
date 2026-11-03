@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -1909,12 +1909,40 @@ func _test_voice_lines_complete() -> void:
 			for key in d[group][lang]:
 				if String(d[group][lang][key]).strip_edges() == "":
 					missing.append("%s/%s/%s (Text leer)" % [group, lang, key])
-				var voices: Array = ["f0", "f1", "m0", "m1"] if group == "passenger_extra" else [group]
+				var voices: Array = PassengerActor.VOICES_F + PassengerActor.VOICES_M if group == "passenger_extra" else [group]
 				for v in voices:
 					total += 1
 					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, key]):
 						missing.append("%s/%s_%s" % [lang, v, key])
 	check(missing.is_empty() and total > 50, "Alle %d Sondersprachzeilen (Tankwart, Zentrale, Passagier-Reaktionen) haben Text und Clip %s" % [total, str(missing.slice(0, 4))])
+
+func _test_passenger_voices() -> void:
+	## Jede Stimme (Qwen und Drama) hat in beiden Sprachen alle Grundzeilen; die Auswahl ist stabil, deckt den Pool ab und verbraucht keine Simulationszufälle.
+	var lines: Array = ["call", "thanks", "angry", "dest_exit", "dest_H"]
+	for n in range(1, 10):
+		lines.append("dest_%d" % n)
+	var missing: Array = []
+	for lang in ["de", "en"]:
+		for v in PassengerActor.VOICES_F + PassengerActor.VOICES_M:
+			for l in lines:
+				if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, l]):
+					missing.append("%s/%s_%s" % [lang, v, l])
+	check(missing.is_empty(), "Alle 14 Fahrgaststimmen haben in Deutsch und Englisch die Grundzeilen %s" % str(missing.slice(0, 4)))
+	var seen := {}
+	var stable := true
+	var right_gender := true
+	for g in ["f", "m"]:
+		for i in 400:
+			var nm := "Fahrgast%d" % i
+			var v := PassengerActor.voice_for(nm, i % 4, g)
+			seen[v] = true
+			stable = stable and v == PassengerActor.voice_for(nm, i % 4, g)
+			right_gender = right_gender and v.begins_with(g)
+	check(stable and right_gender, "Fahrgaststimme ist je Fahrgast stabil und passt zum Geschlecht")
+	check(seen.size() == 14, "Alle 14 Fahrgaststimmen kommen vor (%d)" % seen.size())
+	var a := PassengerActor.new()
+	a.pname = "Mika"; a.look = 0; a.gender = "f"
+	check(a.voice_key() == PassengerActor.voice_for("Mika", 0, "f"), "voice_key() nutzt die stabile Auswahl")
 
 func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()

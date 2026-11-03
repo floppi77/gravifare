@@ -60,7 +60,7 @@ Alles im Trailer stammt aus dem echten Spiel (Autopilot-Flüge, aufgenommen mit 
   (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
 - **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen,
   **Garage** mit Lackierungen und Aufklebern.
-- **Sprachausgabe** für Fahrgäste, Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
+- **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
 - **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
 - **Anzeige:** 16:9, 1440p/2160p und Ultrawide, drei Speicherplätze.
@@ -94,7 +94,7 @@ Weitere Hinweise und Entwickler-Aufrufe stehen weiter unten und in [DESIGN.md](D
 ## Herkunft und Lizenzen
 
 Die Hintergrundbilder und das Logo wurden mit ChatGPT Astra 6.0 erzeugt. Die Sprecherstimmen sind künstlich: Fahrgäste, Tankwart und Zentrale
-mit Qwen3-TTS (Apache-2.0), die Fluglehrer-Stimme im Tutorial **Built with Fish Audio** (Drama 3). Fremdbestandteile: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md),
+mit Qwen3-TTS (Apache-2.0); die Fluglehrer-Stimme im Tutorial und zehn weitere Fahrgaststimmen sind **Built with Fish Audio** (Drama 3). Fremdbestandteile: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md),
 [CREDITS.md](CREDITS.md). Der Titel ist vorläufig. **Lizenz:** frei für nicht-kommerzielle Zwecke – Code unter [PolyForm Noncommercial 1.0.0](LICENSE), Inhalte (Grafik, Musik, Stimmen, Level) unter [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 
 ---
@@ -140,7 +140,7 @@ Everything in the trailer comes from the real game (autopilot flights recorded w
   (jets, hull, tank …). Game over resets the sector.
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs,
   and a **garage** with paint jobs and stickers.
-- **Voice acting** for passengers, fuel attendant, dispatch and the instructor, **German and English** with subtitles.
+- **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
 - **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).
 - **Display:** 16:9, 1440p/2160p and ultrawide, three save slots.
@@ -171,8 +171,8 @@ tools/export_release.sh                  # packages for Linux, Windows, macOS in
 
 ## Provenance and licences
 
-Background images and logo were generated with ChatGPT Astra 6.0. All voices are synthetic: passengers, fuel attendant and dispatch use Qwen3-TTS (Apache-2.0),
-the flight instructor in the tutorial is **Built with Fish Audio** (Drama 3). Third-party material: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [CREDITS.md](CREDITS.md).
+Background images and logo were generated with ChatGPT Astra 6.0. All voices are synthetic: passengers, fuel attendant and dispatch use Qwen3-TTS (Apache-2.0);
+the flight instructor in the tutorial and ten more passenger voices are **Built with Fish Audio** (Drama 3). Third-party material: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [CREDITS.md](CREDITS.md).
 The title is provisional. **Licence:** free for non-commercial use – code under [PolyForm Noncommercial 1.0.0](LICENSE), content (art, music, voices, levels) under [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 
 ---
