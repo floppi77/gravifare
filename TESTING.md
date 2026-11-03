@@ -7,8 +7,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (v0.9.4: 2805). Neu je Runde, jüngste zuerst:
+**Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
 
+- **Runde 38:** Level-Optik (Neon/Glas) hängt nur an vorhandenen Leveln, Neonlabyrinth hat drei Neon-Strahlen, Glasfassade: Sweep-Schleusen (Öffnung immer 3 Felder, wandert über die ganze Höhe, gegenläufig), Pflichtfahrgast-Zähler ohne Abzug, Einspieler beim Einflug, Meteorbahnen streuen breit und meiden nur Pads im Spiel
 - **Runde 37 (v0.9.4):** Ausgangs-Fahrgast zählt im Level als befördert, Menü-Version passt zum Export-Preset, Fenstergröße passt zum Bildschirm, Auto-Pause und Anzeige-Optionen (Quelltextprüfung), Einstellungen atomar, Tagesflug (gleicher Tag = gleiche Karte, Aufträge und Preise; Bestwert und Serie)
 - **Runde 36:** 14 Fahrgaststimmen in beiden Sprachen
 - **Runde 35:** Polwechsel-Magnete, Meteoritenbahnen, mitgebrachter Fahrgast zählt nicht, Preissteilheit, Verlustfahrgast-Strafe

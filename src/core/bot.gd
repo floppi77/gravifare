@@ -22,6 +22,7 @@ var was_blocked := false        # zuletzt wegen Tor/Hindernis geschwebt: danach 
 var last_pos := Vector2.ZERO
 var fail_reason := ""
 var fly_margin := MARGIN
+var sweep_commit := -1.0        # bis zu dieser Torzeit ist der Durchflug durch eine Sweep-Schleuse beschlossen
 
 func _init(r: Run) -> void:
 	run = r
@@ -155,15 +156,46 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		var dir := v_des.normalized()
 		var spd := maxf(sim.vel.length(), 25.0)
 		var inside: Array = level.door_chars_in_box(sim.pos, Tuning.HULL_HALF)     # im Tor: Tor bleibt offen
+		for ch in inside.duplicate():                         # Sweep-Schleuse: erst „im Tor“, wenn die Taxi-Mitte zwischen den Schienen ist (vorher gilt noch die Synchronisierung)
+			if level.is_sweep(ch):
+				var centered := false
+				for gate in level.doors[ch].gates:
+					if (gate.rect as Rect2).has_point(sim.pos):
+						centered = true
+				if not centered:
+					inside.erase(ch)
 		for dist: float in [14.0, 14.0 + spd * 0.5, 14.0 + spd * 1.0]:
 			var probe: Vector2 = sim.pos + dir * dist
 			for ch in level.door_chars_in_box(probe, Tuning.HULL_HALF + Vector2(5, 5)):
 				if inside.has(ch):
 					continue
+				if level.is_sweep(ch):                               # Sweep-Schleuse: mit Abstand vor dem Tor bremsen, auf Höhe schweben, nur starten, wenn die Öffnung den ganzen Durchflug lang frei ist
+					var entry := 999.0
+					for gate in level.doors[ch].gates:
+						var gr: Rect2 = gate.rect
+						var e := maxf((gr.position.x - sim.pos.x - Tuning.HULL_HALF.x) if dir.x > 0.0 else (sim.pos.x - Tuning.HULL_HALF.x - gr.end.x), 0.0)
+						if e < 120.0 and gr.grow(Tuning.HULL_HALF.x + 8.0).has_point(probe):
+							entry = e
+					if entry < 999.0:
+						var go := false
+						if entry < 26.0:
+							v_des.y = 0.0                                    # Höhe halten; die Öffnung wandert vorbei
+							var cross := (entry + 32.0 + Tuning.HULL_HALF.x * 2.0) / 62.0 + 0.1
+							go = level.clock < sweep_commit or (absf(sim.vel.y) < 12.0 and level.door_clear_window(ch, level.clock, cross, sim.pos.y, Tuning.HULL_HALF.y + 4.0))
+							if go and level.clock >= sweep_commit:
+								sweep_commit = level.clock + cross                  # festlegen: den Durchflug nicht mittendrin abbrechen
+						if not go:
+							v_des.x = dir.x * clampf((entry - 12.0) * 1.2, 0.0, 85.0)      # Bremsweg: weit vor dem Tor verlangsamen
+					continue
 				# Frühestmögliche Ankunft (Höchsttempo) bis späteste Ankunft (aktuelles Tempo) + Durchflugzeit muss offen sein
 				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
 		for ch in inside:                                    # Tor schließt gleich: aus den Flügeln heraus, zur näheren Seite
+			if level.is_sweep(ch):                               # in der Sweep-Schleuse: mit der Öffnung mitfliegen
+				for gate in level.doors[ch].gates:
+					if (gate.rect as Rect2).grow(Tuning.HULL_HALF.x).has_point(sim.pos):
+						v_des.y = _sweep_track(ch, gate)
+				continue
 			if level.door_time_to_close(ch, level.clock) < 1.0:
 				var out := level.door_escape(sim.pos, Tuning.HULL_HALF)
 				if out != Vector2.ZERO:
@@ -252,6 +284,13 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 	return [_accel_to_input(a_des), gear]
 
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.
+## Vertikale Sollgeschwindigkeit, um mit der Mitte der wandernden Öffnung mitzufliegen (Vorhalt = Geschwindigkeit der Öffnung).
+func _sweep_track(ch: String, gate: Dictionary) -> float:
+	var sim := run.sim
+	var c := level.sweep_center(ch, gate, level.clock)
+	var vg := (level.sweep_center(ch, gate, level.clock + 0.1) - c) / 0.1
+	return clampf(vg + (c - sim.pos.y) * 4.0, -80.0, 80.0)
+
 static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false) -> Dictionary:
 	var r := Run.new()
 	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional

@@ -216,7 +216,10 @@ func _scan_doors(params: Dictionary) -> void:
 			if DOOR_CHARS.contains(c):
 				if not doors.has(c):
 					var p: Dictionary = params.get(c, {})
-					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0))}
+					# "sweep": Schleuse mit fester Öffnung („gap“ Felder hoch), die dauerhaft über die Torhöhe auf und ab wandert; Wert = Sekunden pro Weg
+					# (oben nach unten). Ohne Haltephasen, Flügel oberhalb und unterhalb der Öffnung sind fest. "glass" ist nur Optik.
+					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0)),
+						"sweep": float(p.get("sweep", 0.0)), "gap_cells": float(p.get("gap", 3.0)), "glass": bool(p.get("glass", false))}
 				doors[c].cells.append(Vector2i(x, y))
 	for c in doors:
 		doors[c]["gates"] = _door_gates(c)
@@ -425,6 +428,8 @@ func _scan_movers(list: Array) -> void:
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
 		if kind == "meteor":
+			m["y0"] = m.y                         # Original-Einsatzreihe und Fallstrecke: je Fall wird der Einsatz in die erste freie Reihe gelegt
+			m["ay0"] = m.ay
 			m["x0"] = m.x                         # feste Bahn aus der Leveldatei, falls keine Spalte erlaubt ist
 			m["w"] = float(d.get("w", 1)) * Tuning.TILE
 			m["h"] = float(d.get("h", 1)) * Tuning.TILE
@@ -447,44 +452,72 @@ func _mover_offset(m: Dictionary, t: float) -> Vector2:
 
 const OFFSCREEN := -1000.0
 
-## Spalten (Felder), in denen ein Meteorit fallen darf: nie über einer Plattform (auch nicht über dem Fahrweg fahrender Plattformen),
-## oben frei und mit freier Fallstrecke. Gibt es keine, bleibt die Bahn aus dem Level (x).
+## Spalten (Felder), in denen ein Meteorit fallen darf: oben frei, mit freier Fallstrecke und nie über einem Pad, das gerade im Spiel ist
+## (`meteor_avoid`: Abhol-/Zielpad des laufenden Auftrags und das Pad unter dem Taxi, setzt Run) oder über Tank-/Lebens-Station.
+## Alle anderen Pads sind keine Sperre (sonst blieben bei Plattformen über die ganze Breite nur die Randspalten übrig); fahrende Plattformen
+## sperren nur, solange sie im Spiel sind, dann samt Fahrweg. Gibt es keine Spalte, bleibt die Bahn aus dem Level (x).
+var meteor_avoid: Array = []
+
 func meteor_columns(m: Dictionary) -> Array:
-	if m.has("cols"):
+	var key := ",".join(PackedStringArray(meteor_avoid))
+	if m.has("cols") and String(m.get("cols_key", "")) == key:
 		return m.cols
 	var blocked := {}
 	for pid in pads:
 		var p: Dictionary = pads[pid]
+		if not (meteor_avoid.has(String(pid)) or bool(p.get("fuel", false)) or bool(p.get("life", false))):
+			continue
 		var x0 := float(p.x0)
 		var x1 := float(p.x1)
 		var b: Dictionary = p.get("base", {})
 		if not b.is_empty():
 			x0 = float(b.x0)
 			x1 = float(b.x1)
-		for mv in movers:
+		for mv in movers:                                  # fahrende Plattform: samt Fahrweg, aber nur solange sie im Spiel ist
 			if mv.kind == "pad" and String(mv.pad) == String(pid):
 				x0 -= absf(float(mv.ax))
 				x1 += absf(float(mv.ax))
 		for c in range(int(floorf(x0 / Tuning.TILE)), int(ceilf(x1 / Tuning.TILE))):
 			blocked[c] = true
 	var cols: Array = []
+	var starts := {}                                     # Spalte -> erste Reihe, ab der der Meteorit sichtbar fällt (bis zu 3 Reihen Fels darüber: er bricht aus der Decke)
 	var w_tiles := int(round(float(m.w) / Tuning.TILE))
-	var top := int(float(m.y) / Tuning.TILE)
-	var span := int(float(m.ay) / Tuning.TILE)
+	var top := int(float(m.get("y0", m.y)) / Tuning.TILE)
+	var bottom := top + int(float(m.get("ay0", m.ay)) / Tuning.TILE)
 	for c in range(1, 39):
-		var ok := true
+		var blocked_col := false
 		for k in w_tiles:
-			if blocked.has(c + k) or cell(c + k, top) != ".":
-				ok = false
-		if not ok:
+			if blocked.has(c + k):
+				blocked_col = true
+		if blocked_col:
+			continue
+		var r0 := -1
+		for r in range(top, top + 4):
+			var open := true
+			for k in w_tiles:
+				if cell(c + k, r) != ".":
+					open = false
+			if open:
+				r0 = r
+				break
+			var rock := true
+			for k in w_tiles:
+				if cell(c + k, r) != "#":
+					rock = false
+			if not rock:
+				break                                    # Dornen, Ausgang o. Ä. oben: dort kein Einsatz
+		if r0 < 0:
 			continue
 		var free := 0
-		for r in range(top, mini(top + span, 21)):
+		for r in range(r0, mini(bottom, 21)):
 			if cell(c, r) == ".":
 				free += 1
 		if free >= 6:
 			cols.append(c)
+			starts[c] = r0
+	m["starts"] = starts
 	m["cols"] = cols
+	m["cols_key"] = key
 	return cols
 
 ## Bahn (linke x-Koordinate) des Falls mit der laufenden Nummer n.
@@ -613,7 +646,15 @@ func update_movers(t: float, reset := false) -> void:
 		if m.kind == "meteor":
 			var cyc := floorf((t + float(m.phase)) / float(m.period))
 			var falling := fposmod(t + float(m.phase), float(m.period)) < float(m.fall)
-			m["x"] = meteor_x_for(m, mi, int(cyc) + (0 if falling else 1))       # laufender bzw. nächster Fall
+			var nfall := int(cyc) + (0 if falling else 1)
+			var warn_at := float(m.warn) + 0.5                                   # Bahn erst kurz vor dem Fall festlegen: dann gelten die aktuellen Pads im Spiel
+			if int(m.get("lane_n", -1)) != nfall and (falling or meteor_eta(m, t) <= warn_at or reset):
+				m["lane_n"] = nfall
+				m["x"] = meteor_x_for(m, mi, nfall)                              # laufender bzw. nächster Fall
+				var col := int(round(float(m.x) / Tuning.TILE))
+				var r0 := int(m.get("starts", {}).get(col, int(float(m.y0) / Tuning.TILE)))
+				m["y"] = float(r0) * Tuning.TILE
+				m["ay"] = maxf(float(m.y0) + float(m.ay0) - m.y, Tuning.TILE)
 		var old: Rect2 = m.rect
 		var r := _mover_rect(m, t)
 		m.vel = Vector2.ZERO if reset else (r.position - old.position) / Tuning.TICK
@@ -723,6 +764,42 @@ static func door_leaves(gate: Dictionary, gap: float) -> Array:
 	var w := r.size.x * f
 	return [Rect2(r.position, Vector2(w, r.size.y)), Rect2(r.end.x - w, r.position.y, w, r.size.y)]
 
+## Sweep-Schleuse: Höhe der Mitte der Öffnung zur Zeit t (Pixel), gleichmäßig hin und her ohne Halt.
+func sweep_center(ch: String, gate: Dictionary, t: float) -> float:
+	var d: Dictionary = doors[ch]
+	var r: Rect2 = gate.rect
+	var half := float(d.gap_cells) * Tuning.TILE * 0.5
+	var u := fposmod(t + float(d.phase), 2.0 * float(d.sweep)) / float(d.sweep)
+	if u > 1.0:
+		u = 2.0 - u
+	return lerpf(r.position.y + half, r.end.y - half, u)
+
+## Ist der Durchflug auf Höhe `y` (Box mit halber Höhe `half_h`) im Zeitfenster [t0, t0 + length] frei von Flügeln?
+func door_clear_window(ch: String, t0: float, length: float, y: float, half_h: float) -> bool:
+	var d: Dictionary = doors.get(ch, {})
+	if doors_forced_open or d.is_empty():
+		return true
+	var t := t0
+	while t <= t0 + length + 0.001:
+		for gate in d.gates:
+			for leaf in door_leaf_rects(ch, gate, t):
+				if leaf.size.y > 0.0 and y + half_h > leaf.position.y and y - half_h < leaf.end.y:
+					return false
+		t += 0.05
+	return true
+
+func is_sweep(ch: String) -> bool:
+	return float(doors.get(ch, {}).get("sweep", 0.0)) > 0.0
+
+## Feste Flügel eines Tors zur Zeit t: oberhalb und unterhalb der Öffnung (Sweep) bzw. die beiden Schiebeflügel.
+func door_leaf_rects(ch: String, gate: Dictionary, t: float) -> Array:
+	if not is_sweep(ch) or doors_forced_open:
+		return door_leaves(gate, door_gap(ch, t))
+	var r: Rect2 = gate.rect
+	var c := sweep_center(ch, gate, t)
+	var half := float(doors[ch].gap_cells) * Tuning.TILE * 0.5
+	return [Rect2(r.position.x, r.position.y, r.size.x, c - half - r.position.y), Rect2(r.position.x, c + half, r.size.x, r.end.y - c - half)]
+
 ## Ist das Tor im gesamten Zeitfenster [t0, t0 + length] offen? (Bot: erst losfliegen, wenn die Passage reicht.)
 func door_open_window(ch: String, t0: float, length: float) -> bool:
 	var t := t0
@@ -756,8 +833,12 @@ func door_time_to_close(ch: String, t: float) -> float:
 	var m := fposmod(t + float(d.phase), float(d.period))
 	return maxf(0.0, float(d.open) - m) if m < float(d.open) else 0.0
 
-func _door_cell_closed(c: String) -> bool:
-	return not doors_ignore and door_gap(c, clock) <= 0.0
+func _door_cell_closed(c: String, cx := -1, cy := -1) -> bool:
+	if doors_ignore:
+		return false
+	if is_sweep(c):                                       # Sweep: keine Zellen-Sperre, die exakten Flügel prüft hits_closed_door (Öffnung bleibt voll 3 Felder hoch)
+		return false
+	return door_gap(c, clock) <= 0.0
 
 ## Berührt die Box einen Torflügel?
 func hits_closed_door(center: Vector2, half: Vector2) -> bool:
@@ -765,12 +846,12 @@ func hits_closed_door(center: Vector2, half: Vector2) -> bool:
 		return false
 	var box := Rect2(center - half, half * 2.0)
 	for ch in doors:
-		var gap := door_gap(ch, clock)
-		if gap >= 1.0:
+		var sweep := is_sweep(ch)
+		if not sweep and door_gap(ch, clock) >= 1.0:
 			continue
 		for gate in doors[ch].gates:
-			for leaf in door_leaves(gate, gap):
-				if box.intersects(leaf):
+			for leaf in door_leaf_rects(ch, gate, clock):
+				if leaf.size.x > 0.0 and leaf.size.y > 0.0 and box.intersects(leaf):
 					return true
 	return false
 
@@ -792,7 +873,7 @@ func door_escape(center: Vector2, half: Vector2) -> Vector2:
 func is_solid_cell(cx: int, cy: int) -> bool:
 	var c := cell(cx, cy)
 	if c != "" and DOOR_CHARS.contains(c):
-		return _door_cell_closed(c)
+		return _door_cell_closed(c, cx, cy)
 	return c == SOLID or c == "^" or c == "P" or (c >= "1" and c <= "9") or c == "F" or c == "L" or c == "H" or (c == "E" and not exit_open)
 
 func is_solid_at(p: Vector2) -> bool:

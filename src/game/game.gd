@@ -45,6 +45,7 @@ var clip_delay := 0.0
 var script_inputs: Array = []
 var ghost: Node2D = null
 var ambient: Node2D = null
+var level_style: Node2D = null         # Optik einzelner Level (Neon, Glas), siehe level_style.gd
 var entry_carry := {}                  # Ausgangs-Fahrgast, der in diesem Level ausgestiegen ist (für den Neustart)
 var autopilot: Bot = null
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
@@ -206,6 +207,12 @@ func load_level(path: String) -> void:
 	dark.setup(run, cam)
 	world_tiles.setup(run)
 	props.setup(run)
+	if level_style == null:
+		level_style = Node2D.new()
+		level_style.set_script(load("res://src/game/level_style.gd"))
+		world.add_child(level_style)
+		world.move_child(level_style, world_tiles.get_index() + 1)      # über dem Fels, unter Requisiten, Taxi und Gefahren
+	level_style.setup(lvl)
 	if ambient == null:
 		ambient = Node2D.new()
 		ambient.set_script(load("res://src/game/ambient_view.gd"))
@@ -295,12 +302,15 @@ func level_clip_key() -> String:
 	return String(idx.get(str(run.level.number), ""))
 
 ## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
-func _queue_clip(delay: float) -> void:
+func _queue_clip(delay: float, now := false) -> void:
 	if not Settings.values.hints or Flow.shift or Flow.daily:
 		return
 	var k := level_clip_key()
 	var seen: Array = Save.data.get("seen_clips", [])
 	if k == "" or seen.has(k):
+		return
+	if now:
+		start_clip(k)
 		return
 	clip_pending = k
 	clip_delay = delay
@@ -1053,7 +1063,7 @@ func _process(delta: float) -> void:
 		trans.radio_age = radio_age
 	# Läuft der Funkspruch noch, wartet der Flug kurz vor der Ankunft, bis Text und Sprache zu Ende sind (nichts wird abgeschnitten)
 	var hold: bool = radio_played and radio_age < trans.radio_len + 0.6 and trans_t > TV.T_IN - 0.4 and trans_t < TV.T_IN
-	if not hold:
+	if not hold and clip == null:           # läuft ein Einspieler, steht auch der automatische Einflug
 		trans_t += delta
 	trans.t = trans_t
 	if not radio_played and trans_t >= 2.15 and trans_t < TV.T_IN:
@@ -1162,6 +1172,7 @@ func _begin_arrival() -> void:
 	taxi.reset_physics_interpolation()
 	assist.sync_state()
 	assist.reset_physics_interpolation()
+	_queue_clip(0.0, true)                  # Neues Spielelement gleich beim Einflug vorstellen; der Einflug steht währenddessen (siehe _process) und läuft danach weiter
 
 func _arrival_tick() -> void:
 	if not arriving or arrive_done:

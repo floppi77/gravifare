@@ -156,7 +156,50 @@ func _draw_doors() -> void:
 		var warn := gap >= 1.0 and ttc > 0.0 and ttc < 1.3 and int(t * 8.0) % 2 == 0
 		var lamp := Color("#ffd24a") if warn else (Color(0.36, 1.0, 0.6, 0.8) if gap >= 1.0 else Color("#ff4d6d"))
 		for gate in d.gates:
-			_draw_slide_gate(gate, gap, lamp)
+			if bool(d.get("glass", false)):
+				_draw_glass_gate(ch, gate, gap)
+			else:
+				_draw_slide_gate(gate, gap, lamp)
+
+## Glasschleuse (Glasfassade): zwei Glasflügel statt Schott. Hellblaue, durchscheinende Fläche mit Spiegelstreifen und leuchtender Vorderkante;
+## die Schienen bleiben sichtbar, auch wenn die Flügel ganz eingefahren sind. Gleiche Fläche und Kollision wie jedes Schiebetor.
+func _draw_glass_gate(ch: String, gate: Dictionary, gap: float) -> void:
+	var r: Rect2 = gate.rect
+	var vert: bool = gate.vertical
+	var edge := Color(0.82, 0.97, 1.0)
+	for k in 2:                                           # Schienen
+		var q := float(k)
+		if vert:
+			draw_rect(Rect2(r.position.x + q * (r.size.x - 1.0), r.position.y, 1.0, r.size.y), Color(0.6, 0.85, 1.0, 0.55))
+		else:
+			draw_rect(Rect2(r.position.x, r.position.y + q * (r.size.y - 1.0), r.size.x, 1.0), Color(0.6, 0.85, 1.0, 0.55))
+	var leaves := level.door_leaf_rects(ch, gate, level.clock)
+	for i in leaves.size():
+		var leaf: Rect2 = leaves[i]
+		if leaf.size.x <= 0.0 or leaf.size.y <= 0.0:
+			continue
+		var lo := Color(0.45, 0.78, 1.0, 0.30)
+		var hi := Color(0.75, 0.95, 1.0, 0.52)
+		var pts := PackedVector2Array([leaf.position, Vector2(leaf.end.x, leaf.position.y), leaf.end, Vector2(leaf.position.x, leaf.end.y)])
+		draw_polygon(pts, PackedColorArray([hi, hi, lo, lo]) if vert else PackedColorArray([hi, lo, lo, hi]))
+		var n := int((leaf.size.y if vert else leaf.size.x) / 22.0)        # Spiegelstreifen, mit dem Flügel mitwandernd
+		for j in n + 1:
+			var u := fposmod(float(j) * 22.0 + (leaf.size.y if vert else leaf.size.x) * 0.0, 1000.0)
+			if vert:
+				var yy := leaf.position.y + u + 3.0
+				if yy + 6.0 < leaf.end.y:
+					draw_colored_polygon(PackedVector2Array([Vector2(leaf.position.x + 2.0, yy + 6.0), Vector2(leaf.position.x + 7.0, yy), Vector2(leaf.position.x + 11.0, yy), Vector2(leaf.position.x + 6.0, yy + 6.0)]), Color(1, 1, 1, 0.22))
+			else:
+				var xx := leaf.position.x + u + 3.0
+				if xx + 6.0 < leaf.end.x:
+					draw_colored_polygon(PackedVector2Array([Vector2(xx, leaf.position.y + 9.0), Vector2(xx + 5.0, leaf.position.y + 2.0), Vector2(xx + 9.0, leaf.position.y + 2.0), Vector2(xx + 4.0, leaf.position.y + 9.0)]), Color(1, 1, 1, 0.22))
+		draw_rect(leaf, Color(edge.r, edge.g, edge.b, 0.75), false, 0.8)
+		var front := 2.0
+		if vert:
+			draw_rect(Rect2(leaf.position.x, leaf.end.y - 1.0 if i == 0 else leaf.position.y, leaf.size.x, 1.0), Color(1, 1, 1, 0.95))
+			draw_rect(Rect2(leaf.position.x, (leaf.end.y - 1.0 - front) if i == 0 else leaf.position.y + 1.0, leaf.size.x, front), Color(edge.r, edge.g, edge.b, 0.35))
+		else:
+			draw_rect(Rect2(leaf.end.x - 1.0 if i == 0 else leaf.position.x, leaf.position.y, 1.0, leaf.size.y), Color(1, 1, 1, 0.95))
 
 ## Schiebetor: zwei Flügel mit Warnstreifen, die Streifen laufen mit der Vorderkante; Schienen und Lampen zeigen den Zustand auch bei offenem Tor.
 func _draw_slide_gate(gate: Dictionary, gap: float, lamp: Color) -> void:
@@ -582,16 +625,17 @@ func _draw_beam(m: Dictionary) -> void:
 	var active := eta <= 0.0
 	var a0: Vector2 = lr.position + (Vector2(0.0, lr.size.y * 0.5) if horiz else Vector2(lr.size.x * 0.5, 0.0))
 	var a1: Vector2 = lr.position + (Vector2(lr.size.x, lr.size.y * 0.5) if horiz else Vector2(lr.size.x * 0.5, lr.size.y))
-	var hot := Color(1.0, 0.62, 0.2)
+	var neon := int(m.get("tint", 0)) == 1            # Neon-Strahlen (Neonlabyrinth): Magenta mit kaltem Kern statt Plasma-Orange
+	var hot := Color(1.0, 0.25, 0.85) if neon else Color(1.0, 0.62, 0.2)
 	# Emitter (Düsenblöcke)
 	for pt in [a0, a1]:
 		draw_rect(Rect2(pt.x - 5.0, pt.y - 5.0, 10.0, 10.0), Color("#1a1d3a"))
 		draw_rect(Rect2(pt.x - 4.0, pt.y - 4.0, 8.0, 8.0), Color("#3a4580"))
-		draw_circle(pt, 2.4, Color(1.0, 0.4 + (0.4 if active else 0.0), 0.2, 0.9 if active else 0.5 + 0.4 * sin(t * 6.0)))
+		draw_circle(pt, 2.4, (Color(1.0, 0.3, 0.9, 0.9 if active else 0.5 + 0.4 * sin(t * 6.0)) if neon else Color(1.0, 0.4 + (0.4 if active else 0.0), 0.2, 0.9 if active else 0.5 + 0.4 * sin(t * 6.0))))
 	if not active and eta <= float(m.warn):
 		var k := 1.0 - eta / float(m.warn)
 		var fl := 0.25 + 0.5 * absf(sin(t * (10.0 + 14.0 * k)))
-		draw_line(a0, a1, Color(1.0, 0.45, 0.2, fl * (0.4 + 0.6 * k)), 1.0)
+		draw_line(a0, a1, Color(1.0, 0.3, 0.9, fl * (0.4 + 0.6 * k)) if neon else Color(1.0, 0.45, 0.2, fl * (0.4 + 0.6 * k)), 1.0)
 		return
 	if not active:
 		draw_line(a0, a1, Color(0.5, 0.45, 0.6, 0.18), 1.0)
@@ -600,7 +644,7 @@ func _draw_beam(m: Dictionary) -> void:
 	for i in 4:
 		var f := float(i) / 3.0
 		var w := thick * (1.0 - f * 0.65)
-		var col := Color(hot.r, hot.g - 0.25 * (1.0 - f), 0.25 + 0.7 * f, 0.18 + 0.5 * f)
+		var col := Color(hot.r * (1.0 - 0.6 * f), hot.g + 0.7 * f, hot.b, 0.18 + 0.5 * f) if neon else Color(hot.r, hot.g - 0.25 * (1.0 - f), 0.25 + 0.7 * f, 0.18 + 0.5 * f)
 		var rr := Rect2(lr.position + (Vector2(0.0, (lr.size.y - w) * 0.5) if horiz else Vector2((lr.size.x - w) * 0.5, 0.0)), Vector2(lr.size.x, w) if horiz else Vector2(w, lr.size.y))
 		draw_rect(rr, col)
 	# zuckender Blitz
@@ -611,7 +655,7 @@ func _draw_beam(m: Dictionary) -> void:
 		var p := a0.lerp(a1, u)
 		var jit := sin(t * 40.0 + float(i) * 2.3) * 1.6 * sin(u * PI)
 		pts.append(p + (Vector2(0.0, jit) if horiz else Vector2(jit, 0.0)))
-	draw_polyline(pts, Color(1.0, 1.0, 0.9, 0.95), 1.0)
+	draw_polyline(pts, Color(0.85, 1.0, 1.0, 0.95) if neon else Color(1.0, 1.0, 0.9, 0.95), 1.0)
 
 ## Meteorit: vor dem Fall blinkt seine Bahn als Warnstreifen, im Fall zieht er einen Feuerschweif hinter sich her.
 func _draw_meteor(m: Dictionary) -> void:

@@ -89,6 +89,45 @@
  },
  "mechanics": [
   "doors",
-  "spikes"
+  "spikes",
+  "beams"
+ ],
+ "movers": [
+  {
+   "kind": "beam",
+   "x": 14,
+   "y": 15,
+   "w": 1,
+   "h": 4,
+   "period": 7.0,
+   "on": 2.4,
+   "phase": 0.0,
+   "warn": 1.6,
+   "tint": 1
+  },
+  {
+   "kind": "beam",
+   "x": 10,
+   "y": 1,
+   "w": 1,
+   "h": 11,
+   "period": 8.2,
+   "on": 2.4,
+   "phase": 3.0,
+   "warn": 1.8,
+   "tint": 1
+  },
+  {
+   "kind": "beam",
+   "x": 29,
+   "y": 1,
+   "w": 1,
+   "h": 11,
+   "period": 9.1,
+   "on": 2.4,
+   "phase": 6.0,
+   "warn": 1.8,
+   "tint": 1
+  }
  ]
 }

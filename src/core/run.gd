@@ -205,6 +205,22 @@ func _spawn_actor(instant: bool) -> void:
 		exit_countdown = maxf(Tuning.EXIT_COUNTDOWN_MIN, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR)      # der letzte Pflichtfahrgast will raus: Zeit läuft
 		pending_log.append({"type": "exit_countdown"})
 
+## Pads, über denen jetzt kein Meteorit fallen darf: Abhol- und Zielpad des laufenden Auftrags, das Pad unter dem Taxi und das Ziel eines Zusatzfahrgasts.
+func _meteor_avoid() -> Array:
+	var out: Array = []
+	var job := current_job()
+	for k in ["from", "to"]:
+		var pid := String(job.get(k, ""))
+		if pid != "" and pid != "exit" and not out.has(pid):
+			out.append(pid)
+	var lp := String(sim.landed_pad.get("id", ""))
+	if lp != "" and not out.has(lp):
+		out.append(lp)
+	var tp := target_pad()
+	if tp != "" and tp != "exit" and not out.has(tp):
+		out.append(tp)
+	return out
+
 func current_job() -> Dictionary:
 	return jobs[job_index] if job_index < jobs.size() else {}
 
@@ -418,6 +434,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		if result == Result.COMPLETE:
 			_step_actors(dt)    # letzte Fahrgäste laufen beim Levelabschluss noch zu Ende
 		return
+	if level.has_meteors():
+		level.meteor_avoid = _meteor_avoid()
 	sim.step(input, gear_request, dt)
 	for e in sim.events:
 		log.append(e)

@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -117,9 +117,9 @@ func _test_full_run() -> void:
 		r.step(Vector2.ZERO, true)
 	check(r.phase == Run.Phase.CARRYING, "Fahrgast an Bord nach Einsteigezeit")
 
-## Start-Sprit der Autopilot-Läufe: der Mindest-Sprit (35 %), bei drei Levels etwas mehr. Mit 20 % weniger Einkommen tankt der Autopilot dort erst spät
+## Start-Sprit der Autopilot-Läufe: der Mindest-Sprit (35 %), bei vier Levels etwas mehr. Mit 20 % weniger Einkommen tankt der Autopilot dort erst spät
 ## (er tankt erst, wenn Credits da sind) und läuft sonst leer, in die Ausfahrtsfrist oder in einen Treffer; der Flug ist chaotisch, nicht der Preis.
-const BOT_FUEL_OVERRIDE := {"s4_05": 38.0, "s8_08": 38.0, "s9_05": 40.0}
+const BOT_FUEL_OVERRIDE := {"s4_05": 38.0, "s8_08": 38.0, "s9_05": 40.0, "s5_11": 45.0}      # s5_11: mehr Meteoritenbahnen quer zum Weg, der Bot wartet länger
 
 ## Zwei schwere Level, in denen der Autopilot mit den zufälligen Meteoritenbahnen bzw. dem Rammen eines Fahrgasts nicht jedes Mal glatt durchkommt:
 ## ein Pflichtfahrgast mehr darf verloren gehen (Geduld) bzw. die Hülle bis 75 % sinken. Für Menschen bleiben die Level lösbar, der Bot ist hier nur langsamer.
@@ -2024,6 +2024,7 @@ func _test_meteor_lanes() -> void:
 	var levels := 0
 	var bad := []
 	var varied := true
+	var wide := 0
 	for f in DirAccess.open("res://data/levels").get_files():
 		if not f.ends_with(".json"):
 			continue
@@ -2035,9 +2036,11 @@ func _test_meteor_lanes() -> void:
 			levels += 1
 			lvl.meteor_seed = 4711
 			var xs := {}
+			lvl.meteor_avoid = []
+			for id in lvl.pads:
+				lvl.meteor_avoid.append(String(id))            # strenge Probe: alle Pads gesperrt, dann darf nie eines getroffen werden
 			for n in 40:
 				var x := lvl.meteor_x_for(m, mi, n)
-				xs[x] = true
 				for id in lvl.pads:
 					var p: Dictionary = lvl.pads[id]
 					var b: Dictionary = p.get("base", p)
@@ -2045,13 +2048,18 @@ func _test_meteor_lanes() -> void:
 					var x1 := float(b.x1)
 					for mv in lvl.movers:
 						if mv.kind == "pad" and String(mv.pad) == String(id):
-							x0 -= absf(float(mv.ax))
+							x0 -= absf(float(mv.ax))              # fahrende Plattform samt Fahrweg
 							x1 += absf(float(mv.ax))
 					if x + float(m.w) > x0 and x < x1:
 						bad.append("%s Pad %s Bahn %d" % [lvl.id, id, int(x / 16.0)])
+			# Im Spiel sind nur die Pads des laufenden Auftrags gesperrt: die Bahnen streuen breit über das Level
+			lvl.meteor_avoid = [String(lvl.jobs[0].from), String(lvl.jobs[0].to)]
+			for n in 40:
+				xs[lvl.meteor_x_for(m, mi, n)] = true
+			wide = maxi(wide, xs.size())
 			varied = varied and (xs.size() >= 3 or lvl.meteor_columns(m).size() < 3)
 	check(levels >= 8 and bad.is_empty(), "Meteoriten fallen nie über einer Plattform (%d Meteoriten, Verstöße: %s)" % [levels, str(bad.slice(0, 3))])
-	check(varied, "Jeder Meteorit fällt auf wechselnden Bahnen (mindestens drei verschiedene in 40 Fällen)")
+	check(varied and wide >= 6, "Jeder Meteorit fällt auf wechselnden Bahnen, im Spiel breit gestreut (mindestens drei, bis zu %d verschiedene in 40 Fällen)" % wide)
 
 func _test_pole_swap() -> void:
 	var rows: Array = []
@@ -2186,6 +2194,53 @@ func _test_shift_jobs() -> void:
 			var r := Bot.fly_level(lvl, 600.0, _bot_fuel(lvl))
 			check(r.complete, "Nachtschicht: Autopilot fliegt Zufallsaufträge auf %s (%.0f s, %s)" % [lvl.id, r.time, r.reason])
 	check(bad.is_empty() and flown >= 9, "Nachtschicht-Aufträge sind gültig %s" % str(bad.slice(0, 4)))
+
+func _test_level_styles() -> void:
+	# Level-Optik (Neon/Glas) hängt an der Level-ID: nur vorhandene Level, Zuordnung nach Namen, Physik unberührt (gleiche Karte)
+	var cm: Dictionary = load("res://src/game/level_style.gd").get_script_constant_map()
+	var styles: Dictionary = cm.STYLES
+	for id in styles:
+		var lv := LevelData.load_file("res://data/levels/%s.json" % String(id).to_lower().replace("-", "_"))
+		check(lv != null and lv.id == id, "Level-Optik %s: Level vorhanden" % id)
+	for id in ["S2-02", "S2-06", "S2-08"]:
+		check(styles.has(id) and styles[id].kind == "neon", "%s ist ein Neon-Level" % id)
+	check(styles.has("S2-11") and styles["S2-11"].kind == "glass", "S2-11 Glasfassade hat Glas-Optik")
+	var l19 := LevelData.load_file("res://data/levels/s2_08.json")
+	var beams := 0
+	for m in l19.movers:
+		if m.kind == "beam":
+			beams += 1
+			check(int(m.tint) == 1, "Neonlabyrinth: Strahlen sind Neon-Strahlen")
+	var mech: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels/s2_08.json")).mechanics
+	check(beams == 3 and mech.has("beams"), "Neonlabyrinth: drei Neon-Strahlen als Hindernis, Mechanik eingetragen")
+
+func _test_sweep_gates_and_counter() -> void:
+	# Glasfassade (22): die Öffnung bleibt immer 3 Felder hoch und wandert ohne Halt über die ganze Torhöhe
+	var lv := LevelData.load_file("res://data/levels/s2_11.json")
+	check(lv.is_sweep("a") and lv.is_sweep("b") and not lv.is_sweep("c"), "Glasfassade: beide Schleusen sind Sweep-Schleusen")
+	var gate: Dictionary = lv.doors["a"].gates[0]
+	var gr: Rect2 = gate.rect
+	check(is_equal_approx(gr.size.y, 19.0 * 16.0), "Glasschleuse geht über die ganze Levelhöhe (19 Felder)")
+	var lo := INF
+	var hi := -INF
+	var gap_ok := true
+	for i in 400:
+		var t := float(i) * 0.05
+		var lr: Array = lv.door_leaf_rects("a", gate, t)
+		gap_ok = gap_ok and absf((lr[1] as Rect2).position.y - (lr[0] as Rect2).end.y - 48.0) < 0.01
+		var c := lv.sweep_center("a", gate, t)
+		lo = minf(lo, c)
+		hi = maxf(hi, c)
+	check(gap_ok, "Glasschleuse: Öffnung immer 3 Felder hoch")
+	check(absf(lo - (gr.position.y + 24.0)) < 2.0 and absf(hi - (gr.end.y - 24.0)) < 2.0, "Glasschleuse: Öffnung wandert von ganz oben bis ganz unten")
+	check(lv.door_clear_window("a", 0.0, 0.2, lv.sweep_center("a", gate, 0.1), 4.0) and not lv.door_clear_window("a", 0.0, 0.2, gr.position.y + 4.0, 4.0), "Glasschleuse: frei nur auf Höhe der Öffnung")
+	var other := lv.sweep_center("b", lv.doors["b"].gates[0], 0.0)
+	check(absf(other - lv.sweep_center("a", gate, 0.0)) > 100.0, "Glasfassade: linke und rechte Schleuse laufen gegenläufig")
+	# Zähler oben im Spiel: Pflichtfahrgäste ohne Abzug verpasster (5/6 statt 5/5)
+	check(not FileAccess.get_file_as_string("res://src/game/hud.gd").contains("jobs.size() - run.missed"), "Pflichtfahrgast-Zähler zieht verpasste Fahrgäste nicht vom Gesamtwert ab")
+	# Einspieler beim Einflug: startet gleich bei der Ankunft und hält den Einflug an
+	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(gsrc.contains("_queue_clip(0.0, true)") and gsrc.contains("if not hold and clip == null:"), "Einspieler startet beim Einflug und pausiert ihn")
 
 func _test_daily_flight() -> void:
 	check(Daily.seed_for("2026-11-03") == 20261103, "Tagesflug: Seed aus dem Datum")

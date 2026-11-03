@@ -109,7 +109,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
 	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift else (tr("DAILY_TAG") + "  " + lname if Flow.daily else "%d/99  %s" % [run.level.number, lname])), 84.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
-	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size() - run.missed], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
+	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei beschriftete Balken (weiße Marke = Grenze der sicheren Landung)
 	var gx := 598.0
 	var gw := 39.0

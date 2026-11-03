@@ -123,9 +123,13 @@ static func analyze(lvl: LevelData) -> Dictionary:
 	var padn := clampf((84.0 - min_pad) / 64.0, 0.0, 1.0)
 	var hz := clampf(float(hazards) / 20.0, 0.0, 3.0)
 	var features := clampf(float((lvl.raw.get("mechanics", []) as Array).size()), 0.0, 12.0)
+	var sweeps := 0                                      # Sweep-Schleusen (wandernde Öffnung über die ganze Höhe) sind die härteste Torart
+	for ch in lvl.doors:
+		if lvl.is_sweep(ch):
+			sweeps += 1
 	return {
 		"clearance": clearance, "route_len": route_len, "jobs": lvl.jobs.size(), "min_window": min_pad, "hazards": hazards,
-		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + 12.0 * lvl.dark + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)) + (FINAL_SECTOR_BONUS if lvl.sector >= 9 else 0.0),
+		"score": 40.0 * eng + 25.0 * length + 15.0 * jobs + 10.0 * padn + 10.0 * hz + 5.0 * features + 14.0 * sweeps + 12.0 * lvl.dark + SECTOR_BONUS * maxf(0.0, float(lvl.sector - SECTOR_BONUS_FROM)) + (FINAL_SECTOR_BONUS if lvl.sector >= 9 else 0.0),
 		"solvable": clearance > 0.0,
 	}
 
