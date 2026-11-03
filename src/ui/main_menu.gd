@@ -102,6 +102,7 @@ func show_main(focus_lang := "") -> void:
 	grid.add_theme_constant_override("v_separation", 3)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	for entry in [
+			[tr("MENU_DAILY"), func(): Flow.start_daily()],
 			[tr("MENU_SHIFT"), func(): Flow.start_shift()],
 			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
@@ -109,14 +110,13 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_OPTIONS"), show_options],
 			[tr("MENU_CREDITS"), func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
 			[tr("SLOT_CURRENT") % Save.slot, show_slots],
+			[tr("MENU_KOFI"), func(): OS.shell_open(Flow.KOFI_URL)],      # per Gamepad wie jeder Eintrag anwählbar
 			[tr("MENU_QUIT"), func(): get_tree().quit()]]:
 		grid.add_child(_small_button(entry[0], entry[1]))
-	grid.get_child(0).disabled = not Save.shift_unlocked(ids)     # Nachtschicht: erst nach allen Leveln
+	grid.get_child(0).disabled = not Save.daily_unlocked(ids)     # Tagesflug: ab Sektor 1
+	grid.get_child(1).disabled = not Save.shift_unlocked(ids)     # Nachtschicht: erst nach allen Leveln
 	box.add_child(grid)
-	var kofi := _small_button(tr("MENU_KOFI"), func(): OS.shell_open(Flow.KOFI_URL))      # per Gamepad wie jeder Eintrag anwählbar
-	kofi.custom_minimum_size = Vector2(128, 18)
-	kofi.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	box.add_child(kofi)
+	_equalize_grid.call_deferred(grid)
 	if Save.debug:
 		box.add_child(MenuKit.button(tr("DEBUG_LEAVE"), func():
 			Flow.set_debug(false)
@@ -128,6 +128,17 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(MenuKit.flag_row(func(code): show_main(code)))
 	_focus_first(focus_lang)
 	_slide_in()
+
+## Alle Knöpfe des Nebenmenüs so breit wie der breiteste (z. B. „Ko-fi: Unterstützen“), damit beide Spalten gleich aussehen.
+## Erst im Baum gemessen, weil die Schrift aus dem Theme kommt.
+func _equalize_grid(grid: GridContainer) -> void:
+	if not is_instance_valid(grid):
+		return
+	var w := 0.0
+	for c in grid.get_children():
+		w = maxf(w, (c as Control).get_combined_minimum_size().x)
+	for c in grid.get_children():
+		(c as Control).custom_minimum_size.x = w
 
 func _small_button(text: String, cb: Callable) -> Button:
 	var sb := MenuKit.button(text, cb)

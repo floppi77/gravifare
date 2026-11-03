@@ -64,9 +64,12 @@ func _ready() -> void:
 	_setup_look()
 	_fit_layers()
 	get_viewport().size_changed.connect(_fit_layers)
+	Input.joy_connection_changed.connect(_on_joy_connection)
 	load_level(level_path)
 	_release_carried()                         # Fortsetzen: Der gespeicherte Ausgangs-Fahrgast steigt aus und zahlt (sonst ginge sein Fahrpreis verloren)
-	if Flow.practice:
+	if Flow.daily:
+		hud.flash_message(tr("MSG_DAILY") % Flow.daily_date, 5.0)
+	elif Flow.practice:
 		hud.flash_message(tr("MSG_PRACTICE"), 4.0)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--debug-input="):
@@ -180,9 +183,11 @@ func load_level(path: String) -> void:
 		var rng := RandomNumberGenerator.new()
 		rng.seed = Flow.run_seed + Flow.shift_maps * 131
 		lvl.jobs = Run.shift_jobs(lvl, Flow.shift_maps, rng)
+	elif Flow.daily:
+		lvl.jobs = Daily.jobs_for(lvl, Flow.daily_date)
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
 	run.lives = Flow.lives
-	var mods := Workshop.mods(Save.data)
+	var mods := Workshop.mods_for({}) if Flow.daily else Workshop.mods(Save.data)      # Tagesflug: Serientaxi, damit Ergebnisse vergleichbar sind
 	run.sim.apply_mods(mods)
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
@@ -234,7 +239,7 @@ func _setup_ghost(lvl: LevelData) -> void:
 		ghost.set_script(load("res://src/game/ghost_view.gd"))
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
-	var best := {} if lvl.tutorial or Flow.shift or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
+	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	ghost.bind(run, best.get("trace", []))
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
@@ -291,7 +296,7 @@ func level_clip_key() -> String:
 
 ## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
 func _queue_clip(delay: float) -> void:
-	if not Settings.values.hints or Flow.shift:
+	if not Settings.values.hints or Flow.shift or Flow.daily:
 		return
 	var k := level_clip_key()
 	var seen: Array = Save.data.get("seen_clips", [])
@@ -430,6 +435,24 @@ func _set_paused(on: bool) -> void:
 		pause_menu.queue_free()
 		pause_menu = null
 
+## Automatische Pause, wenn das Fenster den Fokus verliert (Alt-Tab, Overlay) oder der gerade benutzte Controller getrennt wird:
+## Sprit, Geduld und Countdown sollen nicht weiterlaufen. Fortgesetzt wird nur von Hand (Pausenmenü).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		auto_pause()
+
+func _on_joy_connection(_device: int, connected: bool) -> void:
+	if not connected and Controls.last_device == "gamepad":
+		auto_pause()
+
+func auto_pause() -> bool:
+	if paused or bay != null or clip != null or trans_t >= 0.0 or run == null or run.result != Run.Result.RUNNING:
+		return false
+	if autopilot != null or Save.dev_session or OS.get_cmdline_args().has("--write-movie"):
+		return false                              # Testläufe und Trailer-Aufnahmen laufen ungestört weiter
+	_set_paused(true)
+	return true
+
 func _unhandled_input(event: InputEvent) -> void:
 	if bay != null:
 		return
@@ -460,7 +483,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_open_bay()         # Sektor geschafft: erst in die Werkstatt
 			else:
 				_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
-		elif hud.result.get("counted", false):
+		elif hud.result.get("counted", false) and not Flow.daily:
 			Flow.to_finale()        # letztes Level geschafft: Finale und Abspann
 		else:
 			Flow.to_menu()
@@ -578,6 +601,12 @@ func _physics_process(_delta: float) -> void:
 			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schicht-Bestleistung
 			Flow.shift_fares += run.delivered + run.extras_delivered
 			Flow.shift_maps += 1
+		elif Flow.daily:
+			if counted:                      # Tagesflug: zählt nur für den Tagesbestwert und die Serie, nicht für Level und Medaillen
+				Daily.record(Save.daily_entry(), Save.data.stats, Flow.daily_date, score)
+				Save.write()
+			hud.result["best_score"] = int(Save.daily_entry().get("best", score))
+			counted = false
 		if counted:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})

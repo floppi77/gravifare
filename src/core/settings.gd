@@ -11,8 +11,12 @@ var values := {
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	var first_start := not FileAccess.file_exists(path)
 	load_settings()
 	apply()
+	apply_display()
+	if not values.fullscreen:
+		fit_window(first_start)
 
 func load_settings() -> void:
 	var cf := ConfigFile.new()
@@ -25,15 +29,22 @@ func load_settings() -> void:
 	for k in ["master", "music", "sfx", "voice", "deadzone", "vibration"]:
 		values[k] = clampf(values[k], 0.0, 1.0)
 
+## Atomar wie der Spielstand: erst in eine .tmp-Datei, dann umbenennen (ein Absturz beim Schreiben lässt die alte Datei stehen).
 func save_settings() -> void:
 	var cf := ConfigFile.new()
 	for k in values:
 		cf.set_value("settings", k, values[k])
-	cf.save(path)
+	var tmp := path + ".tmp"
+	if cf.save(tmp) != OK:
+		push_warning("Einstellungen nicht schreibbar")
+		return
+	DirAccess.rename_absolute(tmp, path)
 
 func set_value(key: String, v) -> void:
 	values[key] = v
 	apply()
+	if key in DISPLAY_KEYS:
+		apply_display()
 	save_settings()
 
 func apply() -> void:
@@ -51,9 +62,52 @@ func apply() -> void:
 		InputMap.action_set_deadzone(a, values.deadzone)
 	Engine.max_fps = int(values.fps_cap)
 	_update_fps_overlay()
-	if not DisplayServer.get_name() == "headless":
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
-		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED)
+
+const DISPLAY_KEYS := ["fullscreen", "vsync"]
+const Stage := preload("res://src/core/stage.gd")
+
+## Vollbild und VSync nur setzen, wenn sie sich vom aktuellen Zustand unterscheiden: Andere Optionen (z. B. Lautstärke)
+## lassen das Fenster in Ruhe, und ein maximiertes Fenster bleibt maximiert.
+func apply_display() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var mode := DisplayServer.window_get_mode()
+	var is_fs := mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+	if values.fullscreen and not is_fs:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	elif not values.fullscreen and is_fs:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		fit_window()
+	var vs := DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED
+	if DisplayServer.window_get_vsync_mode() != vs:
+		DisplayServer.window_set_vsync_mode(vs)
+
+## Fenstermodus: Das Fenster (Standard 1920×1080) muss samt Rahmen auf den Bildschirm passen. Sonst wird es auf das
+## größte ganzzahlige Vielfache von 640×360 verkleinert, das passt (z. B. 1280×720 auf einem 1080p-Bildschirm mit Taskleiste),
+## und zentriert. Passt nicht einmal 1280×720 (z. B. 1366×768), wäre das Bild im Fenster nur einfach groß: Dann startet das
+## Spiel beim allerersten Start (`allow_fullscreen`) im Vollbild, das die Option auch speichert. Nie größer als die Vorgabe;
+## Fenstergröße/Vollbild per Kommandozeile (Tests, Trailer-Aufnahme) bleiben unberührt.
+func fit_window(allow_fullscreen := false) -> void:
+	if DisplayServer.get_name() == "headless" or _size_from_cmdline():
+		return
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		return
+	var screen := DisplayServer.window_get_current_screen()
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var want := Stage.window_size_for(usable.size, DisplayServer.window_get_size())
+	if want == DisplayServer.window_get_size():
+		return
+	if allow_fullscreen and Stage.wants_fullscreen(want, DisplayServer.screen_get_size(screen)):
+		set_value("fullscreen", true)
+		return
+	DisplayServer.window_set_size(want)
+	DisplayServer.window_set_position(usable.position + (usable.size - want) / 2)
+
+func _size_from_cmdline() -> bool:
+	for a in OS.get_cmdline_args():
+		if a in ["--resolution", "-f", "--fullscreen", "-m", "--maximized", "--position", "--write-movie"] or a.begins_with("--resolution=") or a.begins_with("--position="):
+			return true
+	return false
 
 var _fps_label: Label
 

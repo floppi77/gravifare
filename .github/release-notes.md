@@ -40,7 +40,7 @@ Gefällt dir GraviFare? Über einen Kaffee auf [Ko-fi](https://ko-fi.com/floppi7
 Frei für nicht-kommerzielle Zwecke: Code unter
 [PolyForm Noncommercial 1.0.0](https://github.com/floppi77/gravifare/blob/main/LICENSE),
 Inhalte unter [CC BY-NC-SA 4.0](https://github.com/floppi77/gravifare/blob/main/LICENSE-ASSETS.md).
-Die Spieldateien enthalten die Godot Engine (MIT); die Fluglehrer-Stimme ist „Built with Fish Audio“, siehe
+Die Spieldateien enthalten die Godot Engine (MIT); die Fluglehrer-Stimme und zehn Fahrgaststimmen sind „Built with Fish Audio“, siehe
 [THIRD_PARTY_NOTICES.md](https://github.com/floppi77/gravifare/blob/main/THIRD_PARTY_NOTICES.md).
 
 Das Spiel spricht Deutsch und Englisch – umschalten per Flagge im Hauptmenü.
@@ -91,5 +91,5 @@ Enjoying GraviFare? A coffee on [Ko-fi](https://ko-fi.com/floppi77) is much appr
 Free for non-commercial use: code under
 [PolyForm Noncommercial 1.0.0](https://github.com/floppi77/gravifare/blob/main/LICENSE),
 content under [CC BY-NC-SA 4.0](https://github.com/floppi77/gravifare/blob/main/LICENSE-ASSETS.md).
-The game files contain the Godot Engine (MIT), see
+The game files contain the Godot Engine (MIT); the flight instructor and ten passenger voices are “Built with Fish Audio”, see
 [THIRD_PARTY_NOTICES.md](https://github.com/floppi77/gravifare/blob/main/THIRD_PARTY_NOTICES.md).

@@ -36,6 +36,12 @@ func _ready() -> void:
 		add_child(p)
 		pool.append(p)
 
+## Beim Beenden die Dauerschleifen (Schub) anhalten, damit ihre Wiedergabe-Objekte mit freigegeben werden.
+func _exit_tree() -> void:
+	for p in [thrust_player, side_player]:
+		if p != null:
+			p.stop()
+
 func _load(path: String) -> AudioStream:
 	if not ResourceLoader.exists(path):
 		return null

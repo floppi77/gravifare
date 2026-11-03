@@ -327,6 +327,10 @@
  "HUD_SHIFT_RESULT": "Schicht: %d Fahrgäste · Bestwert %d",
  "TRANS_GRAVITY": "Schwerkraft %.1f g",
  "TRANS_SHIFT": "Fahrgäste in dieser Schicht: %d",
+ "MENU_DAILY": "Tagesflug",
+ "DAILY_TAG": "Tagesflug",
+ "MSG_DAILY": "Tagesflug %s: Serientaxi, gleiche Aufträge und Preise für den ganzen Tag",
+ "STAT_DAILY": "Tagesflug (Bestwert · Tage in Folge)",
  "MSG_BAD_PLATE": "Nur die helle Landeplatte zählt!",
  "TUT_SKIP": "%s: Text überspringen",
  "LVL_UNKNOWN": "Noch unbekannt"

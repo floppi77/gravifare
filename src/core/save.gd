@@ -197,6 +197,20 @@ func ever_completed() -> Dictionary:
 	out.merge(data.completed)
 	return out
 
+## Tagesflug: Eintrag im Spielstand (Datum, Karte, Bestwert des Tages), fehlt in älteren Spielständen.
+func daily_entry() -> Dictionary:
+	if not (data.get("daily") is Dictionary):
+		data["daily"] = {}
+	return data.daily
+
+## Kartenvorrat des Tagesflugs: alle jemals geschafften Level (ohne Flugschule), die es noch gibt.
+func daily_pool(ids: Array) -> Array:
+	return ever_completed().keys().filter(func(id): return ids.has(id))
+
+## Tagesflug: frei ab Sektor 1 (11 geschaffte Level) oder im Debug-Modus.
+func daily_unlocked(ids: Array) -> bool:
+	return debug or daily_pool(ids).size() >= Daily.UNLOCK_LEVELS
+
 ## Nachtschicht: erst, wenn alle Level einmal geschafft wurden.
 func shift_unlocked(ids: Array) -> bool:
 	var done := ever_completed()

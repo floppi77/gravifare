@@ -58,7 +58,7 @@ Alles im Trailer stammt aus dem echten Spiel (Autopilot-Flüge, aufgenommen mit 
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
 - **Feldzug mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
   (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
-- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen,
+- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen, **Tagesflug** (jeden Tag eine Karte mit festen Aufträgen und Preisen),
   **Garage** mit Lackierungen und Aufklebern.
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
 - **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
@@ -85,7 +85,7 @@ Godot 4.7.x und die passenden Exportvorlagen vorausgesetzt:
 ```bash
 godot --headless --import                # einmal nach dem Checkout
 godot --path .                           # Spiel starten
-godot --headless -s tests/test_runner.gd # Tests (rund 2750 Prüfungen)
+godot --headless -s tests/test_runner.gd # Tests (über 2700 Prüfungen)
 tools/export_release.sh                  # Pakete für Linux, Windows, macOS nach build/release/
 ```
 
@@ -138,7 +138,7 @@ Everything in the trailer comes from the real game (autopilot flights recorded w
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
 - **Campaign with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
   (jets, hull, tank …). Game over resets the sector.
-- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs,
+- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs, a **daily flight** (one map a day with fixed jobs and prices),
   and a **garage** with paint jobs and stickers.
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
 - **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
@@ -165,7 +165,7 @@ Requires Godot 4.7.x and the matching export templates:
 ```bash
 godot --headless --import                # once after checkout
 godot --path .                           # run the game
-godot --headless -s tests/test_runner.gd # tests (about 2750 checks)
+godot --headless -s tests/test_runner.gd # tests (over 2700 checks)
 tools/export_release.sh                  # packages for Linux, Windows, macOS in build/release/
 ```
 

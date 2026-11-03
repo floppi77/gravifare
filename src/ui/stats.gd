@@ -39,6 +39,7 @@ func _ready() -> void:
 		["STAT_PUMP", "%d / %d" % [int(st.get("pump_hits", 0)), int(st.get("pump_explosions", 0))]],
 		["STAT_SQUASH", "%d" % int(st.get("squashes", 0))],
 		["STAT_SHIFT", "%d" % int(st.get("shift_best", 0))],
+		["STAT_DAILY", "%d · %d" % [int(st.get("daily_best", 0)), Daily.current_streak(st, Daily.today())]],
 		["STAT_TIME", "%d:%02d:%02d" % [secs / 3600, (secs / 60) % 60, secs % 60]],
 	]
 	for r in rows:

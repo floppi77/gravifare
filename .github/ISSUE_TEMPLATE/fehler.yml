@@ -13,8 +13,8 @@ body:
     id: version
     attributes:
       label: Version
-      description: Release, z. B. v0.9.0 (steht im Dateinamen des Downloads bzw. im Release). / Release, e.g. v0.9.0.
-      placeholder: v0.9.0
+      description: Release, z. B. v0.9.3 (steht unten rechts im Hauptmenü und im Dateinamen des Downloads). / Release, e.g. v0.9.3 (shown bottom right in the main menu and in the download's file name).
+      placeholder: v0.9.3
     validations:
       required: true
   - type: dropdown

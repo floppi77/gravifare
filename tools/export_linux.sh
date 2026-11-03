@@ -8,7 +8,7 @@ OUT=build/linux
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 rsync -a --exclude .git --exclude .venv --exclude build --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
-sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^$/d' "$WORK/project.godot"
+sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^\[/{/^\[editor_plugins\]$/d; /^\[/!d}' "$WORK/project.godot"
 rm -rf "$OUT"
 mkdir -p "$OUT/licenses"
 ABS=$(pwd)/$OUT

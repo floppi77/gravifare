@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -651,6 +651,9 @@ func _test_campaign_save() -> void:
 	sv3.load_save()
 	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht den gespeicherten Feldzug")
 	_rm(sv.path)
+	sv.free()
+	sv2.free()
+	sv3.free()
 
 func _test_replay() -> void:
 	var q := Replay.quantize(Vector2(0.3333, -1.7))
@@ -1365,6 +1368,7 @@ func _test_exit_passenger() -> void:
 	var money0 := r.money
 	r.step(Vector2.ZERO, false)
 	check(r.result == Run.Result.COMPLETE, "Flug mit Fahrgast durchs Tor beendet das Level")
+	check(r.delivered == 1, "Ausgangs-Fahrgast zählt im HUD und Abschluss als befördert (Zähler %d)" % r.delivered)
 	check(r.money == money0 and not r.carried.is_empty() and not r.carried.pay_info.is_empty(), "Am Tor noch kein Geld: Fahrgast (%s) fährt mit Zahlungsinfo ins nächste Level" % str(r.carried.get("name", "")))
 	# Im nächsten Level: er steigt aus, läuft zum Häuschen, erst dort wird bezahlt
 	var nxt := Run.new()
@@ -1380,6 +1384,14 @@ func _test_exit_passenger() -> void:
 		if nxt.money > 0.0 and paid_at < 0.0:
 			paid_at = nxt.sim.time
 	check(paid_at > 0.2 and nxt.delivered == 1, "Ausgangs-Fahrgast wird erst bei Ankunft im Häuschen bezahlt (nach %.1f s, ¢%d)" % [paid_at, int(nxt.money)])
+
+func _test_version_matches_export() -> void:
+	# Die im Menü angezeigte Version (Flow.VERSION) muss zur Version im Export-Preset passen
+	var cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
+	var m := RegEx.create_from_string('application/short_version="([^"]+)"').search(cfg)
+	var fm := RegEx.create_from_string('const VERSION := "([^"]+)"').search(FileAccess.get_file_as_string("res://src/core/flow.gd"))      # als Text: flow.gd hängt von Autoloads ab
+	var ver := fm.get_string(1) if fm else "?"
+	check(m != null and m.get_string(1) == ver, "Menü-Version %s passt zu export_presets.cfg (%s)" % [ver, m.get_string(1) if m else "?"])
 
 func _test_spawn_not_on_taxi_pad() -> void:
 	# Nachfolge-Fahrgast darf nicht erscheinen, solange das Taxi auf seinem Pad steht
@@ -2174,6 +2186,99 @@ func _test_shift_jobs() -> void:
 			var r := Bot.fly_level(lvl, 600.0, _bot_fuel(lvl))
 			check(r.complete, "Nachtschicht: Autopilot fliegt Zufallsaufträge auf %s (%.0f s, %s)" % [lvl.id, r.time, r.reason])
 	check(bad.is_empty() and flown >= 9, "Nachtschicht-Aufträge sind gültig %s" % str(bad.slice(0, 4)))
+
+func _test_daily_flight() -> void:
+	check(Daily.seed_for("2026-11-03") == 20261103, "Tagesflug: Seed aus dem Datum")
+	check(Daily.yesterday("2026-03-01") == "2026-02-28" and Daily.yesterday("2027-01-01") == "2026-12-31", "Tagesflug: Vortag über Monats- und Jahresgrenze")
+	var pool := ["s1_03", "s1_01", "s2_05", "s1_07", "s3_02"]
+	var shuffled := ["s3_02", "s1_07", "s1_01", "s2_05", "s1_03"]
+	check(Daily.pick_level(pool, "2026-11-03") == Daily.pick_level(shuffled, "2026-11-03"), "Tagesflug: Karte hängt nicht von der Reihenfolge ab")
+	var seen := {}
+	for d in 40:
+		seen[Daily.pick_level(pool, Time.get_date_string_from_unix_time(1793700000 + d * 86400))] = true
+	check(seen.size() >= 3, "Tagesflug: Karten wechseln von Tag zu Tag (%d verschiedene in 40 Tagen)" % seen.size())
+	# Tageskarte bleibt, auch wenn am selben Tag weitere Level geschafft werden
+	var de := {}
+	var first := Daily.level_of_day(de, pool, "2026-11-03")
+	check(Daily.level_of_day(de, pool + ["s4_01", "s4_02", "s4_03"], "2026-11-03") == first, "Tagesflug: Tageskarte bleibt den ganzen Tag gleich")
+	# gleiche Aufträge und Preise am selben Tag, andere am nächsten
+	var lvl := LevelData.load_file("res://data/levels/s2_05.json")
+	var j1 := Daily.jobs_for(lvl, "2026-11-03")
+	var j2 := Daily.jobs_for(lvl, "2026-11-03")
+	var j3 := Daily.jobs_for(lvl, "2026-11-04")
+	check(JSON.stringify(j1) == JSON.stringify(j2) and JSON.stringify(j1) != JSON.stringify(j3), "Tagesflug: gleiche Aufträge am selben Tag, andere am nächsten")
+	check(String(j1[j1.size() - 1].to) == "exit" and j1.size() == Daily.JOBS_LEVEL + 4, "Tagesflug: %d Fahrten, zuletzt zum Ausgang" % j1.size())
+	var r1 := Run.new()
+	var l1 := LevelData.load_file("res://data/levels/s2_05.json")
+	l1.jobs = j1
+	r1.start(l1, -1.0, 0.0, Daily.seed_for("2026-11-03") + l1.number * 7919)
+	var r2 := Run.new()
+	var l2 := LevelData.load_file("res://data/levels/s2_05.json")
+	l2.jobs = j2
+	r2.start(l2, -1.0, 0.0, Daily.seed_for("2026-11-03") + l2.number * 7919)
+	for i in 1200:
+		r1.step(Vector2.ZERO, true)
+		r2.step(Vector2.ZERO, true)
+	check(r1.price_base == r2.price_base and r1.fuel_price() == r2.fuel_price() and r1.extras.size() == r2.extras.size(), "Tagesflug: gleiche Spritpreise und Zusatzfahrgäste (¢%.2f)" % r1.fuel_price())
+	# Wertung: Bestwert des Tages, Tage in Folge
+	var d := {}
+	var st := {}
+	Daily.record(d, st, "2026-11-03", 400)
+	Daily.record(d, st, "2026-11-03", 650)
+	Daily.record(d, st, "2026-11-03", 500)
+	check(int(d.best) == 650 and int(st.daily_days) == 1 and int(st.daily_streak) == 1, "Tagesflug: bester Versuch zählt, ein Tag (%d)" % int(d.best))
+	Daily.record(d, st, "2026-11-04", 300)
+	check(int(d.best) == 300 and int(st.daily_streak) == 2 and int(st.daily_best) == 650, "Tagesflug: neuer Tag, Serie 2, Rekord bleibt")
+	check(Daily.current_streak(st, "2026-11-05") == 2 and Daily.current_streak(st, "2026-11-06") == 0, "Tagesflug: Serie verfällt nach einem ausgelassenen Tag")
+	Daily.record(d, st, "2026-11-07", 100)
+	check(int(st.daily_streak) == 1 and int(st.daily_best_streak) == 2 and int(st.daily_days) == 3, "Tagesflug: Lücke startet die Serie neu")
+	# Freischaltung und alter Spielstand ohne Eintrag
+	var sv: Node = load("res://src/core/save.gd").new()
+	var ids: Array = []
+	for i in 11:
+		ids.append("s1_%02d" % (i + 1))
+	for i in 10:
+		sv.data.completed[ids[i]] = {}
+	check(not sv.daily_unlocked(ids), "Tagesflug: gesperrt vor Abschluss von Sektor 1")
+	sv.data.completed[ids[10]] = {}
+	check(sv.daily_unlocked(ids) and sv.daily_entry().is_empty() and sv.data.daily is Dictionary, "Tagesflug: frei nach Sektor 1, alter Spielstand bekommt einen leeren Eintrag")
+	sv.free()
+	var src := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(src.contains("Workshop.mods_for({}) if Flow.daily") and src.contains("and not Flow.daily:\n\t\t\tFlow.to_finale()"), "Tagesflug: Serientaxi, nach dem Flug zurück ins Menü statt ins Finale")
+	var fsrc := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	check(fsrc.count("daily = false") >= 5, "Tagesflug: alle anderen Startarten schalten ihn ab")
+
+func _test_window_fit() -> void:
+	const St := preload("res://src/core/stage.gd")
+	var full := Vector2i(1920, 1080)
+	check(St.window_size_for(Vector2i(2560, 1400), full) == full, "Fenster: 1920×1080 bleibt auf 1440p")
+	check(St.window_size_for(Vector2i(1920, 1040), full) == Vector2i(1280, 720), "Fenster: auf 1080p (mit Taskleiste) 1280×720")
+	check(St.window_size_for(Vector2i(1600, 860), full) == Vector2i(1280, 720), "Fenster: auf 1600×900 1280×720")
+	check(St.window_size_for(Vector2i(1366, 728), full) == Vector2i(640, 360) and St.wants_fullscreen(Vector2i(640, 360), Vector2i(1366, 768)), "Fenster: 1366×768 wäre nur einfach groß → Vollbild beim ersten Start")
+	check(not St.wants_fullscreen(Vector2i(1280, 720), Vector2i(1920, 1080)) and not St.wants_fullscreen(Vector2i(640, 360), Vector2i(1024, 600)), "Fenster: kein erzwungenes Vollbild, wenn das Fenster passt oder der Bildschirm zu klein ist")
+	check(St.window_size_for(Vector2i(1280, 760), full) == Vector2i(640, 360), "Fenster: zu klein für 2× → 640×360")
+	check(St.window_size_for(Vector2i(800, 400), full) == Vector2i(640, 360), "Fenster: nie kleiner als 640×360")
+	check(St.window_size_for(Vector2i(0, 0), full) == full, "Fenster: unbekannte Bildschirmgröße ändert nichts")
+
+func _test_auto_pause_and_settings() -> void:
+	var g := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(g.contains("NOTIFICATION_APPLICATION_FOCUS_OUT:\n\t\tauto_pause()") and g.contains("Input.joy_connection_changed.connect(_on_joy_connection)"), "Pause bei Fokusverlust und getrenntem Controller")
+	check(g.contains("if not connected and Controls.last_device == \"gamepad\":"), "Getrennter Controller pausiert nur, wenn mit Controller gespielt wird")
+	check(g.contains("if autopilot != null or Save.dev_session or OS.get_cmdline_args().has(\"--write-movie\"):"), "Keine Auto-Pause in Testläufen und Trailer-Aufnahmen")
+	var s := FileAccess.get_file_as_string("res://src/core/settings.gd")
+	check(s.contains("if key in DISPLAY_KEYS:\n\t\tapply_display()") and not s.contains("window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen"), "Nur Anzeige-Optionen setzen Fenstermodus und VSync")
+	# Einstellungen atomar: .tmp wird umbenannt, keine Reste
+	var st: Node = load("res://src/core/settings.gd").new()
+	st.path = "user://test_settings.cfg"
+	st.values.music = 0.37
+	st.save_settings()
+	var st2: Node = load("res://src/core/settings.gd").new()
+	st2.path = "user://test_settings.cfg"
+	st2.load_settings()
+	check(absf(float(st2.values.music) - 0.37) < 0.001 and not FileAccess.file_exists("user://test_settings.cfg.tmp"), "Einstellungen werden atomar geschrieben und wieder gelesen")
+	DirAccess.remove_absolute("user://test_settings.cfg")
+	st.free()
+	st2.free()
 
 func _test_exit_hurry_and_extras() -> void:
 	var lvl := LevelData.load_file("res://data/levels/s2_01.json")

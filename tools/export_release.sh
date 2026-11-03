@@ -5,11 +5,13 @@
 # Aufruf aus der Projektwurzel: tools/export_release.sh [Version]     (Standard: Version aus export_presets.cfg)
 set -eu
 VER=${1:-$(sed -n 's/^application\/short_version="\(.*\)"$/\1/p' export_presets.cfg)}
+MENU_VER=$(sed -n 's/^const VERSION := "\([^"]*\)".*$/\1/p' src/core/flow.gd)
+[ "$MENU_VER" = "$VER" ] || { echo "Flow.VERSION in src/core/flow.gd ($MENU_VER) passt nicht zu $VER (Anzeige im Hauptmenü)" >&2; exit 1; }
 OUT=build/release
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 rsync -a --exclude .git --exclude .venv --exclude build --exclude scratch --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
-sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^$/d' "$WORK/project.godot"
+sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^\[/{/^\[editor_plugins\]$/d; /^\[/!d}' "$WORK/project.godot"
 sed -i 's|^\[rendering\]$|[rendering]\n\ntextures/vram_compression/import_etc2_astc=true|' "$WORK/project.godot"      # macOS (universal/arm64) verlangt ASTC, nur in der Exportkopie
 rm -rf "$OUT"
 mkdir -p "$OUT/stage"

@@ -53,6 +53,9 @@ jobs:
             echo "application/${key}=${have}"
             test "$have" = "$want" || { echo "Version in export_presets.cfg ($have) passt nicht zum Tag $TAG"; exit 1; }
           done
+          have=$(sed -n 's/^const VERSION := "\([^"]*\)".*$/\1/p' src/core/flow.gd)
+          echo "Flow.VERSION=${have}"
+          test "$have" = "$want" || { echo "Flow.VERSION in src/core/flow.gd ($have) passt nicht zum Tag $TAG"; exit 1; }
 
       - name: Release-Zustand prüfen
         env:

@@ -24,7 +24,7 @@ Jedes Release enthält `SHA256SUMS.txt`. Im Download-Ordner:
 sha256sum -c SHA256SUMS.txt --ignore-missing
 ```
 
-Ab dem nächsten Release nach v0.9.2 gibt es zusätzlich einen signierten Herkunftsnachweis
+Ab v0.9.3 gibt es zusätzlich einen signierten Herkunftsnachweis
 (v0.9.2 und älter wurden gebaut, bevor das Repository öffentlich war). Er belegt, dass die
 Datei von der CI dieses Repositorys aus dem getaggten Stand gebaut wurde:
 
@@ -83,7 +83,7 @@ Every release contains `SHA256SUMS.txt`. In the download folder:
 sha256sum -c SHA256SUMS.txt --ignore-missing
 ```
 
-From the release after v0.9.2 on, releases additionally come with a signed build provenance
+From v0.9.3 on, releases additionally come with a signed build provenance
 attestation (v0.9.2 and older were built before the repository went public). It proves that
 the file was built by this repository's CI from the tagged source:
 

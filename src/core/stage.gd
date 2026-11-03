@@ -6,6 +6,25 @@ extends RefCounted
 
 const SIZE := Vector2(640, 360)
 
+const DECOR_MARGIN := Vector2i(16, 64)       # Platz für Fensterrahmen und Titelleiste im Fenstermodus
+
+## Fenstermodus: größte Fenstergröße k·640×k·360 (k ≥ 1), die samt Rahmen in `usable` passt; passt `current` schon, bleibt es.
+## Ganzzahlig, weil das Spiel ganzzahlig skaliert (scale_mode „integer“): Ein Zwischenmaß brächte nur breitere Ränder.
+static func window_size_for(usable: Vector2i, current: Vector2i) -> Vector2i:
+	if usable.x <= 0 or usable.y <= 0:
+		return current                                   # Bildschirmgröße unbekannt (z. B. manche Wayland-Sitzungen)
+	if current.x + DECOR_MARGIN.x <= usable.x and current.y + DECOR_MARGIN.y <= usable.y:
+		return current
+	var room := usable - DECOR_MARGIN
+	var base := Vector2i(SIZE)
+	var k := maxi(1, mini(room.x / base.x, room.y / base.y))
+	return base * k
+
+## Ist das passende Fenster nur einfach groß, der Bildschirm aber mindestens doppelt so groß wie die Spielfläche, ist Vollbild besser.
+static func wants_fullscreen(window: Vector2i, screen: Vector2i) -> bool:
+	var base := Vector2i(SIZE)
+	return window.x < base.x * 2 and screen.x >= base.x * 2 and screen.y >= base.y * 2
+
 ## Sichtbare Größe des Viewports in logischen Pixeln (mindestens 640×360).
 static func view(n: Node) -> Vector2:
 	var v := n.get_viewport().get_visible_rect().size

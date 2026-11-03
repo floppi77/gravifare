@@ -327,6 +327,10 @@
  "HUD_SHIFT_RESULT": "Shift: %d passengers · best %d",
  "TRANS_GRAVITY": "Gravity %.1f g",
  "TRANS_SHIFT": "Passengers this shift: %d",
+ "MENU_DAILY": "Daily flight",
+ "DAILY_TAG": "Daily flight",
+ "MSG_DAILY": "Daily flight %s: stock taxi, same jobs and prices all day",
+ "STAT_DAILY": "Daily flight (best · days in a row)",
  "MSG_BAD_PLATE": "Only the bright landing plate counts!",
  "TUT_SKIP": "%s: skip text",
  "LVL_UNKNOWN": "Still unknown"

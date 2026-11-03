@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "0.9.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "0.9.4"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
@@ -16,6 +16,8 @@ var shift_fares := 0                    # bisher beförderte Fahrgäste dieser S
 var shift_maps := 0                     # abgeschlossene Karten dieser Schicht
 var shift_next := ""
 var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keinen Feldzug (Medaillen und Bestzeiten zählen)
+var daily := false                      # Tagesflug (siehe daily.gd): eine Karte, Seed aus dem Datum, Serientaxi, zählt nur für den Tagesbestwert
+var daily_date := ""
 
 func level_ids() -> Array:
 	var ids: Array = []
@@ -59,6 +61,7 @@ func start_tutorial(next_id := "") -> void:
 	run_seed = randi() % 1000000
 	practice = false
 	shift = false
+	daily = false
 	tutorial_next = next_id
 	start_level(TUTORIAL_ID)
 
@@ -71,6 +74,7 @@ func start_campaign(id: String) -> void:
 	run_seed = randi() % 1000000
 	practice = false
 	shift = false
+	daily = false
 	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
 	start_level(id)
 
@@ -86,6 +90,7 @@ func start_selected(id: String) -> void:
 	run_seed = randi() % 1000000
 	practice = true
 	shift = false
+	daily = false
 	start_level(id)
 
 ## Nachtschicht: zufällige Aufträge auf bereits geflogenen Karten, bis alle Leben weg sind. Ziel: möglichst viele Fahrgäste.
@@ -97,11 +102,33 @@ func start_shift() -> void:
 	run_seed = randi() % 1000000
 	practice = true
 	shift = true
+	daily = false
 	shift_fares = 0
 	shift_maps = 0
 	var first := _pick_shift_map("")
 	shift_next = _pick_shift_map(first)
 	start_level(first)
+
+## Tagesflug: Karte, Aufträge und Preise hängen nur vom Datum ab (siehe daily.gd). Volle Leben, voller Tank, keine Credits.
+func start_daily() -> void:
+	daily_date = Daily.today()
+	var pool := Save.daily_pool(level_ids())
+	if pool.is_empty():
+		pool = level_ids()                 # nur im Debug-Modus erreichbar (sonst erst ab Sektor 1 frei)
+	var id := Daily.level_of_day(Save.daily_entry(), pool, daily_date)
+	if id == "":
+		return
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	run_seed = Daily.seed_for(daily_date)
+	practice = true
+	shift = false
+	daily = true
+	Save.count_event("daily_flights")
+	Save.write()
+	start_level(id)
 
 ## Debug-Modus ein- oder ausschalten (bleibt über einen Neustart erhalten).
 func set_debug(on: bool) -> void:
@@ -142,6 +169,7 @@ func resume_campaign() -> bool:
 	run_seed = int(c.get("seed", 0))
 	practice = false
 	shift = false
+	daily = false
 	start_level(String(c.level))
 	return true
 
@@ -153,6 +181,8 @@ func start_level(id: String) -> void:
 func next_level_id() -> String:
 	if shift:
 		return shift_next
+	if daily:
+		return ""                          # Tagesflug: eine Karte, danach zurück ins Menü
 	var ids := level_ids()
 	var i := ids.find(current_level)
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""

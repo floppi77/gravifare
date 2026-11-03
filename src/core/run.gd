@@ -654,6 +654,7 @@ func _finish_level() -> void:
 	if not job.is_empty() and is_exit_job(job) and phase == Phase.CARRYING and actor != null:
 		# Einkommen erst, wenn der Fahrgast im nächsten Level sein Häuschen erreicht; die Zahlungsinfo fährt mit
 		carried = {"name": actor.pname, "look": actor.look, "gender": actor.gender, "pay_info": _make_pay_info(job, job_clock, pen_pick)}
+		delivered += 1                             # befördert: zählt in diesem Level (bezahlt wird im nächsten, dort mit "carry" nicht erneut gezählt)
 		job_index += 1
 		actor = null
 	_settle_pending()

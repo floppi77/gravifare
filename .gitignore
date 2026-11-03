@@ -14,3 +14,8 @@ __pycache__/
 scratch/
 # Editor-Anbindung (Godot AI): nur lokal, nie im Spiel
 addons/godot_ai/
+# Interne Arbeitsanweisungen (nur lokal)
+/auftrag.md
+/docs/AGENTENPROMPT_PARALLEL.md
+# Cinematic-Trailer (gross): als Release-Anhang, nicht im Repo
+docs/media/trailer_cine_*.mp4
