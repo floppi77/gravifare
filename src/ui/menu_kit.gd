@@ -142,18 +142,26 @@ static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callabl
 	b.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
 	return b
 
-## Sprachwahl: zwei Flaggen ohne Text (Haupt- und Pausenmenü). `on_select(code)` wird mit "de"/"en" aufgerufen.
-static func flag_row(on_select: Callable) -> HBoxContainer:
-	var flags := HBoxContainer.new()
-	flags.alignment = BoxContainer.ALIGNMENT_CENTER
-	flags.add_theme_constant_override("separation", 10)
+## Die beiden Sprach-Flaggenknöpfe (de, en); Meta "lang" = Sprachcode, "help" = Schlüssel des Hilfetexts im Hauptmenü.
+static func _flag_buttons(on_select: Callable) -> Array:
+	var out: Array = []
 	var cur := TranslationServer.get_locale().substr(0, 2)
-	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch"], ["en", "res://assets/art/flag_en.png", "English"]]:
+	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch", "HELP_LANG_DE"], ["en", "res://assets/art/flag_en.png", "English", "HELP_LANG_EN"]]:
 		var code: String = entry[0]
 		var fb := flag_button(load(entry[1]), cur == code, entry[2], func():
 			Settings.set_value("language", code)
 			on_select.call(code))
 		fb.set_meta("lang", code)
+		fb.set_meta("help", entry[3])
+		out.append(fb)
+	return out
+
+## Sprachwahl: zwei Flaggen ohne Text nebeneinander (Pausenmenü). `on_select(code)` wird mit "de"/"en" aufgerufen.
+static func flag_row(on_select: Callable) -> HBoxContainer:
+	var flags := HBoxContainer.new()
+	flags.alignment = BoxContainer.ALIGNMENT_CENTER
+	flags.add_theme_constant_override("separation", 10)
+	for fb in _flag_buttons(on_select):
 		flags.add_child(fb)
 	# Links/Rechts (Pfeiltasten, Stick, Steuerkreuz) wechselt zwischen den Flaggen
 	var fbs := flags.get_children()
@@ -171,6 +179,14 @@ static func flag_row(on_select: Callable) -> HBoxContainer:
 					(fbs[j] as Button).grab_focus()
 				me.accept_event())
 	return flags
+
+## Sprachwahl als Spalte (Hauptmenü, links neben dem Menü): Auf/Ab wechselt zwischen den Flaggen, Rechts führt ins Menü.
+static func flag_column(on_select: Callable) -> VBoxContainer:
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 8)
+	for fb in _flag_buttons(on_select):
+		col.add_child(fb)
+	return col
 
 ## Abdunklung über den Menühintergrund, reicht auf breiten Fenstern bis zum Rand.
 static func dim_rect(alpha: float) -> ColorRect:

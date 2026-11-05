@@ -22,6 +22,7 @@ var community := false:                 # Community-Level (user://community/, si
 	set(v):
 		community = v
 		Save.community_mode = v
+var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
 
 func level_ids() -> Array:
@@ -204,6 +205,8 @@ func start_community(id: String) -> void:
 func start_level(id: String) -> void:
 	current_level = id
 	community = community_level_script().is_valid_id(id)       # nur hier gesetzt: kein anderer Spielmodus kann es „vergessen“
+	if not community:
+		return_to_editor = ""
 	get_tree().paused = false
 	get_tree().change_scene_to_file(GAME)
 
@@ -219,7 +222,8 @@ func next_level_id() -> String:
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
-	menu_screen = "community" if community else ""
+	menu_screen = ("editor:" + return_to_editor if return_to_editor != "" else "community") if community else ""
+	return_to_editor = ""
 	var g := get_tree().current_scene
 	if shift and g != null and "run" in g:
 		finish_shift(g.run.delivered + g.run.extras_delivered)      # Schicht abgebrochen: Bestwert trotzdem sichern

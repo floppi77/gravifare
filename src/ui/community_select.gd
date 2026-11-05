@@ -6,6 +6,7 @@ const CommunityLevel := preload("res://src/core/community_level.gd")
 const CommunityStore := preload("res://src/core/community_store.gd")
 
 var back: Callable
+var edit: Callable                 # Editor öffnen: edit.call(id) (id == "" = neues Level)
 var entries: Array = []
 var sel := -1
 var armed := ""                    # Level, dessen Löschen bestätigt werden muss
@@ -17,6 +18,7 @@ var info_name: Label
 var info_text: Label
 var status: Label
 var btn_share: Button
+var btn_edit: Button
 var btn_delete: Button
 
 class MapPreview extends Control:
@@ -67,10 +69,13 @@ func _ready() -> void:
 	info_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	main.add_child(_at(info_text, Vector2(322, 207), Vector2(302, 44)))
 	var actions := GridContainer.new()
-	actions.columns = 3
+	actions.columns = 4
 	actions.add_theme_constant_override("h_separation", 4)
 	actions.add_theme_constant_override("v_separation", 3)
 	main.add_child(_at(actions, Vector2(16, 256), Vector2(608, 44)))
+	actions.add_child(_action(tr("CM_NEW"), func(): edit.call("")))
+	btn_edit = _action(tr("CM_EDIT"), func(): edit.call(_selected_id()))
+	actions.add_child(btn_edit)
 	actions.add_child(_action(tr("CM_IMPORT"), _import_clipboard))
 	btn_share = _action(tr("CM_SHARE"), _share)
 	actions.add_child(btn_share)
@@ -99,7 +104,8 @@ func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 
 func _action(text: String, cb: Callable) -> Button:
 	var b := MenuKit.button(text, cb)
-	b.custom_minimum_size = Vector2(196, 19)
+	b.custom_minimum_size = Vector2(146, 19)
+	b.add_theme_font_size_override("font_size", 9)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return b
 
@@ -145,6 +151,7 @@ func _rebuild(focus_id := "") -> void:
 		list_box.add_child(l)
 	_select(-1 if entries.is_empty() else (entries.find_custom(func(e): return String(e.id) == keep) if want != null else 0))
 	btn_share.disabled = entries.is_empty()
+	btn_edit.disabled = entries.is_empty()
 	btn_delete.disabled = entries.is_empty()
 	if not is_inside_tree():
 		return

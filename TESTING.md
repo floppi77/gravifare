@@ -10,6 +10,7 @@
 
 **Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
 
+- **Runde 40:** Level-Editor (leeres Level gültig, festes Ausgangstor, Start versetzen, Rückgängig/Wiederholen mit Strichen, Rechteck/Füllen, Pads nummerieren, Aufträge passen sich an, Rundlauf von neun Originalen ohne Änderung, Bildschirm: Malen, Speichern, Sitzungsfassung ersetzen, Kopie beim Bearbeiten, Zurück mit Rückfrage), Hauptmenü (Hilfetexte, Flaggenspalte)
 - **Runde 39:** Community-Level (Format, Prüfung, Positivliste, Zahlenbegrenzung, ID-Hash und Pfadschutz, Code-Rundlauf, Ablage in `user://`, Kopie eines Originals ohne Änderung am Original, Spielmodus ohne Statistik und Feldzug, Fehlertexte vollständig, Fuzz mit beschädigten Leveln, alle 99 Originale als Kopie gültig, Probeflug, Bildschirm), Prüfsummen der Originale
 - **Runde 38:** Level-Optik (Neon/Glas) hängt nur an vorhandenen Leveln, Neonlabyrinth hat drei Neon-Strahlen, Glasfassade: Sweep-Schleusen (Öffnung immer 3 Felder, wandert über die ganze Höhe, gegenläufig), Pflichtfahrgast-Zähler ohne Abzug, Einspieler beim Einflug, Meteorbahnen streuen breit und meiden nur Pads im Spiel
 - **Runde 37 (v0.9.4):** Ausgangs-Fahrgast zählt im Level als befördert, Menü-Version passt zum Export-Preset, Fenstergröße passt zum Bildschirm, Auto-Pause und Anzeige-Optionen (Quelltextprüfung), Einstellungen atomar, Tagesflug (gleicher Tag = gleiche Karte, Aufträge und Preise; Bestwert und Serie)

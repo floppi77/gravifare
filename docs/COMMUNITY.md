@@ -4,6 +4,20 @@
 
 Im Hauptmenü unter **Community** liegen eigene und geteilte Level. Sie sind getrennt vom Feldzug: Sie ändern weder Fortschritt noch Medaillen, Statistik oder Freischaltungen, und die 99 mitgelieferten Level werden nie verändert. Geflogen wird mit dem Serientaxi (ohne Garagen-Einbauten), mit vollem Tank und fünf Leben. Gespeichert werden nur eigene Bestzeit, Bestwert und die Zahl der Flüge je Level.
 
+## Level bauen (Editor)
+
+*Community → Neues Level* (oder *Bearbeiten* für eine Kopie eines vorhandenen Levels). Die Karte zeigt sofort die echte Spielansicht; die Statuszeile meldet live, ob das Level gültig ist. Das Ausgangstor liegt fest mittig oben, die Aufträge entstehen automatisch (*Aufträge würfeln* für andere). Türen, bewegliche Hindernisse, Zonen und Dunkelheit eines bearbeiteten Levels bleiben erhalten. *Testflug* speichert und startet das Level, danach geht es zurück in den Editor. Das geöffnete Level bleibt unverändert; *Speichern* legt eine eigene Fassung an (weitere Speicherungen derselben Sitzung ersetzen sie).
+
+| | Maus | Tastatur | Controller |
+|---|---|---|---|
+| Bewegen | Mauszeiger | Pfeile / WASD | Stick, Steuerkreuz |
+| Malen / Löschen | links / rechts | Leertaste / X | A / X |
+| Auswahl | Rad, Knöpfe | Q/E, 1–9 (Pads) | LB / RB |
+| Werkzeug (Stift, Rechteck, Füllen) | Knöpfe | Tab | Y |
+| Rückgängig / Wiederholen | – | Strg+Z / Strg+Y | LT / RT |
+| Testflug / Vorschau | Knöpfe | T / V | Start / Back |
+| Bedienfelder an/aus | Klick | Esc | B |
+
 ## Level weitergeben und einlesen
 
 - **Code:** *Code kopieren* legt einen Text der Form `GFL1:…` in die Zwischenablage (etwa 1 KB). Der Empfänger wählt *Aus Zwischenablage*. Das funktioniert auch mit dem Controller.
@@ -48,6 +62,10 @@ Eigene Level gehören den Autorinnen und Autoren. Kopien mitgelieferter Level si
 # Community levels (English)
 
 Under **Community** in the main menu you find your own and shared levels. They are separate from the campaign: they change neither progress nor medals, statistics or unlocks, and the 99 bundled levels are never modified. You fly the standard taxi (no garage upgrades) with a full tank and five lives. Only your best time, best score and the number of flights per level are saved.
+
+## Building levels (editor)
+
+*Community → New level* (or *Edit* for a copy of an existing level). The map shows the real game view; the status line reports live whether the level is valid. The exit gate sits fixed in the middle at the top, jobs are generated automatically (*Re-roll jobs* for others). Doors, moving obstacles, zones and darkness of an edited level are preserved. *Test flight* saves and starts the level, then returns to the editor. The opened level stays unchanged; *Save* creates your own version (further saves in the same session replace it). Controls: mouse (left paints, right erases, wheel selects), keyboard (arrows/WASD move, Space paints, X erases, Q/E select, Tab tool, Ctrl+Z/Y, T test flight, V preview, Esc toggles the panels) and controller (stick/D-pad move, A paint, X erase, LB/RB select, Y tool, LT/RT undo/redo, Start test flight, Back preview, B panels).
 
 ## Sharing and importing
 

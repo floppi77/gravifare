@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3124,3 +3124,200 @@ func _test_community_screen() -> void:
 		DirAccess.remove_absolute(CS.dir + fn)
 	DirAccess.remove_absolute(CS.dir)
 	CS.dir = CS.DIR
+
+func _test_main_menu_help() -> void:
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var mm: GDScript = load("res://src/ui/main_menu.gd")
+	var missing: Array = []
+	for k in mm.HELP_KEYS:
+		if String(de.get(k, "")) == "" or String(en.get(k, "")) == "":
+			missing.append(k)
+	check(missing.is_empty() and mm.HELP_KEYS.size() >= 20, "Hauptmenü: Hilfetexte aller Einträge, Sperrgründe und Flaggen in beiden Sprachen %s" % str(missing))
+	# jeder Menüpunkt im Quelltext hat seinen Hilfetext
+	var src := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	var rx := RegEx.create_from_string("_menu_button\\([^,]+, \"(\\w+)\"|\\[tr\\(\"[A-Z_]+\"\\)(?: % Save\\.slot)?, \"(\\w+)\"")
+	var keys: Array = []
+	for m in rx.search_all(src):
+		keys.append((m.get_string(1) if m.get_string(1) != "" else m.get_string(2)))
+	var unknown: Array = keys.filter(func(k): return not mm.HELP_KEYS.has("HELP_" + String(k).to_upper()))
+	check(keys.size() >= 14 and unknown.is_empty(), "Hauptmenü: alle %d Menüpunkte haben einen Hilfetext %s" % [keys.size(), str(unknown)])
+	var kit := FileAccess.get_file_as_string("res://src/ui/menu_kit.gd")
+	check(kit.contains("static func flag_column") and src.contains("MenuKit.flag_column") and not src.contains("MenuKit.flag_row"), "Hauptmenü: Flaggen stehen als Spalte neben dem Menü (nicht mehr unter dem Menü)")
+
+# ---------------------------------------------------------------- Level-Editor (Runde 40)
+const LE := preload("res://src/core/level_edit.gd")
+
+func _test_level_edit_model() -> void:
+	var m = LE.blank()
+	var v: Dictionary = m.validate()
+	check(v.ok and m.w == 40 and m.h == 22 and m.pad_runs().size() == 3 and m.start_cell() == Vector2i(4, m.h - 3), "Editor: das leere Level ist gültig (3 Pads, Start über Pad 1)")
+	check(not m.set_cell(20, 1, "#") and not m.set_cell(20, 1, "."), "Editor: das Ausgangstor ist fest")
+	check(not m.set_cell(4, m.h - 3, "#") and m.cell(4, m.h - 3) == "S", "Editor: der Start lässt sich nicht überschreiben")
+	check(m.set_cell(10, 5, "S") and m.start_cell() == Vector2i(10, 5) and m.cell(4, m.h - 3) == ".", "Editor: Zeichen S versetzt den Start in die Luft")
+	check(not m.set_cell(0, 10, "S") and m.start_cell() == Vector2i(10, 5), "Editor: der Start gehört nicht in Fels")
+	check(not m.set_cell(-1, 3, "#") and not m.set_cell(3, 99, "#"), "Editor: Felder außerhalb werden ignoriert")
+	# Rückgängig: ein Strich = ein Schritt
+	var m2 = LE.blank()
+	var before: Array = m2.rows.duplicate()
+	m2.begin_stroke()
+	m2.line(Vector2i(5, 5), Vector2i(12, 8), "#")
+	m2.set_cell(7, 7, "^")
+	m2.end_stroke()
+	check(m2.rows != before and m2.can_undo(), "Editor: ein Strich verändert die Karte")
+	check(m2.undo() and m2.rows == before and m2.can_redo(), "Editor: Rückgängig nimmt den ganzen Strich zurück")
+	var after_stroke: Array = []
+	m2.redo()
+	after_stroke = m2.rows.duplicate()
+	check(after_stroke != before and not m2.can_redo(), "Editor: Wiederholen stellt den Strich her")
+	m2.begin_stroke()
+	m2.set_cell(5, 5, "#")                 # schon Fels: keine Änderung
+	m2.end_stroke()
+	check(m2.undo() and m2.rows == before, "Editor: ein Strich ohne Änderung erzeugt keinen Rückgängig-Schritt")
+	# Werkzeuge
+	var m3 = LE.blank()
+	check(m3.rect(Vector2i(10, 6), Vector2i(14, 8), "#") == 15 and m3.cell(12, 7) == "#", "Editor: Rechteck füllt 5×3 Felder")
+	check(m3.flood(12, 7, ".") == 15, "Editor: Füllen ersetzt das zusammenhängende Gebiet")
+	m3.rect(Vector2i(3, 12), Vector2i(8, 14), "#")
+	m3.rect(Vector2i(4, 13), Vector2i(7, 13), ".")
+	check(m3.flood(5, 13, "^") == 4 and m3.cell(3, 12) == "#", "Editor: Füllen bleibt in der eigenen Kammer")
+	check(m3.flood(19, 1, "#") == 0 and m3.cell(19, 1) == "E", "Editor: Füllen auf dem Tor ändert nichts")
+	# Pads
+	var m4 = LE.blank()
+	check(m4.next_free_pad() == "4" and m4.pad_used("2") and not m4.pad_used("7"), "Editor: nächste freie Pad-Nummer")
+	m4.rect(Vector2i(10, 12), Vector2i(13, 12), "7")        # Pad 7 über der Lücke 4–6
+	var vr: Dictionary = m4.validate()
+	check(not vr.ok and vr.errors.any(func(e): return e.code == "PAD_NUMBERS"), "Editor: Lücke in den Pad-Nummern wird gemeldet")
+	check(m4.renumber_pads() and m4.pad_used("4") and not m4.pad_used("7"), "Editor: Pads werden lückenlos neu nummeriert")
+	check(m4.validate().ok, "Editor: nach dem Neunummerieren ist das Level gültig")
+	var m5 = LE.blank()
+	m5.rect(Vector2i(10, 12), Vector2i(13, 12), "1")        # Pad 1 zum zweiten Mal an anderer Stelle
+	check(m5.validate().errors.any(func(e): return e.code == "PAD_SPLIT"), "Editor: dieselbe Pad-Nummer an zwei Stellen wird gemeldet")
+	# Aufträge passen sich an
+	var m6 = LE.blank()
+	var g: Dictionary = m6.validate()
+	m6.jobs = g.level.jobs.duplicate(true)
+	m6.rect(Vector2i(m6.w - 7, m6.h - 2), Vector2i(m6.w - 4, m6.h - 2), ".")      # Pad 3 entfernen
+	m6.rect(Vector2i(10, m6.h - 4), Vector2i(13, m6.h - 4), "3")
+	var again: Dictionary = m6.validate()
+	check(again.ok or m6.jobs_reset or again.errors.any(func(e): return e.code == "PAD_NUMBERS"), "Editor: nach Kartenänderung werden Aufträge geprüft")
+	var seed_before: int = m6.job_seed
+	m6.reroll_jobs()
+	check(m6.jobs.is_empty() and m6.job_seed == seed_before + 1 and m6.can_undo(), "Editor: Aufträge würfeln leert sie und zählt die Würfelzahl hoch")
+	check(m6.undo() and m6.job_seed == seed_before, "Editor: Würfeln lässt sich zurücknehmen")
+
+func _test_level_edit_roundtrip() -> void:
+	# Ein unveränderter Rundlauf ergibt dasselbe Level (Türen, Hindernisse, Zonen, Dunkelheit bleiben erhalten)
+	var bad: Array = []
+	for id in ["s1_01", "s2_08", "s3_05", "s4_04", "s5_09", "s6_03", "s7_07", "s8_03", "s9_06"]:
+		var res := CL.clean(_cl_wrap(id))
+		var m = LE.from_result(res)
+		var res2 := CL.clean(m.to_wrapper())
+		if not res2.ok or res2.id != res.id:
+			bad.append(id)
+	check(bad.is_empty(), "Editor: Laden und Zurückschreiben ohne Änderung ergibt dasselbe Level %s" % str(bad))
+	var r8 := CL.clean(_cl_wrap("s8_03"))
+	var m8 = LE.from_result(r8)
+	var moved: bool = true
+	m8.begin_stroke()
+	m8.set_cell(m8.w - 3, 5, "#")
+	m8.end_stroke()
+	var e8: Dictionary = m8.validate()
+	check(float(e8.level.get("dark", 0.0)) == float(r8.level.dark) and e8.level.movers.size() == r8.level.movers.size() and e8.level.zones.size() == r8.level.zones.size(),
+		"Editor: Bearbeiten der Karte behält Dunkelheit, Hindernisse und Zonen")
+	check(moved and LE.PALETTE.size() == 17 and LE.PALETTE.all(func(p): return String(p[0]).length() == 1), "Editor: Palette hat 17 Einträge mit je einem Kartenzeichen")
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var missing: Array = []
+	for p in LE.PALETTE:
+		if String(de.get(p[1], "")) == "" or String(en.get(p[1], "")) == "":
+			missing.append(p[1])
+	check(missing.is_empty(), "Editor: alle Palettentexte sind in beiden Sprachen vorhanden %s" % str(missing))
+
+func _test_level_editor_screen() -> void:
+	var tr_de := Translation.new()          # Übersetzungen wie Loc sie anlegt (der Autoload ist im Testlauf noch nicht gestartet)
+	tr_de.locale = "de"
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	CS.dir = "user://test_community_editor/"
+	CS._cache.clear()
+	var orig_dir: String = CS.dir
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	check(ed.open(""), "Editor-Bildschirm: neues Level öffnet")
+	ed._ready()
+	check(ed.res.ok and ed.status.text.contains("3"), "Editor-Bildschirm: Prüfung läuft beim Öffnen (%s)" % ed.status.text.replace("\n", " "))
+	ed._select_tool(0)
+	ed._select_pal(0)
+	ed._begin(false, Vector2i(10, 8))
+	ed._move_stroke(Vector2i(16, 8))
+	ed._end_stroke()
+	check(ed.model.cell(13, 8) == "#" and ed.model.dirty and ed.model.can_undo(), "Editor-Bildschirm: Strich malt Fels")
+	ed._begin(true, Vector2i(12, 8))
+	ed._end_stroke()
+	check(ed.model.cell(12, 8) == "." and ed.model.cell(13, 8) == "#", "Editor-Bildschirm: Löschen setzt Luft")
+	ed._select_tool(1)
+	ed._begin(false, Vector2i(26, 5))
+	ed._move_stroke(Vector2i(30, 7))
+	ed._end_stroke()
+	check(ed.model.cell(28, 6) == "#", "Editor-Bildschirm: Rechteck-Werkzeug")
+	ed._select_tool(2)
+	ed._select_pal(14)
+	ed._begin(false, Vector2i(30, 10))
+	check(ed.model.cell(35, 15) == "^", "Editor-Bildschirm: Füll-Werkzeug")
+	ed._undo_redo(true)
+	check(ed.model.cell(35, 15) == ".", "Editor-Bildschirm: Rückgängig")
+	var id: String = ed._save(false)
+	check(CommunityLevelIsId(id) and CS.exists(id) and not ed.model.dirty, "Editor-Bildschirm: Speichern legt eine eigene Fassung ab (%s)" % ed.status.text.replace("\n", " | "))
+	ed._select_tool(0)
+	ed._select_pal(0)
+	ed._begin(false, Vector2i(26, 9))
+	ed._end_stroke()
+	var id2: String = ed._save(false)
+	check(id2 != id and CS.exists(id2) and not CS.exists(id) and CS.list().size() == 1, "Editor-Bildschirm: erneutes Speichern ersetzt die Fassung dieser Sitzung")
+	# Bearbeiten einer Kopie: das geöffnete Level bleibt unverändert
+	var ed2: Control = load("res://src/ui/level_editor.gd").new()
+	ed2.back = func(): pass
+	check(ed2.open(id2), "Editor-Bildschirm: gespeichertes Level öffnet zum Bearbeiten")
+	ed2._ready()
+	ed2._begin(false, Vector2i(30, 12))
+	ed2._end_stroke()
+	var id3: String = ed2._save(false)
+	check(id3 != "" and id3 != id2 and CS.exists(id2) and CS.exists(id3) and CS.list().size() == 2, "Editor-Bildschirm: Bearbeiten legt eine Kopie an, die Vorlage bleibt")
+	# Rückweg: ungespeicherte Änderungen verlangen eine zweite Bestätigung
+	ed2._begin(false, Vector2i(31, 12))
+	ed2._end_stroke()
+	var left := [false]
+	ed2.back = func(): left[0] = true
+	ed2._request_back()
+	check(not left[0] and ed2.leave_armed, "Editor-Bildschirm: Zurück mit Änderungen fragt nach")
+	ed2._request_back()
+	check(left[0], "Editor-Bildschirm: zweites Zurück verlässt den Editor")
+	# ungültige Karte: kein Speichern
+	var bad = LE.blank()
+	bad.names = {"de": "x", "en": "x"}
+	ed2.model = bad
+	bad.rect(Vector2i(0, 0), Vector2i(2, 2), "#")
+	check(ed2._save(false) != "" , "Editor-Bildschirm: gültiges Level lässt sich speichern")
+	ed.free()
+	ed2.free()
+	for fn in DirAccess.get_files_at(orig_dir):
+		DirAccess.remove_absolute(orig_dir + fn)
+	DirAccess.remove_absolute(orig_dir)
+	CS.dir = CS.DIR
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+
+func CommunityLevelIsId(id: String) -> bool:
+	return CL.is_valid_id(id)
+
+func _test_editor_flow_hooks() -> void:
+	var flow := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	var menu := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	var sel := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
+	check(flow.contains("var return_to_editor") and flow.contains("\"editor:\" + return_to_editor") and flow.contains("if not community:\n\t\treturn_to_editor = \"\""), "Editor: Rückkehr aus dem Testflug in den Editor ist verdrahtet (Quelltextprüfung)")
+	check(menu.contains("Flow.menu_screen.begins_with(\"editor:\")") and menu.contains("func show_editor") and sel.contains("edit.call(\"\")"), "Editor: Hauptmenü und Community-Liste öffnen den Editor (Quelltextprüfung)")

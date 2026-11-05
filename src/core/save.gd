@@ -196,6 +196,15 @@ func community_plays(id: String) -> int:
 	var e = community_entry().get(id)
 	return int(e.get("plays", 0)) if e is Dictionary else 0
 
+## Name, unter dem eigene Community-Level gespeichert werden (Vorbelegung im Editor), je Speicherplatz.
+func community_author() -> String:
+	return String(data.get("community_author", ""))
+
+func set_community_author(name: String) -> void:
+	if name != community_author():
+		data["community_author"] = name.substr(0, 24)
+		write()
+
 func community_forget(id: String) -> void:
 	if community_entry().erase(id):
 		write()

@@ -32,7 +32,7 @@ const BOT_SECONDS := 300.0
 ## Alle Fehler- und Warncodes mit der Zahl ihrer Argumente (Texte: data/i18n "CL_ERR_<code>" / "CL_WARN_<code>"; ein Test hält beides zusammen).
 const ERROR_CODES := {"NOT_A_LEVEL": 0, "NEWER_VERSION": 0, "MAP_MISSING": 0, "MAP_SIZE": 3, "MAP_SIZE_W": 3, "MAP_ROW_TYPE": 0, "MAP_ROW_LEN": 0, "MAP_CHAR": 1,
 	"TOO_MANY_MOVERS": 1, "BAD_MOVER": 0, "TOO_MANY_ZONES": 1, "BAD_ZONE": 0, "TOO_MANY_JOBS": 1, "BAD_JOB": 0, "SPAWN_COUNT": 1, "NO_EXIT": 0, "EXIT_PLACE": 0,
-	"PAD_NARROW": 1, "PAD_COUNT": 1, "PAD_NUMBERS": 0, "JOB_PADS": 1, "JOB_EXIT": 0, "JOB_CHAIN": 1, "NO_JOBS": 0, "UNSOLVABLE": 0, "TOO_BIG": 0, "BAD_CODE": 0, "STORE_FULL": 0,
+	"PAD_NARROW": 1, "PAD_COUNT": 1, "PAD_NUMBERS": 0, "JOB_PADS": 1, "JOB_EXIT": 0, "JOB_CHAIN": 1, "PAD_SPLIT": 1, "NO_JOBS": 0, "UNSOLVABLE": 0, "TOO_BIG": 0, "BAD_CODE": 0, "STORE_FULL": 0,
 	"WRITE": 0, "INVALID": 0, "NOT_FOUND": 0}
 const WARNING_CODES := {"NO_SHELTER": 1, "BOT_FAIL": 0}
 
@@ -315,6 +315,9 @@ static func clean(raw: Variant) -> Dictionary:
 	var jobs := _clean_jobs(src.get("jobs"), res)
 	if not res.errors.is_empty():
 		return res
+	var job_seed := _int(src.get("job_seed"), 0, 99999, 0)
+	if jobs.is_empty() and job_seed > 0:
+		lvl["job_seed"] = job_seed                  # Würfelzahl der automatischen Aufträge (nur ohne eigene Aufträge)
 	res["meta"] = {"author": clean_text(meta_in.get("author"), MAX_AUTHOR), "license": clean_text(meta_in.get("license"), 40),
 		"created": _date(meta_in.get("created")), "derived_from": _slug(meta_in.get("derived_from")), "game": clean_text(meta_in.get("game"), 12)}
 	if res.meta.license == "":
@@ -349,6 +352,16 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 	var er := base.exit_rect()
 	if not (er.size.x > 0 and absf(er.get_center().x - base.width * Tuning.TILE * 0.5) < 1.0 and er.position.y <= Tuning.TILE * 2.0):
 		_err(res, "EXIT_PLACE")
+	var runs := {}                                # dieselbe Pad-Ziffer an zwei getrennten Stellen ergäbe nur ein Pad: abweisen
+	for r in lvl.map:
+		var row: String = r
+		for x in row.length():
+			var c := row[x]
+			if "123456789".contains(c) and (x == 0 or row[x - 1] != c):
+				runs[c] = int(runs.get(c, 0)) + 1
+	for c in runs:
+		if int(runs[c]) > 1:
+			_err(res, "PAD_SPLIT", [c])
 	var ids: Array = []
 	for id in base.pads:
 		var p: Dictionary = base.pads[id]
@@ -371,7 +384,7 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 	var jobs := jobs_in
 	if jobs.is_empty():
 		var rng := RandomNumberGenerator.new()
-		rng.seed = String(lvl.id).hash()
+		rng.seed = String(lvl.id).hash() + int(lvl.get("job_seed", 0)) * 7919
 		jobs = Run.shift_jobs(base, 3, rng)
 	else:
 		var start_pad := ""                       # Pad unter dem Start: dort darf kein Fahrgast auf das Taxi warten (wie bei den Originalen)
@@ -407,6 +420,7 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 			o["fragile"] = true
 		out.append(o)
 	lvl["jobs"] = out
+	lvl.erase("job_seed")                         # die Aufträge stehen jetzt fest in der Datei
 	var final := LevelData.from_dict(lvl)
 	if not bool(LevelMetrics.analyze(final).get("solvable", false)):
 		_err(res, "UNSOLVABLE")
