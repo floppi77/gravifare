@@ -10,10 +10,16 @@ exports/
 .env
 *.log
 __pycache__/
+*.pyc
+.DS_Store
+# Werkzeug-Ressourcen (Referenzaufnahmen u. a.): vom Editor angelegte Importdateien gehören nicht ins Repo
+tools/**/*.import
 .venv/
 scratch/
 # Editor-Anbindung (Godot AI): nur lokal, nie im Spiel
 addons/godot_ai/
+# Lokale Claude-Code-Konfiguration
+.claude/
 # Interne Arbeitsanweisungen (nur lokal)
 /auftrag.md
 /docs/AGENTENPROMPT_PARALLEL.md
