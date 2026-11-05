@@ -231,7 +231,7 @@ static func _clean_zones(v: Variant, res: Dictionary) -> Array:
 			z["cx"] = _num(d.get("cx"), -8.0, 64.0, 0.0)
 			z["cy"] = _num(d.get("cy"), -8.0, 64.0, 0.0)
 			z["r"] = _num(d.get("r"), 0.5, 20.0, 4.0)
-			z["k"] = _num(d.get("k"), -8.0, 8.0, 0.0)
+			z["k"] = _num(d.get("k"), -400.0, 400.0, 0.0)
 			if _bool(d.get("cycle")):
 				z["cycle"] = true
 		else:

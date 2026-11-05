@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3101,6 +3101,28 @@ func _test_community_originals_and_bot() -> void:
 			if not res.ok:
 				failed.append("%s: %s" % [f.get_basename(), str(_cl_codes(res))])
 	check(failed.is_empty(), "Community: alle 99 Originale lassen sich als Community-Level kopieren und bestehen die Prüfung %s" % str(failed))
+	# Zahlenwerte der Hindernisse und Zonen bleiben beim Kopieren erhalten (Begrenzungen dürfen echte Level nicht verändern)
+	var drift: Array = []
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var orig := _read_json("res://data/levels/" + f)
+		var cp := CL.clean(_cl_wrap(f.get_basename()))
+		if not cp.ok:
+			continue
+		for kind in ["movers", "zones"]:
+			var a: Array = orig.get(kind, [])
+			var b: Array = cp.level.get(kind, [])
+			if a.size() != b.size():
+				drift.append("%s %s: Anzahl" % [f, kind])
+				continue
+			for i in a.size():
+				for key in a[i]:
+					var ov = a[i][key]
+					if (typeof(ov) == TYPE_INT or typeof(ov) == TYPE_FLOAT) and key != "kind":
+						if not b[i].has(key) or absf(float(b[i][key]) - float(ov)) > 0.011:
+							drift.append("%s %s[%d].%s %s→%s" % [f, kind, i, key, str(ov), str(b[i].get(key))])
+	check(drift.is_empty(), "Community: Zahlenwerte von Hindernissen und Zonen bleiben beim Kopieren unverändert %s" % str(drift.slice(0, 6)))
 	var ex := CL.parse_text(FileAccess.get_file_as_string("res://docs/community/zwergenhafen.gflevel"))
 	check(ex.ok and ex.warnings.is_empty() and CL.bot_check(ex).get("complete", false), "Community: das Beispiellevel in docs/community ist gültig und für den Autopiloten lösbar")
 	var res := CL.clean(_cl_wrap("s1_01"))
@@ -3225,7 +3247,7 @@ func _test_level_edit_roundtrip() -> void:
 	var e8: Dictionary = m8.validate()
 	check(float(e8.level.get("dark", 0.0)) == float(r8.level.dark) and e8.level.movers.size() == r8.level.movers.size() and e8.level.zones.size() == r8.level.zones.size(),
 		"Editor: Bearbeiten der Karte behält Dunkelheit, Hindernisse und Zonen")
-	check(moved and LE.PALETTE.size() == 17 and LE.PALETTE.all(func(p): return String(p[0]).length() == 1), "Editor: Palette hat 17 Einträge mit je einem Kartenzeichen")
+	check(moved and LE.PALETTE.size() == 22 and LE.PALETTE.all(func(p): return String(p[0]).length() == 1), "Editor: Palette hat 22 Einträge mit je einem Kartenzeichen")
 	var de := _read_json("res://data/i18n/de.json")
 	var en := _read_json("res://data/i18n/en.json")
 	var missing: Array = []
@@ -3233,6 +3255,18 @@ func _test_level_edit_roundtrip() -> void:
 		if String(de.get(p[1], "")) == "" or String(en.get(p[1], "")) == "":
 			missing.append(p[1])
 	check(missing.is_empty(), "Editor: alle Palettentexte sind in beiden Sprachen vorhanden %s" % str(missing))
+	var miss2: Array = []
+	var keys: Array = []
+	for k in LE.KINDS:
+		keys.append("ED_K_" + k)
+	keys.append("ED_K_door")
+	for kind in LE.PARAMS:
+		for p in LE.PARAMS[kind]:
+			keys.append(p[4])
+	for k in keys:
+		if String(de.get(k, "")) == "" or String(en.get(k, "")) == "":
+			miss2.append(k)
+	check(miss2.is_empty() and LE.DEFAULTS.size() == LE.KINDS.size(), "Editor: Arten- und Parametertexte sind in beiden Sprachen vorhanden %s" % str(miss2))
 
 func _test_level_editor_screen() -> void:
 	var tr_de := Translation.new()          # Übersetzungen wie Loc sie anlegt (der Autoload ist im Testlauf noch nicht gestartet)
@@ -3279,6 +3313,37 @@ func _test_level_editor_screen() -> void:
 	ed._end_stroke()
 	var id2: String = ed._save(false)
 	check(id2 != id and CS.exists(id2) and not CS.exists(id) and CS.list().size() == 1, "Editor-Bildschirm: erneutes Speichern ersetzt die Fassung dieser Sitzung")
+	# Objekt- und Auftragsseite
+	ed._set_page(1)
+	ed.cursor = Vector2i(10, 6)
+	ed._obj_add()
+	check(ed.model.movers.size() == 1 and ed.model.valid_ref(ed.obj_ref) and ed.param_vals.has("period"), "Editor-Bildschirm: Objekt hinzufügen zeigt seine Parameter")
+	ed._param_step("period", 1)
+	check(absf(ed.model.get_param(ed.obj_ref, "period") - 8.5) < 0.01 and ed.param_vals["period"].text == "8.5", "Editor-Bildschirm: Parameter ändern (%s)" % ed.param_vals["period"].text)
+	ed._begin(false, Vector2i(10, 6))
+	ed._move_stroke(Vector2i(12, 7))
+	ed._end_stroke()
+	check(ed.model.get_param(ed.obj_ref, "x") == 12.0 and ed.model.get_param(ed.obj_ref, "y") == 7.0, "Editor-Bildschirm: Ziehen verschiebt das Objekt")
+	ed._begin(true, Vector2i(12, 7))
+	check(ed.model.movers.is_empty() and not ed.model.valid_ref(ed.obj_ref), "Editor-Bildschirm: Löschen entfernt das Objekt unter dem Zeiger")
+	ed._undo_redo(true)
+	check(ed.model.movers.size() == 1, "Editor-Bildschirm: Rückgängig bringt das Objekt zurück")
+	ed._obj_step(1)
+	for k in LevelEdit_KINDS():
+		ed._kind_step(1)
+		ed._obj_add()
+	check(ed.model.movers.size() + ed.model.zones.size() == 11, "Editor-Bildschirm: alle Arten lassen sich über die Oberfläche hinzufügen")
+	ed._set_page(2)
+	ed._job_mode()
+	check(not ed.model.jobs.is_empty() and ed.job_box.get_child_count() >= ed.model.jobs.size() * 6, "Editor-Bildschirm: Auftragsliste wird eigene Aufträge")
+	var jn: int = ed.model.jobs.size()
+	ed._job_insert(0)
+	check(ed.model.jobs.size() == jn + 1, "Editor-Bildschirm: Auftrag einfügen")
+	ed._job_remove(0)
+	check(ed.model.jobs.size() == jn, "Editor-Bildschirm: Auftrag entfernen")
+	ed._job_mode()
+	check(ed.model.jobs.is_empty(), "Editor-Bildschirm: zurück zu automatischen Aufträgen")
+	ed._set_page(0)
 	# Bearbeiten einer Kopie: das geöffnete Level bleibt unverändert
 	var ed2: Control = load("res://src/ui/level_editor.gd").new()
 	ed2.back = func(): pass
@@ -3312,6 +3377,9 @@ func _test_level_editor_screen() -> void:
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tr_de)
 
+func LevelEdit_KINDS() -> Array:
+	return LE.KINDS
+
 func CommunityLevelIsId(id: String) -> bool:
 	return CL.is_valid_id(id)
 
@@ -3321,3 +3389,105 @@ func _test_editor_flow_hooks() -> void:
 	var sel := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
 	check(flow.contains("var return_to_editor") and flow.contains("\"editor:\" + return_to_editor") and flow.contains("if not community:\n\t\treturn_to_editor = \"\""), "Editor: Rückkehr aus dem Testflug in den Editor ist verdrahtet (Quelltextprüfung)")
 	check(menu.contains("Flow.menu_screen.begins_with(\"editor:\")") and menu.contains("func show_editor") and sel.contains("edit.call(\"\")"), "Editor: Hauptmenü und Community-Liste öffnen den Editor (Quelltextprüfung)")
+
+func _test_level_edit_objects() -> void:
+	var m = LE.blank()
+	# Hindernisse und Zonen hinzufügen, prüfen, ändern, entfernen
+	var deb: Dictionary = m.add_object("debris", 10, 8)
+	check(m.valid_ref(deb) and m.obj_kind(deb) == "debris" and m.movers.size() == 1 and m.dirty, "Objekte: Trümmer hinzufügen")
+	check(m.validate().ok, "Objekte: das Level bleibt mit Trümmern gültig (%s)" % str(m.validate().errors))
+	m.set_param(deb, "period", 3.14)
+	check(absf(m.get_param(deb, "period") - 3.14) < 0.001, "Objekte: Parameter setzen (Takt)")
+	m.set_param(deb, "period", 9999.0)
+	check(m.get_param(deb, "period") == 120.0, "Objekte: Parameter werden auf den Bereich begrenzt")
+	m.set_param(deb, "shape", 1.0)
+	check(m.movers[0].shape == "circle" and m.get_param(deb, "shape") == 1.0, "Objekte: Schalter Kreisbahn")
+	m.nudge_param(deb, "x", 1)
+	check(m.get_param(deb, "x") == 11.0, "Objekte: Parameter schrittweise ändern")
+	check(m.move_object(deb, 2, -1) and m.get_param(deb, "x") == 13.0 and m.get_param(deb, "y") == 7.0, "Objekte: Verschieben")
+	var kinds_ok := true
+	for k in LE.KINDS:
+		var r: Dictionary = m.add_object(k, 20, 6)
+		kinds_ok = kinds_ok and m.valid_ref(r) and m.obj_kind(r) == k and not m.obj_params(r).is_empty()
+	check(kinds_ok and m.movers.size() == 7 and m.zones.size() == 4, "Objekte: alle zehn Arten lassen sich hinzufügen")
+	var vr: Dictionary = m.validate()
+	check(vr.ok or vr.errors.size() > 0, "Objekte: Prüfung mit allen Arten läuft durch")
+	# jedes Objekt: Parameter durchprobieren, danach muss das Level prüfbar bleiben
+	for ref in m.objects():
+		for p in m.obj_params(ref):
+			m.nudge_param(ref, p[0], 1)
+			m.nudge_param(ref, p[0], -1)
+	check(m.validate().errors.all(func(e): return e.code == "UNSOLVABLE" or e.code.begins_with("JOB_") or e.code == "PAD_COUNT" or e.code == "PAD_NUMBERS" or e.code == "PAD_SPLIT"), "Objekte: Parameter ändern erzeugt keine Formatfehler")
+	var cnt: int = m.objects().size()
+	m.remove_object(deb)
+	check(m.objects().size() == cnt - 1 and not m.valid_ref(m.objects()[-1]) == false, "Objekte: Entfernen")
+	check(m.undo() and m.objects().size() == cnt, "Objekte: Rückgängig bringt das Objekt zurück")
+	# Auswahl
+	var m2 = LE.blank()
+	var z: Dictionary = m2.add_object("heat", 12, 6)
+	var b: Dictionary = m2.add_object("beam", 30, 5)
+	check(m2.same_ref(m2.pick_object(13, 7), z) and m2.same_ref(m2.pick_object(30, 8), b) and m2.pick_object(2, 2).is_empty(), "Objekte: Auswahl per Feld")
+	# Tore
+	var m3 = LE.blank()
+	m3.set_cell(8, 10, "a")
+	m3.set_cell(8, 11, "a")
+	var dref := {"t": "door", "k": "a"}
+	check(m3.door_letters() == ["a"] and m3.objects().size() == 1 and m3.obj_kind(dref) == "door" and m3.same_ref(m3.pick_object(8, 11), dref), "Objekte: Tore erscheinen als Objekte")
+	m3.set_param(dref, "period", 6.0)
+	m3.set_param(dref, "open", 20.0)
+	check(m3.doors["a"].period == 6.0 and m3.doors["a"].open == 6.0, "Objekte: Tor-Öffnungszeit bleibt im Takt")
+	m3.set_param(dref, "sweep", 5.0)
+	check(m3.doors["a"].has("sweep") and m3.doors["a"].has("gap"), "Objekte: Wandertor setzt Öffnung")
+	m3.set_param(dref, "sweep", 0.0)
+	check(not m3.doors["a"].has("sweep") and not m3.doors["a"].has("gap"), "Objekte: Wandertor ausschalten")
+	m3.remove_object(dref)
+	check(m3.door_letters().is_empty() and m3.cell(8, 10) == ".", "Objekte: Tor entfernen löscht die Felder")
+	# Zone pulsierend ein/aus
+	var m4 = LE.blank()
+	var w4: Dictionary = m4.add_object("wind", 10, 6)
+	check(m4.get_param(w4, "period") == 0.0 and not m4.zones[0].has("period"), "Objekte: Zone ist zunächst dauerhaft")
+	m4.nudge_param(w4, "period", 1)
+	check(m4.zones[0].has("period") and m4.zones[0].has("on"), "Objekte: Zone pulsierend schalten")
+	m4.set_param(w4, "period", 0.0)
+	check(not m4.zones[0].has("period"), "Objekte: Zone wieder dauerhaft")
+	# Grenzen
+	var m5 = LE.blank()
+	for i in CL.MAX_MOVERS + 3:
+		m5.add_object("beam", 5, 5)
+	check(m5.movers.size() == CL.MAX_MOVERS, "Objekte: höchstens %d Hindernisse" % CL.MAX_MOVERS)
+	# Fahrzeug ohne und mit Pfad, Rundlauf über die Prüfung
+	var m6 = LE.blank()
+	var v6: Dictionary = m6.add_object("vehicle", 3, 10)
+	check(m6.obj_params(v6).size() == 6 and m6.validate().ok, "Objekte: Fahrzeug als gerade Bahn")
+	# Magnet-Stärke wie in den Originalen
+	var m7 = LE.blank()
+	var mg: Dictionary = m7.add_object("magnet", 20, 10)
+	m7.set_param(mg, "k", -180.0)
+	check(m7.get_param(mg, "k") == -180.0 and m7.validate().level.zones[0].k == -180.0, "Objekte: Magnetstärke bis ±400")
+
+func _test_level_edit_jobs() -> void:
+	var m = LE.blank()
+	var v: Dictionary = m.validate()
+	var auto: Array = v.level.jobs
+	check(m.jobs.is_empty() and m.pad_digits() == ["1", "2", "3"] and m.start_pad() == "1", "Aufträge: automatisch, Pads 1–3, Start über Pad 1")
+	m.jobs_make_explicit(auto)
+	check(m.jobs.size() == auto.size() and m.validate().ok, "Aufträge: eigene Liste aus den automatischen")
+	var n: int = m.jobs.size()
+	check(m.job_insert(0) and m.jobs.size() == n + 1 and m.validate().ok, "Aufträge: Einfügen erzeugt einen regelkonformen Auftrag (%s)" % str(m.validate().errors))
+	var last: int = m.jobs.size() - 1
+	check(not m.job_insert(last) or String(m.jobs[m.jobs.size() - 1].to) == "exit", "Aufträge: der Ausgangs-Auftrag bleibt der letzte")
+	m.job_cycle(0, "to", 1)
+	check(m.jobs[0].to != "exit" or m.jobs.size() == 1, "Aufträge: Ziel wechseln")
+	check(m.job_options(m.jobs.size() - 1, "to").has("exit") and not m.job_options(0, "to").has("exit"), "Aufträge: Ausgang nur im letzten Auftrag wählbar")
+	m.job_remove(m.jobs.size() - 1)
+	check(String(m.jobs[m.jobs.size() - 1].to) == "exit", "Aufträge: nach dem Entfernen des letzten führt der neue letzte zum Ausgang")
+	m.job_toggle_fragile(0)
+	check(m.jobs[0].get("fragile", false) == true, "Aufträge: zerbrechlich schalten")
+	check(m.undo() and not m.jobs[0].has("fragile"), "Aufträge: Rückgängig")
+	m.jobs_make_auto()
+	check(m.jobs.is_empty() and m.validate().ok, "Aufträge: zurück zu automatisch")
+	var m2 = LE.blank()
+	m2.rect(Vector2i(20, 6), Vector2i(23, 6), "H")
+	m2.jobs_make_explicit(auto)
+	m2.job_toggle_fragile(0)
+	check(m2.job_options(0, "to").has("H"), "Aufträge: zerbrechliche Fahrgäste dürfen zur Klinik")

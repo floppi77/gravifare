@@ -49,7 +49,8 @@ func show_main(focus_lang := "") -> void:
 		in_sub = true
 		box.add_child(MenuKit.options_panel(show_main, _reopen_options))
 		_focus_first()))
-	box.add_child(MenuKit.button(tr("MENU_TO_MENU"), func(): Flow.to_menu()))
+	var to_menu_text := tr("MENU_TO_EDITOR") if Flow.community and Flow.return_to_editor != "" else (tr("MENU_TO_COMMUNITY") if Flow.community else tr("MENU_TO_MENU"))
+	box.add_child(MenuKit.button(to_menu_text, func(): Flow.to_menu()))     # Community-Level: es geht in den Editor bzw. die Liste, nicht ins Hauptmenü
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
 	box.add_child(gap)

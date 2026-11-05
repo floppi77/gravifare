@@ -1,7 +1,7 @@
 extends Control
 ## Level-Editor für Community-Level: Karte malen (Fels, Luft, Pads, Tank, Leben, Klinik, Dornen, Pumpe, Start) mit Stift, Rechteck und Füllen, live geprüft und mit
 ## der echten Spielansicht als Vorschau. Bedienung: Maus (links malen, rechts löschen, Rad = Auswahl), Tastatur (Pfeile/WASD bewegen, Leertaste malen, X löschen)
-## und Controller (Stick/Steuerkreuz bewegen, A malen, X löschen, LB/RB Auswahl). Esc/B öffnet bzw. schließt die Bedienfelder (Menü), alles dort ist per
+## und Controller (Stick/Steuerkreuz bewegen, A malen, B löschen, LB/RB Auswahl). Esc bzw. X (Controller) öffnet und schließt die Bedienfelder (Menü), alles dort ist per
 ## Fokus erreichbar. Das geöffnete Level bleibt unverändert: gespeichert wird eine eigene Fassung (die der letzten Speicherung dieser Sitzung ersetzt wird).
 
 const CommunityLevel := preload("res://src/core/community_level.gd")
@@ -42,7 +42,19 @@ var bottom: Control
 var title: Label
 var status: Label
 var hint: Label
-var jobs_label: Label
+var page := 0                               # 0 Karte, 1 Objekte, 2 Level
+var pages: Array = []
+var page_btns: Array = []
+var obj_ref: Dictionary = {}                # gewähltes Objekt (Verweis des Modells)
+var kind_idx := 0
+var kind_label: Label
+var obj_label: Label
+var param_box: Control
+var param_vals: Dictionary = {}
+var job_box: Control
+var job_mode_btn: Button
+var drag_last := Vector2i(-1, -1)
+var _regrab := ""                           # Meta-Schlüssel des Knopfs, der nach dem Neuaufbau einer Liste wieder den Fokus bekommt
 var name_edit: LineEdit
 var author_edit: LineEdit
 var tool_btns: Array = []
@@ -96,6 +108,7 @@ func _ready() -> void:
 	_build_bottom()
 	_select_pal(0)
 	_select_tool(TOOL_PEN)
+	_set_page(0)
 	_sync_fields()
 	_revalidate()
 	_refresh_preview()
@@ -167,26 +180,60 @@ func _build_panel() -> void:
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	var x0 := 492.0
+	var page_names := [tr("ED_PAGE_MAP"), tr("ED_PAGE_OBJ"), tr("ED_PAGE_LVL")]
 	for i in 3:
-		var names := [tr("ED_TOOL_PEN"), tr("ED_TOOL_RECT"), tr("ED_TOOL_FILL")]
-		tool_btns.append(_button(names[i], _select_tool.bind(i), Vector2(x0 + i * 48.0, 18), Vector2(45, 17), panel, 6))
+		page_btns.append(_button(page_names[i], _set_page.bind(i), Vector2(x0 + i * 48.0, 18), Vector2(45, 17), panel, 7))
+		var pg := Control.new()
+		pg.position = Vector2(x0, 40)
+		pg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(pg)
+		pages.append(pg)
+	_build_page_map(pages[0])
+	_build_page_objects(pages[1])
+	_build_page_level(pages[2])
+
+func _build_page_map(pg: Control) -> void:
+	var names := [tr("ED_TOOL_PEN"), tr("ED_TOOL_RECT"), tr("ED_TOOL_FILL")]
+	for i in 3:
+		tool_btns.append(_button(names[i], _select_tool.bind(i), Vector2(i * 48.0, 0), Vector2(45, 17), pg, 6))
 	for i in LevelEdit.PALETTE.size():
 		var e: Array = LevelEdit.PALETTE[i]
-		var label: String = e[0] if LevelEdit.PAD_CHARS.contains(e[0]) else tr(e[1])
-		var b := _button(label, _select_pal.bind(i), Vector2(x0 + (i % 3) * 48.0, 40.0 + (i / 3) * 20.0), Vector2(45, 17), panel, 7)
-		pal_btns.append(b)
-	look_label = _label("", Vector2(x0 + 22, 166), Vector2(100, 14), panel)
-	_button("<", _change_look.bind(-1), Vector2(x0, 164), Vector2(20, 17), panel)
-	_button(">", _change_look.bind(1), Vector2(x0 + 124, 164), Vector2(20, 17), panel)
-	dark_label = _label("", Vector2(x0 + 22, 186), Vector2(100, 14), panel)
-	_button("<", _change_dark.bind(-1), Vector2(x0, 184), Vector2(20, 17), panel)
-	_button(">", _change_dark.bind(1), Vector2(x0 + 124, 184), Vector2(20, 17), panel)
-	_button(tr("ED_RENUMBER"), _renumber, Vector2(x0, 204), Vector2(144, 17), panel, 7)
-	_button(tr("ED_REROLL"), _reroll, Vector2(x0, 224), Vector2(144, 17), panel, 7)
-	jobs_label = _label("", Vector2(x0, 244), Vector2(144, 38), panel)
-	jobs_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	jobs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	jobs_label.add_theme_font_size_override("font_size", 7)
+		var label: String = e[0] if LevelEdit.PAD_CHARS.contains(e[0]) else tr(e[1]) + (" " + String(e[0]) if LevelEdit.DOOR_CHARS.contains(e[0]) else "")
+		pal_btns.append(_button(label, _select_pal.bind(i), Vector2((i % 3) * 48.0, 22.0 + (i / 3) * 20.0), Vector2(45, 17), pg, 7))
+	_button(tr("ED_RENUMBER"), _renumber, Vector2(0, 186), Vector2(144, 17), pg, 7)
+
+func _build_page_objects(pg: Control) -> void:
+	_button("<", _kind_step.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
+	kind_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
+	_button(">", _kind_step.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
+	_button(tr("ED_O_ADD"), _obj_add, Vector2(0, 20), Vector2(70, 17), pg, 7)
+	_button(tr("ED_O_DEL"), _obj_remove, Vector2(74, 20), Vector2(70, 17), pg, 7)
+	_button("<", _obj_step.bind(-1), Vector2(0, 42), Vector2(20, 17), pg)
+	obj_label = _label("", Vector2(22, 44), Vector2(100, 14), pg)
+	_button(">", _obj_step.bind(1), Vector2(124, 42), Vector2(20, 17), pg)
+	param_box = Control.new()
+	param_box.position = Vector2(0, 64)
+	param_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pg.add_child(param_box)
+	var h := _label(tr("ED_O_HINT"), Vector2(0, 218), Vector2(144, 24), pg)
+	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	h.add_theme_font_size_override("font_size", 7)
+	h.add_theme_color_override("font_color", Color("#9aa6dd"))
+	_kind_step(0)
+
+func _build_page_level(pg: Control) -> void:
+	look_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
+	_button("<", _change_look.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
+	_button(">", _change_look.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
+	dark_label = _label("", Vector2(22, 22), Vector2(100, 14), pg)
+	_button("<", _change_dark.bind(-1), Vector2(0, 20), Vector2(20, 17), pg)
+	_button(">", _change_dark.bind(1), Vector2(124, 20), Vector2(20, 17), pg)
+	_button(tr("ED_REROLL"), _reroll, Vector2(0, 40), Vector2(70, 17), pg, 7)
+	job_mode_btn = _button("", _job_mode, Vector2(74, 40), Vector2(70, 17), pg, 7)
+	job_box = Control.new()
+	job_box.position = Vector2(0, 62)
+	job_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pg.add_child(job_box)
 
 func _label(text: String, pos: Vector2, sz: Vector2, parent: Control) -> Label:
 	var l := Label.new()
@@ -284,7 +331,10 @@ func _select_pal(i: int) -> void:
 	overlay.queue_redraw()
 
 func _cycle_pal(step: int) -> void:
-	_select_pal(pal + step)
+	if page == 1:
+		_obj_step(step)                      # auf der Objektseite wählen LB/RB, Q/E und das Mausrad das Objekt
+	elif page == 0:
+		_select_pal(pal + step)
 
 func _change_look(step: int) -> void:
 	model.sector = wrapi(model.sector - 1 + step, 0, 9) + 1
@@ -328,7 +378,201 @@ func _say(t: String) -> void:
 	status.add_theme_color_override("font_color", Color("#ffe14a"))
 
 func _update_hint() -> void:
-	hint.text = tr("ED_HINT_PAD") if gamepad_hint else tr("ED_HINT_KEYS")
+	if page == 1:
+		hint.text = tr("ED_HINT_OBJ_PAD") if gamepad_hint else tr("ED_HINT_OBJ_KEYS")
+	elif page == 2:
+		hint.text = tr("ED_HINT_LVL")
+	else:
+		hint.text = tr("ED_HINT_PAD") if gamepad_hint else tr("ED_HINT_KEYS")
+
+# ---------------------------------------------------------------------------------------------------------------- Seiten, Objekte, Aufträge
+
+func _set_page(i: int) -> void:
+	if active:
+		return
+	page = clampi(i, 0, 2)
+	for k in pages.size():
+		pages[k].visible = k == page
+		page_btns[k].modulate = Color(1.3, 1.25, 0.8) if k == page else Color.WHITE
+	if page == 1:
+		if not model.valid_ref(obj_ref):
+			var objs: Array = model.objects()
+			obj_ref = objs[0] if not objs.is_empty() else {}
+		_rebuild_params()
+	elif page == 2:
+		_rebuild_jobs()
+	_update_hint()
+	overlay.queue_redraw()
+
+func _kind_step(step: int) -> void:
+	kind_idx = wrapi(kind_idx + step, 0, LevelEdit.KINDS.size())
+	kind_label.text = tr("ED_O_KIND") % tr("ED_K_" + String(LevelEdit.KINDS[kind_idx]))
+
+func _obj_add() -> void:
+	var ref: Dictionary = model.add_object(LevelEdit.KINDS[kind_idx], cursor.x, cursor.y)
+	if ref.is_empty():
+		_say(tr("ED_O_LIMIT"))
+		return
+	_select_obj(ref)
+	_changed()
+
+func _obj_remove_at(ref: Dictionary) -> void:
+	if not model.valid_ref(ref):
+		return
+	model.remove_object(ref)
+	if model.same_ref(ref, obj_ref) or not model.valid_ref(obj_ref):
+		var objs: Array = model.objects()
+		_select_obj(objs[mini(maxi(int(ref.get("i", 0)) - 1, 0), objs.size() - 1)] if not objs.is_empty() and ref.get("t") != "door" else ({} if objs.is_empty() else objs[0]))
+	_changed()
+
+func _obj_remove() -> void:
+	_obj_remove_at(obj_ref)
+
+func _obj_step(step: int) -> void:
+	var objs: Array = model.objects()
+	if objs.is_empty():
+		_select_obj({})
+		return
+	var cur := -1
+	for i in objs.size():
+		if model.same_ref(objs[i], obj_ref):
+			cur = i
+	_select_obj(objs[wrapi(cur + step, 0, objs.size())])
+
+func _select_obj(ref: Dictionary) -> void:
+	obj_ref = ref
+	_rebuild_params()
+	overlay.queue_redraw()
+
+func _param_text(key: String) -> String:
+	var v: float = model.get_param(obj_ref, key)
+	var spec: Array = model.param_spec(obj_ref, key)
+	if key in ["shape", "spikes", "cycle", "glass"]:
+		return tr("ED_ON") if v >= 0.5 else tr("ED_OFF")
+	if key == "period" and obj_ref.get("t") == "zone" and v <= 0.0:
+		return tr("ED_STEADY")
+	if key == "sweep" and v <= 0.0:
+		return tr("ED_OFF")
+	if not spec.is_empty() and float(spec[3]) < 1.0:
+		return "%.2f" % v if float(spec[3]) < 0.1 else "%.1f" % v
+	return "%d" % int(round(v))
+
+func _rebuild_params() -> void:
+	for c in param_box.get_children():
+		param_box.remove_child(c)
+		c.queue_free()
+	param_vals.clear()
+	if not model.valid_ref(obj_ref):
+		obj_label.text = tr("ED_O_NONE")
+		return
+	var objs: Array = model.objects()
+	var idx := 0
+	for i in objs.size():
+		if model.same_ref(objs[i], obj_ref):
+			idx = i + 1
+	var kind: String = model.obj_kind(obj_ref)
+	obj_label.text = tr("ED_O_SEL") % [idx, objs.size(), tr("ED_K_" + kind) + (" " + String(obj_ref.k) if obj_ref.t == "door" else "")]
+	var row := 0
+	for p in model.obj_params(obj_ref):
+		var y := row * 15.0
+		var l := _label(tr(String(p[4])), Vector2(0, y), Vector2(62, 14), param_box)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		l.add_theme_font_size_override("font_size", 7)
+		var key: String = p[0]
+		var b1 := _button("<", _param_step.bind(key, -1), Vector2(64, y), Vector2(16, 14), param_box, 7)
+		b1.set_meta("key", "p:%s:-" % key)
+		var val := _label(_param_text(key), Vector2(82, y), Vector2(44, 14), param_box)
+		val.add_theme_font_size_override("font_size", 7)
+		var b2 := _button(">", _param_step.bind(key, 1), Vector2(128, y), Vector2(16, 14), param_box, 7)
+		b2.set_meta("key", "p:%s:+" % key)
+		param_vals[key] = val
+		row += 1
+	_focus_regrab()
+
+func _param_step(key: String, direction: int) -> void:
+	if not model.valid_ref(obj_ref):
+		return
+	model.nudge_param(obj_ref, key, direction)
+	for k in param_vals:
+		param_vals[k].text = _param_text(k)
+	_changed()
+
+## Nach dem Neuaufbau einer Liste (Parameter, Aufträge) bekommt der zuletzt bediente Knopf den Fokus zurück, damit Controller und Tastatur nicht aus den Bedienfeldern fallen.
+func _focus_regrab_key(key: String) -> void:
+	_regrab = key
+	_focus_regrab()
+
+func _focus_regrab() -> void:
+	if _regrab == "" or not is_inside_tree():
+		return
+	var key := _regrab
+	_regrab = ""
+	for root in [param_box, job_box]:
+		for c in root.find_children("*", "Button", true, false):
+			if String(c.get_meta("key", "")) == key and not (c as Button).disabled:
+				c.grab_focus.call_deferred()
+				return
+
+func _job_mode() -> void:
+	if model.jobs.is_empty():
+		model.jobs_make_explicit(last_jobs)
+	else:
+		model.jobs_make_auto()
+	_changed()
+	_revalidate()
+
+func _job_cycle(i: int, key: String) -> void:
+	model.job_cycle(i, key, 1)
+	_job_changed("j:%d:%s" % [i, key])
+
+func _job_fragile(i: int) -> void:
+	model.job_toggle_fragile(i)
+	_job_changed("j:%d:f" % i)
+
+func _job_insert(i: int) -> void:
+	if not model.job_insert(i):
+		_say(tr("ED_J_LIMIT"))
+		return
+	_job_changed("j:%d:i" % i)
+
+func _job_remove(i: int) -> void:
+	model.job_remove(i)
+	_job_changed("j:%d:d" % maxi(i - 1, 0))
+
+func _job_changed(key: String) -> void:
+	_regrab = key
+	_changed()
+	_revalidate()
+
+func _rebuild_jobs() -> void:
+	for c in job_box.get_children():
+		job_box.remove_child(c)
+		c.queue_free()
+	var own: bool = not model.jobs.is_empty()
+	job_mode_btn.text = tr("ED_J_AUTO") if own else tr("ED_J_CUSTOM")
+	var list: Array = model.jobs if own else last_jobs
+	for i in list.size():
+		var j: Dictionary = list[i]
+		var y := i * 15.0
+		var n := _label(str(i + 1), Vector2(0, y), Vector2(10, 14), job_box)
+		n.add_theme_font_size_override("font_size", 7)
+		var to_text: String = tr("ED_EXIT_SHORT") if String(j.to) == "exit" else String(j.to)
+		var bf := _button(String(j.from), _job_cycle.bind(i, "from"), Vector2(11, y), Vector2(24, 14), job_box, 7)
+		var arrow := _label("→", Vector2(36, y), Vector2(10, 14), job_box)
+		arrow.add_theme_font_size_override("font_size", 7)
+		var bt := _button(to_text, _job_cycle.bind(i, "to"), Vector2(47, y), Vector2(32, 14), job_box, 7)
+		var bz := _button("Z" if j.get("fragile", false) == true else "·", _job_fragile.bind(i), Vector2(80, y), Vector2(18, 14), job_box, 7)
+		var bi := _button("+", _job_insert.bind(i), Vector2(100, y), Vector2(18, 14), job_box, 7)
+		var bd := _button("×", _job_remove.bind(i), Vector2(120, y), Vector2(18, 14), job_box, 7)
+		bf.set_meta("key", "j:%d:from" % i)
+		bt.set_meta("key", "j:%d:to" % i)
+		bz.set_meta("key", "j:%d:f" % i)
+		bi.set_meta("key", "j:%d:i" % i)
+		bd.set_meta("key", "j:%d:d" % i)
+		if not own:
+			for b in [bf, bt, bz, bi, bd]:
+				b.disabled = true
+	_focus_regrab()
 
 # ---------------------------------------------------------------------------------------------------------------- Zeichnen
 
@@ -339,6 +583,11 @@ func _begin(erase: bool, at: Vector2i) -> void:
 	if active:
 		return
 	leave_armed = false
+	if page == 2:
+		return
+	if page == 1:
+		_begin_object(erase, at)
+		return
 	active = true
 	stroke_erase = erase
 	var ch := _tile_char(erase)
@@ -357,8 +606,28 @@ func _begin(erase: bool, at: Vector2i) -> void:
 		_changed()
 	_changed_soft()
 
+func _begin_object(erase: bool, at: Vector2i) -> void:
+	if erase:
+		_obj_remove_at(model.pick_object(at.x, at.y))                   # Löschen entfernt das Objekt unter dem Zeiger
+		return
+	var ref: Dictionary = model.pick_object(at.x, at.y)
+	if not ref.is_empty() and not model.same_ref(ref, obj_ref):
+		_select_obj(ref)
+	if not ref.is_empty() and model.same_ref(ref, obj_ref) and obj_ref.t != "door":
+		active = true                                                  # Ziehen verschiebt das Objekt unter dem Zeiger (Tore sind Kartenfelder)
+		drag_last = at
+		model.begin_stroke()
+
 func _move_stroke(at: Vector2i) -> void:
 	if not active:
+		return
+	if page == 1:
+		var delta := at - drag_last
+		if delta != Vector2i.ZERO and model.move_object(obj_ref, delta.x, delta.y):
+			drag_last = at
+			for k in param_vals:
+				param_vals[k].text = _param_text(k)
+			_changed_soft()
 		return
 	if tool == TOOL_PEN:
 		if at != stroke_last:
@@ -373,6 +642,10 @@ func _end_stroke() -> void:
 	if not active:
 		return
 	active = false
+	if page == 1:
+		model.end_stroke()
+		_changed()
+		return
 	if tool == TOOL_PEN:
 		model.end_stroke()
 	elif tool == TOOL_RECT:
@@ -445,7 +718,21 @@ func _draw_overlay() -> void:
 			overlay.draw_line(Vector2(0, y * cs), Vector2(model.w * cs, y * cs), gc, 1.0)
 	if preview_mode:
 		return
-	if active and tool == TOOL_RECT and rect_start.x >= 0:
+	if page == 1:
+		for ref in model.objects():
+			var bnd: Rect2 = model.obj_bounds(ref)
+			if bnd.size == Vector2.ZERO:
+				continue
+			var sel: bool = model.same_ref(ref, obj_ref)
+			var rr := Rect2(bnd.position * cs, bnd.size * cs)
+			overlay.draw_rect(rr, Color(1, 0.9, 0.3, 0.16) if sel else Color(1, 1, 1, 0.05))
+			overlay.draw_rect(rr, Color("#ffe14a") if sel else Color(1, 1, 1, 0.35), false, 2.0 if sel else 1.0)
+			if ref.t != "door":
+				var d: Dictionary = model.movers[ref.i] if ref.t == "mover" else model.zones[ref.i]
+				if d.get("kind") == "vehicle" and d.has("path"):
+					for k in range(d.path.size() - 1):
+						overlay.draw_line(Vector2(d.path[k][0], d.path[k][1]) * cs, Vector2(d.path[k + 1][0], d.path[k + 1][1]) * cs, Color(0.5, 0.9, 1, 0.7), 1.0)
+	if active and page == 0 and tool == TOOL_RECT and rect_start.x >= 0:
 		var a := Vector2i(mini(rect_start.x, rect_cur.x), mini(rect_start.y, rect_cur.y))
 		var b := Vector2i(maxi(rect_start.x, rect_cur.x), maxi(rect_start.y, rect_cur.y))
 		overlay.draw_rect(Rect2(Vector2(a) * cs, Vector2(b - a + Vector2i.ONE) * cs), Color(1, 0.9, 0.3, 0.25))
@@ -465,7 +752,7 @@ func _refresh_preview() -> void:
 	var jobs: Array = model.jobs if not model.jobs.is_empty() else last_jobs
 	var valid := true
 	for j in jobs:
-		valid = valid and model.pad_used(String(j.get("from", ""))) and (String(j.get("to", "")) == "exit" or String(j.get("to", "")) == "H" or model.pad_used(String(j.get("to", ""))))
+		valid = valid and model.pad_digits().has(String(j.get("from", ""))) and (String(j.get("to", "")) == "exit" or String(j.get("to", "")) == "H" or model.pad_digits().has(String(j.get("to", ""))))
 	d["jobs"] = jobs if valid else []
 	d["id"] = "editor"
 	canvas.show_level(LevelData.from_dict(d))
@@ -485,19 +772,16 @@ func _revalidate() -> void:
 			txt += "\n" + CommunityLevel.describe(w, true)
 		status.text = txt
 		status.add_theme_color_override("font_color", Color("#5dff9a"))
-		var parts: Array = []
-		for j in res.level.jobs:
-			parts.append("%s→%s" % [j.from, tr("ED_EXIT") if j.to == "exit" else j.to])
-		jobs_label.text = tr("ED_JOBS") + " " + ", ".join(parts)
 	else:
 		var lines: Array = []
 		for e in res.errors.slice(0, 2):
 			lines.append(CommunityLevel.describe(e))
 		status.text = "\n".join(lines)
 		status.add_theme_color_override("font_color", Color("#ff8a7a"))
-		jobs_label.text = ""
 	if model.jobs_reset:
 		_refresh_preview()
+	if page == 2:
+		_rebuild_jobs()
 
 ## Speichert eine eigene Fassung. Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
 func _save(announce: bool) -> String:
@@ -550,9 +834,23 @@ func _set_preview(on: bool) -> void:
 
 # ---------------------------------------------------------------------------------------------------------------- Eingabe (Tastatur, Controller)
 
+func _toggle_menu() -> void:
+	if get_viewport().gui_get_focus_owner() != null:
+		get_viewport().gui_release_focus()
+		overlay.queue_redraw()
+	else:
+		_enter_menu()
+
 func _enter_menu() -> void:
 	btn_save.grab_focus()
 	overlay.queue_redraw()
+
+## Tab bzw. Y: auf der Kartenseite das nächste Werkzeug, auf der Objektseite ein neues Objekt der gewählten Art.
+func _primary_next() -> void:
+	if page == 0:
+		_select_tool((tool + 1) % 3)
+	elif page == 1:
+		_obj_add()
 
 ## Nach einem Mausklick auf einen Knopf behält er sonst den Fokus und die Tastatur/der Controller malen nicht mehr: Fokus gleich wieder abgeben.
 func _input(event: InputEvent) -> void:
@@ -564,7 +862,7 @@ func _input(event: InputEvent) -> void:
 			if event.is_action(a):
 				get_viewport().set_input_as_handled()
 				if event.is_action_pressed("ui_focus_next") and not event.is_echo():
-					_select_tool((tool + 1) % 3)
+					_primary_next()
 				return
 
 func _release_button_focus() -> void:
@@ -586,13 +884,20 @@ func _unhandled_input(event: InputEvent) -> void:
 			_set_preview(false)
 		return
 	var focus := get_viewport().gui_get_focus_owner()
+	if event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_X:
+		get_viewport().set_input_as_handled()                  # Controller: X öffnet und schließt die Bedienfelder (B löscht beim Zeichnen)
+		_toggle_menu()
+		return
 	if event.is_action_pressed("ui_cancel"):
-		get_viewport().set_input_as_handled()
 		if focus != null:
-			get_viewport().gui_release_focus()
+			get_viewport().set_input_as_handled()
+			get_viewport().gui_release_focus()                 # in den Bedienfeldern geht B (wie Esc) zurück zur Zeichenfläche
 			overlay.queue_redraw()
-		else:
+		elif event is InputEventKey:
+			get_viewport().set_input_as_handled()
 			_enter_menu()
+		else:
+			get_viewport().set_input_as_handled()              # B auf der Zeichenfläche löscht (siehe _process), es öffnet kein Menü
 		return
 	if focus != null:
 		return
@@ -615,7 +920,16 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_E, KEY_PAGEDOWN, KEY_BRACKETRIGHT:
 					_cycle_pal(1)
 				KEY_TAB:
-					_select_tool((tool + 1) % 3)
+					_primary_next()
+				KEY_N:
+					if page == 1:
+						_obj_add()
+				KEY_F1:
+					_set_page(0)
+				KEY_F2:
+					_set_page(1)
+				KEY_F3:
+					_set_page(2)
 				KEY_G:
 					grid_on = not grid_on
 					overlay.queue_redraw()
@@ -626,7 +940,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_P:
 					_eyedrop(cursor)
 				KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9:
-					_select_pal(2 + (event.keycode - KEY_1))
+					if page == 0:
+						_select_pal(2 + (event.keycode - KEY_1))
 				_:
 					handled = false
 		if handled:
@@ -639,7 +954,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			JOY_BUTTON_RIGHT_SHOULDER:
 				_cycle_pal(1)
 			JOY_BUTTON_Y:
-				_select_tool((tool + 1) % 3)
+				_primary_next()
 			JOY_BUTTON_START:
 				_test_flight()
 			JOY_BUTTON_BACK:
@@ -665,7 +980,14 @@ func _undo_redo(is_undo: bool) -> void:
 		return
 	if (model.undo() if is_undo else model.redo()):
 		model.dirty = true
+		if not model.valid_ref(obj_ref):
+			obj_ref = {}
+		if page == 1:
+			_rebuild_params()
 		_changed()
+		_sync_fields()
+		if page == 2:
+			_rebuild_jobs()
 
 func _pad_pressed(button: int) -> bool:
 	for dev in Input.get_connected_joypads():
@@ -710,7 +1032,7 @@ func _process(delta: float) -> void:
 			overlay.queue_redraw()
 	# Malen (Leertaste/Enter/A) und Löschen (X, Rücktaste, Entf)
 	var paint := (Input.is_action_pressed("ui_accept") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) and not Input.is_key_pressed(KEY_CTRL)
-	var erase := Input.is_key_pressed(KEY_X) or Input.is_key_pressed(KEY_BACKSPACE) or Input.is_key_pressed(KEY_DELETE) or _pad_pressed(JOY_BUTTON_X)
+	var erase := Input.is_key_pressed(KEY_X) or Input.is_key_pressed(KEY_BACKSPACE) or Input.is_key_pressed(KEY_DELETE) or _pad_pressed(JOY_BUTTON_B)
 	if not paint and not erase:
 		input_ready = true                                          # erst nach dem Loslassen: die Taste, die den Editor geöffnet hat, malt nichts
 	if paint and input_ready and not key_paint and not key_erase:
