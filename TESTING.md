@@ -10,6 +10,7 @@
 
 **Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
 
+- **Runde 43:** Editor mit einem Stift (Fahrzeugpfad: Rollen, Beenden, Abbrechen, Punkt ziehen/entfernen, Greifen nur an der Linie; Größe beim Setzen für Zone, Magnet, Meteorit, Plattform; Symbolpaletten; Doppelklick-Füllen; Controllerbelegung per Quelltextprüfung)
 - **Runde 41:** Editor Stufe 3 (Objekte: alle zehn Arten hinzufügen/ändern/verschieben/entfernen/auswählen, Tore und Zonen-Pulsieren, Grenzen, Magnetstärke; Aufträge: eigene Liste, Einfügen, Ziel wechseln, Klinik, Ausgang nur im letzten; Bildschirm: Seiten, Ziehen, Löschen unter dem Zeiger, Auftragsliste; Zahlenwerte aller Originale bleiben beim Kopieren erhalten)
 - **Runde 40:** Level-Editor (leeres Level gültig, festes Ausgangstor, Start versetzen, Rückgängig/Wiederholen mit Strichen, Rechteck/Füllen, Pads nummerieren, Aufträge passen sich an, Rundlauf von neun Originalen ohne Änderung, Bildschirm: Malen, Speichern, Sitzungsfassung ersetzen, Kopie beim Bearbeiten, Zurück mit Rückfrage), Hauptmenü (Hilfetexte, Flaggenspalte)
 - **Runde 39:** Community-Level (Format, Prüfung, Positivliste, Zahlenbegrenzung, ID-Hash und Pfadschutz, Code-Rundlauf, Ablage in `user://`, Kopie eines Originals ohne Änderung am Original, Spielmodus ohne Statistik und Feldzug, Fehlertexte vollständig, Fuzz mit beschädigten Leveln, alle 99 Originale als Kopie gültig, Probeflug, Bildschirm), Prüfsummen der Originale

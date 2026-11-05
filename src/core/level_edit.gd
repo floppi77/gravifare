@@ -626,6 +626,13 @@ func pick_object(tx: int, ty: int) -> Dictionary:
 		if ref.t == "door":
 			if cell(tx, ty) != String(ref.k):
 				continue
+		elif not path_points(ref).is_empty():
+			var pp := path_points(ref)                    # Fahrzeug mit Pfad: nur in der Nähe der Linie, nicht im ganzen Umfangsrechteck
+			var near := false
+			for k in range(pp.size() - 1):
+				near = near or Geometry2D.get_closest_point_to_segment(pt, Vector2(pp[k][0], pp[k][1]), Vector2(pp[k + 1][0], pp[k + 1][1])).distance_to(pt) <= 0.9
+			if not near:
+				continue
 		elif not b.has_point(pt):
 			continue
 		var area := maxf(b.get_area(), 0.01)
@@ -746,5 +753,84 @@ func job_remove(i: int) -> void:
 		jobs.remove_at(i)
 		if was_last and not jobs.is_empty():
 			jobs[jobs.size() - 1]["to"] = "exit"
+		_mark_changed())
+
+# ---------------------------------------------------------------------------------------------------------------- Fahrzeugpfade und Größe beim Setzen
+
+## Neues Fremdfahrzeug auf einem Pfad aus Feldmittelpunkten (Eingang, Zwischenpunkte, Ausgang; Koordinaten in Feldern). Gibt den Verweis zurück ({} bei zu wenigen Punkten oder zu vielen Hindernissen).
+func add_vehicle_path(points: Array) -> Dictionary:
+	if points.size() < 2 or movers.size() >= CL.MAX_MOVERS:
+		return {}
+	var pts: Array = []
+	for p in points:
+		if pts.size() < CL.MAX_PATH_POINTS:
+			pts.append([snappedf(clampf(float(p.x), -8.0, 64.0), 0.01), snappedf(clampf(float(p.y), -8.0, 64.0), 0.01)])
+	var out: Array = [{}]
+	_edit(func():
+		movers.append({"kind": "vehicle", "path": pts, "speed": 50.0, "paint": 0, "phase": 0.0, "w": 1.0, "h": 1.0, "x": 0.0, "y": 0.0, "dx": 0.0, "dy": 0.0, "period": 8.0})
+		out[0] = {"t": "mover", "i": movers.size() - 1}
+		_mark_changed())
+	return out[0]
+
+func path_points(ref: Dictionary) -> Array:
+	var d := _dict(ref, false)
+	return d.get("path", []) if d.get("kind") == "vehicle" else []
+
+## Index des Pfadpunkts, der dem Punkt `p` (Felder) am nächsten liegt und höchstens `radius` entfernt ist; -1 wenn keiner.
+func path_point_near(ref: Dictionary, p: Vector2, radius: float) -> int:
+	var best := -1
+	var best_d := radius
+	var pts := path_points(ref)
+	for i in pts.size():
+		var d := Vector2(pts[i][0], pts[i][1]).distance_to(p)
+		if d <= best_d:
+			best = i
+			best_d = d
+	return best
+
+func set_path_point(ref: Dictionary, idx: int, p: Vector2) -> void:
+	var pts := path_points(ref)
+	if idx < 0 or idx >= pts.size():
+		return
+	_edit(func():
+		pts[idx][0] = snappedf(clampf(p.x, -8.0, 64.0), 0.01)
+		pts[idx][1] = snappedf(clampf(p.y, -8.0, 64.0), 0.01)
+		_mark_changed())
+
+func remove_path_point(ref: Dictionary, idx: int) -> void:
+	var pts := path_points(ref)
+	if pts.size() <= 2 or idx < 0 or idx >= pts.size():
+		return
+	_edit(func():
+		pts.remove_at(idx)
+		_mark_changed())
+
+## Legt Größe bzw. Richtung eines gerade gesetzten Objekts aus den beiden Feldern der Ziehbewegung (a = Druckpunkt, b = aktueller Punkt) fest:
+## Flächen (Strömung, Schwerkraft, Hitze, Strahl, Schieber) werden zum Rechteck, Magnete bekommen den Radius, Meteoriten den Fallweg, Plattformen die Breite,
+## Trümmer den Bewegungsweg.
+func size_object(ref: Dictionary, a: Vector2i, b: Vector2i) -> void:
+	var d := _dict(ref, false)
+	if d.is_empty() or ref.get("t") == "door":
+		return
+	_edit(func():
+		var lo := Vector2i(mini(a.x, b.x), mini(a.y, b.y))
+		var hi := Vector2i(maxi(a.x, b.x), maxi(a.y, b.y))
+		match String(d.get("kind", "")):
+			"wind", "gravity", "heat", "beam", "slider":
+				d["x"] = float(lo.x)
+				d["y"] = float(lo.y)
+				d["w"] = float(hi.x - lo.x + 1)
+				d["h"] = float(hi.y - lo.y + 1)
+			"magnet":
+				d["r"] = clampf(snappedf(Vector2(a).distance_to(Vector2(b)), 0.5), 1.0, 20.0)
+			"meteor":
+				d["dx"] = float(b.x - a.x)
+				d["dy"] = float(maxi(b.y - a.y, 1))
+			"pad":
+				d["x"] = float(lo.x)
+				d["w"] = float(maxi(hi.x - lo.x + 1, 4))
+			"debris":
+				d["dx"] = float(b.x - a.x)
+				d["dy"] = float(b.y - a.y)
 		_mark_changed())
 

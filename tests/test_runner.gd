@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3337,7 +3337,8 @@ func _test_level_editor_screen() -> void:
 	for k in LevelEdit_KINDS():
 		ed._kind_step(1)
 		ed._obj_add()
-	check(ed.model.movers.size() + ed.model.zones.size() == 11, "Editor-Bildschirm: alle Arten lassen sich über die Oberfläche hinzufügen")
+	check(ed.model.movers.size() + ed.model.zones.size() == 10, "Editor-Bildschirm: alle Arten lassen sich setzen (das Fahrzeug braucht einen Pfad)")
+	ed._veh_cancel()
 	ed._set_page(2)
 	ed._job_mode()
 	check(not ed.model.jobs.is_empty() and ed.job_box.get_child_count() >= ed.model.jobs.size() * 6, "Editor-Bildschirm: Auftragsliste wird eigene Aufträge")
@@ -3517,3 +3518,98 @@ func _test_fast_solvability() -> void:
 	m2.jobs = [{"from": "9", "to": "exit", "fare": 60.0, "par": 20.0, "passenger": "x", "gender": "f"}]
 	var r2 := LE.validate_wrapper(m2.to_wrapper())
 	check(r2.ok and r2.get("jobs_reset", false) == true and m2.jobs.size() == 1, "Lösbarkeit: unpassende Aufträge werden im Ergebnis verworfen, das Modell bleibt unberührt")
+
+func _test_editor_unified_pen() -> void:
+	var m = LE.blank()
+	# Fahrzeugpfad: Eingang, Zwischenpunkte, Ausgang
+	var v: Dictionary = m.add_vehicle_path([Vector2(0.5, 8.5), Vector2(10.5, 8.5), Vector2(10.5, 14.5), Vector2(39.5, 14.5)])
+	check(m.valid_ref(v) and m.path_points(v).size() == 4 and m.obj_kind(v) == "vehicle" and m.obj_params(v).size() == 3, "Stift: Fahrzeugpfad wird angelegt (Tempo, Lackierung, Versatz einstellbar)")
+	check(m.add_vehicle_path([Vector2(1, 1)]).is_empty(), "Stift: ein Pfad braucht mindestens zwei Punkte")
+	check(m.same_ref(m.pick_object(5, 8), v) and m.pick_object(5, 11).is_empty() and m.same_ref(m.pick_object(10, 12), v), "Stift: Fahrzeuge lassen sich nur an der Linie greifen")
+	check(m.path_point_near(v, Vector2(10.6, 14.4), 0.8) == 2 and m.path_point_near(v, Vector2(20, 3), 0.8) == -1, "Stift: Pfadpunkt in der Nähe erkennen")
+	m.set_path_point(v, 2, Vector2(12.5, 12.5))
+	check(m.path_points(v)[2][0] == 12.5 and m.path_points(v)[2][1] == 12.5, "Stift: Pfadpunkt verschieben")
+	m.remove_path_point(v, 1)
+	check(m.path_points(v).size() == 3, "Stift: Pfadpunkt entfernen")
+	m.remove_path_point(v, 0)
+	m.remove_path_point(v, 0)
+	check(m.path_points(v).size() == 2, "Stift: ein Pfad behält mindestens zwei Punkte")
+	check(m.validate().ok, "Stift: Level mit Fahrzeugpfad ist gültig (%s)" % str(m.validate().errors))
+	var p0x: float = m.path_points(v)[0][0]
+	var p0y: float = m.path_points(v)[0][1]
+	m.move_object(v, 1, 1)
+	check(m.path_points(v)[0][0] == p0x + 1.0 and m.path_points(v)[0][1] == p0y + 1.0, "Stift: das ganze Fahrzeug lässt sich verschieben")
+	# Größe beim Setzen
+	var m2 = LE.blank()
+	var w: Dictionary = m2.add_object("wind", 10, 6)
+	m2.size_object(w, Vector2i(10, 6), Vector2i(14, 9))
+	check(m2.get_param(w, "w") == 5.0 and m2.get_param(w, "h") == 4.0 and m2.get_param(w, "x") == 10.0, "Stift: Ziehen bestimmt die Fläche einer Zone")
+	m2.size_object(w, Vector2i(14, 9), Vector2i(10, 6))
+	check(m2.get_param(w, "x") == 10.0 and m2.get_param(w, "w") == 5.0, "Stift: Ziehen in jede Richtung ergibt dieselbe Fläche")
+	var mg: Dictionary = m2.add_object("magnet", 20, 10)
+	m2.size_object(mg, Vector2i(20, 10), Vector2i(24, 10))
+	check(m2.get_param(mg, "r") == 4.0, "Stift: Ziehen bestimmt den Radius eines Magneten")
+	var me: Dictionary = m2.add_object("meteor", 30, 3)
+	m2.size_object(me, Vector2i(30, 3), Vector2i(30, 12))
+	check(m2.get_param(me, "dy") == 9.0, "Stift: Ziehen bestimmt den Fallweg eines Meteoriten")
+	var pd: Dictionary = m2.add_object("pad", 20, 8)
+	m2.size_object(pd, Vector2i(20, 8), Vector2i(22, 8))
+	check(m2.get_param(pd, "w") == 4.0, "Stift: eine fahrende Plattform ist mindestens vier Felder breit")
+	# Oberfläche: ein Stift für alles
+	var tr_de := Translation.new()
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	tr_de.locale = "de"
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed._validate_now()
+	check(ed.pal_btns.size() == 22 and ed.kind_btns.size() == 10 and ed.mode_btn != null, "Stift: Paletten sind Symbolknöpfe (22 Felder, 10 Arten, ein Modusknopf)")
+	ed._set_page(1)
+	ed._select_kind(6)                                      # Strömung
+	ed._begin(false, Vector2i(8, 5))
+	ed._move_stroke(Vector2i(12, 8))
+	ed._end_stroke()
+	check(ed.model.zones.size() == 1 and ed.model.get_param(ed.obj_ref, "w") == 5.0 and ed.model.can_undo(), "Stift: Klick und Ziehen auf freier Stelle setzt eine Zone mit Größe")
+	ed._undo_redo(true)
+	check(ed.model.zones.is_empty(), "Stift: Setzen mit Größe ist ein einziger Rückgängig-Schritt")
+	ed._select_kind(5)                                      # Fahrzeug
+	ed._begin(false, Vector2i(0, 8))
+	check(ed.veh_pts.size() == 1 and ed._veh_role_at(Vector2i(10, 8)) == 1 and ed._veh_role_at(Vector2i(39, 8)) == 2 and ed._veh_role_at(Vector2i(10, 0)) == 2, "Stift: Eingang gesetzt, Rollen von Zwischenpunkt und Ausgang werden am Zeiger erkannt")
+	ed._begin(false, Vector2i(10, 8))
+	ed._begin(false, Vector2i(10, 14))
+	check(ed.veh_pts.size() == 3 and ed.model.movers.is_empty(), "Stift: Zwischenpunkte füllen den Pfad, noch kein Fahrzeug")
+	ed._begin(false, Vector2i(39, 14))
+	check(ed.veh_pts.is_empty() and ed.model.movers.size() == 1 and ed.model.path_points(ed.obj_ref).size() == 4, "Stift: Klick auf Wand oder Rand beendet den Pfad als Ausgang")
+	ed._select_kind(5)
+	ed._begin(false, Vector2i(5, 3))
+	ed._begin(false, Vector2i(20, 3))
+	ed._primary_next()
+	check(ed.veh_pts.is_empty() and ed.model.movers.size() == 2, "Stift: Y/Tab beendet einen Pfad am letzten Punkt")
+	ed._begin(false, Vector2i(5, 5))
+	ed._begin(true, Vector2i(5, 5))
+	check(ed.veh_pts.is_empty() and ed.model.movers.size() == 2, "Stift: Löschen bricht einen Pfad im Bau ab")
+	ed._begin(false, Vector2i(10, 8))                       # Punkt eines gewählten Fahrzeugs ziehen
+	var vref: Dictionary = ed.obj_ref
+	ed._select_obj(ed.model.objects()[0])
+	ed._begin(false, Vector2i(10, 14))
+	ed._move_stroke(Vector2i(12, 15))
+	ed._end_stroke()
+	check(ed.model.path_points(ed.model.objects()[0])[2][0] == 12.5, "Stift: einzelner Pfadpunkt lässt sich ziehen")
+	ed._set_page(0)
+	ed._select_pal(0)
+	ed._select_tool(0)
+	ed._begin(false, Vector2i(15, 10), true)                # Doppelklick-Füllen
+	check(ed.model.cell(30, 12) == "#", "Stift: Doppelklick füllt das Gebiet")
+	ed._undo_redo(true)
+	ed.free()
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+	var src := FileAccess.get_file_as_string("res://src/ui/level_editor.gd")
+	check(src.contains("JOY_AXIS_TRIGGER_LEFT or event.axis == JOY_AXIS_TRIGGER_RIGHT") and src.contains("_set_page(wrapi(page - 1, 0, 3))") and src.contains("JOY_BUTTON_LEFT_STICK") and src.contains("_pad_pressed(JOY_BUTTON_B)"),
+		"Stift: Controller – LT/RT schalten Seiten, Stickklick Rückgängig/Wiederholen, B löscht (Quelltextprüfung)")

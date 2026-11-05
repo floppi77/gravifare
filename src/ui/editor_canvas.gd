@@ -29,12 +29,14 @@ func _init() -> void:
 	add_child(props)
 
 ## Zeigt das Level (LevelData aus dem Modell, ohne Prüfung: das Modell hält Tor und Start fest).
-func show_level(l: LevelData) -> void:
+## `rebuild_tiles` = false: nur Hindernisse, Zonen und Aufträge haben sich geändert. Die Felsschicht (die teuerste, rund 10 ms je Neuzeichnen bei vollem Level) bleibt dann stehen.
+func show_level(l: LevelData, rebuild_tiles := true) -> void:
 	lvl = l
 	run = Run.new()
 	run.start(l)
-	tiles.setup(run)
-	style.setup(l)
+	if rebuild_tiles:
+		tiles.setup(run)
+		style.setup(l)
 	props.setup(run)
 	queue_redraw()
 

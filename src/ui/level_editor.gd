@@ -8,6 +8,7 @@ const CommunityLevel := preload("res://src/core/community_level.gd")
 const CommunityStore := preload("res://src/core/community_store.gd")
 const LevelEdit := preload("res://src/core/level_edit.gd")
 const EditorCanvas := preload("res://src/ui/editor_canvas.gd")
+const IconButton := preload("res://src/ui/icon_button.gd")
 
 const TILE := 16.0
 const ZOOM := 0.75
@@ -57,7 +58,15 @@ var drag_last := Vector2i(-1, -1)
 var _regrab := ""                           # Meta-Schlüssel des Knopfs, der nach dem Neuaufbau einer Liste wieder den Fokus bekommt
 var name_edit: LineEdit
 var author_edit: LineEdit
-var tool_btns: Array = []
+var mode_btn: Button
+var mode_label: Label
+var sel_label: Label
+var kind_btns: Array = []
+var drag_mode := ""                         # "move" | "size" | "point"
+var drag_origin := Vector2i.ZERO
+var drag_point := -1
+var veh_pts: Array = []                     # Fahrzeugpfad im Bau: Eingang, Zwischenpunkte (Feldmittelpunkte)
+var stroke_mode := 0                        # Zeichenmodus des laufenden Strichs (Linie, Rechteck, Füllen)
 var pal_btns: Array = []
 var look_label: Label
 var dark_label: Label
@@ -80,6 +89,9 @@ var _thread: Thread = null                  # Prüfung läuft im Arbeitsfaden (k
 var _model_rev := 0                         # zählt Änderungen; ein Ergebnis zu älterem Stand wird verworfen
 var _thread_rev := 0
 var _jobs_sig := ""
+static var _warmed := false                 # Einmal je Programmlauf: die erste Zeichnung von Fels im Inneren und jeder Hindernisart baut Grafikzustände auf (bis 170 ms Ruckler)
+var _tiles_sig := ""                        # Karte und Optik der gezeigten Felsschicht; nur bei Änderung wird sie neu gezeichnet
+var _shown_rows: Array = []                 # Karte der gezeigten Vorschau: Unterschiede zeichnet die Zeichenfläche während eines Strichs selbst
 var _slim_styles := {}
 var input_ready := false
 var trig_l := false
@@ -118,7 +130,30 @@ func _ready() -> void:
 	status.text = tr("CM_CHECKING")
 	_start_async()                         # die erste Prüfung (bei großen Leveln mehrere hundert Millisekunden) blockiert das Öffnen nicht
 	_refresh_preview()
+	_warm_up()
 	_update_hint()
+
+## Zeichnet beim ersten Öffnen einmal (fast durchsichtig, zwei Bilder lang) ein Level mit Fels im Inneren und allen Hindernisarten, damit der erste Strich und das erste
+## Objekt nicht ruckeln.
+func _warm_up() -> void:
+	if _warmed or not is_inside_tree():
+		return
+	_warmed = true
+	var w = LevelEdit.blank()
+	w.rect(Vector2i(14, 8), Vector2i(20, 12), "#")
+	for k in LevelEdit.KINDS:
+		w.add_object(k, 22 + LevelEdit.KINDS.find(k), 6)
+	var d: Dictionary = w.to_level_dict()
+	d["jobs"] = []
+	d["id"] = "warm"
+	canvas.modulate = Color(1, 1, 1, 0.02)
+	canvas.show_level(LevelData.from_dict(d), true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if is_inside_tree():
+		canvas.modulate = Color.WHITE
+		_tiles_sig = ""
+		_refresh_preview()
 
 func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	c.position = pos
@@ -201,34 +236,66 @@ func _build_panel() -> void:
 	_build_page_objects(pages[1])
 	_build_page_level(pages[2])
 
+## Knopf mit gezeichnetem Symbol (die Auswahl steht als Grafik zur Verfügung, der Name zusätzlich als Hinweistext und Beschriftung).
+func _icon_button(icon: String, cb: Callable, pos: Vector2, sz: Vector2, parent: Control, tip := "") -> Button:
+	var b: Button = IconButton.new()
+	b.icon_id = icon
+	b.custom_minimum_size = sz
+	b.position = pos
+	b.size = sz
+	b.focus_mode = Control.FOCUS_ALL
+	b.tooltip_text = tip
+	b.clip_text = true
+	b.pressed.connect(_icon_pressed.bind(cb))
+	b.focus_entered.connect(_icon_focused)
+	parent.add_child(b)
+	_slim(b)
+	b.size = sz
+	return b
+
+func _icon_pressed(cb: Callable) -> void:
+	Sfx.play("ui_ok")
+	cb.call()
+
+func _icon_focused() -> void:
+	Sfx.play("ui_move", -6.0)
+
+func _tile_name(i: int) -> String:
+	var e: Array = LevelEdit.PALETTE[i]
+	var ch: String = e[0]
+	if LevelEdit.PAD_CHARS.contains(ch):
+		return "%s %s" % [tr(e[1]), ch]
+	if LevelEdit.DOOR_CHARS.contains(ch):
+		return "%s %s" % [tr(e[1]), ch]
+	return tr(e[1])
+
 func _build_page_map(pg: Control) -> void:
-	var names := [tr("ED_TOOL_PEN"), tr("ED_TOOL_RECT"), tr("ED_TOOL_FILL")]
-	for i in 3:
-		tool_btns.append(_button(names[i], _select_tool.bind(i), Vector2(i * 48.0, 0), Vector2(45, 17), pg, 6))
 	for i in LevelEdit.PALETTE.size():
-		var e: Array = LevelEdit.PALETTE[i]
-		var label: String = e[0] if LevelEdit.PAD_CHARS.contains(e[0]) else tr(e[1]) + (" " + String(e[0]) if LevelEdit.DOOR_CHARS.contains(e[0]) else "")
-		pal_btns.append(_button(label, _select_pal.bind(i), Vector2((i % 3) * 48.0, 22.0 + (i / 3) * 20.0), Vector2(45, 17), pg, 7))
+		pal_btns.append(_icon_button(String(LevelEdit.PALETTE[i][0]), _select_pal.bind(i), Vector2((i % 5) * 29.0, (i / 5) * 27.0), Vector2(27, 25), pg, _tile_name(i)))
+	sel_label = _label("", Vector2(0, 138), Vector2(144, 14), pg)
+	mode_btn = _icon_button("mode_line", _primary_next, Vector2(0, 158), Vector2(30, 22), pg, tr("ED_MODE_TIP"))
+	mode_label = _label("", Vector2(34, 156), Vector2(110, 26), pg)
+	mode_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	mode_label.add_theme_font_size_override("font_size", 7)
 	_button(tr("ED_RENUMBER"), _renumber, Vector2(0, 186), Vector2(144, 17), pg, 7)
 
 func _build_page_objects(pg: Control) -> void:
-	_button("<", _kind_step.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
-	kind_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
-	_button(">", _kind_step.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
-	_button(tr("ED_O_ADD"), _obj_add, Vector2(0, 20), Vector2(70, 17), pg, 7)
-	_button(tr("ED_O_DEL"), _obj_remove, Vector2(74, 20), Vector2(70, 17), pg, 7)
-	_button("<", _obj_step.bind(-1), Vector2(0, 42), Vector2(20, 17), pg)
-	obj_label = _label("", Vector2(22, 44), Vector2(100, 14), pg)
-	_button(">", _obj_step.bind(1), Vector2(124, 42), Vector2(20, 17), pg)
+	for i in LevelEdit.KINDS.size():
+		kind_btns.append(_icon_button(String(LevelEdit.KINDS[i]), _select_kind.bind(i), Vector2((i % 5) * 29.0, (i / 5) * 27.0), Vector2(27, 25), pg, tr("ED_K_" + String(LevelEdit.KINDS[i]))))
+	kind_label = _label("", Vector2(0, 56), Vector2(144, 20), pg)
+	kind_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	kind_label.add_theme_font_size_override("font_size", 7)
+	_button("<", _obj_step.bind(-1), Vector2(0, 80), Vector2(18, 16), pg, 7)
+	obj_label = _label("", Vector2(20, 81), Vector2(78, 14), pg)
+	obj_label.add_theme_font_size_override("font_size", 7)
+	_button(">", _obj_step.bind(1), Vector2(100, 80), Vector2(18, 16), pg, 7)
+	_button("×", _obj_remove, Vector2(120, 80), Vector2(24, 16), pg, 8)
 	param_box = Control.new()
-	param_box.position = Vector2(0, 64)
+	param_box.position = Vector2(0, 100)
 	param_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pg.add_child(param_box)
-	var h := _label(tr("ED_O_HINT"), Vector2(0, 218), Vector2(144, 24), pg)
-	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	h.add_theme_font_size_override("font_size", 7)
-	h.add_theme_color_override("font_color", Color("#9aa6dd"))
-	_kind_step(0)
+	_select_kind(0)
 
 func _build_page_level(pg: Control) -> void:
 	look_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
@@ -327,21 +394,38 @@ func _update_title() -> void:
 
 # ---------------------------------------------------------------------------------------------------------------- Auswahl und Eigenschaften
 
+## Zeichenmodus des Stifts: 0 Linie, 1 Rechteck, 2 Füllen (Umschalt = Rechteck, Doppelklick = Füllen gelten nur für einen Strich).
 func _select_tool(i: int) -> void:
-	tool = i
-	for k in tool_btns.size():
-		tool_btns[k].modulate = Color(1.3, 1.25, 0.8) if k == i else Color.WHITE
+	tool = posmod(i, 3)
+	mode_btn.icon_id = ["mode_line", "mode_rect", "mode_fill"][tool]
+	mode_btn.queue_redraw()
+	mode_label.text = tr(["ED_MODE_LINE", "ED_MODE_RECT", "ED_MODE_FILL"][tool])
 	_update_hint()
 
 func _select_pal(i: int) -> void:
 	pal = posmod(i, LevelEdit.PALETTE.size())
 	for k in pal_btns.size():
-		pal_btns[k].modulate = Color(1.3, 1.25, 0.8) if k == pal else Color.WHITE
+		pal_btns[k].modulate = Color(1.35, 1.3, 0.8) if k == pal else Color.WHITE
+	sel_label.text = _tile_name(pal)
 	overlay.queue_redraw()
 
+func _select_kind(i: int) -> void:
+	kind_idx = posmod(i, LevelEdit.KINDS.size())
+	_veh_cancel()
+	for k in kind_btns.size():
+		kind_btns[k].modulate = Color(1.35, 1.3, 0.8) if k == kind_idx else Color.WHITE
+	var kn: String = LevelEdit.KINDS[kind_idx]
+	kind_label.text = "%s – %s" % [tr("ED_K_" + kn), tr("ED_KH_" + kn)]
+	if hint != null:
+		_update_hint()
+
+func _kind_step(step: int) -> void:
+	_select_kind(kind_idx + step)
+
+## Auswahl weiterschalten: Kartenseite = Feld, Objektseite = Art (die Zeichenfläche wählt Objekte selbst per Klick).
 func _cycle_pal(step: int) -> void:
 	if page == 1:
-		_obj_step(step)                      # auf der Objektseite wählen LB/RB, Q/E und das Mausrad das Objekt
+		_kind_step(step)
 	elif page == 0:
 		_select_pal(pal + step)
 
@@ -388,7 +472,10 @@ func _say(t: String) -> void:
 
 func _update_hint() -> void:
 	if page == 1:
-		hint.text = tr("ED_HINT_OBJ_PAD") if gamepad_hint else tr("ED_HINT_OBJ_KEYS")
+		if not veh_pts.is_empty():
+			hint.text = tr("ED_VEH_ACTIVE")
+		else:
+			hint.text = tr("ED_HINT_OBJ_PAD") if gamepad_hint else tr("ED_HINT_OBJ_KEYS")
 	elif page == 2:
 		hint.text = tr("ED_HINT_LVL")
 	else:
@@ -399,6 +486,7 @@ func _update_hint() -> void:
 func _set_page(i: int) -> void:
 	if active:
 		return
+	_veh_cancel()
 	page = clampi(i, 0, 2)
 	for k in pages.size():
 		pages[k].visible = k == page
@@ -413,12 +501,13 @@ func _set_page(i: int) -> void:
 	_update_hint()
 	overlay.queue_redraw()
 
-func _kind_step(step: int) -> void:
-	kind_idx = wrapi(kind_idx + step, 0, LevelEdit.KINDS.size())
-	kind_label.text = tr("ED_O_KIND") % tr("ED_K_" + String(LevelEdit.KINDS[kind_idx]))
-
+## Objekt der gewählten Art am Zeiger setzen (Taste N, Tests); mit der Maus genügt ein Klick auf eine freie Stelle.
 func _obj_add() -> void:
-	var ref: Dictionary = model.add_object(LevelEdit.KINDS[kind_idx], cursor.x, cursor.y)
+	var kn: String = LevelEdit.KINDS[kind_idx]
+	if kn == "vehicle":
+		_veh_click(cursor)
+		return
+	var ref: Dictionary = model.add_object(kn, cursor.x, cursor.y)
 	if ref.is_empty():
 		_say(tr("ED_O_LIMIT"))
 		return
@@ -594,7 +683,7 @@ func _rebuild_jobs(force := false) -> void:
 func _tile_char(erase: bool) -> String:
 	return "." if erase else String(LevelEdit.PALETTE[pal][0])
 
-func _begin(erase: bool, at: Vector2i) -> void:
+func _begin(erase: bool, at: Vector2i, force_fill := false) -> void:
 	if active:
 		return
 	leave_armed = false
@@ -603,14 +692,15 @@ func _begin(erase: bool, at: Vector2i) -> void:
 	if page == 1:
 		_begin_object(erase, at)
 		return
+	stroke_mode = TOOL_FILL if force_fill else (TOOL_RECT if tool == TOOL_PEN and Input.is_key_pressed(KEY_SHIFT) else tool)
 	active = true
 	stroke_erase = erase
 	var ch := _tile_char(erase)
-	if tool == TOOL_PEN:
+	if stroke_mode == TOOL_PEN:
 		model.begin_stroke()
 		model.line(at, at, ch)
 		stroke_last = at
-	elif tool == TOOL_RECT:
+	elif stroke_mode == TOOL_RECT:
 		rect_start = at
 		rect_cur = at
 	else:
@@ -621,35 +711,88 @@ func _begin(erase: bool, at: Vector2i) -> void:
 		_changed()
 	_changed_soft()
 
+## Objektseite, ein Stift für alles: ein Klick auf ein vorhandenes Objekt wählt es (Ziehen verschiebt es, bei Fahrzeugpfaden auch einzelne Pfadpunkte), ein Klick auf eine
+## freie Stelle setzt ein Objekt der gewählten Art (Ziehen bestimmt Größe bzw. Richtung); Fahrzeuge werden als Pfad gesetzt (Eingang, Zwischenpunkte, Ausgang).
+## Löschen entfernt das Objekt unter dem Zeiger bzw. bricht einen Fahrzeugpfad ab.
 func _begin_object(erase: bool, at: Vector2i) -> void:
+	var center := Vector2(at) + Vector2(0.5, 0.5)
 	if erase:
-		_obj_remove_at(model.pick_object(at.x, at.y))                   # Löschen entfernt das Objekt unter dem Zeiger
+		if not veh_pts.is_empty():
+			_veh_cancel()
+			return
+		if model.valid_ref(obj_ref):
+			var pi: int = model.path_point_near(obj_ref, center, 0.8)
+			if pi >= 0 and model.path_points(obj_ref).size() > 2:
+				model.remove_path_point(obj_ref, pi)
+				_changed()
+				return
+		_obj_remove_at(model.pick_object(at.x, at.y))
 		return
+	if not veh_pts.is_empty():
+		_veh_click(at)
+		return
+	if model.valid_ref(obj_ref) and not model.path_points(obj_ref).is_empty():
+		var pj: int = model.path_point_near(obj_ref, center, 0.8)
+		if pj >= 0:
+			active = true
+			drag_mode = "point"
+			drag_point = pj
+			model.begin_stroke()
+			return
 	var ref: Dictionary = model.pick_object(at.x, at.y)
-	if not ref.is_empty() and not model.same_ref(ref, obj_ref):
-		_select_obj(ref)
-	if not ref.is_empty() and model.same_ref(ref, obj_ref) and obj_ref.t != "door":
-		active = true                                                  # Ziehen verschiebt das Objekt unter dem Zeiger (Tore sind Kartenfelder)
-		drag_last = at
-		model.begin_stroke()
+	if not ref.is_empty():
+		if not model.same_ref(ref, obj_ref):
+			_select_obj(ref)
+		if ref.t != "door":                                           # Tore sind Kartenfelder und lassen sich nur auf der Karte verschieben
+			active = true
+			drag_mode = "move"
+			drag_last = at
+			model.begin_stroke()
+		return
+	var kn: String = LevelEdit.KINDS[kind_idx]
+	if kn == "vehicle":
+		_veh_click(at)
+		return
+	model.begin_stroke()
+	var nref: Dictionary = model.add_object(kn, at.x, at.y)
+	if nref.is_empty():
+		model.end_stroke()
+		_say(tr("ED_O_LIMIT"))
+		return
+	_select_obj(nref)
+	active = true
+	drag_mode = "size"
+	drag_origin = at
+	_changed_soft()
 
 func _move_stroke(at: Vector2i) -> void:
 	if not active:
 		return
 	if page == 1:
-		var delta := at - drag_last
-		if delta != Vector2i.ZERO and model.move_object(obj_ref, delta.x, delta.y):
-			drag_last = at
+		var moved := false
+		match drag_mode:
+			"move":
+				var delta := at - drag_last
+				if delta != Vector2i.ZERO and model.move_object(obj_ref, delta.x, delta.y):
+					drag_last = at
+					moved = true
+			"size":
+				model.size_object(obj_ref, drag_origin, at)
+				moved = true
+			"point":
+				model.set_path_point(obj_ref, drag_point, Vector2(at) + Vector2(0.5, 0.5))
+				moved = true
+		if moved:
 			for k in param_vals:
 				param_vals[k].text = _param_text(k)
 			_changed_soft()
 		return
-	if tool == TOOL_PEN:
+	if stroke_mode == TOOL_PEN:
 		if at != stroke_last:
 			model.line(stroke_last, at, _tile_char(stroke_erase))
 			stroke_last = at
 			_changed_soft()
-	elif tool == TOOL_RECT:
+	elif stroke_mode == TOOL_RECT:
 		rect_cur = at
 	overlay.queue_redraw()
 
@@ -659,19 +802,70 @@ func _end_stroke() -> void:
 	active = false
 	if page == 1:
 		model.end_stroke()
+		drag_mode = ""
+		_rebuild_params()
 		_changed()
 		return
-	if tool == TOOL_PEN:
+	if stroke_mode == TOOL_PEN:
 		model.end_stroke()
-	elif tool == TOOL_RECT:
+	elif stroke_mode == TOOL_RECT:
 		model.begin_stroke()
 		model.rect(rect_start, rect_cur, _tile_char(stroke_erase))
 		model.end_stroke()
 		rect_start = Vector2i(-1, -1)
 	_changed()
 
+# ---------------------------------------------------------------------------------------------------------------- Fremdfahrzeug: Pfad setzen
+
+## Wand, Rand oder Fels: dort tauchen Fahrzeuge auf und verschwinden (Wandöffnung); alles andere ist freier Raum.
+func _veh_solid(at: Vector2i) -> bool:
+	return at.x <= 0 or at.y <= 0 or at.x >= model.w - 1 or at.y >= model.h - 1 or model.cell(at.x, at.y) == "#"
+
+## Rolle des nächsten Klicks: 0 Eingang, 1 Zwischenpunkt, 2 Ausgang (Klick auf Wand/Rand, sobald ein Eingang gesetzt ist).
+func _veh_role_at(at: Vector2i) -> int:
+	if veh_pts.is_empty():
+		return 0
+	return 2 if _veh_solid(at) else 1
+
+func _veh_click(at: Vector2i) -> void:
+	var p := Vector2(at) + Vector2(0.5, 0.5)
+	if veh_pts.is_empty():
+		veh_pts = [p]
+		_update_hint()
+		overlay.queue_redraw()
+		return
+	if p == veh_pts[veh_pts.size() - 1]:
+		return
+	veh_pts.append(p)
+	if _veh_solid(at):
+		_veh_finish()                                             # Wand oder Rand erreicht: das ist der Ausgang
+	else:
+		overlay.queue_redraw()
+
+func _veh_finish() -> void:
+	if veh_pts.size() >= 2:
+		model.begin_stroke()
+		var ref: Dictionary = model.add_vehicle_path(veh_pts)
+		model.end_stroke()
+		if ref.is_empty():
+			_say(tr("ED_O_LIMIT"))
+		else:
+			_select_obj(ref)
+			_changed()
+	_veh_cancel()
+
+func _veh_cancel() -> void:
+	if veh_pts.is_empty():
+		return
+	veh_pts = []
+	_update_hint()
+	overlay.queue_redraw()
+
+## Während eines Strichs: keine Neuberechnung der Vorschau (die Felsschicht neu zu zeichnen kostet je nach Fels einige Millisekunden und ruckelte). Die Zeichenfläche
+## zeigt die gemalten Felder selbst; die Vorschau folgt am Ende des Strichs. Beim Ziehen von Objekten (Felsschicht bleibt) aktualisiert sie sich laufend.
 func _changed_soft() -> void:
-	preview_t = 0.06
+	if page == 1:
+		preview_t = 0.06
 	_request_validation(0.45)
 	_update_title()
 	overlay.queue_redraw()
@@ -712,10 +906,10 @@ func _view_input(ev: InputEvent) -> void:
 		mouse_mode = true
 		cursor = _tile_at_mouse()
 		if ev.pressed and ev.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
-			_begin(ev.button_index == MOUSE_BUTTON_RIGHT, cursor)
+			_begin(ev.button_index == MOUSE_BUTTON_RIGHT, cursor, bool(ev.double_click) and page == 0)
 		elif not ev.pressed and ev.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
 			_end_stroke()
-		elif ev.pressed and ev.button_index == MOUSE_BUTTON_MIDDLE:
+		elif ev.pressed and ev.button_index == MOUSE_BUTTON_MIDDLE and page == 0:
 			_eyedrop(cursor)
 		elif ev.pressed and ev.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_cycle_pal(-1)
@@ -733,12 +927,29 @@ func _draw_overlay() -> void:
 			overlay.draw_line(Vector2(0, y * cs), Vector2(model.w * cs, y * cs), gc, 1.0)
 	if preview_mode:
 		return
+	if _shown_rows != model.rows and _shown_rows.size() == model.rows.size():
+		for y in model.h:                                              # noch nicht in der Vorschau: gemalte Felder direkt zeigen
+			var a: String = _shown_rows[y]
+			var b: String = model.rows[y]
+			if a == b:
+				continue
+			for x in model.w:
+				if a[x] != b[x]:
+					var ch := b[x]
+					var rc := Rect2(Vector2(x, y) * cs, Vector2(cs, cs))
+					if ch == ".":
+						overlay.draw_rect(rc, Color(0.03, 0.04, 0.1, 0.95))
+					else:
+						var cc: Color = COLORS.get(ch, Color("#ffd24a") if LevelEdit.PAD_CHARS.contains(ch) else Color("#b07bff"))
+						overlay.draw_rect(rc, Color(cc.r, cc.g, cc.b, 0.85))
 	if page == 1:
 		for ref in model.objects():
 			var bnd: Rect2 = model.obj_bounds(ref)
 			if bnd.size == Vector2.ZERO:
 				continue
 			var sel: bool = model.same_ref(ref, obj_ref)
+			if not model.path_points(ref).is_empty():
+				continue                                                  # Pfadfahrzeuge zeigen ihre Linie statt eines Rahmens
 			var rr := Rect2(bnd.position * cs, bnd.size * cs)
 			overlay.draw_rect(rr, Color(1, 0.9, 0.3, 0.16) if sel else Color(1, 1, 1, 0.05))
 			overlay.draw_rect(rr, Color("#ffe14a") if sel else Color(1, 1, 1, 0.35), false, 2.0 if sel else 1.0)
@@ -747,11 +958,12 @@ func _draw_overlay() -> void:
 				if d.get("kind") == "vehicle" and d.has("path"):
 					for k in range(d.path.size() - 1):
 						overlay.draw_line(Vector2(d.path[k][0], d.path[k][1]) * cs, Vector2(d.path[k + 1][0], d.path[k + 1][1]) * cs, Color(0.5, 0.9, 1, 0.7), 1.0)
-	if active and page == 0 and tool == TOOL_RECT and rect_start.x >= 0:
+	if active and page == 0 and stroke_mode == TOOL_RECT and rect_start.x >= 0:
 		var a := Vector2i(mini(rect_start.x, rect_cur.x), mini(rect_start.y, rect_cur.y))
 		var b := Vector2i(maxi(rect_start.x, rect_cur.x), maxi(rect_start.y, rect_cur.y))
 		overlay.draw_rect(Rect2(Vector2(a) * cs, Vector2(b - a + Vector2i.ONE) * cs), Color(1, 0.9, 0.3, 0.25))
 		overlay.draw_rect(Rect2(Vector2(a) * cs, Vector2(b - a + Vector2i.ONE) * cs), Color("#ffe14a"), false, 1.0)
+	_draw_vehicle_paths(cs)
 	if get_viewport().gui_get_focus_owner() == null or mouse_mode:
 		var ch := String(LevelEdit.PALETTE[pal][0])
 		var col: Color = COLORS.get(ch, Color("#ffd24a") if LevelEdit.PAD_CHARS.contains(ch) else Color.WHITE)
@@ -759,10 +971,50 @@ func _draw_overlay() -> void:
 		overlay.draw_rect(r, Color(col.r, col.g, col.b, 0.35))
 		overlay.draw_rect(r, Color("#ffe14a"), false, 1.0)
 
+## Fahrzeugpfade: der Pfad im Bau mit erkannten Rollen (Eingang, Zwischenpunkte, Ausgang) und der Pfad des gewählten Fahrzeugs mit seinen Punkten.
+func _pt(p: Variant) -> Vector2:
+	return p if p is Vector2 else Vector2(float(p[0]), float(p[1]))
+
+func _draw_path(pts: Array, cs: float, col: Color, final: bool, cursor_p := Vector2.INF) -> void:
+	var f: Font = Fonts.ui
+	for i in range(pts.size() - 1):
+		overlay.draw_line(_pt(pts[i]) * cs, _pt(pts[i + 1]) * cs, col, 2.0)
+	if cursor_p != Vector2.INF and not pts.is_empty():
+		overlay.draw_dashed_line(_pt(pts[pts.size() - 1]) * cs, cursor_p * cs, Color(col.r, col.g, col.b, 0.6), 1.0, 3.0)
+	for i in pts.size():
+		var p := _pt(pts[i]) * cs
+		var last := final and i == pts.size() - 1
+		var role := tr("ED_ROLE_ENTRY") if i == 0 else (tr("ED_ROLE_EXIT") if last else str(i))
+		var dot := Color("#5dff9a") if i == 0 else (Color("#ff6a4a") if last else Color("#ffe14a"))
+		overlay.draw_circle(p, 3.5, dot)
+		overlay.draw_circle(p, 3.5, Color(0, 0, 0, 0.6), false, 1.0)
+		var pos := p + Vector2(5, -4)
+		overlay.draw_string_outline(f, pos, role, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, 2, Color(0.02, 0.03, 0.1, 0.95))
+		overlay.draw_string(f, pos, role, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, dot)
+
+func _draw_vehicle_paths(cs: float) -> void:
+	if page != 1:
+		return
+	if not veh_pts.is_empty():
+		var cp := Vector2(cursor) + Vector2(0.5, 0.5)
+		_draw_path(veh_pts, cs, Color("#5dd6ff"), false, cp)
+		var role := _veh_role_at(cursor)
+		var rname := tr(["ED_ROLE_ENTRY", "ED_ROLE_WAY", "ED_ROLE_EXIT"][role])
+		var fnt: Font = Fonts.ui
+		overlay.draw_string_outline(fnt, cp * cs + Vector2(7, 10), rname, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, 2, Color(0.02, 0.03, 0.1, 0.95))
+		overlay.draw_string(fnt, cp * cs + Vector2(7, 10), rname, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#ff6a4a") if role == 2 else Color.WHITE)
+	elif model.valid_ref(obj_ref) and not model.path_points(obj_ref).is_empty():
+		_draw_path(model.path_points(obj_ref), cs, Color(0.5, 0.9, 1, 0.8), true)
+
 # ---------------------------------------------------------------------------------------------------------------- Vorschau, Prüfung, Speichern
 
 func _refresh_preview() -> void:
 	preview_t = -1.0
+	var sig := "%d:%d" % [model.rows.hash(), model.sector]
+	var rebuild := sig != _tiles_sig
+	_tiles_sig = sig
+	if rebuild:
+		_shown_rows = model.rows.duplicate()
 	var d: Dictionary = model.to_level_dict()
 	var jobs: Array = model.jobs if not model.jobs.is_empty() else last_jobs
 	var valid := true
@@ -770,7 +1022,7 @@ func _refresh_preview() -> void:
 		valid = valid and model.pad_digits().has(String(j.get("from", ""))) and (String(j.get("to", "")) == "exit" or String(j.get("to", "")) == "H" or model.pad_digits().has(String(j.get("to", ""))))
 	d["jobs"] = jobs if valid else []
 	d["id"] = "editor"
-	canvas.show_level(LevelData.from_dict(d))
+	canvas.show_level(LevelData.from_dict(d), rebuild)
 
 ## Neue Prüfung anfordern: sie startet nach `delay` Sekunden Ruhe (während des Malens nicht ständig).
 func _request_validation(delay: float) -> void:
@@ -897,12 +1149,15 @@ func _enter_menu() -> void:
 	btn_save.grab_focus()
 	overlay.queue_redraw()
 
-## Tab bzw. Y: auf der Kartenseite das nächste Werkzeug, auf der Objektseite ein neues Objekt der gewählten Art.
+## Tab bzw. Y: auf der Kartenseite den nächsten Zeichenmodus (Linie, Rechteck, Füllen), auf der Objektseite das nächste Objekt bzw. das Ende eines Fahrzeugpfads.
 func _primary_next() -> void:
 	if page == 0:
 		_select_tool((tool + 1) % 3)
 	elif page == 1:
-		_obj_add()
+		if not veh_pts.is_empty():
+			_veh_finish()                      # Fahrzeugpfad beenden (letzter Punkt = Ausgang)
+		else:
+			_obj_step(1)                       # nächstes vorhandenes Objekt wählen (auch unsichtbare wie Meteoriten finden)
 
 ## Nach einem Mausklick auf einen Knopf behält er sonst den Fokus und die Tastatur/der Controller malen nicht mehr: Fokus gleich wieder abgeben.
 func _input(event: InputEvent) -> void:
@@ -939,6 +1194,22 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_X:
 		get_viewport().set_input_as_handled()                  # Controller: X öffnet und schließt die Bedienfelder (B löscht beim Zeichnen)
 		_toggle_menu()
+		return
+	if event is InputEventJoypadMotion and (event.axis == JOY_AXIS_TRIGGER_LEFT or event.axis == JOY_AXIS_TRIGGER_RIGHT):
+		get_viewport().set_input_as_handled()                  # Controller: LT/RT schalten die Seiten (Karte, Objekte, Level) zurück/vor
+		var down: bool = event.axis_value > 0.6
+		if event.axis == JOY_AXIS_TRIGGER_LEFT:
+			if down and not trig_l:
+				_set_page(wrapi(page - 1, 0, 3))
+			trig_l = down
+		else:
+			if down and not trig_r:
+				_set_page(wrapi(page + 1, 0, 3))
+			trig_r = down
+		return
+	if event is InputEventJoypadButton and event.pressed and (event.button_index == JOY_BUTTON_LEFT_STICK or event.button_index == JOY_BUTTON_RIGHT_STICK):
+		get_viewport().set_input_as_handled()                  # Stickklick: L3 rückgängig, R3 wiederholen
+		_undo_redo(event.button_index == JOY_BUTTON_LEFT_STICK)
 		return
 	if event.is_action_pressed("ui_cancel"):
 		if focus != null:
@@ -1015,17 +1286,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				handled2 = false
 		if handled2:
 			get_viewport().set_input_as_handled()
-	elif event is InputEventJoypadMotion:
-		var lt: bool = event.axis == JOY_AXIS_TRIGGER_LEFT and event.axis_value > 0.6
-		var rt: bool = event.axis == JOY_AXIS_TRIGGER_RIGHT and event.axis_value > 0.6
-		if event.axis == JOY_AXIS_TRIGGER_LEFT:
-			if lt and not trig_l:
-				_undo_redo(true)
-			trig_l = lt
-		elif event.axis == JOY_AXIS_TRIGGER_RIGHT:
-			if rt and not trig_r:
-				_undo_redo(false)
-			trig_r = rt
 
 func _undo_redo(is_undo: bool) -> void:
 	if active:

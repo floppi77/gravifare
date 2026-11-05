@@ -1,28 +1,29 @@
-# Community-Level
+# Level-Editor und eigene Level
 
-*Deutsch zuerst · [English below](#community-levels-english)*
+*Deutsch zuerst · [English below](#level-editor-and-your-own-levels-english)*
 
-Im Hauptmenü unter **Community** liegen eigene und geteilte Level. Sie sind getrennt vom Feldzug: Sie ändern weder Fortschritt noch Medaillen, Statistik oder Freischaltungen, und die 99 mitgelieferten Level werden nie verändert. Geflogen wird mit dem Serientaxi (ohne Garagen-Einbauten), mit vollem Tank und fünf Leben. Gespeichert werden nur eigene Bestzeit, Bestwert und die Zahl der Flüge je Level.
+Im Hauptmenü unter **Level-Editor** liegen eigene und geteilte Level. Sie sind getrennt vom Feldzug: Sie ändern weder Fortschritt noch Medaillen, Statistik oder Freischaltungen, und die 99 mitgelieferten Level werden nie verändert. Geflogen wird mit dem Serientaxi (ohne Garagen-Einbauten), mit vollem Tank und fünf Leben. Gespeichert werden nur eigene Bestzeit, Bestwert und die Zahl der Flüge je Level.
 
 ## Level bauen (Editor)
 
-*Community → Neues Level* (oder *Bearbeiten* für eine Kopie eines vorhandenen Levels). Die Karte zeigt sofort die echte Spielansicht; die Statuszeile meldet live, ob das Level gültig ist. Das Ausgangstor liegt fest mittig oben. *Testflug* speichert und startet das Level, danach geht es zurück in den Editor. Das geöffnete Level bleibt unverändert; *Speichern* legt eine eigene Fassung an (weitere Speicherungen derselben Sitzung ersetzen sie).
+*Level-Editor → Neues Level* (oder *Bearbeiten* für eine Kopie eines vorhandenen Levels). Die Karte zeigt sofort die echte Spielansicht; die Statuszeile meldet live, ob das Level gültig ist. Das Ausgangstor liegt fest mittig oben. *Testflug* speichert und startet das Level, danach geht es zurück in den Editor. Das geöffnete Level bleibt unverändert; *Speichern* legt eine eigene Fassung an (weitere Speicherungen derselben Sitzung ersetzen sie).
 
-Das rechte Bedienfeld hat drei Seiten (F1–F3):
+Es gibt einen Stift für alles; was er zeichnet, wählst du in einer Symbolpalette (der Name steht zusätzlich als Hinweistext). Das rechte Bedienfeld hat drei Seiten (F1–F3, am Controller LT/RT):
 
-- **Karte:** Fels, Luft, Pads 1–9, Tank, Leben, Klinik, Dornen, Pumpe, Start und die Tore a–e malen (Stift, Rechteck, Füllen); *Pads nummerieren* ordnet die Pad-Nummern lückenlos.
-- **Objekte:** Bewegliche Hindernisse (Trümmer, Schieber, fahrende Plattform, Meteorit, Strahl, Fahrzeug), Zonen (Strömung, Magnet, Schwerkraft, Hitze) und Tore. Hinzufügen setzt ein Objekt an den Zeiger, Klick wählt, Ziehen verschiebt, Rechtsklick entfernt. Alle Zahlen (Position, Größe, Weg, Takt, Versatz, Stärke …) stehen als Zeilen mit **<** und **>**; bei Zonen bedeutet Pulstakt 0 „dauerhaft“. Die Vorschau zeigt die Hindernisse live in Bewegung. Fahrzeuge mit Pfad aus einem kopierten Level behalten ihren Pfad (verschiebbar, Tempo und Lackierung änderbar).
+- **Karte:** Fels, Luft, Pads 1–9, Tank, Leben, Klinik, Dornen, Pumpe, Start und die Tore a–e. Der Stift zieht Linien; **Umschalt+Ziehen** zeichnet ein Rechteck, **Doppelklick** füllt ein Gebiet. Am Controller und per Tab wechselt der Modusknopf (Linie, Rechteck, Füllen). *Pads nummerieren* ordnet die Pad-Nummern lückenlos.
+- **Objekte:** Art als Symbol wählen (Trümmer, Schieber, Plattform, Meteorit, Strahl, Fahrzeug, Strömung, Magnet, Schwerkraft, Hitze). Ein Klick auf eine freie Stelle setzt sie, **Ziehen bestimmt Größe oder Richtung** (Fläche, Radius, Fallweg, Breite, Bewegungsweg). Ein Klick auf ein vorhandenes Objekt wählt es, Ziehen verschiebt es; Rechtsklick (X, B) entfernt das Objekt unter dem Zeiger. Alle Zahlen (Position, Größe, Weg, Takt, Versatz, Stärke …) stehen als Zeilen mit **<** und **>**; bei Zonen bedeutet Pulstakt 0 „dauerhaft“. Die Vorschau zeigt die Hindernisse live in Bewegung. Tore malst du auf der Karte, ihre Zeiten stellst du hier ein.
+- **Fremdfahrzeuge:** *Fahrzeug* wählen, dann nacheinander klicken: **Eingang** (am besten in der Wand), beliebig viele **Zwischenpunkte** in freiem Raum, und ein Klick auf **Wand oder Rand** setzt den **Ausgang** (wird automatisch erkannt; Y bzw. Tab beendet den Pfad am letzten Punkt, Rechtsklick bzw. B bricht ab). Die Rollen stehen an den Punkten. Einzelne Pfadpunkte lassen sich später ziehen, Rechtsklick auf einen Punkt entfernt ihn (mindestens zwei bleiben).
 - **Level:** Optik (Sektor), Dunkelheit und die **Aufträge**. Automatisch erzeugte Aufträge lassen sich würfeln oder mit *Eigene Aufträge* in eine Liste übernehmen: je Zeile Start und Ziel wechseln (ein Klick), *Z* = zerbrechlich (darf zur Klinik), *+* fügt einen Auftrag ein, *×* löscht ihn. Der letzte Auftrag führt zum Ausgang. Verstöße gegen die Regeln meldet die Statuszeile.
 
 | | Maus | Tastatur | Controller |
 |---|---|---|---|
 | Bewegen | Mauszeiger | Pfeile / WASD | Stick, Steuerkreuz |
-| Malen / Löschen | links / rechts | Leertaste / X, Rücktaste | A / B |
-| Auswahl (Karte: Feld, Objekte: Objekt) | Rad, Knöpfe | Q/E, 1–9 (Pads) | LB / RB |
-| Werkzeug bzw. neues Objekt | Knöpfe | Tab, N | Y |
-| Rückgängig / Wiederholen | – | Strg+Z / Strg+Y | LT / RT |
+| Zeichnen / Löschen | links / rechts | Leertaste / X, Rücktaste | A / B |
+| Auswahl (Karte: Feld, Objekte: Art) | Rad, Symbole | Q/E, 1–9 (Pads) | LB / RB |
+| Zeichenmodus bzw. nächstes Objekt | Modusknopf, Umschalt, Doppelklick | Tab | Y |
+| Seite wechseln | Reiter | F1 / F2 / F3 | LT / RT |
+| Rückgängig / Wiederholen | – | Strg+Z / Strg+Y | L3 / R3 (Stickklick) |
 | Testflug / Vorschau | Knöpfe | T / V | Start / Back |
-| Seite wechseln | Reiter | F1 / F2 / F3 | über die Bedienfelder |
 | Bedienfelder an/aus | Klick | Esc | X (in den Feldern auch B) |
 
 ## Level weitergeben und einlesen
@@ -66,13 +67,13 @@ Eigene Level gehören den Autorinnen und Autoren. Kopien mitgelieferter Level si
 
 ---
 
-# Community levels (English)
+# Level editor and your own levels (English)
 
-Under **Community** in the main menu you find your own and shared levels. They are separate from the campaign: they change neither progress nor medals, statistics or unlocks, and the 99 bundled levels are never modified. You fly the standard taxi (no garage upgrades) with a full tank and five lives. Only your best time, best score and the number of flights per level are saved.
+Under **Level editor** in the main menu you find your own and shared levels. They are separate from the campaign: they change neither progress nor medals, statistics or unlocks, and the 99 bundled levels are never modified. You fly the standard taxi (no garage upgrades) with a full tank and five lives. Only your best time, best score and the number of flights per level are saved.
 
 ## Building levels (editor)
 
-*Community → New level* (or *Edit* for a copy of an existing level). The map shows the real game view; the status line reports live whether the level is valid. The exit gate sits fixed in the middle at the top, jobs are generated automatically (*Re-roll jobs* for others). Doors, moving obstacles, zones and darkness of an edited level are preserved. *Test flight* saves and starts the level, then returns to the editor. The opened level stays unchanged; *Save* creates your own version (further saves in the same session replace it). The right panel has three pages (F1–F3): *Map* (tiles incl. gates a–e), *Objects* (moving obstacles, zones and gates with all their numbers; click selects, drag moves, right-click removes) and *Level* (look, darkness and a job table: start, destination, Z = fragile, + insert, × delete). Controls: mouse (left paints, right erases, wheel selects), keyboard (arrows/WASD move, Space paints, X erases, Q/E select, Tab tool or new object, N new object, Ctrl+Z/Y, T test flight, V preview, F1–F3 pages, Esc toggles the panels) and controller (stick/D-pad move, A paint, B erase, LB/RB select, Y tool or new object, LT/RT undo/redo, Start test flight, Back preview, X toggles the panels; B leaves the panels again).
+*Level editor → New level* (or *Edit* for a copy of an existing level). The map shows the real game view; the status line reports live whether the level is valid. The exit gate sits fixed in the middle at the top, jobs are generated automatically (*Re-roll jobs* for others). Doors, moving obstacles, zones and darkness of an edited level are preserved. *Test flight* saves and starts the level, then returns to the editor. The opened level stays unchanged; *Save* creates your own version (further saves in the same session replace it). There is one pen for everything; what it draws is picked from a palette of symbols (the name is shown as a tooltip and label). The right panel has three pages (F1–F3, controller LT/RT): *Map* (tiles incl. gates a–e; the pen draws lines, **Shift+drag** a rectangle, **double-click** fills; on the controller and with Tab the mode button cycles line/rectangle/fill), *Objects* (pick a kind as a symbol; click an empty spot to place it, **drag to set size or direction**; click an object to select/move it; right-click, X or B removes the object under the pointer; all numbers as rows with < and >) and *Level* (look, darkness and a job table: start, destination, Z = fragile, + insert, × delete). **Foreign vehicles:** pick *Vehicle*, then click the **entry** (best inside the wall), any number of **waypoints** in free space, and a **wall or edge** sets the **exit** (detected automatically; Y/Tab ends the path at the last point, right-click/B cancels). Controls: mouse (left draws, right erases, wheel selects), keyboard (arrows/WASD move, Space draws, X erases, Q/E select, Tab mode or next object, N new object, Ctrl+Z/Y, T test flight, V preview, F1–F3 pages, Esc toggles the panels) and controller (stick/D-pad move, A draw, B erase, LB/RB select, Y mode or next object, LT/RT page, L3/R3 undo/redo, Start test flight, Back preview, X toggles the panels; B leaves the panels again).
 
 ## Sharing and importing
 
