@@ -73,24 +73,38 @@ static func leg_length(lvl: LevelData, from_id: String, to_id: String) -> float:
 	return length
 
 ## Schnelle Lösbarkeitsprüfung: Jede Fahrt der Auftragsfolge (Start → Abholung → Ziel → Ausgang) braucht einen Flugweg bei kleinstem Rand.
-## Dasselbe Ergebnis wie `analyze(...).solvable`, aber ohne die Suche nach dem größten Rand (die bei jedem zu großen Rand das ganze Raster durchsucht
+## Wie `analyze(...).solvable` (am Tor aber mit nur `Pathing.GATE_FREE_DEPTH` Anflugtiefe, also etwas großzügiger), aber ohne die Suche nach dem größten Rand (die bei jedem zu großen Rand das ganze Raster durchsucht
 ## und beim Editor mehrere hundert Millisekunden je Prüfung kostete).
 static func is_solvable(lvl: LevelData) -> bool:
+	return blocked_leg(lvl).is_empty()
+
+## Erste Fahrt ohne Flugweg als {"from", "to"} (Kennungen: "S" = Start, Pad-Ziffer oder "exit"); leer, wenn alle Fahrten möglich sind.
+## Der Editor lässt damit Start-, Ziel- und Torfelder blinken.
+static func blocked_leg(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open
 	lvl.exit_open = true
 	var cur := _start_point(lvl)
-	var ok := true
+	var cur_id := "S"
+	var gate := Pathing.gate_approach(lvl, Pathing.GATE_FREE_DEPTH)
+	var bad := {}
 	for job in lvl.jobs:
-		var a := Pathing.hover_point(lvl, lvl.pads[String(job.from)], 8.0)
-		var b: Vector2 = Pathing.gate_approach(lvl) if String(job.to) == "exit" else Pathing.hover_point(lvl, lvl.pads[String(job.to)], 8.0)
-		if Pathing.plan(lvl, cur, a, STEP).is_empty() or Pathing.plan(lvl, a, b, STEP).is_empty():
-			ok = false
+		var f := String(job.from)
+		var t := String(job.to)
+		var a := Pathing.hover_point(lvl, lvl.pads[f], 8.0)
+		var b: Vector2 = gate if t == "exit" else Pathing.hover_point(lvl, lvl.pads[t], 8.0)
+		if Pathing.plan(lvl, cur, a, STEP).is_empty():
+			bad = {"from": cur_id, "to": f}
+			break
+		if Pathing.plan(lvl, a, b, STEP).is_empty():
+			bad = {"from": f, "to": t}
 			break
 		cur = b
-	if ok and (lvl.jobs.is_empty() or String(lvl.jobs[lvl.jobs.size() - 1].to) != "exit"):
-		ok = not Pathing.plan(lvl, cur, Pathing.gate_approach(lvl), STEP).is_empty()
+		cur_id = t
+	if bad.is_empty() and (lvl.jobs.is_empty() or String(lvl.jobs[lvl.jobs.size() - 1].to) != "exit"):
+		if Pathing.plan(lvl, cur, gate, STEP).is_empty():
+			bad = {"from": cur_id, "to": "exit"}
 	lvl.exit_open = was_open
-	return ok
+	return bad
 
 static func analyze(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open

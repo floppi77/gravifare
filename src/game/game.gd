@@ -102,8 +102,8 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
-	if OS.get_cmdline_user_args().has("--autopilot"):
-		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
+	if OS.get_cmdline_user_args().has("--autopilot") or (Flow.community and Flow.editor_autopilot):
+		run.extras_enabled = false      # Autopilot (Dev bzw. Testflug im Level-Editor) fährt nur die Auftragskette
 		autopilot = Bot.new(run)
 	for ua in OS.get_cmdline_user_args():
 		if ua.begins_with("--skip-time="):          # Dev: Spielzeit vorspulen (Taxi bleibt stehen), z. B. für Screenshots von Meteoriten
@@ -614,7 +614,7 @@ func _physics_process(_delta: float) -> void:
 			Flow.shift_fares += run.delivered + run.extras_delivered
 			Flow.shift_maps += 1
 		elif Flow.community:
-			if counted:                      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist
+			if counted and not Flow.editor_autopilot:                      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
 				Save.complete_community(Flow.current_level, run.level_time, score)
 			counted = false
 		elif Flow.daily:

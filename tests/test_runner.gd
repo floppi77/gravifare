@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3029,7 +3029,7 @@ func _test_community_isolated() -> void:
 	for suffix in ["", ".tmp"]:
 		_rm(sv.slot_path(1) + suffix)
 	var game_src := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(game_src.contains("elif Flow.community:\n\t\t\tif counted:") and game_src.contains("and not Flow.daily and not Flow.community:") and save_src.contains("if community_mode:\n\t\treturn"),
+	check(game_src.contains("elif Flow.community:\n\t\t\tif counted and not Flow.editor_autopilot:") and game_src.contains("and not Flow.daily and not Flow.community:") and save_src.contains("if community_mode:\n\t\treturn"),
 		"Community: Abschluss, Finale-Sprung und Statistik-Sperre sind im Spielcode vorhanden (Quelltextprüfung)")
 
 func _test_community_texts() -> void:
@@ -3626,5 +3626,152 @@ func _test_editor_unified_pen() -> void:
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tr_de)
 	var src := FileAccess.get_file_as_string("res://src/ui/level_editor.gd")
-	check(src.contains("JOY_AXIS_TRIGGER_LEFT or event.axis == JOY_AXIS_TRIGGER_RIGHT") and src.contains("_set_page(wrapi(page - 1, 0, 3))") and src.contains("JOY_BUTTON_LEFT_STICK") and src.contains("_pad_pressed(JOY_BUTTON_B)"),
+	check(src.contains("JOY_AXIS_TRIGGER_LEFT or event.axis == JOY_AXIS_TRIGGER_RIGHT") and src.contains("_set_page(wrapi(page - 1, 0, 3), true)") and src.contains("JOY_BUTTON_LEFT_STICK") and src.contains("_pad_pressed(JOY_BUTTON_B)"),
 		"Stift: Controller – LT/RT schalten Seiten, Stickklick Rückgängig/Wiederholen, B löscht (Quelltextprüfung)")
+
+
+# ---------------------------------------------------------------------------------------------------------------- Runde 45: Regelprüfung, Blinken, Controller, Autopilot
+
+func _test_gate_space_rule() -> void:
+	var gx := 40 / 2 - 2                                     # Torzellen gx … gx+3, Mitte zwischen Spalte gx+1 und gx+2
+	var ok_rows: Array = []
+	var bad_rows: Array = []
+	for row in [5, 6, 7, 8]:
+		var m = LE.blank()
+		m.set_cell(gx + 2, row, "^")
+		(ok_rows if m.validate().ok else bad_rows).append(row)
+	check(ok_rows == [5, 6, 7, 8], "Torraum: zwei freie Felder unter dem Tor genügen, Dornen darunter sind erlaubt (gesperrt: %s)" % str(bad_rows))
+	var m2 = LE.blank()
+	m2.set_cell(gx + 2, 4, "^")
+	check(m2.validate().errors.any(func(e): return e.code == "UNSOLVABLE"), "Torraum: Dornen direkt am Flugweg unter dem Tor bleiben unlösbar")
+
+func _test_error_locations() -> void:
+	var m = LE.blank()
+	m.set_cell(20, 10, "S")
+	var d: Dictionary = m.to_wrapper()
+	d.level.map[9] = String(d.level.map[9]).substr(0, 8) + "S" + String(d.level.map[9]).substr(9)         # zweiter Start
+	var r := LE.validate_wrapper(d)
+	var e: Dictionary = {}
+	for x in r.errors:
+		if x.code == "SPAWN_COUNT":
+			e = x
+	check(not e.is_empty() and (e.at.cells as Array).size() == 2, "Blinken: zwei Startpunkte werden mit ihren Feldern gemeldet")
+	var m2 = LE.blank()
+	m2.rect(Vector2i(14, 3), Vector2i(26, 8), "#")
+	var u: Dictionary = {}
+	for x in m2.validate().errors:
+		if x.code == "UNSOLVABLE":
+			u = x
+	check(not u.is_empty() and (u.at.cells as Array).size() > 0, "Blinken: unlösbare Fahrt meldet Start-, Ziel- und Torfelder")
+	var m3 = LE.blank()
+	var pad_cells: Array = []
+	for x in range(1, 39):
+		if m3.cell(x, 20) == "2":
+			pad_cells.append(x)
+	m3.set_cell(pad_cells[0], 20, "#")
+	m3.set_cell(pad_cells[1], 20, "#")                      # Pad 2 wird zu schmal
+	var n: Dictionary = {}
+	for x in m3.validate().errors:
+		if x.code == "PAD_NARROW":
+			n = x
+	check(not n.is_empty() and (n.at.cells as Array).size() == 2, "Blinken: zu schmales Pad meldet seine Felder")
+
+func _test_editor_blink_and_pad() -> void:
+	var tr_de := Translation.new()
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	tr_de.locale = "de"
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	CS.dir = "user://test_community_editor2/"
+	CS._cache.clear()
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed._validate_now()
+	# Fehler erzeugen: Tor zubauen, dann Speichern/Testflug versuchen
+	ed.model.rect(Vector2i(14, 3), Vector2i(26, 8), "#")
+	ed._test_flight(false)
+	check(ed._blink > 0.0 and not ed._bad_cells.is_empty(), "Blinken: gescheiterter Testflug lässt die betroffenen Felder blinken (%d Felder)" % ed._bad_cells.size())
+	ed._changed()
+	check(ed._blink == 0.0, "Blinken: nach einer Änderung hört das Blinken auf")
+	# Untere Leiste: Testflug und Autopilot sind erreichbar, Textfelder lassen sich verlassen
+	check(ed.bar_btns.size() == 6, "Controller: untere Leiste hat Speichern, Testflug, Autopilot, Vorschau, Raster, Zurück")
+	var chain: Array = []
+	var b: Control = ed.bar_btns[0]
+	for i in 6:
+		chain.append(b)
+		var nb: Control = b.get_node(b.focus_neighbor_right)
+		if nb == b:
+			break
+		b = nb
+	check(chain.size() == 6 and chain[1] == ed.bar_btns[1] and chain[2] == ed.bar_btns[2], "Controller: links/rechts erreicht alle Knöpfe der Leiste, auch Testflug und Autopilot")
+	check(ed.name_edit.get_node(ed.name_edit.focus_neighbor_right) == ed.author_edit and ed.bar_btns[0].get_node(ed.bar_btns[0].focus_neighbor_top) == ed.name_edit and ed.author_edit.get_node(ed.author_edit.focus_neighbor_bottom) == ed.bar_btns[3],
+		"Controller: Name/Autor sind mit der Leiste verbunden")
+	# Bildschirmtastatur
+	ed._open_osk(ed.name_edit)
+	var o: Control = ed.osk
+	o._ready()                                              # nicht im Baum: Aufbau von Hand
+	check(o.keys.size() == 50 and o.text_label != null, "Bildschirmtastatur: 50 Zeichentasten und Textanzeige")
+	check(o != null and o.text == ed.name_edit.text, "Controller: A auf dem Namensfeld öffnet die Bildschirmtastatur mit dem bisherigen Text")
+	o.text = ""
+	o._press_char("q")
+	o._toggle_shift()
+	o._press_char("a")
+	o._press_char(" ")
+	o._press_char("ä")
+	check(o.text == "qA ä", "Bildschirmtastatur: tippt, Umschalten gilt für einen Buchstaben (%s)" % o.text)
+	o._backspace()
+	o._accept()
+	check(ed.osk == null and ed.name_edit.text == "qA" and String(ed.model.names.get("de", "")) == "qA", "Bildschirmtastatur: Fertig übernimmt den Text ins Feld und ins Modell (%s)" % ed.name_edit.text)
+	ed._open_osk(ed.author_edit)
+	ed.osk._press_char("x")
+	ed.osk._cancel()
+	check(ed.osk == null and ed.author_edit.text == "", "Bildschirmtastatur: Abbruch verwirft")
+	# Level-Seite: Fokus kommt mit dem Seitenwechsel
+	ed._set_page(2, true)
+	check(ed.page == 2 and ed.page_first[2] != null, "Controller: die Level-Seite hat einen Einstiegsknopf")
+	ed._set_page(0)
+	ed.free()
+	CS.dir = CS.DIR
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+
+func _test_autopilot_flag_and_list() -> void:
+	var flow := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	var game := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(flow.contains("func start_community(id: String, autopilot := false)") and flow.contains("editor_autopilot = autopilot and return_to_editor != \"\""), "Autopilot: nur aus dem Editor heraus startbar (Quelltextprüfung)")
+	check(game.contains("Flow.community and Flow.editor_autopilot") and game.contains("counted and not Flow.editor_autopilot"), "Autopilot: fliegt im Testflug und zählt keine Bestzeit (Quelltextprüfung)")
+	var tr_de := Translation.new()
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	tr_de.locale = "de"
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	var sel := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
+	check(not sel.contains("mouse_entered.connect(_select") and sel.contains("double_click"), "Levelliste: Darüberfahren ändert die Auswahl nicht, Doppelklick spielt (Quelltextprüfung)")
+	# Auswahl bleibt, wenn die Maus zum Löschknopf wandert: _select wird nur über den Fokus gesetzt
+	CS.dir = "user://test_community_ui2/"
+	CS._cache.clear()
+	CS.import_text(JSON.stringify(_cl_wrap("s1_01")))
+	CS.import_text(JSON.stringify(_cl_wrap("s1_02")))
+	var scr: Control = load("res://src/ui/community_select.gd").new()
+	scr.back = func(): pass
+	scr._ready()
+	scr._select(0)
+	var first_id := String(scr.entries[0].id)
+	scr._delete()
+	scr._delete()
+	check(CS.list().size() == 1 and not CS.exists(first_id), "Levelliste: Löschen trifft den angewählten Eintrag, nicht den letzten")
+	scr.free()
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+	for fn in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + fn)
+	DirAccess.remove_absolute(CS.dir)
+	CS.dir = CS.DIR

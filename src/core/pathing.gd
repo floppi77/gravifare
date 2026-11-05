@@ -95,9 +95,13 @@ static func exit_goal(level: LevelData) -> Vector2:
 	return level.exit_rect().get_center()
 
 ## Anflugpunkt unter dem Tor (für die Metrik: das Tor selbst ist nur 32 px hoch und würde den Korridor künstlich begrenzen).
-static func gate_approach(level: LevelData) -> Vector2:
+## `depth`: Abstand unter der Torkante. Die Richtzeiten-Metrik nimmt 60 px; die Lösbarkeitsprüfung der Level-Werkstatt nur 24 px (`GATE_FREE_DEPTH`):
+## Zwei freie Felder unter dem Tor genügen, dahinter dürfen Fels und Dornen anschließen.
+const GATE_FREE_DEPTH := 24.0
+
+static func gate_approach(level: LevelData, depth := 60.0) -> Vector2:
 	var r := level.exit_rect()
-	return Vector2(r.get_center().x, r.end.y + 60.0)
+	return Vector2(r.get_center().x, r.end.y + depth)
 
 ## Einflug-Pfad für den Levelwechsel: aus dem Tor in der Decke, frei von Hindernissen, bis auf die Startplattform.
 ## Rückgabe: Polylinie (Chaikin-geglättet, sofern die Glättung frei bleibt). `landing` = Landeposition des Taxis.

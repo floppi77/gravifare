@@ -22,6 +22,7 @@ var community := false:                 # Community-Level (user://community/, si
 	set(v):
 		community = v
 		Save.community_mode = v
+var editor_autopilot := false            # Testflug aus dem Level-Editor: der Autopilot fliegt, man sieht ihm zu (zählt nichts)
 var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
 
@@ -189,9 +190,10 @@ func resume_campaign() -> bool:
 	return true
 
 ## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; der Feldzug bleibt unberührt (wie der Übungsflug).
-func start_community(id: String) -> void:
+func start_community(id: String, autopilot := false) -> void:
 	if not community_store().exists(id):
 		return
+	editor_autopilot = autopilot and return_to_editor != ""        # nur aus dem Editor heraus
 	lives = Tuning.START_LIVES
 	entry_fuel = Tuning.FUEL_MAX
 	entry_credits = 0.0
@@ -207,6 +209,7 @@ func start_level(id: String) -> void:
 	community = community_level_script().is_valid_id(id)       # nur hier gesetzt: kein anderer Spielmodus kann es „vergessen“
 	if not community:
 		return_to_editor = ""
+		editor_autopilot = false
 	get_tree().paused = false
 	get_tree().change_scene_to_file(GAME)
 
@@ -224,6 +227,7 @@ func next_level_id() -> String:
 func to_menu() -> void:
 	menu_screen = ("editor:" + return_to_editor if return_to_editor != "" else "community") if community else ""
 	return_to_editor = ""
+	editor_autopilot = false
 	var g := get_tree().current_scene
 	if shift and g != null and "run" in g:
 		finish_shift(g.run.delivered + g.run.extras_delivered)      # Schicht abgebrochen: Bestwert trotzdem sichern

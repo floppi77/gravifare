@@ -136,7 +136,7 @@ func _rebuild(focus_id := "") -> void:
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.clip_text = true
 		b.focus_entered.connect(_select.bind(i))
-		b.mouse_entered.connect(_select.bind(i))
+		b.gui_input.connect(_row_input.bind(b, String(e.id)))
 		list_box.add_child(b)
 		if first == null:
 			first = b
@@ -187,6 +187,16 @@ func _select(i: int) -> void:
 	var id := String(e.id)
 	lines.append(tr("CM_BEST") % [int(Save.community_best_time(id)), Save.community_best_score(id), Save.community_plays(id)] if Save.community_plays(id) > 0 else tr("CM_NO_BEST"))
 	info_text.text = "\n".join(lines)
+
+## Maus: Einfachklick wählt nur an (so lässt sich danach löschen oder kopieren), Doppelklick spielt. Das bloße Darüberfahren ändert die Auswahl nicht
+## (der Weg zum Löschknopf führte sonst über die unteren Einträge). Tastatur und Gamepad: Fokus wählt an, Bestätigen spielt.
+func _row_input(ev: InputEvent, b: Button, id: String) -> void:
+	if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+		b.accept_event()
+		if ev.double_click:
+			_play(id)
+		else:
+			b.grab_focus()
 
 func _play(id: String) -> void:
 	Flow.start_community(id)

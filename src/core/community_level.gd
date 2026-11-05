@@ -58,8 +58,22 @@ static func is_valid_id(id: Variant) -> bool:
 
 # ---------------------------------------------------------------------------------------------------------------- Hilfsfunktionen
 
-static func _err(res: Dictionary, code: String, args: Array = []) -> void:
-	res.errors.append({"code": code, "args": args})
+## `at` (optional): Fundstelle für den Editor, damit er die betroffenen Objekte blinken lassen kann: {"cells": [[x, y], …], "movers": [Index, …]}.
+static func _err(res: Dictionary, code: String, args: Array = [], at: Dictionary = {}) -> void:
+	var e := {"code": code, "args": args}
+	if not at.is_empty():
+		e["at"] = at
+	res.errors.append(e)
+
+## Kartenfelder mit einem der Zeichen `chars` als [[x, y], …].
+static func _cells_of(map: Array, chars: String) -> Array:
+	var out: Array = []
+	for y in map.size():
+		var row := String(map[y])
+		for x in row.length():
+			if chars.contains(row[x]):
+				out.append([x, y])
+	return out
 
 static func _warn(res: Dictionary, code: String, args: Array = []) -> void:
 	res.warnings.append({"code": code, "args": args})
@@ -201,16 +215,17 @@ static func _clean_movers(v: Variant, res: Dictionary) -> Array:
 	if v.size() > MAX_MOVERS:
 		_err(res, "TOO_MANY_MOVERS", [MAX_MOVERS])
 		return out
-	for d in v:
+	for i in v.size():
+		var d: Variant = v[i]
 		if not (d is Dictionary) or not KINDS_MOVER.has(_str(d.get("kind"))):
-			_err(res, "BAD_MOVER")
+			_err(res, "BAD_MOVER", [], {"movers": [i]})
 			return []
 		var m := _clean_mover(d)
 		if m.kind == "pad" and m.pad == "":
-			_err(res, "BAD_MOVER")
+			_err(res, "BAD_MOVER", [], {"movers": [i]})
 			return []
 		if m.kind == "vehicle" and m.has("path") and m.path.size() < 2:
-			_err(res, "BAD_MOVER")
+			_err(res, "BAD_MOVER", [], {"movers": [i]})
 			return []
 		out.append(m)
 	return out
@@ -332,6 +347,14 @@ static func clean(raw: Variant) -> Dictionary:
 	res.ok = true
 	return res
 
+## Fundstelle eines Auftrags: die Felder seiner Pads (Abholung, Ziel; "exit" = Tor).
+static func _job_at(map: Array, j: Dictionary) -> Dictionary:
+	var chars := ""
+	for k in ["from", "to"]:
+		var id := String(j.get(k, ""))
+		chars += "E" if id == "exit" else (id if id.length() == 1 else "")
+	return {"cells": _cells_of(map, chars)}
+
 ## Baut ein LevelData, prüft die Spielregeln und setzt Aufträge samt Richtzeiten (bei fehlenden Aufträgen werden sie erzeugt).
 static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -> void:
 	var spawns := 0
@@ -340,7 +363,7 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 		spawns += String(r).count("S")
 		exits += String(r).count("E")
 	if spawns != 1:
-		_err(res, "SPAWN_COUNT", [spawns])
+		_err(res, "SPAWN_COUNT", [spawns], {"cells": _cells_of(lvl.map, "S")})
 	if exits == 0:
 		_err(res, "NO_EXIT")
 	if not res.errors.is_empty():
@@ -351,7 +374,7 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 	var base := LevelData.from_dict(lvl)
 	var er := base.exit_rect()
 	if not (er.size.x > 0 and absf(er.get_center().x - base.width * Tuning.TILE * 0.5) < 1.0 and er.position.y <= Tuning.TILE * 2.0):
-		_err(res, "EXIT_PLACE")
+		_err(res, "EXIT_PLACE", [], {"cells": _cells_of(lvl.map, "E")})
 	var runs := {}                                # dieselbe Pad-Ziffer an zwei getrennten Stellen ergäbe nur ein Pad: abweisen
 	for r in lvl.map:
 		var row: String = r
@@ -361,23 +384,23 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 				runs[c] = int(runs.get(c, 0)) + 1
 	for c in runs:
 		if int(runs[c]) > 1:
-			_err(res, "PAD_SPLIT", [c])
+			_err(res, "PAD_SPLIT", [c], {"cells": _cells_of(lvl.map, c)})
 	var ids: Array = []
 	for id in base.pads:
 		var p: Dictionary = base.pads[id]
 		if base.is_passenger_pad(id):
 			ids.append(int(id))
 			if int((p.x1 - p.x0) / Tuning.TILE) < 4:
-				_err(res, "PAD_NARROW", [id])
+				_err(res, "PAD_NARROW", [id], {"cells": _cells_of(lvl.map, String(id))})
 			if int(p.get("side", 0)) == 0:
 				_warn(res, "NO_SHELTER", [id])
 	ids.sort()
 	if ids.size() < 2 or ids.size() > 9:
-		_err(res, "PAD_COUNT", [ids.size()])
+		_err(res, "PAD_COUNT", [ids.size()], {"cells": _cells_of(lvl.map, "123456789")})
 	else:
 		for i in ids.size():
 			if ids[i] != i + 1:
-				_err(res, "PAD_NUMBERS")
+				_err(res, "PAD_NUMBERS", [], {"cells": _cells_of(lvl.map, "123456789")})
 				break
 	if not res.errors.is_empty():
 		return
@@ -399,13 +422,13 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 			var to := String(j.to)
 			var to_ok: bool = to == "exit" or base.is_passenger_pad(to) or (to == "H" and base.pads.has("H") and bool(j.get("fragile", false)))      # „H“: Krankenhaus, Ziel zerbrechlicher Fahrgäste
 			if not base.is_passenger_pad(String(j.from)) or not to_ok or String(j.from) == to:
-				_err(res, "JOB_PADS", [i + 1])
+				_err(res, "JOB_PADS", [i + 1], _job_at(lvl.map, j))
 				return
 			if (to == "exit") != (i == jobs.size() - 1):
-				_err(res, "JOB_EXIT")
+				_err(res, "JOB_EXIT", [], _job_at(lvl.map, j))
 				return
 			if String(j.from) == prev_to:
-				_err(res, "JOB_CHAIN", [i + 1])
+				_err(res, "JOB_CHAIN", [i + 1], _job_at(lvl.map, j))
 				return
 			prev_to = to
 	if jobs.is_empty():
@@ -422,8 +445,13 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 	lvl["jobs"] = out
 	lvl.erase("job_seed")                         # die Aufträge stehen jetzt fest in der Datei
 	var final := LevelData.from_dict(lvl)
-	if not LevelMetrics.is_solvable(final):
-		_err(res, "UNSOLVABLE")
+	var bad := LevelMetrics.blocked_leg(final)
+	if not bad.is_empty():
+		var chars := ""
+		for k in ["from", "to"]:
+			var id := String(bad[k])
+			chars += "E" if id == "exit" else id
+		_err(res, "UNSOLVABLE", [], {"cells": _cells_of(lvl.map, chars)})
 
 # ---------------------------------------------------------------------------------------------------------------- Ein- und Ausgabe
 

@@ -9,6 +9,7 @@ const CommunityStore := preload("res://src/core/community_store.gd")
 const LevelEdit := preload("res://src/core/level_edit.gd")
 const EditorCanvas := preload("res://src/ui/editor_canvas.gd")
 const IconButton := preload("res://src/ui/icon_button.gd")
+const Osk := preload("res://src/ui/osk.gd")
 
 const TILE := 16.0
 const ZOOM := 0.75
@@ -71,6 +72,10 @@ var pal_btns: Array = []
 var look_label: Label
 var dark_label: Label
 var btn_back: Button
+var bar_btns: Array = []                    # untere Leiste: Speichern, Testflug, Autopilot, Vorschau, Raster, Zurück
+var osk: Control = null                     # Bildschirmtastatur (Controller) für Name und Autor
+var level_rows: Array = []                  # Knopfreihen der Level-Seite (feste Fokusnachbarn; Auftragszeilen kommen beim Neuaufbau dazu)
+var page_first: Array = [null, null, null]  # erster fokussierbarer Knopf je Seite (Einstieg mit dem Controller)
 var btn_save: Button
 # Strich
 var active := false
@@ -93,6 +98,9 @@ static var _warmed := false                 # Einmal je Programmlauf: die erste 
 var _tiles_sig := ""                        # Karte und Optik der gezeigten Felsschicht; nur bei Änderung wird sie neu gezeichnet
 var _shown_rows: Array = []                 # Karte der gezeigten Vorschau: Unterschiede zeichnet die Zeichenfläche während eines Strichs selbst
 var _slim_styles := {}
+var _blink := 0.0                           # Restzeit des Blinkens fehlerhafter Objekte (nach gescheitertem Speichern oder Testflug)
+var _bad_cells: Array = []                  # betroffene Kartenfelder (Vector2i)
+var _bad_movers: Array = []                 # betroffene bewegliche Hindernisse (Index im Modell)
 var input_ready := false
 var trig_l := false
 var trig_r := false
@@ -299,13 +307,15 @@ func _build_page_objects(pg: Control) -> void:
 
 func _build_page_level(pg: Control) -> void:
 	look_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
-	_button("<", _change_look.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
-	_button(">", _change_look.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
+	var look_l := _button("<", _change_look.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
+	var look_r := _button(">", _change_look.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
+	page_first[2] = look_l
 	dark_label = _label("", Vector2(22, 22), Vector2(100, 14), pg)
-	_button("<", _change_dark.bind(-1), Vector2(0, 20), Vector2(20, 17), pg)
-	_button(">", _change_dark.bind(1), Vector2(124, 20), Vector2(20, 17), pg)
-	_button(tr("ED_REROLL"), _reroll, Vector2(0, 40), Vector2(70, 17), pg, 7)
+	var dark_l := _button("<", _change_dark.bind(-1), Vector2(0, 20), Vector2(20, 17), pg)
+	var dark_r := _button(">", _change_dark.bind(1), Vector2(124, 20), Vector2(20, 17), pg)
+	var reroll := _button(tr("ED_REROLL"), _reroll, Vector2(0, 40), Vector2(70, 17), pg, 7)
 	job_mode_btn = _button("", _job_mode, Vector2(74, 40), Vector2(70, 17), pg, 7)
+	level_rows = [[look_l, look_r], [dark_l, dark_r], [reroll, job_mode_btn]]
 	job_box = Control.new()
 	job_box.position = Vector2(0, 62)
 	job_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -327,7 +337,7 @@ func _build_bottom() -> void:
 	bottom = Control.new()
 	bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bottom)
-	status = _label("", Vector2(6, 284), Vector2(480, 20), bottom)
+	status = _label("", Vector2(6, 283), Vector2(630, 21), bottom)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.add_theme_color_override("font_color", Color("#ffe14a"))
 	hint = _label("", Vector2(6, 305), Vector2(630, 11), bottom)
@@ -339,11 +349,68 @@ func _build_bottom() -> void:
 	_label(tr("ED_AUTHOR"), Vector2(270, 318), Vector2(38, 16), bottom)
 	author_edit = _line_edit(Vector2(310, 318), Vector2(130, 16), CommunityLevel.MAX_AUTHOR)
 	author_edit.text_changed.connect(_author_changed)
-	btn_save = _button(tr("ED_SAVE"), func(): _save(true), Vector2(6, 338), Vector2(118, 18), bottom)
-	_button(tr("ED_TEST"), _test_flight, Vector2(128, 338), Vector2(118, 18), bottom)
-	_button(tr("ED_PREVIEW"), func(): _set_preview(true), Vector2(250, 338), Vector2(118, 18), bottom)
-	_button(tr("ED_GRID"), _toggle_grid, Vector2(372, 338), Vector2(118, 18), bottom)
-	btn_back = _button(tr("ED_BACK"), _request_back, Vector2(494, 338), Vector2(142, 18), bottom)
+	var specs := [[tr("ED_SAVE"), func(): _save(true), 98.0], [tr("ED_TEST"), func(): _test_flight(false), 98.0], [tr("ED_AUTOPILOT"), func(): _test_flight(true), 98.0],
+		[tr("ED_PREVIEW"), func(): _set_preview(true), 98.0], [tr("ED_GRID"), _toggle_grid, 98.0], [tr("ED_BACK"), _request_back, 120.0]]
+	var x := 6.0
+	for sp in specs:
+		var bb := _button(sp[0], sp[1], Vector2(x, 338), Vector2(sp[2], 18), bottom)
+		bar_btns.append(bb)
+		x += float(sp[2]) + 4.0
+	btn_save = bar_btns[0]
+	btn_back = bar_btns[5]
+	_wire_bar()
+
+## Fokusnachbarn der unteren Leiste: links/rechts innerhalb der Reihe, hoch zu Name bzw. Autor, runter zur Leiste. Die automatische Suche übersprang Knöpfe (Testflug)
+## und blieb in den Textfeldern hängen, weil die ihre Pfeiltasten selbst verbrauchen.
+func _wire_bar() -> void:
+	for i in bar_btns.size():
+		var b: Control = bar_btns[i]
+		b.focus_neighbor_left = b.get_path_to(bar_btns[maxi(i - 1, 0)])
+		b.focus_neighbor_right = b.get_path_to(bar_btns[mini(i + 1, bar_btns.size() - 1)])
+		b.focus_neighbor_bottom = b.get_path_to(b)
+		b.focus_neighbor_top = b.get_path_to(name_edit if i < 3 else author_edit)
+	name_edit.focus_neighbor_left = name_edit.get_path_to(name_edit)
+	name_edit.focus_neighbor_right = name_edit.get_path_to(author_edit)
+	name_edit.focus_neighbor_bottom = name_edit.get_path_to(bar_btns[0])
+	author_edit.focus_neighbor_left = author_edit.get_path_to(name_edit)
+	author_edit.focus_neighbor_right = author_edit.get_path_to(author_edit)
+	author_edit.focus_neighbor_bottom = author_edit.get_path_to(bar_btns[3])
+
+## Feste Fokusnachbarn der Level-Seite: links/rechts in der Reihe, hoch/runter zur Reihe darüber/darunter (gleiche Spalte bzw. letzte Taste). Oben geht es zu den Seitenknöpfen,
+## unten zur Leiste. Die automatische Suche sprang von „<“ zu den Seitenknöpfen statt zu „>“.
+func _wire_level_page(job_rows: Array) -> void:
+	var rows: Array = level_rows.duplicate()
+	rows.append_array(job_rows)
+	for r in rows.size():
+		var row: Array = rows[r]
+		for c in row.size():
+			var b: Control = row[c]
+			b.focus_neighbor_left = b.get_path_to(row[maxi(c - 1, 0)])
+			b.focus_neighbor_right = b.get_path_to(row[mini(c + 1, row.size() - 1)])
+			var up: Control = page_btns[2] if r == 0 else rows[r - 1][mini(c, rows[r - 1].size() - 1)]
+			var down: Control = btn_save if r == rows.size() - 1 else rows[r + 1][mini(c, rows[r + 1].size() - 1)]
+			b.focus_neighbor_top = b.get_path_to(up)
+			b.focus_neighbor_bottom = b.get_path_to(down)
+
+## Controller: A auf einem Textfeld öffnet die Bildschirmtastatur (Tastatur und Maus tippen direkt ins Feld).
+func _open_osk(edit: LineEdit) -> void:
+	if osk != null:
+		return
+	osk = Osk.new()
+	osk.text = edit.text
+	osk.max_len = edit.max_length if edit.max_length > 0 else 40
+	osk.title_text = tr("ED_OSK_NAME") if edit == name_edit else tr("ED_OSK_AUTHOR")
+	osk.finished.connect(_osk_done.bind(edit))
+	add_child(osk)
+
+func _osk_done(t: String, accepted: bool, edit: LineEdit) -> void:
+	if osk != null:
+		osk.queue_free()
+		osk = null
+	if accepted:
+		edit.text = t
+		edit.text_changed.emit(t)
+	edit.grab_focus.call_deferred()
 
 func _line_edit(pos: Vector2, sz: Vector2, max_len: int) -> LineEdit:
 	var e := LineEdit.new()
@@ -477,13 +544,14 @@ func _update_hint() -> void:
 		else:
 			hint.text = tr("ED_HINT_OBJ_PAD") if gamepad_hint else tr("ED_HINT_OBJ_KEYS")
 	elif page == 2:
-		hint.text = tr("ED_HINT_LVL")
+		hint.text = tr("ED_HINT_LVL_PAD") if gamepad_hint else tr("ED_HINT_LVL")
 	else:
 		hint.text = tr("ED_HINT_PAD") if gamepad_hint else tr("ED_HINT_KEYS")
 
 # ---------------------------------------------------------------------------------------------------------------- Seiten, Objekte, Aufträge
 
-func _set_page(i: int) -> void:
+## `focus`: Controller und F-Tasten – auf der Level-Seite gibt es nichts zu zeichnen, der Fokus geht gleich in ihre Knöpfe.
+func _set_page(i: int, focus := false) -> void:
 	if active:
 		return
 	_veh_cancel()
@@ -500,6 +568,14 @@ func _set_page(i: int) -> void:
 		_rebuild_jobs(true)
 	_update_hint()
 	overlay.queue_redraw()
+	if page == 2 and focus and page_first[2] != null and is_inside_tree():
+		(page_first[2] as Button).grab_focus()
+	elif focus and page != 2 and get_viewport().gui_get_focus_owner() != null and not _bottom_has_focus():
+		get_viewport().gui_release_focus()                 # Seitenwechsel im Bedienfeld: zurück zum Zeichnen
+
+func _bottom_has_focus() -> bool:
+	var f := get_viewport().gui_get_focus_owner()
+	return f != null and bottom.is_ancestor_of(f)
 
 ## Objekt der gewählten Art am Zeiger setzen (Taste N, Tests); mit der Maus genügt ein Klick auf eine freie Stelle.
 func _obj_add() -> void:
@@ -655,6 +731,7 @@ func _rebuild_jobs(force := false) -> void:
 	var own: bool = not model.jobs.is_empty()
 	job_mode_btn.text = tr("ED_J_AUTO") if own else tr("ED_J_CUSTOM")
 	var list: Array = model.jobs if own else last_jobs
+	var job_rows: Array = []
 	for i in list.size():
 		var j: Dictionary = list[i]
 		var y := i * 15.0
@@ -676,6 +753,9 @@ func _rebuild_jobs(force := false) -> void:
 		if not own:
 			for b in [bf, bt, bz, bi, bd]:
 				b.disabled = true
+		else:
+			job_rows.append([bf, bt, bz, bi, bd])
+	_wire_level_page(job_rows)
 	_focus_regrab()
 
 # ---------------------------------------------------------------------------------------------------------------- Zeichnen
@@ -925,6 +1005,7 @@ func _draw_overlay() -> void:
 			overlay.draw_line(Vector2(x * cs, 0), Vector2(x * cs, model.h * cs), gc, 1.0)
 		for y in range(1, model.h):
 			overlay.draw_line(Vector2(0, y * cs), Vector2(model.w * cs, y * cs), gc, 1.0)
+	_draw_blink(cs)
 	if preview_mode:
 		return
 	if _shown_rows != model.rows and _shown_rows.size() == model.rows.size():
@@ -1027,6 +1108,7 @@ func _refresh_preview() -> void:
 ## Neue Prüfung anfordern: sie startet nach `delay` Sekunden Ruhe (während des Malens nicht ständig).
 func _request_validation(delay: float) -> void:
 	_model_rev += 1
+	_blink = 0.0
 	validate_t = delay
 
 ## Prüfung sofort und gleichzeitig (beim Öffnen und vor dem Speichern, wo das Ergebnis gebraucht wird).
@@ -1087,10 +1169,43 @@ func _apply_validation(r: Dictionary) -> void:
 	if page == 2:
 		_rebuild_jobs()
 
+## Lässt die Objekte blinken, an denen die Prüfung scheitert (Fundstellen `at` der Fehler: Felder und bewegliche Hindernisse).
+func _flag_errors() -> void:
+	_bad_cells = []
+	_bad_movers = []
+	for e in res.get("errors", []):
+		var at: Dictionary = e.get("at", {})
+		for c in at.get("cells", []):
+			var v := Vector2i(int(c[0]), int(c[1]))
+			if not _bad_cells.has(v):
+				_bad_cells.append(v)
+		for i in at.get("movers", []):
+			_bad_movers.append(int(i))
+	_blink = 5.0 if (not _bad_cells.is_empty() or not _bad_movers.is_empty()) else 0.0
+	overlay.queue_redraw()
+
+func _draw_blink(cs: float) -> void:
+	if _blink <= 0.0:
+		return
+	var on := fmod(_blink, 0.5) > 0.25                                 # 2 Hz hart an/aus: auch bei Farbenschwäche gut zu sehen
+	if not on:
+		return
+	for v in _bad_cells:
+		var rc := Rect2(Vector2(v) * cs, Vector2(cs, cs))
+		overlay.draw_rect(rc, Color(1, 0.15, 0.2, 0.55))
+		overlay.draw_rect(rc.grow(1.0), Color(1, 1, 1, 0.95), false, 2.0)
+	for i in _bad_movers:
+		var bnd: Rect2 = model.obj_bounds({"t": "mover", "i": i})
+		if bnd.size != Vector2.ZERO:
+			var rr := Rect2(bnd.position * cs, bnd.size * cs)
+			overlay.draw_rect(rr, Color(1, 0.15, 0.2, 0.45))
+			overlay.draw_rect(rr, Color(1, 1, 1, 0.95), false, 2.0)
+
 ## Speichert eine eigene Fassung. Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
 func _save(announce: bool) -> String:
 	_validate_now()
 	if not res.ok:
+		_flag_errors()
 		return ""
 	var err := CommunityStore.save(res, model.author)
 	if err != "":
@@ -1109,14 +1224,15 @@ func _save(announce: bool) -> String:
 		status.add_theme_color_override("font_color", Color("#5dff9a"))
 	return res.id
 
-func _test_flight() -> void:
+## Testflug: selbst fliegen, oder (`autopilot`) dem Autopiloten beim Lösen zusehen. Bei Fehlern blinken die betroffenen Objekte.
+func _test_flight(autopilot := false) -> void:
 	var id := _save(false)
 	if id == "":
 		if res.ok == false:
-			_say(tr("ED_NEED_VALID") + "\n" + status.text)
+			_say(tr("ED_NEED_VALID") + " " + status.text.replace("\n", " "))
 		return
 	Flow.return_to_editor = id
-	Flow.start_community(id)
+	Flow.start_community(id, autopilot)
 
 func _request_back() -> void:
 	if model.dirty and not leave_armed:
@@ -1146,7 +1262,10 @@ func _toggle_menu() -> void:
 		_enter_menu()
 
 func _enter_menu() -> void:
-	btn_save.grab_focus()
+	if page == 2 and page_first[2] != null:
+		(page_first[2] as Button).grab_focus()           # die Level-Seite hat nichts zu zeichnen: ihre Knöpfe zuerst
+	else:
+		btn_save.grab_focus()
 	overlay.queue_redraw()
 
 ## Tab bzw. Y: auf der Kartenseite den nächsten Zeichenmodus (Linie, Rechteck, Füllen), auf der Objektseite das nächste Objekt bzw. das Ende eines Fahrzeugpfads.
@@ -1161,10 +1280,26 @@ func _primary_next() -> void:
 
 ## Nach einem Mausklick auf einen Knopf behält er sonst den Fokus und die Tastatur/der Controller malen nicht mehr: Fokus gleich wieder abgeben.
 func _input(event: InputEvent) -> void:
+	if osk != null:
+		return                                                 # die Bildschirmtastatur gehört sich selbst
+	var fo := get_viewport().gui_get_focus_owner()
+	if fo is LineEdit and (event is InputEventJoypadButton or event is InputEventJoypadMotion) and not event.is_echo():
+		# Controller im Textfeld: A öffnet die Bildschirmtastatur, die Richtungen verlassen das Feld (es würde sie sonst für den Cursor verbrauchen)
+		if event.is_action_pressed("ui_accept"):
+			get_viewport().set_input_as_handled()
+			_open_osk(fo)
+			return
+		for side in [[SIDE_LEFT, "ui_left"], [SIDE_RIGHT, "ui_right"], [SIDE_TOP, "ui_up"], [SIDE_BOTTOM, "ui_down"]]:
+			if event.is_action_pressed(side[1]):
+				get_viewport().set_input_as_handled()
+				var nb: Control = fo.find_valid_focus_neighbor(side[0])
+				if nb != null:
+					nb.grab_focus()
+				return
 	if event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_release_button_focus.call_deferred()
 	# Im Zeichenmodus (kein Knopf fokussiert) gehören Pfeile, A/Enter und Tab dem Editor: sonst würde die Oberfläche den Fokus an sich ziehen.
-	if not preview_mode and get_viewport().gui_get_focus_owner() == null:
+	if not preview_mode and page != 2 and get_viewport().gui_get_focus_owner() == null:
 		for a in ["ui_left", "ui_right", "ui_up", "ui_down", "ui_accept", "ui_focus_next", "ui_focus_prev"]:
 			if event.is_action(a):
 				get_viewport().set_input_as_handled()
@@ -1179,6 +1314,8 @@ func _release_button_focus() -> void:
 		overlay.queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if osk != null:
+		return
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		gamepad_hint = true
 		_update_hint()
@@ -1200,11 +1337,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		var down: bool = event.axis_value > 0.6
 		if event.axis == JOY_AXIS_TRIGGER_LEFT:
 			if down and not trig_l:
-				_set_page(wrapi(page - 1, 0, 3))
+				_set_page(wrapi(page - 1, 0, 3), true)
 			trig_l = down
 		else:
 			if down and not trig_r:
-				_set_page(wrapi(page + 1, 0, 3))
+				_set_page(wrapi(page + 1, 0, 3), true)
 			trig_r = down
 		return
 	if event is InputEventJoypadButton and event.pressed and (event.button_index == JOY_BUTTON_LEFT_STICK or event.button_index == JOY_BUTTON_RIGHT_STICK):
@@ -1214,7 +1351,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		if focus != null:
 			get_viewport().set_input_as_handled()
-			get_viewport().gui_release_focus()                 # in den Bedienfeldern geht B (wie Esc) zurück zur Zeichenfläche
+			if page == 2:
+				_set_page(0)                                   # Level-Seite: B geht zurück zur Karte (dort wird gezeichnet)
+			else:
+				get_viewport().gui_release_focus()             # in den Bedienfeldern geht B (wie Esc) zurück zur Zeichenfläche
 			overlay.queue_redraw()
 		elif event is InputEventKey:
 			get_viewport().set_input_as_handled()
@@ -1252,14 +1392,16 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_F2:
 					_set_page(1)
 				KEY_F3:
-					_set_page(2)
+					_set_page(2, true)
 				KEY_G:
 					grid_on = not grid_on
 					overlay.queue_redraw()
 				KEY_V:
 					_set_preview(true)
 				KEY_T, KEY_F5:
-					_test_flight()
+					_test_flight(false)
+				KEY_F6:
+					_test_flight(true)
 				KEY_P:
 					_eyedrop(cursor)
 				KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9:
@@ -1279,7 +1421,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			JOY_BUTTON_Y:
 				_primary_next()
 			JOY_BUTTON_START:
-				_test_flight()
+				_test_flight(false)
 			JOY_BUTTON_BACK:
 				_set_preview(true)
 			_:
@@ -1308,6 +1450,9 @@ func _pad_pressed(button: int) -> bool:
 	return false
 
 func _process(delta: float) -> void:
+	if _blink > 0.0:
+		_blink = maxf(0.0, _blink - delta)
+		overlay.queue_redraw()
 	if preview_t >= 0.0:
 		preview_t -= delta
 		if preview_t < 0.0:
