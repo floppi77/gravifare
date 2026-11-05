@@ -107,7 +107,7 @@ Offen: Gamepad-/Eingabetest am echten Gerät, Menü, Pause mit Optionen, Fonts, 
 
 
 ## Dornen
-Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung festen Zusatzschaden (`Tuning.SPIKE_DAMAGE` = 30 Hülle, unabhängig vom Tempo; 0,5 s Sperre gegen Mehrfachzählung). Sie zählen in der Schwierigkeitsmetrik als Gefahr. Erstes Auftreten: S1-08.
+Dornenzellen (`^`) sind fest wie Fels, verursachen aber bei jeder Berührung festen Zusatzschaden (`Tuning.SPIKE_DAMAGE` = 65 Hülle (vorher 30), unabhängig vom Tempo und von der Werkstatt-Panzerung; 0,5 s Sperre gegen Mehrfachzählung). Sie zählen in der Schwierigkeitsmetrik als Gefahr. Erstes Auftreten: S1-08.
 
 ## Zusatzfahrgäste und Ökonomie (siebte Runde)
 - **Zusatzfahrgäste** (`Run.extras`, ab Level 5, Anzahl je Level in `Tuning.extra_slots`): erscheinen in zufälligen Abständen (9–18 s) an einem freien Passagierpad mit zufälligem Ziel, auch während das Taxi jemanden fährt. Das Taxi hat einen Sitz: Solange ein Zusatzfahrgast an Bord ist, steigt der Auftrags-Fahrgast nicht ein (und umgekehrt). Geduld 42–70 s; danach schimpft der Fahrgast („bored“-Sprachzeile) und geht. Bezahlung wie beim Auftrags-Fahrgast (Zeitfaktor, Streckenzuschlag, Serie), aber nicht Teil des Levelziels; zählt für die Einkommens-Medaille.
@@ -424,4 +424,8 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Ein Stift für alles:** Die Textknöpfe Stift/Rechteck/Füllen sind weg. Der Stift zieht Linien, Umschalt+Ziehen ergibt ein Rechteck, Doppelklick füllt (Controller und Tab: Modusknopf mit Symbol). Paletten sind Symbolknöpfe (`icon_button.gd`, gezeichnet in `editor_icons.gd` mit den Grafiken des Spiels für Fels, Pads, Dornen und Taxi; Name als Hinweistext und Beschriftung). Auf der Objektseite wählt man die Art als Symbol: ein Klick auf eine freie Stelle setzt das Objekt, Ziehen bestimmt Größe bzw. Richtung (`LevelEdit.size_object`), ein Klick auf ein Objekt wählt/verschiebt es, Löschen entfernt das Objekt unter dem Zeiger.
 - **Fremdfahrzeuge:** Eingang → Zwischenpunkte → Ausgang. Die Rolle des nächsten Klicks wird am Zeiger erkannt (Wand, Rand oder Fels = Ausgang, sonst Zwischenpunkt, der erste Klick = Eingang) und mit Beschriftung gezeigt; ein Klick auf Wand/Rand beendet den Pfad, Y/Tab beendet am letzten Punkt, Löschen bricht ab. Vorhandene Pfade lassen sich an einzelnen Punkten ziehen oder kürzen; Greifen nur an der Linie (`pick_object`). Neue Fahrzeuge sind immer Pfade (`add_vehicle_path`).
 - **Controller:** LT/RT schalten die Seiten (Karte/Objekte/Level), L3/R3 (Stickklick) sind Rückgängig/Wiederholen (vorher LT/RT), B löscht, X öffnet die Bedienfelder.
+
+## Runde 44: Dornen deutlich gefährlicher
+
+- Der Wandaufprall kostet `100·((v−40)/110)^1,3` Hülle (60 px/s: 11, 80 px/s: 27, 100 px/s: 45, ab 150 px/s Totalschaden). Dornen sind feste Zellen und lösten zusätzlich einen festen Schaden aus, der bei 30 kaum über einem mittleren Wandaufprall lag und sich deshalb kaum davon unterschied. Jetzt kostet jede Dornenberührung 65 Hülle (0,5 s Sperre gegen Mehrfachzählung): zwei Berührungen zerstören das Taxi, selbst eine langsame ist teurer als der härteste Wandaufprall, der noch nicht zerstört. Ein Test hält den Abstand fest (Dorn ≥ 1,4 × Aufprall mit 100 px/s, ≥ 2,3 × Aufprall mit 80 px/s).
 

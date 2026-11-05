@@ -56,7 +56,7 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S1-05 | Doppelschacht (zwei 5-Tiles-Schächte) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→Ausgang | 1: 6, 2/3: 5, 4: 6 | 72.5 | 20 px | 3742 px | 34 px | bestanden (93 s, Tank 25 %) | – |
 | S1-06 | Tankwart (Tanken wird Pflicht) | Lena 3→2, Mika 4→3, Odo 2→4, Jonas 1→2, Ines 3→Ausgang | 1: 7, 2: 6, 3: 7, 4: 6 | 73.8 | 16 px | 3763 px | 50 px | bestanden (100 s, Tank 18 %) | – |
 | S1-07 | Rundkurs (Ringweg um Mittelblock) | Lena 3→2, Odo 4→1, Mika 2→3, Jonas 1→4, Ines 3→Ausgang | 1: 7, 2: 7, 3/4: 5 | 82.4 | 16 px | 4618 px | 34 px | bestanden (101 s, Tank 20 %) | – |
-| S1-08 | Dornenpfad (**erste Dornen**: 30 Hülle je Berührung) | Ines 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Mika 2→Ausgang | 1: 7, 2: 6, 3: 5, 4: 7 | 89.6 | 12 px | 3445 px | 34 px | bestanden (99 s, Tank 20 %) | – |
+| S1-08 | Dornenpfad (**erste Dornen**: 65 Hülle je Berührung) | Ines 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Mika 2→Ausgang | 1: 7, 2: 6, 3: 5, 4: 7 | 89.6 | 12 px | 3445 px | 34 px | bestanden (99 s, Tank 20 %) | – |
 | S1-09 | Nadelspitzen (Säulen über Dornenfeld) | Odo 3→2, Lena 4→3, Mika 2→4, Jonas 1→2, Ines 4→1, Mika 3→Ausgang | 1: 6, 2–4: 5 | 90.2 | 16 px | 3754 px | 34 px | bestanden (101 s, Tank 17 %) | – |
 | S1-10 | Tanknot (Tankturm hoch oben) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→1, Mika 2→Ausgang | 1: 7, 2–4: 5 | 91.6 | 20 px | 4390 px | 34 px | bestanden (142 s, Tank 55 %) | – |
 | S1-11 | **Meisterprüfung** (Bunker, 2-Tiles-Tunnel, Dornen, Tankturm) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→2, Mika 3→Ausgang | 1: 6, 2–4: 5 | 97.4 | 8 px | 4374 px | 34 px | bestanden (118 s, Tank 67 %) | – |

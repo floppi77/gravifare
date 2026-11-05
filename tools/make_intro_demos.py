@@ -60,7 +60,7 @@ def spikes():
     return level("spikes", r, ("Dornen", "Spikes"), {
         "focus": [320, 190], "zoom": 1.6, "length": 9.0, "show_hull": True, "start": [320, 120],
         "script": [{"t": 0, "mode": "hover", "p": [320, 120]}, {"t": 2.0, "mode": "go", "p": [320, 200], "speed": 50},
-                   {"t": 4.5, "mode": "go", "p": [320, 110], "speed": 70}]})
+                   {"t": 3.9, "mode": "go", "p": [320, 110], "speed": 70}]})
 
 
 @demo

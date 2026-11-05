@@ -350,6 +350,19 @@ func _test_spikes() -> void:
 	check(hits >= 1, "Dornen: Berührung löst Dornenschaden aus (%d Treffer)" % hits)
 	check(s.hull <= 100.0 - Tuning.SPIKE_DAMAGE + 0.01, "Dornen: fester Schaden auch bei langsamer Berührung (%.0f Hülle)" % s.hull)
 	check(s.hull > 0.0 or s.state == TaxiSim.State.DESTROYED, "Dornen: Hülle fällt nicht unter 0, ohne zerstört zu sein")
+	var wall_80 := 100.0 * pow((80.0 - Tuning.IMPACT_SAFE) / (Tuning.CRASH_SPEED - Tuning.IMPACT_SAFE), Tuning.DAMAGE_EXP)
+	var wall_100 := 100.0 * pow((100.0 - Tuning.IMPACT_SAFE) / (Tuning.CRASH_SPEED - Tuning.IMPACT_SAFE), Tuning.DAMAGE_EXP)
+	check(Tuning.SPIKE_DAMAGE >= 1.4 * wall_100 and Tuning.SPIKE_DAMAGE >= 2.3 * wall_80 and Tuning.SPIKE_DAMAGE * 2.0 >= Tuning.HULL_MAX,
+		"Dornen: massiv gefährlicher als Wände (Dorn %.0f, Wandaufprall 80 px/s %.0f, 100 px/s %.0f; zwei Berührungen zerstören das Taxi)" % [Tuning.SPIKE_DAMAGE, wall_80, wall_100])
+	var s2 := TaxiSim.new()
+	s2.setup(lv)
+	s2.pos = Vector2(sp_x * Tuning.TILE + 8.0, 8.0 * Tuning.TILE)
+	s2.vel = Vector2(0, 30)
+	s2.state = TaxiSim.State.FLYING
+	s2.damage_k = 0.5                                    # Werkstatt-Panzerung mindert Wandaufprälle, Dornen durchschlagen sie
+	for i in 240:
+		s2.step(Vector2.ZERO, false)
+	check(s2.hull <= 100.0 - Tuning.SPIKE_DAMAGE + 0.01, "Dornen: auch mit Werkstatt-Panzerung voller Dornenschaden (%.0f Hülle)" % s2.hull)
 
 func _test_spikes_attached() -> void:
 	var dir := DirAccess.open("res://data/levels")
