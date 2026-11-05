@@ -72,6 +72,26 @@ static func leg_length(lvl: LevelData, from_id: String, to_id: String) -> float:
 	_leg_cache[key] = length
 	return length
 
+## Schnelle Lösbarkeitsprüfung: Jede Fahrt der Auftragsfolge (Start → Abholung → Ziel → Ausgang) braucht einen Flugweg bei kleinstem Rand.
+## Dasselbe Ergebnis wie `analyze(...).solvable`, aber ohne die Suche nach dem größten Rand (die bei jedem zu großen Rand das ganze Raster durchsucht
+## und beim Editor mehrere hundert Millisekunden je Prüfung kostete).
+static func is_solvable(lvl: LevelData) -> bool:
+	var was_open := lvl.exit_open
+	lvl.exit_open = true
+	var cur := _start_point(lvl)
+	var ok := true
+	for job in lvl.jobs:
+		var a := Pathing.hover_point(lvl, lvl.pads[String(job.from)], 8.0)
+		var b: Vector2 = Pathing.gate_approach(lvl) if String(job.to) == "exit" else Pathing.hover_point(lvl, lvl.pads[String(job.to)], 8.0)
+		if Pathing.plan(lvl, cur, a, STEP).is_empty() or Pathing.plan(lvl, a, b, STEP).is_empty():
+			ok = false
+			break
+		cur = b
+	if ok and (lvl.jobs.is_empty() or String(lvl.jobs[lvl.jobs.size() - 1].to) != "exit"):
+		ok = not Pathing.plan(lvl, cur, Pathing.gate_approach(lvl), STEP).is_empty()
+	lvl.exit_open = was_open
+	return ok
+
 static func analyze(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open
 	lvl.exit_open = true         # Tor für die Planung passierbar

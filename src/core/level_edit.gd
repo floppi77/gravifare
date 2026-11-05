@@ -119,8 +119,8 @@ static func from_result(res: Dictionary) -> RefCounted:
 func to_level_dict() -> Dictionary:
 	var d := {"name": names.duplicate(), "sector": sector, "index": index, "dark": dark, "map": rows.duplicate(), "doors": doors.duplicate(true),
 		"movers": movers.duplicate(true), "zones": zones.duplicate(true), "jobs": jobs.duplicate(true)}
-	if jobs.is_empty() and job_seed > 0:
-		d["job_seed"] = job_seed
+	if job_seed > 0:
+		d["job_seed"] = job_seed                 # gilt nur, solange keine eigenen Aufträge da sind (die Prüfung wertet es dann aus)
 	return d
 
 func to_wrapper() -> Dictionary:
@@ -129,18 +129,27 @@ func to_wrapper() -> Dictionary:
 		doc["derived_from"] = derived_from
 	return doc
 
-## Prüfung wie beim Einlesen. Passen die Aufträge nicht mehr zur Karte, werden sie verworfen und neu erzeugt (`jobs_reset`).
-func validate() -> Dictionary:
-	var res := CL.clean(to_wrapper())
-	jobs_reset = false
-	if not res.ok and not jobs.is_empty():
+## Prüfung wie beim Einlesen, ohne Zugriff auf das Modell (darf in einem Arbeitsfaden laufen). Passen die Aufträge nicht mehr zur Karte (nur `JOB_*`-Fehler),
+## werden sie verworfen und neu erzeugt: Ergebnis mit `jobs_reset = true`.
+static func validate_wrapper(doc: Dictionary) -> Dictionary:
+	var res := CL.clean(doc)
+	if not res.ok and not (doc.level.get("jobs", []) as Array).is_empty():
 		var only_jobs: bool = not res.errors.is_empty()
 		for e in res.errors:
 			only_jobs = only_jobs and String(e.code).begins_with("JOB_")
 		if only_jobs:
-			jobs = []
-			jobs_reset = true
-			res = CL.clean(to_wrapper())
+			var d2: Dictionary = doc.duplicate(true)
+			d2.level["jobs"] = []
+			res = CL.clean(d2)
+			res["jobs_reset"] = true
+	return res
+
+## Prüfung des Modells (gleichzeitig): verworfene Aufträge werden auch im Modell gelöscht.
+func validate() -> Dictionary:
+	var res := validate_wrapper(to_wrapper())
+	jobs_reset = bool(res.get("jobs_reset", false))
+	if jobs_reset:
+		jobs = []
 	return res
 
 # ---------------------------------------------------------------------------------------------------------------- Karte

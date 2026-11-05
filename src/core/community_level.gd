@@ -422,7 +422,7 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 	lvl["jobs"] = out
 	lvl.erase("job_seed")                         # die Aufträge stehen jetzt fest in der Datei
 	var final := LevelData.from_dict(lvl)
-	if not bool(LevelMetrics.analyze(final).get("solvable", false)):
+	if not LevelMetrics.is_solvable(final):
 		_err(res, "UNSOLVABLE")
 
 # ---------------------------------------------------------------------------------------------------------------- Ein- und Ausgabe

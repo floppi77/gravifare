@@ -76,6 +76,11 @@ var key_paint := false
 var key_erase := false
 var preview_t := -1.0
 var validate_t := -1.0
+var _thread: Thread = null                  # Prüfung läuft im Arbeitsfaden (kostet je nach Level bis zu einigen hundert Millisekunden)
+var _model_rev := 0                         # zählt Änderungen; ein Ergebnis zu älterem Stand wird verworfen
+var _thread_rev := 0
+var _jobs_sig := ""
+var _slim_styles := {}
 var input_ready := false
 var trig_l := false
 var trig_r := false
@@ -110,7 +115,8 @@ func _ready() -> void:
 	_select_tool(TOOL_PEN)
 	_set_page(0)
 	_sync_fields()
-	_revalidate()
+	status.text = tr("CM_CHECKING")
+	_start_async()                         # die erste Prüfung (bei großen Leveln mehrere hundert Millisekunden) blockiert das Öffnen nicht
 	_refresh_preview()
 	_update_hint()
 
@@ -167,13 +173,16 @@ func _button(text: String, cb: Callable, pos: Vector2, sz: Vector2, parent: Cont
 
 ## Schmale Ränder, damit kleine Knöpfe ihre Größe behalten (der Menü-Stil lässt je 8 px Rand, das sprengt 33–45 px breite Knöpfe).
 func _slim(b: Button) -> void:
-	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
-		var sb := b.get_theme_stylebox(st)
-		if sb is StyleBoxTexture:
-			var c := sb.duplicate() as StyleBoxTexture
-			c.content_margin_left = 3.0
-			c.content_margin_right = 3.0
-			b.add_theme_stylebox_override(st, c)
+	if _slim_styles.is_empty():
+		for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+			var sb := b.get_theme_stylebox(st)
+			if sb is StyleBoxTexture:
+				var c := sb.duplicate() as StyleBoxTexture
+				c.content_margin_left = 3.0
+				c.content_margin_right = 3.0
+				_slim_styles[st] = c                  # einmal angelegt und von allen kleinen Knöpfen geteilt (spart beim Neuaufbau der Listen viel Zeit)
+	for st in _slim_styles:
+		b.add_theme_stylebox_override(st, _slim_styles[st])
 
 func _build_panel() -> void:
 	panel = Control.new()
@@ -371,7 +380,7 @@ func _name_changed(t: String) -> void:
 	model.names = {"de": s, "en": s} if s != "" else {"de": "Mein Level", "en": "My level"}
 	model.dirty = true
 	_update_title()
-	validate_t = 0.45
+	_request_validation(0.45)
 
 func _say(t: String) -> void:
 	status.text = t
@@ -400,7 +409,7 @@ func _set_page(i: int) -> void:
 			obj_ref = objs[0] if not objs.is_empty() else {}
 		_rebuild_params()
 	elif page == 2:
-		_rebuild_jobs()
+		_rebuild_jobs(true)
 	_update_hint()
 	overlay.queue_redraw()
 
@@ -519,7 +528,7 @@ func _job_mode() -> void:
 	else:
 		model.jobs_make_auto()
 	_changed()
-	_revalidate()
+	_rebuild_jobs(true)
 
 func _job_cycle(i: int, key: String) -> void:
 	model.job_cycle(i, key, 1)
@@ -542,9 +551,15 @@ func _job_remove(i: int) -> void:
 func _job_changed(key: String) -> void:
 	_regrab = key
 	_changed()
-	_revalidate()
+	_rebuild_jobs(true)
 
-func _rebuild_jobs() -> void:
+func _rebuild_jobs(force := false) -> void:
+	var own_now: bool = not model.jobs.is_empty()
+	var sig := JSON.stringify([own_now, model.jobs if own_now else last_jobs])
+	if not force and sig == _jobs_sig:
+		_focus_regrab()
+		return
+	_jobs_sig = sig
 	for c in job_box.get_children():
 		job_box.remove_child(c)
 		c.queue_free()
@@ -657,13 +672,13 @@ func _end_stroke() -> void:
 
 func _changed_soft() -> void:
 	preview_t = 0.06
-	validate_t = 0.45
+	_request_validation(0.45)
 	_update_title()
 	overlay.queue_redraw()
 
 func _changed() -> void:
 	_refresh_preview()
-	validate_t = 0.35
+	_request_validation(0.35)
 	_update_title()
 	overlay.queue_redraw()
 
@@ -757,14 +772,51 @@ func _refresh_preview() -> void:
 	d["id"] = "editor"
 	canvas.show_level(LevelData.from_dict(d))
 
-func _revalidate() -> void:
+## Neue Prüfung anfordern: sie startet nach `delay` Sekunden Ruhe (während des Malens nicht ständig).
+func _request_validation(delay: float) -> void:
+	_model_rev += 1
+	validate_t = delay
+
+## Prüfung sofort und gleichzeitig (beim Öffnen und vor dem Speichern, wo das Ergebnis gebraucht wird).
+func _validate_now() -> void:
+	_join_validation()
 	validate_t = -1.0
-	res = model.validate()
+	_apply_validation(model.validate())
+
+func _start_async() -> void:
+	validate_t = -1.0
+	if _thread != null:
+		return                                   # läuft schon; bei Rückkehr wird wegen der neueren Änderung neu gestartet
+	_thread_rev = _model_rev
+	_thread = Thread.new()
+	_thread.start(LevelEdit.validate_wrapper.bind(model.to_wrapper()))
+
+func _join_validation() -> void:
+	if _thread != null:
+		_thread.wait_to_finish()
+		_thread = null
+
+func _exit_tree() -> void:
+	_join_validation()
+
+func _poll_validation() -> void:
+	if _thread == null or _thread.is_alive():
+		return
+	var r: Dictionary = _thread.wait_to_finish()
+	_thread = null
+	if _thread_rev == _model_rev:
+		model.jobs_reset = bool(r.get("jobs_reset", false))
+		if model.jobs_reset:
+			model.jobs = []
+		_apply_validation(r)
+	else:
+		_start_async()
+
+func _apply_validation(r: Dictionary) -> void:
+	res = r
 	if res.ok:
 		last_jobs = res.level.jobs
-		var pads := 0
-		for r in model.pad_runs():
-			pads += 1
+		var pads: int = model.pad_runs().size()
 		var txt := tr("ED_VALID") % [pads, res.level.jobs.size()]
 		if model.jobs_reset:
 			txt += " · " + tr("ED_JOBS_RESET")
@@ -785,7 +837,7 @@ func _revalidate() -> void:
 
 ## Speichert eine eigene Fassung. Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
 func _save(announce: bool) -> String:
-	_revalidate()
+	_validate_now()
 	if not res.ok:
 		return ""
 	var err := CommunityStore.save(res, model.author)
@@ -1003,7 +1055,8 @@ func _process(delta: float) -> void:
 	if validate_t >= 0.0:
 		validate_t -= delta
 		if validate_t < 0.0:
-			_revalidate()
+			_start_async()
+	_poll_validation()
 	if preview_mode:
 		return
 	if get_viewport().gui_get_focus_owner() != null:

@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_flow_hooks", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -2950,6 +2950,10 @@ func _test_community_store() -> void:
 	check(r.ok and r.saved and not r.existed and CS.exists(r.id) and CS.list().size() == 1, "Community-Ablage: Import speichert das Level")
 	check(CS.import_text(text).existed, "Community-Ablage: derselbe Inhalt wird nicht doppelt gespeichert")
 	check(CS.list().size() == 1 and CS.list()[0].id == r.id and String(CS.list()[0].name.de) != "", "Community-Ablage: Liste nennt das Level mit Namen")
+	check(FileAccess.file_exists(CS.dir + "index.json") and CS.list()[0].map.size() >= CL.MIN_H, "Community-Ablage: die Liste führt einen Auszug (Index) mit Kartenvorschau")
+	CS._cache.clear()
+	var again: Array = CS.list()
+	check(again.size() == 1 and CS._cache.is_empty(), "Community-Ablage: die Liste prüft unveränderte Dateien nicht erneut (Index)")
 	var code: String = CS.export_code(r.id)
 	check(code != "" and CS.import_text("  " + code + "\n").id == r.id, "Community-Ablage: Teilen-Code lässt sich wieder importieren")
 	check(CS.import_text("GFL1:5:xx").errors.any(func(e): return e.code == "BAD_CODE"), "Community-Ablage: defekter Code wird gemeldet")
@@ -3284,6 +3288,7 @@ func _test_level_editor_screen() -> void:
 	ed.back = func(): pass
 	check(ed.open(""), "Editor-Bildschirm: neues Level öffnet")
 	ed._ready()
+	ed._validate_now()
 	check(ed.res.ok and ed.status.text.contains("3"), "Editor-Bildschirm: Prüfung läuft beim Öffnen (%s)" % ed.status.text.replace("\n", " "))
 	ed._select_tool(0)
 	ed._select_pal(0)
@@ -3349,6 +3354,7 @@ func _test_level_editor_screen() -> void:
 	ed2.back = func(): pass
 	check(ed2.open(id2), "Editor-Bildschirm: gespeichertes Level öffnet zum Bearbeiten")
 	ed2._ready()
+	ed2._validate_now()
 	ed2._begin(false, Vector2i(30, 12))
 	ed2._end_stroke()
 	var id3: String = ed2._save(false)
@@ -3491,3 +3497,23 @@ func _test_level_edit_jobs() -> void:
 	m2.jobs_make_explicit(auto)
 	m2.job_toggle_fragile(0)
 	check(m2.job_options(0, "to").has("H"), "Aufträge: zerbrechliche Fahrgäste dürfen zur Klinik")
+
+func _test_fast_solvability() -> void:
+	var diff: Array = []
+	var dir := DirAccess.open("res://data/levels")
+	for f in dir.get_files():
+		if f.ends_with(".json"):
+			var lvl := LevelData.load_file("res://data/levels/" + f)
+			if LevelMetrics.is_solvable(lvl) != bool(LevelMetrics.analyze(lvl).solvable):
+				diff.append(f)
+	check(diff.is_empty(), "Lösbarkeit: die schnelle Prüfung stimmt bei allen 99 Originalen mit der Analyse überein %s" % str(diff))
+	var m = LE.blank()
+	m.rect(Vector2i(14, 3), Vector2i(26, 8), "#")           # Raum unter dem Ausgangstor zugebaut
+	check(m.validate().errors.any(func(e): return e.code == "UNSOLVABLE"), "Lösbarkeit: zugebauter Raum unter dem Ausgangstor wird erkannt")
+	var m2 = LE.blank()
+	var w: Dictionary = m2.to_wrapper()
+	var r := LE.validate_wrapper(w)
+	check(r.ok and not r.has("jobs_reset") and r.id == m2.validate().id, "Lösbarkeit: Prüfung ohne Modell liefert dasselbe Ergebnis")
+	m2.jobs = [{"from": "9", "to": "exit", "fare": 60.0, "par": 20.0, "passenger": "x", "gender": "f"}]
+	var r2 := LE.validate_wrapper(m2.to_wrapper())
+	check(r2.ok and r2.get("jobs_reset", false) == true and m2.jobs.size() == 1, "Lösbarkeit: unpassende Aufträge werden im Ergebnis verworfen, das Modell bleibt unberührt")

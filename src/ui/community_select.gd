@@ -177,8 +177,7 @@ func _select(i: int) -> void:
 		info_text.text = ""
 		return
 	var e: Dictionary = entries[i]
-	var res := CommunityStore.load_level(String(e.id))
-	preview.rows = res.level.get("map", []) if res.ok else []
+	preview.rows = e.get("map", [])                      # aus dem Listenauszug: die Auswahl soll nicht jedes Level erneut prüfen
 	preview.queue_redraw()
 	info_name.text = String(e.name.get(_lang(), e.name.de))
 	var lines: Array = [tr("CM_AUTHOR") % (String(e.author) if String(e.author) != "" else tr("CM_NO_AUTHOR")), tr("CM_THEME") % [int(e.sector), int(e.jobs)],
