@@ -1,12 +1,11 @@
 extends RefCounted
-## Symbole der Editor-Paletten, gezeichnet (keine zusätzlichen Bilddateien): Kartenfelder mit den Grafiken des Spiels (Fels, Pads, Dornen, Taxi), Hindernisse und
-## Zonen als einfache Zeichen. Verwendung: EditorIcons.draw(canvas_item, "debris", Rect2(...)). Ids: Kartenzeichen ("#", ".", "1"–"9", "F", "L", "H", "^", "P", "S",
+## Symbole der Editor-Paletten, gezeichnet aus Formen und Farben (keine Bilddateien: der Kachelatlas des Spiels ist fast weiß und bekommt seine Farbe erst durch die
+## Beleuchtung der Spielansicht, als Symbol wäre er eine weiße Fläche; nur das Taxi kommt aus seiner Grafik). Hindernisse und Zonen sind einfache Zeichen. Verwendung: EditorIcons.draw(canvas_item, "debris", Rect2(...)). Ids: Kartenzeichen ("#", ".", "1"–"9", "F", "L", "H", "^", "P", "S",
 ## "a"–"e"), Arten ("debris", "slider", "pad", "meteor", "beam", "vehicle", "wind", "magnet", "gravity", "heat") und Zeichenmodi ("mode_line", "mode_rect", "mode_fill").
 
-const ROCK := Rect2(48, 0, 48, 48)
-const PAD := Rect2(4 * 48, 0, 48, 48)
-const FUEL := Rect2(5 * 48, 0, 48, 48)
-const SPIKE := Rect2(6 * 48, 0, 48, 48)
+const ROCK_COL := Color("#5a6aa8")
+const ROCK_DARK := Color("#34407f")
+const ROCK_LIGHT := Color("#8a98d8")
 
 static func _font() -> Font:
 	return Fonts.ui
@@ -24,36 +23,52 @@ static func _arrow(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w := 1.5)
 	var n := Vector2(-d.y, d.x)
 	ci.draw_colored_polygon(PackedVector2Array([b, b - d * 4.0 + n * 2.5, b - d * 4.0 - n * 2.5]), col)
 
+## Plattform als Balken: heller Rand oben, dunklerer Körper.
+static func _bar(ci: CanvasItem, r: Rect2, body: Color, top: Color) -> void:
+	ci.draw_rect(r, body)
+	ci.draw_rect(Rect2(r.position.x, r.position.y, r.size.x, maxf(2.0, r.size.y * 0.22)), top)
+	ci.draw_line(Vector2(r.position.x + 1, r.end.y - 1.5), Vector2(r.end.x - 1, r.end.y - 1.5), Color(0, 0, 0, 0.35), 1.0)
+
+static func _rock(ci: CanvasItem, r: Rect2) -> void:
+	ci.draw_rect(r, ROCK_COL)
+	ci.draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 2.0), ROCK_LIGHT)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 2.0, r.size.x, 2.0), ROCK_DARK)
+	ci.draw_rect(Rect2(r.end.x - 2.0, r.position.y, 2.0, r.size.y), ROCK_DARK)
+	for k in [[0.25, 0.35], [0.65, 0.3], [0.45, 0.65], [0.8, 0.7], [0.18, 0.78]]:
+		ci.draw_rect(Rect2(r.position.x + r.size.x * k[0], r.position.y + r.size.y * k[1], 2, 2), ROCK_DARK)
+
 static func draw(ci: CanvasItem, id: String, r: Rect2) -> void:
-	var tex: Texture2D = SectorLook.tiles(1)
 	var c := r.get_center()
 	var s := minf(r.size.x, r.size.y)
 	match id:
 		"#":
-			ci.draw_texture_rect_region(tex, r, ROCK)
+			_rock(ci, r)
 		".":
 			ci.draw_rect(r, Color(0.03, 0.04, 0.1, 0.9))
 			for i in 4:
 				for j in 3:
 					ci.draw_rect(Rect2(r.position.x + 3.0 + i * (r.size.x - 6.0) / 3.0, r.position.y + 3.0 + j * (r.size.y - 6.0) / 2.0, 1, 1), Color(1, 1, 1, 0.35))
 		"1", "2", "3", "4", "5", "6", "7", "8", "9":
-			ci.draw_texture_rect_region(tex, Rect2(r.position.x, r.position.y + r.size.y * 0.5, r.size.x, r.size.y * 0.42), PAD)
+			_bar(ci, Rect2(r.position.x, r.position.y + r.size.y * 0.58, r.size.x, r.size.y * 0.36), Color("#1f7a86"), Color("#5dffe0"))
 			_text(ci, id, Rect2(r.position.x, r.position.y, r.size.x, r.size.y * 0.55), 9, Color("#ffe14a"))
 		"F":
-			ci.draw_texture_rect_region(tex, Rect2(r.position.x, r.position.y + r.size.y * 0.55, r.size.x, r.size.y * 0.4), FUEL)
+			_bar(ci, Rect2(r.position.x, r.position.y + r.size.y * 0.62, r.size.x, r.size.y * 0.32), Color("#8a6a1f"), Color("#ffd24a"))
 			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -s * 0.38), c + Vector2(-s * 0.2, -s * 0.02), c + Vector2(s * 0.2, -s * 0.02)]), Color("#5dff9a"))
 			ci.draw_circle(c + Vector2(0, -s * 0.0), s * 0.2, Color("#5dff9a"))
 		"L":
-			ci.draw_texture_rect_region(tex, Rect2(r.position.x, r.position.y + r.size.y * 0.55, r.size.x, r.size.y * 0.4), FUEL)
+			_bar(ci, Rect2(r.position.x, r.position.y + r.size.y * 0.62, r.size.x, r.size.y * 0.32), Color("#8a6a1f"), Color("#ffd24a"))
 			ci.draw_circle(c + Vector2(-s * 0.13, -s * 0.12), s * 0.15, Color("#ff8ad8"))
 			ci.draw_circle(c + Vector2(s * 0.13, -s * 0.12), s * 0.15, Color("#ff8ad8"))
 			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-s * 0.27, -s * 0.06), c + Vector2(s * 0.27, -s * 0.06), c + Vector2(0, s * 0.26)]), Color("#ff8ad8"))
 		"H":
-			ci.draw_texture_rect_region(tex, Rect2(r.position.x, r.position.y + r.size.y * 0.55, r.size.x, r.size.y * 0.4), PAD)
+			_bar(ci, Rect2(r.position.x, r.position.y + r.size.y * 0.62, r.size.x, r.size.y * 0.32), Color("#a8b4d0"), Color("#ffffff"))
 			ci.draw_rect(Rect2(c.x - s * 0.08, c.y - s * 0.34, s * 0.16, s * 0.5), Color("#ff4d6d"))
 			ci.draw_rect(Rect2(c.x - s * 0.25, c.y - s * 0.17, s * 0.5, s * 0.16), Color("#ff4d6d"))
 		"^":
-			ci.draw_texture_rect_region(tex, r, SPIKE)
+			ci.draw_rect(Rect2(r.position.x, r.end.y - r.size.y * 0.22, r.size.x, r.size.y * 0.22), ROCK_DARK)
+			for k in 3:
+				var x0 := r.position.x + r.size.x * (k / 3.0)
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(x0 + 1, r.end.y - r.size.y * 0.2), Vector2(x0 + r.size.x / 6.0, r.position.y + 2), Vector2(x0 + r.size.x / 3.0 - 1, r.end.y - r.size.y * 0.2)]), Color("#ff4d6d"))
 		"P":
 			ci.draw_rect(Rect2(c.x - s * 0.14, c.y - s * 0.38, s * 0.28, s * 0.78), Color("#2f8f5a"))
 			ci.draw_rect(Rect2(c.x - s * 0.1, c.y - s * 0.3, s * 0.2, s * 0.2), Color("#7dffb0"))
@@ -76,7 +91,7 @@ static func draw(ci: CanvasItem, id: String, r: Rect2) -> void:
 			ci.draw_rect(Rect2(c.x - s * 0.22, c.y - s * 0.32, s * 0.44, s * 0.64), Color("#ffe14a"), false, 1.0)
 			_arrow(ci, Vector2(c.x, c.y + s * 0.18), Vector2(c.x, c.y - s * 0.18), Color("#ffe14a"))
 		"pad":
-			ci.draw_texture_rect_region(tex, Rect2(r.position.x + 2, c.y - s * 0.06, r.size.x - 4, s * 0.34), PAD)
+			_bar(ci, Rect2(r.position.x + 2, c.y - s * 0.06, r.size.x - 4, s * 0.34), Color("#1f7a86"), Color("#5dffe0"))
 			_arrow(ci, Vector2(c.x - s * 0.1, c.y - s * 0.22), Vector2(r.position.x + 3, c.y - s * 0.22), Color("#5dd6ff"))
 			_arrow(ci, Vector2(c.x + s * 0.1, c.y - s * 0.22), Vector2(r.end.x - 3, c.y - s * 0.22), Color("#5dd6ff"))
 		"meteor":

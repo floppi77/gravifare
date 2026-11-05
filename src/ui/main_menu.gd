@@ -193,6 +193,7 @@ func show_main(focus_lang := "") -> void:
 	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagesflug: ab Sektor 1
 	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln
 	box.add_child(grid)
+	_link_grid(grid)
 	_equalize_grid.call_deferred(grid)
 	if Save.debug:
 		box.add_child(_menu_button(tr("DEBUG_LEAVE"), "debug", func():
@@ -206,6 +207,17 @@ func show_main(focus_lang := "") -> void:
 		_bind_help(fb)
 	_focus_first(focus_lang, true)
 	_slide_in()
+
+## Links/Rechts innerhalb einer Zeile fest verdrahten: Die automatische Suche überspringt ausgegraute Knöpfe, Tagesflug und Nachtschicht (beide gesperrt) waren so nur von
+## oben oder unten erreichbar.
+func _link_grid(grid: GridContainer) -> void:
+	var n := grid.get_child_count()
+	for i in n:
+		var b := grid.get_child(i) as Control
+		if i % 2 == 0 and i + 1 < n:
+			b.focus_neighbor_right = b.get_path_to(grid.get_child(i + 1))
+		elif i % 2 == 1:
+			b.focus_neighbor_left = b.get_path_to(grid.get_child(i - 1))
 
 ## Alle Knöpfe des Nebenmenüs so breit wie der breiteste (z. B. „Ko-fi: Unterstützen“), damit beide Spalten gleich aussehen.
 ## Erst im Baum gemessen, weil die Schrift aus dem Theme kommt.

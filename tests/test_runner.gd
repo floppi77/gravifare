@@ -3169,6 +3169,8 @@ func _test_main_menu_help() -> void:
 	var unknown: Array = keys.filter(func(k): return not mm.HELP_KEYS.has("HELP_" + String(k).to_upper()))
 	check(keys.size() >= 14 and unknown.is_empty(), "Hauptmenü: alle %d Menüpunkte haben einen Hilfetext %s" % [keys.size(), str(unknown)])
 	var kit := FileAccess.get_file_as_string("res://src/ui/menu_kit.gd")
+	check(src.contains("func _link_grid") and src.contains("focus_neighbor_right") and src.contains("focus_neighbor_left"), "Hauptmenü: Tagesflug und Nachtschicht sind seitlich verbunden (auch wenn beide gesperrt sind)")
+	check(not FileAccess.get_file_as_string("res://src/ui/editor_icons.gd").contains("draw_texture_rect_region"), "Editor: Symbole nutzen nicht den fast weißen Kachelatlas (Farben kommen aus der Beleuchtung der Spielansicht)")
 	check(kit.contains("static func flag_column") and src.contains("MenuKit.flag_column") and not src.contains("MenuKit.flag_row"), "Hauptmenü: Flaggen stehen als Spalte neben dem Menü (nicht mehr unter dem Menü)")
 
 # ---------------------------------------------------------------- Level-Editor (Runde 40)
