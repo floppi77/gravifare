@@ -70,6 +70,8 @@ func _ready() -> void:
 	_release_carried()                         # Fortsetzen: Der gespeicherte Ausgangs-Fahrgast steigt aus und zahlt (sonst ginge sein Fahrpreis verloren)
 	if Flow.daily:
 		hud.flash_message(tr("MSG_DAILY") % Flow.daily_date, 5.0)
+	elif Flow.community:
+		hud.flash_message(tr("MSG_COMMUNITY"), 4.0)
 	elif Flow.practice:
 		hud.flash_message(tr("MSG_PRACTICE"), 4.0)
 	for a in OS.get_cmdline_user_args():
@@ -176,7 +178,7 @@ func restart_level() -> void:
 	_release_carried()
 
 func load_level(path: String) -> void:
-	var lvl := LevelData.load_file(path)
+	var lvl: LevelData = Flow.community_store().load_runtime(Flow.current_level) if Flow.community else LevelData.load_file(path)
 	if lvl == null:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
@@ -188,7 +190,7 @@ func load_level(path: String) -> void:
 		lvl.jobs = Daily.jobs_for(lvl, Flow.daily_date)
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
 	run.lives = Flow.lives
-	var mods := Workshop.mods_for({}) if Flow.daily else Workshop.mods(Save.data)      # Tagesflug: Serientaxi, damit Ergebnisse vergleichbar sind
+	var mods := Workshop.mods_for({}) if Flow.daily or Flow.community else Workshop.mods(Save.data)      # Tagesflug und Community-Level: Serientaxi, damit Ergebnisse vergleichbar sind
 	run.sim.apply_mods(mods)
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
@@ -246,7 +248,7 @@ func _setup_ghost(lvl: LevelData) -> void:
 		ghost.set_script(load("res://src/game/ghost_view.gd"))
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
-	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
+	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	ghost.bind(run, best.get("trace", []))
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
@@ -303,7 +305,7 @@ func level_clip_key() -> String:
 
 ## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
 func _queue_clip(delay: float, now := false) -> void:
-	if not Settings.values.hints or Flow.shift or Flow.daily:
+	if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community:
 		return
 	var k := level_clip_key()
 	var seen: Array = Save.data.get("seen_clips", [])
@@ -493,7 +495,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_open_bay()         # Sektor geschafft: erst in die Werkstatt
 			else:
 				_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
-		elif hud.result.get("counted", false) and not Flow.daily:
+		elif hud.result.get("counted", false) and not Flow.daily and not Flow.community:
 			Flow.to_finale()        # letztes Level geschafft: Finale und Abspann
 		else:
 			Flow.to_menu()
@@ -597,7 +599,7 @@ func _physics_process(_delta: float) -> void:
 	if run.result == Run.Result.COMPLETE and not completion_saved:
 		completion_saved = true
 		Save.note_max("best_streak", run.best_streak)
-		var prev_best := Save.best_time(Flow.current_level)
+		var prev_best := Save.community_best_time(Flow.current_level) if Flow.community else Save.best_time(Flow.current_level)
 		# Ohne eine einzige Beförderung (z. B. Leerlauf bis zum Countdown) zählt das Level nicht als geschafft.
 		var counted := run.delivered > 0 or run.extras_delivered > 0
 		var med := run.medals() if counted else {"time": false, "clean": false, "pro": false}
@@ -606,11 +608,15 @@ func _physics_process(_delta: float) -> void:
 		hud.next_exists = Flow.next_level_id() != ""
 		var score := run.level_score() if counted else 0
 		hud.result["score"] = score
-		hud.result["best_score"] = maxi(score, Save.best_score(Flow.current_level))
+		hud.result["best_score"] = maxi(score, Save.community_best_score(Flow.current_level) if Flow.community else Save.best_score(Flow.current_level))
 		if Flow.shift:
 			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schicht-Bestleistung
 			Flow.shift_fares += run.delivered + run.extras_delivered
 			Flow.shift_maps += 1
+		elif Flow.community:
+			if counted:                      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist
+				Save.complete_community(Flow.current_level, run.level_time, score)
+			counted = false
 		elif Flow.daily:
 			if counted:                      # Tagesflug: zählt nur für den Tagesbestwert und die Serie, nicht für Level und Medaillen
 				Daily.record(Save.daily_entry(), Save.data.stats, Flow.daily_date, score)

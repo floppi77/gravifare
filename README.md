@@ -60,6 +60,7 @@ Alles im Trailer stammt aus dem echten Spiel (Autopilot-Flüge, aufgenommen mit 
   (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
 - **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen, **Tagesflug** (jeden Tag eine Karte mit festen Aufträgen und Preisen),
   **Garage** mit Lackierungen und Aufklebern.
+- **Community-Level:** eigene und geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt vom Feldzug; die 99 Originale bleiben unveränderlich ([Format und Regeln](docs/COMMUNITY.md)).
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
 - **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
@@ -140,6 +141,7 @@ Everything in the trailer comes from the real game (autopilot flights recorded w
   (jets, hull, tank …). Game over resets the sector.
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs, a **daily flight** (one map a day with fixed jobs and prices),
   and a **garage** with paint jobs and stickers.
+- **Community levels:** import and play your own and shared levels (a code from the clipboard or a file), strictly validated and kept apart from the campaign; the 99 originals stay untouched ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
 - **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).

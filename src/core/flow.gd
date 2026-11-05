@@ -18,6 +18,11 @@ var shift_next := ""
 var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keinen Feldzug (Medaillen und Bestzeiten zählen)
 var daily := false                      # Tagesflug (siehe daily.gd): eine Karte, Seed aus dem Datum, Serientaxi, zählt nur für den Tagesbestwert
 var daily_date := ""
+var community := false:                 # Community-Level (user://community/, siehe community_store.gd): ein Level, zählt nur für die eigenen Bestwerte
+	set(v):
+		community = v
+		Save.community_mode = v
+var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
 
 func level_ids() -> Array:
 	var ids: Array = []
@@ -44,9 +49,18 @@ const KOFI_URL := "https://ko-fi.com/floppi77"
 const TUTORIAL_ID := "tutorial"
 var tutorial_next := ""                 # nach dem Tutorial: Level, in das es übergeht ("" = zurück ins Menü)
 
+## Community-Skripte erst bei Gebrauch laden: Autoloads dürfen beim Start keine Skripte vorladen, die selbst Autoloads kennen.
+func community_level_script() -> GDScript:
+	return load("res://src/core/community_level.gd")
+
+func community_store() -> GDScript:
+	return load("res://src/core/community_store.gd")
+
 func level_path(id: String) -> String:
 	if id == TUTORIAL_ID:
 		return "res://data/tutorial/tutorial.json"
+	if community_level_script().is_valid_id(id):
+		return community_store().path_for(id)
 	return "res://data/levels/%s.json" % id
 
 func in_tutorial() -> bool:
@@ -173,12 +187,29 @@ func resume_campaign() -> bool:
 	start_level(String(c.level))
 	return true
 
+## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; der Feldzug bleibt unberührt (wie der Übungsflug).
+func start_community(id: String) -> void:
+	if not community_store().exists(id):
+		return
+	lives = Tuning.START_LIVES
+	entry_fuel = Tuning.FUEL_MAX
+	entry_credits = 0.0
+	carry_passenger = {}
+	run_seed = randi() % 1000000
+	practice = true
+	shift = false
+	daily = false
+	start_level(id)
+
 func start_level(id: String) -> void:
 	current_level = id
+	community = community_level_script().is_valid_id(id)       # nur hier gesetzt: kein anderer Spielmodus kann es „vergessen“
 	get_tree().paused = false
 	get_tree().change_scene_to_file(GAME)
 
 func next_level_id() -> String:
+	if community:
+		return ""                          # Community-Level: ein Level, danach zurück zur Liste
 	if shift:
 		return shift_next
 	if daily:
@@ -188,10 +219,12 @@ func next_level_id() -> String:
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
+	menu_screen = "community" if community else ""
 	var g := get_tree().current_scene
 	if shift and g != null and "run" in g:
 		finish_shift(g.run.delivered + g.run.extras_delivered)      # Schicht abgebrochen: Bestwert trotzdem sichern
 	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
+	community = false
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)
 	Sfx.stop_ambient()
@@ -212,6 +245,7 @@ var _presses: Array = []
 var _frame := 0
 
 func _ready() -> void:
+	community_store().game_version = VERSION
 	Save.debug = Settings.values.debug
 	for a in OS.get_cmdline_user_args():
 		if a == "--dump-input":

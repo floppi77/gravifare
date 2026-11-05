@@ -14,6 +14,8 @@ var data := _default_data()
 static func _default_data() -> Dictionary:
 	return {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none"}, "campaign": {}}
 
+## Gesetzt von Flow.community: Während eines Community-Levels werden Statistik und Freischaltungen nicht verändert.
+var community_mode := false
 var slot_prefix := "user://save_"      # Tests weichen auf eigene Dateien aus
 
 func slot_path(n: int) -> String:
@@ -176,12 +178,48 @@ func complete_level(id: String, time: float, money: float, earned := 0.0, medals
 	data.stats["credits_total"] = int(data.stats.get("credits_total", 0)) + int(earned)
 	write()
 
+## Community-Level: eigene Bestwerte je Level-ID (Inhalts-Hash), getrennt vom Feldzug; fehlt in älteren Spielständen.
+func community_entry() -> Dictionary:
+	if not (data.get("community") is Dictionary):
+		data["community"] = {}
+	return data.community
+
+func community_best_time(id: String) -> float:
+	var e = community_entry().get(id)
+	return float(e.get("time", -1.0)) if e is Dictionary else -1.0
+
+func community_best_score(id: String) -> int:
+	var e = community_entry().get(id)
+	return int(e.get("score", 0)) if e is Dictionary else 0
+
+func community_plays(id: String) -> int:
+	var e = community_entry().get(id)
+	return int(e.get("plays", 0)) if e is Dictionary else 0
+
+func community_forget(id: String) -> void:
+	if community_entry().erase(id):
+		write()
+
+## Geschafften Community-Flug werten (nur Bestzeit, Bestwert, Zähler). Die Einträge sind auf 200 Level begrenzt.
+func complete_community(id: String, time: float, score: int) -> void:
+	var c := community_entry()
+	if not c.has(id) and c.size() >= 200:
+		return
+	var prev = c.get(id, {})
+	var best_t: float = minf(float(prev.get("time", 1e9)), time) if prev is Dictionary else time
+	c[id] = {"time": best_t, "score": maxi(int(prev.get("score", 0)) if prev is Dictionary else 0, score), "plays": (int(prev.get("plays", 0)) if prev is Dictionary else 0) + 1}
+	write()
+
 ## Rekord-Statistik (z. B. längste Serie perfekter Landungen).
 func note_max(key: String, value: int) -> void:
+	if community_mode:
+		return                                       # Community-Level zählen nicht für Statistiken und Freischaltungen
 	if value > int(data.stats.get(key, 0)):
 		data.stats[key] = value
 
 func count_event(key: String, n := 1) -> void:
+	if community_mode:
+		return
 	data.stats[key] = int(data.stats.get(key, 0)) + n
 
 ## Debug-Modus (im Hauptmenü per Code ein- und abschaltbar, Settings.values.debug): alles frei.

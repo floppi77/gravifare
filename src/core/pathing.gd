@@ -58,6 +58,9 @@ static func plan(level: LevelData, from: Vector2, to: Vector2, margin: float) ->
 	while cur != s:
 		cells.push_front(Vector2(cur.x * step + step * 0.5, cur.y * step + step * 0.5))
 		cur = prev[cur]
+	if cells.is_empty():                 # Start und Ziel liegen in derselben Rasterzelle: kein Umweg nötig
+		res.append(to)
+		return res
 	var anchor := from
 	var i := 0
 	while i < cells.size():

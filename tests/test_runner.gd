@@ -14,7 +14,8 @@ func check(cond: bool, msg: String) -> void:
 		print("  FAIL ", msg)
 
 func _initialize() -> void:
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	CS = load("res://src/core/community_store.gd")
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -2299,7 +2300,7 @@ func _test_daily_flight() -> void:
 	check(sv.daily_unlocked(ids) and sv.daily_entry().is_empty() and sv.data.daily is Dictionary, "Tagesflug: frei nach Sektor 1, alter Spielstand bekommt einen leeren Eintrag")
 	sv.free()
 	var src := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(src.contains("Workshop.mods_for({}) if Flow.daily") and src.contains("and not Flow.daily:\n\t\t\tFlow.to_finale()"), "Tagesflug: Serientaxi, nach dem Flug zurück ins Menü statt ins Finale")
+	check(src.contains("Workshop.mods_for({}) if Flow.daily") and src.contains("and not Flow.daily and not Flow.community:\n\t\t\tFlow.to_finale()"), "Tagesflug: Serientaxi, nach dem Flug zurück ins Menü statt ins Finale")
 	var fsrc := FileAccess.get_file_as_string("res://src/core/flow.gd")
 	check(fsrc.count("daily = false") >= 5, "Tagesflug: alle anderen Startarten schalten ihn ab")
 
@@ -2842,3 +2843,284 @@ func _test_assist_and_audio_options() -> void:
 	check(names_ok, "Effekt-Variation und Schutzliste nennen nur vorhandene Effekte")
 	var stage: GDScript = load("res://src/core/stage.gd")
 	check(stage.SIZE == Vector2(640, 360), "Spielfläche ist 640×360")
+
+# ---------------------------------------------------------------- Community-Level (Runde 39)
+const CL := preload("res://src/core/community_level.gd")
+var CS: GDScript            # erst zur Laufzeit geladen: das Skript kennt Autoloads, die beim Übersetzen dieses Testskripts noch fehlen
+
+func _cl_wrap(level_id := "s1_01") -> Dictionary:
+	return {"format": CL.FORMAT, "version": CL.VERSION, "level": _read_json("res://data/levels/%s.json" % level_id)}
+
+func _cl_codes(res: Dictionary) -> Array:
+	return res.errors.map(func(e): return e.code)
+
+func _test_originals_unchanged() -> void:
+	var lines := FileAccess.get_file_as_string("res://data/levels.sha256").split("\n", false)
+	var listed := {}
+	for ln in lines:
+		var parts := ln.split("  ", false)
+		if parts.size() == 2:
+			listed[parts[1]] = parts[0]
+	var dir := DirAccess.open("res://data/levels")
+	var files: Array = Array(dir.get_files()).filter(func(f): return f.ends_with(".json"))
+	check(files.size() == 99 and listed.size() == 100, "Prüfsummenliste: 99 Level und das Tutorial (%d Einträge)" % listed.size())
+	var bad: Array = []
+	for f in files + ["tutorial.json"]:
+		var rel: String = ("levels/" + f) if f != "tutorial.json" else "tutorial/tutorial.json"
+		var text := FileAccess.get_file_as_string("res://data/" + rel).replace("\r\n", "\n")
+		if listed.get(rel, "") != text.sha256_text():
+			bad.append(rel)
+	check(bad.is_empty(), "Mitgelieferte Level und Tutorial sind unverändert (tools/level_hashes.py nach gewollten Änderungen) %s" % str(bad))
+
+func _test_community_level() -> void:
+	var good := CL.clean(_cl_wrap())
+	check(good.ok and CL.is_valid_id(good.id) and good.level.jobs.size() > 0, "Community: ein mitgeliefertes Level besteht die Prüfung (%s)" % good.id)
+	check(CL.clean(_cl_wrap()).id == good.id, "Community: gleiche Eingabe ergibt dieselbe ID")
+	for bad_id in ["", "c_", "c_0123456789a", "c_0123456789ab", "c_ZZZZZZZZZZ", "../etc/passwd", "c_../../x1234", "s1_01", "C_0123456789"]:
+		check(not CL.is_valid_id(bad_id), "Community: ID %s ist ungültig" % bad_id)
+	check(CS.path_for("../../x") == "" and CS.path_for("c_0123456789") != "" and CS.path_for("c_0123456789").begins_with("user://"), "Community: Dateipfade nur für gültige IDs, nur unter user://")
+	# Positivliste: Unbekanntes, Tutorial-Schalter, Schwerkraft und Mechanik-Liste fallen weg
+	var w := _cl_wrap()
+	w.level["tutorial"] = true
+	w.level["gravity"] = 0.01
+	w.level["mechanics"] = ["x"]
+	w.level["evil"] = {"a": 1}
+	w["extra"] = 1
+	var wr := CL.clean(w)
+	check(wr.ok and not wr.level.has("tutorial") and not wr.level.has("gravity") and not wr.level.has("mechanics") and not wr.level.has("evil") and wr.id == good.id,
+		"Community: nur bekannte Felder werden übernommen (gleiche ID wie ohne Zusätze)")
+	# Pars werden berechnet, Aufträge bereinigt
+	var pars_ok := true
+	for j in good.level.jobs:
+		pars_ok = pars_ok and float(j.par) >= 14.0 and ["f", "m"].has(j.gender)
+	check(pars_ok, "Community: Richtzeiten werden aus dem Flugweg berechnet")
+	# Strukturfehler
+	var cases := {
+		"SPAWN_COUNT": func(d): d.level.map = d.level.map.map(func(r): return String(r).replace("S", ".")),
+		"NO_EXIT": func(d): d.level.map = d.level.map.map(func(r): return String(r).replace("E", "#")),
+		"MAP_CHAR": func(d): d.level.map[3] = "x" + String(d.level.map[3]).substr(1),
+		"MAP_SIZE": func(d): d.level.map = d.level.map.slice(0, 5),
+		"MAP_ROW_LEN": func(d): d.level.map[2] = String(d.level.map[2]).substr(1),
+		"MAP_SIZE_W": func(d): d.level.map = d.level.map.map(func(r): return String(r) + "#".repeat(30)),
+		"BAD_MOVER": func(d): d.level["movers"] = [{"kind": "rocket"}],
+		"BAD_ZONE": func(d): d.level["zones"] = [{"kind": "portal"}],
+		"JOB_PADS": func(d): d.level.jobs[0]["from"] = "9",
+		"JOB_EXIT": func(d): d.level.jobs[0]["to"] = "exit",
+		"JOB_CHAIN": func(d): d.level.jobs[1]["from"] = d.level.jobs[0]["to"],
+		"NOT_A_LEVEL": func(d): d["format"] = "etwas-anderes",
+		"NEWER_VERSION": func(d): d["version"] = 99,
+	}
+	for code in cases:
+		var d := _cl_wrap()
+		cases[code].call(d)
+		check(_cl_codes(CL.clean(d)).has(code), "Community: Fehler %s wird erkannt" % code)
+	check(_cl_codes(CL.clean([1, 2])).has("NOT_A_LEVEL") and _cl_codes(CL.clean(null)).has("NOT_A_LEVEL") and _cl_codes(CL.parse_text("kein json")).has("NOT_A_LEVEL"), "Community: Nicht-Level-Eingaben werden abgelehnt")
+	check(_cl_codes(CL.parse_text(" ".repeat(CL.MAX_FILE_BYTES + 1))).has("TOO_BIG"), "Community: zu große Dateien werden abgelehnt")
+	# Werte werden begrenzt (auch 1e999 aus JSON)
+	var hz := CL.parse_text(JSON.stringify(_cl_wrap("s3_05")).replace("\"period\":", "\"period\":1e999,\"periodx\":"))
+	var clamp_ok: bool = hz.ok
+	if hz.ok:
+		for m in hz.level.movers:
+			clamp_ok = clamp_ok and float(m.period) <= 120.0 and float(m.period) >= 0.5
+	check(clamp_ok, "Community: unendliche und riesige Zahlen werden begrenzt")
+	var tx := CL.clean_text("  A\u0001B\u007fC" + "x".repeat(100), 10)
+	check(tx == "ABCxxxxxxx", "Community: Texte ohne Steuerzeichen und gekürzt")
+	# Hin und zurück: Datei und Teilen-Code
+	var text := CL.to_file_text(good, "Tester", "0.9.4")
+	var back := CL.parse_text(text)
+	check(back.ok and back.id == good.id and back.meta.author == "Tester", "Community: Dateitext liest sich mit gleicher ID zurück")
+	var code := CL.to_code(text)
+	check(code.begins_with("GFL1:") and CL.from_code(code) == text and code.length() < text.length(), "Community: Teilen-Code ist kürzer und verlustfrei (%d → %d Zeichen)" % [text.length(), code.length()])
+	check(CL.from_code("GFL1:99999999:AAAA") == "" and CL.from_code("GFL1:12:!!!") == "" and CL.from_code("xyz") == "" and CL.from_code("GFL1:" + str(CL.MAX_FILE_BYTES + 1) + ":AAAA") == "", "Community: ungültige und überzogene Codes ergeben nichts")
+	# Aufträge werden erzeugt, wenn sie fehlen
+	var nj := _cl_wrap()
+	nj.level.erase("jobs")
+	var gen := CL.clean(nj)
+	check(gen.ok and gen.level.jobs.size() >= 4 and String(gen.level.jobs[gen.level.jobs.size() - 1].to) == "exit", "Community: fehlende Aufträge werden erzeugt, der letzte führt zum Ausgang")
+	check(CL.clean(nj).id == gen.id, "Community: erzeugte Aufträge sind je Level stabil")
+
+func _test_community_store() -> void:
+	CS.dir = "user://test_community/"
+	CS._cache.clear()
+	for f in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + f)
+	check(CS.list().is_empty(), "Community-Ablage: leer am Anfang")
+	var text := JSON.stringify(_cl_wrap("s2_02"))
+	var r: Dictionary = CS.import_text(text)
+	check(r.ok and r.saved and not r.existed and CS.exists(r.id) and CS.list().size() == 1, "Community-Ablage: Import speichert das Level")
+	check(CS.import_text(text).existed, "Community-Ablage: derselbe Inhalt wird nicht doppelt gespeichert")
+	check(CS.list().size() == 1 and CS.list()[0].id == r.id and String(CS.list()[0].name.de) != "", "Community-Ablage: Liste nennt das Level mit Namen")
+	var code: String = CS.export_code(r.id)
+	check(code != "" and CS.import_text("  " + code + "\n").id == r.id, "Community-Ablage: Teilen-Code lässt sich wieder importieren")
+	check(CS.import_text("GFL1:5:xx").errors.any(func(e): return e.code == "BAD_CODE"), "Community-Ablage: defekter Code wird gemeldet")
+	# Kopie eines Originals trägt den Vermerk und lässt das Original unberührt
+	var before := FileAccess.get_file_as_string("res://data/levels/s1_01.json")
+	var cp: Dictionary = CS.copy_original("s1_01")
+	check(cp.ok and cp.saved and cp.meta.derived_from == "s1_01" and CS.list().size() == 2, "Community-Ablage: Original kopieren legt ein neues Level an")
+	check(FileAccess.get_file_as_string("res://data/levels/s1_01.json") == before, "Community-Ablage: das Original bleibt unverändert")
+	check(not CS.copy_original("../project").ok and not CS.copy_original("gibt_es_nicht").ok, "Community-Ablage: ungültige Originalnamen werden abgelehnt")
+	# Handbearbeitete Datei mit anderem Inhalt gilt nicht mehr als dieses Level
+	var path: String = CS.path_for(r.id)
+	var tampered := FileAccess.get_file_as_string(path).replace("\"sector\": 2", "\"sector\": 5")
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(tampered)
+	f.close()
+	CS._cache.clear()
+	check(CS.load_runtime(r.id) == null and CS.list().size() == 1, "Community-Ablage: verfälschter Inhalt wird nicht gespielt")
+	var lvl: LevelData = CS.load_runtime(CS.list()[0].id)
+	check(lvl != null and lvl.id == CS.list()[0].id and lvl.pads.size() >= 2, "Community-Ablage: gespeichertes Level lässt sich als LevelData laden")
+	check(CS.delete(CS.list()[0].id) and CS.list().is_empty() and not CS.delete("../x"), "Community-Ablage: Löschen")
+	for fn in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + fn)
+	DirAccess.remove_absolute(CS.dir)
+	CS.dir = CS.DIR
+
+func _test_community_isolated() -> void:
+	var flow: Node = get_root().get_node("Flow")
+	var save_src := FileAccess.get_file_as_string("res://src/core/save.gd")
+	check(flow.level_ids().size() == 99 and not flow.level_ids().any(func(i): return CL.is_valid_id(i)), "Community: die Level-Liste des Feldzugs bleibt bei 99 Originalen")
+	var cid := "c_0123456789"
+	check(flow.level_path(cid) == CS.path_for(cid) and flow.level_path("s1_01") == "res://data/levels/s1_01.json", "Community: Wege der Original- und Community-Level sind getrennt")
+	# Spielmodus: keine Statistik, kein Feldzug, Bestwerte nur im eigenen Bereich (eigene Save-Instanz, der echte Spielstand bleibt unberührt)
+	var sv: Node = load("res://src/core/save.gd").new()
+	sv.slot_prefix = "user://test_cm_save_"
+	sv.legacy_path = "user://gibt_es_nicht.json"
+	_rm(sv.slot_path(1))
+	sv.select_slot(1)
+	flow.community = true
+	sv.community_mode = true                       # die Test-Instanz ist nicht der Autoload, den Flow.community schaltet
+	sv.count_event("deliveries", 5)
+	sv.note_max("best_streak", 9)
+	check(int(sv.data.stats.get("deliveries", 0)) == 0 and int(sv.data.stats.get("best_streak", 0)) == 0, "Community: Flüge zählen nicht für Statistik und Freischaltungen")
+	check(flow.next_level_id() == "", "Community: nach dem Level geht es zurück zur Liste")
+	flow.community = false
+	sv.community_mode = false
+	sv.count_event("deliveries", 2)
+	check(int(sv.data.stats.get("deliveries", 0)) == 2, "Community: außerhalb des Modus zählt die Statistik wie zuvor")
+	sv.complete_community(cid, 80.0, 500)
+	sv.complete_community(cid, 95.0, 700)
+	check(sv.community_best_time(cid) == 80.0 and sv.community_best_score(cid) == 700 and sv.community_plays(cid) == 2, "Community: Bestzeit, Bestwert und Zähler je Level")
+	check(sv.data.completed.is_empty() and sv.campaign().is_empty(), "Community: Feldzugfortschritt (completed, campaign) bleibt unberührt")
+	var again: Node = load("res://src/core/save.gd").new()
+	again.slot_prefix = "user://test_cm_save_"
+	again.select_slot(1)
+	check(again.community_best_score(cid) == 700, "Community: Bestwerte stehen im Spielstand und überleben das Neuladen")
+	sv.community_forget(cid)
+	check(sv.community_best_time(cid) < 0.0 and sv.community_plays(cid) == 0, "Community: Bestwerte lassen sich vergessen")
+	sv.data["community"] = "kaputt"
+	check(sv.community_best_time(cid) < 0.0, "Community: defekter Bereich im Spielstand stürzt nicht ab")
+	for suffix in ["", ".tmp"]:
+		_rm(sv.slot_path(1) + suffix)
+	var game_src := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(game_src.contains("elif Flow.community:\n\t\t\tif counted:") and game_src.contains("and not Flow.daily and not Flow.community:") and save_src.contains("if community_mode:\n\t\treturn"),
+		"Community: Abschluss, Finale-Sprung und Statistik-Sperre sind im Spielcode vorhanden (Quelltextprüfung)")
+
+func _test_community_texts() -> void:
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var bad: Array = []
+	for pair in [["CL_ERR_", CL.ERROR_CODES], ["CL_WARN_", CL.WARNING_CODES]]:
+		for code in pair[1]:
+			for lang in [de, en]:
+				var key: String = pair[0] + code
+				var t := String(lang.get(key, ""))
+				if t == "" or t.count("%") != int(pair[1][code]):
+					bad.append(key)
+	check(bad.is_empty(), "Community: jeder Fehler- und Warncode hat in beiden Sprachen einen Text mit passender Argumentzahl %s" % str(bad))
+	# Übersetzungen wie Loc sie anlegt (der Autoload ist im Testlauf noch nicht gestartet)
+	var tr_de := Translation.new()
+	tr_de.locale = "de"
+	for k in de:
+		tr_de.add_message(k, de[k])
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	var d_text := CL.describe({"code": "MAP_SIZE", "args": [3, 10, 22]})
+	check(d_text.contains("3 Zeilen") and d_text.contains("10 bis 22") and CL.describe({"code": "GIBTS_NICHT", "args": []}) == "GIBTS_NICHT" and CL.describe({"code": "NO_SHELTER", "args": ["2"]}, true).contains("2"),
+		"Community: describe liefert den Text in der Sprache bzw. den Code (%s)" % d_text)
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+
+func _test_community_fuzz() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 424242
+	var base := _cl_wrap("s3_05")
+	var junk: Array = [null, true, "x", "", 0, -1, INF, -INF, 1e18, [], {}, [1, 2, 3], {"a": 1}, "c_0123456789", "../..", "\u0001"]
+	var crashed := 0
+	var oks := 0
+	for i in 150:
+		var d: Dictionary = base.duplicate(true)
+		for k in 1 + rng.randi() % 3:
+			var node: Variant = d
+			var keys: Array = []
+			var guard := 0
+			while (node is Dictionary or node is Array) and guard < 4 and (node.size() > 0):
+				guard += 1
+				var key: Variant = node.keys()[rng.randi() % node.size()] if node is Dictionary else rng.randi() % node.size()
+				keys.append([node, key])
+				if rng.randf() < 0.35:
+					break
+				node = node[key]
+			if keys.is_empty():
+				continue
+			var last: Array = keys[keys.size() - 1]
+			var mode := rng.randi() % 3
+			if mode == 0 and last[0] is Dictionary:
+				last[0].erase(last[1])
+			elif mode == 1:
+				last[0][last[1]] = junk[rng.randi() % junk.size()]
+			elif last[1] is int or last[0] is Array:
+				last[0][last[1]] = junk[rng.randi() % junk.size()]
+		var res := CL.clean(d)
+		if not (res is Dictionary) or not res.has("ok"):
+			crashed += 1
+			continue
+		if res.ok:
+			oks += 1
+			var lv := CL.to_level(res)
+			if lv == null or lv.width > CL.MAX_W or lv.height > CL.MAX_H or lv.movers.size() > CL.MAX_MOVERS:
+				crashed += 1
+	check(crashed == 0, "Community: 150 zufällig beschädigte Level werden ohne Absturz geprüft (%d davon gültig)" % oks)
+	# ganze Texte beschädigen
+	var text := JSON.stringify(base)
+	var parse_ok := true
+	for i in 60:
+		var t := text
+		for k in 1 + rng.randi() % 4:
+			var p := rng.randi() % t.length()
+			t = t.substr(0, p) + String.chr(33 + rng.randi() % 90) + t.substr(p + 1)
+		parse_ok = parse_ok and CL.parse_text(t) is Dictionary
+	check(parse_ok, "Community: 60 beschädigte Dateitexte werden ohne Absturz geprüft")
+
+func _test_community_originals_and_bot() -> void:
+	var dir := DirAccess.open("res://data/levels")
+	var failed: Array = []
+	for f in dir.get_files():
+		if f.ends_with(".json"):
+			var res := CL.clean(_cl_wrap(f.get_basename()))
+			if not res.ok:
+				failed.append("%s: %s" % [f.get_basename(), str(_cl_codes(res))])
+	check(failed.is_empty(), "Community: alle 99 Originale lassen sich als Community-Level kopieren und bestehen die Prüfung %s" % str(failed))
+	var ex := CL.parse_text(FileAccess.get_file_as_string("res://docs/community/zwergenhafen.gflevel"))
+	check(ex.ok and ex.warnings.is_empty() and CL.bot_check(ex).get("complete", false), "Community: das Beispiellevel in docs/community ist gültig und für den Autopiloten lösbar")
+	var res := CL.clean(_cl_wrap("s1_01"))
+	var bot := CL.bot_check(res)
+	check(bot.get("complete", false), "Community: Probeflug des Autopiloten schafft eine Kopie von Level 1")
+
+func _test_community_screen() -> void:
+	CS.dir = "user://test_community_ui/"
+	CS._cache.clear()
+	CS.import_text(JSON.stringify(_cl_wrap("s1_01")))
+	var scr: Control = load("res://src/ui/community_select.gd").new()
+	scr.back = func(): pass
+	scr._ready()                  # nicht im Baum (der Baum startet erst nach _initialize): Aufbau von Hand auslösen
+	check(scr.entries.size() == 1 and scr.list_box.get_child_count() == 1 and scr.info_name.text != "", "Community-Bildschirm: Liste, Vorschau und Info zeigen das gespeicherte Level")
+	check(scr.preview.rows.size() >= CL.MIN_H and not scr.btn_share.disabled, "Community-Bildschirm: Kartenvorschau und Aktionen sind vorhanden")
+	scr.armed = ""
+	scr._delete()
+	check(scr.armed == String(scr.entries[0].id) and CS.list().size() == 1, "Community-Bildschirm: Löschen verlangt eine zweite Bestätigung")
+	scr.free()
+	for fn in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + fn)
+	DirAccess.remove_absolute(CS.dir)
+	CS.dir = CS.DIR

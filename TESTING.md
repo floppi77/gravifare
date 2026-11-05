@@ -2,6 +2,7 @@
 | Befehl | Zweck |
 |---|---|
 | `godot --headless -s tests/test_runner.gd` | Physik, Landung, Schaden, Auftragsfluss, Autopilot je Level (Exit-Code ≠ 0 bei Fehlern) |
+| `python3 tools/level_hashes.py` | schreibt `data/levels.sha256` neu (nach gewollten Änderungen an den Originalleveln; der Test `_test_originals_unchanged` prüft sie) |
 | `godot --headless -s tools/run_bot.gd [-- s1_01]` | Autopilot fliegt Level mit echter Physik und meldet Zeit, Tank, Hülle |
 | `HF_HOME=<cache> <venv>/bin/python tools/audio/verify_voice.py --model medium` | prüft Sprachclips per lokaler Spracherkennung (Ziffernnormalisierung, Ähnlichkeit ≥ 0,88) |
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
@@ -9,6 +10,7 @@
 
 **Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
 
+- **Runde 39:** Community-Level (Format, Prüfung, Positivliste, Zahlenbegrenzung, ID-Hash und Pfadschutz, Code-Rundlauf, Ablage in `user://`, Kopie eines Originals ohne Änderung am Original, Spielmodus ohne Statistik und Feldzug, Fehlertexte vollständig, Fuzz mit beschädigten Leveln, alle 99 Originale als Kopie gültig, Probeflug, Bildschirm), Prüfsummen der Originale
 - **Runde 38:** Level-Optik (Neon/Glas) hängt nur an vorhandenen Leveln, Neonlabyrinth hat drei Neon-Strahlen, Glasfassade: Sweep-Schleusen (Öffnung immer 3 Felder, wandert über die ganze Höhe, gegenläufig), Pflichtfahrgast-Zähler ohne Abzug, Einspieler beim Einflug, Meteorbahnen streuen breit und meiden nur Pads im Spiel
 - **Runde 37 (v0.9.4):** Ausgangs-Fahrgast zählt im Level als befördert, Menü-Version passt zum Export-Preset, Fenstergröße passt zum Bildschirm, Auto-Pause und Anzeige-Optionen (Quelltextprüfung), Einstellungen atomar, Tagesflug (gleicher Tag = gleiche Karte, Aufträge und Preise; Bestwert und Serie)
 - **Runde 36:** 14 Fahrgaststimmen in beiden Sprachen
@@ -56,6 +58,8 @@ Sprachclips: `tools/audio/gen_voice.py --validate` erzeugt Clips mit automatisch
 `godot --headless -s tools/level_report.gd` gibt Schwierigkeitsmetrik und Bot-Ergebnis je Level aus (Grundlage für LEVELS.md).
 
 **Parallelbetrieb:** Ein zweiter Agent kann gleichzeitig Godot nutzen. Deshalb nie Prozesse per Name beenden (kein `pkill godot`/`pgrep -f`), nur eigene PIDs; jedes Projekt hat einen eigenen Ordner und Namen (`user://` getrennt).
+
+**Testskript und Autoloads:** `tests/test_runner.gd` wird übersetzt, bevor die Autoloads (Flow, Save, Sfx …) existieren. Dort deshalb kein `Flow`/`Save` im Quelltext und kein `preload` von Skripten, die Autoloads nennen (z. B. `community_store.gd`); stattdessen zur Laufzeit `get_root().get_node("Flow")` bzw. `load(...)`, und eigene `Save`-Instanzen (`load("res://src/core/save.gd").new()`) mit eigenem `slot_prefix`. Die Autoload-Knoten sind in `_initialize` noch nicht „im Baum“ (kein `_ready`, keine Übersetzungen, `add_child` an die Wurzel wirkt nicht): Oberflächen von Hand mit `_ready()` aufbauen, Übersetzungen wie `Loc` selbst anlegen. Skripte wie `game.gd` übersetzt der Testlauf nicht; ihre Fehler zeigt erst ein Fensterlauf (`godot -w … -- --slot=1 --community --press=ui_accept@60 --shot=…`).
 
 Musik: `python3 tools/audio/gen_music.py [thema]` (22 Themen × 3 Schichten, Noten in `tools/audio/music_score.py`). Sprachclips: Texte in `data/voice_lines.json`, Erzeugung `tools/audio/gen_voice.py --validate`; Stand: 167/168 + 1 Wiederholung bestätigt.
 **Nicht automatisch prüfbar:** Klang der Musik/Stimmen, Vibrationsgefühl, Zeitlupe/Kamera-Gefühl – bitte spielen und anhören.

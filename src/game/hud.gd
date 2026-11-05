@@ -108,7 +108,7 @@ func _draw() -> void:
 			pcol = pcol.lerp(Color.WHITE, price_flash)
 		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift else (tr("DAILY_TAG") + "  " + lname if Flow.daily else "%d/99  %s" % [run.level.number, lname])), 84.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname]))), 84.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
 	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei beschriftete Balken (weiße Marke = Grenze der sicheren Landung)
 	var gx := 598.0
@@ -270,7 +270,7 @@ func _draw_result() -> void:
 		draw_rect(Rect2(px, py + 38.0, pw, 1.0), Color("#ffb02e"))
 	draw_string(font, Vector2(px, py + 19.0), tr("HUD_COMPLETE") if counted else tr("RES_NOT_COUNTED"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#5dff9a") if counted else Color("#ffb02e"))
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	draw_string(ui, Vector2(px, py + 33.0), "Level %d · %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
+	draw_string(ui, Vector2(px, py + 33.0), (tr("COMMUNITY_TAG") + " · " + lname if Flow.community else "Level %d · %s" % [run.level.number, lname]), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
 	# Medaillen als drei Karten
 	var items := [["time", tr("MEDAL_TIME"), tr("MEDAL_TIME_D")], ["clean", tr("MEDAL_CLEAN"), tr("MEDAL_CLEAN_D")], ["pro", tr("MEDAL_PRO"), tr("MEDAL_PRO_D")]]
 	var cw := 112.0

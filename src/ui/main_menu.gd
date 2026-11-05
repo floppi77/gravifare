@@ -2,6 +2,7 @@ extends Control
 ## Hauptmenü: Weiter/Spielen, Levelauswahl, Musik, Optionen, Beenden. Vollständig per Tastatur und Gamepad bedienbar.
 
 const Stage := preload("res://src/core/stage.gd")
+const CommunitySelect := preload("res://src/ui/community_select.gd")
 
 var box: VBoxContainer
 var stage: Control
@@ -38,8 +39,13 @@ func _ready() -> void:
 	stage.add_child(notice)
 	if Save.slot == 0 or OS.get_cmdline_user_args().has("--slots"):      # Dev: --slots zeigt die Platzwahl
 		show_slots()                                    # Spielstand wählen (beim Start)
+	elif Flow.menu_screen == "community":               # zurück aus einem Community-Level: wieder die Liste zeigen
+		Flow.menu_screen = ""
+		show_community()
 	elif OS.get_cmdline_user_args().has("--levels"):    # Dev: direkt die Levelauswahl zeigen
 		show_levels()
+	elif OS.get_cmdline_user_args().has("--community"): # Dev: direkt die Community-Liste zeigen
+		show_community()
 	elif OS.get_cmdline_user_args().has("--music"):     # Dev: direkt den Musikplayer zeigen
 		show_music()
 	else:
@@ -104,6 +110,7 @@ func show_main(focus_lang := "") -> void:
 	for entry in [
 			[tr("MENU_DAILY"), func(): Flow.start_daily()],
 			[tr("MENU_SHIFT"), func(): Flow.start_shift()],
+			[tr("MENU_COMMUNITY"), show_community],
 			[tr("MENU_GARAGE"), func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
 			[tr("MENU_MUSIC"), show_music],
@@ -183,6 +190,11 @@ func show_levels() -> void:
 	var ls := LevelSelect.new()
 	ls.back = show_main
 	_show_screen(ls)
+
+func show_community() -> void:
+	var cs := CommunitySelect.new()
+	cs.back = show_main
+	_show_screen(cs)
 
 func show_music() -> void:
 	var mr := MusicRoom.new()
