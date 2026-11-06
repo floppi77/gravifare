@@ -31,7 +31,7 @@ const PARAMS := {
 		["tint", 0.0, 1.0, 1.0, "ED_P_TINT"]],
 	"vehicle_lane": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["dx", -64.0, 64.0, 1.0, "ED_P_LANE"], ["speed", -400.0, 400.0, 4.0, "ED_P_SPEED"],
 		["paint", 0.0, 7.0, 1.0, "ED_P_PAINT"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
-	"vehicle": [["speed", -400.0, 400.0, 4.0, "ED_P_SPEED"], ["paint", 0.0, 7.0, 1.0, "ED_P_PAINT"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
+	"vehicle": [["count", 1.0, 12.0, 1.0, "ED_P_COUNT"], ["speed", -400.0, 400.0, 4.0, "ED_P_SPEED"], ["paint", 0.0, 7.0, 1.0, "ED_P_PAINT"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
 	"wind": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["w", 1.0, 64.0, 1.0, "ED_P_W"], ["h", 1.0, 64.0, 1.0, "ED_P_H"],
 		["ax", -400.0, 400.0, 5.0, "ED_P_AX"], ["ay", -400.0, 400.0, 5.0, "ED_P_AY"], ["period", 0.0, 120.0, 0.5, "ED_P_GUST"], ["on", 0.0, 120.0, 0.5, "ED_P_ON"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
 	"magnet": [["cx", -8.0, 64.0, 1.0, "ED_P_CX"], ["cy", -8.0, 64.0, 1.0, "ED_P_CY"], ["r", 0.5, 20.0, 0.5, "ED_P_R"], ["k", -400.0, 400.0, 10.0, "ED_P_K"],
@@ -439,6 +439,8 @@ func param_spec(ref: Dictionary, key: String) -> Array:
 func get_param(ref: Dictionary, key: String) -> float:
 	var d := _dict(ref, false)
 	match key:
+		"count":
+			return float(vehicle_group(ref).size())
 		"shape":
 			return 1.0 if String(d.get("shape", "line")) == "circle" else 0.0
 		"pad":
@@ -463,6 +465,9 @@ func set_param(ref: Dictionary, key: String, value: float) -> void:
 	var step: float = spec[3]
 	var v := clampf(value, spec[1], spec[2])
 	v = snappedf(v, step) if step >= 1.0 else snappedf(v, 0.01)
+	if key == "count":
+		set_vehicle_count(ref, int(v))
+		return
 	_edit(func():
 		var d := _dict(ref, true)
 		match key:
@@ -500,6 +505,63 @@ func set_param(ref: Dictionary, key: String, value: float) -> void:
 				d[key] = int(round(v))
 			_:
 				d[key] = v
+		_mark_changed())
+
+## Fahrzeuge einer Route: alle Fahrzeuge mit demselben Pfad (Indizes im Modell, aufsteigend).
+func vehicle_group(ref: Dictionary) -> Array:
+	var d := _dict(ref, false)
+	if d.get("kind") != "vehicle" or not d.has("path"):
+		return []
+	var key := JSON.stringify(d.path)
+	var out: Array = []
+	for i in movers.size():
+		if movers[i].get("kind") == "vehicle" and movers[i].has("path") and JSON.stringify(movers[i].path) == key:
+			out.append(i)
+	return out
+
+## Dauer eines Umlaufs auf der Route in Sekunden (Weg plus Lücke von 64 px, wie in LevelData.vehicle_state).
+func vehicle_cycle(ref: Dictionary) -> float:
+	var d := _dict(ref, false)
+	var pts: Array = d.get("path", [])
+	var total := 0.0
+	for k in range(pts.size() - 1):
+		total += Vector2(float(pts[k][0]), float(pts[k][1])).distance_to(Vector2(float(pts[k + 1][0]), float(pts[k + 1][1]))) * 16.0
+	return (total + 64.0) / maxf(absf(float(d.get("speed", 50.0))), 1.0)
+
+## Anzahl der Fahrzeuge auf der Route des gewählten Fahrzeugs: ergänzt Kopien (andere Lackierung) bzw. entfernt die zuletzt angelegten (das gewählte bleibt)
+## und verteilt die Fahrzeuge gleichmäßig über den Umlauf (Phase). Der Verweis `ref` wird bei Bedarf auf den neuen Index gesetzt.
+func set_vehicle_count(ref: Dictionary, n: int) -> void:
+	var group := vehicle_group(ref)
+	if group.is_empty() or n < 1:
+		return
+	n = mini(n, group.size() + maxi(0, CL.MAX_MOVERS - movers.size()))
+	if n == group.size():
+		return
+	_edit(func():
+		var base: Dictionary = movers[ref.i]
+		while group.size() < n:
+			var c: Dictionary = base.duplicate(true)
+			c["paint"] = (int(movers[group[-1]].get("paint", 0)) + 1) % 8
+			movers.append(c)
+			group.append(movers.size() - 1)
+		while group.size() > n:
+			var victim: int = -1
+			for g in range(group.size() - 1, -1, -1):
+				if group[g] != int(ref.i):
+					victim = g
+					break
+			var idx: int = group[victim]
+			movers.remove_at(idx)
+			group.remove_at(victim)
+			for g in group.size():
+				if group[g] > idx:
+					group[g] -= 1
+			if int(ref.i) > idx:
+				ref["i"] = int(ref.i) - 1
+		var cycle := vehicle_cycle(ref)
+		var p0 := float(movers[group[0]].get("phase", 0.0))
+		for j in group.size():
+			movers[group[j]]["phase"] = snappedf(p0 + cycle * float(j) / float(group.size()), 0.01)
 		_mark_changed())
 
 func nudge_param(ref: Dictionary, key: String, direction: int) -> void:

@@ -514,6 +514,7 @@
  "ED_P_TINT": "Neon colour",
  "ED_P_LANE": "Lane length",
  "ED_P_SPEED": "Speed",
+ "ED_P_COUNT": "Vehicles",
  "ED_P_PAINT": "Paint",
  "ED_P_AX": "Wind X",
  "ED_P_AY": "Wind Y",

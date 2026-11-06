@@ -514,6 +514,7 @@
  "ED_P_TINT": "Neonfarbe",
  "ED_P_LANE": "Bahnlänge",
  "ED_P_SPEED": "Tempo",
+ "ED_P_COUNT": "Fahrzeuge",
  "ED_P_PAINT": "Lackierung",
  "ED_P_AX": "Wind X",
  "ED_P_AY": "Wind Y",
