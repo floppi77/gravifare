@@ -26,7 +26,7 @@ const ORDER := {
 	"heat": ["kind", "x", "y", "w", "h", "period", "on", "phase"],
 	"gravity": ["kind", "x", "y", "w", "h", "g", "period", "on", "phase"],
 	"magnet": ["kind", "cx", "cy", "r", "k", "period", "on", "phase", "cycle"],
-	"door": ["period", "open", "sweep", "gap", "phase", "glass"],
+	"door": ["period", "open", "sweep", "gap", "phase", "glass", "orient"],
 	"job": ["from", "to", "fare", "par", "passenger", "gender", "fragile"]}
 
 # ---------------------------------------------------------------------------------------------------------------- Zugriff

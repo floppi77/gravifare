@@ -168,6 +168,9 @@ static func _clean_doors(v: Variant, rows: Array) -> Dictionary:
 			d["gap"] = _num(p.get("gap"), 1.0, 8.0, 3.0)
 		if _bool(p.get("glass")):
 			d["glass"] = true
+		var orient := _int(p.get("orient"), 0, 2, 0)
+		if orient > 0:
+			d["orient"] = orient                         # 1 Flügel fahren senkrecht, 2 waagerecht (sonst aus der Umgebung)
 		out[ch] = d
 	return out
 

@@ -700,6 +700,8 @@ func _param_text(key: String) -> String:
 		return tr("ED_STEADY")
 	if key == "sweep" and v <= 0.0:
 		return tr("ED_OFF")
+	if key == "orient":
+		return tr("ED_ORIENT_%d" % clampi(int(round(v)), 0, 2))
 	if not spec.is_empty() and float(spec[3]) < 1.0:
 		return "%.2f" % v if float(spec[3]) < 0.1 else "%.1f" % v
 	return "%d" % int(round(v))

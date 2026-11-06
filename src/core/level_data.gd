@@ -221,12 +221,13 @@ func _scan_doors(params: Dictionary) -> void:
 					# "sweep": Schleuse mit fester Öffnung („gap“ Felder hoch), die dauerhaft über die Torhöhe auf und ab wandert; Wert = Sekunden pro Weg
 					# (oben nach unten). Ohne Haltephasen, Flügel oberhalb und unterhalb der Öffnung sind fest. "glass" ist nur Optik.
 					doors[c] = {"cells": [], "period": float(p.get("period", 8.0)), "open": float(p.get("open", 5.0)), "phase": float(p.get("phase", 0.0)),
-						"sweep": float(p.get("sweep", 0.0)), "gap_cells": float(p.get("gap", 3.0)), "glass": bool(p.get("glass", false))}
+						"sweep": float(p.get("sweep", 0.0)), "gap_cells": float(p.get("gap", 3.0)), "glass": bool(p.get("glass", false)), "orient": int(p.get("orient", 0))}
 				doors[c].cells.append(Vector2i(x, y))
 	for c in doors:
 		doors[c]["gates"] = _door_gates(c)
 
-## Zusammenhängende Torzellen als Rechteck; Flügel fahren senkrecht, wenn über und unter dem Tor Wand steht (Durchflug waagerecht).
+## Zusammenhängende Torzellen als Rechteck; Flügel fahren senkrecht, wenn über und unter dem Tor Wand steht (Durchflug waagerecht). Mit "orient" (1 senkrecht,
+## 2 waagerecht) lässt sich die Richtung festlegen, wenn die Umgebung nicht eindeutig ist.
 func _door_gates(ch: String) -> Array:
 	var out: Array = []
 	var left: Array = doors[ch].cells.duplicate()
@@ -240,9 +241,10 @@ func _door_gates(ch: String) -> Array:
 				if left.has(p + d):
 					left.erase(p + d)
 					todo.append(p + d)
+		var orient: int = int(doors[ch].get("orient", 0))
 		var above := cell(r.position.x, r.position.y - 1) != "."
 		var below := cell(r.position.x, r.end.y) != "."
-		out.append({"rect": Rect2(Vector2(r.position) * Tuning.TILE, Vector2(r.size) * Tuning.TILE), "vertical": above and below})
+		out.append({"rect": Rect2(Vector2(r.position) * Tuning.TILE, Vector2(r.size) * Tuning.TILE), "vertical": (orient == 1) or (orient == 0 and above and below)})
 	return out
 
 ## Passagierpad (weder Tank-, Lebens-Station noch Krankenhaus; das Krankenhaus „H“ ist nur Ziel von Krankentransporten).
@@ -792,7 +794,8 @@ static func door_leaves(gate: Dictionary, gap: float) -> Array:
 	var w := r.size.x * f
 	return [Rect2(r.position, Vector2(w, r.size.y)), Rect2(r.end.x - w, r.position.y, w, r.size.y)]
 
-## Sweep-Schleuse: Höhe der Mitte der Öffnung zur Zeit t (Pixel), gleichmäßig hin und her ohne Halt.
+## Sweep-Schleuse: Lage der Mitte der Öffnung zur Zeit t (Pixel), gleichmäßig hin und her ohne Halt: bei senkrechten Toren die Höhe (y), bei waagerechten
+## (Flügel fahren seitlich, Durchflug von oben/unten) die Breite (x).
 func sweep_center(ch: String, gate: Dictionary, t: float) -> float:
 	var d: Dictionary = doors[ch]
 	var r: Rect2 = gate.rect
@@ -800,6 +803,8 @@ func sweep_center(ch: String, gate: Dictionary, t: float) -> float:
 	var u := fposmod(t + float(d.phase), 2.0 * float(d.sweep)) / float(d.sweep)
 	if u > 1.0:
 		u = 2.0 - u
+	if not gate.vertical:
+		return lerpf(r.position.x + half, r.end.x - half, u)
 	return lerpf(r.position.y + half, r.end.y - half, u)
 
 ## Ist der Durchflug auf Höhe `y` (Box mit halber Höhe `half_h`) im Zeitfenster [t0, t0 + length] frei von Flügeln?
@@ -819,6 +824,15 @@ func door_clear_window(ch: String, t0: float, length: float, y: float, half_h: f
 func is_sweep(ch: String) -> bool:
 	return float(doors.get(ch, {}).get("sweep", 0.0)) > 0.0
 
+## Sweep-Schleuse mit senkrecht fahrenden Flügeln (die Öffnung wandert in der Höhe)? Der Autopilot kennt nur diese Form.
+func is_sweep_vertical(ch: String) -> bool:
+	if not is_sweep(ch):
+		return false
+	for gate in doors[ch].gates:
+		if not gate.vertical:
+			return false
+	return true
+
 ## Feste Flügel eines Tors zur Zeit t: oberhalb und unterhalb der Öffnung (Sweep) bzw. die beiden Schiebeflügel.
 func door_leaf_rects(ch: String, gate: Dictionary, t: float) -> Array:
 	if not is_sweep(ch) or doors_forced_open:
@@ -826,6 +840,8 @@ func door_leaf_rects(ch: String, gate: Dictionary, t: float) -> Array:
 	var r: Rect2 = gate.rect
 	var c := sweep_center(ch, gate, t)
 	var half := float(doors[ch].gap_cells) * Tuning.TILE * 0.5
+	if not gate.vertical:
+		return [Rect2(r.position.x, r.position.y, c - half - r.position.x, r.size.y), Rect2(c + half, r.position.y, r.end.x - c - half, r.size.y)]
 	return [Rect2(r.position.x, r.position.y, r.size.x, c - half - r.position.y), Rect2(r.position.x, c + half, r.size.x, r.end.y - c - half)]
 
 ## Ist das Tor im gesamten Zeitfenster [t0, t0 + length] offen? (Bot: erst losfliegen, wenn die Passage reicht.)

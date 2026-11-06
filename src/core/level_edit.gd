@@ -41,7 +41,8 @@ const PARAMS := {
 	"heat": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["w", 1.0, 64.0, 1.0, "ED_P_W"], ["h", 1.0, 64.0, 1.0, "ED_P_H"],
 		["period", 0.0, 120.0, 0.5, "ED_P_GUST"], ["on", 0.0, 120.0, 0.5, "ED_P_ON"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
 	"door": [["period", 2.0, 60.0, 0.5, "ED_P_PERIOD"], ["open", 0.0, 60.0, 0.5, "ED_P_OPEN"], ["phase", 0.0, 240.0, 0.5, "ED_P_PHASE"], ["sweep", 0.0, 60.0, 0.5, "ED_P_SWEEP"],
-		["gap", 1.0, 8.0, 1.0, "ED_P_GAP"], ["glass", 0.0, 1.0, 1.0, "ED_P_GLASS"]]}
+		["gap", 1.0, 8.0, 1.0, "ED_P_GAP"], ["glass", 0.0, 1.0, 1.0, "ED_P_GLASS"],
+		["orient", 0.0, 2.0, 1.0, "ED_P_ORIENT"]]}
 const DEFAULTS := {
 	"debris": {"w": 2.0, "h": 1.0, "dx": 4.0, "dy": 0.0, "period": 8.0, "phase": 0.0, "shape": "line"},
 	"slider": {"w": 2.0, "h": 3.0, "dx": 0.0, "dy": 3.0, "period": 8.0, "phase": 0.0, "shape": "line"},
@@ -449,6 +450,8 @@ func get_param(ref: Dictionary, key: String) -> float:
 			return 1.0 if d.get(key, false) == true else 0.0
 		"sweep":
 			return float(d.get("sweep", 0.0))
+		"orient":
+			return float(d.get("orient", 0))
 		"gap":
 			return float(d.get("gap", 3.0))
 		"on":
@@ -503,6 +506,11 @@ func set_param(ref: Dictionary, key: String, value: float) -> void:
 				d["open"] = minf(v, float(d.get("period", 8.0)))
 			"tint", "paint":
 				d[key] = int(round(v))
+			"orient":
+				if v < 0.5:
+					d.erase("orient")
+				else:
+					d["orient"] = int(round(v))
 			_:
 				d[key] = v
 		_mark_changed())

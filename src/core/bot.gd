@@ -206,7 +206,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		var spd := maxf(sim.vel.length(), 25.0)
 		var inside: Array = level.door_chars_in_box(sim.pos, Tuning.HULL_HALF)     # im Tor: Tor bleibt offen
 		for ch in inside.duplicate():                         # Sweep-Schleuse: erst „im Tor“, wenn die Taxi-Mitte zwischen den Schienen ist (vorher gilt noch die Synchronisierung)
-			if level.is_sweep(ch):
+			if level.is_sweep_vertical(ch):
 				var centered := false
 				for gate in level.doors[ch].gates:
 					if (gate.rect as Rect2).has_point(sim.pos):
@@ -218,7 +218,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 			for ch in level.door_chars_in_box(probe, Tuning.HULL_HALF + Vector2(5, 5)):
 				if inside.has(ch):
 					continue
-				if level.is_sweep(ch):                               # Sweep-Schleuse: mit Abstand vor dem Tor bremsen, auf Höhe schweben, nur starten, wenn die Öffnung den ganzen Durchflug lang frei ist
+				if level.is_sweep_vertical(ch):                               # Sweep-Schleuse: mit Abstand vor dem Tor bremsen, auf Höhe schweben, nur starten, wenn die Öffnung den ganzen Durchflug lang frei ist
 					var entry := 999.0
 					var entry_gate: Dictionary = {}
 					for gate in level.doors[ch].gates:
@@ -267,7 +267,7 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
 		for ch in inside:                                    # Tor schließt gleich: aus den Flügeln heraus, zur näheren Seite
-			if level.is_sweep(ch):                               # in der Sweep-Schleuse: mit der Öffnung mitfliegen
+			if level.is_sweep_vertical(ch):                               # in der Sweep-Schleuse: mit der Öffnung mitfliegen
 				for gate in level.doors[ch].gates:
 					if (gate.rect as Rect2).grow(Tuning.HULL_HALF.x).has_point(sim.pos):
 						v_des.y = _sweep_track(ch, gate)
