@@ -36,7 +36,7 @@ eigener Grafik und eigenem Klang.
   <sub>▶ Trailer ansehen (1080p60, 69 s) · <a href="docs/media/trailer_en.mp4">English version</a></sub>
 </p>
 
-Alles im Trailer stammt aus dem echten Spiel (Autopilot-Flüge, aufgenommen mit Godots Movie Maker); Schnitt, Kamera und Effekte entstehen per Skript, siehe [tools/trailer](tools/trailer/README.md).
+Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Autopilot-Flüge, aufgenommen mit Godots Movie Maker); Schnitt, Kamera und Effekte entstehen per Skript, siehe [tools/trailer](tools/trailer/README.md).
 
 ## Galerie
 
@@ -117,7 +117,7 @@ A homage to the flying-taxi genre, with its own world, levels, art and sound.
   <sub>▶ Watch the trailer (1080p60, 69 s) · <a href="docs/media/trailer_de.mp4">Deutsche Version</a></sub>
 </p>
 
-Everything in the trailer comes from the real game (autopilot flights recorded with Godot's Movie Maker); cutting, camera and effects are scripted, see [tools/trailer](tools/trailer/README.md) (German).
+Everything in the trailer comes from the real game and its 99 handmade levels (autopilot flights recorded with Godot's Movie Maker); cutting, camera and effects are scripted, see [tools/trailer](tools/trailer/README.md) (German).
 
 ## Gallery
 

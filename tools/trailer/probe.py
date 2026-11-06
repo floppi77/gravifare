@@ -3,7 +3,7 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import engine
-engine.CLIPS = os.path.expanduser("~/.cache/gravifare-trailer/clips")
+engine.CLIPS = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v2"))
 import timeline, render
 from PIL import Image, ImageDraw
 lang, out = sys.argv[1], sys.argv[2]

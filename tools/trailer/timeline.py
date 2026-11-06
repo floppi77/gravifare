@@ -13,6 +13,7 @@ TXT = {
         "gravity": "SCHWERKRAFT\nKENNT KEINE GNADE.",
         "taxi7": "Du bist Taxi 7.",
         "levels": "99 LEVEL",
+        "handmade": "HANDGEMACHT.",
         "sectors": "9 SEKTOREN",
         "hazards": "TORE · HITZE · VERKEHR",
         "dark": "UND FINSTERNIS.",
@@ -33,6 +34,7 @@ TXT = {
         "gravity": "GRAVITY\nSHOWS NO MERCY.",
         "taxi7": "You are Taxi 7.",
         "levels": "99 LEVELS",
+        "handmade": "HANDMADE.",
         "sectors": "9 SECTORS",
         "hazards": "GATES · HEAT · TRAFFIC",
         "dark": "AND DARKNESS.",
@@ -255,10 +257,10 @@ def build(lang):
     tl.add(Shot(tl.pre("n_s1_01"), first - 2 * BAR * 0.8 * 0.8, 2 * BAR, speed=0.8, zoom=[(0, 2.4), (2 * BAR, 3.0)], at=(0.5, 0.62), grade=(1.1, 1.1, (0.97, 0.98, 1.04))))
     tl.text("taxi7", 2 * BAR + 0.25, 4 * BAR - 0.2, size=120, cy=880, kind="fade", style=dict(fill=(240, 244, 255), glow=(90, 160, 255)))
     # Montage mit steigendem Tempo
-    mont([("n_s3_09", 0)], BAR, speed=1.5)
-    mont([("n_s5_03", 1)], BAR, speed=1.5)
-    mont([("n_s6_04", 1), ("n_s7_02", 0)], BAR / 2, speed=1.6)
-    mont([("n_s8_08", 1), ("n_s9_10", 1), ("n_s4_05", 1)], BEAT, speed=1.6, frac=0.6)
+    mont([("n_s3_04", 0)], BAR, speed=1.5)
+    mont([("n_s5_04", 1)], BAR, speed=1.5)
+    mont([("n_s6_05", 1), ("n_s7_03", 0)], BAR / 2, speed=1.6)
+    mont([("n_s8_03", 1), ("n_s9_10", 1), ("n_s4_05", 1)], BEAT, speed=1.6, frac=0.6)
     tl.risers.append((4 * BAR, D - BEAT - 4 * BAR))
     tl.mutes.append((D - BEAT, D))
     tl.whooshes += [4 * BAR, 6 * BAR, D - BEAT]
@@ -273,14 +275,15 @@ def build(lang):
     mont([("n_s1_01", 1)], BAR)
     tl.text("levels", D, D + BAR, size=190, kind="slam")
     mont([("n_s2_04", 1)], BAR)
-    mont([("n_s3_09", 1)], BAR)
+    tl.text("handmade", 9 * BAR, 10 * BAR, size=190, kind="slam", style=dict(fill=(255, 224, 140), glow=(255, 160, 40))); hit(9 * BAR, 0.5, 0.8, False)
+    mont([("n_s3_04", 1)], BAR)
     tl.text("sectors", 10 * BAR, 11 * BAR, size=190, kind="slam"); hit(10 * BAR, 0.5, 0.8, False)
     mont([("n_s4_05", 0)], BAR)
-    mont([("n_s5_03", 0)], BAR)
+    mont([("n_s5_04", 0)], BAR)
     tl.text("hazards", 12 * BAR, 13 * BAR, size=140, kind="slam"); hit(12 * BAR, 0.5, 0.8, False)
-    mont([("n_s6_04", 0)], BAR)
-    mont([("n_s7_05", 1), ("n_s7_02", 1)], BAR / 2)
-    mont([("n_s8_08", 0)], BAR, zoom=2.0)
+    mont([("n_s6_05", 0)], BAR)
+    mont([("n_s7_05", 1), ("n_s7_03", 1)], BAR / 2)
+    mont([("n_s8_03", 0)], BAR, zoom=2.0)
     tl.text("dark", 15 * BAR, 16 * BAR, size=150, kind="slam", style=dict(fill=(190, 225, 255), glow=(60, 130, 255))); hit(15 * BAR, 0.5, 0.8, False)
     # Zwischenspiel: Fluglehrer (HUD-Aufnahme, ruhiger)
     B1 = 16 * BAR
@@ -291,22 +294,22 @@ def build(lang):
     tl.text("teach", B1 + 0.2, B1 + 2.9, size=44, cy=858, kind="fade", style=dict(font=engine.FONT_B, fill=(255, 207, 51), glow=(255, 150, 30), spacing=6))
     tl.text("gate", B1 + 0.25, B1 + 2.9, size=58, cy=925, kind="fade", style=dict(font=engine.FONT_B, fill=(245, 248, 255), glow=(70, 120, 255)))
     # zweite Hälfte
-    mont([(H + "s3_09", 0)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
-    mont([(H + "s5_03", 1)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
+    mont([(H + "s3_04", 0)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
+    mont([(H + "s5_04", 1)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
     tl.add(Shot(tl.pre("trans"), 6.0, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
     tl.text("land", 20 * BAR, 21 * BAR, size=170, kind="slam"); hit(20 * BAR, 0.5, 0.8, False)
     mont([("n_s9_05", 0)], BAR)
     tl.text("fuel", 21 * BAR, 22 * BAR, size=170, kind="slam"); hit(21 * BAR, 0.5, 0.8, False)
     mont([("n_s9_10", 0)], BAR)
     tl.text("survive", 22 * BAR, 23 * BAR, size=170, kind="slam", style=dict(fill=(255, 120, 90), glow=(255, 60, 30))); hit(22 * BAR, 0.5, 0.8, False)
-    mont([("n_s6_04", 2)], BAR)
+    mont([("n_s6_05", 2)], BAR)
     # ---------- Akt 3: Steigerung ----------
     tl.cursor = 24 * BAR
     hit(24 * BAR, 0.8, 1.0)
     tl.text("every", 24 * BAR, 25.9 * BAR, size=120, kind="slam", style=dict(fill=(255, 255, 255), glow=(255, 190, 60)))
-    mont([("n_s7_02", 2), ("n_s8_08", 2), ("n_s9_05", 1), ("n_s5_03", 2)], BAR / 2, speed=1.7, zoom=2.5)
-    mont([("n_s3_09", 2), ("n_s2_04", 2), ("n_s4_05", 3), ("n_s6_04", 2)], BAR / 2, speed=1.7, zoom=3.0)
-    mont([("n_s7_05", 0), ("n_s8_08", 3), ("n_s9_10", 2), ("n_s5_03", 3), ("n_s1_01", 2), ("n_s2_04", 0), ("n_s3_09", 0), ("n_s4_05", 2)], BEAT, speed=1.8, zoom=3.0, frac=0.6)
+    mont([("n_s7_03", 2), ("n_s8_03", 2), ("n_s9_05", 1), ("n_s5_04", 2)], BAR / 2, speed=1.7, zoom=2.5)
+    mont([("n_s3_04", 2), ("n_s2_04", 2), ("n_s4_05", 3), ("n_s6_05", 2)], BAR / 2, speed=1.7, zoom=3.0)
+    mont([("n_s7_05", 0), ("n_s8_03", 3), ("n_s9_10", 2), ("n_s5_04", 3), ("n_s1_01", 2), ("n_s2_04", 0), ("n_s3_04", 0), ("n_s4_05", 2)], BEAT, speed=1.8, zoom=3.0, frac=0.6)
     for i in range(8):
         tl.pulses.append((28 * BAR + i * BEAT, 0.6))
     # Finale: Zeitlupe, perfekte Landung

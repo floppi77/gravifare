@@ -25,3 +25,5 @@ addons/godot_ai/
 /docs/AGENTENPROMPT_PARALLEL.md
 # Cinematic-Trailer (gross): als Release-Anhang, nicht im Repo
 docs/media/trailer_cine_*.mp4
+# Alte Trailer-Fassung (lokal behalten)
+docs/media/alt/
