@@ -4105,7 +4105,7 @@ func _test_round47_original_editor() -> void:
 	ed._ready()
 	ed._validate_now()
 	check(ed.res.ok and ed.status.text.contains(tr("ED_NEED_SOLVE")), "Handlösung: der Editor weist darauf hin, dass erst gelöst werden muss (%s)" % ed.status.text.replace("\n", " "))
-	check(ed._save(false) == "" and CS.list().is_empty() and ed.status.text == tr("ED_NEED_SOLVE"), "Handlösung: Speichern ohne Lösung wird verweigert")
+	check(ed._save(false) == "" and CS.list().is_empty() and ed.status.text.begins_with(tr("ED_NEED_SOLVE")), "Handlösung: Speichern ohne Lösung wird verweigert")
 	CS.mark_solved(ed.res.id)
 	ed._validate_now()
 	check(ed.status.text.contains(tr("ED_SOLVED")), "Handlösung: nach dem Lösen meldet der Editor die Freigabe (%s)" % ed.status.text.replace("\n", " "))

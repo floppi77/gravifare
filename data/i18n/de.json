@@ -472,6 +472,7 @@
  "ED_SKIP_ON": "Handlösung: übersprungen",
  "ED_SKIP_OFF": "Handlösung: nötig",
  "ED_SKIP_ACTIVE": "Debug: Speichern ohne eigene Lösung freigegeben.",
+ "ED_SKIP_HINT": "Debug: Schalter „Handlösung“ auf der Level-Seite.",
  "ED_NEED_VALID": "Testflug erst nach Behebung der Fehler:",
  "ED_JOBS": "Aufträge:",
  "ED_EXIT": "Ausgang",

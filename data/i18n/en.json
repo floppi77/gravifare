@@ -472,6 +472,7 @@
  "ED_SKIP_ON": "Solve by hand: skipped",
  "ED_SKIP_OFF": "Solve by hand: required",
  "ED_SKIP_ACTIVE": "Debug: saving without your own solution is enabled.",
+ "ED_SKIP_HINT": "Debug: switch “Solve by hand” on the level page.",
  "ED_NEED_VALID": "Test flight needs the errors fixed first:",
  "ED_JOBS": "Jobs:",
  "ED_EXIT": "exit",

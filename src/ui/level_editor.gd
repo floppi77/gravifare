@@ -1233,7 +1233,7 @@ func _apply_validation(r: Dictionary) -> void:
 		if model.jobs_reset:
 			txt += " · " + tr("ED_JOBS_RESET")
 		if _save_blocked():
-			txt += "\n" + tr("ED_NEED_SOLVE")
+			txt += "\n" + _need_solve_text()
 		elif _skip_solve() and not _is_saved_version() and not CommunityStore.is_solved(res.id):
 			txt += "\n" + tr("ED_SKIP_ACTIVE")
 		else:
@@ -1294,6 +1294,10 @@ func _is_saved_version() -> bool:
 func _save_blocked() -> bool:
 	return res.get("ok", false) and not _is_saved_version() and not CommunityStore.is_solved(res.id) and not _skip_solve()
 
+## Hinweis „erst selbst lösen“; im Debug-Modus mit dem Verweis auf den Schalter.
+func _need_solve_text() -> String:
+	return tr("ED_NEED_SOLVE") + (" " + tr("ED_SKIP_HINT") if Save.debug else "")
+
 ## Debug-Override: Im Debug-Modus lässt sich die Handlösung abschalten (für kleine Änderungen, die keinen neuen Testflug brauchen).
 func _skip_solve() -> bool:
 	return Save.debug and Flow.editor_skip_solve
@@ -1315,7 +1319,7 @@ func _save(announce: bool) -> String:
 		_flag_errors()
 		return ""
 	if _save_blocked():
-		_say(tr("ED_NEED_SOLVE"))
+		_say(_need_solve_text())
 		return ""
 	if orig_id != "":
 		return _save_original(announce)
