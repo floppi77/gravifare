@@ -24,6 +24,7 @@ var community := false:                 # Community-Level (user://community/, si
 		Save.community_mode = v
 var editor_autopilot := false            # Testflug aus dem Level-Editor: der Autopilot fliegt, man sieht ihm zu (zählt nichts)
 var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
+var editor_skip_solve := false          # Debug: Speichern im Editor ohne Handlösung (nur wirksam bei Save.debug; bleibt über Testflüge erhalten)
 var editor_session := ""                # Die in dieser Editorsitzung gespeicherte Fassung bleibt über den Testflug hinweg die, die das nächste Speichern ersetzt
 var editor_original := ""               # Debug: Id des mitgelieferten Levels, das der Editor gerade bearbeitet (bleibt über den Testflug erhalten)
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
@@ -151,6 +152,8 @@ func start_daily() -> void:
 ## Debug-Modus ein- oder ausschalten (bleibt über einen Neustart erhalten).
 func set_debug(on: bool) -> void:
 	Save.debug = on
+	if not on:
+		editor_skip_solve = false
 	Settings.set_value("debug", on)
 
 ## Game Over im Feldzug: zurück an den Anfang des Sektors. Gibt das Level zurück, mit dem es weitergeht.

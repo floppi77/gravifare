@@ -4145,6 +4145,28 @@ func _test_round47_original_editor() -> void:
 		"Original bearbeiten: nach der Lösung wird die Datei geschrieben (nicht als Community-Level) (%s)" % e1.status.text)
 	check(LevelData.load_file(LF.dir + "s3_05.json").names.de == "Probe-Name", "Original bearbeiten: das Spiel liest die geänderte Datei")
 	e1.free()
+	# Debug-Override: Speichern ohne Handlösung, nur im Debug-Modus
+	var e2: Control = load("res://src/ui/level_editor.gd").new()
+	e2.back = func(): pass
+	e2.open("")
+	e2._ready()
+	e2._begin(false, Vector2i(24, 9))
+	e2._end_stroke()
+	e2._validate_now()
+	check(e2.skip_btn != null and e2._save_blocked() and e2._save(false) == "", "Debug-Override: ohne Schalter bleibt die Handlösung nötig")
+	e2._toggle_skip_solve()
+	e2._validate_now()
+	check(flow_node.editor_skip_solve and not e2._save_blocked() and e2.status.text.contains(tr("ED_SKIP_ACTIVE")) and e2.skip_btn.text == tr("ED_SKIP_ON"), "Debug-Override: Schalter gibt das Speichern frei und sagt es (%s)" % e2.status.text.replace("\n", " "))
+	var sid2: String = e2._save(false)
+	check(sid2 != "" and CS.exists(sid2) and not CS.is_solved(sid2), "Debug-Override: gespeichert ohne Handlösung (und ohne sie nachzutragen)")
+	e2._begin(false, Vector2i(25, 9))
+	e2._end_stroke()
+	save_node.debug = false
+	e2._validate_now()
+	check(e2._save_blocked() and e2._save(false) == "", "Debug-Override: außerhalb des Debug-Modus wirkungslos")
+	save_node.debug = true
+	check(FileAccess.get_file_as_string("res://src/core/flow.gd").contains("if not on:\n\t\teditor_skip_solve = false"), "Debug-Override: Debug ausschalten setzt den Schalter zurück (Quelltextprüfung)")
+	e2.free()
 	flow_node.editor_original = ""
 	save_node.debug = was_debug
 	_lf_restore(root)

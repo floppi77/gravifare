@@ -85,6 +85,7 @@ var orig_raw: Dictionary = {}               # Inhalt dieser Datei
 var orig_base: Dictionary = {}              # ihre bereinigte Fassung (Vergleichsbasis)
 var base_id := ""                           # ID der bereinigten Dateifassung; eine gleiche Fassung braucht keinen Nachweis und wird nicht geschrieben
 var look_btns: Array = []
+var skip_btn: Button = null                 # nur im Debug-Modus: Handlösung überspringen
 # Strich
 var active := false
 var stroke_erase := false
@@ -361,8 +362,14 @@ func _build_page_level(pg: Control) -> void:
 	var reroll := _button(tr("ED_REROLL"), _reroll, Vector2(0, 40), Vector2(70, 17), pg, 7)
 	job_mode_btn = _button("", _job_mode, Vector2(74, 40), Vector2(70, 17), pg, 7)
 	level_rows = [[look_l, look_r], [dark_l, dark_r], [reroll, job_mode_btn]]
+	var job_y := 62.0
+	if Save.debug:
+		skip_btn = _button("", _toggle_skip_solve, Vector2(0, 60), Vector2(144, 17), pg, 7)       # Debug: Speichern ohne eigene Lösung
+		level_rows.append([skip_btn])
+		_update_skip_btn()
+		job_y = 82.0
 	job_box = Control.new()
-	job_box.position = Vector2(0, 62)
+	job_box.position = Vector2(0, job_y)
 	job_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pg.add_child(job_box)
 
@@ -1227,6 +1234,8 @@ func _apply_validation(r: Dictionary) -> void:
 			txt += " · " + tr("ED_JOBS_RESET")
 		if _save_blocked():
 			txt += "\n" + tr("ED_NEED_SOLVE")
+		elif _skip_solve() and not _is_saved_version() and not CommunityStore.is_solved(res.id):
+			txt += "\n" + tr("ED_SKIP_ACTIVE")
 		else:
 			if CommunityStore.is_solved(res.id) and not _is_saved_version():
 				txt += " · " + tr("ED_SOLVED")
@@ -1283,7 +1292,21 @@ func _is_saved_version() -> bool:
 
 ## Fehlt für die geprüfte Fassung noch die Handlösung? Speichern geht nur, wenn der Ersteller genau dieses Level einmal selbst geflogen ist.
 func _save_blocked() -> bool:
-	return res.get("ok", false) and not _is_saved_version() and not CommunityStore.is_solved(res.id)
+	return res.get("ok", false) and not _is_saved_version() and not CommunityStore.is_solved(res.id) and not _skip_solve()
+
+## Debug-Override: Im Debug-Modus lässt sich die Handlösung abschalten (für kleine Änderungen, die keinen neuen Testflug brauchen).
+func _skip_solve() -> bool:
+	return Save.debug and Flow.editor_skip_solve
+
+func _toggle_skip_solve() -> void:
+	Flow.editor_skip_solve = not Flow.editor_skip_solve
+	_update_skip_btn()
+	_request_validation(0.05)
+
+func _update_skip_btn() -> void:
+	if skip_btn != null:
+		skip_btn.text = tr("ED_SKIP_ON") if Flow.editor_skip_solve else tr("ED_SKIP_OFF")
+		skip_btn.modulate = Color(1.35, 1.2, 0.7) if Flow.editor_skip_solve else Color.WHITE
 
 ## Speichert eine eigene Fassung (im Original-Modus: die Datei des Originals). Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
 func _save(announce: bool) -> String:
