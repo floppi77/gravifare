@@ -5,6 +5,8 @@ var lines: Array = []
 var lang := "de"
 var owner_scene: Node
 var y := 380.0
+var logo: Texture2D = load("res://assets/art/logo.png") if ResourceLoader.exists("res://assets/art/logo.png") else null
+const LOGO_W := 210.0               # Breite des Logos im Abspann (statt der Schrift „GRAVIFARE“)
 
 func _text(v) -> String:
 	return v if typeof(v) == TYPE_STRING else String(v.get(lang, v.get("en", "")))
@@ -24,7 +26,7 @@ func _total_height() -> float:
 
 func _row_h(kind: String) -> float:
 	match kind:
-		"title": return 64.0
+		"title": return (LOGO_W * float(logo.get_height()) / float(logo.get_width()) + 10.0) if logo != null else 64.0
 		"sub": return 34.0
 		"head": return 30.0
 	return 16.0
@@ -51,6 +53,14 @@ func _draw() -> void:
 				col = Color("#35e0d2")
 		var a := clampf(minf((cy - 10.0) / 40.0, (350.0 - cy) / 40.0), 0.0, 1.0)
 		col.a = a
-		if cy > -20.0 and cy < 380.0:
+		if kind == "title" and logo != null:                       # Titelzeile: das GraviFare-Logo statt des Schrifttextes
+			if cy > -_row_h(kind) and cy < 380.0:
+				var lh := LOGO_W * float(logo.get_height()) / float(logo.get_width())
+				var r := Rect2((size.x - LOGO_W) * 0.5, cy + 2.0, LOGO_W, lh)
+				var mid := cy + lh * 0.5                                  # die hohe Zeile blendet nach ihrer Mitte ein und aus
+				a = clampf(minf((mid - 10.0) / 40.0, (350.0 - mid) / 40.0), 0.0, 1.0)
+				draw_texture_rect(logo, Rect2(r.position + Vector2(2, 3), r.size), false, Color(0, 0, 0, 0.45 * a))        # Schatten wie im Hauptmenü
+				draw_texture_rect(logo, r, false, Color(1, 1, 1, a))
+		elif cy > -20.0 and cy < 380.0:
 			draw_string(fnt, Vector2(0, cy + _row_h(kind) * 0.6), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, sz, col)
 		cy += _row_h(kind)

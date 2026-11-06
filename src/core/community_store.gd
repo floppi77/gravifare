@@ -7,10 +7,15 @@ const CommunityLevel := preload("res://src/core/community_level.gd")
 const DIR := "user://community/"
 const MAX_LEVELS := 200
 static var dir := DIR                 # Tests weichen auf einen eigenen Ordner aus
+
+## Ordner der Level. Nach dem Neuladen von Skripten im laufenden Editor-Spiel werden statische Variablen auf ihren Typ-Standard ("") zurückgesetzt;
+## dann landeten Level ohne diese Absicherung relativ im Projektordner und die Liste zeigte nur sie (die gespeicherten Level kamen erst nach einem Neustart zurück).
+static func _d() -> String:
+	return dir if dir != "" else DIR
 static var game_version := ""         # setzt Flow beim Start; steht in den gespeicherten Dateien
 
 static func path_for(id: String) -> String:
-	return dir + id + ".gflevel" if CommunityLevel.is_valid_id(id) else ""
+	return _d() + id + ".gflevel" if CommunityLevel.is_valid_id(id) else ""
 
 static func exists(id: String) -> bool:
 	var p := path_for(id)
@@ -18,7 +23,7 @@ static func exists(id: String) -> bool:
 
 static func _ids() -> Array:
 	var out: Array = []
-	var d := DirAccess.open(dir)
+	var d := DirAccess.open(_d())
 	if d == null:
 		return out
 	for f in d.get_files():
@@ -90,11 +95,11 @@ static func list() -> Array:
 	return out
 
 static func _load_index() -> void:
-	if _index_dir == dir:
+	if _index_dir == _d():
 		return
-	_index_dir = dir
+	_index_dir = _d()
 	_index = {}
-	var f := FileAccess.open(dir + "index.json", FileAccess.READ)
+	var f := FileAccess.open(_d() + "index.json", FileAccess.READ)
 	var d = JSON.parse_string(f.get_as_text()) if f != null else null
 	if d is Dictionary:
 		for id in d:
@@ -102,14 +107,14 @@ static func _load_index() -> void:
 				_index[id] = d[id]
 
 static func _save_index() -> void:
-	DirAccess.make_dir_recursive_absolute(dir)
-	var tmp := dir + "index.json.tmp"
+	DirAccess.make_dir_recursive_absolute(_d())
+	var tmp := _d() + "index.json.tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		return
 	f.store_string(JSON.stringify(_index))
 	f.close()
-	DirAccess.rename_absolute(tmp, dir + "index.json")
+	DirAccess.rename_absolute(tmp, _d() + "index.json")
 
 ## Geprüftes Ergebnis speichern (atomar). Gibt "" zurück oder einen Fehlercode.
 static func save(res: Dictionary, author := "") -> String:
@@ -118,7 +123,7 @@ static func save(res: Dictionary, author := "") -> String:
 	var id: String = res.id
 	if not exists(id) and _ids().size() >= MAX_LEVELS:
 		return "STORE_FULL"
-	DirAccess.make_dir_recursive_absolute(dir)
+	DirAccess.make_dir_recursive_absolute(_d())
 	var p := path_for(id)
 	var tmp := p + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)

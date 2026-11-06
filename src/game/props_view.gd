@@ -159,7 +159,7 @@ func _draw_doors() -> void:
 			if bool(d.get("glass", false)):
 				_draw_glass_gate(ch, gate, gap)
 			else:
-				_draw_slide_gate(gate, gap, lamp)
+				_draw_slide_gate(gate, gap, lamp, level.door_leaf_rects(ch, gate, level.clock) if level.is_sweep(ch) else [])
 
 ## Glasschleuse (Glasfassade): zwei Glasflügel statt Schott. Hellblaue, durchscheinende Fläche mit Spiegelstreifen und leuchtender Vorderkante;
 ## die Schienen bleiben sichtbar, auch wenn die Flügel ganz eingefahren sind. Gleiche Fläche und Kollision wie jedes Schiebetor.
@@ -202,10 +202,10 @@ func _draw_glass_gate(ch: String, gate: Dictionary, gap: float) -> void:
 			draw_rect(Rect2(leaf.end.x - 1.0 if i == 0 else leaf.position.x, leaf.position.y, 1.0, leaf.size.y), Color(1, 1, 1, 0.95))
 
 ## Schiebetor: zwei Flügel mit Warnstreifen, die Streifen laufen mit der Vorderkante; Schienen und Lampen zeigen den Zustand auch bei offenem Tor.
-func _draw_slide_gate(gate: Dictionary, gap: float, lamp: Color) -> void:
+func _draw_slide_gate(gate: Dictionary, gap: float, lamp: Color, sweep_leaves: Array = []) -> void:
 	var r: Rect2 = gate.rect
 	var vert: bool = gate.vertical
-	var leaves := LevelData.door_leaves(gate, gap)
+	var leaves: Array = sweep_leaves if not sweep_leaves.is_empty() else LevelData.door_leaves(gate, gap)          # Sweep-Schleuse: die Flügel folgen der wandernden Öffnung, auch ohne Glas
 	for i in leaves.size():
 		var leaf: Rect2 = leaves[i]
 		if leaf.size.x <= 0.0 or leaf.size.y <= 0.0:

@@ -5,6 +5,7 @@ extends Control
 signal finished(text: String, accepted: bool)
 
 const ROWS := ["1234567890", "qwertzuiop", "asdfghjklö", "yxcvbnmäüß", ".,-_'!?:&+"]
+const PadGlyph := preload("res://src/ui/pad_glyph.gd")
 const KEY_W := 34.0
 const KEY_H := 17.0
 const GAP := 3.0
@@ -47,28 +48,50 @@ func _ready() -> void:
 			var b := _key(ch, _press_char.bind(ch), Vector2(x0 + c * (KEY_W + GAP), 102.0 + r * (KEY_H + GAP)), Vector2(KEY_W, KEY_H))
 			keys.append([b, ch])
 	var y := 102.0 + ROWS.size() * (KEY_H + GAP) + 6.0
-	var specs := [[tr("ED_OSK_SHIFT"), _toggle_shift, 62.0], [tr("ED_OSK_SPACE"), _press_char.bind(" "), 104.0], [tr("ED_OSK_DEL"), _backspace, 62.0],
-		[tr("ED_OSK_OK"), _accept, 62.0], [tr("ED_OSK_CANCEL"), _cancel, 62.0]]
+	var specs := [[tr("ED_OSK_SHIFT"), _toggle_shift, 88.0, "LB/RB"], [tr("ED_OSK_SPACE"), _press_char.bind(" "), 100.0, "Y"], [tr("ED_OSK_DEL"), _backspace, 62.0, "X"],
+		[tr("ED_OSK_OK"), _accept, 62.0, "START"], [tr("ED_OSK_CANCEL"), _cancel, 62.0, "B"]]
 	var total := 0.0
 	for s in specs:
 		total += s[2] + GAP
 	var x := 112.0 + (416.0 - (total - GAP)) * 0.5
 	for s in specs:
 		var b := _key(s[0], s[1], Vector2(x, y), Vector2(s[2], KEY_H + 2.0))
+		var gw := PadGlyph.width_for(s[3], 10.0)                     # das Controllersymbol steht direkt im Knopf, links vom Namen
+		var g := PadGlyph.make(s[3], Vector2(gw, 10.0))
+		g.position = Vector2(4.0, (KEY_H + 2.0 - 10.0) * 0.5)
+		b.add_child(g)
+		b.alignment = HORIZONTAL_ALIGNMENT_RIGHT                   # Text rechts, damit das Symbol links Platz hat
 		if s[0] == tr("ED_OSK_SHIFT"):
 			shift_btn = b
 		x += s[2] + GAP
-	var hint := Label.new()
-	hint.text = tr("ED_OSK_HINT")
-	hint.position = Vector2(112, 288)
-	hint.size = Vector2(416, 12)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 7)
-	hint.add_theme_color_override("font_color", Color("#9aa6dd"))
-	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(hint)
+	_hint_row(Vector2(112, 288), [["DPAD", tr("ED_OSK_H_MOVE")], ["A", tr("ED_OSK_H_TYPE")]])
 	_refresh()
 	(keys[10][0] as Button).grab_focus.call_deferred()          # Start auf „q“: die Buchstaben liegen am nächsten
+
+## Hinweiszeile aus Controllersymbolen mit kurzem Text dahinter, mittig in der Tastaturbox.
+func _hint_row(pos: Vector2, items: Array) -> void:
+	var f: Font = Fonts.ui if Fonts.ui != null else ThemeDB.fallback_font
+	var widths: Array = []
+	var total := 0.0
+	for it in items:
+		var w := 12.0 + 3.0 + f.get_string_size(String(it[1]), HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+		widths.append(w)
+		total += w + 12.0
+	var x := pos.x + (416.0 - (total - 12.0)) * 0.5
+	for i in items.size():
+		var g := PadGlyph.make(items[i][0], Vector2(12, 12))
+		g.position = Vector2(x, pos.y)
+		add_child(g)
+		var l := Label.new()
+		l.text = items[i][1]
+		l.position = Vector2(x + 15.0, pos.y - 1.0)
+		l.size = Vector2(widths[i] - 15.0 + 2.0, 14)
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		l.add_theme_font_size_override("font_size", 8)
+		l.add_theme_color_override("font_color", Color("#9aa6dd"))
+		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(l)
+		x += widths[i] + 12.0
 
 func _key(label: String, cb: Callable, pos: Vector2, sz: Vector2) -> Button:
 	var b := MenuKit.button(label, cb)

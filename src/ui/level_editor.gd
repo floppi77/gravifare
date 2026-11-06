@@ -74,6 +74,8 @@ var dark_label: Label
 var btn_back: Button
 var bar_btns: Array = []                    # untere Leiste: Speichern, Testflug, Autopilot, Vorschau, Raster, Zurück
 var osk: Control = null                     # Bildschirmtastatur (Controller) für Name und Autor
+var param_rows: Array = []                  # Objekte-Seite: Knopfpaare „<“, „>“ der Eigenschaften des gewählten Objekts
+var obj_nav: Array = []                     # Objekte-Seite: Knöpfe „<“, „>“, „×“ der Objektauswahl
 var level_rows: Array = []                  # Knopfreihen der Level-Seite (feste Fokusnachbarn; Auftragszeilen kommen beim Neuaufbau dazu)
 var page_first: Array = [null, null, null]  # erster fokussierbarer Knopf je Seite (Einstieg mit dem Controller)
 var btn_save: Button
@@ -294,11 +296,12 @@ func _build_page_objects(pg: Control) -> void:
 	kind_label = _label("", Vector2(0, 56), Vector2(144, 20), pg)
 	kind_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	kind_label.add_theme_font_size_override("font_size", 7)
-	_button("<", _obj_step.bind(-1), Vector2(0, 80), Vector2(18, 16), pg, 7)
+	var o_prev := _button("<", _obj_step.bind(-1), Vector2(0, 80), Vector2(18, 16), pg, 7)
 	obj_label = _label("", Vector2(20, 81), Vector2(78, 14), pg)
 	obj_label.add_theme_font_size_override("font_size", 7)
-	_button(">", _obj_step.bind(1), Vector2(100, 80), Vector2(18, 16), pg, 7)
-	_button("×", _obj_remove, Vector2(120, 80), Vector2(24, 16), pg, 8)
+	var o_next := _button(">", _obj_step.bind(1), Vector2(100, 80), Vector2(18, 16), pg, 7)
+	var o_del := _button("×", _obj_remove, Vector2(120, 80), Vector2(24, 16), pg, 8)
+	obj_nav = [o_prev, o_next, o_del]
 	param_box = Control.new()
 	param_box.position = Vector2(0, 100)
 	param_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -359,6 +362,7 @@ func _build_bottom() -> void:
 	btn_save = bar_btns[0]
 	btn_back = bar_btns[5]
 	_wire_bar()
+	_wire_object_page()
 
 ## Fokusnachbarn der unteren Leiste: links/rechts innerhalb der Reihe, hoch zu Name bzw. Autor, runter zur Leiste. Die automatische Suche übersprang Knöpfe (Testflug)
 ## und blieb in den Textfeldern hängen, weil die ihre Pfeiltasten selbst verbrauchen.
@@ -376,21 +380,36 @@ func _wire_bar() -> void:
 	author_edit.focus_neighbor_right = author_edit.get_path_to(author_edit)
 	author_edit.focus_neighbor_bottom = author_edit.get_path_to(bar_btns[3])
 
-## Feste Fokusnachbarn der Level-Seite: links/rechts in der Reihe, hoch/runter zur Reihe darüber/darunter (gleiche Spalte bzw. letzte Taste). Oben geht es zu den Seitenknöpfen,
-## unten zur Leiste. Die automatische Suche sprang von „<“ zu den Seitenknöpfen statt zu „>“.
-func _wire_level_page(job_rows: Array) -> void:
-	var rows: Array = level_rows.duplicate()
-	rows.append_array(job_rows)
+## Feste Fokusnachbarn der Seiten (Controller, Tastatur): links/rechts in der Reihe, hoch/runter zur Reihe darüber/darunter (gleiche Spalte bzw. letzte Taste). Oben geht es zu
+## `up` (Seitenknopf), unten zu `down` (Leiste). Die automatische Suche sprang von „<“ zu den Seitenknöpfen statt zu „>“ und übersprang Knöpfe.
+func _wire_rows(rows: Array, up: Control, down: Control) -> void:
 	for r in rows.size():
 		var row: Array = rows[r]
 		for c in row.size():
 			var b: Control = row[c]
 			b.focus_neighbor_left = b.get_path_to(row[maxi(c - 1, 0)])
 			b.focus_neighbor_right = b.get_path_to(row[mini(c + 1, row.size() - 1)])
-			var up: Control = page_btns[2] if r == 0 else rows[r - 1][mini(c, rows[r - 1].size() - 1)]
-			var down: Control = btn_save if r == rows.size() - 1 else rows[r + 1][mini(c, rows[r + 1].size() - 1)]
-			b.focus_neighbor_top = b.get_path_to(up)
-			b.focus_neighbor_bottom = b.get_path_to(down)
+			var u: Control = up if r == 0 else rows[r - 1][mini(c, rows[r - 1].size() - 1)]
+			var d: Control = down if r == rows.size() - 1 else rows[r + 1][mini(c, rows[r + 1].size() - 1)]
+			b.focus_neighbor_top = b.get_path_to(u)
+			b.focus_neighbor_bottom = b.get_path_to(d)
+
+## Level-Seite: Optik, Dunkelheit, Würfeln, Auftragszeilen.
+func _wire_level_page(job_rows: Array) -> void:
+	var rows: Array = level_rows.duplicate()
+	rows.append_array(job_rows)
+	_wire_rows(rows, page_btns[2], btn_save)
+
+## Objekte-Seite: Artenpalette, Objektauswahl und die Eigenschaften des gewählten Objekts (je eine Reihe „<“, „>“).
+func _wire_object_page() -> void:
+	if btn_save == null or kind_btns.is_empty() or obj_nav.is_empty():
+		return                                                    # beim Aufbau existiert die untere Leiste noch nicht (sie ruft das hier selbst auf)
+	var rows: Array = []
+	for i in range(0, kind_btns.size(), 5):
+		rows.append(kind_btns.slice(i, mini(i + 5, kind_btns.size())))
+	rows.append(obj_nav)
+	rows.append_array(param_rows)
+	_wire_rows(rows, page_btns[1], btn_save)
 
 ## Controller: A auf einem Textfeld öffnet die Bildschirmtastatur (Tastatur und Maus tippen direkt ins Feld).
 func _open_osk(edit: LineEdit) -> void:
@@ -638,6 +657,8 @@ func _rebuild_params() -> void:
 	param_vals.clear()
 	if not model.valid_ref(obj_ref):
 		obj_label.text = tr("ED_O_NONE")
+		param_rows = []
+		_wire_object_page()
 		return
 	var objs: Array = model.objects()
 	var idx := 0
@@ -647,6 +668,7 @@ func _rebuild_params() -> void:
 	var kind: String = model.obj_kind(obj_ref)
 	obj_label.text = tr("ED_O_SEL") % [idx, objs.size(), tr("ED_K_" + kind) + (" " + String(obj_ref.k) if obj_ref.t == "door" else "")]
 	var row := 0
+	param_rows = []
 	for p in model.obj_params(obj_ref):
 		var y := row * 15.0
 		var l := _label(tr(String(p[4])), Vector2(0, y), Vector2(62, 14), param_box)
@@ -660,7 +682,9 @@ func _rebuild_params() -> void:
 		var b2 := _button(">", _param_step.bind(key, 1), Vector2(128, y), Vector2(16, 14), param_box, 7)
 		b2.set_meta("key", "p:%s:+" % key)
 		param_vals[key] = val
+		param_rows.append([b1, b2])
 		row += 1
+	_wire_object_page()
 	_focus_regrab()
 
 func _param_step(key: String, direction: int) -> void:
@@ -1264,6 +1288,8 @@ func _toggle_menu() -> void:
 func _enter_menu() -> void:
 	if page == 2 and page_first[2] != null:
 		(page_first[2] as Button).grab_focus()           # die Level-Seite hat nichts zu zeichnen: ihre Knöpfe zuerst
+	elif page == 1 and not kind_btns.is_empty():
+		(kind_btns[clampi(kind_idx, 0, kind_btns.size() - 1)] as Button).grab_focus()      # Objekte: Art, Objektauswahl und Eigenschaften
 	else:
 		btn_save.grab_focus()
 	overlay.queue_redraw()

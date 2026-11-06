@@ -11,7 +11,8 @@ static func free_at(level: LevelData, p: Vector2, margin: float) -> bool:
 	var hit := level.box_hits_solid(p, Tuning.HULL_HALF + Vector2(margin, margin))
 	level.doors_ignore = prev
 	level.movers_ignore = prev_m
-	return not hit and not level.pad_sweeps_hit(p, Tuning.HULL_HALF + Vector2(margin, margin)) and not level.heat_hit_box(p, Tuning.HULL_HALF + Vector2(margin, margin))
+	var half := Tuning.HULL_HALF + Vector2(margin, margin)
+	return not hit and not level.pad_sweeps_hit(p, half) and not level.heat_hit_box(p, half) and not (level.pump_aware and level.pumps_hit_box(p, half))
 
 static func line_free(level: LevelData, a: Vector2, b: Vector2, margin: float) -> bool:
 	var n := int(ceil(a.distance_to(b) / 3.0))

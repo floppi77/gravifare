@@ -104,7 +104,7 @@ func _ready() -> void:
 		run.sim.state = TaxiSim.State.DESTROYED
 	if OS.get_cmdline_user_args().has("--autopilot") or (Flow.community and Flow.editor_autopilot):
 		run.extras_enabled = false      # Autopilot (Dev bzw. Testflug im Level-Editor) fährt nur die Auftragskette
-		autopilot = Bot.new(run)
+		autopilot = Bot.new(run, Flow.community and Flow.editor_autopilot)
 	for ua in OS.get_cmdline_user_args():
 		if ua.begins_with("--skip-time="):          # Dev: Spielzeit vorspulen (Taxi bleibt stehen), z. B. für Screenshots von Meteoriten
 			for i in int(float(ua.substr(12)) / Tuning.TICK):
@@ -231,7 +231,7 @@ func load_level(path: String) -> void:
 	_setup_ghost(lvl)
 	if autopilot != null:
 		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
-		autopilot = Bot.new(run)
+		autopilot = Bot.new(run, Flow.community and Flow.editor_autopilot)
 	hud.paused = false
 	paused = false
 	near_z = 0.0

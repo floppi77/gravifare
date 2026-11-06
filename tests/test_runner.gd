@@ -15,7 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3737,6 +3737,125 @@ func _test_editor_blink_and_pad() -> void:
 	ed._set_page(0)
 	ed.free()
 	CS.dir = CS.DIR
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
+
+## Fester Probe-Level für Runde 46: zwei Kammern, schmaler linker Gang, Zapfsäule, Schieber (Karte wie im Editor-Screenshot des Nutzers).
+func _round46_wrap(extra_movers: Array = []) -> Dictionary:
+	var map := ["##################....##################", "#.................EEEE#................#", "#.................EEEE#................#", "#.....................#................#", "#.....................#................#",
+		"#...###################................#", "#......................................#", "#......................................#", "#......................................#", "#......................................#",
+		"#......................................#", "#......................................#", "#......................................#", "#......................................#", "#...###################................#",
+		"#.....................#................#", "#.....................#................#", "#.....................#................#", "#.....................#................#", "#....S........P.......#................#",
+		"#..1111....FFFF..22222#..........3333..#", "########################################"]
+	var jobs := [{"from": "2", "to": "1", "fare": 60.0, "par": 20.0, "passenger": "Ben", "gender": "m"}, {"from": "3", "to": "exit", "fare": 60.0, "par": 24.0, "passenger": "Mika", "gender": "f"}]
+	var lvl := {"name": {"de": "Probe", "en": "Probe"}, "sector": 4, "index": 6, "map": map, "jobs": jobs, "doors": {},
+		"movers": extra_movers, "zones": [], "dark": 0.0}
+	return {"format": CL.FORMAT, "version": CL.VERSION, "level": lvl}
+
+func _test_round46_fixes() -> void:
+	var tr_de := Translation.new()
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	tr_de.locale = "de"
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	# 1. Fahrendes Pad im einzigen Gang: sperrt nur seinen Kern, nicht den ganzen Fahrweg
+	var pad_mv := {"kind": "pad", "pad": "4", "x": 9.0, "y": 15.0, "w": 4.0, "h": 2.0, "dx": 8.0, "period": 10.0}
+	var res := CL.clean(_round46_wrap([pad_mv]))
+	check(res.ok, "Fahrendes Pad: Probe-Level ist gültig %s" % str(res.errors))
+	var lvl: LevelData = CL.to_level(res)
+	check(LevelMetrics.blocked_leg(lvl).is_empty(), "Fahrendes Pad: Level ist lösbar, obwohl der Fahrweg des Pads den linken Gang quert")
+	check(not lvl.sweep_core, "Fahrendes Pad: die Prüfung stellt den Planungsmodus zurück")
+	lvl.sweep_core = false
+	check(Pathing.plan(lvl, Vector2(40, 300), Vector2(40, 200), 4.0).is_empty(), "Fahrendes Pad: mit ganzem Fahrweg als Wand wäre der Gang gesperrt (Planung des Autopiloten)")
+	lvl.sweep_core = true
+	check(not Pathing.plan(lvl, Vector2(40, 300), Vector2(40, 200), 4.0).is_empty(), "Fahrendes Pad: nur der Kern gesperrt, der Gang bleibt passierbar")
+	var m0: Dictionary = lvl.movers[0]
+	var mc: Vector2 = (m0.rect as Rect2).get_center()
+	check(lvl.movers_hit_at(mc, Vector2(2, 2), 0.0, true) and not lvl.movers_hit_at(mc, Vector2(2, 2), 0.0, false) and not lvl.movers_hit_at(mc, Vector2(2, 2), 0.0, true, "4"), "Fahrendes Pad: Platte zählt für den Autopiloten nur mit pads_too, nie als Zielpad")
+	var wide := {"kind": "pad", "pad": "4", "x": 1.0, "y": 15.0, "w": 6.0, "h": 2.0, "dx": 1.0, "period": 10.0}
+	var res2 := CL.clean(_round46_wrap([wide]))
+	check(not res2.ok and _cl_codes(res2).has("UNSOLVABLE"), "Fahrendes Pad: füllt die Platte den Gang in jeder Stellung, bleibt er gesperrt (%s)" % str(_cl_codes(res2)))
+	# 2. Zapfsäule: Kopf zählt für den Autopiloten als Hindernis
+	var plain: LevelData = CL.to_level(CL.clean(_round46_wrap([])))
+	check(plain != null and plain.pumps.size() == 1, "Zapfsäule: Probe-Level hat eine Säule")
+	var head_pt := Vector2(232.0, 292.0)
+	check(Pathing.free_at(plain, head_pt, 2.0), "Zapfsäule: der Kopf ist ohne Zapfsäulen-Planung kein Hindernis (Standard-Autopilot unverändert)")
+	plain.pump_aware = true
+	check(not Pathing.free_at(plain, head_pt, 2.0), "Zapfsäule: mit pump_aware sperrt der Kopf die Planung")
+	# 3. Zuschauer-Autopilot: Flag, kein Zapfsäulen-Treffer, zügiger als der Standard
+	var lv3: LevelData = CL.to_level(CL.clean(_round46_wrap([])))
+	var run := Run.new()
+	run.extras_enabled = false
+	run.start(lv3, 100.0)
+	var bot := Bot.new(run, true)
+	check(bot.pro and lv3.pump_aware, "Zuschauer-Autopilot: pro-Modus schaltet die Zapfsäulen-Planung ein")
+	var vmax := 0.0
+	for i in int(70.0 / Tuning.TICK):
+		var cmd := bot.decide()
+		run.step(Replay.quantize(cmd[0]), cmd[1])
+		vmax = maxf(vmax, run.sim.vel.length())
+		if run.result != Run.Result.RUNNING:
+			break
+	check(run.pump_touches == 0 and run.sim.hull > 90.0 and run.delivered >= 1 and vmax > 90.0, "Zuschauer-Autopilot: liefert aus, ohne die Zapfsäule zu berühren, mit Reisetempo (%d befördert, Spitze %.0f px/s, %d Berührungen, Hülle %.0f)" % [run.delivered, vmax, run.pump_touches, run.sim.hull])
+	var r_std := Bot.fly_level(CL.to_level(CL.clean(_round46_wrap([]))), 60.0, 100.0)
+	check(not r_std.get("pro", false) and absf(float(r_std.get("hull", 0.0))) <= 100.0, "Standard-Autopilot läuft unverändert weiter")
+	# 4. Levelliste: A wählt an und springt zu den Aktionen
+	CS.dir = "user://test_community_ui3/"
+	CS._cache.clear()
+	CS.import_text(JSON.stringify(_cl_wrap("s1_01")))
+	CS.import_text(JSON.stringify(_cl_wrap("s1_02")))
+	var scr: Control = load("res://src/ui/community_select.gd").new()
+	scr.back = func(): pass
+	scr._ready()
+	check(scr.btn_play != null and scr.actions.columns == 5 and scr.btn_play.text == "Spielen", "Levelliste: eigener Knopf „Spielen“ in den Aktionen")
+	scr._pick(1)
+	check(scr.sel == 1, "Levelliste: Bestätigen auf einem Eintrag wählt ihn nur an (kein sofortiger Start)")
+	var sel_src := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
+	check(not sel_src.contains("_play.bind(String(e.id))") and sel_src.contains("_pick.bind(i)") and sel_src.contains("_actions_have_focus"), "Levelliste: A startet nicht mehr, B führt aus den Aktionen zurück in die Liste (Quelltextprüfung)")
+	check(not sel_src.contains("bot_check"), "Import: kein Probeflug des Autopiloten mehr (er blockierte die Oberfläche und ist kein Maßstab)")
+	scr.free()
+	for fn in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + fn)
+	DirAccess.remove_absolute(CS.dir)
+	# 5. Objekte-Seite: per Controller erreichbar
+	CS.dir = "user://test_community_editor3/"
+	CS._cache.clear()
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed.model.add_object("debris", 10, 8)
+	ed._set_page(1)
+	var kb: Array = ed.kind_btns
+	check(kb[0].get_node(kb[0].focus_neighbor_bottom) == kb[5] and kb[5].get_node(kb[5].focus_neighbor_bottom) == ed.obj_nav[0] and kb[0].get_node(kb[0].focus_neighbor_top) == ed.page_btns[1], "Objekte-Seite: Arten, Objektauswahl und Seitenknopf sind per Steuerkreuz verbunden")
+	check(ed.param_rows.size() >= 4 and ed.obj_nav[0].get_node(ed.obj_nav[0].focus_neighbor_bottom) == ed.param_rows[0][0], "Objekte-Seite: die Eigenschaften des Objekts sind erreichbar")
+	var last: Array = ed.param_rows[ed.param_rows.size() - 1]
+	check(last[0].get_node(last[0].focus_neighbor_bottom) == ed.btn_save and last[0].get_node(last[0].focus_neighbor_right) == last[1], "Objekte-Seite: links/rechts zwischen „<“ und „>“, unten weiter zur Leiste")
+	ed._set_page(0)
+	ed.free()
+	for fn in DirAccess.get_files_at(CS.dir):
+		DirAccess.remove_absolute(CS.dir + fn)
+	DirAccess.remove_absolute(CS.dir)
+	CS.dir = CS.DIR
+	# 6. Controllersymbole in der Bildschirmtastatur
+	var PG: GDScript = load("res://src/ui/pad_glyph.gd")
+	check(PG.width_for("LB/RB", 10.0) > PG.width_for("A", 10.0) and PG.make("X", Vector2(12, 12)) is Control, "Controllersymbole: Schultertasten sind breiter als Knöpfe, Symbole sind Controls")
+	var osk_src := FileAccess.get_file_as_string("res://src/ui/osk.gd")
+	check(osk_src.contains("PadGlyph.make") and not osk_src.contains("ED_OSK_HINT") and de_texts.has("ED_OSK_H_MOVE") and not de_texts.has("ED_OSK_HINT"), "Bildschirmtastatur: Controllersymbole statt Hinweistext (Quelltextprüfung)")
+	# 5b. Speicherordner übersteht zurückgesetzte statische Variablen (Skript-Neuladen im Editor-Spiel)
+	CS.dir = ""
+	check(CS._d() == CS.DIR and CS.path_for("c_0123456789").begins_with("user://community/"), "Speicherort: ein zurückgesetzter Ordner (\"\") fällt auf user://community/ zurück, Level landen nie im Projektordner")
+	CS.dir = CS.DIR
+	# 6b. Sweep-Schleuse auch ohne Glas sichtbar wandernd
+	var pv := FileAccess.get_file_as_string("res://src/game/props_view.gd")
+	check(pv.contains("level.door_leaf_rects(ch, gate, level.clock) if level.is_sweep(ch) else []") and pv.contains("sweep_leaves: Array = []"), "Tore: eine Sweep-Schleuse zeigt die wandernde Öffnung auch ohne Glas (Quelltextprüfung)")
+	# 7. Credits mit Logo
+	var cv: Control = load("res://src/ui/credits_view.gd").new()
+	check(cv.logo != null and cv._row_h("title") > 64.0, "Credits: die Titelzeile ist das GraviFare-Logo (höher als die Schriftzeile)")
+	cv.free()
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tr_de)
 

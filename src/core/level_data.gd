@@ -45,6 +45,8 @@ var movers: Array = []
 var meteor_seed := 0             # Meteoriten fallen je Fall auf einer anderen Bahn (zufällig je Lauf, reproduzierbar im Replay); setzt Run.start
 var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast schwarz); nur Taxi, Plattformen, Tor und leuchtende Gefahren sind beleuchtet
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
+var pump_aware := false          # Planung (Zuschauer-Autopilot): Zapfsäulen samt Kopf sind Hindernisse (sonst zählt jede Berührung zum Zerstören der Station)
+var sweep_core := false          # Planung: fahrende Pads sperren nur den Bereich, den die Platte in jeder Stellung belegt (statt ihres ganzen Fahrwegs)
 
 static func load_file(path: String) -> LevelData:
 	var f := FileAccess.open(path, FileAccess.READ)
@@ -691,25 +693,51 @@ func movers_hit_box(center: Vector2, half: Vector2) -> bool:
 	return false
 
 ## Planung: fahrende Pads belegen ihren gesamten Fahrweg (Platte + Schiene) als feste Fläche.
+## Mit `sweep_core` (Lösbarkeitsprüfung, Autopilot-Rückfall) nur der Kern: Bereich, den die Platte in jeder Stellung ihrer Fahrt belegt.
+## Sonst wäre eine Öffnung, an der die Platte nur zeitweise vorbeifährt, dauerhaft gesperrt, obwohl man dort durchkommt, wenn sie weg ist.
 func pad_sweeps_hit(center: Vector2, half: Vector2) -> bool:
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.kind == "pad" and Rect2(float(m.x) - float(m.ax), float(m.y), float(m.w) + 2.0 * float(m.ax), float(m.h)).intersects(box):
+		if m.kind != "pad":
+			continue
+		if sweep_core:
+			var cw := float(m.w) - 2.0 * float(m.ax)
+			if cw > 0.0 and Rect2(float(m.x) + float(m.ax), float(m.y), cw, float(m.h)).intersects(box):
+				return true
+		elif Rect2(float(m.x) - float(m.ax), float(m.y), float(m.w) + 2.0 * float(m.ax), float(m.h)).intersects(box):
 			return true
 	return false
 
 ## Bot: Trifft das Taxi auf seiner voraussichtlichen Bahn (Anfahrt von v0 auf v_des, Zeitkonstante 0,3 s) innerhalb des
 ## Horizonts ein Hindernis (Trümmer/Schieber; Pads zählen nicht)? Prüft die Mover-Positionen zu jedem Zeitpunkt mit.
-func movers_collide_traj(p0: Vector2, v0: Vector2, v_des: Vector2, half: Vector2, t0: float, horizon: float) -> bool:
+## `pads_too`: auch fahrende Plattformen (außer `skip_pad`, dem Zielpad) zählen als Hindernis.
+func movers_collide_traj(p0: Vector2, v0: Vector2, v_des: Vector2, half: Vector2, t0: float, horizon: float, pads_too := false, skip_pad := "") -> bool:
 	var t := 0.1
 	while t <= horizon:
 		var k := 1.0 - exp(-t / 0.3)
 		var p := p0 + v_des * t + (v0 - v_des) * 0.3 * k
 		var box := Rect2(p - half, half * 2.0)
 		for m in movers:
-			if m.kind != "pad" and _mover_rect(m, t0 + t).intersects(box):
+			if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t0 + t).intersects(box):
 				return true
 		t += 0.1
+	return false
+
+## Trifft eine Box, die sich zur Zeit `t0 + t` an `p` befindet, ein Hindernis (Pads nur mit `pads_too`, außer dem Zielpad)?
+func movers_hit_at(p: Vector2, half: Vector2, t: float, pads_too := false, skip_pad := "") -> bool:
+	var box := Rect2(p - half, half * 2.0)
+	for m in movers:
+		if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t).intersects(box):
+			return true
+	return false
+
+## Zapfsäulen (Säule und breiterer Kopf mit der Preisanzeige, wie in `Run._check_pump`) gegen eine Box.
+func pumps_hit_box(center: Vector2, half: Vector2) -> bool:
+	var box := Rect2(center - half, half * 2.0)
+	for pm in pumps:
+		var pr: Rect2 = pm.rect
+		if box.intersects(pr) or box.intersects(Rect2(pr.position.x + pr.size.x * 0.5 - 11.0, pr.end.y - 35.2, 22.0, 16.0)):
+			return true
 	return false
 
 func movers_at_box(center: Vector2, half: Vector2) -> Array:

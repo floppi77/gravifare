@@ -20,6 +20,8 @@ var status: Label
 var btn_share: Button
 var btn_edit: Button
 var btn_delete: Button
+var btn_play: Button
+var actions: GridContainer
 
 class MapPreview extends Control:
 	var rows: Array = []
@@ -68,21 +70,23 @@ func _ready() -> void:
 	info_text.add_theme_font_size_override("font_size", 8)
 	info_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	main.add_child(_at(info_text, Vector2(322, 207), Vector2(302, 44)))
-	var actions := GridContainer.new()
-	actions.columns = 4
+	actions = GridContainer.new()
+	actions.columns = 5
 	actions.add_theme_constant_override("h_separation", 4)
 	actions.add_theme_constant_override("v_separation", 3)
 	main.add_child(_at(actions, Vector2(16, 256), Vector2(608, 44)))
-	actions.add_child(_action(tr("CM_NEW"), func(): edit.call("")))
+	btn_play = _action(tr("CM_PLAY"), func(): _play(_selected_id()))
+	actions.add_child(btn_play)
 	btn_edit = _action(tr("CM_EDIT"), func(): edit.call(_selected_id()))
 	actions.add_child(btn_edit)
-	actions.add_child(_action(tr("CM_IMPORT"), _import_clipboard))
-	btn_share = _action(tr("CM_SHARE"), _share)
-	actions.add_child(btn_share)
-	actions.add_child(_action(tr("CM_COPY_ORIG"), _open_originals))
-	actions.add_child(_action(tr("CM_OPEN_DIR"), _open_folder))
+	actions.add_child(_action(tr("CM_NEW"), func(): edit.call("")))
 	btn_delete = _action(tr("CM_DELETE"), _delete)
 	actions.add_child(btn_delete)
+	btn_share = _action(tr("CM_SHARE"), _share)
+	actions.add_child(btn_share)
+	actions.add_child(_action(tr("CM_IMPORT"), _import_clipboard))
+	actions.add_child(_action(tr("CM_COPY_ORIG"), _open_originals))
+	actions.add_child(_action(tr("CM_OPEN_DIR"), _open_folder))
 	actions.add_child(_action(tr("MENU_BACK"), func(): back.call()))
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -104,7 +108,7 @@ func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 
 func _action(text: String, cb: Callable) -> Button:
 	var b := MenuKit.button(text, cb)
-	b.custom_minimum_size = Vector2(146, 19)
+	b.custom_minimum_size = Vector2(116, 19)
 	b.add_theme_font_size_override("font_size", 9)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return b
@@ -130,7 +134,7 @@ func _rebuild(focus_id := "") -> void:
 	for i in entries.size():
 		var e: Dictionary = entries[i]
 		var author := String(e.author)
-		var b := MenuKit.button("%s · %s" % [String(e.name.get(_lang(), e.name.de)), author if author != "" else tr("CM_NO_AUTHOR")], _play.bind(String(e.id)))
+		var b := MenuKit.button("%s · %s" % [String(e.name.get(_lang(), e.name.de)), author if author != "" else tr("CM_NO_AUTHOR")], _pick.bind(i))
 		b.custom_minimum_size = Vector2(272, 17)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -153,6 +157,7 @@ func _rebuild(focus_id := "") -> void:
 	btn_share.disabled = entries.is_empty()
 	btn_edit.disabled = entries.is_empty()
 	btn_delete.disabled = entries.is_empty()
+	btn_play.disabled = entries.is_empty()
 	if not is_inside_tree():
 		return
 	await get_tree().process_frame
@@ -162,7 +167,7 @@ func _rebuild(focus_id := "") -> void:
 	if target != null:
 		target.grab_focus()
 	else:
-		btn_share.get_parent().get_child(0).grab_focus()
+		actions.get_child(2).grab_focus()               # keine Level: „Neues Level“
 
 func _select(i: int) -> void:
 	if i == sel:
@@ -189,7 +194,8 @@ func _select(i: int) -> void:
 	info_text.text = "\n".join(lines)
 
 ## Maus: Einfachklick wählt nur an (so lässt sich danach löschen oder kopieren), Doppelklick spielt. Das bloße Darüberfahren ändert die Auswahl nicht
-## (der Weg zum Löschknopf führte sonst über die unteren Einträge). Tastatur und Gamepad: Fokus wählt an, Bestätigen spielt.
+## (der Weg zum Löschknopf führte sonst über die unteren Einträge). Tastatur und Gamepad: Fokus wählt an, Bestätigen (A/Enter) springt wie der
+## Einfachklick zu den Aktionen („Spielen“ zuerst), statt das Level sofort zu laden; Zurück (B) führt aus den Aktionen wieder in die Liste.
 func _row_input(ev: InputEvent, b: Button, id: String) -> void:
 	if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
 		b.accept_event()
@@ -197,6 +203,11 @@ func _row_input(ev: InputEvent, b: Button, id: String) -> void:
 			_play(id)
 		else:
 			b.grab_focus()
+
+func _pick(i: int) -> void:
+	_select(i)
+	if btn_play != null and not btn_play.disabled and btn_play.is_inside_tree():
+		btn_play.grab_focus()
 
 func _play(id: String) -> void:
 	Flow.start_community(id)
@@ -213,8 +224,8 @@ func _share() -> void:
 	_say(tr("CM_COPIED"))
 
 func _open_folder() -> void:
-	DirAccess.make_dir_recursive_absolute(CommunityStore.dir)
-	OS.shell_show_in_file_manager(ProjectSettings.globalize_path(CommunityStore.dir))
+	DirAccess.make_dir_recursive_absolute(CommunityStore._d())
+	OS.shell_show_in_file_manager(ProjectSettings.globalize_path(CommunityStore._d()))
 
 ## Zweimal drücken: Der erste Druck fragt nach, der zweite löscht (auch mit dem Gamepad ohne Dialog bedienbar).
 func _delete() -> void:
@@ -249,11 +260,7 @@ func _import_clipboard() -> void:
 		return
 	_say(tr("CM_CHECKING"))
 	await get_tree().process_frame
-	var res := CommunityStore.import_text(text)
-	if res.ok and not res.get("existed", false):
-		var bot := CommunityLevel.bot_check(res)             # nur eine Warnung: der Autopilot schafft nicht jedes lösbare Level
-		if not bot.get("complete", false):
-			res.warnings.append({"code": "BOT_FAIL", "args": []})
+	var res := CommunityStore.import_text(text)           # die Lösbarkeit prüft die Regelprüfung; der Autopilot ist kein Maßstab (und blockierte hier die Oberfläche)
 	_report(res)
 	_rebuild(String(res.id) if res.ok else "")
 
@@ -304,5 +311,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		if overlay != null:
 			_close_originals()
+		elif _actions_have_focus() and sel >= 0 and sel < list_box.get_child_count():
+			(list_box.get_child(sel) as Control).grab_focus()               # B in den Aktionen: zurück in die Liste
 		else:
 			back.call()
+
+func _actions_have_focus() -> bool:
+	var f := get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	return f != null and actions != null and actions.is_ancestor_of(f)

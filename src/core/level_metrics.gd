@@ -82,7 +82,9 @@ static func is_solvable(lvl: LevelData) -> bool:
 ## Der Editor lässt damit Start-, Ziel- und Torfelder blinken.
 static func blocked_leg(lvl: LevelData) -> Dictionary:
 	var was_open := lvl.exit_open
+	var was_core := lvl.sweep_core
 	lvl.exit_open = true
+	lvl.sweep_core = true              # fahrende Pads sperren nur ihren Kern, nicht den ganzen Fahrweg (die Platte fährt ja weiter)
 	var cur := _start_point(lvl)
 	var cur_id := "S"
 	var gate := Pathing.gate_approach(lvl, Pathing.GATE_FREE_DEPTH)
@@ -104,6 +106,7 @@ static func blocked_leg(lvl: LevelData) -> Dictionary:
 		if Pathing.plan(lvl, cur, gate, STEP).is_empty():
 			bad = {"from": cur_id, "to": "exit"}
 	lvl.exit_open = was_open
+	lvl.sweep_core = was_core
 	return bad
 
 static func analyze(lvl: LevelData) -> Dictionary:
