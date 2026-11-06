@@ -282,8 +282,11 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			events.append({"type": "liftoff"})
 		else:
 			vel = Vector2.ZERO
-			pos.x += float(landed_pad.get("dx_step", 0.0))               # fahrende Plattform nimmt das Taxi mit
+			var carry := float(landed_pad.get("dx_step", 0.0))
+			pos.x += carry                                               # fahrende Plattform nimmt das Taxi mit
 			tilt = move_toward(tilt, 0.0, dt * 2.0)
+			if carry != 0.0 and level.box_hits_cells(pos, Tuning.HULL_HALF):
+				_crush_out(Vector2.ZERO, Tuning.HULL_HALF)               # die Plattform schiebt das Taxi in den Fels: Quetschung wie beim Tor
 			return
 
 	air_t += dt
