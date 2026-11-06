@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -1309,6 +1309,43 @@ func _test_horizontal_sweep_gate() -> void:
 	check(m.doors["a"].orient == 2, "Editor: Flügel waagerecht (begrenzt auf 2)")
 	m.set_param(dref, "orient", 0.0)
 	check(not m.doors["a"].has("orient"), "Editor: auto entfernt den Eintrag")
+
+## Der Autopilot fliegt durch Wandertore mit waagerechten Flügeln (Durchflug von unten nach oben, die Öffnung wandert seitlich).
+func _test_bot_horizontal_sweep() -> void:
+	var rows: Array = []
+	for y in 22:
+		rows.append("#" + ".".repeat(38) + "#")
+	rows[0] = "#".repeat(18) + "....".repeat(1) + "#".repeat(18)
+	rows[1] = "#" + ".".repeat(17) + "EEEE" + ".".repeat(17) + "#"
+	rows[2] = rows[1]
+	rows[10] = "#".repeat(17) + "a".repeat(6) + "#".repeat(17)
+	rows[19] = "#....S" + ".".repeat(33)
+	rows[20] = "#..1111....FFFF..22222..........3333..#"
+	rows[21] = "#".repeat(40)
+	var jobs := [{"from": "1", "to": "exit", "fare": 60.0, "par": 30.0, "passenger": "Ben", "gender": "m"}]
+	var results: Array = []
+	for sweep in [5.0, 3.0, 4.0]:
+		var d := {"id": "T-BH", "sector": 3, "index": 3, "name": {"de": "x", "en": "x"}, "map": rows, "jobs": jobs,
+			"doors": {"a": {"period": 8.0, "open": 5.0, "phase": 0.0, "sweep": sweep, "gap": 3.0 if sweep != 4.0 else 2.0}}}
+		var lv := LevelData.from_dict(d)
+		var ok_gate: bool = not lv.doors["a"].gates[0].vertical and lv.is_sweep("a") and not lv.is_sweep_vertical("a")
+		var r := Bot.fly_level(lv, 240.0, 100.0)
+		results.append([ok_gate, r.complete, r.hull, r.time])
+	check(results[0][0] and results[0][1] and results[0][2] >= 99.5, "Autopilot: waagerechtes Wandertor (5 s je Weg) ohne Treffer durchflogen (%s)" % str(results[0]))
+	check(results[1][1] and results[1][2] >= 99.5, "Autopilot: schnelleres waagerechtes Wandertor (3 s je Weg) ohne Treffer durchflogen (%s)" % str(results[1]))
+	check(results[2][1] and results[2][2] >= 99.5, "Autopilot: schmale Öffnung (2 Felder, 4 s je Weg) ohne Treffer durchflogen (%s)" % str(results[2]))
+	# beide Richtungen: erst von oben durch das Tor nach unten (Pad 2 liegt über dem Tor), dann wieder hinauf zum Ausgang
+	var rows2: Array = rows.duplicate()
+	rows2[7] = "#....S" + ".".repeat(33)
+	rows2[8] = "#..2222" + "#".repeat(5) + ".".repeat(26) + "#"
+	rows2[8] = String(rows2[8]).substr(0, 40)
+	rows2[19] = "#" + ".".repeat(38) + "#"
+	rows2[20] = "#..1111....FFFF................3333..#"
+	var jobs2 := [{"from": "2", "to": "1", "fare": 60.0, "par": 30.0, "passenger": "Ben", "gender": "m"}, {"from": "1", "to": "exit", "fare": 60.0, "par": 30.0, "passenger": "Mika", "gender": "f"}]
+	var lv2 := LevelData.from_dict({"id": "T-BH2", "sector": 3, "index": 3, "name": {"de": "x", "en": "x"}, "map": rows2, "jobs": jobs2,
+		"doors": {"a": {"period": 8.0, "open": 5.0, "phase": 0.0, "sweep": 4.0, "gap": 3.0}}})
+	var r2 := Bot.fly_level(lv2, 300.0, 100.0)
+	check(r2.complete and r2.hull >= 99.5, "Autopilot: waagerechtes Wandertor in beiden Richtungen (nach unten und wieder hinauf) (%s)" % str([r2.complete, r2.hull, r2.time, r2.reason]))
 
 func _test_vehicle_count() -> void:
 	var m = LE.blank()

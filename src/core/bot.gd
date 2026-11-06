@@ -31,6 +31,8 @@ var last_pos := Vector2.ZERO
 var fail_reason := ""
 var fly_margin := MARGIN
 var sweep_commit := -1.0        # bis zu dieser Torzeit ist der Durchflug durch eine Sweep-Schleuse beschlossen
+var hs_commit := -1.0           # dasselbe für Sweep-Schleusen mit waagerechten Flügeln (Durchflug von oben/unten)
+var hs_dir := 0.0               # Richtung (±1, nach unten +1) des beschlossenen Durchflugs
 ## Einzelne Verbesserungen des pro-Modus (zum Einzelprüfen in der Entwicklung abschaltbar): pump, speed, reach, route, dash, escape, track (Mitfliegen mit schnellen Sweep-Öffnungen), doordash (Gas an Schiebetoren), crossfast (Sweep-Tor im Durchflugtempo queren), core
 static var features := {"pump": true, "speed": true, "reach": false, "route": true, "dash": false, "escape": true, "track": false, "doordash": false, "crossfast": true, "core": true}
 var pro := false
@@ -199,7 +201,9 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 		if heading_exit and last and dist < 6.0:
 			v_des = Vector2.ZERO
 	var v_des_before := v_des
-	var committed: bool = pro and features.crossfast and level.clock < sweep_commit          # beschlossener Tordurchflug: nicht mittendrin wegen Hindernissen bremsen
+	if v_des != Vector2.ZERO or level.clock < hs_commit:
+		v_des = _sweep_horizontal(v_des)
+	var committed: bool = (pro and features.crossfast and level.clock < sweep_commit) or level.clock < hs_commit          # beschlossener Tordurchflug: nicht mittendrin wegen Hindernissen bremsen
 	if level.has_doors() and v_des != Vector2.ZERO:
 		# Tore voraus: nur hineinfliegen, wenn sie bei Ankunft offen sind und lange genug offen bleiben (sonst schweben).
 		var dir := v_des.normalized()
@@ -263,10 +267,14 @@ func _fly(tgt_pad_id: String, heading_exit: bool) -> Array:
 							if not go:
 								v_des.x = dir.x * clampf((entry - 12.0) * 1.2, 0.0, 85.0)      # Bremsweg: weit vor dem Tor verlangsamen
 					continue
+				if level.is_sweep(ch):
+					continue                                         # Sweep-Schleuse mit waagerechten Flügeln: `_sweep_horizontal`
 				# Frühestmögliche Ankunft (Höchsttempo) bis späteste Ankunft (aktuelles Tempo) + Durchflugzeit muss offen sein
 				if not level.door_open_window(ch, level.clock + dist / V_MAX - 0.05, maxf(dist / spd - dist / V_MAX, 0.0) + 2.0):
 					v_des = Vector2.ZERO
 		for ch in inside:                                    # Tor schließt gleich: aus den Flügeln heraus, zur näheren Seite
+			if level.is_sweep(ch) and not level.is_sweep_vertical(ch):
+				continue                                         # waagerechte Sweep-Schleuse: `_sweep_horizontal`
 			if level.is_sweep_vertical(ch):                               # in der Sweep-Schleuse: mit der Öffnung mitfliegen
 				for gate in level.doors[ch].gates:
 					if (gate.rect as Rect2).grow(Tuning.HULL_HALF.x).has_point(sim.pos):
@@ -507,6 +515,49 @@ func _pro_escape(v_des: Vector2, half: Vector2, pads_too: bool, skip: String) ->
 		escape_v = best
 		escape_until = level.clock + 0.5
 	return best
+
+## Sweep-Schleuse mit waagerechten Flügeln (Durchflug von oben oder unten, die Öffnung wandert in der Breite): Mit der Öffnung mitfliegen (seitlich folgen), vor dem Tor
+## bremsen und hindurchfliegen, sobald das Taxi unter bzw. über der Öffnung ist und ihr Tempo hat. Der Durchflug wird beschlossen und nicht mittendrin abgebrochen.
+func _sweep_horizontal(v_des: Vector2) -> Vector2:
+	var sim := run.sim
+	var hh := Tuning.HULL_HALF.y + Tuning.GEAR_LEN * 0.5
+	for ch in level.doors:
+		if not level.is_sweep(ch) or level.is_sweep_vertical(ch):
+			continue
+		for gate in level.doors[ch].gates:
+			if gate.vertical:
+				continue
+			var gr: Rect2 = gate.rect
+			if sim.pos.x < gr.position.x - 24.0 or sim.pos.x > gr.end.x + 24.0:
+				continue
+			var c := level.sweep_center(ch, gate, level.clock)
+			var vg := (level.sweep_center(ch, gate, level.clock + 0.1) - c) / 0.1
+			var track := clampf(vg + (c - sim.pos.x) * 5.0, -140.0, 140.0)
+			if level.clock < hs_commit:
+				if sim.pos.y > gr.position.y - 90.0 and sim.pos.y < gr.end.y + 90.0:
+					v_des.y = hs_dir * CROSS_V
+					v_des.x = track                                      # im Tor und davor/danach mit der Öffnung weiter
+					return v_des
+				continue
+			var dirv := signf(v_des.y)
+			if dirv == 0.0:
+				continue
+			var entry := (gr.position.y - sim.pos.y - hh) if dirv > 0.0 else (sim.pos.y - hh - gr.end.y)
+			if entry < -2.0 or entry > 80.0:
+				continue
+			v_des.x = track
+			if entry > 30.0:
+				v_des.y = dirv * clampf((entry - 20.0) * 1.2, 0.0, 85.0)
+				continue
+			var aligned := absf(c - sim.pos.x) < 4.0 and absf(sim.vel.x - vg) < 16.0 and absf(sim.vel.y) < 30.0
+			if aligned:
+				hs_commit = level.clock + (entry + gr.size.y + 2.0 * hh) / CROSS_V + 0.35
+				hs_dir = dirv
+				v_des.y = dirv * CROSS_V
+			else:
+				v_des.y = 0.0
+			return v_des
+	return v_des
 
 ## Fliegt eine komplette Level-Fahrt. Rückgabe: Ergebnis-Dictionary.
 ## Vertikale Sollgeschwindigkeit, um mit der Mitte der wandernden Öffnung mitzufliegen (Vorhalt = Geschwindigkeit der Öffnung).
