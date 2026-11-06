@@ -195,6 +195,7 @@ func load_level(path: String) -> void:
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
 	replay.mods = mods
+	replay.sig = Replay.sig_of(lvl)
 	Music.play_theme(Music.theme_for_level(lvl.number))
 	Music.duck(0.0)
 	Sfx.play_ambient(lvl.sector)
@@ -249,6 +250,8 @@ func _setup_ghost(lvl: LevelData) -> void:
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
 	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
+	if best.has("sig") and String(best.sig) != Replay.sig_of(lvl):
+		best = {}                        # das Level wurde nach diesem Lauf geändert
 	ghost.bind(run, best.get("trace", []))
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
@@ -614,8 +617,11 @@ func _physics_process(_delta: float) -> void:
 			Flow.shift_fares += run.delivered + run.extras_delivered
 			Flow.shift_maps += 1
 		elif Flow.community:
-			if counted and not Flow.editor_autopilot:                      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
+			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug und Entwürfe zählen nicht)
 				Save.complete_community(Flow.current_level, run.level_time, score)
+			if _solved_by_hand():                                           # Testflug aus dem Editor, selbst und vollständig geflogen: erst damit lässt sich das Level speichern
+				Flow.community_store().mark_solved(Flow.current_level)
+				hud.result["solved"] = true
 			counted = false
 		elif Flow.daily:
 			if counted:                      # Tagesflug: zählt nur für den Tagesbestwert und die Serie, nicht für Level und Medaillen
@@ -808,6 +814,11 @@ func _near_miss_fx() -> void:
 	hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
 
 ## Neu freigeschaltete Lackierungen/Aufkleber melden (Toast + Ton).
+## Zählt dieser Flug als Handlösung für den Editor? Nur ein Testflug aus dem Editor, ohne Autopilot und ohne Entwicklerschalter, bei dem alle Aufträge befördert wurden.
+func _solved_by_hand() -> bool:
+	return Flow.community and Flow.return_to_editor != "" and not Flow.editor_autopilot and autopilot == null and not Save.dev_session \
+		and run.result == Run.Result.COMPLETE and run.delivered >= run.level.jobs.size()
+
 func _check_unlocks() -> void:
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	for it in Cosmetics.check_unlocks():

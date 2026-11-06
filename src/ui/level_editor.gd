@@ -10,6 +10,7 @@ const LevelEdit := preload("res://src/core/level_edit.gd")
 const EditorCanvas := preload("res://src/ui/editor_canvas.gd")
 const IconButton := preload("res://src/ui/icon_button.gd")
 const Osk := preload("res://src/ui/osk.gd")
+const LevelFiles := preload("res://src/core/level_files.gd")
 
 const TILE := 16.0
 const ZOOM := 0.75
@@ -79,6 +80,11 @@ var obj_nav: Array = []                     # Objekte-Seite: Knöpfe „<“, �
 var level_rows: Array = []                  # Knopfreihen der Level-Seite (feste Fokusnachbarn; Auftragszeilen kommen beim Neuaufbau dazu)
 var page_first: Array = [null, null, null]  # erster fokussierbarer Knopf je Seite (Einstieg mit dem Controller)
 var btn_save: Button
+var orig_id := ""                           # Original-Level-Modus (Debug): Id der mitgelieferten Datei, die beim Speichern geändert wird (sonst eigene Level)
+var orig_raw: Dictionary = {}               # Inhalt dieser Datei
+var orig_base: Dictionary = {}              # ihre bereinigte Fassung (Vergleichsbasis)
+var base_id := ""                           # ID der bereinigten Dateifassung; eine gleiche Fassung braucht keinen Nachweis und wird nicht geschrieben
+var look_btns: Array = []
 # Strich
 var active := false
 var stroke_erase := false
@@ -110,7 +116,7 @@ var trig_r := false
 ## Neues Level (id == "") oder Kopie des Levels `id` zum Bearbeiten. `session` = bereits in dieser Sitzung gespeicherte Fassung.
 func open(id: String, session := "") -> bool:
 	origin_id = id
-	session_id = session
+	session_id = session if session != "" and CommunityStore.exists(session) else ""      # nur eine wirklich gespeicherte Fassung wird beim nächsten Speichern ersetzt
 	if id == "":
 		model = LevelEdit.blank()
 	else:
@@ -119,8 +125,40 @@ func open(id: String, session := "") -> bool:
 			return false
 		model = LevelEdit.from_result(r)
 		last_jobs = r.level.jobs
+		model.dirty = not CommunityStore.exists(id)                  # Entwurf aus einem Testflug: noch nicht gespeichert
+		if Flow.editor_original != "":                               # Rückkehr aus dem Testflug eines Originals
+			if not _attach_original(Flow.editor_original):
+				Flow.editor_original = ""
+			else:
+				model.dirty = r.id != base_id
 	if model.author == "":
 		model.author = Save.community_author()
+	return true
+
+## Original-Level (Debug-Modus) zum Bearbeiten öffnen: Gespeichert wird in die Datei des Levels, nicht als eigene Kopie.
+func open_original(id: String) -> bool:
+	if not _attach_original(id):
+		return false
+	var r := LevelFiles.clean_of(orig_raw)
+	model = LevelEdit.from_result(r)
+	last_jobs = r.level.jobs
+	Flow.editor_original = id
+	origin_id = ""
+	session_id = ""
+	model.author = Save.community_author()
+	return true
+
+func _attach_original(id: String) -> bool:
+	if not (Save.debug and LevelFiles.can_write()):
+		return false
+	var raw := LevelFiles.read(id)
+	var base := LevelFiles.clean_of(raw) if not raw.is_empty() else {}
+	if base.is_empty() or not base.ok:
+		return false
+	orig_id = id
+	orig_raw = raw
+	orig_base = base
+	base_id = base.id
 	return true
 
 func _ready() -> void:
@@ -313,6 +351,10 @@ func _build_page_level(pg: Control) -> void:
 	var look_l := _button("<", _change_look.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
 	var look_r := _button(">", _change_look.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
 	page_first[2] = look_l
+	look_btns = [look_l, look_r]
+	if orig_id != "":
+		look_l.disabled = true                     # Sektor und Index bestimmen bei den Originalen die Levelnummer und den Preisrahmen
+		look_r.disabled = true
 	dark_label = _label("", Vector2(22, 22), Vector2(100, 14), pg)
 	var dark_l := _button("<", _change_dark.bind(-1), Vector2(0, 20), Vector2(20, 17), pg)
 	var dark_r := _button(">", _change_dark.bind(1), Vector2(124, 20), Vector2(20, 17), pg)
@@ -476,7 +518,8 @@ func _sync_fields() -> void:
 	_update_title()
 
 func _update_title() -> void:
-	title.text = "%s%s" % [tr("ED_TITLE"), " *" if model.dirty else ""]
+	var head := tr("ED_TITLE_ORIG") % orig_id.to_upper().replace("_", "-") if orig_id != "" else tr("ED_TITLE")
+	title.text = "%s%s" % [head, " *" if model.dirty else ""]
 
 # ---------------------------------------------------------------------------------------------------------------- Auswahl und Eigenschaften
 
@@ -547,7 +590,11 @@ func _reroll() -> void:
 
 func _name_changed(t: String) -> void:
 	var s := CommunityLevel.clean_text(t, CommunityLevel.MAX_TEXT)
-	model.names = {"de": s, "en": s} if s != "" else {"de": "Mein Level", "en": "My level"}
+	if orig_id != "":
+		var lang := TranslationServer.get_locale().substr(0, 2)       # Originale haben zwei verschiedene Namen: nur den der gezeigten Sprache ändern
+		model.names[lang if model.names.has(lang) else "de"] = s if s != "" else String(model.names.get("de", ""))
+	else:
+		model.names = {"de": s, "en": s} if s != "" else {"de": "Mein Level", "en": "My level"}
 	model.dirty = true
 	_update_title()
 	_request_validation(0.45)
@@ -1178,8 +1225,13 @@ func _apply_validation(r: Dictionary) -> void:
 		var txt := tr("ED_VALID") % [pads, res.level.jobs.size()]
 		if model.jobs_reset:
 			txt += " · " + tr("ED_JOBS_RESET")
-		for w in res.warnings.slice(0, 1):
-			txt += "\n" + CommunityLevel.describe(w, true)
+		if _save_blocked():
+			txt += "\n" + tr("ED_NEED_SOLVE")
+		else:
+			if CommunityStore.is_solved(res.id) and not _is_saved_version():
+				txt += " · " + tr("ED_SOLVED")
+			for w in res.warnings.slice(0, 1):
+				txt += "\n" + CommunityLevel.describe(w, true)
 		status.text = txt
 		status.add_theme_color_override("font_color", Color("#5dff9a"))
 	else:
@@ -1225,12 +1277,25 @@ func _draw_blink(cs: float) -> void:
 			overlay.draw_rect(rr, Color(1, 0.15, 0.2, 0.45))
 			overlay.draw_rect(rr, Color(1, 1, 1, 0.95), false, 2.0)
 
-## Speichert eine eigene Fassung. Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
+## Ist diese Fassung schon gespeichert (Community) bzw. gleich der Datei (Original)? Dann braucht sie keine Handlösung.
+func _is_saved_version() -> bool:
+	return res.id == base_id if orig_id != "" else CommunityStore.exists(res.id)
+
+## Fehlt für die geprüfte Fassung noch die Handlösung? Speichern geht nur, wenn der Ersteller genau dieses Level einmal selbst geflogen ist.
+func _save_blocked() -> bool:
+	return res.get("ok", false) and not _is_saved_version() and not CommunityStore.is_solved(res.id)
+
+## Speichert eine eigene Fassung (im Original-Modus: die Datei des Originals). Gibt die ID zurück oder "" bei einem Fehler (der Grund steht in der Statuszeile).
 func _save(announce: bool) -> String:
 	_validate_now()
 	if not res.ok:
 		_flag_errors()
 		return ""
+	if _save_blocked():
+		_say(tr("ED_NEED_SOLVE"))
+		return ""
+	if orig_id != "":
+		return _save_original(announce)
 	var err := CommunityStore.save(res, model.author)
 	if err != "":
 		_say(CommunityLevel.describe({"code": err, "args": []}))
@@ -1248,14 +1313,39 @@ func _save(announce: bool) -> String:
 		status.add_theme_color_override("font_color", Color("#5dff9a"))
 	return res.id
 
-## Testflug: selbst fliegen, oder (`autopilot`) dem Autopiloten beim Lösen zusehen. Bei Fehlern blinken die betroffenen Objekte.
+## Original-Datei schreiben (nur Geändertes; Prüfsumme und Geisterläufe werden nachgeführt).
+func _save_original(announce: bool) -> String:
+	var out := LevelFiles.save(orig_id, orig_raw, orig_base, res)
+	if out.error != "":
+		_say(CommunityLevel.describe({"code": out.error, "args": []}))
+		return ""
+	orig_raw = out.raw
+	orig_base = LevelFiles.clean_of(orig_raw)
+	base_id = orig_base.id if orig_base.ok else res.id
+	model.dirty = false
+	_update_title()
+	if announce:
+		var nm := String(model.names.get(TranslationServer.get_locale().substr(0, 2), model.names.get("de", "")))
+		status.text = (tr("ED_ORIG_SAVED") if out.changed else tr("ED_ORIG_UNCHANGED")) % nm
+		status.add_theme_color_override("font_color", Color("#5dff9a"))
+	return res.id
+
+## Testflug: selbst fliegen, oder (`autopilot`) dem Autopiloten beim Lösen zusehen. Die Fassung liegt dafür nur als Entwurf bereit (gespeichert wird erst nach einer
+## eigenen, vollständigen Lösung). Bei Fehlern blinken die betroffenen Objekte.
 func _test_flight(autopilot := false) -> void:
-	var id := _save(false)
-	if id == "":
-		if res.ok == false:
-			_say(tr("ED_NEED_VALID") + " " + status.text.replace("\n", " "))
+	_validate_now()
+	if not res.ok:
+		_flag_errors()
+		_say(tr("ED_NEED_VALID") + " " + status.text.replace("\n", " "))
 		return
+	var id: String = res.id
+	if not CommunityStore.exists(id):
+		var err := CommunityStore.save_draft(res, model.author)
+		if err != "":
+			_say(CommunityLevel.describe({"code": err, "args": []}))
+			return
 	Flow.return_to_editor = id
+	Flow.editor_session = session_id
 	Flow.start_community(id, autopilot)
 
 func _request_back() -> void:

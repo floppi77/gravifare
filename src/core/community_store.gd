@@ -21,6 +21,98 @@ static func exists(id: String) -> bool:
 	var p := path_for(id)
 	return p != "" and FileAccess.file_exists(p)
 
+## Entwürfe: Fassungen, die für einen Testflug bereitliegen, aber noch nicht gespeichert sind (Speichern setzt eine Handlösung voraus). Sie erscheinen weder in der
+## Liste noch zählen sie zum Limit; es bleiben nur die neuesten.
+const MAX_DRAFTS := 8
+
+static func draft_dir() -> String:
+	return _d() + "drafts/"
+
+static func draft_path(id: String) -> String:
+	return draft_dir() + id + ".gflevel" if CommunityLevel.is_valid_id(id) else ""
+
+static func draft_exists(id: String) -> bool:
+	var p := draft_path(id)
+	return p != "" and FileAccess.file_exists(p)
+
+## Spielbar (gespeichert oder als Entwurf)?
+static func playable(id: String) -> bool:
+	return exists(id) or draft_exists(id)
+
+## Entwurf ablegen (nur gültige Ergebnisse). Gibt "" oder einen Fehlercode zurück.
+static func save_draft(res: Dictionary, author := "") -> String:
+	if not res.get("ok", false) or not CommunityLevel.is_valid_id(res.get("id", "")):
+		return "INVALID"
+	DirAccess.make_dir_recursive_absolute(draft_dir())
+	var p := draft_path(res.id)
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	if f == null:
+		return "WRITE"
+	f.store_string(CommunityLevel.to_file_text(res, author, game_version))
+	f.close()
+	_cache[res.id] = {"sha": FileAccess.get_sha256(p), "res": res}
+	_prune_drafts()
+	return ""
+
+static func _prune_drafts() -> void:
+	var d := DirAccess.open(draft_dir())
+	if d == null:
+		return
+	var files: Array = []
+	for f in d.get_files():
+		if f.ends_with(".gflevel"):
+			files.append([FileAccess.get_modified_time(draft_dir() + f), f])
+	files.sort_custom(func(a, b): return a[0] > b[0])
+	for i in range(MAX_DRAFTS, files.size()):
+		DirAccess.remove_absolute(draft_dir() + String(files[i][1]))
+
+static func drop_draft(id: String) -> void:
+	var p := draft_path(id)
+	if p != "" and FileAccess.file_exists(p):
+		DirAccess.remove_absolute(p)
+
+## Handlösung: Nur wer sein Level (genau diesen Inhalt, die ID ist der Hash) einmal selbst bis zum Ende geflogen ist, darf es speichern. Der Nachweis liegt in
+## solved.json neben den Leveln und gilt nur für unveränderten Inhalt; jede Änderung ergibt eine neue ID und verlangt einen neuen Flug.
+const MAX_SOLVED := 400
+static var _solved := {}              # id -> Unix-Zeit
+static var _solved_dir := "?"
+
+static func _load_solved() -> void:
+	if _solved_dir == _d():
+		return
+	_solved_dir = _d()
+	_solved = {}
+	var f := FileAccess.open(_d() + "solved.json", FileAccess.READ)
+	var d = JSON.parse_string(f.get_as_text()) if f != null else null
+	if d is Dictionary:
+		for id in d:
+			if CommunityLevel.is_valid_id(id) and (d[id] is float or d[id] is int):
+				_solved[id] = d[id]
+
+static func is_solved(id: String) -> bool:
+	_load_solved()
+	return _solved.has(id)
+
+static func mark_solved(id: String) -> void:
+	if not CommunityLevel.is_valid_id(id):
+		return
+	_load_solved()
+	_solved[id] = Time.get_unix_time_from_system()
+	if _solved.size() > MAX_SOLVED:
+		var ids: Array = _solved.keys()
+		ids.sort_custom(func(a, b): return _solved[a] < _solved[b])
+		for i in _solved.size() - MAX_SOLVED:
+			_solved.erase(ids[i])
+	DirAccess.make_dir_recursive_absolute(_d())
+	var f := FileAccess.open(_d() + "solved.json", FileAccess.WRITE)
+	if f != null:
+		f.store_string(JSON.stringify(_solved))
+		f.close()
+
+## Darf diese Fassung aus dem Editor gespeichert werden? Schon gespeicherte Level ja, sonst nur nach einer Handlösung.
+static func may_save(id: String) -> bool:
+	return exists(id) or is_solved(id)
+
 static func _ids() -> Array:
 	var out: Array = []
 	var d := DirAccess.open(_d())
@@ -40,6 +132,9 @@ static var _index_dir := ""
 static func load_level(id: String) -> Dictionary:
 	var p := path_for(id)
 	var f := FileAccess.open(p, FileAccess.READ) if p != "" else null
+	if f == null:
+		p = draft_path(id)                 # noch nicht gespeicherter Entwurf eines Testflugs
+		f = FileAccess.open(p, FileAccess.READ) if p != "" else null
 	if f == null:
 		return {"ok": false, "errors": [{"code": "NOT_FOUND", "args": []}], "warnings": [], "id": "", "meta": {}, "level": {}}
 	var sha := FileAccess.get_sha256(p)
@@ -135,6 +230,7 @@ static func save(res: Dictionary, author := "") -> String:
 		DirAccess.remove_absolute(tmp)
 		return "WRITE"
 	_cache[id] = {"sha": FileAccess.get_sha256(p), "res": res}      # gerade geprüft: Liste und Spielstart brauchen es nicht noch einmal zu prüfen
+	drop_draft(id)
 	return ""
 
 static func delete(id: String) -> bool:

@@ -24,6 +24,8 @@ var community := false:                 # Community-Level (user://community/, si
 		Save.community_mode = v
 var editor_autopilot := false            # Testflug aus dem Level-Editor: der Autopilot fliegt, man sieht ihm zu (zählt nichts)
 var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
+var editor_session := ""                # Die in dieser Editorsitzung gespeicherte Fassung bleibt über den Testflug hinweg die, die das nächste Speichern ersetzt
+var editor_original := ""               # Debug: Id des mitgelieferten Levels, das der Editor gerade bearbeitet (bleibt über den Testflug erhalten)
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
 
 func level_ids() -> Array:
@@ -191,7 +193,7 @@ func resume_campaign() -> bool:
 
 ## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; der Feldzug bleibt unberührt (wie der Übungsflug).
 func start_community(id: String, autopilot := false) -> void:
-	if not community_store().exists(id):
+	if not community_store().playable(id):         # gespeichert oder Entwurf eines Testflugs
 		return
 	editor_autopilot = autopilot and return_to_editor != ""        # nur aus dem Editor heraus
 	lives = Tuning.START_LIVES

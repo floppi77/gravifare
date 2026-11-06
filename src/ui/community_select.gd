@@ -4,9 +4,12 @@ extends Control
 
 const CommunityLevel := preload("res://src/core/community_level.gd")
 const CommunityStore := preload("res://src/core/community_store.gd")
+const LevelFiles := preload("res://src/core/level_files.gd")
 
 var back: Callable
 var edit: Callable                 # Editor öffnen: edit.call(id) (id == "" = neues Level)
+var edit_original: Callable        # Debug: Original im Editor öffnen: edit_original.call(id)
+var editing_originals := false     # die Originalauswahl öffnet den Editor statt eine Kopie anzulegen
 var entries: Array = []
 var sel := -1
 var armed := ""                    # Level, dessen Löschen bestätigt werden muss
@@ -85,7 +88,9 @@ func _ready() -> void:
 	btn_share = _action(tr("CM_SHARE"), _share)
 	actions.add_child(btn_share)
 	actions.add_child(_action(tr("CM_IMPORT"), _import_clipboard))
-	actions.add_child(_action(tr("CM_COPY_ORIG"), _open_originals))
+	actions.add_child(_action(tr("CM_COPY_ORIG"), _open_originals.bind(false)))
+	if Save.debug and LevelFiles.can_write() and edit_original.is_valid():
+		actions.add_child(_action(tr("CM_EDIT_ORIG"), _open_originals.bind(true)))
 	actions.add_child(_action(tr("CM_OPEN_DIR"), _open_folder))
 	actions.add_child(_action(tr("MENU_BACK"), func(): back.call()))
 	status = Label.new()
@@ -266,12 +271,13 @@ func _import_clipboard() -> void:
 
 # ---------------------------------------------------------------------------------------------------------------- Originale kopieren
 
-func _open_originals() -> void:
+func _open_originals(for_editing := false) -> void:
+	editing_originals = for_editing
 	main.visible = false
 	overlay = Control.new()
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(overlay)
-	overlay.add_child(_at(MenuKit.title(tr("CM_PICK_ORIG"), 12), Vector2(0, 14), Vector2(640, 16)))
+	overlay.add_child(_at(MenuKit.title(tr("CM_PICK_ORIG_EDIT") if for_editing else tr("CM_PICK_ORIG"), 12), Vector2(0, 14), Vector2(640, 16)))
 	var grid := GridContainer.new()
 	grid.columns = 11
 	grid.add_theme_constant_override("h_separation", 3)
@@ -281,7 +287,7 @@ func _open_originals() -> void:
 	for id in Flow.level_ids():
 		var parts := String(id).split("_")                  # s3_05 -> Levelnummer 27, ohne die Datei zu laden
 		var number := (int(parts[0].substr(1)) - 1) * 11 + int(parts[1]) if parts.size() == 2 else 0
-		var b := MenuKit.button("%02d" % number, _copy_original.bind(String(id)))
+		var b := MenuKit.button("%02d" % number, _pick_original.bind(String(id)))
 		b.custom_minimum_size = Vector2(36, 18)
 		b.add_theme_font_size_override("font_size", 8)
 		grid.add_child(b)
@@ -298,6 +304,12 @@ func _close_originals() -> void:
 		overlay = null
 	main.visible = true
 	_rebuild()
+
+func _pick_original(id: String) -> void:
+	if editing_originals and edit_original.is_valid():
+		edit_original.call(id)
+	else:
+		_copy_original(id)
 
 func _copy_original(id: String) -> void:
 	var res := CommunityStore.copy_original(id)

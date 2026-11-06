@@ -62,7 +62,7 @@ func _ready() -> void:
 	elif Flow.menu_screen.begins_with("editor:"):       # zurück aus dem Testflug: wieder in den Editor
 		var eid := Flow.menu_screen.substr(7)
 		Flow.menu_screen = ""
-		show_editor(eid, eid)
+		show_editor(eid, Flow.editor_session)
 	elif Flow.menu_screen == "community":               # zurück aus einem Community-Level: wieder die Liste zeigen
 		Flow.menu_screen = ""
 		show_community()
@@ -275,10 +275,23 @@ func show_levels() -> void:
 	_show_screen(ls)
 
 func show_community() -> void:
+	Flow.editor_session = ""
+	Flow.editor_original = ""                  # eine neue Editorsitzung beginnt immer hier (nur die Rückkehr aus dem Testflug geht direkt in den Editor)
 	var cs := CommunitySelect.new()
 	cs.back = show_main
 	cs.edit = show_editor
+	cs.edit_original = show_original_editor
 	_show_screen(cs)
+
+## Debug: ein mitgeliefertes Level im Editor öffnen (Änderungen landen in data/levels).
+func show_original_editor(id: String) -> void:
+	var ed := LevelEditor.new()
+	if not ed.open_original(id):
+		ed.free()
+		show_community()
+		return
+	ed.back = show_community
+	_show_screen(ed)
 
 ## Editor für ein neues Level (id == "") oder zum Bearbeiten einer Kopie von `id`; `session` = bereits gespeicherte Fassung dieser Sitzung.
 func show_editor(id := "", session := "") -> void:

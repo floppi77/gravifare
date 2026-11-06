@@ -21,6 +21,11 @@ var ticks := 0
 var result: Dictionary = {}
 var trace: Array = []         # flach: x, y, Neigung je Abtastung
 var mods: Dictionary = {}     # Werkstatt-Einbauten des Laufs
+var sig := ""                 # Kennung des Leveldateiinhalts: Wurde das Level danach geändert, wird der Geist nicht mehr gezeigt (er flöge durch die alte Karte)
+
+## Kennung des Levelinhalts (für `sig`).
+static func sig_of(lvl: LevelData) -> String:
+	return JSON.stringify(lvl.raw, "", true).sha256_text().substr(0, 12)
 
 ## Eingaben werden auf 1/127 gerundet, damit Aufzeichnung und Wiedergabe exakt dieselben Werte rechnen.
 static func quantize(v: Vector2) -> Vector2:
@@ -66,7 +71,7 @@ func finish(res: Dictionary) -> void:
 
 func to_dict() -> Dictionary:
 	return {"v": VERSION, "level": level_id, "seed": seed, "fuel": fuel, "credits": credits, "carry": carry, "extras": extras,
-		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods}
+		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods, "sig": sig}
 
 ## Rechnet einen Lauf nach. Rückgabe: {complete, time, money, earned, delivered, ticks}.
 static func play(lvl: LevelData, d: Dictionary) -> Dictionary:

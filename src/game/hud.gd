@@ -301,6 +301,8 @@ func _draw_result() -> void:
 	var best_line := tr("RES_NEW_BEST") if (float(result.best) <= 0.0 or float(result.time) < float(result.best)) else tr("RES_BEST") % int(result.best)
 	if not counted:
 		best_line = tr("MSG_NOT_COUNTED")
+	if result.get("solved", false):
+		best_line = tr("RES_SOLVED")
 	_fit_text(ui, Vector2(lx, py + 161.0), best_line, colw, 9, Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else Color("#8a93c9"), HORIZONTAL_ALIGNMENT_LEFT)
 	draw_rect(Rect2(px + pw * 0.5 - 0.5, py + 92.0, 1.0, 76.0), Color("#232a52"))
 	draw_string(ui, Vector2(rx, py + 100.0), tr("RES_H_EARNED"), HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#7c86bb"))

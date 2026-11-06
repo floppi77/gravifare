@@ -15,7 +15,10 @@ func check(cond: bool, msg: String) -> void:
 
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+		if not only.is_empty() and not only.has(t):
+			continue
 		print(t)
 		call(t)
 	print("%d Prüfungen, %d Fehler" % [checks, failures])
@@ -3029,7 +3032,7 @@ func _test_community_isolated() -> void:
 	for suffix in ["", ".tmp"]:
 		_rm(sv.slot_path(1) + suffix)
 	var game_src := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(game_src.contains("elif Flow.community:\n\t\t\tif counted and not Flow.editor_autopilot:") and game_src.contains("and not Flow.daily and not Flow.community:") and save_src.contains("if community_mode:\n\t\treturn"),
+	check(game_src.contains("elif Flow.community:\n\t\t\tif counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):") and game_src.contains("and not Flow.daily and not Flow.community:") and save_src.contains("if community_mode:\n\t\treturn"),
 		"Community: Abschluss, Finale-Sprung und Statistik-Sperre sind im Spielcode vorhanden (Quelltextprüfung)")
 
 func _test_community_texts() -> void:
@@ -3325,12 +3328,16 @@ func _test_level_editor_screen() -> void:
 	check(ed.model.cell(35, 15) == "^", "Editor-Bildschirm: Füll-Werkzeug")
 	ed._undo_redo(true)
 	check(ed.model.cell(35, 15) == ".", "Editor-Bildschirm: Rückgängig")
+	check(ed._save(false) == "" and not ed.status.text.is_empty(), "Editor-Bildschirm: ohne eigene Lösung wird nicht gespeichert")
+	CS.mark_solved(ed.res.id)                                  # Handlösung (siehe Runde 47)
 	var id: String = ed._save(false)
 	check(CommunityLevelIsId(id) and CS.exists(id) and not ed.model.dirty, "Editor-Bildschirm: Speichern legt eine eigene Fassung ab (%s)" % ed.status.text.replace("\n", " | "))
 	ed._select_tool(0)
 	ed._select_pal(0)
 	ed._begin(false, Vector2i(26, 9))
 	ed._end_stroke()
+	ed._validate_now()
+	CS.mark_solved(ed.res.id)
 	var id2: String = ed._save(false)
 	check(id2 != id and CS.exists(id2) and not CS.exists(id) and CS.list().size() == 1, "Editor-Bildschirm: erneutes Speichern ersetzt die Fassung dieser Sitzung")
 	# Objekt- und Auftragsseite
@@ -3373,6 +3380,8 @@ func _test_level_editor_screen() -> void:
 	ed2._validate_now()
 	ed2._begin(false, Vector2i(30, 12))
 	ed2._end_stroke()
+	ed2._validate_now()
+	CS.mark_solved(ed2.res.id)
 	var id3: String = ed2._save(false)
 	check(id3 != "" and id3 != id2 and CS.exists(id2) and CS.exists(id3) and CS.list().size() == 2, "Editor-Bildschirm: Bearbeiten legt eine Kopie an, die Vorlage bleibt")
 	# Rückweg: ungespeicherte Änderungen verlangen eine zweite Bestätigung
@@ -3389,6 +3398,8 @@ func _test_level_editor_screen() -> void:
 	bad.names = {"de": "x", "en": "x"}
 	ed2.model = bad
 	bad.rect(Vector2i(0, 0), Vector2i(2, 2), "#")
+	ed2._validate_now()
+	CS.mark_solved(ed2.res.id)
 	check(ed2._save(false) != "" , "Editor-Bildschirm: gültiges Level lässt sich speichern")
 	ed.free()
 	ed2.free()
@@ -3894,3 +3905,254 @@ func _test_autopilot_flag_and_list() -> void:
 		DirAccess.remove_absolute(CS.dir + fn)
 	DirAccess.remove_absolute(CS.dir)
 	CS.dir = CS.DIR
+
+# ---------------------------------------------------------------------------------------------------------------- Runde 47: Originale bearbeiten, Speichern nur nach Handlösung
+
+const LF := preload("res://src/core/level_files.gd")
+
+func _rm_dir(path: String) -> void:
+	var d := DirAccess.open(path)
+	if d == null:
+		return
+	for sub in d.get_directories():
+		_rm_dir(path.path_join(sub))
+	for fn in d.get_files():
+		DirAccess.remove_absolute(path.path_join(fn))
+	DirAccess.remove_absolute(path)
+
+## Kopie von s3_05 samt Prüfsummendatei in einem Testordner; setzt LF.dir/hash_file/replay_dir darauf.
+func _lf_sandbox() -> String:
+	var root := "user://test_levels47/"
+	_rm_dir(root)
+	DirAccess.make_dir_recursive_absolute(root + "levels")
+	DirAccess.make_dir_recursive_absolute(root + "replays/s1")
+	for id in ["s3_05", "s1_01"]:
+		var f := FileAccess.open(root + "levels/%s.json" % id, FileAccess.WRITE)
+		f.store_string(FileAccess.get_file_as_string("res://data/levels/%s.json" % id))
+		f.close()
+	var h := FileAccess.open(root + "levels.sha256", FileAccess.WRITE)
+	h.store_string("%s  levels/s1_01.json\n%s  levels/s3_05.json\n" % [FileAccess.get_file_as_string(root + "levels/s1_01.json").sha256_text(), FileAccess.get_file_as_string(root + "levels/s3_05.json").sha256_text()])
+	h.close()
+	for p in [root + "replays/s3_05.json", root + "replays/s1/s3_05.json", root + "replays/s1/s1_01.json"]:
+		var r := FileAccess.open(p, FileAccess.WRITE)
+		r.store_string("{}")
+		r.close()
+	LF.dir = root + "levels/"
+	LF.hash_file = root + "levels.sha256"
+	LF.replay_dir = root + "replays/"
+	return root
+
+func _lf_restore(root: String) -> void:
+	LF.dir = LF.DIR
+	LF.hash_file = LF.HASH_FILE
+	LF.replay_dir = "user://replays/"
+	_rm_dir(root)
+
+func _test_round47_original_files() -> void:
+	# Das Schreibformat der Python-Erzeuger wird getroffen (bis auf Zahlen, die auf der letzten Dezimalstelle anders gerundet sind).
+	var same := 0
+	var total := 0
+	var kept := 0
+	for f in DirAccess.get_files_at("res://data/levels"):
+		if not f.ends_with(".json"):
+			continue
+		total += 1
+		var txt := FileAccess.get_file_as_string("res://data/levels/" + f)
+		var raw: Dictionary = JSON.parse_string(txt)
+		if LF.to_text(raw) == txt:
+			same += 1
+		var base := LF.clean_of(raw)
+		if base.ok and LF.to_text(LF.merged(raw, base, base)) == LF.to_text(raw):
+			kept += 1
+	check(total == 99 and same >= 97, "Originale: Schreibformat trifft die Dateien Zeichen für Zeichen (%d von %d)" % [same, total])
+	check(kept == total, "Originale: unveränderte Bearbeitung ändert nichts an der Datei (%d von %d)" % [kept, total])
+	# Einarbeiten: nur Geändertes wird neu geschrieben
+	var raw2: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels/s3_05.json"))
+	var base2 := LF.clean_of(raw2)
+	var m = LE.from_result(base2)
+	m.names = {"de": "Neuer Name", "en": "Emergency Run"}
+	m.set_cell(1, 2, "#")
+	var res2: Dictionary = m.validate()
+	check(res2.ok, "Originale: geänderte Fassung ist gültig (%s)" % str(res2.errors))
+	var out: Dictionary = LF.merged(raw2, base2, res2)
+	check(out.id == "S3-05" and out.name.de == "Neuer Name" and out.name.en == "Emergency Run" and String(out.map[2]).begins_with("##"), "Originale: Name und Karte übernommen, Id bleibt")
+	check(JSON.stringify(out.jobs) == JSON.stringify(raw2.jobs) and JSON.stringify(out.movers) == JSON.stringify(raw2.movers) and out.mechanics == raw2.mechanics and out.sector == raw2.sector,
+		"Originale: Aufträge mit ihren Richtzeiten, Hindernisse und Mechanik-Liste bleiben unverändert")
+	# Hindernis verschieben: nur dieses Hindernis ändert sich, Vergleich über die Textform
+	var m2 = LE.from_result(base2)
+	m2.set_param({"t": "mover", "i": 0}, "x", float(raw2.movers[0].x) + 1.0)
+	var out2: Dictionary = LF.merged(raw2, base2, m2.validate())
+	check(out2.movers[0].x == raw2.movers[0].x + 1 and JSON.stringify(out2.movers.slice(1)) == JSON.stringify(raw2.movers.slice(1)) and JSON.stringify(out2.map) == JSON.stringify(raw2.map),
+		"Originale: ein verschobenes Hindernis ändert nur seinen Eintrag")
+	# Auftrag ändern: der geänderte bekommt die berechnete Richtzeit, die anderen behalten ihre
+	var m3 = LE.from_result(base2)
+	m3.job_cycle(0, "to", 1)
+	var res3: Dictionary = m3.validate()
+	if res3.ok:
+		var out3: Dictionary = LF.merged(raw2, base2, res3)
+		check(JSON.stringify(out3.jobs.slice(1)) == JSON.stringify(raw2.jobs.slice(1)) and (out3.jobs[0].to != raw2.jobs[0].to), "Originale: geänderter Auftrag neu, die übrigen behalten ihre Richtzeiten")
+	# Schreiben in eine Kopie: Datei, Prüfsumme, Geisterläufe
+	var root := _lf_sandbox()
+	var before_other := FileAccess.get_file_as_string(LF.dir + "s1_01.json")
+	var r1: Dictionary = LF.save("s3_05", raw2, base2, res2)
+	var written := FileAccess.get_file_as_string(LF.dir + "s3_05.json")
+	check(r1.error == "" and r1.changed and written == LF.to_text(out) and JSON.parse_string(written).name.de == "Neuer Name", "Originale: Speichern schreibt die Datei im Erzeugerformat")
+	var hashes := FileAccess.get_file_as_string(root + "levels.sha256").split("\n")
+	check(hashes[1] == "%s  levels/s3_05.json" % written.sha256_text() and hashes[0].begins_with(before_other.sha256_text()) and FileAccess.get_file_as_string(LF.dir + "s1_01.json") == before_other,
+		"Originale: Prüfsumme des geänderten Levels nachgeführt, andere Level unberührt")
+	check(not FileAccess.file_exists(root + "replays/s3_05.json") and not FileAccess.file_exists(root + "replays/s1/s3_05.json") and FileAccess.file_exists(root + "replays/s1/s1_01.json"),
+		"Originale: Geisterläufe des geänderten Levels verworfen, die anderen bleiben")
+	var r2: Dictionary = LF.save("s3_05", r1.raw, LF.clean_of(r1.raw), res2)
+	check(r2.error == "" and not r2.changed, "Originale: erneutes Speichern derselben Fassung schreibt nichts")
+	check(LF.save("../x", raw2, base2, res2).error == "NOT_FOUND" and LF.save("s9_99", raw2, base2, res2).error == "NOT_FOUND", "Originale: ungültige Namen werden abgelehnt")
+	_lf_restore(root)
+	check(LF.dir == LF.DIR and not LF.exists("../x") and LF.exists("s3_05"), "Originale: Ordner nach dem Test zurückgesetzt")
+	# Geister: Kennung ändert sich mit dem Levelinhalt
+	var l1 := LevelData.load_file("res://data/levels/s3_05.json")
+	var d3: Dictionary = raw2.duplicate(true)
+	d3.map[2] = String(d3.map[2]).substr(0, 1) + "#" + String(d3.map[2]).substr(2)
+	var l2 := LevelData.from_dict(d3)
+	check(Replay.sig_of(l1) == Replay.sig_of(LevelData.load_file("res://data/levels/s3_05.json")) and Replay.sig_of(l1) != Replay.sig_of(l2), "Geister: Kennung folgt dem Levelinhalt")
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("Replay.sig_of(lvl)") and Replay.new().to_dict().has("sig"), "Geister: Läufe tragen die Kennung, ein geändertes Level zeigt keinen alten Geist (Quelltextprüfung)")
+
+func _test_round47_solve_gate() -> void:
+	CS.dir = "user://test_community47/"
+	_rm_dir(CS.dir)
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	var res: Dictionary = CL.clean(_round46_wrap([]))
+	check(res.ok and not CS.may_save(res.id) and not CS.is_solved(res.id), "Handlösung: ohne Nachweis ist Speichern nicht erlaubt")
+	check(CS.save_draft(res) == "" and CS.draft_exists(res.id) and CS.playable(res.id) and not CS.exists(res.id), "Handlösung: Entwurf ist spielbar, aber nicht gespeichert")
+	check(CS.list().is_empty(), "Handlösung: Entwürfe erscheinen nicht in der Liste")
+	var dr: Dictionary = CS.load_level(res.id)
+	check(dr.ok and dr.id == res.id and CS.load_runtime(res.id) != null, "Handlösung: Entwurf lässt sich laden und spielen")
+	CS.mark_solved(res.id)
+	check(CS.is_solved(res.id) and CS.may_save(res.id), "Handlösung: nach dem Lösen darf gespeichert werden")
+	CS._solved_dir = "?"                                    # frisch von der Platte lesen
+	check(CS.is_solved(res.id) and FileAccess.file_exists(CS.dir + "solved.json"), "Handlösung: der Nachweis bleibt über einen Neustart erhalten")
+	check(CS.save(res) == "" and CS.exists(res.id) and not CS.draft_exists(res.id) and CS.list().size() == 1, "Handlösung: Speichern legt das Level ab und räumt den Entwurf weg")
+	var changed: Dictionary = CL.clean(_round46_wrap([{"kind": "debris", "x": 24, "y": 10, "w": 1, "h": 1, "dx": 2, "dy": 0, "period": 5.0, "phase": 0.0, "shape": "line"}]))
+	check(changed.ok and changed.id != res.id and not CS.may_save(changed.id), "Handlösung: jede Änderung ergibt eine neue Fassung, die einen neuen Flug verlangt")
+	check(CS.may_save(res.id), "Handlösung: ein schon gespeichertes Level darf unverändert wieder gespeichert werden")
+	# Entwürfe sind begrenzt
+	for i in CS.MAX_DRAFTS + 3:
+		var w: Dictionary = _round46_wrap([])
+		w.level["name"] = {"de": "Entwurf %d" % i, "en": "Draft %d" % i}
+		var r: Dictionary = CL.clean(w)
+		CS.save_draft(r)
+	check(DirAccess.get_files_at(CS.draft_dir()).size() <= CS.MAX_DRAFTS, "Handlösung: höchstens %d Entwürfe bleiben liegen" % CS.MAX_DRAFTS)
+	check(CS.save_draft({"ok": false}) == "INVALID", "Handlösung: ungültige Ergebnisse werden nicht als Entwurf abgelegt")
+	# Speichern, ändern, fliegen, speichern: die Liste behält genau eine Fassung (die Fassung der Sitzung wird über den Testflug getragen)
+	var cs_dir := "user://test_community47c/"
+	_rm_dir(cs_dir)
+	CS.dir = cs_dir
+	CS._cache.clear()
+	var e_a: Control = load("res://src/ui/level_editor.gd").new()
+	e_a.back = func(): pass
+	e_a.open("")
+	e_a._ready()
+	e_a._validate_now()
+	CS.mark_solved(e_a.res.id)
+	var id_a: String = e_a._save(false)
+	e_a._begin(false, Vector2i(26, 9))
+	e_a._end_stroke()
+	e_a._validate_now()
+	var sess: String = e_a.session_id
+	check(CS.save_draft(e_a.res) == "" and sess == id_a, "Handlösung: Entwurf nach dem Speichern (Fassung der Sitzung bekannt)")
+	var draft_id: String = e_a.res.id
+	e_a.free()
+	var e_b: Control = load("res://src/ui/level_editor.gd").new()
+	e_b.back = func(): pass
+	check(e_b.open(draft_id, sess) and e_b.session_id == id_a and e_b.model.dirty, "Handlösung: Rückkehr aus dem Testflug kennt die gespeicherte Fassung und den ungespeicherten Entwurf")
+	e_b._ready()
+	e_b._validate_now()
+	CS.mark_solved(e_b.res.id)
+	var id_b: String = e_b._save(false)
+	check(id_b != "" and id_b != id_a and CS.list().size() == 1 and not CS.exists(id_a), "Handlösung: erneutes Speichern nach dem Testflug ersetzt die Fassung der Sitzung (%d in der Liste)" % CS.list().size())
+	e_b.free()
+	_rm_dir(cs_dir)
+	CS.dir = "user://test_community47/"
+	# Quelltext: Spiel wertet nur eigene, vollständige Editor-Flüge
+	var game := FileAccess.get_file_as_string("res://src/game/game.gd")
+	var body := game.substr(game.find("func _solved_by_hand"), 420)
+	check(body.contains("Flow.return_to_editor != \"\"") and body.contains("not Flow.editor_autopilot") and body.contains("autopilot == null") and body.contains("not Save.dev_session") and body.contains("run.delivered >= run.level.jobs.size()"),
+		"Handlösung: zählt nur ohne Autopilot, ohne Entwicklerschalter und mit allen Fahrten (Quelltextprüfung)")
+	var ed_src := FileAccess.get_file_as_string("res://src/ui/level_editor.gd")
+	var tf := ed_src.substr(ed_src.find("func _test_flight"), 700)
+	check(tf.contains("save_draft") and not tf.contains("_save(") and tf.contains("Flow.editor_session = session_id") and FileAccess.get_file_as_string("res://src/ui/main_menu.gd").contains("show_editor(eid, Flow.editor_session)"),
+		"Handlösung: der Testflug legt nur einen Entwurf an und trägt die Fassung der Sitzung mit (Quelltextprüfung)")
+	_rm_dir(CS.dir)
+	CS.dir = CS.DIR
+	CS._solved_dir = "?"
+
+func _test_round47_original_editor() -> void:
+	var tr_de := Translation.new()
+	var de_texts := _read_json("res://data/i18n/de.json")
+	for k in de_texts:
+		tr_de.add_message(k, de_texts[k])
+	tr_de.locale = "de"
+	TranslationServer.add_translation(tr_de)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	CS.dir = "user://test_community47b/"
+	_rm_dir(CS.dir)
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	# Eigenes Level: Speichern erst nach der Handlösung
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed._validate_now()
+	check(ed.res.ok and ed.status.text.contains(tr("ED_NEED_SOLVE")), "Handlösung: der Editor weist darauf hin, dass erst gelöst werden muss (%s)" % ed.status.text.replace("\n", " "))
+	check(ed._save(false) == "" and CS.list().is_empty() and ed.status.text == tr("ED_NEED_SOLVE"), "Handlösung: Speichern ohne Lösung wird verweigert")
+	CS.mark_solved(ed.res.id)
+	ed._validate_now()
+	check(ed.status.text.contains(tr("ED_SOLVED")), "Handlösung: nach dem Lösen meldet der Editor die Freigabe (%s)" % ed.status.text.replace("\n", " "))
+	var id: String = ed._save(false)
+	check(id != "" and CS.exists(id), "Handlösung: gelöst, also lässt sich speichern")
+	ed._begin(false, Vector2i(26, 9))
+	ed._end_stroke()
+	check(ed._save(false) == "" and CS.list().size() == 1, "Handlösung: nach einer Änderung ist die Lösung verbraucht")
+	ed.free()
+	# Original (Debug-Modus) in einer Kopie des Ordners
+	var root := _lf_sandbox()
+	var save_node: Node = self.root.get_node("Save")                    # Autoloads sind beim Übersetzen dieses Skripts noch nicht als Namen bekannt
+	var flow_node: Node = self.root.get_node("Flow")
+	var was_debug: bool = save_node.debug
+	save_node.debug = false
+	var e0: Control = load("res://src/ui/level_editor.gd").new()
+	check(not e0.open_original("s3_05"), "Original bearbeiten: nur im Debug-Modus")
+	e0.free()
+	save_node.debug = true
+	var e1: Control = load("res://src/ui/level_editor.gd").new()
+	e1.back = func(): pass
+	check(e1.open_original("s3_05") and e1.orig_id == "s3_05" and flow_node.editor_original == "s3_05", "Original bearbeiten: im Debug-Modus öffnet es")
+	e1._ready()
+	e1._validate_now()
+	check(e1.res.ok and e1.res.id == e1.base_id and not e1._save_blocked() and e1.title.text.contains("S3-05"), "Original bearbeiten: unverändert gilt als gespeichert, Titel nennt das Level (%s)" % e1.title.text)
+	check(e1._save(true) == e1.res.id and FileAccess.get_file_as_string(LF.dir + "s3_05.json") == FileAccess.get_file_as_string("res://data/levels/s3_05.json"), "Original bearbeiten: unveränderte Fassung schreibt nichts")
+	e1._name_changed("Probe-Name")
+	e1._validate_now()
+	check(String(e1.model.names.de) == "Probe-Name" and String(e1.model.names.en) == "Emergency Run", "Original bearbeiten: nur der Name der gezeigten Sprache ändert sich")
+	check(e1._save_blocked() and e1._save(false) == "" and FileAccess.get_file_as_string(LF.dir + "s3_05.json") == FileAccess.get_file_as_string("res://data/levels/s3_05.json"), "Original bearbeiten: ohne Handlösung bleibt die Datei unberührt")
+	check(e1.look_btns.size() == 2 and e1.look_btns[0].disabled and e1.look_btns[1].disabled, "Original bearbeiten: Sektor ist gesperrt (Levelnummer)")
+	CS.mark_solved(e1.res.id)
+	e1._validate_now()
+	var sid: String = e1._save(true)
+	var disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(LF.dir + "s3_05.json"))
+	check(sid != "" and disk.name.de == "Probe-Name" and disk.id == "S3-05" and not e1.model.dirty and e1.base_id == LF.clean_of(disk).id and CS.list().size() == 1,
+		"Original bearbeiten: nach der Lösung wird die Datei geschrieben (nicht als Community-Level) (%s)" % e1.status.text)
+	check(LevelData.load_file(LF.dir + "s3_05.json").names.de == "Probe-Name", "Original bearbeiten: das Spiel liest die geänderte Datei")
+	e1.free()
+	flow_node.editor_original = ""
+	save_node.debug = was_debug
+	_lf_restore(root)
+	var sel := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
+	var menu := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(sel.contains("CM_EDIT_ORIG") and sel.contains("Save.debug and LevelFiles.can_write()") and menu.contains("Flow.editor_original = \"\"") and menu.contains("show_original_editor"), "Original bearbeiten: Knopf nur im Debug-Modus, Sitzungsende räumt auf (Quelltextprüfung)")
+	_rm_dir(CS.dir)
+	CS.dir = CS.DIR
+	CS._solved_dir = "?"
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tr_de)
