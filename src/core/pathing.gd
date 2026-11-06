@@ -112,7 +112,13 @@ static func arrival_path(level: LevelData, landing: Vector2) -> PackedVector2Arr
 	var start := level.exit_rect().get_center() + Vector2(0, 4)
 	var pad := level.pad_at_foot(Vector2(landing.x, landing.y + Tuning.HULL_HALF.y + Tuning.GEAR_LEN + 2.0))
 	var hover := Vector2(landing.x, landing.y - 32.0) if pad.is_empty() else hover_point(level, pad, 8.0)
-	var pts: Array[Vector2] = [start, gate_approach(level)]
+	if not free_at(level, hover, 0.0):       # niedrige Decke (Dornen/Fels dicht über der Plattform): so tief schweben, wie die Hülle frei bleibt
+		for h in [24.0, 16.0, 8.0]:
+			var lower := Vector2(hover.x, landing.y - h)
+			if free_at(level, lower, 0.0):
+				hover = lower
+				break
+	var pts: Array[Vector2] = [start, _arrival_gate_point(level, start)]
 	for m in [10.0, 8.0, 6.0, 4.0, 2.0]:
 		var p := plan(level, pts[1], hover, m)
 		if not p.is_empty():
@@ -134,10 +140,19 @@ static func arrival_path(level: LevelData, landing: Vector2) -> PackedVector2Arr
 	for i in range(2, smooth.size() - 1):     # ab dem Anflugpunkt: Hülle darf nirgends anstoßen
 		var n := int(ceil(smooth[i].distance_to(smooth[i + 1]) / 3.0))
 		for k in range(n + 1):
-			if not free_at(level, smooth[i].lerp(smooth[i + 1], float(k) / maxf(n, 1)), 0.0):
+			if not free_at(level, smooth[i].lerp(smooth[i + 1], float(k) / maxf(n, 1)), 1.5):     # kleiner Rand: die Glättung schneidet sonst Ecken um Bruchteile eines Pixels
 				ok = false
 	level.exit_open = was_open
 	return smooth if ok else raw
+
+## Erster Wegpunkt unter dem Tor: 60 px unter der Torkante, wenn die Strecke dorthin frei ist; sonst näher am Tor (Fels oder Dornen
+## direkt unter dem Tor), damit die Planung ab dort seitlich um das Hindernis herum fliegt statt durch es hindurch.
+static func _arrival_gate_point(level: LevelData, start: Vector2) -> Vector2:
+	for depth in [60.0, 44.0, 32.0, 24.0, 16.0]:
+		var p := gate_approach(level, depth)
+		if line_free(level, start, p, 2.0):
+			return p
+	return gate_approach(level, 16.0)
 
 ## Punkt bei Anteil `e` (0..1) der Gesamtlänge der Polylinie.
 static func sample_path(path: PackedVector2Array, e: float) -> Vector2:
