@@ -9,6 +9,7 @@ const LevelFiles := preload("res://src/core/level_files.gd")
 var back: Callable
 var edit: Callable                 # Editor öffnen: edit.call(id) (id == "" = neues Level)
 var edit_original: Callable        # Debug: Original im Editor öffnen: edit_original.call(id)
+var reopen_originals := ""        # Id eines Originals: die Liste öffnet sofort die Originalauswahl (Debug) und wählt dieses an
 var editing_originals := false     # die Originalauswahl öffnet den Editor statt eine Kopie anzulegen
 var entries: Array = []
 var sel := -1
@@ -105,6 +106,8 @@ func _ready() -> void:
 	hint.add_theme_font_size_override("font_size", 8)
 	main.add_child(_at(hint, Vector2(0, 336), Vector2(640, 12)))
 	_rebuild()
+	if reopen_originals != "" and Save.debug and edit_original.is_valid():
+		_open_originals(true)
 
 func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	c.position = pos
@@ -291,7 +294,7 @@ func _open_originals(for_editing := false) -> void:
 		b.custom_minimum_size = Vector2(36, 18)
 		b.add_theme_font_size_override("font_size", 8)
 		grid.add_child(b)
-		if first == null:
+		if first == null or String(id) == reopen_originals:
 			first = b
 	var bb := MenuKit.button(tr("MENU_BACK"), _close_originals)
 	overlay.add_child(_at(bb, Vector2(256, 300), Vector2(128, 19)))

@@ -4151,6 +4151,7 @@ func _test_round47_original_editor() -> void:
 	var sel := FileAccess.get_file_as_string("res://src/ui/community_select.gd")
 	var menu := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
 	check(sel.contains("CM_EDIT_ORIG") and sel.contains("Save.debug and LevelFiles.can_write()") and menu.contains("Flow.editor_original = \"\"") and menu.contains("show_original_editor"), "Original bearbeiten: Knopf nur im Debug-Modus, Sitzungsende räumt auf (Quelltextprüfung)")
+	check(menu.contains("show_community.bind(id)") and menu.contains("show_community.bind(ed.orig_id)") and sel.contains("reopen_originals"), "Original bearbeiten: Zurück führt zur Originalauswahl, nicht zur Liste (Quelltextprüfung)")
 	_rm_dir(CS.dir)
 	CS.dir = CS.DIR
 	CS._solved_dir = "?"

@@ -274,13 +274,15 @@ func show_levels() -> void:
 	ls.back = show_main
 	_show_screen(ls)
 
-func show_community() -> void:
+## `pick_original`: Id eines Originals, mit dessen Auswahl (Debug) die Liste sofort wieder die Originalauswahl zeigt (Rückweg aus dem Editor eines Originals).
+func show_community(pick_original := "") -> void:
 	Flow.editor_session = ""
 	Flow.editor_original = ""                  # eine neue Editorsitzung beginnt immer hier (nur die Rückkehr aus dem Testflug geht direkt in den Editor)
 	var cs := CommunitySelect.new()
 	cs.back = show_main
 	cs.edit = show_editor
 	cs.edit_original = show_original_editor
+	cs.reopen_originals = pick_original
 	_show_screen(cs)
 
 ## Debug: ein mitgeliefertes Level im Editor öffnen (Änderungen landen in data/levels).
@@ -290,7 +292,7 @@ func show_original_editor(id: String) -> void:
 		ed.free()
 		show_community()
 		return
-	ed.back = show_community
+	ed.back = show_community.bind(id)               # zurück zur Auswahl der Originale, nicht zur Liste
 	_show_screen(ed)
 
 ## Editor für ein neues Level (id == "") oder zum Bearbeiten einer Kopie von `id`; `session` = bereits gespeicherte Fassung dieser Sitzung.
@@ -300,7 +302,7 @@ func show_editor(id := "", session := "") -> void:
 		ed.free()
 		show_community()
 		return
-	ed.back = show_community
+	ed.back = show_community.bind(ed.orig_id) if ed.orig_id != "" else show_community       # Original: zurück zur Auswahl der Originale
 	_show_screen(ed)
 
 func show_music() -> void:
