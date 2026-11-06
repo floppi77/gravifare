@@ -20,4 +20,4 @@ Version und Lizenz steht in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), 
   und im Abspann). Sie erlaubt nicht-kommerzielle Nutzung und darüber hinaus kommerzielle Nutzung, solange der
   Jahresumsatz unter 500 000 USD liegt; darüber wäre eine eigene Vereinbarung mit Fish Audio nötig. Die Lizenz des
   Spiels selbst (nur nicht-kommerziell, siehe `LICENSE` und `LICENSE-ASSETS.md`) ist davon unabhängig.
-- **ChatGPT Astra 6.0**: Hintergrundbilder und Logo.
+- **KI-generierte Bilder**: Hintergrundbilder und Logo (Angabe des Entwicklers, frei verwendbar).

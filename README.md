@@ -53,14 +53,14 @@ Alles im Trailer stammt aus dem echten Spiel (Autopilot-Flüge, aufgenommen mit 
 
 ## Was drinsteckt
 
-- **99 Level in 9 Sektoren** mit steigender Schwierigkeit: Tore, bewegliche Plattformen, Meteoriten, Hitze, Lavablasen,
-  Fremdverkehr, wechselnde Schwerkraft. Jedes Level lässt sich per Autopilot-Test lösen.
+- **99 handgemachte Level in 9 Sektoren** mit steigender Schwierigkeit: Tore, bewegliche Plattformen, Meteoriten, Hitze, Lavablasen,
+  Fremdverkehr, wechselnde Schwerkraft. Jedes Level wurde von Hand gebaut, abgestimmt und selbst durchgeflogen – nichts davon ist zufallsgeneriert.
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
 - **Feldzug mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
   (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
 - **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen, **Tagesflug** (jeden Tag eine Karte mit festen Aufträgen und Preisen),
   **Garage** mit Lackierungen und Aufklebern.
-- **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt vom Feldzug; die 99 Originale bleiben unveränderlich ([Format und Regeln](docs/COMMUNITY.md)).
+- **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt vom Feldzug. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
 - **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
@@ -94,7 +94,7 @@ Weitere Hinweise und Entwickler-Aufrufe stehen weiter unten und in [DESIGN.md](D
 
 ## Herkunft und Lizenzen
 
-Die Hintergrundbilder und das Logo wurden mit ChatGPT Astra 6.0 erzeugt. Die Sprecherstimmen sind künstlich: Fahrgäste, Tankwart und Zentrale
+Hintergrundbilder und Logo sind KI-generiert. Die Sprecherstimmen sind künstlich: Fahrgäste, Tankwart und Zentrale
 mit Qwen3-TTS (Apache-2.0); die Fluglehrer-Stimme im Tutorial und zehn weitere Fahrgaststimmen sind **Built with Fish Audio** (Drama 3). Fremdbestandteile: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md),
 [CREDITS.md](CREDITS.md). Der Titel ist vorläufig. **Lizenz:** frei für nicht-kommerzielle Zwecke – Code unter [PolyForm Noncommercial 1.0.0](LICENSE), Inhalte (Grafik, Musik, Stimmen, Level) unter [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 
@@ -134,14 +134,14 @@ Everything in the trailer comes from the real game (autopilot flights recorded w
 
 ## What's inside
 
-- **99 levels in 9 sectors** with rising difficulty: gates, moving platforms, meteors, heat, lava bubbles, ambient traffic,
-  changing gravity. Every level is verified solvable by an autopilot test.
+- **99 handmade levels in 9 sectors** with rising difficulty: gates, moving platforms, meteors, heat, lava bubbles, ambient traffic,
+  changing gravity. Every level was built, tuned and flown through by hand – nothing is procedurally generated.
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
 - **Campaign with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
   (jets, hull, tank …). Game over resets the sector.
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs, a **daily flight** (one map a day with fixed jobs and prices),
   and a **garage** with paint jobs and stickers.
-- **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the campaign; the 99 originals stay untouched ([format and rules](docs/COMMUNITY.md)).
+- **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the campaign. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
 - **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).
@@ -173,7 +173,7 @@ tools/export_release.sh                  # packages for Linux, Windows, macOS in
 
 ## Provenance and licences
 
-Background images and logo were generated with ChatGPT Astra 6.0. All voices are synthetic: passengers, fuel attendant and dispatch use Qwen3-TTS (Apache-2.0);
+Background images and logo are AI-generated. All voices are synthetic: passengers, fuel attendant and dispatch use Qwen3-TTS (Apache-2.0);
 the flight instructor in the tutorial and ten more passenger voices are **Built with Fish Audio** (Drama 3). Third-party material: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [CREDITS.md](CREDITS.md).
 The title is provisional. **Licence:** free for non-commercial use – code under [PolyForm Noncommercial 1.0.0](LICENSE), content (art, music, voices, levels) under [CC BY-NC-SA 4.0](LICENSE-ASSETS.md).
 

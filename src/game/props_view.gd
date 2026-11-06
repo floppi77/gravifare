@@ -270,7 +270,8 @@ func _draw_zones() -> void:
 func _draw_wind(z: Dictionary, on: bool) -> void:
 	var r: Rect2 = z.rect
 	var dir: Vector2 = (z.a as Vector2).normalized()
-	var spd := clampf((z.a as Vector2).length() / 55.0, 0.6, 1.4)
+	# Schlierengeschwindigkeit in px/s proportional zur Windstärke (25 → ~43 px/s, 55 → ~94 px/s, 70 → ~120 px/s), unabhängig von der Zonengröße
+	var px_s := clampf((z.a as Vector2).length() * 1.7, 24.0, 280.0)
 	var al := 1.0 if on else 0.14
 	if float(z.period) > 0.0 and not on:
 		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
@@ -286,9 +287,9 @@ func _draw_wind(z: Dictionary, on: bool) -> void:
 		var h := fmod(float(i) * 0.61803 + 0.13, 1.0)
 		var h2 := fmod(float(i) * 0.37 + 0.41, 1.0)
 		var lane := 2.0 + h * (across - 4.0)
-		var ln := 7.0 + 9.0 * h2
-		var fr := fmod(t * spd * (0.45 + 0.5 * h2) + h * 3.0, 1.0)
-		var pos := fr * (along + ln) - ln
+		var ln := (7.0 + 9.0 * h2) * clampf(px_s / 90.0, 0.7, 1.8)    # schneller Wind: längere Schlieren
+		var travel := along + ln
+		var pos := fposmod(t * px_s * (0.8 + 0.4 * h2) + h * travel, travel) - ln
 		var wob := sin(t * 3.0 + float(i) * 1.9) * 0.9
 		var p0: Vector2
 		var p1: Vector2
