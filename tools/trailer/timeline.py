@@ -13,6 +13,9 @@ TXT = {
         "gravity": "SCHWERKRAFT\nKENNT KEINE GNADE.",
         "taxi7": "Du bist Taxi 7.",
         "levels": "99 LEVEL",
+        "gates": "TORE.",
+        "heat": "HITZE.",
+        "traffic": "VERKEHR.",
         "handmade": "HANDGEMACHT.",
         "sectors": "9 SEKTOREN",
         "hazards": "TORE · HITZE · VERKEHR",
@@ -34,6 +37,9 @@ TXT = {
         "gravity": "GRAVITY\nSHOWS NO MERCY.",
         "taxi7": "You are Taxi 7.",
         "levels": "99 LEVELS",
+        "gates": "GATES.",
+        "heat": "HEAT.",
+        "traffic": "TRAFFIC.",
         "handmade": "HANDMADE.",
         "sectors": "9 SECTORS",
         "hazards": "GATES · HEAT · TRAFFIC",
@@ -126,7 +132,7 @@ class Timeline:
 
     def pre(self, clip):
         """Aufnahmen ohne Bedienfeld gibt es je Sprache (en_n_…, en_trans); die mit Bedienfeld heißen h_… und h_en_…."""
-        return "en_" + clip if self.lang == "en" and (clip.startswith("n_") or clip == "trans") else clip
+        return "en_" + clip if self.lang == "en" and (clip.startswith(("n_", "f_")) or clip == "trans") else clip
 
     def landing(self, clip, n, dur, frac=0.7, speed=1.0, zoom=2.0, **kw):
         """Ausschnitt, in dem die n-te Landung bei Anteil `frac` der Dauer passiert."""
@@ -278,29 +284,33 @@ def build(lang):
     tl.text("handmade", 9 * BAR, 10 * BAR, size=190, kind="slam", style=dict(fill=(255, 224, 140), glow=(255, 160, 40))); hit(9 * BAR, 0.5, 0.8, False)
     mont([("n_s3_04", 1)], BAR)
     tl.text("sectors", 10 * BAR, 11 * BAR, size=190, kind="slam"); hit(10 * BAR, 0.5, 0.8, False)
-    mont([("n_s4_05", 0)], BAR)
-    mont([("n_s5_04", 0)], BAR)
-    tl.text("hazards", 12 * BAR, 13 * BAR, size=140, kind="slam"); hit(12 * BAR, 0.5, 0.8, False)
-    mont([("n_s6_05", 0)], BAR)
-    mont([("n_s7_05", 1), ("n_s7_03", 1)], BAR / 2)
-    mont([("n_s8_03", 0)], BAR, zoom=2.0)
+    # Tore, Hitze, Verkehr: Der Text steht jeweils über einem Bild, auf dem genau das zu sehen ist
+    tl.add(Shot(tl.pre("n_s2_04"), 16.4, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi fliegt an den Wandertoren vorbei
+    tl.text("gates", 11 * BAR, 12 * BAR, size=190, kind="slam"); hit(11 * BAR, 0.5, 0.8, False)
+    tl.add(Shot(tl.pre("n_s5_01"), 20.9, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))  # Taxi neben der glühenden Hitzezone
+    tl.text("heat", 12 * BAR, 13 * BAR, size=190, kind="slam", style=dict(fill=(255, 190, 110), glow=(255, 90, 30))); hit(12 * BAR, 0.5, 0.8, False)
+    tl.add(Shot(tl.pre("n_s7_05"), 12.3, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi zwischen Fremdfahrzeugen
+    tl.text("traffic", 13 * BAR, 14 * BAR, size=190, kind="slam", style=dict(fill=(180, 235, 255), glow=(60, 150, 255))); hit(13 * BAR, 0.5, 0.8, False)
+    mont([("n_s4_05", 0), ("n_s6_05", 0)], BAR / 2)
+    tl.add(Shot(tl.pre("n_s9_10"), 21.9, BAR, zoom=[(0, 2.0), (BAR, 2.4)], at=(0.5, 0.74)))                 # dunkles Level mit Hitze und Verkehr
     tl.text("dark", 15 * BAR, 16 * BAR, size=150, kind="slam", style=dict(fill=(190, 225, 255), glow=(60, 130, 255))); hit(15 * BAR, 0.5, 0.8, False)
     # Zwischenspiel: Fluglehrer (HUD-Aufnahme, ruhiger)
     B1 = 16 * BAR
     hit(B1, 0.6, 0.6)
-    tl.add(L(H + "s1_01", 1, 2 * BAR, frac=0.8, speed=1.0, zoom=[(0, 1.0), (2 * BAR, 1.35)], at=(0.5, 0.55), grade=(1.12, 1.08, (1.0, 1.0, 1.02))))
+    # das Ausgangstor oben öffnet sich (Spiel-Aufnahme: Tor ab 26,5 s offen), das Taxi fliegt darauf zu
+    tl.add(Shot(H + "s1_01", 26.55, 2 * BAR, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(960, 400), fix_to=(960, 330), grade=(1.12, 1.08, (1.0, 1.0, 1.02))), sfx_land=False)
     voice_gate = ("i0_tut_gate", 0.95)
     tl.voices.append((B1 + 0.25, voice_gate[0], voice_gate[1]))
     tl.text("teach", B1 + 0.2, B1 + 2.9, size=44, cy=858, kind="fade", style=dict(font=engine.FONT_B, fill=(255, 207, 51), glow=(255, 150, 30), spacing=6))
     tl.text("gate", B1 + 0.25, B1 + 2.9, size=58, cy=925, kind="fade", style=dict(font=engine.FONT_B, fill=(245, 248, 255), glow=(70, 120, 255)))
     # zweite Hälfte
-    mont([(H + "s3_04", 0)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
     mont([(H + "s5_04", 1)], BAR, zoom=[(0, 1.0), (BAR, 1.3)])
     tl.add(Shot(tl.pre("trans"), 6.0, BAR, speed=1.0, zoom=[(0, 1.0), (BAR, 1.25)], cam="fix", fix=(1200, 500), bloom=0.55), sfx_land=False)
+    tl.add(L(H + "s3_04", 1, BAR, frac=0.75, speed=1.0, zoom=[(0, 1.5), (BAR, 2.0)], at=(0.5, 0.74)))        # sanfte Landung mit Landeassistent
     tl.text("land", 20 * BAR, 21 * BAR, size=170, kind="slam"); hit(20 * BAR, 0.5, 0.8, False)
-    mont([("n_s9_05", 0)], BAR)
+    tl.add(L("f_s9_05", 0, BAR, frac=0.45, speed=1.0, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))         # Taxi landet an der Tankstelle und tankt (Start mit wenig Sprit)
     tl.text("fuel", 21 * BAR, 22 * BAR, size=170, kind="slam"); hit(21 * BAR, 0.5, 0.8, False)
-    mont([("n_s9_10", 0)], BAR)
+    tl.add(Shot(tl.pre("n_s5_04"), 29.1, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi neben dem Plasmastrahl
     tl.text("survive", 22 * BAR, 23 * BAR, size=170, kind="slam", style=dict(fill=(255, 120, 90), glow=(255, 60, 30))); hit(22 * BAR, 0.5, 0.8, False)
     mont([("n_s6_05", 2)], BAR)
     # ---------- Akt 3: Steigerung ----------

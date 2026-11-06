@@ -34,7 +34,7 @@ static func leg_mult(lvl: LevelData, from_id: String, to_id: String) -> float:
 	var was_open := lvl.exit_open
 	lvl.exit_open = true
 	var a := Pathing.hover_point(lvl, lvl.pads[from_id], 8.0)
-	var b: Vector2 = Pathing.gate_approach(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
+	var b: Vector2 = Pathing.metric_gate(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
 	var clearance := 8.0
 	var length := a.distance_to(b)
 	for m in [40.0, 32.0, 24.0, 16.0, 8.0]:
@@ -61,7 +61,7 @@ static func leg_length(lvl: LevelData, from_id: String, to_id: String) -> float:
 	var was_open := lvl.exit_open
 	lvl.exit_open = true
 	var a := Pathing.hover_point(lvl, lvl.pads[from_id], 8.0)
-	var b: Vector2 = Pathing.gate_approach(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
+	var b: Vector2 = Pathing.metric_gate(lvl) if to_id == "exit" else Pathing.hover_point(lvl, lvl.pads[to_id], 8.0)
 	var length := a.distance_to(b)
 	for m in [16.0, 8.0, 4.0]:
 		var path := Pathing.plan(lvl, a, b, m)
@@ -119,13 +119,13 @@ static func analyze(lvl: LevelData) -> Dictionary:
 		legs.append([cur, a])
 		var b: Vector2
 		if String(job.to) == "exit":
-			b = Pathing.gate_approach(lvl)
+			b = Pathing.metric_gate(lvl)
 		else:
 			b = Pathing.hover_point(lvl, lvl.pads[String(job.to)], 8.0)
 		legs.append([a, b])
 		cur = b
 	if lvl.jobs.is_empty() or String(lvl.jobs[lvl.jobs.size() - 1].to) != "exit":
-		legs.append([cur, Pathing.gate_approach(lvl)])
+		legs.append([cur, Pathing.metric_gate(lvl)])
 	var clearance := 0.0
 	var m := MAX_MARGIN
 	while m >= STEP:

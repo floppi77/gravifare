@@ -95,15 +95,17 @@
  "movers": [
   {
    "kind": "beam",
-   "x": 14,
-   "y": 15,
+   "x": 16,
+   "y": 14,
    "w": 1,
-   "h": 4,
+   "h": 6,
    "period": 7.0,
    "on": 2.4,
    "phase": 0.0,
    "warn": 1.6,
-   "tint": 1
+   "tint": 1,
+   "dx": 0,
+   "dy": 0
   },
   {
    "kind": "beam",

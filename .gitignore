@@ -27,3 +27,5 @@ addons/godot_ai/
 docs/media/trailer_cine_*.mp4
 # Alte Trailer-Fassung (lokal behalten)
 docs/media/alt/
+# Eigenstaendige Trailer-Produktion: ausschliesslich lokal behalten
+/docs/media/gravity-shift-20261106-230224/

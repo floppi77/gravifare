@@ -145,6 +145,15 @@ static func arrival_path(level: LevelData, landing: Vector2) -> PackedVector2Arr
 	level.exit_open = was_open
 	return smooth if ok else raw
 
+## Anflugpunkt der Metrik/Lösbarkeitsanalyse: 60 px unter der Torkante; liegt dort Fels oder Dornen (Level mit Hindernis dicht unter dem Tor),
+## rückt er näher ans Tor (bis 24 px, wie die Lösbarkeitsprüfung der Level-Werkstatt).
+static func metric_gate(level: LevelData) -> Vector2:
+	for depth in [60.0, 44.0, 32.0]:
+		var p := gate_approach(level, depth)
+		if free_at(level, p, 2.0):
+			return p
+	return gate_approach(level, GATE_FREE_DEPTH)
+
 ## Erster Wegpunkt unter dem Tor: 60 px unter der Torkante, wenn die Strecke dorthin frei ist; sonst näher am Tor (Fels oder Dornen
 ## direkt unter dem Tor), damit die Planung ab dort seitlich um das Hindernis herum fliegt statt durch es hindurch.
 static func _arrival_gate_point(level: LevelData, start: Vector2) -> Vector2:

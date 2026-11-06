@@ -247,10 +247,10 @@
    "h": 1,
    "dx": 0,
    "dy": 18,
-   "fall": 1.6,
+   "fall": 4.2,
    "warn": 2.0,
-   "period": 22.0,
-   "phase": 19.4
+   "period": 9.0,
+   "phase": 19.4000000000000021
   },
   {
    "kind": "meteor",
@@ -276,17 +276,6 @@
    "period": 7.8,
    "phase": 6.1,
    "shape": "line"
-  },
-  {
-   "kind": "beam",
-   "x": 37,
-   "y": 4,
-   "w": 1,
-   "h": 5,
-   "period": 9.0,
-   "on": 3.0,
-   "phase": 4.7,
-   "warn": 2.0
   },
   {
    "kind": "meteor",
@@ -348,6 +337,18 @@
    "dy": 2,
    "period": 8.0,
    "phase": 4.0,
+   "shape": "line"
+  },
+  {
+   "kind": "debris",
+   "x": 26,
+   "y": 13,
+   "w": 2,
+   "h": 1,
+   "dx": 4,
+   "dy": 0,
+   "period": 8.0,
+   "phase": 0.0,
    "shape": "line"
   }
  ],

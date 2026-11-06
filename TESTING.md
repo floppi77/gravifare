@@ -10,6 +10,7 @@
 
 **Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
 
+- **Runde 48:** Handlevel: Autopilot-Lösbarkeit nur statisch für 20 Level (`BOT_HAND_LEVELS`), Sektor-Mittelwert der Schwierigkeit steigt, Einflug hindernisfrei in allen 99 Leveln, Metrik-Anflugpunkt unter dem Tor
 - **Runde 47:** Schreibformat und Einarbeiten von Original-Änderungen (97 von 99 Dateien byteidentisch, unveränderte Bearbeitung schreibt nichts), Prüfsumme/Geister beim Speichern, Handlösung (Nachweis je Inhalt, Entwürfe, Speichersperre im Editor, Original-Modus nur im Debug-Modus)
 - **Runde 43:** Editor mit einem Stift (Fahrzeugpfad: Rollen, Beenden, Abbrechen, Punkt ziehen/entfernen, Greifen nur an der Linie; Größe beim Setzen für Zone, Magnet, Meteorit, Plattform; Symbolpaletten; Doppelklick-Füllen; Controllerbelegung per Quelltextprüfung)
 - **Runde 41:** Editor Stufe 3 (Objekte: alle zehn Arten hinzufügen/ändern/verschieben/entfernen/auswählen, Tore und Zonen-Pulsieren, Grenzen, Magnetstärke; Aufträge: eigene Liste, Einfügen, Ziel wechseln, Klinik, Ausgang nur im letzten; Bildschirm: Seiten, Ziehen, Löschen unter dem Zeiger, Auftragsliste; Zahlenwerte aller Originale bleiben beim Kopieren erhalten)

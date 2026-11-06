@@ -35,7 +35,7 @@
    "from": "3",
    "to": "2",
    "fare": 120,
-   "par": 32,
+   "par": 14,
    "passenger": "Mika",
    "gender": "f"
   },
@@ -43,7 +43,7 @@
    "from": "4",
    "to": "2",
    "fare": 130,
-   "par": 22,
+   "par": 19,
    "passenger": "Odo",
    "gender": "m"
   },
@@ -51,7 +51,7 @@
    "from": "5",
    "to": "1",
    "fare": 140,
-   "par": 12,
+   "par": 18,
    "passenger": "Lena",
    "gender": "f"
   },
@@ -67,7 +67,7 @@
    "from": "2",
    "to": "3",
    "fare": 160,
-   "par": 43,
+   "par": 17,
    "passenger": "Ines",
    "gender": "f"
   },
@@ -75,7 +75,7 @@
    "from": "5",
    "to": "exit",
    "fare": 170,
-   "par": 10,
+   "par": 13,
    "passenger": "Ben",
    "gender": "m"
   }
@@ -91,12 +91,15 @@
   {
    "kind": "pad",
    "pad": "5",
-   "x": 19,
+   "x": 18,
    "y": 12,
    "w": 4,
-   "dx": 2,
-   "period": 9.1,
-   "phase": 0.0
+   "dx": 5,
+   "period": 16.1,
+   "phase": 0.0,
+   "spikes": true,
+   "h": 1,
+   "dy": 0
   },
   {
    "kind": "debris",
@@ -117,8 +120,8 @@
    "w": 1,
    "h": 2,
    "dx": 0,
-   "dy": 1,
-   "period": 9.0,
+   "dy": 3,
+   "period": 7.5,
    "phase": 0.0,
    "shape": "line"
   },
