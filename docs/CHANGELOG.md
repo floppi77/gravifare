@@ -3,7 +3,7 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
-## 0.9.9
+## 0.9.10
 
 ### Deutsch
 
@@ -15,6 +15,7 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 - Neue Knöpfe für Rückgängig, Wiederholen und Hilfe; Raster-Zustand, Eingabemodus und das Feld unter dem Zeiger sind sichtbar
 - Automatische Aufträge stehen als lesbarer Text da, bis zu 12 Aufträge passen auf den Bildschirm
 - Mit „Bewegung reduzieren“ blinken Fehlerstellen nicht mehr, sondern bleiben ruhig markiert
+- Testflug eines Entwurfs: Ist er geschafft, wird die Bestzeit beim Speichern übernommen; selbst gelöste Level heißen in der Levelliste „Von dir gelöst (Testflug) – noch keine Bestzeit“ statt „Noch nicht geschafft“
 
 ### English
 
@@ -26,6 +27,7 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 - New buttons for undo, redo and help; grid state, input mode and the cell under the pointer are shown
 - Automatic jobs are shown as readable text, and up to 12 jobs fit on screen
 - With "Reduce motion" error spots no longer blink but stay calmly marked
+- Test flight of a draft: once completed, the best time is kept when you save; levels you solved yourself show "Solved by you (test flight) – no best time yet" in the level list instead of "Not completed yet"
 
 ## 0.9.8
 
