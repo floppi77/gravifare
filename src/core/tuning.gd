@@ -23,6 +23,7 @@ const GEAR_THRUST_DOWN := 80.0
 const GEAR_THRUST_SIDE := 68.0
 const GEAR_DRAG := 1.1
 const GEAR_MAX_SPEED := 90.0
+const GEAR_FALL_FACTOR := 0.6    # Fahrwerk nach unten: nur 60 % der Dämpfung und Tempobegrenzung (Schwerkraft und Trägheit tragen das Taxi weiter)
 
 # Hülle
 const TAXI_SCALE := 0.8           # Taxi 20 % kleiner als im ersten Entwurf (mehr Platz auf den Pads)

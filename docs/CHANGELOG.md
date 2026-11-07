@@ -3,6 +3,18 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.7
+
+### Deutsch
+
+**Spiel**
+- Die Fahrwerks-Bremse beim Fallen aus 0.9.6 war zu krass und ist teilweise zurückgenommen: Nach unten bremst das ausgefahrene Fahrwerk jetzt mit 60 % der ursprünglichen Wirkung (Dämpfung und Höchstgeschwindigkeit), nach oben und zur Seite wie immer
+
+### English
+
+**Game**
+- The landing-gear braking when falling, removed in 0.9.6, was too extreme and is partly restored: downwards the extended gear now brakes with 60% of its original effect (damping and top speed), upwards and sideways as always
+
 ## 0.9.6
 
 ### Deutsch
