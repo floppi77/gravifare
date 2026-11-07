@@ -185,7 +185,7 @@ godot --path .                                  # Spiel (Godot 4.7.x)
 godot --path . -- --level=s1_01                 # bestimmtes Level (data/levels/<id>.json)
 godot --headless -s tests/test_runner.gd        # Tests
 godot --headless -s tools/run_bot.gd            # Autopilot fliegt alle Level
-python3 tools/art/gen_art.py                    # Pixel-Art neu erzeugen
+python3 tools/art/gen_art.py                    # Pixel-Art neu erzeugen (Taxi/Fahrgäste: tools/art/aseprite/)
 tools/export_linux.sh                           # Linux-Build nach build/linux/ (mit Lizenztexten)
 tools/make_level_shots.sh                       # Vorschaubilder der Levelauswahl
 tools/make_sector_sheets.sh                     # Sektor-Übersichten docs/levels/sektor_<n>.jpg

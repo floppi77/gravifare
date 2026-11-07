@@ -12,7 +12,7 @@ Ein Schwebetaxi holt Fahrgäste von nummerierten Pads ab und liefert sie an Ziel
 | Tile-Raster 16 px, Level als JSON mit ASCII-Karte | pro Level separat prüfbar, gut diffbar, schnell iterierbar |
 | Bewegte Gefahren als Funktion der Zeit (geplant) | deterministisch, für Bot/Validator vorausberechenbar |
 | Neigung folgt dem Seitenschub (keine Rotationssteuerung) | „Neigung“ bleibt Landekriterium, Steuerung bleibt einfach |
-| Pixel-Art per Python/Pillow-Skript (`tools/art`) | eigenständig, reproduzierbar, keine Fremdassets; Aseprite für spätere Feinarbeit |
+| Pixel-Art per Python/Pillow-Skript (`tools/art`) | eigenständig, reproduzierbar, keine Fremdassets; Taxi und Fahrgäste in Aseprite verfeinert (`tools/art/aseprite`) |
 | Lokalisierung per JSON → `Translation` | kein Import-Schritt, robust bei fehlenden Schlüsseln |
 | Logische Auflösung 640×360, Standardfenster **1920×1080** (Skalierung 3), Stretch `canvas_items` + Integer-Scaling | UI/Schrift bleiben scharf; 4K = exakt 6× |
 | Grafik in 3-facher Detailauflösung (Tile 48 px = 16 Welteinheiten) | pixelgenau bei 1080p, detailreicher als 640×360-Pixel-Art |
@@ -489,3 +489,10 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 
 - **Fehler:** Ein im Editor selbst gelöstes und dann gespeichertes Level stand in der Levelliste als „Noch nicht geschafft“. Der Testflug läuft als Entwurf, und Entwürfe schreiben absichtlich nichts in den Spielstand (verworfene Entwürfe sollen keine Einträge sammeln, die Liste ist auf 200 begrenzt). Beim Speichern behält das Level dieselbe ID, hatte aber keinen Eintrag.
 - **Behoben:** `game.gd` merkt geschaffte Hand-Testflüge eines Entwurfs in `Flow.editor_runs` (Bestzeit, Bestwert, Flüge; nur im Speicher, `note_editor_run`). Der Editor übernimmt sie beim Speichern in den Spielstand (`_take_draft_runs` → `Save.complete_community(…, plays)`). Level, die vorher so gespeichert wurden, zeigen in der Liste „Von dir gelöst (Testflug) – noch keine Bestzeit“ (`CommunityStore.is_solved`), bis sie einmal aus der Liste geflogen werden.
+
+## Runde 51: Taxi und Fahrgäste in Aseprite überarbeitet
+
+- **Herkunft:** `taxi.png` und `passengers.png` kommen nicht mehr aus `gen_art.py`. `tools/art/aseprite/gen_parts.py` legt flache Grundformen an. Schattierung (Licht von oben, eigene Farbrampen), Glanzpunkte, Kontur und Pixel-Details entstehen in Aseprite über den MCP, die Quellen mit Ebenen liegen daneben (Ablauf und Parameter in `tools/art/aseprite/README.md`). `gen_art.py` leitet daraus nur noch die Lackierungen ab.
+- **Taxi:** runder Rumpf mit Glanzpunkt, Schachbrettband als Rille, Kuppel mit Spiegelung und Chromkragen, Fahrer mit Gesicht, Schirmmütze und Uniform, Kühlglühen an den Seitenkapseln, Restglut in der Düse (Farbton unter 0,04, bleibt bei allen Lackierungen rot). Umriss und alle Stellen, auf die Code zeichnet (Flammen, Fahrwerk, Aufkleber, Bodenspiegelung), sind unverändert.
+- **Fahrgäste:** Erkennungsmerkmal je Figur (Haarspange, Hemd und Koffer, blaue Schirmmütze, leuchtende Fühler), Augen mit Glanz, Wangen. Der Laufzyklus hat Knie (Zwei-Segment-Beine per IK), der Koffer hängt in der hinteren Hand. Licht kommt von oben, weil die Laufbilder für links gespiegelt werden.
+- **1080p:** Das Taxi wird dort auf 0,8×, die Fahrgäste auf etwa 0,85× verkleinert (nächster Nachbar), einzelne Pixelzeilen fallen weg. Ein TAXI-Schriftzug am Rumpf zerfiel dabei und wurde wieder entfernt.

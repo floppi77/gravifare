@@ -1,4 +1,5 @@
-"""Erzeugt die Pixel-Art-Assets (Sektor 1 Sternenhafen, Taxi, Fahrgäste, Ausgangstor, Hintergründe).
+"""Erzeugt die Pixel-Art-Assets (Sektor 1 Sternenhafen, Taxi-Lackierungen, Ausgangstor, Hintergründe).
+Taxi und Fahrgäste selbst sind in Aseprite gezeichnet: tools/art/aseprite/.
 Aufruf: python3 tools/art/gen_art.py   -> schreibt nach assets/art/
 Alle Grafiken entstehen in 3-facher Detailauflösung (Tile = 48 px, im Spiel 16 Welteinheiten),
 damit sie bei 1080p (Skalierung 3) pixelgenau und bei 4K (6x) sauber vergrößert erscheinen.
@@ -142,143 +143,9 @@ def tiles_normal():
         out[:, i * T:(i + 1) * T, :3] = blk
     Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "tiles_s1_n.png")
 
-# ------------------------------------------------------------------ Taxi
-def taxi():
-    W, H = 96, 60
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    yl, yd, ydd, yh = hexc("#ffcb3d"), hexc("#e8901f"), hexc("#b8631a"), hexc("#fff3b0")
-    mt, md, mh = hexc("#7a80a8"), hexc("#3d4166"), hexc("#b8bfe6")
-    # Seitenpods
-    for ox, flip in ((1, 1), (83, -1)):
-        d.rounded_rectangle([ox, 20, ox + 11, 40], radius=4, fill=md)
-        vgrad(d, (ox + 1, 22, ox + 10, 38), mh[:3], md[:3])
-        for k in range(3): d.line([ox + 2, 25 + k * 4, ox + 9, 25 + k * 4], fill=md)
-    d.rectangle([0, 26, 2, 34], fill=OUTLINE); d.rectangle([93, 26, 95, 34], fill=OUTLINE)
-    # Düse unten
-    d.rounded_rectangle([32, 44, 63, 55], radius=3, fill=md)
-    vgrad(d, (34, 45, 61, 52), mh[:3], md[:3])
-    d.rectangle([40, 52, 55, 56], fill=OUTLINE); d.rectangle([42, 52, 53, 54], fill=hexc("#22254a"))
-    # Rumpf
-    d.rounded_rectangle([8, 14, 87, 46], radius=15, fill=yl)
-    body_mask = Image.new("L", (W, H), 0); ImageDraw.Draw(body_mask).rounded_rectangle([8, 14, 87, 46], radius=15, fill=255)
-    shade_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0)); sd = ImageDraw.Draw(shade_layer)
-    sd.rectangle([0, 33, W, 40], fill=yd); sd.rectangle([0, 41, W, H], fill=ydd)
-    sd.rectangle([0, 14, W, 16], fill=yh)
-    img.paste(shade_layer, (0, 0), Image.composite(shade_layer.split()[3], Image.new("L", (W, H), 0), body_mask))
-    d = ImageDraw.Draw(img)
-    d.arc([8, 14, 87, 46], 195, 345, fill=hexc("#ffe27a"), width=1)
-    # Schachbrettband
-    for i, x in enumerate(range(14, 82, 4)):
-        d.rectangle([x, 31, x + 3, 33], fill=OUTLINE if i % 2 else hexc("#ffffff"))
-        d.rectangle([x, 34, x + 3, 36], fill=hexc("#ffffff") if i % 2 else OUTLINE)
-    # Heckflossen / Lampen
-    d.polygon([(8, 22), (2, 16), (2, 26), (8, 30)], fill=yd); d.polygon([(87, 22), (93, 16), (93, 26), (87, 30)], fill=yd)
-    d.rectangle([11, 20, 14, 23], fill=hexc("#ff4d6d")); d.rectangle([81, 20, 84, 23], fill=hexc("#5dff9a"))
-    # Kuppel
-    dome = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(dome)
-    dd.rounded_rectangle([29, 2, 66, 28], radius=13, fill=OUTLINE)
-    dd.rounded_rectangle([31, 4, 64, 27], radius=11, fill=hexc("#6fe8ea"))
-    vgrad(dd, (33, 6, 62, 26), hexc("#c8fffd")[:3], hexc("#2a9fb0")[:3])
-    m = Image.new("L", (W, H), 0); ImageDraw.Draw(m).rounded_rectangle([31, 4, 64, 27], radius=11, fill=255)
-    glass = Image.new("RGBA", (W, H), (0, 0, 0, 0)); gd = ImageDraw.Draw(glass)
-    vgrad(gd, (31, 4, 64, 27), hexc("#bdfcfb")[:3], hexc("#2a8fa8")[:3])
-    dome.paste(glass, (0, 0), m)
-    dd = ImageDraw.Draw(dome)
-    # Fahrer: Kopf, Mütze
-    dd.ellipse([44, 12, 53, 21], fill=hexc("#f2c29b")); dd.rectangle([46, 15, 47, 16], fill=OUTLINE); dd.rectangle([50, 15, 51, 16], fill=OUTLINE)
-    dd.rectangle([43, 10, 54, 13], fill=hexc("#ff7a2e")); dd.rectangle([43, 13, 56, 14], fill=hexc("#c9561a"))
-    dd.polygon([(38, 8), (46, 5), (44, 12), (36, 14)], fill=hexc("#ffffff"))  # Spiegelung
-    dd.line([36, 8, 42, 6], fill=hexc("#ffffff"))
-    dd.line([33, 25, 62, 25], fill=hexc("#1f7f92"))
-    img.alpha_composite(dome)
-    img = add_outline(img)
-    # Zusatzkontur Rumpfunterkante
-    d = ImageDraw.Draw(img)
-    d.arc([8, 14, 87, 46], 20, 160, fill=shade(ydd, 0.75), width=1)
-    img.save(OUT + "taxi.png")
-
-# ------------------------------------------------------------------ Fahrgäste (24x36 je Frame)
-# Sheet: 4 Figuren (Zeilen) x 10 Frames: 0-1 Idle, 2-3 Winken, 4-9 Laufzyklus (blickt nach rechts)
-LOOKS = [  # Haut, Kleidung, Haar, Highlight, weiblich?
-    ("#f2c29b", "#d9467f", "#3a2a52", "#ffd0e8", True),
-    ("#a8714f", "#3fb68b", "#1c1c30", "#b9ffe0", False),
-    ("#e9b58c", "#e8a33a", "#552a1c", "#fff0b0", False),
-    ("#8fd0c8", "#7a6bd8", "#22223d", "#d9d2ff", True),
-]
-PANTS, SHOE = hexc("#43529c"), hexc("#10142b")
-
-def person(i, pose, k=0):
-    """pose: 'idle' (k=0/1), 'wave' (k=0/1), 'walk' (k=0..5)."""
-    skin, cloth, hair, hi, fem = LOOKS[i]
-    sk, cl, hr = hexc(skin), hexc(cloth), hexc(hair)
-    f = Image.new("RGBA", (24, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(f)
-    if pose == "walk":
-        ph = k / 6.0 * 2 * np.pi
-        bob = int(round(abs(np.sin(ph)) * 1.2))
-        sw = np.sin(ph)
-        hx = 12
-        top = 14 + bob
-        # hintere Gliedmaßen zuerst (dunkler)
-        def limb(x0, y0, ang, ln, col, w):
-            x1, y1 = x0 + np.sin(ang) * ln, y0 + np.cos(ang) * ln
-            d.line([x0, y0, x1, y1], fill=col, width=w)
-            return int(x1), int(y1)
-        back_leg = limb(hx, 27 + bob, -sw * 0.65, 9, shade(PANTS, 0.75), 4)
-        back_arm = limb(hx, top + 2, sw * 0.6, 9, shade(cl, 0.75), 3)
-        d.rectangle([back_leg[0] - 1, back_leg[1] - 1, back_leg[0] + 3, back_leg[1] + 1], fill=SHOE)
-        # Torso (Seitenansicht)
-        d.rounded_rectangle([hx - 4, top, hx + 4, 28 + bob], radius=3, fill=cl)
-        d.rectangle([hx - 4, 23 + bob, hx + 4, 28 + bob], fill=shade(cl, 0.82))
-        if fem: d.polygon([(hx - 5, 27 + bob), (hx + 5, 27 + bob), (hx + 6, 30 + bob), (hx - 6, 30 + bob)], fill=shade(cl, 0.9))
-        front_leg = limb(hx, 27 + bob, sw * 0.65, 9, PANTS, 4)
-        d.rectangle([front_leg[0] - 1, front_leg[1] - 1, front_leg[0] + 4, front_leg[1] + 1], fill=SHOE)
-        # Kopf im Profil, Blick nach rechts
-        d.ellipse([hx - 4, 2 + bob, hx + 5, 13 + bob], fill=sk)
-        d.rectangle([hx + 3, 7 + bob, hx + 5, 8 + bob], fill=shade(sk, 0.85))      # Nase
-        d.point((hx + 3, 6 + bob), fill=SHOE)
-        d.pieslice([hx - 5, 0 + bob, hx + 5, 11 + bob], 180, 360, fill=hr)
-        d.rectangle([hx - 5, 4 + bob, hx - 3, (14 if fem else 9) + bob], fill=hr)
-        if i == 3: d.ellipse([hx - 7, 0 + bob, hx - 3, 4 + bob], fill=hr)
-        front_arm = limb(hx, top + 2, -sw * 0.6, 9, cl, 3)
-        d.rectangle([front_arm[0] - 1, front_arm[1] - 1, front_arm[0] + 1, front_arm[1] + 1], fill=sk)
-        if i == 1: d.rectangle([front_arm[0] - 2, front_arm[1] + 1, front_arm[0] + 3, front_arm[1] + 7], fill=hexc("#6a4a2a"))
-    else:
-        yoff = 1 if (pose == "idle" and k == 1) else 0
-        d.rounded_rectangle([6, 14 + yoff, 17, 28], radius=3, fill=cl)
-        d.rectangle([6, 22, 17, 28], fill=shade(cl, 0.82)); d.line([7, 15 + yoff, 16, 15 + yoff], fill=hexc(hi))
-        if fem: d.polygon([(5, 27), (18, 27), (20, 31), (3, 31)], fill=shade(cl, 0.9))
-        d.rectangle([8, 28, 11, 35], fill=PANTS); d.rectangle([12, 28, 15, 35], fill=PANTS)
-        d.rectangle([7, 34, 11, 35], fill=SHOE); d.rectangle([12, 34, 16, 35], fill=SHOE)
-        if pose == "wave":
-            up = 0 if k == 0 else 2
-            d.rectangle([3, 15, 5, 25], fill=cl); d.rectangle([3, 25, 5, 27], fill=sk)          # linker Arm unten
-            d.polygon([(18, 16), (21 + up, 6), (24 if up else 23, 6), (20, 17)], fill=cl)       # rechter Arm hoch
-            d.rectangle([20 + up, 3, 23 + up, 6], fill=sk)
-        else:
-            d.rectangle([3, 15, 5, 25], fill=cl); d.rectangle([18, 15, 20, 25], fill=cl)
-            d.rectangle([3, 25, 5, 27], fill=sk); d.rectangle([18, 25, 20, 27], fill=sk)
-        d.ellipse([6, 2 + yoff, 17, 14 + yoff], fill=sk)
-        d.pieslice([5, 0 + yoff, 18, 12 + yoff], 180, 360, fill=hr); d.rectangle([5, 5 + yoff, 7, (13 if fem else 9) + yoff], fill=hr)
-        if fem: d.rectangle([16, 5 + yoff, 18, 13 + yoff], fill=hr)
-        if i == 3: d.ellipse([9, -1 + yoff, 14, 3 + yoff], fill=hr)
-        blink = pose == "idle" and k == 1
-        if blink:
-            d.line([9, 8 + yoff, 10, 8 + yoff], fill=OUTLINE); d.line([13, 8 + yoff, 14, 8 + yoff], fill=OUTLINE)
-        else:
-            d.rectangle([9, 8 + yoff, 10, 9 + yoff], fill=OUTLINE); d.rectangle([13, 8 + yoff, 14, 9 + yoff], fill=OUTLINE)
-        d.line([10, 12 + yoff, 13, 12 + yoff], fill=shade(sk, 0.7))
-        if pose == "wave": d.rectangle([11, 11 + yoff, 12, 11 + yoff], fill=hexc("#7a2a3a"))
-        if i == 1 and pose != "wave": d.rectangle([19, 25, 23, 32], fill=hexc("#6a4a2a")); d.rectangle([19, 25, 23, 26], fill=hexc("#a07a3a"))
-    return add_outline(f)
-
-def passengers():
-    frames = [("idle", 0), ("idle", 1), ("wave", 0), ("wave", 1)] + [("walk", k) for k in range(6)]
-    img = Image.new("RGBA", (24 * len(frames), 36 * len(LOOKS)), (0, 0, 0, 0))
-    for i in range(len(LOOKS)):
-        for j, (pose, k) in enumerate(frames):
-            img.alpha_composite(person(i, pose, k), (j * 24, i * 36))
-    img.save(OUT + "passengers.png")
+# ------------------------------------------------------------------ Taxi und Fahrgäste
+# taxi.png und passengers.png entstehen in Aseprite (tools/art/aseprite/, siehe README dort) und werden hier
+# nicht mehr erzeugt. taxi_skins() leitet die Lackierungen weiterhin aus assets/art/taxi.png ab.
 
 # ------------------------------------------------------------------ Wartebereich-Unterstand (24x20 Einheiten = 72x60 px)
 def shelter():
@@ -646,6 +513,6 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "tiles_normal", "taxi", "passengers", "shelter", "gate", "taxi_skins", "stickers", "background", "space", "flags", "pump"):
+    for f in ("tiles", "tiles_normal", "shelter", "gate", "taxi_skins", "stickers", "background", "space", "flags", "pump"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)
