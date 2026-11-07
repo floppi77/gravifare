@@ -3,6 +3,54 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.11
+
+### Deutsch
+
+**Grafik**
+- Taxi und Fahrgäste neu gezeichnet: schattierter Rumpf mit Glanz, Kuppel mit Spiegelung, Fahrer mit Mütze; Fahrgäste mit Laufzyklus und Koffer
+- 14 Fahrgastfiguren statt 4, jede Stimme hat ihre eigene, passende Figur; die Namen wechseln jetzt auch von Sektor zu Sektor
+- Eigene Verkehrsfahrzeuge (Pendlergleiter) in fünf Farben statt umgefärbter Taxis, mit weißem Scheinwerferkegel vorn und rotem Rücklicht hinten – auch in der Dunkelheit leuchten sie nur noch nach vorn und hinten
+- Jeder Sektor hat seine eigene Haltestelle (Kristalle, Wellblech, Eiszapfen, Solarpaneel, Bullaugen, Bahnhofsuhr, Leuchtpilze …)
+- Weiche Schatten unter Felsen und Plattformen, Bodenschatten unter Fahrgästen und Fahrzeugen, Triebwerksflammen aus Pixelzeilen
+- Sektor 7: Wände dunkler, sie heben sich besser vom hellen Himmel ab
+
+**Oberfläche**
+- HUD: dunkle Leiste oben über die ganze Breite, gut lesbare Tank- und Hüllenanzeige, Landeanzeige mit Symbolen und gestreiften Warnbalken
+- Wimpelzahlen, Torschild und Fahrpreis besser lesbar; Hauptmenü mit Tafel hinter den Knöpfen
+- Eigenes Leben-Symbol in der Farbe der Lackierung
+- Werkstatt überarbeitet: Karten mit Symbol, Stufen, Wirkung jetzt › nächste Stufe und rotem Preis, wenn das Geld nicht reicht; das Taxi zeigt das gewählte Teil, die Halle ist eingerichtet
+- Garage zeigt Farbfelder und Aufkleber, gesperrte Teile lassen sich in der Vorschau ansehen; Statistik mit Tafel und Symbolen
+
+**Klang**
+- Eigene Warntöne für Plasmastrahl und Meteorit; in den letzten 15 Sekunden des Ausgangs tickt eine Uhr, zum Schluss schneller
+
+**Behoben**
+- Große Meteoriten (z. B. Level 95) trafen schon in den leeren Ecken um den Brocken; getroffen wird jetzt nur noch, wer den sichtbaren Brocken berührt
+
+### English
+
+**Graphics**
+- Taxi and passengers redrawn: shaded hull with highlight, dome with reflection, driver with a cap; passengers with a walk cycle and suitcase
+- 14 passenger figures instead of 4, every voice has its own matching figure; names now also change from sector to sector
+- Own traffic vehicles (commuter gliders) in five colours instead of recoloured taxis, with a white headlight cone in front and a red tail light behind – in the dark they now only light up forwards and backwards
+- Every sector has its own shelter (crystals, corrugated iron, icicles, solar panel, portholes, station clock, glowing mushrooms …)
+- Soft shadows below rocks and platforms, ground shadows under passengers and vehicles, pixel-row engine flames
+- Sector 7: darker walls that stand out better against the bright sky
+
+**Interface**
+- HUD: dark bar across the full width at the top, readable fuel and hull gauges, landing gauge with symbols and striped warning bars
+- Flag numbers, gate sign and fare easier to read; main menu with a panel behind the buttons
+- Own life icon in the colour of your paint job
+- Workshop reworked: cards with icon, levels, effect now › next level and a red price when you can't afford it; the taxi shows the selected part, and the hall is furnished
+- Garage shows colour swatches and stickers, locked items can be previewed; statistics with a panel and icons
+
+**Sound**
+- Own warning sounds for plasma beams and meteors; in the last 15 seconds before the exit closes a clock ticks, faster at the end
+
+**Fixed**
+- Large meteors (e.g. level 95) already hit you in the empty corners around the rock; now only touching the visible rock counts as a hit
+
 ## 0.9.10
 
 ### Deutsch

@@ -185,7 +185,7 @@ func _mover_push() -> void:
 	var box := Rect2(pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0)
 	for m in level.movers:
 		var r: Rect2 = m.rect
-		if not r.intersects(box):
+		if not level.mover_touches(m, box):
 			continue
 		if m.kind == "beam":                 # Strahl schiebt nicht, er verbrennt nur (solange man darin ist)
 			_beam_burn()

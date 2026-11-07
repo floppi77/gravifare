@@ -42,14 +42,16 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 
 | | |
 |---|---|
-| ![Hauptmenü](docs/media/de/menu.jpg) | ![Neue Gefahr: Lavablasen im Takt](docs/media/de/lava.jpg) |
-| **Hauptmenü** | **Neue Gefahr: Lavablasen im Takt** |
+| ![Hauptmenü](docs/media/de/menu.jpg) | ![Sektor 5 – Hitze und Lavablasen im Takt](docs/media/de/lava.jpg) |
+| **Hauptmenü** | **Sektor 5 – Hitze und Lavablasen im Takt** |
 | ![Flugschule mit Fluglehrer (Stimme, Untertitel, Hinweise)](docs/media/de/tutorial.jpg) | ![Sektor 1 – Fahrgäste, Tankstelle, Tor](docs/media/de/sector1.jpg) |
 | **Flugschule mit Fluglehrer (Stimme, Untertitel, Hinweise)** | **Sektor 1 – Fahrgäste, Tankstelle, Tor** |
 | ![Sektor 3 – bewegliche Plattformen](docs/media/de/sector3.jpg) | ![Sektor 6](docs/media/de/sector6.jpg) |
 | **Sektor 3 – bewegliche Plattformen** | **Sektor 6** |
-| ![Nachtschicht – nur das Taxi leuchtet](docs/media/de/night.jpg) | ![Garage – Lackierungen und Aufkleber](docs/media/de/garage.jpg) |
-| **Nachtschicht – nur das Taxi leuchtet** | **Garage – Lackierungen und Aufkleber** |
+| ![Nachtschicht – im Dunkeln leuchten nur Lampen und Scheinwerfer](docs/media/de/night.jpg) | ![Garage – Lackierungen und Aufkleber](docs/media/de/garage.jpg) |
+| **Nachtschicht – im Dunkeln leuchten nur Lampen und Scheinwerfer** | **Garage – Lackierungen und Aufkleber** |
+| ![Werkstatt – Düsen, Hülle und Fahrwerk aufrüsten](docs/media/de/workshop.jpg) | ![Level-Editor – eigene Level bauen, testen und teilen](docs/media/de/editor.jpg) |
+| **Werkstatt – Düsen, Hülle und Fahrwerk aufrüsten** | **Level-Editor – eigene Level bauen, testen und teilen** |
 
 ## Was drinsteckt
 
@@ -123,14 +125,16 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 
 | | |
 |---|---|
-| ![Main menu](docs/media/en/menu.jpg) | ![New hazard: lava bubbles in rhythm](docs/media/en/lava.jpg) |
-| **Main menu** | **New hazard: lava bubbles in rhythm** |
+| ![Main menu](docs/media/en/menu.jpg) | ![Sector 5 – heat and lava bubbles in rhythm](docs/media/en/lava.jpg) |
+| **Main menu** | **Sector 5 – heat and lava bubbles in rhythm** |
 | ![Flight school with an instructor (voice, subtitles, hints)](docs/media/en/tutorial.jpg) | ![Sector 1 – passengers, fuel station, gate](docs/media/en/sector1.jpg) |
 | **Flight school with an instructor (voice, subtitles, hints)** | **Sector 1 – passengers, fuel station, gate** |
 | ![Sector 3 – moving platforms](docs/media/en/sector3.jpg) | ![Sector 6](docs/media/en/sector6.jpg) |
 | **Sector 3 – moving platforms** | **Sector 6** |
-| ![Night shift – only the taxi glows](docs/media/en/night.jpg) | ![Garage – paint jobs and stickers](docs/media/en/garage.jpg) |
-| **Night shift – only the taxi glows** | **Garage – paint jobs and stickers** |
+| ![Night shift – in the dark only lamps and headlights glow](docs/media/en/night.jpg) | ![Garage – paint jobs and stickers](docs/media/en/garage.jpg) |
+| **Night shift – in the dark only lamps and headlights glow** | **Garage – paint jobs and stickers** |
+| ![Workshop – upgrade jets, hull and landing gear](docs/media/en/workshop.jpg) | ![Level editor – build, test and share your own levels](docs/media/en/editor.jpg) |
+| **Workshop – upgrade jets, hull and landing gear** | **Level editor – build, test and share your own levels** |
 
 ## What's inside
 

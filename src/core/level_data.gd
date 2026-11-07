@@ -688,12 +688,36 @@ func update_movers(t: float, reset := false) -> void:
 			var sh: Rect2 = b.shelter
 			p["shelter"] = Rect2(sh.position.x + dx, sh.position.y, sh.size.x, sh.size.y) if sh.size.x > 0.0 else sh
 
+## Meteorit: Trefferfläche ist eine Ellipse in Größe des gezeichneten Brockens (Radius wie in PropsView._draw_meteor, etwas kleiner als die
+## Grafik), nicht das volle Rechteck aus der Leveldatei: Bei großen Brocken (5 × 5 Felder) lagen an den Ecken sonst gut 20 px Luft, in denen
+## das Taxi ohne sichtbaren Kontakt getroffen wurde. Planung des Autopiloten nutzt weiter das Rechteck (Sicherheitsabstand).
+const METEOR_HIT := 0.85
+
+static func meteor_radii(m: Dictionary) -> Vector2:
+	var rad := 11.0 * (float(m.w) / Tuning.TILE * 0.5 + 0.5) * METEOR_HIT
+	return Vector2(minf(rad, float(m.w) * 0.5), minf(rad * 0.86, float(m.h) * 0.5))     # nie größer als das bisherige Rechteck (kleine Brocken bleiben wie gehabt)
+
+func _meteor_hits(m: Dictionary, box: Rect2) -> bool:
+	var r: Rect2 = m.rect
+	if r.position.x < OFFSCREEN * 0.5:
+		return false
+	var c := r.get_center()
+	var q := Vector2(clampf(c.x, box.position.x, box.end.x), clampf(c.y, box.position.y, box.end.y)) - c
+	var rr := meteor_radii(m)
+	return (q.x * q.x) / (rr.x * rr.x) + (q.y * q.y) / (rr.y * rr.y) <= 1.0
+
+## Echte Berührung eines Movers mit der Box (Spiellogik).
+func mover_touches(m: Dictionary, box: Rect2) -> bool:
+	if m.kind == "meteor":
+		return _meteor_hits(m, box)
+	return (m.rect as Rect2).intersects(box)
+
 func movers_hit_box(center: Vector2, half: Vector2) -> bool:
 	if movers.is_empty() or movers_ignore:
 		return false
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.kind != "beam" and (m.rect.intersects(box) or (m.spikes and pad_spike_rect(m).intersects(box))):          # Plasmastrahlen sind nicht fest: man fliegt hindurch (und verbrennt)
+		if m.kind != "beam" and (mover_touches(m, box) or (m.spikes and pad_spike_rect(m).intersects(box))):          # Plasmastrahlen sind nicht fest: man fliegt hindurch (und verbrennt)
 			return true
 	return false
 
@@ -751,7 +775,7 @@ func movers_at_box(center: Vector2, half: Vector2) -> Array:
 		return out
 	var box := Rect2(center - half, half * 2.0)
 	for m in movers:
-		if m.rect.intersects(box):
+		if mover_touches(m, box):
 			out.append(m)
 	return out
 
@@ -926,7 +950,7 @@ func is_solid_cell(cx: int, cy: int) -> bool:
 func is_solid_at(p: Vector2) -> bool:
 	if not movers.is_empty() and not movers_ignore:
 		for m in movers:
-			if m.kind != "beam" and m.rect.has_point(p):
+			if m.kind != "beam" and (_meteor_hits(m, Rect2(p, Vector2.ZERO)) if m.kind == "meteor" else m.rect.has_point(p)):
 				return true
 	if hits_closed_door(p, Vector2(0.01, 0.01)):
 		return true

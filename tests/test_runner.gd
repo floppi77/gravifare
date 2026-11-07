@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -964,6 +964,56 @@ func _test_fragile_and_meteors() -> void:
 			break
 	check(warned, "Meteoritenschauer meldet vorher eine Warnung")
 	check(hit and s.hull < 100.0, "Meteoriten-Treffer: Schaden (%.0f Hülle)" % s.hull)
+
+## Level 95 (S9-07): großer Meteor (5 × 5 Felder). Treffer nur am sichtbaren Brocken, nicht in den leeren Ecken des Rechtecks.
+func _test_meteor_hitbox() -> void:
+	var lv := LevelData.load_file("res://data/levels/s9_07.json")
+	var m: Dictionary = {}
+	for mv in lv.movers:
+		if mv.kind == "meteor":
+			m = mv
+	check(not m.is_empty() and float(m.w) == 80.0, "Level 95 hat den großen Meteor")
+	lv.update_movers(5.0, true)
+	var r: Rect2 = m.rect
+	var c := r.get_center()
+	var rr := LevelData.meteor_radii(m)
+	var pv_src := FileAccess.get_file_as_string("res://src/game/props_view.gd")
+	check(pv_src.contains("var rad := 11.0 * (float(m.w) / 16.0 * 0.5 + 0.5)") and rr.x < 11.0 * 3.0 and rr.x > 11.0 * 3.0 * 0.7, "Trefferellipse passt zum gezeichneten Brocken (%.1f × %.1f px)" % [rr.x, rr.y])
+	var half := Tuning.HULL_HALF
+	var corner := r.position + half * 0.9                      # Taxi steckt in der Ecke des Rechtecks, weit weg vom Brocken
+	check(r.intersects(Rect2(corner - half, half * 2.0)), "Ecke liegt im alten Rechteck")
+	check(not lv.movers_hit_box(corner, half) and lv.movers_at_box(corner, half).is_empty(), "Kein Treffer in der leeren Ecke")
+	check(not lv.is_solid_at(r.position + Vector2(2, 2)), "Ecke ist nicht fest")
+	check(lv.movers_hit_box(c, half) and lv.is_solid_at(c), "Treffer in der Mitte")
+	check(lv.movers_hit_box(c + Vector2(rr.x + half.x - 1.0, 0.0), half), "Treffer am Rand des Brockens")
+	check(not lv.movers_hit_box(c + Vector2(rr.x + half.x + 1.0, 0.0), half), "Knapp daneben ist kein Treffer")
+	check(lv.movers_collide_traj(corner, Vector2.ZERO, Vector2.ZERO, half, 5.0, 0.2), "Autopilot plant weiter mit dem vollen Rechteck")
+	# Simulation: Taxi schwebt in der Ecke, während der Meteor vorbeizieht -> kein Schaden
+	var s := TaxiSim.new()
+	s.setup(lv)
+	s.state = TaxiSim.State.FLYING
+	s.pos = corner
+	s.vel = Vector2.ZERO
+	s.time = 5.0
+	lv.clock = 5.0
+	lv.update_movers(5.0, true)
+	s._mover_push()
+	check(s.hull >= Tuning.HULL_MAX and s.state != TaxiSim.State.DESTROYED, "Meteor schiebt das Taxi in der Ecke nicht an (Hülle %.0f)" % s.hull)
+	# ganzer Vorbeiflug: Taxi bleibt (festgehalten) in der jeweils aktuellen Rechteckecke, kein Meteor-Schaden
+	var dmg := false
+	for i in int(3.0 / Tuning.TICK):
+		var rc: Rect2 = m.rect
+		if rc.position.x > LevelData.OFFSCREEN * 0.5:
+			s.pos = Vector2(rc.end.x - half.x * 0.9, rc.position.y + half.y * 0.9)
+		s.vel = Vector2.ZERO
+		s.step(Vector2.ZERO, false)
+		for e in s.events:
+			if e.type == "damage" and e.get("mover", "") == "meteor":
+				dmg = true
+	check(not dmg, "Drei Sekunden in der Ecke des fallenden Meteors: kein Treffer")
+	var small := {"kind": "meteor", "w": 16.0, "h": 16.0}
+	var sr := LevelData.meteor_radii(small)
+	check(sr.x <= 8.0 and sr.y <= 8.0, "Kleiner Meteor: Trefferfläche nie größer als das alte Feld (%.1f × %.1f)" % [sr.x, sr.y])
 
 func _test_perfect_needs_flight() -> void:
 	# Eine „perfekte Landung“ zählt nur nach echtem Flug (Zeit und Strecke seit dem Abheben), nicht nach Hüpfern auf der Stelle
