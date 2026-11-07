@@ -1,0 +1,122 @@
+name: Publish Gravifare to itch.io
+
+# Läuft, sobald ein stabiles Release veröffentlicht wird (nicht bei Entwürfen und Vorabversionen),
+# und lädt die drei Spielpakete des Releases per Butler auf itch.io hoch.
+# Manuell (Actions › Run workflow) lädt der Lauf das aktuelle stabile Release hoch; mit "dry_run"
+# (Standard) wird nur geprüft, was Butler hochladen würde, ohne etwas auf itch.io zu ändern.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Nur prüfen, nichts auf itch.io hochladen'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: itch-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      ITCH_TARGET: ${{ vars.ITCH_TARGET }}
+      BUTLER_VERSION: 15.32.0           # fest gepinnt, damit sich der Lauf nicht mit einer unbekannten Butler-Fassung ändert
+
+    steps:
+      - name: Konfiguration prüfen
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          test -n "$ITCH_TARGET" || {
+            echo "::error::ITCH_TARGET fehlt"
+            exit 1
+          }
+          test -n "$BUTLER_API_KEY" || {
+            echo "::error::BUTLER_API_KEY fehlt"
+            exit 1
+          }
+
+      - name: Release ermitteln
+        id: release
+        env:
+          EVENT_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # Bei einer Veröffentlichung gilt genau dieses Release, nicht "das neueste" (das kann kurz danach noch das alte sein).
+          # Manuell gilt das aktuelle stabile Release.
+          TAG="${EVENT_TAG:-$(gh release view --json tagName --jq .tagName)}"
+          test -n "$TAG" || {
+            echo "::error::Kein Release gefunden"
+            exit 1
+          }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Release-Dateien herunterladen und prüfen
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          mkdir -p dist
+          gh release download "$TAG" --dir dist
+
+          cd dist
+          sha256sum -c SHA256SUMS.txt
+
+          for platform in \
+            windows-x86_64 \
+            linux-x86_64 \
+            macos-universal
+          do
+            test -f "GraviFare-${VERSION}-${platform}.zip"
+          done
+
+      - name: Butler installieren (itch.io, feste Version)
+        run: |
+          curl -fsSL \
+            "https://broth.itch.zone/butler/linux-amd64/${BUTLER_VERSION}/archive/default" \
+            -o "$RUNNER_TEMP/butler.zip"
+
+          mkdir -p "$RUNNER_TEMP/butler"
+          unzip -q "$RUNNER_TEMP/butler.zip" \
+            -d "$RUNNER_TEMP/butler"
+
+          chmod +x "$RUNNER_TEMP/butler/butler"
+          echo "$RUNNER_TEMP/butler" >> "$GITHUB_PATH"
+
+      - name: Gravifare auf itch.io veröffentlichen
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          VERSION: ${{ steps.release.outputs.version }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          OPTS=()
+          if [ "$DRY_RUN" = "true" ]; then
+            OPTS+=(--dry-run)
+            echo "Probelauf: es wird nichts hochgeladen."
+          fi
+
+          butler push "${OPTS[@]}" \
+            "dist/GraviFare-${VERSION}-windows-x86_64.zip" \
+            "$ITCH_TARGET:windows" \
+            --userversion "$VERSION"
+
+          butler push "${OPTS[@]}" \
+            "dist/GraviFare-${VERSION}-linux-x86_64.zip" \
+            "$ITCH_TARGET:linux" \
+            --userversion "$VERSION"
+
+          butler push "${OPTS[@]}" \
+            "dist/GraviFare-${VERSION}-macos-universal.zip" \
+            "$ITCH_TARGET:osx" \
+            --userversion "$VERSION"
