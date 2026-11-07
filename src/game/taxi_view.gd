@@ -160,21 +160,9 @@ func _draw() -> void:
 			var ok := sim.landing_margin()
 			var lamp := Color("#5dff9a") if ok > 0.0 else Color("#ff4d6d")
 			draw_rect(Rect2(-1, 7, 2, 1), lamp)
-	# Flammen
+	# Flammen: aus Pixelzeilen (heißer Kern, flackernder Rand, Spitzen in Rot), Lenkdüsen blau
 	var flick := 0.6 + 0.4 * sin(t * 60.0)
-	if flame_main > 0.0:
-		var h := 4.0 + 8.0 * flame_main * flick
-		draw_colored_polygon(PackedVector2Array([Vector2(-3, 8.5), Vector2(3, 8.5), Vector2(0, 8.5 + h)]), Color("#ff8a2e"))
-		draw_colored_polygon(PackedVector2Array([Vector2(-1.5, 8.5), Vector2(1.5, 8.5), Vector2(0, 8.5 + h * 0.6)]), Color("#fff0a0"))
-	if flame_down > 0.0:
-		var h2 := 3.0 + 4.0 * flick
-		for sx in [-1.0, 1.0]:
-			draw_colored_polygon(PackedVector2Array([Vector2(sx * 9 - 1, -5), Vector2(sx * 9 + 1, -5), Vector2(sx * 9, -5 - h2)]), Color("#8fd8ff"))
-	if absf(flame_side) > 0.05:
-		var s := -signf(flame_side)
-		var w := 3.0 + 6.0 * absf(flame_side) * flick
-		var x0 := s * 15.5
-		draw_colored_polygon(PackedVector2Array([Vector2(x0, -1), Vector2(x0, 1), Vector2(x0 + s * w, 0)]), Color("#8fd8ff"))
+	_pixel_flames(flick)
 	# Rumpf
 	var mod := Color.WHITE
 	if flash > 0.0:
@@ -187,3 +175,37 @@ func _draw() -> void:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))
 	if hurt > 0.7:
 		draw_rect(Rect2(4, -9 - fmod(t * 20.0, 6.0), 2, 2), Color(0.5, 0.5, 0.55, 0.7))
+
+
+## Flamme als Pixelzeilen auf einem Raster von 1,25 Einheiten: je Zeile schmaler, Farbe vom heißen Kern zur roten Spitze, der Rand flackert je Zeile.
+func _flame_rows(origin: Vector2, dir: Vector2, length: float, width: float, hot: Array, seed: float) -> void:
+	var p := 1.25
+	var n := int(length / p)
+	var side := Vector2(-dir.y, dir.x)
+	for r in n:
+		var k := float(r) / maxf(1.0, float(n))
+		var jit := roundf(sin(t * 41.0 + r * 2.3 + seed) * 0.8)
+		var w := maxf(1.0, roundf(width * pow(1.0 - k, 0.65) + jit))
+		var ci := mini(int(k * hot.size()), hot.size() - 1)
+		var c: Color = hot[ci]
+		var cen := origin + dir * (r * p)
+		for j in int(w):
+			var off := (float(j) - (w - 1.0) * 0.5) * p
+			var cc: Color = c if absf(off) < w * 0.25 or ci >= hot.size() - 1 else hot[mini(ci + 1, hot.size() - 1)]
+			var q := cen + side * off
+			draw_rect(Rect2(Vector2(roundf(q.x), roundf(q.y)) - Vector2(p, p) * 0.5, Vector2(p, p)), cc)
+
+const FIRE := [Color("#fff6c8"), Color("#ffd04a"), Color("#ff8a2e"), Color("#e8452c")]
+const ICE := [Color("#e8fbff"), Color("#8fd8ff"), Color("#4fb8e8"), Color("#2a6ab8")]
+
+func _pixel_flames(flick: float) -> void:
+	if flame_main > 0.0:
+		var h := 6.0 + 10.0 * flame_main * flick
+		draw_circle(Vector2(0, 11.5), 4.0, Color(1.0, 0.6, 0.2, 0.22 * flame_main))
+		_flame_rows(Vector2(0, 10.6), Vector2(0, 1), h, 6.0, FIRE, 0.0)
+	if flame_down > 0.0:
+		for sx in [-1.0, 1.0]:
+			_flame_rows(Vector2(sx * 9, -5.5), Vector2(0, -1), 3.0 + 4.0 * flick, 2.6, ICE, sx)
+	if absf(flame_side) > 0.05:
+		var sd := -signf(flame_side)
+		_flame_rows(Vector2(sd * 16.0, 0), Vector2(sd, 0), 3.0 + 6.0 * absf(flame_side) * flick, 2.8, ICE, 5.0)

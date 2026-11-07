@@ -23,7 +23,7 @@ var hint_t := 0.0
 var result := {}
 var result_age := 0.0            # Sekunden seit Anzeige der Ergebnisansicht
 var next_exists := true
-var taxi_icon: Texture2D = Cosmetics.paint_texture()
+var life_icon: Texture2D = Cosmetics.life_texture()
 var font: Font = Fonts.hud
 
 func bind(r: Run) -> void:
@@ -97,7 +97,7 @@ func _draw() -> void:
 	_bar(75, 4, 66, 8, s.hull / Tuning.HULL_MAX, Color("#5dff9a") if s.hull > 35.0 else Color("#ff4d6d"), tr("HUD_HULL"))
 	draw_string(font, Vector2(147, 12), "¢%d" % int(run.money), HORIZONTAL_ALIGNMENT_LEFT, 56, 9, Color("#ffe14a"))
 	for i in Flow.lives:
-		draw_texture_rect(taxi_icon, Rect2(204 + i * 11, 4.5, 10, 6.3), false)
+		draw_texture_rect(life_icon, Rect2(204 + i * 11, 4.2, 32.0 / 3.0, 20.0 / 3.0), false)      # pixelgenau: 32×20 px = 3 px je Einheit
 	if run.streak >= 1:
 		var stars := mini(run.streak, Tuning.COMBO_MAX)
 		draw_string(font, Vector2(262, 12), "★%d +%d%%" % [run.streak, int(round(Tuning.COMBO_STEP * stars * 100.0))], HORIZONTAL_ALIGNMENT_LEFT, 34, 8, Color("#ffe14a"))

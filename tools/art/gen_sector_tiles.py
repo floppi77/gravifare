@@ -9,7 +9,7 @@ PAD = 4
 PAD_TOP = 15        # Oberkante des Pads (Pixel im Tile) bleibt in der Funktionsfarbe
 # Sektor: Farbton (0..1), Sättigungsfaktor, Helligkeitsfaktor
 LOOK = {2: (0.80, 0.85, 0.95), 3: (0.075, 0.90, 0.95), 4: (0.55, 0.45, 1.05), 5: (0.02, 0.60, 0.72),
-        6: (0.47, 0.75, 0.85), 7: (0.11, 0.55, 1.10), 8: (0.32, 0.50, 0.70), 9: (0.70, 0.40, 0.62)}
+        6: (0.47, 0.75, 0.85), 7: (0.10, 0.62, 0.80), 8: (0.32, 0.50, 0.70), 9: (0.70, 0.40, 0.62)}
 
 src = Image.open("assets/art/tiles_s1.png").convert("RGBA")
 for sector, (hue, sat, val) in LOOK.items():

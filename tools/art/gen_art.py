@@ -329,26 +329,29 @@ def _hsv2rgb(h, s_, v):
     return out
 
 def taxi_skins():
-    base = np.array(Image.open(OUT + "taxi.png").convert("RGBA")).astype(float)
-    rgb = base[..., :3] / 255.0
-    h, s_, v = _rgb2hsv(rgb)
-    body = (base[..., 3] > 0) & (h > 0.04) & (h < 0.18) & (s_ > 0.4) & (v > 0.35)   # gelb/orange Karosserie
-    def make(name, hue, smul=1.0, vmul=1.0):
-        hh = np.where(body, (hue / 360.0 + (h - 0.12) * 0.5) % 1.0, h)
-        ss = np.where(body, np.clip(s_ * smul, 0, 1), s_); vv = np.where(body, np.clip(v * vmul, 0, 1), v)
-        out = base.copy(); out[..., :3] = _hsv2rgb(hh, ss, vv) * 255.0
-        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "taxi_%s.png" % name)
-        return out
-    for name, hue, sm, vm in (("neon", 318, 1.0, 1.0), ("mint", 150, 0.9, 1.0), ("night", 225, 0.9, 0.78),
-                              ("sunset", 8, 1.0, 1.0), ("candy", 178, 0.85, 1.05), ("gold", 46, 0.7, 1.12)):
-        make(name, hue, sm, vm)
-    # Wespe: dunkle Karosserie mit gelben Streifen
-    out = make("wasp", 235, 0.35, 0.28)
-    yy, xx = np.mgrid[0:base.shape[0], 0:base.shape[1]]
-    stripes = body & ((xx // 6) % 2 == 0)
-    out[stripes, :3] = base[stripes, :3]
-    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + "taxi_wasp.png")
-    Image.open(OUT + "taxi.png").save(OUT + "taxi_std.png")
+    """Lackierungen per Farbtausch der gelb-orangen Karosserie: taxi_<name>.png aus taxi.png und das Leben-Symbol life_<name>.png
+    aus life_icon.png (beide in Aseprite gezeichnet, tools/art/aseprite)."""
+    for src, dst, stripe in (("taxi.png", "taxi_%s.png", 6), ("life_icon.png", "life_%s.png", 3)):
+        base = np.array(Image.open(OUT + src).convert("RGBA")).astype(float)
+        rgb = base[..., :3] / 255.0
+        h, s_, v = _rgb2hsv(rgb)
+        body = (base[..., 3] > 0) & (h > 0.04) & (h < 0.18) & (s_ > 0.4) & (v > 0.35)   # gelb/orange Karosserie
+        def make(name, hue, smul=1.0, vmul=1.0):
+            hh = np.where(body, (hue / 360.0 + (h - 0.12) * 0.5) % 1.0, h)
+            ss = np.where(body, np.clip(s_ * smul, 0, 1), s_); vv = np.where(body, np.clip(v * vmul, 0, 1), v)
+            out = base.copy(); out[..., :3] = _hsv2rgb(hh, ss, vv) * 255.0
+            Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + dst % name)
+            return out
+        for name, hue, sm, vm in (("neon", 318, 1.0, 1.0), ("mint", 150, 0.9, 1.0), ("night", 225, 0.9, 0.78),
+                                  ("sunset", 8, 1.0, 1.0), ("candy", 178, 0.85, 1.05), ("gold", 46, 0.7, 1.12)):
+            make(name, hue, sm, vm)
+        # Wespe: dunkle Karosserie mit gelben Streifen
+        out = make("wasp", 235, 0.35, 0.28)
+        yy, xx = np.mgrid[0:base.shape[0], 0:base.shape[1]]
+        stripes = body & ((xx // stripe) % 2 == 0)
+        out[stripes, :3] = base[stripes, :3]
+        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + dst % "wasp")
+        Image.open(OUT + src).save(OUT + dst % "std")
 
 def stickers():
     def icon(draw_fn, name):

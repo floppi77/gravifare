@@ -5,6 +5,8 @@ Diese Grafiken sind in Aseprite (über den Aseprite-MCP) gezeichnet und werden *
 - `assets/art/taxi.png` (96×60). `gen_art.py` leitet daraus nur die Lackierungen `taxi_<name>.png` per Farbtausch ab.
 - `assets/art/passengers.png` (240×504): 14 Figuren × 10 Frames à 24×36, **eine Figur je Fahrgaststimme**.
 - `assets/art/vehicle_<farbe>.png` (96×60): Verkehrsfahrzeug „Pendlergleiter“ in Rot, Blau, Grün, Lila, Silber.
+- `assets/art/shelters.png` (684×60): Haltestelle je Sektor, 72×60 im Abstand von 76 px (Sektor 1 links).
+- `assets/art/life_icon.png` (32×20, HUD-Leben; Lackierungen `life_<name>.png` leitet `gen_art.taxi_skins()` ab), `stat_icons.png` (13 × 18 px), `ws_icons.png` (3 × 26 px).
 
 Eigene Arbeit, keine Fremdassets.
 
@@ -15,6 +17,8 @@ Eigene Arbeit, keine Fremdassets.
 | `gen_parts.py` | Grundformen des Taxis (flache Materialflächen und Detail-Ebenen) nach `build/aseprite-workspace/gf_polish/` |
 | `gen_figures.py` | Grundformen der 14 Figuren nach `build/aseprite-workspace/gf_polish/figures/`; die Tabelle `FIG` beschreibt jede Figur |
 | `gen_vehicle.py` | Grundformen des Verkehrsfahrzeugs nach `build/aseprite-workspace/gf_polish/vehicle/` |
+| `gen_round2.py` | Grundformen der Haltestellen (Wand flach, Details), Leben-Symbol, Statistik- und Werkstatt-Symbole nach `build/aseprite-workspace/gf_polish/round2/` |
+| `shelters.aseprite`, `life_icon.aseprite`, `stat_icons.aseprite`, `ws_icons.aseprite` | Aseprite-Quellen dazu (Haltestellen mit Ebenen, ohne Kontur) |
 | `finish.py` | Letzter Schritt: Fahrgastblatt (Kontur-Bereinigung, Zeilenreihenfolge) und die fünf Fahrzeugfarben nach `assets/art/` |
 | `taxi.aseprite` | Taxi mit Ebenen `metal`, `fins`, `hull`, `glass`, `detail`, `driver` (schattiert, ohne Außenkontur) |
 | `passengers_14.aseprite` | Alle 14 Figuren (240×504, Reihenfolge f0–f6, m0–m6) mit Ebenen `Layer 1` (schattiert) und `top`, ohne Außenkontur |
@@ -45,7 +49,8 @@ Die Zeilenfolge steht in `PassengerActor.LOOK_VOICE`. Zeilen 0–3 sind die vier
 3. **Fahrgäste:** `fig_base.png` stempeln. Je Oberteil- und Hautfarbe aus `FIG` einmal `shade_region_by_light` mit `base_color` (Toleranz 3), Licht 100°; Kleidung light_z 0.5, bulge 0.8, ambient 0.3; Haut light_z 0.6, bulge 0.9, ambient 0.4. Rampe: Schatten = Farbe × (0,62/0,62/0,74), Halbschatten × (0,80/0,80/0,88), Licht = Farbe + 22 % Richtung Weiß; Haut × (0,80/0,70/0,70), × (0,91/0,84/0,83), + 30 %. Dann `fig_top.png` als Ebene `top`. Flach als `figures/fig_pre.png` exportieren.
 4. **Fahrzeug:** Ebenen `metal`, `hull`, `glass` stempeln und schattieren (`hull`: Rampe `#5a1a32 #8a2438 #b8333c #e04a4a #f2785e`, Licht 100°, light_z 0.55, ambient 0.25, Glanzpunkt `#ffd0b8`; `metal` wie beim Taxi; `glass`: `#123a52 #1d5f78 #2a8fa8 #4fc3cf #8ae8ea`, Licht 120°, bulge 0.8), dann `detail`.
 5. Flach speichern (`save_sprite_as`, flatten), Außenkontur `outline_smart` mode `single` mit `#0c0f24`, als PNG exportieren (Taxi nach `assets/art/taxi.png`, Fahrgäste als `figures/passengers_14.png`, Fahrzeug als `vehicle/v2_red.png`).
-6. `python3 tools/art/aseprite/finish.py figures` und `finish.py vehicles`; für das Taxi die Lackierungen neu ableiten:
+6. **Haltestellen:** `shelters_base.png` stempeln, je Wandfarbe aus `SH` in `gen_round2.py` einmal `shade_region_by_light` (Toleranz 3, Licht 110°, bulge 0,5, Rampe wie bei den Fahrgästen), `shelters_top.png` als Ebene `top`, flach speichern, Kontur `#0c0f24`, nach `assets/art/shelters.png`. Symbole: Rohbild stempeln, Kontur, exportieren.
+7. `python3 tools/art/aseprite/finish.py figures` und `finish.py vehicles`; für das Taxi die Lackierungen neu ableiten:
    `python3 -c "import sys; sys.path.insert(0,'tools/art'); import gen_art; gen_art.taxi_skins()"`
 
 ## Zu beachten

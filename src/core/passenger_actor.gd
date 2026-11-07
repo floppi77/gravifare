@@ -65,9 +65,11 @@ const NAMES_M := ["Odo", "Jonas", "Ben", "Tarek", "Finn", "Leo", "Kofi", "Emil",
 
 ## Deterministische neue Identität (Ersatz-Fahrgast): gleicher Level/Auftrag/Versuch ergibt immer dieselbe Person.
 ## Name eines Auftrags-Fahrgasts: wechselt je Level und Auftrag (die Leveldaten nennen sonst fast immer dieselben Personen).
+## Der Sektor geht mit ein: Jeder Sektor hat 11 Level, sonst hieße der erste Fahrgast in Level 5, 16, 27 … immer gleich.
 static func rotated_name(level_no: int, job_index: int, gender: String) -> String:
 	var names: Array = NAMES_F if gender == "f" else NAMES_M
-	return names[absi(level_no * 7 + job_index * 3) % names.size()]
+	var sector := maxi(level_no - 1, 0) / 11 + 1
+	return names[absi(level_no * 7 + sector * 4 + job_index * 3) % names.size()]
 
 static func pick_identity(level_id: String, job_index: int, attempt: int, old_name: String) -> Dictionary:
 	var h := absi(("%s:%d:%d" % [level_id, job_index, attempt]).hash())

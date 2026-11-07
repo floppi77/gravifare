@@ -1,5 +1,6 @@
 extends Control
-## Statistik-Seite: Gesamtstand des Profils (Level, Medaillen, Auslieferungen, Landungen, Pannen, Spielzeit).
+## Statistik-Seite: Gesamtstand des Profils (Level, Medaillen, Auslieferungen, Landungen, Pannen, Spielzeit). Dunkle Tafel wie im
+## Hauptmenü, je Zeile ein Symbol aus assets/art/stat_icons.png (Reihenfolge wie die Zeilen, 18 px je Symbol).
 
 func _ready() -> void:
 	Music.play_theme("menu")
@@ -42,9 +43,35 @@ func _ready() -> void:
 		["STAT_DAILY", "%d · %d" % [int(st.get("daily_best", 0)), Daily.current_streak(st, Daily.today())]],
 		["STAT_TIME", "%d:%02d:%02d" % [secs / 3600, (secs / 60) % 60, secs % 60]],
 	]
+	var panel := Panel.new()
+	var sbf := StyleBoxFlat.new()
+	sbf.bg_color = Color(0.03, 0.04, 0.13, 0.82)
+	sbf.border_color = Color("#3a4580")
+	sbf.set_border_width_all(1)
+	sbf.set_corner_radius_all(4)
+	panel.add_theme_stylebox_override("panel", sbf)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(panel)
+	move_child(panel, box.get_index())
+	box.item_rect_changed.connect(func():
+		var first := box.get_child(1) as Control
+		panel.position = box.position + Vector2(-14, first.position.y - 8)
+		panel.size = Vector2(box.size.x + 28, box.size.y - first.position.y + 12))
+	var icons: Texture2D = load("res://assets/art/stat_icons.png")
+	var ri := 0
 	for r in rows:
 		var h := HBoxContainer.new()
 		h.alignment = BoxContainer.ALIGNMENT_CENTER
+		var ic := TextureRect.new()
+		var at := AtlasTexture.new()
+		at.atlas = icons
+		at.region = Rect2(ri * 18, 0, 18, 18)
+		ic.texture = at
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.custom_minimum_size = Vector2(12, 12)
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		h.add_child(ic)
+		ri += 1
 		var a := Label.new()
 		a.text = tr(r[0])
 		a.custom_minimum_size = Vector2(150, 0)

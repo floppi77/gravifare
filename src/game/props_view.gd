@@ -11,7 +11,7 @@ var level: LevelData
 var run: Run
 var pass_tex: Texture2D = preload("res://assets/art/passengers.png")
 var taxi_tex: Texture2D = Cosmetics.paint_texture()
-var shelter_tex: Texture2D = preload("res://assets/art/shelter.png")
+var shelter_tex: Texture2D = preload("res://assets/art/shelters.png")      # eine Haltestelle je Sektor, Blatt mit 76 px Abstand (tools/art/aseprite)
 var pump_base_tex: Texture2D = preload("res://assets/art/pump_base.png")
 var pump_head_tex: Texture2D = preload("res://assets/art/pump_head.png")
 var pump_flash := 0.0                 # kurzes Aufblitzen der Preisanzeige bei Preiswechsel
@@ -74,7 +74,7 @@ func _draw_pads() -> void:
 		# Wartebereich-Unterstand, Pfosten mit Signalbaken nur am freien Ende
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
-			draw_texture_rect(shelter_tex, shelter, false)
+			draw_texture_rect_region(shelter_tex, shelter, Rect2((clampi(level.sector, 1, 9) - 1) * 76, 0, 72, 60))
 			_light_shelter(shelter, id)
 			var rx := shelter.get_center().x
 			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
@@ -495,6 +495,8 @@ func _draw_movers() -> void:
 ## Verkehr: eigenes Fahrzeug („Pendlergleiter“, assets/art/vehicle_<farbe>.png) statt umgefärbter Taxis, in Taxigröße gezeichnet.
 const PAINTS := ["red", "blue", "green", "purple", "silver"]
 const VEH_SIZE := Vector2(32.0, 20.0) * Tuning.TAXI_SCALE       # wie das Taxi (25,6 × 16 Einheiten)
+const VEH_BEAM_LEN := 12.0      # Länge des weißen Lichtkegels vor dem Fahrzeug
+const VEH_TAIL_LEN := 5.0       # Länge des roten Kegels hinter dem Fahrzeug
 var _paint_tex := {}
 
 func _vehicle_tex(i: int) -> Texture2D:
@@ -613,10 +615,24 @@ func _draw_vehicle(m: Dictionary) -> void:
 	draw_set_transform(c, ang, Vector2(1.0, 1.0))
 	var fwd := 1.0 if dir.x >= 0.0 else -1.0
 	var hw := VEH_SIZE.x * 0.5
+	# schwacher Schatten unter dem Fahrzeug
+	draw_set_transform(c + Vector2(0, 9.0), 0.0, Vector2(1.0, 0.25))
+	draw_circle(Vector2.ZERO, 10.0, Color(0.0, 0.0, 0.05, 0.16))
+	draw_circle(Vector2.ZERO, 6.0, Color(0.0, 0.0, 0.05, 0.14))
+	draw_set_transform(c, ang, Vector2(1.0, 1.0))
+	# Lichtkegel: weiß nach vorn, klein und rot nach hinten (dieselbe Form lässt dark_view.gd in der Dunkelheit frei)
+	for k in 3:
+		var ln := VEH_BEAM_LEN - k * 3.5
+		var sp := 4.2 - k * 1.2
+		draw_colored_polygon(PackedVector2Array([Vector2(fwd * (hw - 1.0), 1.6), Vector2(fwd * (hw - 1.0 + ln), 1.6 - sp), Vector2(fwd * (hw - 1.0 + ln), 1.6 + sp)]), Color(1.0, 1.0, 1.0, 0.09))
+	for k in 2:
+		var ln2 := VEH_TAIL_LEN - k * 2.0
+		var sp2 := 1.8 - k * 0.6
+		draw_colored_polygon(PackedVector2Array([Vector2(-fwd * (hw - 1.4), -0.9), Vector2(-fwd * (hw - 1.4 + ln2), -0.9 - sp2), Vector2(-fwd * (hw - 1.4 + ln2), -0.9 + sp2)]), Color(1.0, 0.15, 0.2, 0.16))
+	draw_circle(Vector2(-fwd * (hw - 1.4), -0.9), 0.7, Color(1.0, 0.3, 0.35, 0.9))
 	for i in 4:
 		var f := float(i + 1) / 4.0
 		draw_circle(Vector2(-fwd * (hw + 0.4 + f * 6.0), 0.7 + sin(t * 20.0 + float(i)) * 0.5), (1.0 - f) * 2.0 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))      # Düse am Heck
-	draw_colored_polygon(PackedVector2Array([Vector2(fwd * (hw - 0.6), 1.6), Vector2(fwd * (hw + 7.0), -1.6), Vector2(fwd * (hw + 7.0), 4.8)]), Color(1.0, 0.98, 0.7, 0.16))
 	draw_set_transform(c, ang, Vector2(flip, 1.0))                                                            # Spiegeln über die Transformation (negative Rechtecke verschieben das Bild um eine Länge)
 	draw_texture_rect(tex, Rect2(-VEH_SIZE * 0.5, VEH_SIZE), false)
 	draw_set_transform(c, ang, Vector2.ONE)
@@ -818,6 +834,10 @@ func _draw_actor(a: PassengerActor) -> void:
 		return
 	var is_extra := not run.extra_of(a).is_empty()
 	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8) if is_extra else Color(1, 1, 1, a.fade)       # Zusatzfahrgäste wirken blasser/bläulich
+	if not a.medical:          # flacher Bodenschatten unter den Füßen
+		draw_set_transform(Vector2(pos.x, pos.y), 0.0, Vector2(1.0, 0.32))
+		draw_circle(Vector2.ZERO, 3.6, Color(0.0, 0.0, 0.05, 0.38 * a.fade))
+		draw_circle(Vector2.ZERO, 2.4, Color(0.0, 0.0, 0.05, 0.25 * a.fade))
 	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
 	if a.medical:
 		_draw_stretcher(a, pos.y, col.a)

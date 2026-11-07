@@ -1,10 +1,12 @@
 extends Control
 ## Garage: Lackierung und Aufkleber wählen (nur Optik). Gesperrte Einträge zeigen ihre Freischaltbedingung.
-## Fokus auf einem Eintrag zeigt eine Vorschau; A/Enter legt ihn an. „Nur Standardtaxi“ erzwingt den Challenge-Look.
+## Fokus auf einem Eintrag zeigt eine Vorschau, bei gesperrten Teilen abgedunkelt mit Schloss; A/Enter legt ihn an. Neben jedem Eintrag
+## steht ein Farbfeld bzw. der Aufkleber. „Nur Standardtaxi“ erzwingt den Challenge-Look.
 
 class Preview extends Control:
 	var paint := "std"
 	var sticker := "none"
+	var locked := false
 	var t := 0.0
 	func _process(d: float) -> void:
 		t += d
@@ -16,11 +18,17 @@ class Preview extends Control:
 		var tex := Cosmetics.paint_texture(paint)
 		var fl := 0.7 + 0.3 * sin(t * 40.0)
 		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 5, c.y + 14), Vector2(c.x + 5, c.y + 14), Vector2(c.x, c.y + 14 + 10 * fl)]), Color("#ff8a2e"))
+		var mod := Color(0.62, 0.64, 0.78) if locked else Color.WHITE
 		if tex != null:
-			draw_texture_rect(tex, Rect2(c.x - 40, c.y - 25, 80, 50), false)
+			draw_texture_rect(tex, Rect2(c.x - 40, c.y - 25, 80, 50), false, mod)
 		var st := Cosmetics.sticker_texture(sticker)
 		if st != null:
-			draw_texture_rect(st, Rect2(c.x - 32.5, c.y - 10.5, 20, 20), false)
+			draw_texture_rect(st, Rect2(c.x - 32.5, c.y - 10.5, 20, 20), false, mod)
+		if locked:          # Schloss: Vorschau eines noch gesperrten Teils
+			var lc := Vector2(c.x + 34, c.y - 20)
+			draw_arc(lc + Vector2(0, -2), 3.2, PI, TAU, 10, Color("#c9cfee"), 1.6)
+			draw_rect(Rect2(lc.x - 5, lc.y - 1, 10, 8), Color("#ffcb3d"))
+			draw_rect(Rect2(lc.x - 1, lc.y + 1.5, 2, 3), Color("#0c0f24"))
 
 const Stage := preload("res://src/core/stage.gd")
 var stage: Control                # zentrierte 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
@@ -105,9 +113,27 @@ func _column(kind: String, x: float, head: String) -> void:
 		b.focus_entered.connect(func():
 			Sfx.play("ui_move", -6.0)
 			info.text = (Cosmetics.requirement_text(it) if not unlocked else (nm + "  ✔" if Cosmetics.selected(kind) == it.id else nm))
-			# Vorschau zeigt das fokussierte Teil, die andere Spalte bleibt wie gewählt
-			preview.paint = it.id if unlocked and kind == "paint" else Cosmetics.selected("paint")
-			preview.sticker = it.id if unlocked and kind == "sticker" else Cosmetics.selected("sticker"))
+			# Vorschau zeigt das fokussierte Teil (gesperrte abgedunkelt mit Schloss), die andere Spalte bleibt wie gewählt
+			preview.locked = not unlocked
+			preview.paint = it.id if kind == "paint" else Cosmetics.selected("paint")
+			preview.sticker = it.id if kind == "sticker" else Cosmetics.selected("sticker"))
+		# Farbfeld der Lackierung bzw. Aufkleber am rechten Rand (gesperrt etwas gedämpft)
+		if kind == "paint":
+			var sw := ColorRect.new()
+			sw.color = Cosmetics.paint_texture(it.id).get_image().get_pixel(24, 24) * (Color(0.75, 0.75, 0.8) if not unlocked else Color.WHITE)
+			sw.position = Vector2(150, 4)
+			sw.size = Vector2(14, 10)
+			sw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			b.add_child(sw)
+		elif it.id != "none":
+			var ic := TextureRect.new()
+			ic.texture = Cosmetics.sticker_texture(it.id)
+			ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			ic.position = Vector2(151, 2)
+			ic.size = Vector2(14, 14)
+			ic.modulate = Color(0.7, 0.72, 0.85) if not unlocked else Color.WHITE
+			ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			b.add_child(ic)
 		col.add_child(b)
 		buttons.append(b)
 	stage.add_child(col)

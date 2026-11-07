@@ -69,11 +69,15 @@ func _draw_world() -> void:
 	var edge: Color = look.edge
 	var edge_hi: Color = look.hi
 	var shadow: Color = look.shade
-	# Pass 1: weicher Schlagschatten der Felsmasse auf den Hintergrund (versetzt nach rechts unten)
-	var sh := Color(0.01, 0.015, 0.03, 0.6)
+	# Pass 1: Schlagschatten der Felsmasse auf den Hintergrund, nach rechts unten versetzt und in drei Stufen weich auslaufend
+	var sh_far := Color(0.01, 0.015, 0.03, 0.14)
+	var sh_mid := Color(0.01, 0.015, 0.03, 0.22)
+	var sh := Color(0.01, 0.015, 0.03, 0.45)
 	for cy in level.height:
 		for cx in level.width:
 			if level.is_solid_cell(cx, cy) and (not level.is_solid_cell(cx + 1, cy) or not level.is_solid_cell(cx, cy + 1) or not level.is_solid_cell(cx + 1, cy + 1)):
+				draw_rect(Rect2(cx * T + 7.0, cy * T + 10.0, T, T), sh_far)
+				draw_rect(Rect2(cx * T + 4.5, cy * T + 6.5, T, T), sh_mid)
 				draw_rect(Rect2(cx * T + 2.0, cy * T + 3.0, T, T), sh)
 	for cy in level.height:
 		for cx in level.width:

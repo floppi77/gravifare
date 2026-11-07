@@ -91,6 +91,13 @@ func paint_texture(id := "") -> Texture2D:
 		id = selected("paint")
 	return _tex("res://assets/art/taxi_%s.png" % id)
 
+## Leben-Symbol im HUD in der Farbe der Lackierung (life_<id>.png, abgeleitet in tools/art/gen_art.py).
+func life_texture(id := "") -> Texture2D:
+	if id == "":
+		id = selected("paint")
+	var t := _tex("res://assets/art/life_%s.png" % id)
+	return t if t != null else _tex("res://assets/art/life_icon.png")
+
 func sticker_texture(id := "") -> Texture2D:
 	if id == "":
 		id = selected("sticker")
