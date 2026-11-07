@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -4767,3 +4767,64 @@ func _test_round49_editor_access() -> void:
 	TranslationServer.set_locale(old_locale)
 	for tl in trs:
 		TranslationServer.remove_translation(tl)
+
+## Runde 50: Ein im Testflug (als Entwurf) geschafftes Level zeigt nach dem Speichern seine Bestzeit statt „Noch nicht geschafft“.
+func _test_round50_draft_result() -> void:
+	var tl := Translation.new()
+	tl.locale = "de"
+	var texts := _read_json("res://data/i18n/de.json")
+	for k in texts:
+		tl.add_message(k, texts[k])
+	TranslationServer.add_translation(tl)
+	var old_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	var flow: Node = self.root.get_node("Flow")
+	var save: Node = self.root.get_node("Save")
+	CS.dir = "user://test_community50/"
+	_rm_dir(CS.dir)
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	flow.editor_runs.clear()
+	flow.note_editor_run("c_0000000001", 50.0, 300)
+	flow.note_editor_run("c_0000000001", 40.0, 200)
+	var r0: Dictionary = flow.editor_runs["c_0000000001"]
+	check(r0.time == 40.0 and r0.score == 300 and r0.plays == 2, "Entwurf: Testflüge merken Bestzeit, Bestwert und Zahl (%s)" % str(r0))
+	flow.editor_runs.clear()
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed._validate_now()
+	var id: String = ed.res.id
+	CS.mark_solved(id)
+	flow.note_editor_run(id, 33.0, 420)                       # so trägt game.gd einen selbst geschafften Testflug des Entwurfs ein
+	save.community_forget(id)
+	check(save.community_plays(id) == 0, "Entwurf: vor dem Speichern steht nichts im Spielstand")
+	check(ed._save(false) == id, "Entwurf: gelöstes Level lässt sich speichern")
+	check(save.community_plays(id) == 1 and int(save.community_best_time(id)) == 33 and save.community_best_score(id) == 420 and not flow.editor_runs.has(id),
+		"Entwurf: beim Speichern wandert der Testflug in den Spielstand (Bestzeit %d s, %d Flüge)" % [int(save.community_best_time(id)), save.community_plays(id)])
+	ed.free()
+	# Levelliste: gespeichert und selbst gelöst, aber ohne Eintrag (vor dieser Runde gespeichert) – „von dir gelöst“ statt „noch nicht geschafft“
+	save.community_forget(id)
+	var scr: Control = load("res://src/ui/community_select.gd").new()
+	scr.back = func(): pass
+	scr._ready()
+	var idx := -1
+	for i in scr.entries.size():
+		if String(scr.entries[i].id) == id:
+			idx = i
+	scr.sel = -2
+	scr._select(idx)
+	check(idx >= 0 and scr.info_text.text.contains(tr("CM_SOLVED_NO_BEST")) and not scr.info_text.text.contains(tr("CM_NO_BEST")), "Levelliste: selbst gelöstes Level ohne Bestzeit heißt nicht „noch nicht geschafft“")
+	save.complete_community(id, 30.0, 500)
+	scr.sel = -2
+	scr._select(idx)
+	check(scr.info_text.text.contains("30 s"), "Levelliste: mit Eintrag steht die Bestzeit da")
+	scr.free()
+	save.community_forget(id)
+	_rm_dir(CS.dir)
+	CS.dir = CS.DIR
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	TranslationServer.set_locale(old_locale)
+	TranslationServer.remove_translation(tl)

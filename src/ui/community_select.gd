@@ -198,7 +198,10 @@ func _select(i: int) -> void:
 	if String(e.derived_from) != "":
 		lines.append(tr("CM_DERIVED") % String(e.derived_from).to_upper().replace("_", "-"))
 	var id := String(e.id)
-	lines.append(tr("CM_BEST") % [int(Save.community_best_time(id)), Save.community_best_score(id), Save.community_plays(id)] if Save.community_plays(id) > 0 else tr("CM_NO_BEST"))
+	if Save.community_plays(id) > 0:
+		lines.append(tr("CM_BEST") % [int(Save.community_best_time(id)), Save.community_best_score(id), Save.community_plays(id)])
+	else:
+		lines.append(tr("CM_SOLVED_NO_BEST") if CommunityStore.is_solved(id) else tr("CM_NO_BEST"))       # im Editor-Testflug selbst gelöst (vor Runde 50 gespeicherte Level haben dazu keine Bestzeit)
 	info_text.text = "\n".join(lines)
 
 ## Maus: Einfachklick wählt nur an (so lässt sich danach löschen oder kopieren), Doppelklick spielt. Das bloße Darüberfahren ändert die Auswahl nicht

@@ -617,8 +617,10 @@ func _physics_process(_delta: float) -> void:
 			Flow.shift_fares += run.delivered + run.extras_delivered
 			Flow.shift_maps += 1
 		elif Flow.community:
-			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug und Entwürfe zählen nicht)
+			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
 				Save.complete_community(Flow.current_level, run.level_time, score)
+			elif counted and _solved_by_hand():
+				Flow.note_editor_run(Flow.current_level, run.level_time, score)      # Entwurf: erst beim Speichern in den Spielstand (sonst sammelten verworfene Entwürfe Einträge)
 			if _solved_by_hand():                                           # Testflug aus dem Editor, selbst und vollständig geflogen: erst damit lässt sich das Level speichern
 				Flow.community_store().mark_solved(Flow.current_level)
 				hud.result["solved"] = true

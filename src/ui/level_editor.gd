@@ -1693,6 +1693,7 @@ func _save(announce: bool) -> String:
 		CommunityStore.delete(session_id)                 # die frühere Fassung dieser Sitzung wird ersetzt
 		Save.community_forget(session_id)
 	session_id = res.id
+	_take_draft_runs(res.id)
 	model.dirty = false
 	if model.author != "":
 		Save.set_community_author(model.author)
@@ -1701,6 +1702,14 @@ func _save(announce: bool) -> String:
 		status.text = tr("ED_SAVED") % String(model.names.get(TranslationServer.get_locale().substr(0, 2), model.names.get("de", "")))
 		status.add_theme_color_override("font_color", Color("#5dff9a"))
 	return res.id
+
+## Geschaffte Testflüge des Entwurfs gehören jetzt zum gespeicherten Level: Bestzeit, Bestwert und Flüge in den Spielstand (sonst stünde es als „noch nicht geschafft“ da).
+func _take_draft_runs(id: String) -> void:
+	var r: Dictionary = Flow.editor_runs.get(id, {})
+	if r.is_empty():
+		return
+	Flow.editor_runs.erase(id)
+	Save.complete_community(id, float(r.time), int(r.score), int(r.plays))
 
 ## Original-Datei schreiben (nur Geändertes; Prüfsumme und Geisterläufe werden nachgeführt).
 func _save_original(announce: bool) -> String:

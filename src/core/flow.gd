@@ -27,7 +27,13 @@ var return_to_editor := ""              # Level-ID, in deren Editor es nach eine
 var editor_skip_solve := false          # Debug: Speichern im Editor ohne Handlösung (nur wirksam bei Save.debug; bleibt über Testflüge erhalten)
 var editor_session := ""                # Die in dieser Editorsitzung gespeicherte Fassung bleibt über den Testflug hinweg die, die das nächste Speichern ersetzt
 var editor_original := ""               # Debug: Id des mitgelieferten Levels, das der Editor gerade bearbeitet (bleibt über den Testflug erhalten)
+var editor_runs := {}                   # Geschaffte Testflüge noch nicht gespeicherter Fassungen (Entwürfe): Level-ID → {time, score, plays}; der Editor übernimmt sie beim Speichern in den Spielstand
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
+
+## Geschafften Testflug eines Entwurfs merken (Bestzeit, Bestwert, Zahl der Flüge), bis die Fassung gespeichert wird.
+func note_editor_run(id: String, time: float, score: int) -> void:
+	var prev: Dictionary = editor_runs.get(id, {})
+	editor_runs[id] = {"time": minf(float(prev.get("time", 1e9)), time), "score": maxi(int(prev.get("score", 0)), score), "plays": int(prev.get("plays", 0)) + 1}
 
 func level_ids() -> Array:
 	var ids: Array = []

@@ -617,5 +617,6 @@
  "ED_CURSOR": "x %d · y %d · %s",
  "ED_CELL_EXIT": "Ausgangstor",
  "ED_HINT_VALUE_KEYS": "Links/Rechts ändern (halten: schneller) · Umschalt bzw. Bild auf/ab: großer Schritt · Enter weiterschalten · Esc zurück zur Zeichenfläche",
- "ED_HINT_VALUE_PAD": "Links/Rechts ändern (halten: schneller) · LB/RB großer Schritt · A weiterschalten · B zurück zur Zeichenfläche"
+ "ED_HINT_VALUE_PAD": "Links/Rechts ändern (halten: schneller) · LB/RB großer Schritt · A weiterschalten · B zurück zur Zeichenfläche",
+ "CM_SOLVED_NO_BEST": "Von dir gelöst (Testflug) – noch keine Bestzeit"
 }

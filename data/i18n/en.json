@@ -617,5 +617,6 @@
  "ED_CURSOR": "x %d · y %d · %s",
  "ED_CELL_EXIT": "Exit gate",
  "ED_HINT_VALUE_KEYS": "Left/Right change (hold: faster) · Shift or Page up/down: big step · Enter steps through · Esc back to drawing",
- "ED_HINT_VALUE_PAD": "Left/Right change (hold: faster) · LB/RB big step · A steps through · B back to drawing"
+ "ED_HINT_VALUE_PAD": "Left/Right change (hold: faster) · LB/RB big step · A steps through · B back to drawing",
+ "CM_SOLVED_NO_BEST": "Solved by you (test flight) – no best time yet"
 }

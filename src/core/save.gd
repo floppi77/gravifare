@@ -216,13 +216,13 @@ func community_forget(id: String) -> void:
 		write()
 
 ## Geschafften Community-Flug werten (nur Bestzeit, Bestwert, Zähler). Die Einträge sind auf 200 Level begrenzt.
-func complete_community(id: String, time: float, score: int) -> void:
+func complete_community(id: String, time: float, score: int, plays := 1) -> void:
 	var c := community_entry()
 	if not c.has(id) and c.size() >= 200:
 		return
 	var prev = c.get(id, {})
 	var best_t: float = minf(float(prev.get("time", 1e9)), time) if prev is Dictionary else time
-	c[id] = {"time": best_t, "score": maxi(int(prev.get("score", 0)) if prev is Dictionary else 0, score), "plays": (int(prev.get("plays", 0)) if prev is Dictionary else 0) + 1}
+	c[id] = {"time": best_t, "score": maxi(int(prev.get("score", 0)) if prev is Dictionary else 0, score), "plays": (int(prev.get("plays", 0)) if prev is Dictionary else 0) + maxi(plays, 1)}
 	write()
 
 ## Rekord-Statistik (z. B. längste Serie perfekter Landungen).
