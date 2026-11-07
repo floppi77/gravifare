@@ -420,7 +420,7 @@ func _scaled(poly: PackedVector2Array, c: Vector2, f: float) -> PackedVector2Arr
 		out.append(c + (p_ - c) * f)
 	return out
 
-## Magnetzone: Spule (Hufeisen mit Polkappen), Feldlinien, einströmende (Anziehung, warm) oder ausströmende (Abstoßung, kalt)
+## Magnetzone (Tempo der Bewegung folgt der Stärke): Spule (Hufeisen mit Polkappen), Feldlinien, einströmende (Anziehung, warm) oder ausströmende (Abstoßung, kalt)
 ## Partikel und weiche Energieringe. Pulsierende Magnete zeigen vor dem Einschalten ein Flackern und sind ausgeschaltet gedämpft.
 func _draw_magnet(z: Dictionary, on: bool) -> void:
 	var c: Vector2 = z.center
@@ -429,6 +429,8 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 	var hot := Color(1.0, 0.45, 0.55) if attract else Color(0.4, 0.8, 1.0)
 	var deep := Color(0.55, 0.12, 0.3) if attract else Color(0.1, 0.25, 0.6)
 	var al := 1.0 if on else 0.22
+	# Drehen, Strömen und Wellen laufen wie beim Wind je nach Stärke schneller oder langsamer (Stärke 100 = bisheriges Tempo)
+	var ts := t * clampf(absf(float(z.k)) / 100.0, 0.25, 3.5)
 	if float(z.period) > 0.0 and not on:
 		var left := float(z.period) - fposmod(level.clock + float(z.phase), float(z.period))
 		if z.get("cycle", false):
@@ -444,7 +446,7 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 		draw_circle(c, R * f, Color(deep.r, deep.g, deep.b, 0.035 * al))
 	# Feldlinien: gekrümmte Bögen um den Kern
 	for i in 8:
-		var ang := float(i) / 8.0 * TAU + t * 0.25 * (1.0 if attract else -1.0)
+		var ang := float(i) / 8.0 * TAU + ts * 0.25 * (1.0 if attract else -1.0)
 		var pts := PackedVector2Array()
 		for k in 9:
 			var u := float(k) / 8.0
@@ -456,7 +458,7 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 	for i in 28:
 		var h := fmod(float(i) * 0.6180339, 1.0)
 		var ang := float(i) / 28.0 * TAU + h * 2.0
-		var fr := fmod(t * (0.35 + 0.25 * h) + h * 3.0, 1.0)
+		var fr := fmod(ts * (0.35 + 0.25 * h) + h * 3.0, 1.0)
 		var u := (1.0 - fr) if attract else fr
 		var rr := lerpf(8.0, R, u)
 		var p := c + Vector2(cos(ang + u * 0.6), sin(ang + u * 0.6)) * rr
@@ -465,14 +467,14 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 		draw_line(p, p + tail, Color(hot.r, hot.g, hot.b, 0.85 * fade * al), 1.2)
 	# Wellenringe
 	for i in 3:
-		var f := fmod(t * 0.5 + float(i) / 3.0, 1.0)
+		var f := fmod(ts * 0.5 + float(i) / 3.0, 1.0)
 		var rr := R * ((1.0 - f) if attract else f)
 		draw_arc(c, rr, 0.0, TAU, 48, Color(hot.r, hot.g, hot.b, 0.5 * sin(f * PI) * al), 1.0)
 	# Kern: metallische Kugel mit Hufeisen und Polkappen
 	draw_circle(c, 6.5, Color(0.04, 0.05, 0.14, 0.9 * al))
 	draw_circle(c, 5.0, Color(0.32, 0.35, 0.5, al))
 	draw_circle(c + Vector2(-1.2, -1.4), 2.0, Color(0.85, 0.9, 1.0, 0.7 * al))
-	var rot := t * 0.8 * (1.0 if attract else -1.0)
+	var rot := ts * 0.8 * (1.0 if attract else -1.0)
 	draw_arc(c, 8.5, rot + 0.5, rot + PI - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
 	draw_arc(c, 8.5, rot + PI + 0.5, rot + TAU - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
 	for sgn in [1.0, -1.0]:

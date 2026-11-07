@@ -13,7 +13,7 @@ const PALETTE := [["#", "ED_T_ROCK"], [".", "ED_T_AIR"], ["1", "ED_T_PAD"], ["2"
 const DOOR_CHARS := "abcde"
 const KINDS := ["debris", "slider", "pad", "meteor", "beam", "vehicle", "wind", "magnet", "gravity", "heat"]
 ## Parameter je Art: [Schlüssel, Min, Max, Schritt, Textschlüssel]. Zahlen in Feldern bzw. Sekunden; "period" > 0 bei Zonen = pulsierend (0 = dauerhaft).
-## Schalter (shape, spikes, cycle, glass, tint) sind 0/1; "pad" ist die Pad-Ziffer eines fahrenden Pads.
+## Schalter (shape, spikes, cycle, glass, tint, pole) sind 0/1 („pole“: 0 anziehend, 1 abstoßend; „k“ zeigt nur die Stärke, das Vorzeichen steckt im Dateiformat); "pad" ist die Pad-Ziffer eines fahrenden Pads.
 const PARAMS := {
 	"debris": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["w", 1.0, 64.0, 1.0, "ED_P_W"], ["h", 1.0, 64.0, 1.0, "ED_P_H"],
 		["dx", -64.0, 64.0, 1.0, "ED_P_DX"], ["dy", -64.0, 64.0, 1.0, "ED_P_DY"], ["period", 0.5, 120.0, 0.5, "ED_P_PERIOD"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"],
@@ -34,7 +34,7 @@ const PARAMS := {
 	"vehicle": [["count", 1.0, 12.0, 1.0, "ED_P_COUNT"], ["speed", -400.0, 400.0, 4.0, "ED_P_SPEED"], ["paint", 0.0, 7.0, 1.0, "ED_P_PAINT"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
 	"wind": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["w", 1.0, 64.0, 1.0, "ED_P_W"], ["h", 1.0, 64.0, 1.0, "ED_P_H"],
 		["ax", -400.0, 400.0, 5.0, "ED_P_AX"], ["ay", -400.0, 400.0, 5.0, "ED_P_AY"], ["period", 0.0, 120.0, 0.5, "ED_P_GUST"], ["on", 0.0, 120.0, 0.5, "ED_P_ON"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
-	"magnet": [["cx", -8.0, 64.0, 1.0, "ED_P_CX"], ["cy", -8.0, 64.0, 1.0, "ED_P_CY"], ["r", 0.5, 20.0, 0.5, "ED_P_R"], ["k", -400.0, 400.0, 10.0, "ED_P_K"],
+	"magnet": [["cx", -8.0, 64.0, 1.0, "ED_P_CX"], ["cy", -8.0, 64.0, 1.0, "ED_P_CY"], ["r", 0.5, 20.0, 0.5, "ED_P_R"], ["pole", 0.0, 1.0, 1.0, "ED_P_POLE"], ["k", 10.0, 400.0, 10.0, "ED_P_K"],
 		["cycle", 0.0, 1.0, 1.0, "ED_P_CYCLE"], ["period", 0.0, 120.0, 0.5, "ED_P_GUST"], ["on", 0.0, 120.0, 0.5, "ED_P_ON"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
 	"gravity": [["x", -8.0, 64.0, 1.0, "ED_P_X"], ["y", -8.0, 64.0, 1.0, "ED_P_Y"], ["w", 1.0, 64.0, 1.0, "ED_P_W"], ["h", 1.0, 64.0, 1.0, "ED_P_H"],
 		["g", -3.0, 3.0, 0.05, "ED_P_G"], ["period", 0.0, 120.0, 0.5, "ED_P_GUST"], ["on", 0.0, 120.0, 0.5, "ED_P_ON"], ["phase", -240.0, 240.0, 0.5, "ED_P_PHASE"]],
@@ -448,6 +448,10 @@ func get_param(ref: Dictionary, key: String) -> float:
 			return float(int(String(d.get("pad", "1"))))
 		"spikes", "cycle", "glass":
 			return 1.0 if d.get(key, false) == true else 0.0
+		"pole":
+			return 1.0 if float(d.get("k", 100.0)) < 0.0 else 0.0
+		"k":
+			return absf(float(d.get("k", 0.0)))
 		"sweep":
 			return float(d.get("sweep", 0.0))
 		"orient":
@@ -483,6 +487,10 @@ func set_param(ref: Dictionary, key: String, value: float) -> void:
 					d[key] = true
 				else:
 					d.erase(key)
+			"pole":
+				d["k"] = (-1.0 if v >= 0.5 else 1.0) * maxf(absf(float(d.get("k", 100.0))), 10.0)
+			"k":
+				d["k"] = (-1.0 if float(d.get("k", 100.0)) < 0.0 else 1.0) * v
 			"sweep":
 				if v <= 0.0:
 					d.erase("sweep")

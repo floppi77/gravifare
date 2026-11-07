@@ -3,6 +3,32 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.8
+
+### Deutsch
+
+**Fehlerbehebungen**
+- Der Einspieler zu den Plasmastrahlen läuft jetzt in Level 19, wo die ersten Strahlen auftauchen, nicht erst in Level 46
+- Level 20: Hob das Taxi im selben Moment ab, in dem der Fahrgast einstieg, blieb dieser unsichtbar an Bord hängen. Das Pflichtziel blinkte weiter, es erschien kein neuer Fahrgast und das Level kam nicht weiter. Das ist behoben; Zustände ohne Ausweg löst das Spiel jetzt von selbst auf (Fahrgast an Bord, Fahrgast weg, fehlender Nachfolger)
+- Level 33 und alle Level mit fahrenden Plattformen: Nach einem Absturz sprang die Plattform zurück, und wartende Fahrgäste blieben daneben in der Luft stehen. Sie bleiben jetzt auf ihrer Plattform
+- Level-Editor: Werte wie „abstoßend“ oder „waagerecht“ saßen nicht mittig und lagen unter dem rechten Knopf; alle Werte und Beschriftungen sind jetzt mittig und voll sichtbar
+
+**Level-Editor**
+- Magnete: Die Wirkung (anziehend oder abstoßend) ist getrennt von der Stärke wählbar
+- Die Bewegung der Magnete (Drehung, Feldlinien, Partikel, Ringe) wird wie beim Wind je nach Stärke schneller oder langsamer
+
+### English
+
+**Bug fixes**
+- The intro clip for plasma beams now plays in level 19, where the first beams appear, instead of level 46
+- Level 20: if the taxi lifted off in the same moment the passenger boarded, the passenger stayed stuck aboard, invisible. The objective kept flashing, no new passenger appeared and the level could not continue. Fixed; the game now resolves dead-end states by itself (passenger aboard, passenger gone, missing successor)
+- Level 33 and all levels with moving pads: after a crash the pad jumped back and waiting passengers were left standing in mid-air beside it. They now stay on their pad
+- Level editor: values such as "repels" or "horizontal" were off-centre and sat under the right-hand button; all values and labels are now centred and fully visible
+
+**Level editor**
+- Magnets: the effect (attracts or repels) can be chosen separately from the strength
+- Magnet animation (rotation, field lines, particles, rings) now runs faster or slower with the strength, like wind
+
 ## 0.9.7
 
 ### Deutsch

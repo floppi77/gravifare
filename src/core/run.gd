@@ -456,6 +456,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if actor != null or respawn_keep_clock:
 		job_clock += dt
 	_step_actors(dt)
+	_heal_main_job()
 	_step_extras(dt)
 	_update_prices(dt)
 	_check_pump(dt)
@@ -687,17 +688,23 @@ func _finish_level() -> void:
 	result = Result.COMPLETE
 	log.append({"type": "level_complete"})
 
-## Fahrgäste auf einer fahrenden Plattform bewegen sich mit ihr (Position und Laufziel).
-func _shift_with_pads() -> void:
-	if not level.has_movers():
-		return
+func _all_actors() -> Array:
 	var all: Array = leavers.duplicate()
 	if actor != null:
 		all.append(actor)
 	for e in extras:
 		all.append(e.actor)
-	for a in all:
-		var p: Dictionary = a.dest if (a.state == PassengerActor.S.EXITING and not a.dest.is_empty()) else a.pad
+	return all
+
+func _actor_pad(a: PassengerActor) -> Dictionary:
+	return a.dest if (a.state == PassengerActor.S.EXITING and not a.dest.is_empty()) else a.pad
+
+## Fahrgäste auf einer fahrenden Plattform bewegen sich mit ihr (Position und Laufziel).
+func _shift_with_pads() -> void:
+	if not level.has_movers():
+		return
+	for a in _all_actors():
+		var p := _actor_pad(a)
 		if p.is_empty() or not p.get("moving", false):
 			continue
 		var dx := float(p.get("dx_step", 0.0))
@@ -705,8 +712,42 @@ func _shift_with_pads() -> void:
 			a.x += dx
 			a.target_x += dx
 
+## Auslenkung jeder fahrenden Plattform (Pad-Nr. → dx).
+func _pad_offsets() -> Dictionary:
+	var out := {}
+	for id in level.pads:
+		if level.pads[id].get("moving", false):
+			out[id] = float(level.pads[id].get("dx", 0.0))
+	return out
+
+## Plattformen wurden versetzt (Neustart der Mover-Uhr): alle Fahrgäste auf ihnen um denselben Weg mitnehmen.
+func _follow_pads(before: Dictionary) -> void:
+	for a in _all_actors():
+		var p := _actor_pad(a)
+		if p.is_empty() or not before.has(String(p.id)):
+			continue
+		var d := float(p.get("dx", 0.0)) - float(before[String(p.id)])
+		if d != 0.0:
+			a.x += d
+			a.target_x += d
+
+## Absicherung: ein wartender, auftauchender oder zurückkehrender Fahrgast steht immer auf seiner Plattform (nie daneben in der Luft).
+func _anchor_actors() -> void:
+	for a in _all_actors():
+		if not (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING or a.state == PassengerActor.S.RETURNING):
+			continue
+		var p: Dictionary = a.pad
+		if p.is_empty() or not p.has("x0"):
+			continue
+		var lo := float(p.x0) + Tuning.PASS_HALF_W
+		var hi := float(p.x1) - Tuning.PASS_HALF_W
+		if a.x < lo - 0.5 or a.x > hi + 0.5:
+			a.x = clampf(a.x, lo, hi)
+		a.target_x = clampf(a.target_x, lo, hi)
+
 func _step_actors(dt: float) -> void:
 	_shift_with_pads()
+	_anchor_actors()
 	if spawn_timer > 0.0:
 		spawn_timer -= dt
 		if spawn_timer <= 0.0:
@@ -759,16 +800,50 @@ func _step_actors(dt: float) -> void:
 				log.append({"type": "splat", "x": e.x, "y": e.y})
 	leavers = leavers.filter(func(l): return l.state != PassengerActor.S.GONE)
 
+## Netz und doppelter Boden für den Pflichtauftrag: Zustände, aus denen kein Weg mehr herausführt, werden aufgelöst
+## (Fahrgast unsichtbar an Bord, Fahrgast weg ohne Folgeauftrag, Spawn-Zähler abgelaufen ohne Fahrgast).
+func _heal_main_job() -> void:
+	if result != Result.RUNNING or level.tutorial:
+		return
+	var job := current_job()
+	if job.is_empty():
+		return
+	if actor != null:
+		var st := actor.state
+		if phase == Phase.WAITING and st == PassengerActor.S.ABOARD:
+			_finish_boarding(job)                                  # sitzt im Taxi, die Fahrt wurde nur nicht gebucht
+		elif phase == Phase.WAITING and st == PassengerActor.S.TO_TAXI and sim.state != TaxiSim.State.LANDED:
+			actor.abort_board()                                    # läuft zu einem Taxi, das nicht mehr da ist
+		elif phase != Phase.CARRYING and phase != Phase.DROPOFF and (st == PassengerActor.S.GONE or st == PassengerActor.S.DEAD or st == PassengerActor.S.FALLING or st == PassengerActor.S.EXITING):
+			var gone := actor
+			log.append({"type": "extra_left", "voice": gone.voice_key(), "name": gone.pname})
+			leavers.append(gone)
+			actor = null
+			_lose_job(gone.pname)                                  # Fahrgast ist weg: Auftrag verpasst, weiter mit dem nächsten
+		elif (phase == Phase.CARRYING or phase == Phase.DROPOFF) and (st == PassengerActor.S.GONE or st == PassengerActor.S.DEAD):
+			actor = null
+			phase = Phase.WAITING
+			_lose_job(String(job.get("passenger", "")))
+	else:
+		if phase != Phase.WAITING:
+			phase = Phase.WAITING
+			phase_timer = 0.0
+		if not spawn_wait and spawn_timer <= 0.0 and not spawn_locked:
+			spawn_wait = true                                      # der Fahrgast des Auftrags erscheint, sobald das Pad frei ist
+
 func _service_pad(dt: float) -> void:
 	refuel_tick = false
 	_service_extras()
 	if sim.state != TaxiSim.State.LANDED:
 		pump_warned = false
 		if phase == Phase.BOARDING:
-			phase = Phase.WAITING
-			phase_timer = 0.0
-			if actor != null:
-				actor.abort_board()
+			if actor != null and actor.state == PassengerActor.S.ABOARD:
+				_finish_boarding(current_job())          # schon eingestiegen, Taxi startet gleichzeitig: er fliegt mit
+			else:
+				phase = Phase.WAITING
+				phase_timer = 0.0
+				if actor != null:
+					actor.abort_board()
 		elif phase == Phase.DROPOFF:
 			if actor != null:
 				_deliver(current_job())          # Fahrgast ist schon ausgestiegen: er geht auch bei sofortigem Abflug zum Häuschen
@@ -803,13 +878,7 @@ func _service_pad(dt: float) -> void:
 				pen_ride = 0.0
 		Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
-				phase = Phase.CARRYING
-				var dest := "exit" if is_exit_job(job) else String(job.to)
-				log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest})
-				if is_exit_job(job):
-					exit_open = true
-					level.exit_open = true
-					log.append({"type": "exit_open"})
+				_finish_boarding(job)
 		Phase.CARRYING:
 			if not is_exit_job(job) and pad.id == String(job.to):
 				phase = Phase.DROPOFF
@@ -822,6 +891,16 @@ func _service_pad(dt: float) -> void:
 			phase_timer += dt
 			if phase_timer >= STEP_OUT_TIME:
 				_deliver(job)
+
+## Fahrgast ist eingestiegen: Fahrt beginnt (auch wenn das Taxi im selben Tick schon abhebt: sonst bliebe er unsichtbar an Bord hängen).
+func _finish_boarding(job: Dictionary) -> void:
+	phase = Phase.CARRYING
+	var dest := "exit" if is_exit_job(job) else String(job.to)
+	log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest})
+	if is_exit_job(job):
+		exit_open = true
+		level.exit_open = true
+		log.append({"type": "exit_open"})
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
 	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "slope": price_slope(job), "base": base_clock,
@@ -898,7 +977,9 @@ func _respawn_after_crash() -> void:
 		taxi_fees += fee
 		log.append({"type": "cost", "what": "taxi", "amount": fee})
 	taxi_damage = 0.0
-	sim.setup(level)
+	var dx_before := _pad_offsets()
+	sim.setup(level)                        # setzt auch die Uhr der Mover zurück: fahrende Pads springen in ihre Ausgangsstellung
+	_follow_pads(dx_before)                 # wartende Fahrgäste springen mit (sonst stehen sie neben der Plattform in der Luft)
 	sim.fuel = fuel_keep
 	result = Result.RUNNING
 	last_vy = 0.0
@@ -915,6 +996,14 @@ func _respawn_after_crash() -> void:
 		_lose_job(lost_name)
 	elif actor != null and phase == Phase.BOARDING:
 		actor.abort_board()
+		if actor.state == PassengerActor.S.ABOARD:        # saß schon im Taxi: mit ihm verloren (sonst bliebe er unsichtbar an Bord)
+			var lost_name2: String = actor.pname
+			log.append({"type": "passenger_lost", "name": lost_name2, "pad": String(current_job().get("from", ""))})
+			actor = null
+			pen_pick = 0.0
+			pen_drop = 0.0
+			pen_ride = 0.0
+			_lose_job(lost_name2)
 	phase = Phase.WAITING
 	phase_timer = 0.0
 	exit_open = job_index >= jobs.size()

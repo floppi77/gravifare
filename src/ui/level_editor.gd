@@ -382,8 +382,19 @@ func _label(text: String, pos: Vector2, sz: Vector2, parent: Control) -> Label:
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", 8)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.clip_text = true                      # ein zu langer Text vergrößert das Feld nicht mehr nach rechts (dann säße er nicht mehr mittig und läge unter dem Nachbarknopf)
 	parent.add_child(l)
+	l.size = Vector2(sz.x, maxf(sz.y, 17.0))        # Mindesthöhe wie bisher (Zeilen und Knöpfe sind darauf abgestimmt), aber nie breiter als angegeben
 	return l
+
+## Text in ein Feld setzen und die Schrift bei Bedarf verkleinern, bis er ganz hineinpasst (nie abgeschnitten, nie unter einem Knopf).
+func _fit_text(l: Label, text: String, base_size := 7) -> void:
+	l.text = text
+	var fs := base_size
+	var f: Font = l.get_theme_font("font")
+	while fs > 5 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > l.size.x - 1.0:
+		fs -= 1
+	l.add_theme_font_size_override("font_size", fs)
 
 func _build_bottom() -> void:
 	bottom = Control.new()
@@ -696,6 +707,8 @@ func _param_text(key: String) -> String:
 	var spec: Array = model.param_spec(obj_ref, key)
 	if key in ["shape", "spikes", "cycle", "glass"]:
 		return tr("ED_ON") if v >= 0.5 else tr("ED_OFF")
+	if key == "pole":
+		return tr("ED_POLE_1") if v >= 0.5 else tr("ED_POLE_0")
 	if key == "period" and obj_ref.get("t") == "zone" and v <= 0.0:
 		return tr("ED_STEADY")
 	if key == "sweep" and v <= 0.0:
@@ -727,14 +740,14 @@ func _rebuild_params() -> void:
 	param_rows = []
 	for p in model.obj_params(obj_ref):
 		var y := row * 15.0
-		var l := _label(tr(String(p[4])), Vector2(0, y), Vector2(62, 14), param_box)
+		var l := _label("", Vector2(0, y), Vector2(62, 14), param_box)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		l.add_theme_font_size_override("font_size", 7)
+		_fit_text(l, tr(String(p[4])))
 		var key: String = p[0]
 		var b1 := _button("<", _param_step.bind(key, -1), Vector2(64, y), Vector2(16, 14), param_box, 7)
 		b1.set_meta("key", "p:%s:-" % key)
-		var val := _label(_param_text(key), Vector2(82, y), Vector2(44, 14), param_box)
-		val.add_theme_font_size_override("font_size", 7)
+		var val := _label("", Vector2(82, y), Vector2(44, 14), param_box)
+		_fit_text(val, _param_text(key))
 		var b2 := _button(">", _param_step.bind(key, 1), Vector2(128, y), Vector2(16, 14), param_box, 7)
 		b2.set_meta("key", "p:%s:+" % key)
 		param_vals[key] = val
@@ -748,7 +761,7 @@ func _param_step(key: String, direction: int) -> void:
 		return
 	model.nudge_param(obj_ref, key, direction)
 	for k in param_vals:
-		param_vals[k].text = _param_text(k)
+		_fit_text(param_vals[k], _param_text(k))
 	_changed()
 
 ## Nach dem Neuaufbau einer Liste (Parameter, Aufträge) bekommt der zuletzt bediente Knopf den Fokus zurück, damit Controller und Tastatur nicht aus den Bedienfeldern fallen.
@@ -944,7 +957,7 @@ func _move_stroke(at: Vector2i) -> void:
 				moved = true
 		if moved:
 			for k in param_vals:
-				param_vals[k].text = _param_text(k)
+				_fit_text(param_vals[k], _param_text(k))
 			_changed_soft()
 		return
 	if stroke_mode == TOOL_PEN:

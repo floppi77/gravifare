@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -1593,6 +1593,128 @@ func _test_version_matches_export() -> void:
 	var ver := fm.get_string(1) if fm else "?"
 	check(m != null and m.get_string(1) == ver, "Menü-Version %s passt zu export_presets.cfg (%s)" % [ver, m.get_string(1) if m else "?"])
 
+## Zustände, aus denen es für den Pflichtauftrag keinen Weg mehr gäbe (Level 20: Fahrgast unsichtbar an Bord; Level 33: Fahrgast neben dem fahrenden Pad in der Luft).
+func _stuck_violation(r: Run) -> String:
+	if r.result != Run.Result.RUNNING or r.level.tutorial:
+		return ""
+	var a: PassengerActor = r.actor
+	if a != null:
+		if a.state == PassengerActor.S.ABOARD and r.phase != Run.Phase.CARRYING:
+			return "Fahrgast sitzt an Bord, Phase %d" % r.phase
+		if (r.phase == Run.Phase.CARRYING) and a.state != PassengerActor.S.ABOARD and a.state != PassengerActor.S.EXITING:
+			return "Phase Fahrt, Fahrgast nicht an Bord (%d)" % a.state
+		if a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING or a.state == PassengerActor.S.RETURNING:
+			var p: Dictionary = a.pad
+			if a.x < float(p.x0) - 1.0 or a.x > float(p.x1) + 1.0:
+				return "Fahrgast steht neben dem Pad (x=%.1f, Pad %.1f–%.1f)" % [a.x, p.x0, p.x1]
+	elif not r.current_job().is_empty() and r.phase == Run.Phase.WAITING and not r.spawn_wait and r.spawn_timer <= 0.0 and not r.spawn_locked:
+		return "kein Fahrgast und kein Spawn vorgesehen"
+	elif not r.current_job().is_empty() and r.phase != Run.Phase.WAITING:
+		return "Phase %d ohne Fahrgast" % r.phase
+	return ""
+
+func _test_main_job_never_stuck() -> void:
+	# 1) Einsteigen und Abheben im selben Tick
+	var r := Run.new()
+	r.start(_lvl())
+	_land_on(r, "2")
+	r.step(Vector2.ZERO, true)
+	check(r.phase == Run.Phase.BOARDING, "Einsteigen beginnt")
+	r.actor.state = PassengerActor.S.ABOARD
+	r.sim.state = TaxiSim.State.FLYING
+	r.sim.pos.y -= 20.0
+	r.step(Vector2(0, -1), false)
+	check(r.phase == Run.Phase.CARRYING and r.actor != null and r.actor.state == PassengerActor.S.ABOARD, "Einsteigen und Abheben im selben Tick: der Fahrgast fliegt mit")
+	check(_stuck_violation(r) == "", "…und der Zustand ist stimmig")
+	# 2) Auftrag fehlerhaft: Fahrgast an Bord, Phase „wartet“ → heilt sich
+	var r2 := Run.new()
+	r2.start(_lvl())
+	r2.actor.state = PassengerActor.S.ABOARD
+	r2.step(Vector2.ZERO, false)
+	check(r2.phase == Run.Phase.CARRYING, "Fahrgast an Bord bei Phase „wartet“: Fahrt wird gebucht")
+	# 3) kein Fahrgast, kein Spawn-Zähler → Fahrgast erscheint trotzdem
+	var r3 := Run.new()
+	r3.start(_lvl())
+	r3.actor = null
+	r3.spawn_wait = false
+	r3.spawn_timer = 0.0
+	for i in 300:
+		r3.step(Vector2.ZERO, false)
+	check(r3.actor != null, "Ohne Spawn-Zähler erscheint der Fahrgast trotzdem")
+	# 4) Absturz nach dem Einsteigen: Fahrgast geht mit dem Taxi verloren, der nächste Auftrag läuft
+	var r4 := Run.new()
+	r4.start(_lvl())
+	_land_on(r4, "2")
+	r4.step(Vector2.ZERO, true)
+	r4.actor.state = PassengerActor.S.ABOARD
+	r4.respawn_after_crash()
+	check(r4.actor == null and r4.job_index == 1 and r4.phase == Run.Phase.WAITING, "Absturz beim Einsteigen: Auftrag verpasst, nichts hängt")
+	for i in 2400:
+		r4.step(Vector2.ZERO, false)
+	check(r4.actor != null and _stuck_violation(r4) == "", "…und der nächste Fahrgast erscheint (auch wenn das neue Taxi auf seinem Pad steht)")
+	# 5) Fahrende Pads (Level 33): Fahrgast bleibt nach dem Neustart des Taxis auf seiner Plattform
+	var l33 := LevelData.load_file("res://data/levels/s3_11.json")
+	var bad := 0
+	for t_steps in [0, 40, 130, 260, 420, 700]:
+		var r5 := Run.new()
+		r5.start(l33)
+		r5.jobs[0]["from"] = "4"
+		r5._spawn_actor(true)
+		for i in t_steps:
+			r5.step(Vector2.ZERO, false)
+			if r5.result != Run.Result.RUNNING:
+				break
+		r5.sim.state = TaxiSim.State.LANDED
+		r5.respawn_after_crash()
+		for i in 3:
+			r5.step(Vector2.ZERO, false)
+		var p: Dictionary = l33.pads["4"]
+		if r5.actor == null or r5.actor.x < float(p.x0) - 1.0 or r5.actor.x > float(p.x1) + 1.0:
+			bad += 1
+	check(bad == 0, "Level 33: Fahrgast auf der fahrenden Plattform bleibt nach dem Neustart des Taxis auf ihr (%d Fehler)" % bad)
+	# 5b) Wartepunkt und Tür jedes Passagierpads liegen zu jeder Zeit auf dem Pad (auch bei fahrenden Plattformen)
+	var off_pad: Array = []
+	for f in DirAccess.open("res://data/levels").get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lv := LevelData.load_file("res://data/levels/" + f)
+		for tt in range(0, 400, 7):
+			lv.update_movers(float(tt) * 0.5)
+			for id in lv.pads:
+				var pp: Dictionary = lv.pads[id]
+				if lv.is_passenger_pad(id) and (float(pp.wait_x) < float(pp.x0) or float(pp.wait_x) > float(pp.x1) or float(pp.door_x) < float(pp.x0) or float(pp.door_x) > float(pp.x1)):
+					off_pad.append("%s/%s" % [lv.id, id])
+	check(off_pad.is_empty(), "Alle Levels: Tür und Wartepunkt jedes Passagierpads liegen auf dem Pad (%s)" % ", ".join(off_pad.slice(0, 4)))
+	# 6) Zufallstest über alle Level: keine unauflösbaren Zustände
+	var dir := DirAccess.open("res://data/levels")
+	var viol: Array = []
+	var rng := RandomNumberGenerator.new()
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		rng.seed = absi(String(lvl.id).hash())
+		var rr := Run.new()
+		rr.start(lvl, -1.0, 0.0, 5)
+		rr.extras_enabled = true
+		for i in 2400:
+			if rr.result == Run.Result.FAILED:
+				rr.respawn_after_crash()
+			elif rr.result != Run.Result.RUNNING:
+				break
+			var roll := rng.randf()
+			if roll < 0.02 and not rr.current_job().is_empty():
+				var tgt := rr.target_pad()
+				if tgt != "" and tgt != "exit" and rr.level.pads.has(tgt):
+					_land_on(rr, tgt)
+			var inp := Vector2(rng.randf_range(-1, 1), rng.randf_range(-1, 0.4)) if roll > 0.5 else Vector2(0, -1)
+			rr.step(inp, roll < 0.75)
+			var why := _stuck_violation(rr)
+			if why != "":
+				viol.append("%s: %s (Tick %d)" % [lvl.id, why, i])
+				break
+	check(viol.is_empty(), "Zufallsflug in allen Leveln: nie ein unauflösbarer Zustand (%s)" % ", ".join(viol.slice(0, 5)))
+
 func _test_spawn_not_on_taxi_pad() -> void:
 	# Nachfolge-Fahrgast darf nicht erscheinen, solange das Taxi auf seinem Pad steht
 	var lvl := _lvl()
@@ -2984,6 +3106,23 @@ func _test_intro_demos() -> void:
 	var idx = JSON.parse_string(FileAccess.get_file_as_string("res://data/intros/index.json"))
 	var vl: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/voice_lines.json"))
 	check(typeof(idx) == TYPE_DICTIONARY and idx.size() >= 18, "Einspieler: Index mit %d Leveln" % (idx.size() if typeof(idx) == TYPE_DICTIONARY else 0))
+	# Jeder Einspieler läuft im Level, in dem das Element zum ersten Mal vorkommt (Plasmastrahlen: Level 19, nicht 46)
+	var first_level := {}
+	var lfiles := DirAccess.open("res://data/levels").get_files()
+	for f in lfiles:
+		if f.ends_with(".json"):
+			var ll := LevelData.load_file("res://data/levels/" + f)
+			var lj := _read_json("res://data/levels/" + f)
+			for m in lj.get("mechanics", []):
+				if not first_level.has(m) or ll.number < int(first_level[m]):
+					first_level[m] = ll.number
+	var clip_mech := {"spikes": "spikes", "doors": "doors", "beam": "beams", "debris": "debris", "moving_pad": "moving_pads", "hospital": "medical", "meteors": "meteors",
+		"slider": "sliders", "magnet_pull": "attract_fields", "magnet_push": "repel_fields", "magnet_pulse": "pulsing_fields", "heat": "heat", "heat_pulse": "pulsing_heat",
+		"wind": "currents", "gravity": "gravity_zones", "wind_gust": "gusts", "traffic": "traffic", "dark": "darkness"}
+	for n in idx:
+		var cm := String(clip_mech.get(String(idx[n]), ""))
+		if cm != "" and first_level.has(cm):
+			check(int(n) == int(first_level[cm]), "Einspieler %s läuft im ersten Level mit dem Element (Level %s, erstes Vorkommen %s)" % [idx[n], n, str(first_level[cm])])
 	var seen := {}
 	for n in idx:
 		var k := String(idx[n])
@@ -3487,6 +3626,63 @@ func _test_level_edit_roundtrip() -> void:
 			miss2.append(k)
 	check(miss2.is_empty() and LE.DEFAULTS.size() == LE.KINDS.size(), "Editor: Arten- und Parametertexte sind in beiden Sprachen vorhanden %s" % str(miss2))
 
+## Editor: Werte und Beschriftungen liegen mittig in ihrem Feld, passen ganz hinein und liegen nie unter einem Knopf (Magnet „abstoßend“ und
+## Tor „waagerecht“ vergrößerten ihr Feld nach rechts, der Text saß dann unter dem „>“-Knopf). Beide Sprachen, alle Objektarten.
+func _test_editor_labels_fit() -> void:
+	var fv := FontVariation.new()
+	fv.base_font = load("res://assets/fonts/oxanium/Oxanium.ttf")
+	fv.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 600}
+	var old_locale := TranslationServer.get_locale()
+	var bad: Array = []
+	var rows := 0
+	for lang in ["de", "en"]:
+		var tl := Translation.new()
+		tl.locale = lang
+		var texts := _read_json("res://data/i18n/%s.json" % lang)
+		for k in texts:
+			tl.add_message(k, texts[k])
+		TranslationServer.add_translation(tl)
+		TranslationServer.set_locale(lang)
+		var ed: Control = load("res://src/ui/level_editor.gd").new()
+		ed.back = func(): pass
+		ed.open("")
+		ed._ready()
+		ed._set_page(1)
+		var refs: Array = []
+		for kind in LE.KINDS:
+			var r: Dictionary = ed.model.add_object(kind, 20, 10)
+			if not r.is_empty():
+				refs.append(r)
+		ed.model.rows[3] = ed.model.rows[3].substr(0, 5) + "aa" + ed.model.rows[3].substr(7)
+		refs.append({"t": "door", "k": "a"})
+		for r in refs:
+			for variant in 3:
+				var kind: String = ed.model.obj_kind(r)
+				if kind == "magnet":
+					ed.model.set_param(r, "pole", float(variant % 2))
+				if kind == "door":
+					ed.model.set_param(r, "orient", float(variant))
+				if ed.model.param_spec(r, "period").size() > 0 and kind != "door":
+					ed.model.set_param(r, "period", [0.0, 8.0, 100.0][variant])
+				ed._select_obj(r)
+				for l in ed.param_box.find_children("*", "Label", true, false):
+					rows += 1
+					var fs: int = l.get_theme_font_size("font_size")
+					var w: float = fv.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+					var tag := "%s/%s/%s" % [lang, kind, l.text]
+					if l.size.x > 64.0 or l.position.x + l.size.x > 145.0:
+						bad.append("%s: Feld zu breit (%.0f)" % [tag, l.size.x])
+					if w > l.size.x - 0.5:
+						bad.append("%s: Text %.0f breiter als Feld %.0f" % [tag, w, l.size.x])
+					var x0: float = l.position.x + (l.size.x - w) * 0.5 if l.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER else l.position.x
+					for sib in l.get_parent().get_children():
+						if sib is Button and sib.get_rect().intersects(Rect2(x0, l.position.y + 3.0, w, l.size.y - 6.0)):
+							bad.append("%s: Text liegt unter Knopf '%s'" % [tag, sib.text])
+		# Werte der Wirkung und der Ausrichtung sind mittig im Feld
+		ed.free()
+	TranslationServer.set_locale(old_locale)
+	check(rows > 100 and bad.is_empty(), "Editor: alle Werte und Beschriftungen mittig, ganz sichtbar, nie unter einem Knopf (%d Felder; %s)" % [rows, "; ".join(bad.slice(0, 4))])
+
 func _test_level_editor_screen() -> void:
 	var tr_de := Translation.new()          # Übersetzungen wie Loc sie anlegt (der Autoload ist im Testlauf noch nicht gestartet)
 	tr_de.locale = "de"
@@ -3692,8 +3888,24 @@ func _test_level_edit_objects() -> void:
 	# Magnet-Stärke wie in den Originalen
 	var m7 = LE.blank()
 	var mg: Dictionary = m7.add_object("magnet", 20, 10)
-	m7.set_param(mg, "k", -180.0)
-	check(m7.get_param(mg, "k") == -180.0 and m7.validate().level.zones[0].k == -180.0, "Objekte: Magnetstärke bis ±400")
+	check(m7.get_param(mg, "pole") == 0.0 and m7.validate().level.zones[0].k == 100.0, "Objekte: neuer Magnet zieht an (Stärke 100)")
+	m7.set_param(mg, "pole", 1.0)
+	check(m7.get_param(mg, "pole") == 1.0 and m7.get_param(mg, "k") == 100.0 and m7.validate().level.zones[0].k == -100.0, "Objekte: Wirkung „abstoßend“ kehrt nur das Vorzeichen um, die Stärke bleibt")
+	m7.set_param(mg, "k", 180.0)
+	check(m7.get_param(mg, "k") == 180.0 and m7.get_param(mg, "pole") == 1.0 and m7.validate().level.zones[0].k == -180.0, "Objekte: Stärke ändern behält die Wirkung (abstoßend), bis 400")
+	m7.set_param(mg, "pole", 0.0)
+	check(m7.validate().level.zones[0].k == 180.0, "Objekte: zurück auf anziehend")
+	m7.nudge_param(mg, "pole", 1)
+	m7.nudge_param(mg, "k", 1)
+	check(m7.get_param(mg, "pole") == 1.0 and m7.validate().level.zones[0].k == -190.0, "Objekte: Pfeiltasten schalten Wirkung und Stärke")
+	m7.set_param(mg, "k", 9999.0)
+	check(m7.validate().level.zones[0].k == -400.0, "Objekte: Magnetstärke bis 400")
+	var mo := LevelData.load_file("res://data/levels/s4_02.json")           # Original mit abstoßendem Magneten: Wirkung bleibt beim Bearbeiten
+	var repel_found := false
+	for zz in mo.zones:
+		if zz.kind == "magnet" and float(zz.k) < 0.0:
+			repel_found = true
+	check(repel_found, "Original S4-02 enthält einen abstoßenden Magneten")
 
 func _test_level_edit_jobs() -> void:
 	var m = LE.blank()
