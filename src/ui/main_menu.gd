@@ -38,6 +38,7 @@ func _ready() -> void:
 	box.grow_horizontal = Control.GROW_DIRECTION_END
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
+	_add_button_panel()
 	stage.add_child(box)
 	version = MenuKit.version_label()
 	stage.add_child(version)
@@ -227,10 +228,36 @@ func _equalize_grid(grid: GridContainer) -> void:
 	for c in grid.get_children():
 		(c as Control).custom_minimum_size.x = w
 
+## Dunkle Tafel hinter den Menüknöpfen (nicht hinter Logo und Untertitel): die Knöpfe liegen sonst direkt auf dem detailreichen Stadtbild.
+func _add_button_panel() -> void:
+	var panel := Panel.new()
+	var sbf := StyleBoxFlat.new()
+	sbf.bg_color = Color(0.03, 0.04, 0.13, 0.78)
+	sbf.border_color = Color("#3a4580")
+	sbf.set_border_width_all(1)
+	sbf.set_corner_radius_all(4)
+	panel.add_theme_stylebox_override("panel", sbf)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(panel)
+	var fit := func():
+		var r := Rect2()
+		var first := true
+		for i in range(3, box.get_child_count()):          # Kind 0–2: Logo, Untertitel, Abstand
+			var c := box.get_child(i) as Control
+			var cr := Rect2(box.position + c.position, c.size)
+			r = cr if first else r.merge(cr)
+			first = false
+		panel.visible = box.visible and not first             # Levelauswahl/Spielstände blenden die Spalte aus, die Tafel mit
+		panel.position = r.position - Vector2(8, 6)
+		panel.size = r.size + Vector2(16, 12)
+	box.item_rect_changed.connect(fit)
+	box.sort_children.connect(func(): fit.call_deferred())
+	box.visibility_changed.connect(fit)
+
 func _small_button(text: String, cb: Callable) -> Button:
 	var sb := MenuKit.button(text, cb)
-	sb.custom_minimum_size = Vector2(62, 18)
-	sb.add_theme_font_size_override("font_size", 7)
+	sb.custom_minimum_size = Vector2(66, 20)
+	sb.add_theme_font_size_override("font_size", 8)
 	return sb
 
 ## Menüeinträge gleiten nacheinander von links ein (nur beim ersten Aufbau, nicht bei „Weniger Bewegung“).

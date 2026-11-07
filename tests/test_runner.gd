@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -2293,15 +2293,42 @@ func _test_passenger_voices() -> void:
 	for g in ["f", "m"]:
 		for i in 400:
 			var nm := "Fahrgast%d" % i
-			var v := PassengerActor.voice_for(nm, i % 4, g)
+			var lk := PassengerActor.look_for(nm, g, i)
+			var v := PassengerActor.voice_for(nm, lk, g)
 			seen[v] = true
-			stable = stable and v == PassengerActor.voice_for(nm, i % 4, g)
-			right_gender = right_gender and v.begins_with(g)
+			stable = stable and v == PassengerActor.voice_for(nm, lk, g) and lk == PassengerActor.look_for(nm, g, i)
+			right_gender = right_gender and v.begins_with(g) and PassengerActor.LOOK_VOICE[lk] == v
 	check(stable and right_gender, "Fahrgaststimme ist je Fahrgast stabil und passt zum Geschlecht")
 	check(seen.size() == 14, "Alle 14 Fahrgaststimmen kommen vor (%d)" % seen.size())
 	var a := PassengerActor.new()
 	a.pname = "Mika"; a.look = 0; a.gender = "f"
 	check(a.voice_key() == PassengerActor.voice_for("Mika", 0, "f"), "voice_key() nutzt die stabile Auswahl")
+
+## Eine Figur je Stimme (14 Zeilen im Fahrgastblatt, Zeilen 0–3 wie früher) und eigene Verkehrsfahrzeuge in Taxigröße.
+func _test_figures_and_traffic_art() -> void:
+	var lv: Array[String] = PassengerActor.LOOK_VOICE
+	var uniq := {}
+	for v in lv:
+		uniq[v] = true
+	check(lv.size() == 14 and uniq.size() == 14 and (PassengerActor.VOICES_F + PassengerActor.VOICES_M).all(func(v): return uniq.has(v)), "Jede der 14 Stimmen hat genau eine Figur")
+	check(lv.slice(0, 4) == ["f0", "m0", "m2", "f6"], "Zeilen 0–3 behalten die bisherigen Figuren (gespeicherte Werte bleiben gültig)")
+	check(PassengerActor.LOOKS_F.all(func(l): return lv[l].begins_with("f")) and PassengerActor.LOOKS_M.all(func(l): return lv[l].begins_with("m")), "Figurenauswahl passt zum Geschlecht")
+	var sheet: Texture2D = load("res://assets/art/passengers.png")
+	check(sheet != null and sheet.get_width() == 240 and sheet.get_height() == 36 * lv.size(), "Fahrgastblatt hat 10 Frames × 14 Figuren")
+	var a := PassengerActor.new()
+	a.setup({"passenger": "Ines", "gender": "f", "look": 1}, _lvl().pads["1"], 0, true)
+	check(lv[a.look].begins_with("f"), "Figur eines anderen Geschlechts wird ersetzt (keine Männerstimme für eine Fahrgästin)")
+	var ok := true
+	for c in ["red", "blue", "green", "purple", "silver"]:
+		var t: Texture2D = load("res://assets/art/vehicle_%s.png" % c)
+		ok = ok and t != null and t.get_width() == 96 and t.get_height() == 60
+	check(ok, "Verkehr: fünf eigene Fahrzeuggrafiken in Taxi-Auflösung")
+	var pv = load("res://src/game/props_view.gd")
+	check(pv.VEH_SIZE.is_equal_approx(Vector2(32.0, 20.0) * Tuning.TAXI_SCALE), "Verkehr wird in Taxigröße gezeichnet")
+	var lvl := LevelData.from_dict({"id": "T-VEH", "sector": 7, "index": 1, "name": {"de": "t", "en": "t"}, "map": ["#####", "#...#", "#...#", "#####"], "jobs": [],
+		"movers": [{"kind": "vehicle", "path": [[0.5, 1.5], [4.5, 1.5]], "speed": 48.0, "phase": 0.0, "paint": 0}]})
+	var vm: Dictionary = lvl.movers[0] if not lvl.movers.is_empty() else {}
+	check(not vm.is_empty() and float(vm.w) < pv.VEH_SIZE.x and float(vm.h) < pv.VEH_SIZE.y, "Trefferfläche des Verkehrs liegt innerhalb der Grafik")
 
 func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()

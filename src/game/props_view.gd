@@ -101,7 +101,8 @@ func _draw_pads() -> void:
 			draw_colored_polygon(tri, fc)
 			draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]), Color("#0c0f24"), PX * 2)
 			var tx: float = x + 1.0 if dir > 0.0 else x - 9.0
-			draw_string(font, Vector2(tx, top + 8.8), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 7, Color("#0c0f24"))
+			draw_string_outline(font, Vector2(tx, top + 9.1), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, 3, Color(1, 1, 1, 0.92))      # heller Rand: Zahl lesbar auf jeder Wimpelfarbe
+			draw_string(font, Vector2(tx, top + 9.1), label, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color("#0c0f24"))
 		_pad_glow(p, y, col)
 		var plate := _draw_plate(p, y, col)
 		if p.life:
@@ -491,13 +492,15 @@ func _draw_movers() -> void:
 
 ## Tunnelöffnungen in den Seitenwänden an Anfang und Ende jedes Fahrzeugpfads: Fahrzeuge fahren hier ein und aus. Für das Taxi sind sie
 ## nicht betretbar (die Wand bleibt fest). Wird nach den Fahrzeugen gezeichnet und verdeckt so deren Ein- und Austritt.
-const PAINTS := ["candy", "mint", "neon", "night", "gold"]
+## Verkehr: eigenes Fahrzeug („Pendlergleiter“, assets/art/vehicle_<farbe>.png) statt umgefärbter Taxis, in Taxigröße gezeichnet.
+const PAINTS := ["red", "blue", "green", "purple", "silver"]
+const VEH_SIZE := Vector2(32.0, 20.0) * Tuning.TAXI_SCALE       # wie das Taxi (25,6 × 16 Einheiten)
 var _paint_tex := {}
 
 func _vehicle_tex(i: int) -> Texture2D:
 	var id: String = PAINTS[i % PAINTS.size()]
 	if not _paint_tex.has(id):
-		_paint_tex[id] = load("res://assets/art/taxi_%s.png" % id)
+		_paint_tex[id] = load("res://assets/art/vehicle_%s.png" % id)
 	return _paint_tex[id]
 
 func _draw_vehicle_portals() -> void:
@@ -609,14 +612,15 @@ func _draw_vehicle(m: Dictionary) -> void:
 	# Triebwerksflamme hinten und Scheinwerferkegel vorn (im gedrehten Koordinatensystem)
 	draw_set_transform(c, ang, Vector2(1.0, 1.0))
 	var fwd := 1.0 if dir.x >= 0.0 else -1.0
+	var hw := VEH_SIZE.x * 0.5
 	for i in 4:
 		var f := float(i + 1) / 4.0
-		draw_circle(Vector2(-fwd * (14.0 + f * 7.0), 3.0 + sin(t * 20.0 + float(i)) * 0.6), (1.0 - f) * 2.2 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))
-	draw_colored_polygon(PackedVector2Array([Vector2(fwd * 14.0, 2.0), Vector2(fwd * 22.0, -1.5), Vector2(fwd * 22.0, 5.5)]), Color(1.0, 0.98, 0.7, 0.16))
+		draw_circle(Vector2(-fwd * (hw + 0.4 + f * 6.0), 0.7 + sin(t * 20.0 + float(i)) * 0.5), (1.0 - f) * 2.0 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))      # Düse am Heck
+	draw_colored_polygon(PackedVector2Array([Vector2(fwd * (hw - 0.6), 1.6), Vector2(fwd * (hw + 7.0), -1.6), Vector2(fwd * (hw + 7.0), 4.8)]), Color(1.0, 0.98, 0.7, 0.16))
 	draw_set_transform(c, ang, Vector2(flip, 1.0))                                                            # Spiegeln über die Transformation (negative Rechtecke verschieben das Bild um eine Länge)
-	draw_texture_rect(tex, Rect2(-16.0, -10.0, 32.0, 20.0), false)
+	draw_texture_rect(tex, Rect2(-VEH_SIZE * 0.5, VEH_SIZE), false)
 	draw_set_transform(c, ang, Vector2.ONE)
-	draw_circle(Vector2(fwd * 13.5, 2.0), 1.4, Color(1.0, 0.98, 0.75, 0.95))                                   # Scheinwerfer sitzt an der Nase
+	draw_circle(Vector2(fwd * (hw - 1.2), 1.6), 1.1, Color(1.0, 0.98, 0.75, 0.95))                              # Scheinwerfer sitzt an der Nase
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 ## Plasmastrahl: zwei Emitter an den Enden; vor dem Einschalten flackert eine dünne Ladelinie, im Takt brennt ein weiß-orangener
@@ -788,7 +792,10 @@ func _draw_gate() -> void:
 	var sy := r.position.y - 13.0
 	draw_rect(Rect2(cxm - 22, sy, 44, 10), Color("#0c0f24"))
 	draw_rect(Rect2(cxm - 22 + PX * 2, sy + PX * 2, 44 - PX * 4, 10 - PX * 4), Color("#1a2150"))
-	draw_string(font, Vector2(cxm - 22, sy + 7.8), tr("EXIT_SIGN") if open else tr("EXIT_LOCKED"), HORIZONTAL_ALIGNMENT_CENTER, 44, 8, lamp)
+	var tc := Color("#7dffb0") if open else Color("#ff7a8e")          # Schrift bleibt immer hell, nur die Rahmenlampen blinken
+	draw_rect(Rect2(cxm - 22, sy, 44, 10), tc, false, PX * 2)
+	draw_string_outline(font, Vector2(cxm - 22, sy + 7.8), tr("EXIT_SIGN") if open else tr("EXIT_LOCKED"), HORIZONTAL_ALIGNMENT_CENTER, 44, 8, 3, Color("#0c0f24"))
+	draw_string(font, Vector2(cxm - 22, sy + 7.8), tr("EXIT_SIGN") if open else tr("EXIT_LOCKED"), HORIZONTAL_ALIGNMENT_CENTER, 44, 8, tc)
 	if open:
 		# Lichtkegel unter dem Tor
 		var spill := Color("#5dff9a")
@@ -991,10 +998,11 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	var font := Fonts.hud
 	var tw := maxf(16.0, font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x + 4.0)     # Betrag nie abschneiden
 	var mand := run.extra_of(a).is_empty() and a == run.actor
-	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(0.04, 0.05, 0.14, 0.72 * a.fade))
+	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(0.04, 0.05, 0.14, 0.92 * a.fade))
 	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(1.0, 0.82, 0.2, a.fade) if mand else Color(0.3, 0.85, 0.95, 0.7 * a.fade), false, 0.7)
 	if mand and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
 		_gold_star(Vector2(pos.x, pos.y - 28.0 - sin(t * 4.0) * 1.0), 3.6, a.fade)
+	draw_string_outline(font, Vector2(pos.x - tw * 0.5, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, tw, 7, 3, Color(0.02, 0.03, 0.1, a.fade))
 	draw_string(font, Vector2(pos.x - tw * 0.5, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, tw, 7, col)
 
 ## Zapfsäule mit Preisanzeige. Der Kopf knickt mit jeder Berührung weiter ab (Stufe 1–3); nach der dritten explodiert

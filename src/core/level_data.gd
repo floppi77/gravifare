@@ -426,8 +426,10 @@ func _scan_movers(list: Array) -> void:
 			"fall": maxf(float(d.get("fall", 1.6)), 0.3), "warn": float(d.get("warn", 2.0)), "on": float(d.get("on", 3.0)),
 			"speed": float(d.get("speed", 50.0)), "tint": int(d.get("tint", 0)), "paint": int(d.get("paint", d.get("tint", 0))), "spikes": bool(d.get("spikes", false))}
 		if kind == "vehicle":
-			m["w"] = 26.0                         # Trefferfläche passend zum Rumpf des Taxi-Sprites (32 × 20 px), etwas kleiner als die Grafik
-			m["h"] = 12.0
+			m["w"] = 21.0                         # Trefferfläche passend zum Rumpf des Fahrzeugs in Taxigröße (25,6 × 16), etwas kleiner als die Grafik
+			m["h"] = 10.0
+			m["pw"] = 26.0                        # Autopilot plant mit dem früheren, größeren Sicherheitsabstand (Bot-Lösungen bleiben gültig)
+			m["ph"] = 12.0
 			_setup_vehicle_path(m, d)
 		if kind == "beam":
 			m["period"] = maxf(float(d.get("period", 9.0)), m.on + 1.0)
@@ -607,22 +609,23 @@ func vehicle_state(m: Dictionary, t: float) -> Dictionary:
 		acc += seg
 	return {"visible": false}
 
-func _vehicle_rect(m: Dictionary, t: float) -> Rect2:
+func _vehicle_rect(m: Dictionary, t: float, plan := false) -> Rect2:
 	var st := vehicle_state(m, t)
 	if not st.visible:
 		return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
 	var dir: Vector2 = st.dir
-	var w := float(m.w)
-	var h := float(m.h)
+	var w := float(m.pw) if plan else float(m.w)
+	var h := float(m.ph) if plan else float(m.h)
 	var c: Vector2 = st.pos
 	if absf(dir.x) >= absf(dir.y):
 		return Rect2(c.x - w * 0.5, c.y - h * 0.5, w, h)
 	return Rect2(c.x - h * 0.5, c.y - w * 0.5, h, w)
 
 ## Plasmastrahl: nur in den ersten `on` Sekunden jeder Periode sichtbar und gefährlich (Rechteck x/y/w/h fest).
-func _mover_rect(m: Dictionary, t: float) -> Rect2:
+## `plan`: Rechteck für die Vorausplanung des Autopiloten (Fahrzeuge mit Sicherheitsabstand), sonst die echte Trefferfläche.
+func _mover_rect(m: Dictionary, t: float, plan := false) -> Rect2:
 	if m.kind == "vehicle":
-		return _vehicle_rect(m, t)
+		return _vehicle_rect(m, t, plan)
 	if m.kind == "beam":
 		if fposmod(t + float(m.phase), float(m.period)) >= float(m.on):
 			return Rect2(OFFSCREEN, OFFSCREEN, float(m.w), float(m.h))
@@ -720,7 +723,7 @@ func movers_collide_traj(p0: Vector2, v0: Vector2, v_des: Vector2, half: Vector2
 		var p := p0 + v_des * t + (v0 - v_des) * 0.3 * k
 		var box := Rect2(p - half, half * 2.0)
 		for m in movers:
-			if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t0 + t).intersects(box):
+			if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t0 + t, true).intersects(box):
 				return true
 		t += 0.1
 	return false
@@ -729,7 +732,7 @@ func movers_collide_traj(p0: Vector2, v0: Vector2, v_des: Vector2, half: Vector2
 func movers_hit_at(p: Vector2, half: Vector2, t: float, pads_too := false, skip_pad := "") -> bool:
 	var box := Rect2(p - half, half * 2.0)
 	for m in movers:
-		if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t).intersects(box):
+		if (m.kind != "pad" or (pads_too and String(m.pad) != skip_pad)) and _mover_rect(m, t, true).intersects(box):
 			return true
 	return false
 
@@ -758,7 +761,7 @@ func movers_block(center: Vector2, half: Vector2, t0: float, length: float) -> b
 	var t := t0
 	while t <= t0 + length:
 		for m in movers:
-			if m.kind != "pad" and _mover_rect(m, t).intersects(box):
+			if m.kind != "pad" and _mover_rect(m, t, true).intersects(box):
 				return true
 		t += 0.15
 	return false

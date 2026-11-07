@@ -68,6 +68,7 @@ func _bar(x: float, y: float, w: float, h: float, frac: float, col: Color, label
 	draw_rect(Rect2(x - 1, y - 1, w + 2, h + 2), Color("#10142b"))
 	draw_rect(Rect2(x, y, w, h), Color("#232a52"))
 	draw_rect(Rect2(x, y, w * clampf(frac, 0.0, 1.0), h), col)
+	draw_string_outline(font, Vector2(x + 2, y + h - 1), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, 3, Color("#0c0f24"))      # lesbar auch auf hellem Balken
 	draw_string(font, Vector2(x + 2, y + h - 1), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color.WHITE)
 
 ## Das HUD liegt nur in den Randstreifen: oben auf der Felsreihe 0 (y 0–16), unten unter der Bodenreihe (y 336–360).
@@ -85,7 +86,13 @@ func _draw() -> void:
 	var blink := int(Time.get_ticks_msec() / 250) % 2 == 0
 	if run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING and blink:
 		draw_string(font, Vector2(0, size.y * 0.30), tr("HUD_NO_FUEL") % maxf(0.0, Tuning.OUT_OF_FUEL_TIME - run.fuel_dead_t), HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color("#ff4d6d"))
-	# ---------------- oberer Streifen
+	# ---------------- oberer Streifen: dunkle Unterlage über die ganze Fensterbreite (auch Ultrawide); x 296–344 bleibt für das Torschild frei
+	var fr := _full_rect()
+	var band := Color(0.03, 0.04, 0.12, 0.86)
+	draw_rect(Rect2(fr.position.x, 0, 296.0 - fr.position.x, 16), band)
+	draw_rect(Rect2(344, 0, fr.end.x - 344.0, 16), band)
+	draw_line(Vector2(fr.position.x, 16), Vector2(296, 16), Color("#3a4580"), 0.67)
+	draw_line(Vector2(344, 16), Vector2(fr.end.x, 16), Color("#3a4580"), 0.67)
 	_bar(4, 4, 66, 8, fuel_frac, Color("#ff4d6d") if (low and blink) else Color("#ffb02e"), tr("HUD_FUEL"))
 	_bar(75, 4, 66, 8, s.hull / Tuning.HULL_MAX, Color("#5dff9a") if s.hull > 35.0 else Color("#ff4d6d"), tr("HUD_HULL"))
 	draw_string(font, Vector2(147, 12), "¢%d" % int(run.money), HORIZONTAL_ALIGNMENT_LEFT, 56, 9, Color("#ffe14a"))
@@ -110,23 +117,16 @@ func _draw() -> void:
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
 	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname]))), 84.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
 	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
-	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei beschriftete Balken (weiße Marke = Grenze der sicheren Landung)
-	var gx := 598.0
-	var gw := 39.0
-	var rows := [[tr("HUD_VY"), s.vel.y, run.sim.land_vy], [tr("HUD_VX"), absf(s.vel.x), Tuning.LAND_VX], [tr("HUD_TILT"), rad_to_deg(absf(s.tilt)), rad_to_deg(Tuning.LAND_TILT)]]
+	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei Balken mit gezeichneten Symbolen (weiße Marke = Grenze der sicheren Landung;
+	# darüber gestreift, damit der Zustand auch ohne Farbsehen erkennbar ist)
+	var rows := [s.vel.y / run.sim.land_vy, absf(s.vel.x) / Tuning.LAND_VX, absf(s.tilt) / Tuning.LAND_TILT]
 	for i in rows.size():
-		var v: float = rows[i][1]
-		var lim: float = rows[i][2]
+		var r: float = rows[i]
 		if gauge_override.size() == rows.size():
-			v = float(gauge_override[i]) * lim
-		var ratio: float = clampf(v / lim, 0.0, 2.0)
+			r = float(gauge_override[i])
+		var ratio: float = clampf(r, 0.0, 2.0)
 		var col := Color("#5dff9a") if ratio <= 0.7 else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
-		var gy := 1.6 + i * 4.8
-		draw_string(font, Vector2(576, gy + 3.6), String(rows[i][0]), HORIZONTAL_ALIGNMENT_LEFT, 22, 5, Color("#aab6e8"))
-		draw_rect(Rect2(gx - 0.5, gy - 0.5, gw + 1, 4.0), Color("#0c0f24"))
-		draw_rect(Rect2(gx, gy, gw, 3.0), Color("#2a3266"))
-		draw_rect(Rect2(gx, gy, gw * minf(ratio / 2.0, 1.0), 3.0), col)
-		draw_rect(Rect2(gx + gw * 0.5 - 0.5, gy - 0.5, 1, 4.0), Color.WHITE)
+		_gauge_row(i, ratio, col)
 	# Countdown des letzten Pflichtfahrgasts: unter dem Tor, ab 10 s rot blinkend
 	if run.exit_countdown > 0.0 and run.result == Run.Result.RUNNING:
 		var cd := run.exit_countdown
@@ -208,6 +208,39 @@ func _draw() -> void:
 		_draw_result()
 	if paused:
 		draw_rect(_full_rect(), Color(0, 0, 0, 0.55))
+
+## Eine Zeile der Landeanzeige: Symbol (Pfeil nach unten = Sinken, Doppelpfeil = seitwärts, Winkel = Neigung), Balken, Grenzmarke.
+func _gauge_row(i: int, ratio: float, col: Color) -> void:
+	var gx := 588.0
+	var gw := 49.0
+	var gy := 1.0 + i * 5.0
+	var h := 3.6
+	var ic := Color("#d8e0ff")
+	var ix := 578.0
+	var my := gy + h * 0.5
+	match i:
+		0:
+			draw_line(Vector2(ix + 3.5, gy - 0.3), Vector2(ix + 3.5, gy + h), ic, 0.67)
+			draw_polyline(PackedVector2Array([Vector2(ix + 1.5, gy + h - 1.8), Vector2(ix + 3.5, gy + h + 0.2), Vector2(ix + 5.5, gy + h - 1.8)]), ic, 0.67)
+		1:
+			draw_line(Vector2(ix, my), Vector2(ix + 7, my), ic, 0.67)
+			draw_polyline(PackedVector2Array([Vector2(ix + 1.6, my - 1.6), Vector2(ix, my), Vector2(ix + 1.6, my + 1.6)]), ic, 0.67)
+			draw_polyline(PackedVector2Array([Vector2(ix + 5.4, my - 1.6), Vector2(ix + 7, my), Vector2(ix + 5.4, my + 1.6)]), ic, 0.67)
+		2:
+			draw_line(Vector2(ix, gy + h), Vector2(ix + 7, gy + h), ic, 0.67)
+			draw_line(Vector2(ix, gy + h), Vector2(ix + 6, gy - 0.2), ic, 0.67)
+	draw_rect(Rect2(gx - 0.67, gy - 0.67, gw + 1.34, h + 1.34), Color("#0c0f24"))
+	draw_rect(Rect2(gx, gy, gw, h), Color("#2a3266"))
+	var fill := gw * minf(ratio / 2.0, 1.0)
+	var half := gw * 0.5
+	draw_rect(Rect2(gx, gy, minf(fill, half), h), col)
+	var x := gx + half
+	var k := 0
+	while x < gx + fill:
+		draw_rect(Rect2(x, gy, minf(1.34, gx + fill - x), h), col if k % 2 == 0 else col.darkened(0.6))
+		x += 1.34
+		k += 1
+	draw_rect(Rect2(gx + half - 0.67, gy - 0.67, 1.34, h + 1.34), Color.WHITE)
 
 ## Text, der in `width` passen muss: Schriftgröße schrumpft bis 6 px, damit nichts abgeschnitten wird oder überläuft.
 func _fit_text(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color, align: int) -> void:

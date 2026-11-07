@@ -47,7 +47,9 @@ func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 	pname = job.get("passenger", "?")
 	gender = job.get("gender", "f")
 	medical = bool(job.get("fragile", false))
-	look = int(job.get("look", _default_look(gender, index)))
+	look = int(job.get("look", look_for(pname, gender, index)))
+	if look < 0 or look >= LOOK_VOICE.size() or not LOOK_VOICE[look].begins_with(gender):
+		look = look_for(pname, gender, index)
 	surface_y = p.row * Tuning.TILE
 	if instant:
 		x = p.wait_x
@@ -74,21 +76,28 @@ static func pick_identity(level_id: String, job_index: int, attempt: int, old_na
 	var name: String = names[(h / 2) % names.size()]
 	if name == old_name:
 		name = names[((h / 2) + 1) % names.size()]
-	var looks: Array = [0, 3] if gender == "f" else [1, 2]
-	return {"name": name, "gender": gender, "look": looks[(h / 7) % 2]}
+	return {"name": name, "gender": gender, "look": look_for(name, gender, h / 7)}
 
-static func _default_look(g: String, index: int) -> int:
-	var f := [0, 3]
-	var m := [1, 2]
-	return (f if g == "f" else m)[index % 2]
+## Eine Figur je Stimme: Zeile im Fahrgastblatt passengers.png → Stimme (tools/art/aseprite/README.md). Zeilen 0–3 sind die vier
+## ursprünglichen Figuren, damit gespeicherte Werte (mitfahrender Fahrgast im Spielstand) ihre Figur behalten.
+const LOOK_VOICE: Array[String] = ["f0", "m0", "m2", "f6", "f1", "f2", "f3", "f4", "f5", "m1", "m3", "m4", "m5", "m6"]
+const LOOKS_F: Array[int] = [0, 3, 4, 5, 6, 7, 8]
+const LOOKS_M: Array[int] = [1, 2, 9, 10, 11, 12, 13]
+
+## Figur (und damit Stimme) eines Fahrgasts: je Name zufällig wirkend, aber stabil; verbraucht keine Zufallszahlen der Simulation.
+static func look_for(pname: String, gender: String, salt: int) -> int:
+	var pool: Array[int] = LOOKS_F if gender == "f" else LOOKS_M
+	return pool[absi(("%s|%d|%s" % [pname, salt, gender]).hash()) % pool.size()]
 
 ## Stimmen je Geschlecht: f0/f1, m0/m1 (Qwen3-TTS) und f2–f6, m2–m6 (Fish Audio Drama 3).
 const VOICES_F: Array[String] = ["f0", "f1", "f2", "f3", "f4", "f5", "f6"]
 const VOICES_M: Array[String] = ["m0", "m1", "m2", "m3", "m4", "m5", "m6"]
 
 static func voice_for(pname: String, look: int, gender: String) -> String:
-	## Wählt die Stimme aus Name, Figur und Geschlecht: je Fahrgast zufällig wirkend, aber stabil (auch beim Mitflug in den nächsten Level
-	## und nach „Fortsetzen“) und ohne Zufallszahlen der Simulation zu verbrauchen (Geister und Bots bleiben deterministisch).
+	## Die Stimme folgt aus der Figur (jede Stimme hat genau eine Figur, LOOK_VOICE). Nur für eine unbekannte Figur wählt der Name stabil
+	## eine Stimme des Geschlechts (auch beim Mitflug in den nächsten Level und nach „Fortsetzen“ gleich, ohne Zufallszahlen der Simulation).
+	if look >= 0 and look < LOOK_VOICE.size() and LOOK_VOICE[look].begins_with(gender):
+		return LOOK_VOICE[look]
 	var pool: Array[String] = VOICES_F if gender == "f" else VOICES_M
 	return pool[absi(("%s|%d|%s" % [pname, look, gender]).hash()) % pool.size()]
 
