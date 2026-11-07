@@ -579,6 +579,7 @@ func _physics_process(_delta: float) -> void:
 			warn_cd = lerpf(0.12, 1.0, clampf(run.sim.fuel / 25.0, 0.0, 1.0))        # je leerer der Tank, desto schneller piept es
 	else:
 		warn_cd = 0.0
+	_exit_clock_tick()
 	taxi.sync_state()
 	assist.sync_state()
 	if run.result == Run.Result.RUNNING:
@@ -650,6 +651,23 @@ func _physics_process(_delta: float) -> void:
 
 var field_cd := 0.0
 var warn_cd := 0.0
+const EXIT_TICK_SLOW := 15.0        # Restsekunden, ab denen die Uhr langsam tickt
+const EXIT_TICK_FAST := 7.0         # Restsekunden, ab denen sie schnell tickt
+var exit_tick_cd := 0.0             # Zeitdruck am Ausgang: tickende Uhr
+var exit_cd_last := -1.0
+
+## Tickende Uhr für die letzten 15 Sekunden des Ausgangs-Countdowns, ab 7 Sekunden schneller und lauter. Sie tickt nur, solange die Zeit
+## des letzten Fahrgasts wirklich läuft (nicht beim Mitfahren eines Zusatzfahrgasts, nicht in der Flugschule). Der Tankalarm („warn“) bleibt dem Tank vorbehalten.
+func _exit_clock_tick() -> void:
+	var cd: float = run.exit_countdown
+	if run.result == Run.Result.RUNNING and cd > 0.0 and cd <= EXIT_TICK_SLOW and not run.level.tutorial and exit_cd_last >= 0.0 and cd < exit_cd_last:
+		exit_tick_cd -= Tuning.TICK
+		if exit_tick_cd <= 0.0:
+			Sfx.play("exit_tick_fast" if cd <= EXIT_TICK_FAST else "exit_tick", -5.0 if cd <= EXIT_TICK_FAST else -10.0)
+			exit_tick_cd = 1.0
+	else:
+		exit_tick_cd = 0.0
+	exit_cd_last = cd
 var heat_msg_t := -99.0
 var field_msg_t := -99.0
 
@@ -940,11 +958,11 @@ func _on_event(e: Dictionary) -> void:
 				hud.subtitle(e.name, tr("VOICE_BUMPY"), 2.0)
 		"beam_warn":
 			hud.flash_message(tr("MSG_BEAM_WARN"), 2.0)
-			Sfx.play("warn", -5.0)
+			Sfx.play("plasma_warn", -4.0)            # eigener Ton (Plasmabrenner), nicht der Tankalarm
 			Haptics.pulse(0.15, 0.2, 0.2)
 		"meteor_warn":
 			hud.flash_message(tr("MSG_METEOR_WARN"), 2.4)
-			Sfx.play("warn", -4.0)
+			Sfx.play("meteor_warn", -4.0)
 			Haptics.pulse(0.15, 0.2, 0.2)
 		"fragile_broke":
 			Sfx.play_voice(e.voice, "hard")
@@ -1023,13 +1041,11 @@ func _on_event(e: Dictionary) -> void:
 			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
 		"exit_countdown":
 			hud.flash_message(tr("MSG_EXIT_COUNTDOWN"), 3.0)
-			Sfx.play("warn", -6.0)
 			if not run.level.tutorial and Sfx.play_voice("d0", "exit_start"):
 				var ms := int((Sfx.voice_player.stream.get_length() + 0.3) * 1000.0)
 				Sfx.narration_until = Time.get_ticks_msec() + ms            # Fahrgast-Zurufe warten, bis die Zentrale fertig ist
 				hud.subtitle(tr("SPK_DISPATCH"), Sfx.line_text("d0", "exit_start"), float(ms) / 1000.0)
 		"exit_hurry":
-			Sfx.play("warn", -8.0)
 			Haptics.pulse(0.15, 0.1, 0.12)
 			if e.voice != "":
 				Sfx.play_voice(e.voice, "hurry_%d" % e.n)

@@ -496,3 +496,11 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Taxi:** runder Rumpf mit Glanzpunkt, Schachbrettband als Rille, Kuppel mit Spiegelung und Chromkragen, Fahrer mit Gesicht, Schirmmütze und Uniform, Kühlglühen an den Seitenkapseln, Restglut in der Düse (Farbton unter 0,04, bleibt bei allen Lackierungen rot). Umriss und alle Stellen, auf die Code zeichnet (Flammen, Fahrwerk, Aufkleber, Bodenspiegelung), sind unverändert.
 - **Fahrgäste:** Erkennungsmerkmal je Figur (Haarspange, Hemd und Koffer, blaue Schirmmütze, leuchtende Fühler), Augen mit Glanz, Wangen. Der Laufzyklus hat Knie (Zwei-Segment-Beine per IK), der Koffer hängt in der hinteren Hand. Licht kommt von oben, weil die Laufbilder für links gespiegelt werden.
 - **1080p:** Das Taxi wird dort auf 0,8×, die Fahrgäste auf etwa 0,85× verkleinert (nächster Nachbar), einzelne Pixelzeilen fallen weg. Ein TAXI-Schriftzug am Rumpf zerfiel dabei und wurde wieder entfernt.
+
+## Runde 52: Eigene Warntöne
+
+- **Tankalarm nur für den Tank:** Bisher piepte bei Plasmastrahl, Meteorit und Ausgangs-Countdown derselbe Ton wie bei leerem Tank (`warn`). Jetzt spielt `warn` nur noch der Tank (Test `_test_alarm_sounds`).
+- **Plasmastrahl (`plasma_warn`, 0,7 s):** Zündknall, aufsteigendes Zischen, elektrisches Brummen und Knistern, als würde der Strahl aufladen.
+- **Meteorit (`meteor_warn`, 1,5 s):** anschwellendes Rumpeln mit Pfeifen und Rauschen, der Einschlag kündigt sich an.
+- **Tickende Uhr am Ausgang (`exit_tick`, `exit_tick_fast`):** In den letzten 15 Sekunden des Ausgangs-Countdowns tickt eine Uhr, ab 7 Sekunden schneller und lauter (`_exit_clock_tick` in `game.gd`, `EXIT_TICK_SLOW`/`EXIT_TICK_FAST`). Sie tickt nur, solange die Zeit wirklich läuft, also nicht in der Flugschule und nicht, solange der Countdown steht (etwa während ein Zusatzfahrgast mitfährt). Den Beginn des Countdowns kündigt weiter die Zentrale per Stimme an, der zusätzliche Piepton dort entfällt.
+- **Herkunft:** eigene Synthese mit numpy/scipy (`tools/audio/gen_sfx_alarms.py`, fester Zufallssamen, erzeugt die vier WAVs bitgleich). Ohne Zielordner schreibt das Skript nach `build/sound_preview/`, für das Spiel mit `assets/audio/sfx/` aufrufen.
