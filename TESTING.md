@@ -8,8 +8,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Meilenstein M4, laufend):** über 2700 Prüfungen, alle bestanden (2825). Neu je Runde, jüngste zuerst:
+**Stand (Meilenstein M4, laufend):** über 3200 Prüfungen, alle bestanden (3213). Neu je Runde, jüngste zuerst:
 
+- **Runde 49:** Editor zugänglicher (Speichersperre mit Schloss und Warnfarbe, Auswahlrahmen, Name des fokussierten Symbols, Raster- und Rückgängig-Knöpfe, Wertfelder mit Schritt/großem Schritt/Weiterschalten und Halten, automatische Aufträge als Text, Kopfzeile, 12 Aufträge passen, Fehler anspringen, ruhige Markierung bei „Bewegung reduzieren“, Feldanzeige, Verlassen-Dialog, Hilfeseite in beiden Sprachen und für alle Seiten lesbar und im Fenster, Mindestschrift)
 - **Runde 48:** Handlevel: Autopilot-Lösbarkeit nur statisch für 20 Level (`BOT_HAND_LEVELS`), Sektor-Mittelwert der Schwierigkeit steigt, Einflug hindernisfrei in allen 99 Leveln, Metrik-Anflugpunkt unter dem Tor
 - **Runde 47:** Schreibformat und Einarbeiten von Original-Änderungen (97 von 99 Dateien byteidentisch, unveränderte Bearbeitung schreibt nichts), Prüfsumme/Geister beim Speichern, Handlösung (Nachweis je Inhalt, Entwürfe, Speichersperre im Editor, Original-Modus nur im Debug-Modus)
 - **Runde 43:** Editor mit einem Stift (Fahrzeugpfad: Rollen, Beenden, Abbrechen, Punkt ziehen/entfernen, Greifen nur an der Linie; Größe beim Setzen für Zone, Magnet, Meteorit, Plattform; Symbolpaletten; Doppelklick-Füllen; Controllerbelegung per Quelltextprüfung)

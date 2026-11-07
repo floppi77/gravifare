@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -3783,9 +3783,12 @@ func _test_level_editor_screen() -> void:
 	var left := [false]
 	ed2.back = func(): left[0] = true
 	ed2._request_back()
-	check(not left[0] and ed2.leave_armed, "Editor-Bildschirm: Zurück mit Änderungen fragt nach")
+	check(not left[0] and ed2.leave_dlg != null, "Editor-Bildschirm: Zurück mit Änderungen fragt nach (Dialog)")
+	ed2._leave_close()
+	check(not left[0] and ed2.leave_dlg == null, "Editor-Bildschirm: „Weiter bearbeiten“ bleibt im Editor")
 	ed2._request_back()
-	check(left[0], "Editor-Bildschirm: zweites Zurück verlässt den Editor")
+	ed2._leave_discard()
+	check(left[0], "Editor-Bildschirm: „Verwerfen“ verlässt den Editor")
 	# ungültige Karte: kein Speichern
 	var bad = LE.blank()
 	bad.names = {"de": "x", "en": "x"}
@@ -4253,7 +4256,7 @@ func _test_round46_fixes() -> void:
 	check(kb[0].get_node(kb[0].focus_neighbor_bottom) == kb[5] and kb[5].get_node(kb[5].focus_neighbor_bottom) == ed.obj_nav[0] and kb[0].get_node(kb[0].focus_neighbor_top) == ed.page_btns[1], "Objekte-Seite: Arten, Objektauswahl und Seitenknopf sind per Steuerkreuz verbunden")
 	check(ed.param_rows.size() >= 4 and ed.obj_nav[0].get_node(ed.obj_nav[0].focus_neighbor_bottom) == ed.param_rows[0][0], "Objekte-Seite: die Eigenschaften des Objekts sind erreichbar")
 	var last: Array = ed.param_rows[ed.param_rows.size() - 1]
-	check(last[0].get_node(last[0].focus_neighbor_bottom) == ed.btn_save and last[0].get_node(last[0].focus_neighbor_right) == last[1], "Objekte-Seite: links/rechts zwischen „<“ und „>“, unten weiter zur Leiste")
+	check(last.size() == 1 and last[0].has_meta("step") and last[0].get_node(last[0].focus_neighbor_bottom) == ed.btn_save and last[0].get_node(last[0].focus_neighbor_right) == last[0], "Objekte-Seite: je Eigenschaft ein Wertfeld (Links/Rechts ändern den Wert), unten weiter zur Leiste")
 	ed._set_page(0)
 	ed.free()
 	for fn in DirAccess.get_files_at(CS.dir):
@@ -4588,3 +4591,179 @@ func _test_round47_original_editor() -> void:
 	CS._solved_dir = "?"
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tr_de)
+
+
+# ---------------------------------------------------------------------------------------------------------------- Runde 49: Editor zugänglicher
+
+func _test_round49_editor_access() -> void:
+	var old_locale := TranslationServer.get_locale()
+	var trs: Array = []
+	for lang in ["de", "en"]:
+		var tl := Translation.new()
+		tl.locale = lang
+		var texts := _read_json("res://data/i18n/%s.json" % lang)
+		for k in texts:
+			tl.add_message(k, texts[k])
+		TranslationServer.add_translation(tl)
+		trs.append(tl)
+	TranslationServer.set_locale("de")
+	CS.dir = "user://test_community49/"
+	_rm_dir(CS.dir)
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	var settings: Node = self.root.get_node("Settings")
+	var calm_before: bool = settings.values.reduce_motion
+	var ed: Control = load("res://src/ui/level_editor.gd").new()
+	ed.back = func(): pass
+	ed.open("")
+	ed._ready()
+	ed._validate_now()
+	# 4. Speichersperre: Hinweis nicht im Grün des Erfolgs, Schloss auf dem Knopf
+	check(ed._save_blocked() and ed.save_lock.visible and ed.status.get_theme_color("font_color") == ed.COL_WARN, "Zugang: gesperrtes Speichern zeigt Schloss und Warnfarbe")
+	CS.mark_solved(ed.res.id)
+	ed._validate_now()
+	check(not ed.save_lock.visible and ed.status.get_theme_color("font_color") == ed.COL_OK, "Zugang: nach der Handlösung ist das Schloss weg")
+	# 3. Auswahl als Rahmen, 2. Name des fokussierten Symbols
+	ed._select_pal(17)
+	check(ed.pal_btns[17].selected and not ed.pal_btns[0].selected and ed.pal_btns[17].modulate == Color.WHITE, "Zugang: Auswahl ist ein Rahmen, keine Tönung")
+	ed._icon_focused(ed.pal_btns[14])
+	check(ed.sel_label.text.begins_with(tr("ED_T_SPIKES")) and ed.sel_label.text.contains(tr("ED_PICK_A")), "Zugang: Fokus auf einem Symbol nennt seinen Namen (%s)" % ed.sel_label.text)
+	ed._icon_unfocused()
+	check(ed.sel_label.text == ed._tile_name(17), "Zugang: ohne Fokus steht wieder die Auswahl da")
+	ed._icon_focused(ed.kind_btns[7])
+	check(ed.kind_label.text.begins_with(tr("ED_K_magnet")), "Zugang: Fokus auf einer Objektart nennt sie")
+	ed._icon_unfocused()
+	ed._select_pal(0)
+	# 6. Raster zeigt seinen Zustand, 7. Rückgängig/Wiederholen als Knöpfe
+	check(ed.btn_grid.text == tr("ED_GRID_ON"), "Zugang: Raster-Knopf zeigt „an“")
+	ed._toggle_grid()
+	check(ed.btn_grid.text == tr("ED_GRID_OFF") and not ed.grid_on, "Zugang: Raster-Knopf zeigt „aus“")
+	ed._toggle_grid()
+	check(ed.btn_undo.disabled and ed.btn_redo.disabled, "Zugang: Rückgängig/Wiederholen gesperrt, solange es nichts gibt")
+	ed._begin(false, Vector2i(10, 8))
+	ed._end_stroke()
+	check(not ed.btn_undo.disabled and ed.btn_redo.disabled, "Zugang: nach einem Strich ist Rückgängig frei")
+	ed.btn_undo.pressed.emit()
+	check(ed.model.cell(10, 8) == "." and not ed.btn_redo.disabled, "Zugang: der Knopf Rückgängig nimmt den Strich zurück")
+	ed.btn_redo.pressed.emit()
+	check(ed.model.cell(10, 8) == "#", "Zugang: der Knopf Wiederholen stellt ihn wieder her")
+	var row_ok: bool = ed.author_edit.get_node(ed.author_edit.focus_neighbor_right) == ed.btn_undo and ed.btn_help.get_node(ed.btn_help.focus_neighbor_bottom) == ed.bar_btns[5]
+	check(row_ok, "Zugang: Rückgängig, Wiederholen und Hilfe sind per Steuerkreuz erreichbar")
+	# 9. Wertfelder: Schritt, große Schritte, Weiterschalten
+	ed._set_page(1)
+	ed.cursor = Vector2i(10, 6)
+	ed._obj_add()
+	var px: Button = ed.param_vals["x"]
+	var x0: float = ed.model.get_param(ed.obj_ref, "x")
+	(px.get_meta("step") as Callable).call(1)
+	check(ed.model.get_param(ed.obj_ref, "x") == x0 + 1.0 and px.text == str(int(x0 + 1.0)), "Zugang: Wertfeld ändert den Wert (%s)" % px.text)
+	(px.get_meta("step") as Callable).call(ed.BIG_STEP)
+	check(ed.model.get_param(ed.obj_ref, "x") == x0 + 1.0 + ed.BIG_STEP, "Zugang: großer Schritt (LB/RB, Umschalt, Halten)")
+	ed._param_accept("shape")
+	var c1: float = ed.model.get_param(ed.obj_ref, "shape")
+	ed._param_accept("shape")
+	check(c1 == 1.0 and ed.model.get_param(ed.obj_ref, "shape") == 0.0, "Zugang: A/Enter auf einem Schalter schaltet hin und her")
+	var minus: Button = null
+	for c in ed.param_box.get_children():
+		if c is Button and c.text == "<":
+			minus = c
+			break
+	check(minus != null and minus.focus_mode == Control.FOCUS_NONE and minus.action_mode == BaseButton.ACTION_MODE_BUTTON_PRESS, "Zugang: „<“/„>“ sind Mausknöpfe mit Halten, der Fokus liegt auf dem Wert")
+	ed._hold_begin(px.get_meta("step"), 1, 0)
+	check(ed._hold_cb.is_valid() and ed._hold_dir == 1, "Zugang: Halten startet die Wiederholung")
+	ed._hold_tick(0.01)                                       # keine Maustaste gedrückt: die Wiederholung endet
+	check(not ed._hold_cb.is_valid(), "Zugang: Loslassen beendet die Wiederholung")
+	# Level-Seite: Optik und Dunkelheit als Wertfelder, automatische Aufträge als lesbarer Text
+	ed._set_page(2)
+	check(ed.look_label is Button and ed.look_label.has_meta("step") and ed.level_rows[0] == [ed.look_label], "Zugang: Optik ist ein Wertfeld")
+	var sec: int = ed.model.sector
+	(ed.dark_label.get_meta("step") as Callable).call(1)
+	(ed.look_label.get_meta("step") as Callable).call(ed.BIG_STEP)
+	check(ed.model.sector == sec % 9 + 1 and ed.model.dark > 0.0, "Zugang: große Schritte bei Optik schalten nur einen Sektor weiter")
+	ed._rebuild_jobs(true)
+	var disabled := 0
+	var lines := 0
+	for c in ed.job_box.get_children():
+		if c is Button and c.disabled:
+			disabled += 1
+		if c is Label and String(c.text).begins_with("Pad "):
+			lines += 1
+	check(disabled == 0 and lines == ed.last_jobs.size() and lines > 0, "Zugang: automatische Aufträge als Text, keine ausgegrauten Knöpfe (%d Zeilen)" % lines)
+	ed._job_mode()
+	var heads: Array = ed.job_box.get_children().filter(func(c): return c is Label and c.text == tr("ED_J_H_FRAGILE"))
+	check(heads.size() == 1, "Zugang: eigene Aufträge haben eine Kopfzeile (Start, Ziel, Zerbrechlich)")
+	var bottom_y := 0.0
+	for i in 14:
+		ed.model.job_insert(0)
+	ed._rebuild_jobs(true)
+	bottom_y = 0.0
+	for c in ed.job_box.get_children():
+		if c is Button:
+			bottom_y = maxf(bottom_y, c.position.y + c.custom_minimum_size.y)      # Sollhöhe (außerhalb des Baums gilt das Standard-Thema mit größerer Mindesthöhe)
+	check(ed.model.jobs.size() <= 12 and 40.0 + ed.job_box.position.y + bottom_y <= 283.5, "Zugang: auch 12 Aufträge enden über der Statuszeile (%.0f)" % (40.0 + ed.job_box.position.y + bottom_y))
+	ed._job_mode()
+	ed._set_page(0)
+	# 10. Fehler anspringen, 1. ruhige Markierung bei „Bewegung reduzieren“
+	ed.model.rect(Vector2i(14, 3), Vector2i(26, 8), "#")
+	ed._changed()
+	ed._validate_now()
+	check(not ed.res.ok and ed.btn_err.visible and ed._err_list.size() == ed.res.errors.size(), "Zugang: „Fehler (n)“ erscheint neben der Statuszeile")
+	ed._next_error()
+	var e0: Dictionary = ed._err_list[0]
+	check(ed.status.text.begins_with("Fehler 1/") and (e0.cells.is_empty() or ed.cursor == e0.cells[0]), "Zugang: F zeigt den ersten Fehler und setzt den Zeiger auf die Fundstelle (%s)" % ed.status.text)
+	settings.values.reduce_motion = true
+	ed._flag_errors()
+	check(ed._blink == 12.0, "Zugang: mit „Bewegung reduzieren“ bleibt die Markierung ruhig und länger stehen")
+	settings.values.reduce_motion = false
+	ed._flag_errors()
+	check(ed._blink == 5.0, "Zugang: sonst blinkt sie wie bisher 5 s")
+	settings.values.reduce_motion = calm_before
+	ed._undo_redo(true)
+	ed._validate_now()
+	check(ed.res.ok and not ed.btn_err.visible and ed.status.size.x == 630.0, "Zugang: ohne Fehler verschwindet der Knopf wieder")
+	# 11. Feld unter dem Zeiger
+	ed.cursor = Vector2i(4, 20)
+	ed._update_cursor_info(true)
+	check(ed.cursor_info.text.begins_with("x 4 · y 20"), "Zugang: Titelzeile zeigt Koordinaten und Inhalt (%s)" % ed.cursor_info.text)
+	ed._update_cursor_info(false)
+	check(ed.cursor_info.text == "", "Zugang: ohne Zeiger bleibt die Zeile leer")
+	# 12. Rückfrage mit Speichern: gesperrt, wenn nicht gespeichert werden darf
+	ed.model.dirty = true
+	ed._validate_now()
+	ed._request_back()
+	var dlg_btns: Array = ed.leave_dlg.find_children("*", "Button", true, false)
+	check(dlg_btns.size() == 3 and dlg_btns[0].disabled == ed._save_blocked(), "Zugang: Dialog hat Speichern, Verwerfen, Weiter bearbeiten; Speichern nur wenn erlaubt")
+	ed._leave_close()
+	# 13. Hilfeseite für jede Seite und beide Sprachen: alles lesbar und innerhalb des Fensters
+	var bad: Array = []
+	for lang in ["de", "en"]:
+		TranslationServer.set_locale(lang)
+		for pg in 3:
+			ed.page = pg
+			ed._open_help()
+			var n := 0
+			var fv: Font = ed.status.get_theme_font("font")
+			for l in ed.help.find_children("*", "Label", true, false):
+				n += 1
+				var fs: int = l.get_theme_font_size("font_size")
+				var w: float = fv.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+				if fs < ed.MIN_FONT or (l.autowrap_mode == TextServer.AUTOWRAP_OFF and w > l.size.x + 0.5) or l.position.y + 14.0 > 336.0:
+					bad.append("%s/%d: %s" % [lang, pg, l.text])
+			if n < 25:
+				bad.append("%s/%d: nur %d Zeilen" % [lang, pg, n])
+			ed._close_help()
+	ed.page = 0
+	TranslationServer.set_locale("de")
+	check(bad.is_empty() and ed.help == null, "Zugang: Hilfeseite vollständig, lesbar, im Fenster (%s)" % "; ".join(bad.slice(0, 4)))
+	# 14. Mindestschrift
+	var src := FileAccess.get_file_as_string("res://src/ui/level_editor.gd")
+	check(src.contains("const MIN_FONT := 6") and not src.contains("while fs > 5"), "Zugang: Schrift wird nie kleiner als 6 (Quelltextprüfung)")
+	check(src.contains("JOY_BUTTON_BACK") and src.contains("BACK_HOLD") and src.contains("KEY_H:") and src.contains("KEY_F:"), "Zugang: Hilfe per H bzw. Back halten, Fehler per F (Quelltextprüfung)")
+	ed.free()
+	_rm_dir(CS.dir)
+	CS.dir = CS.DIR
+	CS._cache.clear()
+	CS._solved_dir = "?"
+	TranslationServer.set_locale(old_locale)
+	for tl in trs:
+		TranslationServer.remove_translation(tl)

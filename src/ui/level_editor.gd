@@ -22,6 +22,16 @@ const MOVE_DELAY := 0.28
 const MOVE_REPEAT := 0.055
 const COLORS := {"#": Color("#6a78c8"), ".": Color(1, 1, 1, 0.10), "^": Color("#ff4d6d"), "S": Color("#5dd6ff"), "F": Color("#5dff9a"), "L": Color("#ff8ad8"),
 	"H": Color("#ffffff"), "P": Color("#2f8f5a")}
+const COL_OK := Color("#5dff9a")
+const COL_WARN := Color("#ffb35a")                 # gültig, aber Speichern gesperrt (erst selbst lösen)
+const COL_ERR := Color("#ff8a7a")
+const COL_HINT := Color("#c3cdf5")                 # Hinweiszeile (vorher #9aa6dd, zu blass)
+const MIN_FONT := 6                                # kleinste Schrift beim Einpassen (640×360-Fläche: 18 px bei 1080p)
+const HOLD_DELAY := 0.38                           # Halten von „<“/„>“ bzw. Links/Rechts auf einem Wert: erste Wiederholung
+const HOLD_REPEAT := 0.07
+const HOLD_FAST_AFTER := 8                         # ab der achten Wiederholung große Schritte
+const BIG_STEP := 10
+const BACK_HOLD := 0.5                             # Controller: Back halten öffnet die Hilfe (kurz drücken = Vorschau)
 
 var back: Callable
 var model                                   # LevelEdit
@@ -35,8 +45,27 @@ var cursor := Vector2i(4, 4)
 var mouse_mode := false
 var grid_on := true
 var preview_mode := false
-var leave_armed := false
 var gamepad_hint := false
+var leave_dlg: Control = null               # Rückfrage beim Verlassen mit ungespeicherten Änderungen
+var help: Control = null                    # Hilfeseite (H, Hilfe-Knopf, Controller: Back halten)
+var cursor_info: Label                      # Titelzeile links: Feld unter dem Zeiger
+var mode_badge: Label                       # Titelzeile rechts: Zeichnen oder Bedienfelder
+var _badge_state := -1
+var btn_undo: Button
+var btn_redo: Button
+var btn_help: Button
+var btn_err: Button                         # neben der Statuszeile: nächsten Fehler zeigen (F)
+var btn_grid: Button
+var save_lock: Control                      # Schloss auf „Speichern“, solange nicht gespeichert werden kann
+var _err_list: Array = []                   # Fehler der letzten Prüfung: {text, cells, movers}
+var _err_idx := -1
+var _hold_cb := Callable()                  # gehaltener „<“/„>“-Knopf bzw. Links/Rechts auf einem Wert
+var _hold_t := 0.0
+var _hold_dir := 0
+var _hold_n := 0
+var _val_dir := 0                           # Links/Rechts auf einem fokussierten Wert (-1/+1)
+var _back_t := -1.0                         # Controller: Back gedrückt seit … (-1 = nicht gedrückt)
+var _back_used := false
 var view: Control
 var canvas                                  # EditorCanvas
 var overlay: Control
@@ -70,8 +99,8 @@ var drag_point := -1
 var veh_pts: Array = []                     # Fahrzeugpfad im Bau: Eingang, Zwischenpunkte (Feldmittelpunkte)
 var stroke_mode := 0                        # Zeichenmodus des laufenden Strichs (Linie, Rechteck, Füllen)
 var pal_btns: Array = []
-var look_label: Label
-var dark_label: Label
+var look_label: Button                      # Level-Seite: Werte Optik und Dunkelheit (fokussierbar, Links/Rechts ändern)
+var dark_label: Button
 var btn_back: Button
 var bar_btns: Array = []                    # untere Leiste: Speichern, Testflug, Autopilot, Vorschau, Raster, Zurück
 var osk: Control = null                     # Bildschirmtastatur (Controller) für Name und Autor
@@ -169,6 +198,7 @@ func _ready() -> void:
 		model = LevelEdit.blank()
 	title = MenuKit.title("", 10)
 	add_child(_at(title, Vector2(0, 2), Vector2(640, 14)))
+	_build_top()
 	_build_view()
 	_build_panel()
 	_build_bottom()
@@ -210,6 +240,39 @@ func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	return c
 
 # ---------------------------------------------------------------------------------------------------------------- Aufbau
+
+## Titelzeile: links das Feld unter dem Zeiger (Koordinaten, Inhalt), rechts der Eingabemodus (Zeichnen oder Bedienfelder).
+func _build_top() -> void:
+	cursor_info = _label("", Vector2(6, 1), Vector2(230, 14), self)
+	cursor_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	cursor_info.add_theme_font_size_override("font_size", 7)
+	cursor_info.add_theme_color_override("font_color", COL_HINT)
+	mode_badge = _label("", Vector2(492, 2), Vector2(144, 13), self)
+	mode_badge.add_theme_font_size_override("font_size", 7)
+	mode_badge.size = Vector2(144, 14)                 # nicht die Mindesthöhe der Felder: darunter beginnen die Seitenknöpfe
+	_update_badge(true)
+
+func _update_badge(force := false) -> void:
+	var drawing := not _panels_have_focus()
+	var state := (1 if drawing else 0) + (2 if page == 2 else 0)
+	if state == _badge_state and not force:
+		return
+	_badge_state = state
+	mode_badge.visible = not (drawing and page == 2) and not preview_mode     # auf der Level-Seite gibt es nichts zu zeichnen
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("#1d5c3a") if drawing else Color("#3a3f8c")
+	sb.border_color = Color("#5dff9a") if drawing else Color("#ffe14a")
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(3)
+	mode_badge.add_theme_stylebox_override("normal", sb)
+	mode_badge.text = tr("ED_BADGE_DRAW") if drawing else tr("ED_BADGE_PANEL")
+	if hint != null:
+		_update_hint()
+	if overlay != null:
+		overlay.queue_redraw()
+
+func _panels_have_focus() -> bool:
+	return is_inside_tree() and get_viewport().gui_get_focus_owner() != null
 
 func _build_view() -> void:
 	view = Control.new()
@@ -296,7 +359,8 @@ func _icon_button(icon: String, cb: Callable, pos: Vector2, sz: Vector2, parent:
 	b.tooltip_text = tip
 	b.clip_text = true
 	b.pressed.connect(_icon_pressed.bind(cb))
-	b.focus_entered.connect(_icon_focused)
+	b.focus_entered.connect(_icon_focused.bind(b))
+	b.focus_exited.connect(_icon_unfocused)
 	parent.add_child(b)
 	_slim(b)
 	b.size = sz
@@ -306,8 +370,24 @@ func _icon_pressed(cb: Callable) -> void:
 	Sfx.play("ui_ok")
 	cb.call()
 
-func _icon_focused() -> void:
+## Mit Controller oder Tastatur gibt es keinen Hinweistext beim Darüberfahren: das Feld unter der Palette nennt das fokussierte Symbol (danach wieder die Auswahl).
+func _icon_focused(b: Button) -> void:
 	Sfx.play("ui_move", -6.0)
+	var i := pal_btns.find(b)
+	if i >= 0:
+		sel_label.text = _tile_name(i) + ("" if i == pal else " · " + tr("ED_PICK_A"))
+		return
+	i = kind_btns.find(b)
+	if i >= 0:
+		var kn: String = LevelEdit.KINDS[i]
+		kind_label.text = "%s – %s" % [tr("ED_K_" + kn), tr("ED_KH_" + kn)]
+
+func _icon_unfocused() -> void:
+	if sel_label != null:
+		sel_label.text = _tile_name(pal)
+	if kind_label != null and not kind_btns.is_empty():
+		var kn: String = LevelEdit.KINDS[kind_idx]
+		kind_label.text = "%s – %s" % [tr("ED_K_" + kn), tr("ED_KH_" + kn)]
 
 func _tile_name(i: int) -> String:
 	var e: Array = LevelEdit.PALETTE[i]
@@ -348,20 +428,19 @@ func _build_page_objects(pg: Control) -> void:
 	_select_kind(0)
 
 func _build_page_level(pg: Control) -> void:
-	look_label = _label("", Vector2(22, 2), Vector2(100, 14), pg)
-	var look_l := _button("<", _change_look.bind(-1), Vector2(0, 0), Vector2(20, 17), pg)
-	var look_r := _button(">", _change_look.bind(1), Vector2(124, 0), Vector2(20, 17), pg)
-	page_first[2] = look_l
-	look_btns = [look_l, look_r]
+	var xs := [0.0, 20.0, 22.0, 100.0, 124.0, 20.0]
+	var look := _stepper(pg, 0.0, xs, 17.0, func(d: int): _change_look(d), func(): _change_look(1), "l:look", 8)
+	look_label = look[1]
+	page_first[2] = look_label
+	look_btns = [look[0], look[2]]
 	if orig_id != "":
-		look_l.disabled = true                     # Sektor und Index bestimmen bei den Originalen die Levelnummer und den Preisrahmen
-		look_r.disabled = true
-	dark_label = _label("", Vector2(22, 22), Vector2(100, 14), pg)
-	var dark_l := _button("<", _change_dark.bind(-1), Vector2(0, 20), Vector2(20, 17), pg)
-	var dark_r := _button(">", _change_dark.bind(1), Vector2(124, 20), Vector2(20, 17), pg)
+		for b in look:
+			b.disabled = true                     # Sektor und Index bestimmen bei den Originalen die Levelnummer und den Preisrahmen
+	var dark := _stepper(pg, 20.0, xs, 17.0, func(d: int): _change_dark(d), func(): _change_dark(1), "l:dark", 8)
+	dark_label = dark[1]
 	var reroll := _button(tr("ED_REROLL"), _reroll, Vector2(0, 40), Vector2(70, 17), pg, 7)
 	job_mode_btn = _button("", _job_mode, Vector2(74, 40), Vector2(70, 17), pg, 7)
-	level_rows = [[look_l, look_r], [dark_l, dark_r], [reroll, job_mode_btn]]
+	level_rows = [[look_label], [dark_label], [reroll, job_mode_btn]]
 	var job_y := 62.0
 	if Save.debug:
 		skip_btn = _button("", _toggle_skip_solve, Vector2(0, 60), Vector2(144, 17), pg, 7)       # Debug: Speichern ohne eigene Lösung
@@ -392,9 +471,89 @@ func _fit_text(l: Label, text: String, base_size := 7) -> void:
 	l.text = text
 	var fs := base_size
 	var f: Font = l.get_theme_font("font")
-	while fs > 5 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > l.size.x - 1.0:
+	while fs > MIN_FONT and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > l.size.x - 1.0:
 		fs -= 1
 	l.add_theme_font_size_override("font_size", fs)
+
+## Wie `_fit_text`, für Wertknöpfe (Text in einem Knopf mit schmalen Rändern).
+func _fit_button(b: Button, text: String, base_size := 7) -> void:
+	b.text = text
+	var fs := base_size
+	var f: Font = b.get_theme_font("font")
+	while fs > MIN_FONT and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > b.size.x - 6.0:
+		fs -= 1
+	b.add_theme_font_size_override("font_size", fs)
+
+## Zahlenwert als „<“ Wert „>“. `xs` = [x, Breite] von „<“, Wert und „>“. „<“/„>“ sind für die Maus (Halten wiederholt, nach einer Weile in großen Schritten); der Wert
+## selbst ist der Fokuspunkt für Controller und Tastatur: Links/Rechts ändern ihn (Halten wiederholt), Umschalt+Links/Rechts, Bild auf/ab bzw. LB/RB machen große Schritte,
+## A/Enter schaltet weiter (bei Schaltern: um). `step(d)` ändert um d Schritte, `accept()` schaltet weiter. Gibt [„<“, Wert, „>“] zurück.
+func _stepper(parent: Control, y: float, xs: Array, h: float, step: Callable, accept: Callable, key: String, fs := 7) -> Array:
+	var bm := _button("<", func(): step.call(-1), Vector2(xs[0], y), Vector2(xs[1], h), parent, 7)
+	var bv := _button("", accept, Vector2(xs[2], y), Vector2(xs[3], h), parent, fs)
+	var bp := _button(">", func(): step.call(1), Vector2(xs[4], y), Vector2(xs[5], h), parent, 7)
+	for b in [bm, bp]:
+		b.focus_mode = Control.FOCUS_NONE
+		b.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
+		b.button_down.connect(_hold_begin.bind(step, -1 if b == bm else 1, 0))
+		b.button_up.connect(_hold_end)
+	bv.set_meta("step", step)
+	bv.set_meta("key", key)
+	bv.focus_entered.connect(_update_hint)
+	bv.focus_exited.connect(_update_hint)
+	return [bm, bv, bp]
+
+## Halten beginnt (Maus auf „<“/„>“ bzw. Links/Rechts auf einem Wert, `val_dir` ≠ 0): erste Wiederholung nach HOLD_DELAY, danach alle HOLD_REPEAT Sekunden.
+func _hold_begin(step: Callable, dir: int, val_dir: int) -> void:
+	_hold_cb = step
+	_hold_dir = dir
+	_val_dir = val_dir
+	_hold_t = HOLD_DELAY
+	_hold_n = 0
+
+func _hold_end() -> void:
+	_hold_cb = Callable()
+	_val_dir = 0
+
+func _hold_tick(delta: float) -> void:
+	if not _hold_cb.is_valid():
+		return
+	var held: bool = Input.is_action_pressed("ui_right" if _val_dir > 0 else "ui_left") if _val_dir != 0 else Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+	if not held:
+		_hold_end()
+		return
+	_hold_t -= delta
+	if _hold_t <= 0.0:
+		_hold_n += 1
+		_hold_t = HOLD_REPEAT
+		_hold_cb.call(_hold_dir * (BIG_STEP if _hold_n >= HOLD_FAST_AFTER else 1))
+
+## Controller und Tastatur auf einem fokussierten Wert: Links/Rechts ändern ihn, statt den Fokus zu verschieben. Gibt true zurück, wenn das Ereignis verbraucht ist.
+func _value_input(fo: Control, event: InputEvent) -> bool:
+	if not (fo is Button and fo.has_meta("step")):
+		return false
+	var step: Callable = fo.get_meta("step")
+	var big := 0
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_PAGEUP, KEY_PAGEDOWN]:
+		big = -1 if event.keycode == KEY_PAGEDOWN else 1
+	elif event is InputEventJoypadButton and event.pressed and event.button_index in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER]:
+		big = -1 if event.button_index == JOY_BUTTON_LEFT_SHOULDER else 1
+	if big != 0:
+		get_viewport().set_input_as_handled()
+		if not (fo as Button).disabled:
+			step.call(big * BIG_STEP)
+		return true
+	for d in [-1, 1]:
+		var act := "ui_left" if d < 0 else "ui_right"
+		if not event.is_action(act):
+			continue
+		get_viewport().set_input_as_handled()                 # auch Wiederholungen und Loslassen: der Fokus bleibt auf dem Wert, die Wiederholung macht _hold_tick
+		if event.is_action_pressed(act) and not (fo as Button).disabled and not (_hold_cb.is_valid() and _val_dir == d):      # Stick: jedes Bewegungsereignis gilt als „gedrückt“, die Wiederholung macht _hold_tick
+			var shift: bool = event is InputEventKey and event.shift_pressed
+			step.call(d * (BIG_STEP if shift else 1))
+			Sfx.play("ui_move", -8.0)
+			_hold_begin(step, d, d)
+		return true
+	return false
 
 func _build_bottom() -> void:
 	bottom = Control.new()
@@ -405,22 +564,40 @@ func _build_bottom() -> void:
 	status.add_theme_color_override("font_color", Color("#ffe14a"))
 	hint = _label("", Vector2(6, 305), Vector2(630, 11), bottom)
 	hint.add_theme_font_size_override("font_size", 7)
-	hint.add_theme_color_override("font_color", Color("#9aa6dd"))
+	hint.add_theme_color_override("font_color", COL_HINT)
+	btn_err = _button("", _next_error, Vector2(566, 285), Vector2(70, 17), bottom, 7)
+	btn_err.visible = false
 	_label(tr("ED_NAME"), Vector2(6, 318), Vector2(34, 16), bottom)
 	name_edit = _line_edit(Vector2(42, 318), Vector2(220, 16), CommunityLevel.MAX_TEXT)
 	name_edit.text_changed.connect(_name_changed)
 	_label(tr("ED_AUTHOR"), Vector2(270, 318), Vector2(38, 16), bottom)
 	author_edit = _line_edit(Vector2(310, 318), Vector2(130, 16), CommunityLevel.MAX_AUTHOR)
 	author_edit.text_changed.connect(_author_changed)
+	btn_undo = _button(tr("ED_UNDO"), func(): _undo_redo(true), Vector2(444, 318), Vector2(62, 16), bottom, 7)
+	btn_redo = _button(tr("ED_REDO"), func(): _undo_redo(false), Vector2(510, 318), Vector2(62, 16), bottom, 7)
+	btn_help = _button(tr("ED_HELP"), _open_help, Vector2(576, 318), Vector2(60, 16), bottom, 7)
+	btn_undo.tooltip_text = tr("ED_UNDO_TIP")
+	btn_redo.tooltip_text = tr("ED_REDO_TIP")
+	btn_help.tooltip_text = tr("ED_HELP_TIP")
 	var specs := [[tr("ED_SAVE"), func(): _save(true), 98.0], [tr("ED_TEST"), func(): _test_flight(false), 98.0], [tr("ED_AUTOPILOT"), func(): _test_flight(true), 98.0],
-		[tr("ED_PREVIEW"), func(): _set_preview(true), 98.0], [tr("ED_GRID"), _toggle_grid, 98.0], [tr("ED_BACK"), _request_back, 120.0]]
+		[tr("ED_PREVIEW"), func(): _set_preview(true), 98.0], [tr("ED_GRID_ON"), _toggle_grid, 98.0], [tr("ED_BACK"), _request_back, 120.0]]
 	var x := 6.0
 	for sp in specs:
 		var bb := _button(sp[0], sp[1], Vector2(x, 338), Vector2(sp[2], 18), bottom)
 		bar_btns.append(bb)
 		x += float(sp[2]) + 4.0
 	btn_save = bar_btns[0]
+	btn_grid = bar_btns[4]
 	btn_back = bar_btns[5]
+	save_lock = Control.new()
+	save_lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	save_lock.position = Vector2(8, 3)
+	save_lock.size = Vector2(9, 12)
+	save_lock.draw.connect(_draw_lock)
+	save_lock.visible = false
+	btn_save.add_child(save_lock)
+	_update_grid_btn()
+	_update_undo_btns()
 	_wire_bar()
 	_wire_object_page()
 
@@ -432,13 +609,52 @@ func _wire_bar() -> void:
 		b.focus_neighbor_left = b.get_path_to(bar_btns[maxi(i - 1, 0)])
 		b.focus_neighbor_right = b.get_path_to(bar_btns[mini(i + 1, bar_btns.size() - 1)])
 		b.focus_neighbor_bottom = b.get_path_to(b)
-		b.focus_neighbor_top = b.get_path_to(name_edit if i < 3 else author_edit)
-	name_edit.focus_neighbor_left = name_edit.get_path_to(name_edit)
-	name_edit.focus_neighbor_right = name_edit.get_path_to(author_edit)
-	name_edit.focus_neighbor_bottom = name_edit.get_path_to(bar_btns[0])
-	author_edit.focus_neighbor_left = author_edit.get_path_to(name_edit)
-	author_edit.focus_neighbor_right = author_edit.get_path_to(author_edit)
-	author_edit.focus_neighbor_bottom = author_edit.get_path_to(bar_btns[3])
+		b.focus_neighbor_top = b.get_path_to([name_edit, name_edit, name_edit, author_edit, btn_undo, btn_help][i])
+	var row: Array = [name_edit, author_edit, btn_undo, btn_redo, btn_help]
+	var below: Array = [bar_btns[0], bar_btns[3], bar_btns[4], bar_btns[4], bar_btns[5]]
+	for i in row.size():
+		var c: Control = row[i]
+		c.focus_neighbor_left = c.get_path_to(row[maxi(i - 1, 0)])
+		c.focus_neighbor_right = c.get_path_to(row[mini(i + 1, row.size() - 1)])
+		c.focus_neighbor_bottom = c.get_path_to(below[i])
+	_wire_err_btn()
+
+## „Fehler zeigen“ steht über der Name-Zeile, nur solange es Fehler gibt; nach oben führt die Zeile dann dorthin, sonst bleibt sie stehen.
+func _wire_err_btn() -> void:
+	if name_edit == null or btn_help == null:
+		return
+	for c in [name_edit, author_edit, btn_undo, btn_redo, btn_help]:
+		c.focus_neighbor_top = c.get_path_to(btn_err if btn_err.visible else c)
+	btn_err.focus_neighbor_bottom = btn_err.get_path_to(btn_help)
+	btn_err.focus_neighbor_top = btn_err.get_path_to(btn_err)
+	btn_err.focus_neighbor_left = btn_err.get_path_to(btn_err)
+	btn_err.focus_neighbor_right = btn_err.get_path_to(btn_err)
+
+## Schloss auf „Speichern“ (gesperrt: Fehler im Level oder noch nicht selbst gelöst).
+func _draw_lock() -> void:
+	save_lock.draw_arc(Vector2(4.5, 5.0), 3.0, PI, TAU, 10, COL_WARN, 1.6)
+	save_lock.draw_line(Vector2(1.5, 5.0), Vector2(1.5, 6.0), COL_WARN, 1.6)
+	save_lock.draw_line(Vector2(7.5, 5.0), Vector2(7.5, 6.0), COL_WARN, 1.6)
+	save_lock.draw_rect(Rect2(0.5, 5.5, 8.0, 6.0), COL_WARN)
+	save_lock.draw_rect(Rect2(3.75, 7.5, 1.5, 2.5), Color(0.1, 0.1, 0.2))
+
+func _update_save_btn() -> void:
+	if btn_save == null or save_lock == null:
+		return
+	var blocked := _save_blocked()
+	var locked: bool = blocked or not res.get("ok", false)
+	save_lock.visible = locked
+	btn_save.modulate = Color(0.8, 0.8, 0.88) if locked else Color.WHITE
+	btn_save.tooltip_text = tr("ED_SAVE_TIP_SOLVE") if blocked else (tr("ED_SAVE_TIP_ERR") if locked else "")
+
+func _update_grid_btn() -> void:
+	if btn_grid != null:
+		btn_grid.text = tr("ED_GRID_ON") if grid_on else tr("ED_GRID_OFF")
+
+func _update_undo_btns() -> void:
+	if btn_undo != null:
+		btn_undo.disabled = not model.can_undo()
+		btn_redo.disabled = not model.can_redo()
 
 ## Feste Fokusnachbarn der Seiten (Controller, Tastatur): links/rechts in der Reihe, hoch/runter zur Reihe darüber/darunter (gleiche Spalte bzw. letzte Taste). Oben geht es zu
 ## `up` (Seitenknopf), unten zu `down` (Leiste). Die automatische Suche sprang von „<“ zu den Seitenknöpfen statt zu „>“ und übersprang Knöpfe.
@@ -525,6 +741,7 @@ func _author_changed(t: String) -> void:
 
 func _toggle_grid() -> void:
 	grid_on = not grid_on
+	_update_grid_btn()
 	overlay.queue_redraw()
 
 func _sync_fields() -> void:
@@ -538,6 +755,7 @@ func _sync_fields() -> void:
 func _update_title() -> void:
 	var head := tr("ED_TITLE_ORIG") % orig_id.to_upper().replace("_", "-") if orig_id != "" else tr("ED_TITLE")
 	title.text = "%s%s" % [head, " *" if model.dirty else ""]
+	_update_undo_btns()
 
 # ---------------------------------------------------------------------------------------------------------------- Auswahl und Eigenschaften
 
@@ -552,7 +770,7 @@ func _select_tool(i: int) -> void:
 func _select_pal(i: int) -> void:
 	pal = posmod(i, LevelEdit.PALETTE.size())
 	for k in pal_btns.size():
-		pal_btns[k].modulate = Color(1.35, 1.3, 0.8) if k == pal else Color.WHITE
+		pal_btns[k].selected = k == pal
 	sel_label.text = _tile_name(pal)
 	overlay.queue_redraw()
 
@@ -560,7 +778,7 @@ func _select_kind(i: int) -> void:
 	kind_idx = posmod(i, LevelEdit.KINDS.size())
 	_veh_cancel()
 	for k in kind_btns.size():
-		kind_btns[k].modulate = Color(1.35, 1.3, 0.8) if k == kind_idx else Color.WHITE
+		kind_btns[k].selected = k == kind_idx
 	var kn: String = LevelEdit.KINDS[kind_idx]
 	kind_label.text = "%s – %s" % [tr("ED_K_" + kn), tr("ED_KH_" + kn)]
 	if hint != null:
@@ -577,7 +795,9 @@ func _cycle_pal(step: int) -> void:
 		_select_pal(pal + step)
 
 func _change_look(step: int) -> void:
-	model.sector = wrapi(model.sector - 1 + step, 0, 9) + 1
+	if orig_id != "":
+		return
+	model.sector = wrapi(model.sector - 1 + signi(step), 0, 9) + 1
 	_after_property()
 
 func _change_dark(step: int) -> void:
@@ -586,7 +806,7 @@ func _change_dark(step: int) -> void:
 	for k in steps.size():
 		if absf(float(steps[k]) - model.dark) < absf(float(steps[i]) - model.dark):
 			i = k
-	model.dark = float(steps[wrapi(i + step, 0, steps.size())])
+	model.dark = float(steps[wrapi(i + signi(step), 0, steps.size())])
 	_after_property()
 
 func _after_property() -> void:
@@ -622,6 +842,12 @@ func _say(t: String) -> void:
 	status.add_theme_color_override("font_color", Color("#ffe14a"))
 
 func _update_hint() -> void:
+	if hint == null:
+		return
+	var fo: Control = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	if fo != null and fo.has_meta("step"):
+		hint.text = tr("ED_HINT_VALUE_PAD") if gamepad_hint else tr("ED_HINT_VALUE_KEYS")
+		return
 	if page == 1:
 		if not veh_pts.is_empty():
 			hint.text = tr("ED_VEH_ACTIVE")
@@ -651,6 +877,8 @@ func _set_page(i: int, focus := false) -> void:
 	elif page == 2:
 		_rebuild_jobs(true)
 	_update_hint()
+	if mode_badge != null:
+		_update_badge(true)
 	overlay.queue_redraw()
 	if page == 2 and focus and page_first[2] != null and is_inside_tree():
 		(page_first[2] as Button).grab_focus()
@@ -744,14 +972,11 @@ func _rebuild_params() -> void:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_fit_text(l, tr(String(p[4])))
 		var key: String = p[0]
-		var b1 := _button("<", _param_step.bind(key, -1), Vector2(64, y), Vector2(16, 14), param_box, 7)
-		b1.set_meta("key", "p:%s:-" % key)
-		var val := _label("", Vector2(82, y), Vector2(44, 14), param_box)
-		_fit_text(val, _param_text(key))
-		var b2 := _button(">", _param_step.bind(key, 1), Vector2(128, y), Vector2(16, 14), param_box, 7)
-		b2.set_meta("key", "p:%s:+" % key)
+		var st := _stepper(param_box, y, [64.0, 16.0, 82.0, 44.0, 128.0, 16.0], 14.0, func(d: int): _param_step(key, d), func(): _param_accept(key), "p:%s" % key)
+		var val: Button = st[1]
+		_fit_button(val, _param_text(key))
 		param_vals[key] = val
-		param_rows.append([b1, b2])
+		param_rows.append([val])
 		row += 1
 	_wire_object_page()
 	_focus_regrab()
@@ -760,9 +985,25 @@ func _param_step(key: String, direction: int) -> void:
 	if not model.valid_ref(obj_ref):
 		return
 	model.nudge_param(obj_ref, key, direction)
-	for k in param_vals:
-		_fit_text(param_vals[k], _param_text(k))
+	_refresh_param_vals()
 	_changed()
+
+## A/Enter auf einem Wert: einen Schritt weiter, am Ende wieder von vorn (Schalter wechseln so hin und her).
+func _param_accept(key: String) -> void:
+	if not model.valid_ref(obj_ref):
+		return
+	var before: float = model.get_param(obj_ref, key)
+	model.nudge_param(obj_ref, key, 1)
+	if is_equal_approx(before, model.get_param(obj_ref, key)):
+		var spec: Array = model.param_spec(obj_ref, key)
+		if not spec.is_empty():
+			model.set_param(obj_ref, key, float(spec[1]))
+	_refresh_param_vals()
+	_changed()
+
+func _refresh_param_vals() -> void:
+	for k in param_vals:
+		_fit_button(param_vals[k], _param_text(k))
 
 ## Nach dem Neuaufbau einer Liste (Parameter, Aufträge) bekommt der zuletzt bediente Knopf den Fokus zurück, damit Controller und Tastatur nicht aus den Bedienfeldern fallen.
 func _focus_regrab_key(key: String) -> void:
@@ -825,29 +1066,54 @@ func _rebuild_jobs(force := false) -> void:
 	job_mode_btn.text = tr("ED_J_AUTO") if own else tr("ED_J_CUSTOM")
 	var list: Array = model.jobs if own else last_jobs
 	var job_rows: Array = []
+	# Kopfzeile: was die Spalten bedeuten (im Automatikmodus: woher die Liste kommt)
+	if own:
+		for hd in [["ED_J_H_FROM", 11.0, 24.0], ["ED_J_H_TO", 47.0, 32.0], ["ED_J_H_FRAGILE", 80.0, 64.0]]:
+			var hl := _label("", Vector2(hd[1], 0), Vector2(hd[2], 11), job_box)
+			hl.size.y = 11.0
+			hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if hd[0] == "ED_J_H_FRAGILE" else HORIZONTAL_ALIGNMENT_CENTER
+			hl.add_theme_color_override("font_color", COL_HINT)
+			_fit_text(hl, tr(hd[0]), 6)
+	else:
+		var al := _label("", Vector2(0, 0), Vector2(144, 11), job_box)
+		al.size.y = 11.0
+		al.add_theme_color_override("font_color", COL_HINT)
+		_fit_text(al, tr("ED_J_AUTO_HEAD"), 6)
+	var pitch := clampf((283.0 - 40.0 - job_box.position.y - 12.0) / float(maxi(list.size(), 1)), 12.0, 15.0)     # bis zu 12 Aufträge passen über die Statuszeile
+	var bh := minf(14.0, pitch - 0.5)
 	for i in list.size():
 		var j: Dictionary = list[i]
-		var y := i * 15.0
+		var y := 12.0 + i * pitch
 		var n := _label(str(i + 1), Vector2(0, y), Vector2(10, 14), job_box)
 		n.add_theme_font_size_override("font_size", 7)
 		var to_text: String = tr("ED_EXIT_SHORT") if String(j.to) == "exit" else String(j.to)
-		var bf := _button(String(j.from), _job_cycle.bind(i, "from"), Vector2(11, y), Vector2(24, 14), job_box, 7)
+		var fragile: bool = j.get("fragile", false) == true
+		if not own:
+			# Automatische Aufträge: nur zur Ansicht, als gut lesbarer Text statt ausgegrauter Knöpfe
+			var line := _label("", Vector2(11, y), Vector2(133, 14), job_box)
+			line.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			line.add_theme_color_override("font_color", Color("#dfe4ff"))
+			_fit_text(line, tr("ED_J_LINE") % [String(j.from), to_text] + (" · " + tr("ED_J_FRAGILE_WORD") if fragile else ""), 7)
+			continue
+		var bf := _button(String(j.from), _job_cycle.bind(i, "from"), Vector2(11, y), Vector2(24, bh), job_box, 7)
 		var arrow := _label("→", Vector2(36, y), Vector2(10, 14), job_box)
 		arrow.add_theme_font_size_override("font_size", 7)
-		var bt := _button(to_text, _job_cycle.bind(i, "to"), Vector2(47, y), Vector2(32, 14), job_box, 7)
-		var bz := _button("Z" if j.get("fragile", false) == true else "·", _job_fragile.bind(i), Vector2(80, y), Vector2(18, 14), job_box, 7)
-		var bi := _button("+", _job_insert.bind(i), Vector2(100, y), Vector2(18, 14), job_box, 7)
-		var bd := _button("×", _job_remove.bind(i), Vector2(120, y), Vector2(18, 14), job_box, 7)
+		var bt := _button(to_text, _job_cycle.bind(i, "to"), Vector2(47, y), Vector2(32, bh), job_box, 7)
+		_fit_button(bt, to_text)
+		var bz := _button("Z" if fragile else "–", _job_fragile.bind(i), Vector2(80, y), Vector2(18, bh), job_box, 7)
+		var bi := _button("+", _job_insert.bind(i), Vector2(100, y), Vector2(18, bh), job_box, 7)
+		var bd := _button("×", _job_remove.bind(i), Vector2(120, y), Vector2(18, bh), job_box, 7)
+		bf.tooltip_text = tr("ED_J_TIP_FROM")
+		bt.tooltip_text = tr("ED_J_TIP_TO")
+		bz.tooltip_text = tr("ED_J_TIP_FRAGILE")
+		bi.tooltip_text = tr("ED_J_TIP_INSERT")
+		bd.tooltip_text = tr("ED_J_TIP_DELETE")
 		bf.set_meta("key", "j:%d:from" % i)
 		bt.set_meta("key", "j:%d:to" % i)
 		bz.set_meta("key", "j:%d:f" % i)
 		bi.set_meta("key", "j:%d:i" % i)
 		bd.set_meta("key", "j:%d:d" % i)
-		if not own:
-			for b in [bf, bt, bz, bi, bd]:
-				b.disabled = true
-		else:
-			job_rows.append([bf, bt, bz, bi, bd])
+		job_rows.append([bf, bt, bz, bi, bd])
 	_wire_level_page(job_rows)
 	_focus_regrab()
 
@@ -859,7 +1125,6 @@ func _tile_char(erase: bool) -> String:
 func _begin(erase: bool, at: Vector2i, force_fill := false) -> void:
 	if active:
 		return
-	leave_armed = false
 	if page == 2:
 		return
 	if page == 1:
@@ -956,8 +1221,7 @@ func _move_stroke(at: Vector2i) -> void:
 				model.set_path_point(obj_ref, drag_point, Vector2(at) + Vector2(0.5, 0.5))
 				moved = true
 		if moved:
-			for k in param_vals:
-				_fit_text(param_vals[k], _param_text(k))
+			_refresh_param_vals()
 			_changed_soft()
 		return
 	if stroke_mode == TOOL_PEN:
@@ -1138,12 +1402,40 @@ func _draw_overlay() -> void:
 		overlay.draw_rect(Rect2(Vector2(a) * cs, Vector2(b - a + Vector2i.ONE) * cs), Color(1, 0.9, 0.3, 0.25))
 		overlay.draw_rect(Rect2(Vector2(a) * cs, Vector2(b - a + Vector2i.ONE) * cs), Color("#ffe14a"), false, 1.0)
 	_draw_vehicle_paths(cs)
-	if get_viewport().gui_get_focus_owner() == null or mouse_mode:
+	var show_cursor: bool = page != 2 and (get_viewport().gui_get_focus_owner() == null or mouse_mode)      # Level-Seite: kein Zeichnen, kein Zeiger
+	if show_cursor:
 		var ch := String(LevelEdit.PALETTE[pal][0])
 		var col: Color = COLORS.get(ch, Color("#ffd24a") if LevelEdit.PAD_CHARS.contains(ch) else Color.WHITE)
 		var r := Rect2(Vector2(cursor) * cs, Vector2(cs, cs))
-		overlay.draw_rect(r, Color(col.r, col.g, col.b, 0.35))
-		overlay.draw_rect(r, Color("#ffe14a"), false, 1.0)
+		if page == 0:
+			overlay.draw_rect(r, Color(col.r, col.g, col.b, 0.35))
+		overlay.draw_rect(r.grow(1.5), Color(0.02, 0.03, 0.1, 0.9), false, 1.0)       # dunkler Außenrand: der Zeiger bleibt auf hellem Fels und Pads sichtbar
+		overlay.draw_rect(r.grow(0.5), Color("#ffe14a"), false, 2.0)
+	_update_cursor_info(show_cursor)
+
+## Titelzeile links: Koordinaten und Inhalt des Felds unter dem Zeiger (Objekte-Seite: das Objekt darunter).
+func _update_cursor_info(show: bool) -> void:
+	if cursor_info == null:
+		return
+	if not show or page == 2:
+		cursor_info.text = ""
+		return
+	var what := ""
+	if page == 1:
+		var ref: Dictionary = model.pick_object(cursor.x, cursor.y)
+		if not ref.is_empty():
+			what = tr("ED_K_" + model.obj_kind(ref)) + (" " + String(ref.k) if ref.t == "door" else "")
+	if what == "":
+		what = _cell_name(model.cell(cursor.x, cursor.y))
+	cursor_info.text = tr("ED_CURSOR") % [cursor.x, cursor.y, what]
+
+func _cell_name(ch: String) -> String:
+	for i in LevelEdit.PALETTE.size():
+		if LevelEdit.PALETTE[i][0] == ch:
+			return _tile_name(i)
+	if ch == "E":
+		return tr("ED_CELL_EXIT")
+	return ""
 
 ## Fahrzeugpfade: der Pfad im Bau mit erkannten Rollen (Eingang, Zwischenpunkte, Ausgang) und der Pfad des gewählten Fahrzeugs mit seinen Punkten.
 func _pt(p: Variant) -> Vector2:
@@ -1257,17 +1549,68 @@ func _apply_validation(r: Dictionary) -> void:
 			for w in res.warnings.slice(0, 1):
 				txt += "\n" + CommunityLevel.describe(w, true)
 		status.text = txt
-		status.add_theme_color_override("font_color", Color("#5dff9a"))
+		status.add_theme_color_override("font_color", COL_WARN if _save_blocked() else COL_OK)      # gesperrtes Speichern nicht im Grün des Erfolgs
 	else:
 		var lines: Array = []
 		for e in res.errors.slice(0, 2):
 			lines.append(CommunityLevel.describe(e))
+		if res.errors.size() > 2:
+			lines[1] = String(lines[1]) + " " + tr("ED_ERR_MORE") % (res.errors.size() - 2)
 		status.text = "\n".join(lines)
-		status.add_theme_color_override("font_color", Color("#ff8a7a"))
+		status.add_theme_color_override("font_color", COL_ERR)
+	_collect_errors()
+	_update_save_btn()
 	if model.jobs_reset:
 		_refresh_preview()
 	if page == 2:
 		_rebuild_jobs()
+
+## Fehler der letzten Prüfung mit ihren Fundstellen (für „Fehler zeigen“ und die dauerhafte dünne Markierung auf der Karte).
+func _collect_errors() -> void:
+	_err_list = []
+	_err_idx = -1
+	for e in res.get("errors", []):
+		var at: Dictionary = e.get("at", {})
+		var cells: Array = []
+		for c in at.get("cells", []):
+			cells.append(Vector2i(int(c[0]), int(c[1])))
+		var movers: Array = []
+		for i in at.get("movers", []):
+			movers.append(int(i))
+		_err_list.append({"text": CommunityLevel.describe(e), "cells": cells, "movers": movers})
+	if btn_err != null:
+		btn_err.visible = not _err_list.is_empty()
+		btn_err.text = tr("ED_ERR_SHOW") % _err_list.size()
+		status.size.x = 556.0 if btn_err.visible else 630.0
+		_wire_err_btn()
+	overlay.queue_redraw()
+
+## Nächsten Fehler zeigen (F, Knopf neben der Statuszeile): Text in der Statuszeile, Zeiger auf die Fundstelle, die Stelle wird hervorgehoben.
+func _next_error() -> void:
+	if _err_list.is_empty():
+		_say(tr("ED_ERR_NONE") if res.get("ok", false) else tr("CM_CHECKING"))
+		return
+	_err_idx = (_err_idx + 1) % _err_list.size()
+	var e: Dictionary = _err_list[_err_idx]
+	status.text = tr("ED_ERR_N") % [_err_idx + 1, _err_list.size(), e.text]
+	status.add_theme_color_override("font_color", COL_ERR)
+	_bad_cells = (e.cells as Array).duplicate()
+	_bad_movers = (e.movers as Array).duplicate()
+	var target := Vector2i(-1, -1)
+	if not _bad_cells.is_empty():
+		target = _bad_cells[0]
+	elif not _bad_movers.is_empty():
+		var bnd: Rect2 = model.obj_bounds({"t": "mover", "i": _bad_movers[0]})
+		if bnd.size != Vector2.ZERO:
+			target = Vector2i(bnd.get_center().floor())
+	if target.x >= 0:
+		cursor = Vector2i(clampi(target.x, 0, model.w - 1), clampi(target.y, 0, model.h - 1))
+		mouse_mode = false
+	_blink = _blink_time() if (not _bad_cells.is_empty() or not _bad_movers.is_empty()) else 0.0
+	overlay.queue_redraw()
+
+func _blink_time() -> float:
+	return 12.0 if Settings.values.reduce_motion else 5.0                # ohne Blinken bleibt die ruhige Markierung länger stehen
 
 ## Lässt die Objekte blinken, an denen die Prüfung scheitert (Fundstellen `at` der Fehler: Felder und bewegliche Hindernisse).
 func _flag_errors() -> void:
@@ -1281,13 +1624,17 @@ func _flag_errors() -> void:
 				_bad_cells.append(v)
 		for i in at.get("movers", []):
 			_bad_movers.append(int(i))
-	_blink = 5.0 if (not _bad_cells.is_empty() or not _bad_movers.is_empty()) else 0.0
+	_blink = _blink_time() if (not _bad_cells.is_empty() or not _bad_movers.is_empty()) else 0.0
 	overlay.queue_redraw()
 
 func _draw_blink(cs: float) -> void:
+	if not res.get("ok", true):                                         # alle Fundstellen der aktuellen Fehler dauerhaft dünn umrandet
+		for e in _err_list:
+			for v in e.cells:
+				overlay.draw_rect(Rect2(Vector2(v) * cs, Vector2(cs, cs)).grow(-0.5), Color(1, 0.35, 0.35, 0.85), false, 1.0)
 	if _blink <= 0.0:
 		return
-	var on := fmod(_blink, 0.5) > 0.25                                 # 2 Hz hart an/aus: auch bei Farbenschwäche gut zu sehen
+	var on: bool = bool(Settings.values.reduce_motion) or fmod(_blink, 0.5) > 0.25   # 2 Hz hart an/aus (auch bei Farbenschwäche gut zu sehen); mit „Bewegung reduzieren“ ruhig
 	if not on:
 		return
 	for v in _bad_cells:
@@ -1391,18 +1738,140 @@ func _test_flight(autopilot := false) -> void:
 	Flow.start_community(id, autopilot)
 
 func _request_back() -> void:
-	if model.dirty and not leave_armed:
-		leave_armed = true
-		btn_back.text = tr("ED_DISCARD")
-		_say(tr("ED_UNSAVED"))
+	if model.dirty:
+		_open_leave_dialog()
 		return
 	back.call()
+
+# ---------------------------------------------------------------------------------------------------------------- Rückfrage beim Verlassen, Hilfeseite
+
+## Fenster mit Rahmen in der Mitte der 640×360-Fläche; der Rest wird abgedunkelt und nimmt keine Klicks an die Zeichenfläche durch.
+func _modal(sz: Vector2) -> Array:
+	var root := Control.new()
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(MenuKit.dim_rect(0.7))
+	var box := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("#10142b")
+	sb.border_color = Color("#ffe14a")
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(3)
+	box.add_theme_stylebox_override("panel", sb)
+	box.position = (Vector2(640, 360) - sz) * 0.5
+	box.size = sz
+	box.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(box)
+	add_child(root)
+	return [root, box]
+
+## Ungespeicherte Änderungen: Speichern und zurück, Verwerfen oder weiter bearbeiten (Fokus zuerst auf dem harmlosen „Weiter bearbeiten“).
+func _open_leave_dialog() -> void:
+	if leave_dlg != null:
+		return
+	_hold_end()
+	var m := _modal(Vector2(300, 96))
+	leave_dlg = m[0]
+	var box: Control = m[1]
+	var head := _label(tr("ED_LEAVE_TITLE"), Vector2(8, 4), Vector2(284, 16), box)
+	head.add_theme_color_override("font_color", Color("#ffe14a"))
+	head.add_theme_font_size_override("font_size", 9)
+	var blocked: bool = not res.get("ok", false) or _save_blocked()
+	var body := _label(tr("ED_LEAVE_TEXT") + ("\n" + tr("ED_LEAVE_NOSAVE") if blocked else ""), Vector2(8, 22), Vector2(284, 40), box)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_theme_font_size_override("font_size", 7)
+	var b_save := _button(tr("ED_LEAVE_SAVE"), _leave_save, Vector2(8, 70), Vector2(92, 18), box, 7)
+	var b_drop := _button(tr("ED_LEAVE_DISCARD"), _leave_discard, Vector2(104, 70), Vector2(92, 18), box, 7)
+	var b_stay := _button(tr("ED_LEAVE_STAY"), _leave_close, Vector2(200, 70), Vector2(92, 18), box, 7)
+	b_save.disabled = blocked
+	var row: Array = [b_save, b_drop, b_stay]
+	for i in row.size():
+		var c: Control = row[i]
+		c.focus_neighbor_left = c.get_path_to(row[maxi(i - 1, 0)])
+		c.focus_neighbor_right = c.get_path_to(row[mini(i + 1, row.size() - 1)])
+		c.focus_neighbor_top = c.get_path_to(c)
+		c.focus_neighbor_bottom = c.get_path_to(c)
+	if is_inside_tree():
+		b_stay.grab_focus.call_deferred()
+
+func _leave_close() -> void:
+	if leave_dlg != null:
+		leave_dlg.queue_free()
+		leave_dlg = null
+	input_ready = false
+	if is_inside_tree():
+		get_viewport().gui_release_focus()
+	_update_badge(true)
+
+func _leave_save() -> void:
+	_leave_close()
+	if _save(true) != "":
+		back.call()
+
+func _leave_discard() -> void:
+	_leave_close()
+	back.call()
+
+## Hilfeseite: alle Belegungen der aktuellen Seite und die allgemeinen, links Tastatur und Maus, rechts Controller. Jede Taste oder ein Klick schließt sie.
+func _open_help() -> void:
+	if help != null:
+		return
+	_hold_end()
+	_end_key_stroke()
+	var m := _modal(Vector2(620, 336))
+	help = m[0]
+	var box: Control = m[1]
+	var page_key: String = ["MAP", "OBJ", "LVL"][page]
+	var head := _label(tr("ED_HELP_TITLE") % tr(["ED_PAGE_MAP", "ED_PAGE_OBJ", "ED_PAGE_LVL"][page]), Vector2(8, 3), Vector2(604, 16), box)
+	head.add_theme_color_override("font_color", Color("#ffe14a"))
+	head.add_theme_font_size_override("font_size", 10)
+	var cols := [["ED_HELP_KEYS", "ED_HELP_%s_KEYS" % page_key, "ED_HELP_ALL_KEYS"], ["ED_HELP_PAD", "ED_HELP_%s_PAD" % page_key, "ED_HELP_ALL_PAD"]]
+	for ci in cols.size():
+		var x := 10.0 + ci * 304.0
+		var y := 22.0
+		var ch := _label(tr(cols[ci][0]), Vector2(x, y), Vector2(296, 13), box)
+		ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		ch.add_theme_color_override("font_color", COL_OK)
+		y += 15.0
+		for part in [cols[ci][1], cols[ci][2]]:
+			for line in tr(part).split("\n"):
+				var kv := String(line).split("|")
+				if kv.size() < 2:
+					continue
+				var kl := _label("", Vector2(x, y), Vector2(104, 11), box)
+				kl.size.y = 11.0
+				kl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+				kl.add_theme_color_override("font_color", Color("#ffe14a"))
+				_fit_text(kl, kv[0], 7)
+				var vl := _label("", Vector2(x + 108, y), Vector2(188, 11), box)
+				vl.size.y = 11.0
+				vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+				_fit_text(vl, kv[1], 7)
+				y += 11.0
+			y += 5.0
+	var foot := _label(tr("ED_HELP_CLOSE"), Vector2(8, 318), Vector2(604, 14), box)
+	foot.add_theme_font_size_override("font_size", 7)
+	foot.add_theme_color_override("font_color", COL_HINT)
+	help.gui_input.connect(func(ev: InputEvent):
+		if ev is InputEventMouseButton and ev.pressed:
+			_close_help())
+	box.gui_input.connect(func(ev: InputEvent):
+		if ev is InputEventMouseButton and ev.pressed:
+			_close_help())
+
+func _close_help() -> void:
+	if help != null:
+		help.queue_free()
+		help = null
+	input_ready = false                   # die Taste, die die Hilfe schließt, malt bzw. löscht nicht (erst nach dem Loslassen wieder)
 
 func _set_preview(on: bool) -> void:
 	preview_mode = on
 	panel.visible = not on
 	bottom.visible = not on
 	title.visible = not on
+	cursor_info.visible = not on
+	_update_badge(true)
 	if on:
 		get_viewport().gui_release_focus()
 		canvas.lvl.exit_open = false
@@ -1440,7 +1909,24 @@ func _primary_next() -> void:
 func _input(event: InputEvent) -> void:
 	if osk != null:
 		return                                                 # die Bildschirmtastatur gehört sich selbst
+	if help != null:
+		if (event is InputEventKey or event is InputEventJoypadButton) and event.is_pressed() and not event.is_echo():
+			get_viewport().set_input_as_handled()              # jede Taste schließt die Hilfe (Mausklick: über die Fläche selbst)
+			_close_help()
+		elif event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion:
+			get_viewport().set_input_as_handled()
+		return
+	if leave_dlg != null:
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			_leave_close()
+		return                                                 # sonst bedient der normale Fokus die drei Knöpfe
 	var fo := get_viewport().gui_get_focus_owner()
+	if fo != null and (event is InputEventJoypadButton or event is InputEventKey) and event.is_pressed():
+		gamepad_hint = event is InputEventJoypadButton              # Hinweiszeile folgt dem Gerät auch dort, wo ein Wert das Ereignis verbraucht
+	if fo != null and _value_input(fo, event):
+		_update_hint()
+		return
 	if fo is LineEdit and (event is InputEventJoypadButton or event is InputEventJoypadMotion) and not event.is_echo():
 		# Controller im Textfeld: A öffnet die Bildschirmtastatur, die Richtungen verlassen das Feld (es würde sie sonst für den Cursor verbrauchen)
 		if event.is_action_pressed("ui_accept"):
@@ -1472,7 +1958,7 @@ func _release_button_focus() -> void:
 		overlay.queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if osk != null:
+	if osk != null or help != null or leave_dlg != null:
 		return
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		gamepad_hint = true
@@ -1502,6 +1988,16 @@ func _unhandled_input(event: InputEvent) -> void:
 				_set_page(wrapi(page + 1, 0, 3), true)
 			trig_r = down
 		return
+	if event is InputEventJoypadButton and event.button_index == JOY_BUTTON_BACK:
+		get_viewport().set_input_as_handled()                  # Back: kurz = Vorschau (beim Loslassen), gehalten = Hilfe (in _process), auch aus den Bedienfeldern
+		if event.pressed:
+			_back_t = 0.0
+			_back_used = false
+		elif _back_t >= 0.0:
+			if not _back_used:
+				_set_preview(true)
+			_back_t = -1.0
+		return
 	if event is InputEventJoypadButton and event.pressed and (event.button_index == JOY_BUTTON_LEFT_STICK or event.button_index == JOY_BUTTON_RIGHT_STICK):
 		get_viewport().set_input_as_handled()                  # Stickklick: L3 rückgängig, R3 wiederholen
 		_undo_redo(event.button_index == JOY_BUTTON_LEFT_STICK)
@@ -1511,8 +2007,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			if page == 2:
 				_set_page(0)                                   # Level-Seite: B geht zurück zur Karte (dort wird gezeichnet)
+				input_ready = false
 			else:
 				get_viewport().gui_release_focus()             # in den Bedienfeldern geht B (wie Esc) zurück zur Zeichenfläche
+				input_ready = false                            # B löscht erst nach dem Loslassen wieder
 			overlay.queue_redraw()
 		elif event is InputEventKey:
 			get_viewport().set_input_as_handled()
@@ -1552,8 +2050,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_F3:
 					_set_page(2, true)
 				KEY_G:
-					grid_on = not grid_on
-					overlay.queue_redraw()
+					_toggle_grid()
+				KEY_F:
+					_next_error()
+				KEY_H:
+					_open_help()
 				KEY_V:
 					_set_preview(true)
 				KEY_T, KEY_F5:
@@ -1580,8 +2081,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				_primary_next()
 			JOY_BUTTON_START:
 				_test_flight(false)
-			JOY_BUTTON_BACK:
-				_set_preview(true)
 			_:
 				handled2 = false
 		if handled2:
@@ -1607,7 +2106,21 @@ func _pad_pressed(button: int) -> bool:
 			return true
 	return false
 
+func _end_key_stroke() -> void:
+	if key_paint or key_erase:
+		key_paint = false
+		key_erase = false
+		_end_stroke()
+
 func _process(delta: float) -> void:
+	_hold_tick(delta)
+	if _back_t >= 0.0:
+		_back_t += delta
+		if _back_t >= BACK_HOLD and not _back_used:
+			_back_used = true
+			_open_help()
+	if leave_dlg == null and help == null:
+		_update_badge()
 	if _blink > 0.0:
 		_blink = maxf(0.0, _blink - delta)
 		overlay.queue_redraw()
@@ -1620,13 +2133,11 @@ func _process(delta: float) -> void:
 		if validate_t < 0.0:
 			_start_async()
 	_poll_validation()
-	if preview_mode:
+	if preview_mode or help != null or leave_dlg != null:
+		_end_key_stroke()
 		return
 	if get_viewport().gui_get_focus_owner() != null:
-		if key_paint or key_erase:
-			key_paint = false
-			key_erase = false
-			_end_stroke()
+		_end_key_stroke()
 		return
 	# Cursor mit Tastatur und Controller: sofort ein Schritt, nach kurzer Pause wiederholt
 	var dir := Vector2i(
