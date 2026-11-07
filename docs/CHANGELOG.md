@@ -3,6 +3,30 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.9
+
+### Deutsch
+
+**Level-Editor**
+- Zahlenfelder lassen sich mit Links/Rechts ändern, Halten wiederholt, nach einer Weile in größeren Schritten
+- Neue Hilfeseite mit allen Tasten und Knöpfen für Tastatur, Maus und Controller (H, Knopf „Hilfe“ oder Back halten)
+- „Fehler (n)“ bzw. F springt von Fehler zu Fehler und markiert die Stelle im Level
+- „Speichern“ trägt ein Schloss, solange das Level Fehler hat oder noch nicht selbst gelöst ist; das Verlassen mit ungespeicherten Änderungen fragt nach (Speichern, Verwerfen, Weiter bearbeiten)
+- Neue Knöpfe für Rückgängig, Wiederholen und Hilfe; Raster-Zustand, Eingabemodus und das Feld unter dem Zeiger sind sichtbar
+- Automatische Aufträge stehen als lesbarer Text da, bis zu 12 Aufträge passen auf den Bildschirm
+- Mit „Bewegung reduzieren“ blinken Fehlerstellen nicht mehr, sondern bleiben ruhig markiert
+
+### English
+
+**Level editor**
+- Number fields can be changed with Left/Right; holding repeats, and after a while it moves in bigger steps
+- New help page with all keys and buttons for keyboard, mouse and controller (H, the "Help" button or hold Back)
+- "Errors (n)" or F jumps from error to error and marks the spot in the level
+- "Save" carries a lock while the level has errors or has not been solved by you yet; leaving with unsaved changes asks first (save, discard, keep editing)
+- New buttons for undo, redo and help; grid state, input mode and the cell under the pointer are shown
+- Automatic jobs are shown as readable text, and up to 12 jobs fit on screen
+- With "Reduce motion" error spots no longer blink but stay calmly marked
+
 ## 0.9.8
 
 ### Deutsch
