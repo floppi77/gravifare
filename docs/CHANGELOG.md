@@ -3,6 +3,28 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.6
+
+### Deutsch
+
+**Fehlerbehebungen**
+- Erklärvideos zu neuen Spielelementen (Dornen, Tore, Magnete …) waren beim Einflug ins Level nicht zu sehen, nur die Stimme lief: Sie liegen jetzt über der Übergangsansicht
+- „Neues Spiel“ übernahm die Werkstatt-Einbauten des früheren Spielstands, und „Fortsetzen“ erschien schon ohne laufenden Feldzug: Ein neues Spiel beginnt jetzt ohne Einbauten, „Fortsetzen“ gibt es nur mit laufendem Feldzug (Bestzeiten und Medaillen bleiben)
+
+**Spiel**
+- Das ausgefahrene Fahrwerk bremst das Taxi nicht mehr beim Fallen nach unten (Schwerkraft und Massenträgheit); nach oben und zur Seite bleibt die Bremswirkung als Feinmanöver-Feature
+- „Neues Spiel“ startet direkt Level 1; das Tutorial ist nicht mehr Pflicht und bleibt als eigener Menüpunkt erreichbar
+
+### English
+
+**Bug fixes**
+- The explainer videos for newly introduced game elements (spikes, gates, magnets …) were hidden during the arrival flight, only the voice played: they now sit above the transition view
+- "New Game" kept the workshop upgrades from the previous save, and "Continue" appeared without a running campaign: a new game now starts without upgrades, "Continue" only shows with a running campaign (best times and medals are kept)
+
+**Game**
+- The extended landing gear no longer brakes the taxi when falling downwards (gravity and inertia); braking upwards and sideways stays as a fine-manoeuvre feature
+- "New Game" starts level 1 directly; the tutorial is no longer mandatory and remains available as its own menu entry
+
 ## 0.9.5
 
 ### Deutsch
