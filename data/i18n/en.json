@@ -394,7 +394,7 @@
  "CL_WARN_BOT_FAIL": "The autopilot did not complete the level – it may still be solvable.",
  "CL_ERR_JOB_CHAIN": "Job %d: the passenger must not wait on the pad where the taxi is standing (start or last destination).",
  "HELP_CONTINUE": "Continue the campaign where you left off.",
- "HELP_PLAY": "New campaign: flight school first, then level 1.",
+ "HELP_PLAY": "New campaign from level 1. Flight school is its own menu entry.",
  "HELP_LEVELS": "Practise an unlocked level; medals and best times count.",
  "HELP_TUTORIAL": "Flight school: thrust, landing, refuelling and passengers.",
  "HELP_DAILY": "One map a day with fixed jobs and prices.",

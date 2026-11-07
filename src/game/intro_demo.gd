@@ -83,12 +83,12 @@ func _pilot() -> Array:
 	var a_des := Vector2.ZERO
 	match mode:
 		"hover":
-			a_des = (((p - s.pos) * 2.0).limit_length(70.0) - s.vel) / 0.30 + s.vel * s.drag()
+			a_des = (((p - s.pos) * 2.0).limit_length(70.0) - s.vel) / 0.30 + s.vel * s.drag_v()
 		"go":
-			a_des = (((p - s.pos) * 1.8).limit_length(float(st.get("speed", 70.0))) - s.vel) / 0.30 + s.vel * s.drag()
+			a_des = (((p - s.pos) * 1.8).limit_length(float(st.get("speed", 70.0))) - s.vel) / 0.30 + s.vel * s.drag_v()
 		"level":
 			var vy := clampf((float(st.get("y", s.pos.y)) - s.pos.y) * 2.0, -60.0, 60.0)
-			a_des = Vector2(0.0, (vy - s.vel.y) / 0.30 + s.vel.y * s.drag())
+			a_des = Vector2(0.0, (vy - s.vel.y) / 0.30 + s.vel.y * s.drag_v().y)
 		"land":
 			var pad: Dictionary = level.pads[String(st.get("pad", "1"))]
 			var pv := float(pad.get("dx_step", 0.0)) / Tuning.TICK          # Tempo der (fahrenden) Plattform
@@ -101,7 +101,7 @@ func _pilot() -> Array:
 				v_des.y = clampf((foot - 9.0 - s.pos.y) * 1.5, 12.0, 26.0)
 			else:
 				v_des.y = clampf((foot - 55.0 - s.pos.y) * 2.0, -50.0, 40.0)
-			a_des = (v_des - s.vel) / 0.30 + s.vel * s.drag()
+			a_des = (v_des - s.vel) / 0.30 + s.vel * s.drag_v()
 		_:
 			a_des = Vector2.ZERO
 	var x := clampf(a_des.x / s.side_power(), -1.0, 1.0)

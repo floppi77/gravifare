@@ -94,6 +94,7 @@ func start_campaign(id: String) -> void:
 	practice = false
 	shift = false
 	daily = false
+	Save.reset_workshop()                  # neuer Feldzug beginnt ohne Einbauten
 	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
 	start_level(id)
 

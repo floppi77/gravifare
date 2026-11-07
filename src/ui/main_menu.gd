@@ -150,20 +150,17 @@ func show_main(focus_lang := "") -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 2)
 	box.add_child(spacer)
-	var any_done: bool = not Save.data.completed.is_empty()
 	var id := _next_open_level()
 	var ids := Flow.level_ids()
-	if any_done or not Save.campaign().is_empty():
+	if not Save.campaign().is_empty():              # „Fortsetzen“ nur mit laufendem Feldzug; erledigte Level allein genügen nicht (neues Spiel, Tutorial)
 		box.add_child(_menu_button(tr("MENU_CONTINUE"), "continue", func():
 			if not Flow.resume_campaign():
 				Flow.start_campaign(id)))
 	var start_new := func():
 		Save.clear_campaign()
+		Save.reset_workshop()
 		var first: String = ids[0] if not ids.is_empty() else id
-		if bool(Save.data.get("tutorial_done", false)):
-			Flow.start_campaign(first)
-		else:
-			Flow.start_tutorial(first)                 # neuer Spielstand: erst die Flugschule, danach Level 1
+		Flow.start_campaign(first)                     # Neues Spiel beginnt direkt mit Level 1; die Flugschule ist der eigene Menüpunkt „Tutorial“
 	box.add_child(_menu_button(tr("MENU_PLAY"), "play", func():
 		if Save.campaign().is_empty():
 			start_new.call()

@@ -394,7 +394,7 @@
  "CL_WARN_BOT_FAIL": "Der Autopilot hat das Level nicht geschafft – es kann trotzdem lösbar sein.",
  "CL_ERR_JOB_CHAIN": "Auftrag %d: Der Fahrgast darf nicht auf dem Pad warten, auf dem das Taxi gerade steht (Start oder letztes Ziel).",
  "HELP_CONTINUE": "Den Feldzug dort fortsetzen, wo du aufgehört hast.",
- "HELP_PLAY": "Neuer Feldzug: erst die Flugschule, danach Level 1.",
+ "HELP_PLAY": "Neuer Feldzug ab Level 1. Die Flugschule steht als eigener Punkt bereit.",
  "HELP_LEVELS": "Ein freigeschaltetes Level üben; Medaillen und Bestzeiten zählen.",
  "HELP_TUTORIAL": "Flugschule: Schub, Landung, Tanken und Fahrgäste.",
  "HELP_DAILY": "Jeden Tag eine Karte mit festen Aufträgen und Preisen.",

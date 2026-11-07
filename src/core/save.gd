@@ -141,6 +141,12 @@ func note_campaign_lives(n: int) -> void:
 		data.campaign["lives"] = n
 		write()
 
+## Neuer Feldzug: ohne Einbauten der Werkstatt (die gehören zum laufenden Feldzug, siehe lose_sector). Bestzeiten und Medaillen bleiben.
+func reset_workshop() -> void:
+	if not data.get("workshop", {}).is_empty():
+		data["workshop"] = {}
+		write()
+
 func clear_campaign() -> void:
 	if not data.get("campaign", {}).is_empty():
 		data["campaign"] = {}

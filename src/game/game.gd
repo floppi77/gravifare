@@ -330,7 +330,7 @@ func start_clip(k: String) -> void:
 		Save.data["seen_clips"] = seen
 		Save.write()
 	var layer := CanvasLayer.new()
-	layer.layer = 12
+	layer.layer = 45                                       # über der Übergangsebene (40): der Einspieler startet beim Einflug
 	layer.offset = Stage.margin(self)
 	add_child(layer)
 	var c := IntroClip.new()

@@ -230,6 +230,9 @@ func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, 
 func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear)
 func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear)
 func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, gear)
+## Dämpfung je Achse: Das ausgefahrene Fahrwerk bremst seitlich und nach oben (Feinmanöver-Feature), aber nicht nach unten – dort tragen
+## Schwerkraft und Massenträgheit das Taxi weiter.
+func drag_v() -> Vector2: return Vector2(drag(), Tuning.DRAG if vel.y > 0.0 else drag())
 func max_speed() -> float: return lerpf(Tuning.MAX_SPEED, Tuning.GEAR_MAX_SPEED, gear)
 
 func gear_extended() -> bool:
@@ -300,8 +303,13 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	fuel = maxf(0.0, fuel - dt * burn_k * (Tuning.BURN_UP * up + Tuning.BURN_DOWN * down + Tuning.BURN_SIDE * absf(side)))
 
 	vel += acc * dt
-	vel *= maxf(0.0, 1.0 - drag() * dt)
-	if vel.length() > max_speed():
+	var dv := drag_v()
+	vel = Vector2(vel.x * maxf(0.0, 1.0 - dv.x * dt), vel.y * maxf(0.0, 1.0 - dv.y * dt))
+	if vel.y > 0.0 and max_speed() < Tuning.MAX_SPEED:
+		vel.x = clampf(vel.x, -max_speed(), max_speed())          # Fahrwerk: seitlich gedeckelt, nach unten gilt die normale Höchstgeschwindigkeit
+		if vel.length() > Tuning.MAX_SPEED:
+			vel = vel.normalized() * Tuning.MAX_SPEED
+	elif vel.length() > max_speed():
 		vel = vel.normalized() * max_speed()
 
 	var target_tilt := side * Tuning.TILT_MAX
