@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "1.0.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "1.0.1"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
@@ -186,9 +186,7 @@ func start_daily() -> void:
 	daily_rule = dev_day_rule if dev_day_rule != "" else DayShift.rule_of(daily_date)
 	daily_goal = dev_day_goal if dev_day_goal != "" else DayShift.goal_of(daily_date)
 	daily_briefed = false
-	var pool := Save.daily_pool(level_ids())
-	if pool.is_empty():
-		pool = level_ids()                 # nur im Debug-Modus erreichbar (sonst erst ab Sektor 1 frei)
+	var pool := level_ids()                    # alle 99 Level: für alle Spieler dasselbe Level am selben Tag, auch wenn es noch nicht geschafft ist
 	var id := Daily.level_of_day(Save.daily_entry(), pool, daily_date)
 	if id == "":
 		return

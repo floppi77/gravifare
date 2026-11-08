@@ -1,5 +1,5 @@
 class_name Daily
-## Tagesflug: eine Karte pro Tag mit festem Seed. Gleiches Datum = gleiche Karte (bei gleichem Fortschritt), gleiche Aufträge,
+## Tagschicht: eine Karte pro Tag mit festem Seed. Gleiches Datum = gleiche Karte für alle (aus allen 99 Leveln), gleiche Aufträge,
 ## gleiche Spritpreise und Zusatzfahrgäste; geflogen wird mit dem Serientaxi (ohne Werkstatt-Einbauten), damit Ergebnisse
 ## vergleichbar bleiben. Beliebig viele Versuche, gewertet wird der beste des Tages. Reine Logik ohne Autoloads (testbar).
 
@@ -38,18 +38,18 @@ static func yesterday(date: String) -> String:
 	var t := Time.get_unix_time_from_datetime_string(date + "T12:00:00")
 	return Time.get_date_string_from_unix_time(int(t) - 86400)
 
-## Tageskarte festhalten: Ist für `date` schon eine gewählt, bleibt sie (auch wenn inzwischen mehr Level geschafft sind).
-## `d` ist der Speicherstand-Eintrag "daily" und wird verändert. Rückgabe: Level-ID.
+## Tageskarte des Tages: ein Level aus allen `pool` (die Level des Spiels, nicht nur die geschafften – für alle Spieler dasselbe, auch wenn es noch nicht freigespielt ist).
+## `d` ist der Speicherstand-Eintrag "daily" und wird verändert: ein neuer Tag setzt Bestwert und Medaille zurück. Rückgabe: Level-ID.
 static func level_of_day(d: Dictionary, pool: Array, date: String) -> String:
-	if String(d.get("date", "")) == date and pool.has(String(d.get("level", ""))):
-		return String(d.level)
-	d["date"] = date
-	d["level"] = pick_level(pool, date)
-	d["best"] = 0
-	d["done"] = false
-	d["medal"] = 0
-	d["gold"] = false
-	return String(d.level)
+	var id := pick_level(pool, date)
+	if String(d.get("date", "")) != date:
+		d["date"] = date
+		d["best"] = 0
+		d["done"] = false
+		d["medal"] = 0
+		d["gold"] = false
+	d["level"] = id
+	return id
 
 ## Abgeschlossene Tagschicht werten. `d` = Eintrag "daily", `stats` = Statistik; beide werden verändert. `score` = Wertung des Tagesziels, `medal` = 0–3 (siehe DayShift).
 ## Tage in Folge zählen nur abgeschlossene Tagschichten; der beste Wert und die beste Medaille des Tages bleiben stehen, Gold zählt je Tag einmal.

@@ -2981,10 +2981,27 @@ func _test_daily_flight() -> void:
 	for d in 40:
 		seen[Daily.pick_level(pool, Time.get_date_string_from_unix_time(1793700000 + d * 86400))] = true
 	check(seen.size() >= 3, "Tagesflug: Karten wechseln von Tag zu Tag (%d verschiedene in 40 Tagen)" % seen.size())
-	# Tageskarte bleibt, auch wenn am selben Tag weitere Level geschafft werden
+	# Tageskarte: aus allen 99 Leveln, für alle am selben Tag dasselbe – unabhängig vom Fortschritt und von früheren Einträgen im Spielstand
+	var all_ids: Array = []
+	var ldir := DirAccess.open("res://data/levels")
+	for lf in ldir.get_files():
+		if lf.ends_with(".json"):
+			all_ids.append(lf.get_basename())
+	all_ids.sort()
 	var de := {}
-	var first := Daily.level_of_day(de, pool, "2026-11-03")
-	check(Daily.level_of_day(de, pool + ["s4_01", "s4_02", "s4_03"], "2026-11-03") == first, "Tagesflug: Tageskarte bleibt den ganzen Tag gleich")
+	var first := Daily.level_of_day(de, all_ids, "2026-11-03")
+	var other := {"date": "2026-11-03", "level": "s1_01", "best": 5}                       # Eintrag eines Spielers mit anderem Stand (z. B. aus einer älteren Version)
+	var second := Daily.level_of_day(other, all_ids, "2026-11-03")
+	check(all_ids.size() == 99 and first == second and all_ids.has(first) and String(other.level) == first and int(other.best) == 5, "Tagschicht: alle Spieler bekommen am selben Tag dasselbe Level aus allen 99, der Bestwert des Tages bleibt")
+	var day_seen := {}
+	for dd in 400:
+		day_seen[Daily.pick_level(all_ids, Time.get_date_string_from_unix_time(1793700000 + dd * 86400))] = true
+	var late_sector := false
+	for sid in day_seen:
+		late_sector = late_sector or String(sid).begins_with("s9_")
+	check(day_seen.size() > 70 and late_sector, "Tagschicht: im Lauf der Zeit kommen fast alle der 99 Level dran, auch spätere Sektoren (%d verschiedene in 400 Tagen)" % day_seen.size())
+	var next_day := Daily.level_of_day(de, all_ids, "2026-11-04")
+	check(int(de.best) == 0 and String(de.date) == "2026-11-04" and next_day == Daily.pick_level(all_ids, "2026-11-04"), "Tagschicht: ein neuer Tag setzt den Bestwert zurück und wählt neu")
 	# gleiche Aufträge und Preise am selben Tag, andere am nächsten
 	var lvl := LevelData.load_file("res://data/levels/s2_05.json")
 	var j1 := Daily.jobs_for(lvl, "2026-11-03")

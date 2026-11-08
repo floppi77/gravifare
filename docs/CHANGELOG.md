@@ -3,6 +3,26 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.0.1
+
+### Deutsch
+
+**Fehlerbehebung**
+- Tagschicht: Das Level des Tages hing vom eigenen Fortschritt ab, Spieler mit anderem Stand bekamen eine andere Karte. Jetzt wählt das Datum ein Level aus allen 99, für alle am selben Tag dasselbe – auch wenn man es noch nicht geschafft hat
+- Der Tagesbestwert bleibt erhalten, ein neuer Tag setzt ihn wie bisher zurück
+
+**Entwicklung**
+- Neue Dev-Schalter zum Prüfen und für Screenshots (`--shift-quality`, `--options`, `--confirm`, `--hold-action`, `--click`)
+
+### English
+
+**Bug fix**
+- Day shift: the level of the day depended on your own progress, so players at a different stage got a different map. The date now picks one level out of all 99, the same for everyone on the same day – even if you have not completed it yet
+- The best score of the day is kept, a new day resets it as before
+
+**Development**
+- New dev switches for checking and screenshots (`--shift-quality`, `--options`, `--confirm`, `--hold-action`, `--click`)
+
 ## 1.0.0
 
 ### Deutsch
