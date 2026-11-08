@@ -735,13 +735,13 @@ func _physics_process(_delta: float) -> void:
 		hud.result["best_score"] = maxi(score, Save.community_best_score(Flow.current_level) if Flow.community else Save.best_score(Flow.current_level))
 		if Flow.shift:
 			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schichtnote
-			var mr := NightShift.map_result(run.shift_stats())
+			var mr := NightShift.map_result(run.shift_stats() if Flow.dev_shift_quality < 0.0 else Flow.dev_fake_map_stats(RandomNumberGenerator.new(), Flow.dev_shift_quality))      # Dev: --shift-quality ersetzt auch die letzte Karte durch Beispielwerte
 			mr["id"] = Flow.current_level
-			mr["time"] = run.level_time
+			mr["time"] = run.level_time if Flow.dev_shift_quality < 0.0 else 150.0
 			mr["number"] = run.level.number
 			mr["names"] = run.level.names
 			Flow.shift_results.append(mr)
-			Flow.shift_credits = run.money
+			Flow.shift_credits = run.money if Flow.dev_shift_quality < 0.0 else 4200.0 + Flow.dev_shift_quality * 9000.0
 			hud.result["shift"] = mr
 			hud.result["shift_index"] = Flow.shift_index() + 1
 			hud.result["shift_final"] = Flow.finish_shift() if Flow.next_level_id() == "" else {}

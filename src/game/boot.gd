@@ -22,6 +22,8 @@ func _ready() -> void:
 		elif a == "--shift-demo":               # Dev: die Karten davor mit Beispielwerten füllen (Vorschau der Auswertung)
 			Flow.dev_shift_fake = true
 			shift_run = true
+		elif a.begins_with("--shift-quality="):    # Dev: Güte der Beispielkarten von --shift-demo (0–1)
+			Flow.dev_shift_quality = float(a.substr(16))
 		elif a == "--shift":
 			shift_run = true
 	if shift_run:

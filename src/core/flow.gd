@@ -19,6 +19,7 @@ var shift_credits := 0.0                # Guthaben am Ende der letzten Karte (fl
 var shift_last_result := {}              # Gesamtwertung der zuletzt beendeten Schicht (für das Finale der Nachtschicht)
 var shift_last_date := ""
 var shift_done := false                 # Wertung ist gebildet; die Schicht bleibt bis zum Verlassen "aktiv", damit nach der Auswertung kein weiteres Level folgt
+var dev_shift_quality := -1.0           # Dev: --shift-quality=0..1 macht die Beispielkarten von --shift-demo besser (0 = schlecht, 1 = makellos)
 var dev_shift_fake := false             # Entwicklung (--shift-demo): die Karten vor der Startkarte als geflogen mit Beispielwerten füllen (Vorschau der Auswertung)
 var dev_shift_start := 0                # Entwicklung (--shift-map=N): Schicht ab dieser Karte starten
 var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keine Karriere (Medaillen und Bestzeiten zählen)
@@ -130,6 +131,19 @@ func start_selected(id: String) -> void:
 	daily = false
 	start_level(id)
 
+## Dev (--shift-demo): Zählwerte einer Beispielkarte; `q` 0–1 = Güte (negativ: zufällig wie bisher).
+func dev_fake_map_stats(drng: RandomNumberGenerator, q: float) -> Dictionary:
+	var ds := {"jobs": 4, "waits": [], "landings": [], "damage": drng.randf_range(0.0, 60.0), "near": drng.randi() % 6}
+	if q >= 0.0:
+		ds["damage"] = drng.randf_range(0.0, lerpf(60.0, 6.0, q))
+		ds["near"] = clampi(int(round(q * 5.0 - drng.randf_range(0.0, 2.0))), 0, 5)
+	for j in 4:
+		var wmax := lerpf(40.0, 12.0, q) if q >= 0.0 else 40.0
+		ds.waits.append({"job": j, "wait": drng.randf_range(4.0, wmax), "leg": 300.0})
+		if j < 3:
+			ds.landings.append({"job": j, "vy": drng.randf_range(8.0, lerpf(44.0, 24.0, q) if q >= 0.0 else 44.0)})
+	return ds
+
 ## Nachtschicht: 9 Karten, je eine pro Sektor (1 → 9), mit festem Tages-Seed. Ein Versuch pro Tag (im Debug-Modus unbegrenzt), 5 Taxis, volle Tanks.
 func start_shift() -> void:
 	var date := Daily.today()
@@ -155,18 +169,14 @@ func start_shift() -> void:
 		drng.seed = 4
 		for i in clampi(dev_shift_start, 0, shift_plan.size() - 1):
 			var dl := LevelData.load_file(level_path(String(shift_plan[i])))
-			var ds := {"jobs": 4, "waits": [], "landings": [], "damage": drng.randf_range(0.0, 60.0), "near": drng.randi() % 6}
-			for j in 4:
-				ds.waits.append({"job": j, "wait": drng.randf_range(4.0, 40.0), "leg": 300.0})
-				if j < 3:
-					ds.landings.append({"job": j, "vy": drng.randf_range(8.0, 44.0)})
+			var ds := dev_fake_map_stats(drng, dev_shift_quality)
 			var dr := NightShift.map_result(ds)
 			dr["id"] = String(shift_plan[i])
 			dr["time"] = drng.randf_range(60.0, 260.0)
 			dr["number"] = dl.number
 			dr["names"] = dl.names
 			shift_results.append(dr)
-		shift_credits = 4200.0
+		shift_credits = 4200.0 if dev_shift_quality < 0.0 else 4200.0 + dev_shift_quality * 9000.0
 	Save.shift_begin(date)
 	start_level(shift_plan[clampi(dev_shift_start, 0, shift_plan.size() - 1)])
 
