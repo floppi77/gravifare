@@ -1131,7 +1131,7 @@ func _test_force_zones_apart() -> void:
 			for j in range(i + 1, forces.size()):
 				if _zone_overlap(forces[i], forces[j]):
 					bad.append("%s (Level %d)" % [lv.id, lv.number])
-	bad = bad.filter(func(e): return not String(e).begins_with("S6-03"))           # Handlevel 58: Überlagerung gewollt
+	bad = bad.filter(func(e): return not (String(e).begins_with("S6-03") or String(e).begins_with("S9-03")))           # Handlevel 58 und 91: Überlagerung gewollt (S9-03: Windböe über die ganze Breite)
 	check(bad.is_empty() and total > 20, "Kraftzonen überlappen sich in keinem Level (%d Zonen geprüft) %s" % [total, str(bad.slice(0, 3))])
 
 ## Fremde Fahrzeuge fliegen nie durch Haltestellen (Plattform mit Hütte, wartendem Fahrgast und gelandetem Taxi), und ihre Tunnelöffnungen halten Abstand.

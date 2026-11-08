@@ -185,12 +185,14 @@
   "a": {
    "period": 6.5,
    "open": 4.5,
-   "phase": 0.0,
+   "sweep": 3.0,
+   "gap": 2,
+   "phase": 1.5,
    "glass": true
   },
   "b": {
    "period": 6.5,
-   "open": 2.5,
+   "open": 3.5,
    "phase": 0.0,
    "glass": true
   }

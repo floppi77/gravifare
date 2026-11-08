@@ -3,6 +3,18 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 0.9.12
+
+### Deutsch
+
+**Level**
+- Balancing in Sektor 9 (Level 89, 90, 91, 94, 95, 97 und 99), dazu eine Lebensstation in Level 97
+
+### English
+
+**Levels**
+- Balancing in sector 9 (levels 89, 90, 91, 94, 95, 97 and 99), plus a life station in level 97
+
 ## 0.9.11
 
 ### Deutsch
