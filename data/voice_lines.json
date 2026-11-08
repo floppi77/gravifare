@@ -141,7 +141,13 @@
    "exit_start": "Letzter Fahrgast des Levels. Die Uhr läuft, Taxi sieben.",
    "exit_hurry": "Taxi sieben, die Zeit wird knapp!",
    "finale_1": "Taxi sieben, hier Zentrale. Das war die letzte Fahrt. Alle neunundneunzig Level, und der Hausmeister spricht wieder mit dir.",
-   "finale_2": "Stell das Taxi ab. Feierabend. Der Kaffee geht heute auf die Zentrale."
+   "finale_2": "Stell das Taxi ab. Feierabend. Der Kaffee geht heute auf die Zentrale.",
+   "shift_S": "Taxi sieben, hier Zentrale. Makellos! Die Nacht gehört dir. Feierabend!",
+   "shift_A": "Taxi sieben, hier Zentrale. Starke Schicht, kaum ein Kratzer. Gute Nacht!",
+   "shift_B": "Taxi sieben, hier Zentrale. Solide Arbeit heute Nacht. Ab ins Depot.",
+   "shift_C": "Taxi sieben, hier Zentrale. Schicht geschafft. Beim nächsten Mal landest du etwas sanfter.",
+   "shift_D": "Taxi sieben, hier Zentrale. Die Fahrgäste haben schon Netteres erlebt. Schlaf dich aus.",
+   "shift_E": "Taxi sieben, hier Zentrale. Hauptsache, du bist zurück. Morgen ist eine neue Nacht."
   },
   "en": {
    "r2": "Fuel stop ahead: land, refuel, pay. Prices fluctuate.",
@@ -246,7 +252,13 @@
    "exit_start": "Last passenger of the level. The clock is running, Taxi seven.",
    "exit_hurry": "Taxi seven, time is getting short!",
    "finale_1": "Taxi seven, this is dispatch. That was the last ride. All ninety-nine levels, and the caretaker is talking to you again.",
-   "finale_2": "Park the taxi. Shift over. Coffee is on dispatch today."
+   "finale_2": "Park the taxi. Shift over. Coffee is on dispatch today.",
+   "shift_S": "Taxi seven, dispatch here. Flawless! The night is yours. Clocking off!",
+   "shift_A": "Taxi seven, dispatch here. Strong shift, hardly a scratch. Good night!",
+   "shift_B": "Taxi seven, dispatch here. Solid work tonight. Back to the depot.",
+   "shift_C": "Taxi seven, dispatch here. Shift done. Try landing a bit softer next time.",
+   "shift_D": "Taxi seven, dispatch here. The passengers have had nicer rides. Get some sleep.",
+   "shift_E": "Taxi seven, dispatch here. The main thing is that you're back. Tomorrow is a new night."
   }
  },
  "i0": {

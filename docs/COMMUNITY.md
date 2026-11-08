@@ -2,7 +2,7 @@
 
 *Deutsch zuerst · [English below](#level-editor-and-your-own-levels-english)*
 
-Im Hauptmenü unter **Level-Editor** liegen eigene und geteilte Level. Sie sind getrennt vom Feldzug: Sie ändern weder Fortschritt noch Medaillen, Statistik oder Freischaltungen, und die 99 mitgelieferten Level werden nie verändert. Geflogen wird mit dem Serientaxi (ohne Garagen-Einbauten), mit vollem Tank und fünf Leben. Gespeichert werden nur eigene Bestzeit, Bestwert und die Zahl der Flüge je Level.
+Im Hauptmenü unter **Level-Editor** liegen eigene und geteilte Level. Sie sind getrennt von der Karriere: Sie ändern weder Fortschritt noch Medaillen, Statistik oder Freischaltungen, und die 99 mitgelieferten Level werden nie verändert. Geflogen wird mit dem Serientaxi (ohne Garagen-Einbauten), mit vollem Tank und fünf Leben. Gespeichert werden nur eigene Bestzeit, Bestwert und die Zahl der Flüge je Level.
 
 ## Level bauen (Editor)
 
@@ -75,7 +75,7 @@ Eigene Level gehören den Autorinnen und Autoren. Kopien mitgelieferter Level si
 
 # Level editor and your own levels (English)
 
-Under **Level editor** in the main menu you find your own and shared levels. They are separate from the campaign: they change neither progress nor medals, statistics or unlocks, and the 99 bundled levels are never modified. You fly the standard taxi (no garage upgrades) with a full tank and five lives. Only your best time, best score and the number of flights per level are saved.
+Under **Level editor** in the main menu you find your own and shared levels. They are separate from the career: they change neither progress nor medals, statistics or unlocks, and the 99 bundled levels are never modified. You fly the standard taxi (no garage upgrades) with a full tank and five lives. Only your best time, best score and the number of flights per level are saved.
 
 ## Building levels (editor)
 

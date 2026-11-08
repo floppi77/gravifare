@@ -8,6 +8,8 @@ Diese Grafiken sind in Aseprite (über den Aseprite-MCP) gezeichnet und werden *
 - `assets/art/shelters.png` (684×60): Haltestelle je Sektor, 72×60 im Abstand von 76 px (Sektor 1 links).
 - `assets/art/life_icon.png` (32×20, HUD-Leben; Lackierungen `life_<name>.png` leitet `gen_art.taxi_skins()` ab), `stat_icons.png` (13 × 18 px), `ws_icons.png` (3 × 26 px).
 
+- `assets/art/driver.png` (680×56, 17 Bilder à 40×56) und `taxi_cockpit_empty.png` (96×60): Fahrer fürs Finale der Nachtschicht und die leere Kuppel. Ablauf: `python3 tools/art/gen_driver.py pre` (Grundflächen und Schattierung nach `build/aseprite-workspace/gf_driver/`), `aseprite -b --script tools/art/aseprite/build_driver.lua` (baut `driver.aseprite` mit Ebenen `body` und `outline`, Kontur in abgedunkelter Nachbarfarbe, Tags walk/stand/turn/front/wave/jump/land), `python3 tools/art/gen_driver.py export` (Blatt nach `assets/art/`), `… cockpit` (leere Kuppel aus `taxi.aseprite`). Farben und Formen wie der Fahrer in `taxi.aseprite`.
+
 Eigene Arbeit, keine Fremdassets.
 
 ## Dateien

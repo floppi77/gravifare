@@ -58,11 +58,11 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 - **99 handgemachte Level in 9 Sektoren** mit steigender Schwierigkeit: Tore, bewegliche Plattformen, Meteoriten, Hitze, Lavablasen,
   Fremdverkehr, wechselnde Schwerkraft. Jedes Level wurde von Hand gebaut, abgestimmt und selbst durchgeflogen – nichts davon ist zufallsgeneriert.
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
-- **Feldzug mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
+- **Karriere mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
   (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
-- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** mit Zufallsaufträgen, **Tagesflug** (jeden Tag eine Karte mit festen Aufträgen und Preisen),
+- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
   **Garage** mit Lackierungen und Aufklebern.
-- **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt vom Feldzug. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
+- **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
 - **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
@@ -141,11 +141,11 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **99 handmade levels in 9 sectors** with rising difficulty: gates, moving platforms, meteors, heat, lava bubbles, ambient traffic,
   changing gravity. Every level was built, tuned and flown through by hand – nothing is procedurally generated.
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
-- **Campaign with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
+- **Career with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
   (jets, hull, tank …). Game over resets the sector.
-- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** with random jobs, a **daily flight** (one map a day with fixed jobs and prices),
+- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (one map a day with fixed jobs and prices),
   and a **garage** with paint jobs and stickers.
-- **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the campaign. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
+- **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
 - **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).

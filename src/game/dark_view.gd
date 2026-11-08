@@ -15,6 +15,7 @@ const SHADER := """
 shader_type canvas_item;
 uniform vec2 size = vec2(640.0, 360.0);
 uniform float dark = 0.8;
+uniform vec3 tint = vec3(0.01, 0.0, 0.06);
 uniform vec3 lights[32];
 uniform int n = 0;
 uniform vec4 cones[16];       // Ursprung xy, Richtung mal Länge zw
@@ -43,7 +44,7 @@ void fragment() {
 		}
 	}
 	float a = dark * (1.0 - lit);
-	COLOR = vec4(vec3(0.01, 0.0, 0.06), a);
+	COLOR = vec4(tint, a);
 }
 """
 
@@ -64,9 +65,11 @@ func _ready() -> void:
 func setup(r: Run, c: Camera2D) -> void:
 	run = r
 	cam = c
-	visible = r.level.dark > 0.0
+	visible = r.level.dark > 0.0 or r.level.fog > 0.0
 	if visible:
-		mat.set_shader_parameter("dark", r.level.dark)
+		var foggy: bool = r.level.fog > 0.0                              # Tagschicht-Regel Nebel: helle Schwaden statt Dunkelheit, kleinere Sicht um das Taxi
+		mat.set_shader_parameter("dark", r.level.fog if foggy else r.level.dark)
+		mat.set_shader_parameter("tint", Vector3(0.72, 0.77, 0.86) if foggy else Vector3(0.01, 0.0, 0.06))
 
 func _screen(world: Vector2) -> Vector2:
 	var half := get_viewport_rect().size * 0.5
@@ -82,11 +85,11 @@ func _process(_d: float) -> void:
 	var cones := PackedVector4Array()
 	var spreads := PackedFloat32Array()
 	var tp := _screen(run.sim.pos)
-	lights.append(Vector3(tp.x, tp.y, 72.0 + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
+	lights.append(Vector3(tp.x, tp.y, (56.0 if lv.fog > 0.0 else 72.0) + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
 	for id in lv.pads:
 		var p: Dictionary = lv.pads[id]
 		var c := _screen(Vector2(float(p.center), float(p.row) * Tuning.TILE - 8.0))
-		lights.append(Vector3(c.x, c.y, 38.0))
+		lights.append(Vector3(c.x, c.y, 26.0 if lv.fog > 0.0 else 38.0))
 		var shl: Rect2 = p.get("shelter", Rect2())
 		if shl.size.x > 0.0:                                        # Ampellampe auf dem Dach bleibt auch im Dunkeln sichtbar
 			var lc := _screen(Vector2(shl.get_center().x, shl.position.y - 5.5))

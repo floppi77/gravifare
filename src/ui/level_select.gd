@@ -1,7 +1,7 @@
 class_name LevelSelect
 extends Control
 ## Levelauswahl: je Sektor eine Seite mit elf Levelkarten und einer Vorschau (Grundriss, Name, Medaillen, Bestwerte).
-## Sektorwechsel über die Reiter oder LB/RB bzw. Bild auf/ab; B/Esc geht zurück. Mit laufendem Feldzug ist ein Start ein Übungsflug.
+## Sektorwechsel über die Reiter oder LB/RB bzw. Bild auf/ab; B/Esc geht zurück. Mit laufender Karriere ist ein Start ein Übungsflug.
 
 var back: Callable
 var ids: Array = []
@@ -59,7 +59,7 @@ func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	c.custom_minimum_size = sz if c is LevelPreview else c.custom_minimum_size
 	return c
 
-## Laufender Feldzug: dessen Sektor; sonst der Sektor des nächsten offenen Levels.
+## Laufende Karriere: deren Sektor; sonst der Sektor des nächsten offenen Levels.
 func _start_sector() -> int:
 	var id: String = String(Save.campaign().get("level", ""))
 	if id == "":

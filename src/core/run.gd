@@ -37,6 +37,9 @@ var damage_taken := 0.0       # Hüllenschaden im Level (für die Medaille „Sa
 var respawns := 0             # verlorene Leben im Level
 var best_streak := 0
 var perfect_count := 0
+var landing_count := 0         # gewertete Landungen (ohne Hüpfer direkt nach dem Abheben): Grundlage des Tagesziels „Präzision“
+var fuel_cap := Tuning.FUEL_MAX   # Fassungsvermögen des Tanks; wird wie patience_k vor start() gesetzt
+var patience_k := 1.0          # Tagschicht (Regel Eilfahrt): Faktor auf die Geduld der Fahrgäste; wird vor start() gesetzt
 var log: Array = []         # Ereignisse des letzten Ticks: {type, ...}
 var pending_log: Array = []   # Ereignisse außerhalb von step() (Rauswerfen, Absturz-Neustart): kommen im nächsten Tick ins log
 var actor: PassengerActor = null       # Fahrgast des aktuellen Auftrags
@@ -88,6 +91,12 @@ var wrong_pad_last := ""          # zuletzt bemeckerte Plattform (ein Hüpfer be
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
 var taxi_fees := 0.0              # Ersatztaxis in diesem Level
+var shift_mode := false           # Nachtschicht: keine Geduldgrenze, keine Lebensstation; zählt Wartezeit, Landungen und Vorbeiflüge (siehe NightShift)
+var shift_waits: Array = []       # je abgeholtem Fahrgast {job, wait, leg}: Wartezeit bis zur Landung am Abholpad und Anflugstrecke
+var shift_landings: Array = []    # je Landung mit Fahrgast an Bord {job, vy}: Sinkgeschwindigkeit beim Aufsetzen am Ziel
+var near_misses := 0              # knappe Vorbeiflüge in diesem Level (das Spiel meldet sie, siehe Game._check_near_miss)
+var _shift_pick_job := -1         # Auftrag, dessen Abholung schon gezählt ist
+var _shift_drop_job := -1
 
 func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> void:
 	level = lvl
@@ -101,10 +110,11 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
 		j["fare"] = snappedf(maxf(float(j.fare), min_fare(lvl, j)) * Tuning.INCOME_FACTOR, 1.0)
 	sim.setup(lvl)
+	sim.fuel_cap = fuel_cap
 	if fuel_in >= 0.0:
-		sim.fuel = clampf(maxf(fuel_in, Tuning.MIN_START_FUEL), 0.0, Tuning.FUEL_MAX)
+		sim.fuel = clampf(maxf(fuel_in, minf(Tuning.MIN_START_FUEL, fuel_cap)), 0.0, fuel_cap)
 	else:
-		sim.fuel = Tuning.FUEL_MAX
+		sim.fuel = fuel_cap
 	job_index = 0
 	phase = Phase.WAITING
 	phase_timer = 0.0
@@ -122,6 +132,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	streak = 0
 	best_streak = 0
 	perfect_count = 0
+	landing_count = 0
 	damage_taken = 0.0
 	respawns = 0
 	leavers.clear()
@@ -146,6 +157,11 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	missed_due = 0.0
 	repair_cost = 0.0
 	taxi_fees = 0.0
+	shift_waits.clear()
+	shift_landings.clear()
+	near_misses = 0
+	_shift_pick_job = -1
+	_shift_drop_job = -1
 	level_time = 0.0
 	pump_touches = 0
 	pump_cd = 0.0
@@ -164,20 +180,19 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	pending_log.clear()
 	_spawn_actor(true)
 
-## Nachtschicht: zufällige Auftragskette auf einer Karte, mit jeder geschafften Karte länger (3 bis 7 Fahrten), zuletzt der Ausgangs-Fahrgast.
+## Auftragskette für Nachtschicht (3 bis 7 Fahrten, mit jeder geschafften Karte länger) und Tagesflug (feste Länge).
 static func shift_jobs(lvl: LevelData, maps_done: int, rng: RandomNumberGenerator) -> Array:
+	return chain_jobs(lvl, mini(3 + maps_done, 7), rng)
+
+## Zufällige Auftragskette auf einer Karte: `n` Fahrten zwischen Fahrgast-Pads, zuletzt der Ausgangs-Fahrgast. Ein Fahrgast erscheint nie auf dem
+## Pad, auf dem das Taxi gerade steht (Startpad, danach das letzte Ziel).
+static func chain_jobs(lvl: LevelData, n: int, rng: RandomNumberGenerator) -> Array:
 	var ids: Array = lvl.pads.keys().filter(func(id): return lvl.is_passenger_pad(id))
 	ids.sort()
 	var out: Array = []
 	if ids.size() < 2:
 		return lvl.jobs
-	var start_pad: Dictionary = {}
-	for dy in range(0, 3):
-		start_pad = lvl.pad_at_foot(lvl.spawn + Vector2(0, dy * Tuning.TILE))
-		if not start_pad.is_empty():
-			break
-	var prev_to := String(start_pad.get("id", ""))         # nie auf dem Pad erscheinen, auf dem das Taxi gerade steht
-	var n := mini(3 + maps_done, 7)
+	var prev_to := NightShift.start_pad_id(lvl)         # nie auf dem Pad erscheinen, auf dem das Taxi gerade steht
 	for i in n + 1:
 		var froms := ids.filter(func(id): return id != prev_to)
 		var from_id: String = froms[rng.randi() % froms.size()]
@@ -197,7 +212,9 @@ func _spawn_actor(instant: bool) -> void:
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
 	main_wait = 0.0
-	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), Tuning.MAIN_PATIENCE_FLOOR)      # unabhängig von der Richtzeit (sonst ändern neue Richtzeiten den Ablauf)
+	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), Tuning.MAIN_PATIENCE_FLOOR) * patience_k      # unabhängig von der Richtzeit (sonst ändern neue Richtzeiten den Ablauf)
+	if shift_mode:
+		main_patience = 1.0e9          # Nachtschicht: Pflichtfahrgäste warten, die Wartezeit fließt in die Wertung ein
 	if not respawn_keep_clock:
 		job_clock = 0.0
 	respawn_keep_clock = false
@@ -490,6 +507,11 @@ func _service_life(dt: float) -> void:
 		life_timer = 0.0
 		life_note = false
 		return
+	if shift_mode:                           # Nachtschicht: Lebensstationen sind außer Betrieb
+		if not life_note:
+			life_note = true
+			log.append({"type": "life_denied", "full": false, "off": true, "price": 0})
+		return
 	if lives >= Tuning.MAX_LIVES or money < Tuning.life_price(level.sector):
 		if not life_note:
 			life_note = true
@@ -551,6 +573,8 @@ func _lose_job(pname: String, extra_fee := 0.0) -> void:
 	var fee := maxf(snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.missed_fee_factor(level.sector), 1.0), snappedf(extra_fee, 1.0))
 	missed += 1
 	missed_due += fee                            # fällig am Levelende, nicht sofort
+	shift_waits = shift_waits.filter(func(w): return int(w.job) != job_index)          # Nachtschicht: ein verlorener Fahrgast zählt gar nicht
+	shift_landings = shift_landings.filter(func(l): return int(l.job) != job_index)
 	log.append({"type": "job_missed", "name": pname, "fee": fee})
 	if bool(jobs[job_index].get("fragile", false)):
 		log.append({"type": "patient_lost", "name": pname, "fee": fee})
@@ -648,6 +672,7 @@ func _evaluate_landing(e: Dictionary) -> void:
 	var flown := _flown(e)
 	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
+	landing_count += 1
 	if flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		streak += 1
 		perfect_count += 1
@@ -854,8 +879,8 @@ func _service_pad(dt: float) -> void:
 		if not pump_warned:
 			pump_warned = true
 			log.append({"type": "pump_out"})
-	elif pad.fuel and sim.fuel < Tuning.FUEL_MAX:
-		var want := minf(Tuning.REFUEL_RATE * dt, Tuning.FUEL_MAX - sim.fuel)
+	elif pad.fuel and sim.fuel < sim.fuel_cap:
+		var want := minf(Tuning.REFUEL_RATE * dt, sim.fuel_cap - sim.fuel)
 		var free := sim.fuel < Tuning.EMERGENCY_FUEL
 		var cost := want * fuel_price()
 		if free:
@@ -876,6 +901,7 @@ func _service_pad(dt: float) -> void:
 				phase_timer = 0.0
 				pen_pick = Tuning.landing_penalty(last_vy)
 				pen_ride = 0.0
+				_note_pickup(job)
 		Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
 				_finish_boarding(job)
@@ -884,6 +910,7 @@ func _service_pad(dt: float) -> void:
 				phase = Phase.DROPOFF
 				phase_timer = 0.0
 				pen_drop = Tuning.landing_penalty(last_vy)
+				_note_drop(job)
 				dropoff_clock = job_clock
 				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
 				actor.step_out(sim.pos.x, level.pads[String(job.to)])
@@ -891,6 +918,34 @@ func _service_pad(dt: float) -> void:
 			phase_timer += dt
 			if phase_timer >= STEP_OUT_TIME:
 				_deliver(job)
+
+## Nachtschicht: Abholung des laufenden Auftrags festhalten (einmal je Auftrag): Wartezeit seit Erscheinen und Anflugstrecke. Die Landung zum Abholen zählt
+## nicht für die Landewertung: dabei sitzt noch kein Fahrgast im Taxi.
+func _note_pickup(job: Dictionary) -> void:
+	if not shift_mode or _shift_pick_job == job_index:
+		return
+	_shift_pick_job = job_index
+	var prev := String(jobs[job_index - 1].to) if job_index > 0 else ""
+	shift_waits.append({"job": job_index, "wait": job_clock, "leg": NightShift.leg_estimate(level, prev, String(job.from))})
+
+func _note_drop(_job: Dictionary) -> void:
+	if not shift_mode or _shift_drop_job == job_index:
+		return
+	_shift_drop_job = job_index
+	shift_landings.append({"job": job_index, "vy": last_vy})
+
+## Knapper Vorbeiflug an einem Hindernis (das Spiel erkennt ihn und meldet ihn hier).
+func note_near_miss() -> void:
+	near_misses += 1
+
+## Zählwerte für das Tagesziel der Tagschicht (siehe DayShift.goal_score).
+func day_stats() -> Dictionary:
+	return {"time": level_time, "target": time_target(), "perfect": perfect_count, "landings": landing_count, "damage": damage_taken, "respawns": respawns,
+		"net": maxf(0.0, earned - repair_cost - taxi_fees - missed_fees), "money_target": money_target()}
+
+## Zählwerte der Nachtschicht-Karte für `NightShift.map_result`.
+func shift_stats() -> Dictionary:
+	return {"jobs": jobs.size(), "sector": level.sector, "waits": shift_waits.duplicate(true), "landings": shift_landings.duplicate(true), "damage": damage_taken, "near": near_misses}
 
 ## Fahrgast ist eingestiegen: Fahrt beginnt (auch wenn das Taxi im selben Tick schon abhebt: sonst bliebe er unsichtbar an Bord hängen).
 func _finish_boarding(job: Dictionary) -> void:
@@ -958,7 +1013,7 @@ func respawn_after_crash() -> void:
 	pending_log.append_array(log.slice(log_start))
 
 func _respawn_after_crash() -> void:
-	var fuel_keep := Tuning.FUEL_MAX        # ein neues Taxi startet immer mit vollem Tank
+	var fuel_keep := sim.fuel_cap           # ein neues Taxi startet immer mit vollem Tank
 	if actor != null and phase == Phase.DROPOFF:
 		_deliver(current_job())             # schon ausgestiegen: bleibt abgeliefert, läuft zum Häuschen
 	for ex in extras.duplicate():
@@ -1195,7 +1250,7 @@ func _spawn_extra(force_from := "", force_to := "") -> void:
 		job["fare"] = snappedf(base_fare * 1.25, 5.0)
 	var a := PassengerActor.new()
 	a.setup(job, level.pads[from_id], 100 + extra_count, false)
-	var pat := flow_rng.randf_range(Tuning.EXTRA_PATIENCE_MIN, Tuning.EXTRA_PATIENCE_MAX)
+	var pat := flow_rng.randf_range(Tuning.EXTRA_PATIENCE_MIN, Tuning.EXTRA_PATIENCE_MAX) * patience_k
 	extras.append({"job": job, "actor": a, "state": ES.WAIT, "clock": 0.0, "patience": pat, "patience_max": pat, "pen_pick": 0.0, "timer": 0.0})
 	log.append({"type": "extra_appeared", "name": ident.name, "pad": from_id, "to": to_id})
 

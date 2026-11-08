@@ -173,6 +173,54 @@
 	"stat": "stars_pro",
 	"min": 0
    }
+  },
+  {
+   "id": "sun",
+   "kind": "sticker",
+   "name": {
+	"de": "Sonne",
+	"en": "Sun"
+   },
+   "unlock": {
+	"stat": "daily_best_streak",
+	"min": 3
+   }
+  },
+  {
+   "id": "sky",
+   "kind": "paint",
+   "name": {
+	"de": "Himmelblau",
+	"en": "Sky Blue"
+   },
+   "unlock": {
+	"stat": "daily_best_streak",
+	"min": 7
+   }
+  },
+  {
+   "id": "medal",
+   "kind": "sticker",
+   "name": {
+	"de": "Medaille",
+	"en": "Medal"
+   },
+   "unlock": {
+	"stat": "day_golds",
+	"min": 5
+   }
+  },
+  {
+   "id": "platinum",
+   "kind": "paint",
+   "name": {
+	"de": "Platin",
+	"en": "Platinum"
+   },
+   "unlock": {
+	"stat": "daily_best_streak",
+	"min": 14
+   }
   }
  ]
 }

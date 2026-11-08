@@ -8,7 +8,7 @@ const SOLID := "#"
 var id := ""
 var sector := 1
 var index := 1
-var number := 1                # Kampagnennummer 1..99
+var number := 1                # Levelnummer 1..99
 var names := {}
 var rows: Array = []
 var width := 0
@@ -43,6 +43,7 @@ var doors_forced_open := false   # Levelwechsel-Einflug: Tore stehen offen
 ## blinkt seine Bahn). Bewegung nach der Simulationszeit.
 var movers: Array = []
 var meteor_seed := 0             # Meteoriten fallen je Fall auf einer anderen Bahn (zufällig je Lauf, reproduzierbar im Replay); setzt Run.start
+var fog := 0.0                   # Tagschicht (Regel Nebel): Sichtweite nur um das Taxi, Plattformen und Gefahren schimmern durch (0 = klar … 1 = dichter Nebel)
 var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast schwarz); nur Taxi, Plattformen, Tor und leuchtende Gefahren sind beleuchtet
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 var pump_aware := false          # Planung (Zuschauer-Autopilot): Zapfsäulen samt Kopf sind Hindernisse (sonst zählt jede Berührung zum Zerstören der Station)

@@ -12,6 +12,7 @@ var tilt := 0.0
 var gear := 0.0              # 0 = eingefahren, 1 = ausgefahren
 var gear_cmd := false
 var fuel := Tuning.FUEL_MAX
+var fuel_cap := Tuning.FUEL_MAX       # Fassungsvermögen des Tanks (Tagschicht, Regel Dünner Tank: die Hälfte)
 var hull := Tuning.HULL_MAX
 var state := State.FLYING
 var landed_pad := {}
@@ -431,7 +432,7 @@ func _spike_hit() -> void:
 		events.append({"type": "destroyed"})
 
 func refuel(amount: float) -> void:
-	fuel = minf(Tuning.FUEL_MAX, fuel + amount)
+	fuel = minf(fuel_cap, fuel + amount)
 
 func in_exit(exit_rect_cells: Array) -> bool:
 	var c := Vector2i(floori(pos.x / Tuning.TILE), floori(pos.y / Tuning.TILE))

@@ -2,7 +2,7 @@ extends Node
 ## Autoload "Cosmetics": Lackierungen und Aufkleber (nur Optik, kein Einfluss auf das Spiel), Freischaltungen
 ## über Spielstatistiken (data/cosmetics.json). „Standardtaxi erzwingen“ = Challenge-Look.
 
-const STAT_NAMES := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all"]
+const STAT_NAMES := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all", "daily_best_streak", "day_golds"]
 ## Stern-Freischaltungen: „bei allen Leveln“ den 1. (Zeit), 2. (Sauber), 3. (Meister) oder alle drei Sterne (Mindestwert 0 = alle Level)
 const STAR_STATS := {"stars_time": "time", "stars_clean": "clean", "stars_pro": "pro"}
 var items: Array = []

@@ -73,6 +73,25 @@ static func make_theme() -> Theme:
 	th.set_color("font_color", "Label", Color("#c9cfee"))
 	return th
 
+## Dunkle, abgerundete Tafel wie hinter dem Hauptmenü (Hintergrund bleibt sichtbar, Inhalt gut lesbar); für alle Menüs gleich.
+static func panel_style(alpha := 0.78, radius := 8) -> StyleBoxFlat:
+	var sbf := StyleBoxFlat.new()
+	sbf.bg_color = Color(0.03, 0.04, 0.13, alpha)
+	sbf.border_color = Color("#3a4580")
+	sbf.set_border_width_all(1)
+	sbf.set_corner_radius_all(radius)
+	sbf.anti_aliasing = true
+	return sbf
+
+## Tafel für einen Vollbild-Menübildschirm auf der 640×360-Fläche (mit schmalem Rand).
+static func screen_panel(rect := Rect2(5, 4, 630, 352)) -> Panel:
+	var p := Panel.new()
+	p.add_theme_stylebox_override("panel", panel_style())
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.position = rect.position
+	p.size = rect.size
+	return p
+
 static func button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text

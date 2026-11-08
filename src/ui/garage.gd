@@ -53,6 +53,7 @@ func _ready() -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
 	stage = Stage.make(self)
+	stage.add_child(MenuKit.screen_panel())                  # Tafel wie hinter dem Hauptmenü
 	var title := MenuKit.title(tr("MENU_GARAGE"), 36)
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	title.offset_top = 6

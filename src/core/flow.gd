@@ -1,23 +1,34 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "0.9.12"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "1.0.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
-# Kampagnenzustand eines Laufs (5 Leben für alle Level; Sprit und Credits laufen von Level zu Level mit)
+# Karrierezustand eines Laufs (5 Leben für alle Level; Sprit und Credits laufen von Level zu Level mit)
 var lives := Tuning.START_LIVES
 var entry_fuel := Tuning.FUEL_MAX       # Sprit bei Levelbeginn (auch Wiederholung nach Verlust)
 var entry_credits := 0.0
 var carry_passenger := {}               # Fahrgast, der ins nächste Level mitfährt
 var run_seed := 0                       # Zufalls-Seed des Laufs (Spritpreise): je Lauf neu, je Level/Neustart reproduzierbar
-var shift := false                      # Nachtschicht (Endlosmodus): zählt nur die eigene Bestleistung, kein Feldzug, keine Medaillen
-var shift_fares := 0                    # bisher beförderte Fahrgäste dieser Schicht
-var shift_maps := 0                     # abgeschlossene Karten dieser Schicht
-var shift_next := ""
-var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keinen Feldzug (Medaillen und Bestzeiten zählen)
+var shift := false                      # Nachtschicht (9 Karten): zählt nur für die Schichtnote, keine Karriere, keine Medaillen
+var shift_date := ""                    # Datum der laufenden Schicht (Seed für Karten, Aufträge und Schwerkraft)
+var shift_plan: Array = []              # die 9 Karten der Schicht (je Sektor eine)
+var shift_results: Array = []           # Wertung der bisher geflogenen Karten
+var shift_credits := 0.0                # Guthaben am Ende der letzten Karte (fließt in die Schichtwertung ein)
+var shift_last_result := {}              # Gesamtwertung der zuletzt beendeten Schicht (für das Finale der Nachtschicht)
+var shift_last_date := ""
+var shift_done := false                 # Wertung ist gebildet; die Schicht bleibt bis zum Verlassen "aktiv", damit nach der Auswertung kein weiteres Level folgt
+var dev_shift_fake := false             # Entwicklung (--shift-demo): die Karten vor der Startkarte als geflogen mit Beispielwerten füllen (Vorschau der Auswertung)
+var dev_shift_start := 0                # Entwicklung (--shift-map=N): Schicht ab dieser Karte starten
+var practice := false                   # Übungsflug aus der Levelauswahl: schreibt und löscht keine Karriere (Medaillen und Bestzeiten zählen)
 var daily := false                      # Tagesflug (siehe daily.gd): eine Karte, Seed aus dem Datum, Serientaxi, zählt nur für den Tagesbestwert
 var daily_date := ""
+var daily_rule := ""                 # Tagschicht: Regel des Tages (DayShift.RULES)
+var daily_goal := ""                 # … und Tagesziel (DayShift.GOALS)
+var daily_briefed := false            # Briefing dieser Tagschicht-Sitzung schon gezeigt (ein Neustart des Levels zeigt es nicht erneut)
+var dev_day_rule := ""                # Dev: Regel/Ziel erzwingen (--day-rule=, --day-goal=)
+var dev_day_goal := ""
 var community := false:                 # Community-Level (user://community/, siehe community_store.gd): ein Level, zählt nur für die eigenen Bestwerte
 	set(v):
 		community = v
@@ -100,11 +111,11 @@ func start_campaign(id: String) -> void:
 	practice = false
 	shift = false
 	daily = false
-	Save.reset_workshop()                  # neuer Feldzug beginnt ohne Einbauten
+	Save.reset_workshop()                  # neue Karriere beginnt ohne Einbauten
 	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
 	start_level(id)
 
-## Start aus der Levelauswahl: Läuft ein Feldzug, wird es ein Übungsflug (der Feldzug bleibt unberührt), sonst beginnt ab hier ein neuer Feldzug.
+## Start aus der Levelauswahl: Läuft eine Karriere, wird es ein Übungsflug (die Karriere bleibt unberührt), sonst beginnt ab hier eine neue Karriere.
 func start_selected(id: String) -> void:
 	if Save.campaign().is_empty():
 		start_campaign(id)
@@ -119,25 +130,52 @@ func start_selected(id: String) -> void:
 	daily = false
 	start_level(id)
 
-## Nachtschicht: zufällige Aufträge auf bereits geflogenen Karten, bis alle Leben weg sind. Ziel: möglichst viele Fahrgäste.
+## Nachtschicht: 9 Karten, je eine pro Sektor (1 → 9), mit festem Tages-Seed. Ein Versuch pro Tag (im Debug-Modus unbegrenzt), 5 Taxis, volle Tanks.
 func start_shift() -> void:
-	lives = Tuning.START_LIVES
+	var date := Daily.today()
+	if Save.shift_used_today(date):
+		return
+	shift_date = date
+	shift_plan = NightShift.plan(date, level_ids())
+	if shift_plan.is_empty():
+		return
+	lives = NightShift.START_TAXIS
 	entry_fuel = Tuning.FUEL_MAX
 	entry_credits = 0.0
 	carry_passenger = {}
-	run_seed = randi() % 1000000
+	run_seed = Daily.seed_for(date)
 	practice = true
 	shift = true
 	daily = false
-	shift_fares = 0
-	shift_maps = 0
-	var first := _pick_shift_map("")
-	shift_next = _pick_shift_map(first)
-	start_level(first)
+	shift_results = []
+	shift_credits = 0.0
+	shift_done = false
+	if dev_shift_fake:
+		var drng := RandomNumberGenerator.new()
+		drng.seed = 4
+		for i in clampi(dev_shift_start, 0, shift_plan.size() - 1):
+			var dl := LevelData.load_file(level_path(String(shift_plan[i])))
+			var ds := {"jobs": 4, "waits": [], "landings": [], "damage": drng.randf_range(0.0, 60.0), "near": drng.randi() % 6}
+			for j in 4:
+				ds.waits.append({"job": j, "wait": drng.randf_range(4.0, 40.0), "leg": 300.0})
+				if j < 3:
+					ds.landings.append({"job": j, "vy": drng.randf_range(8.0, 44.0)})
+			var dr := NightShift.map_result(ds)
+			dr["id"] = String(shift_plan[i])
+			dr["time"] = drng.randf_range(60.0, 260.0)
+			dr["number"] = dl.number
+			dr["names"] = dl.names
+			shift_results.append(dr)
+		shift_credits = 4200.0
+	Save.shift_begin(date)
+	start_level(shift_plan[clampi(dev_shift_start, 0, shift_plan.size() - 1)])
 
-## Tagesflug: Karte, Aufträge und Preise hängen nur vom Datum ab (siehe daily.gd). Volle Leben, voller Tank, keine Credits.
+## Tagschicht: Karte, Regel, Ziel, Aufträge und Preise hängen nur vom Datum ab (siehe daily.gd, day_shift.gd). Volle Leben, keine Credits, Tank je nach Regel.
 func start_daily() -> void:
 	daily_date = Daily.today()
+	daily_rule = dev_day_rule if dev_day_rule != "" else DayShift.rule_of(daily_date)
+	daily_goal = dev_day_goal if dev_day_goal != "" else DayShift.goal_of(daily_date)
+	daily_briefed = false
 	var pool := Save.daily_pool(level_ids())
 	if pool.is_empty():
 		pool = level_ids()                 # nur im Debug-Modus erreichbar (sonst erst ab Sektor 1 frei)
@@ -145,7 +183,7 @@ func start_daily() -> void:
 	if id == "":
 		return
 	lives = Tuning.START_LIVES
-	entry_fuel = Tuning.FUEL_MAX
+	entry_fuel = DayShift.entry_fuel(daily_rule)
 	entry_credits = 0.0
 	carry_passenger = {}
 	run_seed = Daily.seed_for(daily_date)
@@ -163,29 +201,32 @@ func set_debug(on: bool) -> void:
 		editor_skip_solve = false
 	Settings.set_value("debug", on)
 
-## Game Over im Feldzug: zurück an den Anfang des Sektors. Gibt das Level zurück, mit dem es weitergeht.
+## Game Over in der Karriere: zurück an den Anfang des Sektors. Gibt das Level zurück, mit dem es weitergeht.
 func lose_sector(sector: int) -> LevelData:
 	var first := "s%d_01" % sector
 	Save.lose_sector(sector, first, randi() % 1000000)
 	return LevelData.load_file(level_path(first))
 
-## Nächste Karte: nur Level, die schon geschafft sind (mindestens Sektor 1).
-func _pick_shift_map(avoid: String) -> String:
-	var pool: Array = Save.data.completed.keys().filter(func(id): return level_ids().has(id) and id != avoid)
-	if pool.is_empty():
-		pool = level_ids().slice(0, 11).filter(func(id): return id != avoid)
-	return pool[randi() % pool.size()]
+## Index der laufenden Karte in der Schicht (0 = Sektor 1), -1 außerhalb einer Schicht.
+func shift_index() -> int:
+	return shift_plan.find(current_level) if shift else -1
 
-## Ende der Schicht (Game Over oder Hauptmenü): Bestwert sichern.
-func finish_shift(extra_fares: int) -> void:
-	if not shift:
-		return
-	shift_fares += extra_fares
-	Save.note_max("shift_best", shift_fares)
-	Save.write()
-	shift = false
+## Ende der Schicht (letzte Karte, Game Over oder Hauptmenü): Gesamtwertung bilden und festhalten. Nicht geflogene Karten zählen 0.
+func finish_shift() -> Dictionary:
+	if not shift or shift_done:
+		return {}
+	shift_done = true                  # `shift` bleibt gesetzt: sonst fände next_level_id() nach der Auswertung das nächste Karriere-Level
+	var res := NightShift.final_result(shift_results, lives, shift_credits)
+	var now := Time.get_datetime_dict_from_system()
+	res["date"] = shift_date
+	res["hour"] = int(now.hour)
+	res["minute"] = int(now.minute)
+	shift_last_result = res
+	shift_last_date = shift_date
+	Save.shift_record(shift_date, res, shift_results)
+	return res
 
-## Gespeicherten Feldzug fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keiner vorhanden ist.
+## Gespeicherte Karriere fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keine vorhanden ist.
 func resume_campaign() -> bool:
 	var c := Save.campaign()
 	if c.is_empty() or not level_ids().has(String(c.level)):
@@ -201,7 +242,7 @@ func resume_campaign() -> bool:
 	start_level(String(c.level))
 	return true
 
-## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; der Feldzug bleibt unberührt (wie der Übungsflug).
+## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; die Karriere bleibt unberührt (wie der Übungsflug).
 func start_community(id: String, autopilot := false) -> void:
 	if not community_store().playable(id):         # gespeichert oder Entwurf eines Testflugs
 		return
@@ -229,7 +270,8 @@ func next_level_id() -> String:
 	if community:
 		return ""                          # Community-Level: ein Level, danach zurück zur Liste
 	if shift:
-		return shift_next
+		var i := shift_index()
+		return String(shift_plan[i + 1]) if i >= 0 and i + 1 < shift_plan.size() else ""
 	if daily:
 		return ""                          # Tagesflug: eine Karte, danach zurück ins Menü
 	var ids := level_ids()
@@ -241,14 +283,27 @@ func to_menu() -> void:
 	return_to_editor = ""
 	editor_autopilot = false
 	var g := get_tree().current_scene
-	if shift and g != null and "run" in g:
-		finish_shift(g.run.delivered + g.run.extras_delivered)      # Schicht abgebrochen: Bestwert trotzdem sichern
+	if shift:
+		finish_shift()                 # Schicht abgebrochen: Wertung trotzdem sichern (nicht geflogene Karten zählen 0)
+		shift = false
+		shift_done = false
 	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
 	community = false
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)
 	Sfx.stop_ambient()
 	get_tree().change_scene_to_file(MENU)
+
+## Nach der Nachtschicht: eigenes Finale (Feierabend im Depot) mit der Abrechnung, danach zurück ins Menü.
+func to_shift_finale() -> void:
+	shift = false
+	shift_done = false
+	community = false
+	Save.write()
+	get_tree().paused = false
+	Sfx.set_thrust(0.0, 0.0)
+	Sfx.stop_ambient()
+	get_tree().change_scene_to_file("res://src/ui/shift_finale.tscn")
 
 ## Nach Level 99: Finale, danach Abspann.
 func to_finale() -> void:
@@ -262,6 +317,7 @@ func to_finale() -> void:
 var _shot := ""
 var _shot_frame := 0
 var _presses: Array = []
+var _clicks: Array = []             # Dev: --click=x,y@frame (Viewport-Koordinaten, Bewegung + Linksklick)
 var _frame := 0
 
 func _ready() -> void:
@@ -282,14 +338,33 @@ func _ready() -> void:
 			_shot = a.substr(7)
 		elif a.begins_with("--frames="):
 			_shot_frame = int(a.substr(9))
+		elif a.begins_with("--click="):
+			var cp := a.substr(8).split("@")
+			var xy := cp[0].split(",")
+			_clicks.append([Vector2(float(xy[0]), float(xy[1])), int(cp[1])])
 		elif a.begins_with("--press="):
 			var parts := a.substr(8).split("@")
 			_presses.append([parts[0], int(parts[1])])
 
 func _process(_d: float) -> void:
-	if _shot == "" and _presses.is_empty():
+	if _shot == "" and _presses.is_empty() and _clicks.is_empty():
 		return
 	_frame += 1
+	for c in _clicks:
+		if c[1] == _frame:
+			var mm := InputEventMouseMotion.new()
+			mm.position = c[0]
+			mm.global_position = c[0]
+			Input.parse_input_event(mm)
+			var mb := InputEventMouseButton.new()
+			mb.button_index = MOUSE_BUTTON_LEFT
+			mb.position = c[0]
+			mb.global_position = c[0]
+			mb.pressed = true
+			Input.parse_input_event(mb)
+			var mu := mb.duplicate() as InputEventMouseButton
+			mu.pressed = false
+			Input.parse_input_event(mu)
 	for p in _presses:
 		if p[1] == _frame:
 			var ev := InputEventAction.new()

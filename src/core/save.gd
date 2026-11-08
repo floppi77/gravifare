@@ -1,5 +1,5 @@
 extends Node
-## Autoload "Save": Kampagnenfortschritt in drei unabhängigen Speicherplätzen (user://save_1.json … save_3.json).
+## Autoload "Save": Karrierefortschritt in drei unabhängigen Speicherplätzen (user://save_1.json … save_3.json).
 ## Atomar geschrieben (tmp + rename), bei defekter Datei wird sie als .bad gesichert und ein leerer Stand verwendet.
 ## Bis ein Platz gewählt ist (slot == 0), wird nichts geladen oder geschrieben.
 
@@ -24,7 +24,7 @@ func slot_path(n: int) -> String:
 func _ready() -> void:
 	var want := 0
 	for a in OS.get_cmdline_user_args():
-		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives"] or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark="):
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark="):
 			dev_session = true
 		if a.begins_with("--level=") or a.begins_with("--scene=") or a == "--levels" or a.begins_with("--shot="):
 			want = maxi(want, 1)                 # Dev-Aufrufe überspringen die Platzwahl (Platz 1)
@@ -45,6 +45,40 @@ func select_slot(n: int) -> void:
 	data = _default_data()
 	load_save()
 
+## Name des gewählten Spielstands ("" = keiner vergeben).
+func slot_name() -> String:
+	return String(data.get("name", "")) if data.get("name") is String else ""
+
+## Anzeigename: der vergebene Name, sonst „Spielstand N“.
+func slot_label() -> String:
+	var nm := slot_name()
+	return nm if nm != "" else tr("SLOT_CURRENT") % slot
+
+## Name eines Spielstands setzen (höchstens Shots.NAME_MAX Zeichen). Auch für Plätze, die gerade nicht gewählt sind; ein freier Platz wird damit angelegt.
+func rename_slot(n: int, new_name: String) -> void:
+	n = clampi(n, 1, SLOTS)
+	new_name = new_name.strip_edges().left(Shots.NAME_MAX)
+	if n == slot:
+		data["name"] = new_name
+		write()
+		return
+	if dev_session:
+		return
+	var d: Dictionary = _default_data()
+	if slot_exists(n):
+		var f := FileAccess.open(slot_path(n), FileAccess.READ)
+		var parsed = JSON.parse_string(f.get_as_text()) if f != null else null
+		if typeof(parsed) == TYPE_DICTIONARY and parsed.get("completed") is Dictionary:
+			d = parsed
+	d["name"] = new_name
+	var tmp := slot_path(n) + ".tmp"
+	var out := FileAccess.open(tmp, FileAccess.WRITE)
+	if out == null:
+		return
+	out.store_string(JSON.stringify(d, "\t"))
+	out.close()
+	DirAccess.rename_absolute(tmp, slot_path(n))
+
 ## Zurück zur Platzwahl (Menü „Spielstand wechseln“); der laufende Stand ist bereits gespeichert.
 func leave_slot() -> void:
 	slot = 0
@@ -56,7 +90,7 @@ func slot_exists(n: int) -> bool:
 
 ## Kurzinfo eines Platzes für die Auswahl: {"exists", "levels", "score", "seconds", "credits", "lives"} (Datei wird nur gelesen).
 func slot_summary(n: int) -> Dictionary:
-	var info := {"exists": false, "levels": 0, "score": 0, "seconds": 0, "credits": 0, "lives": 0}
+	var info := {"exists": false, "name": "", "levels": 0, "score": 0, "seconds": 0, "credits": 0, "lives": 0}
 	if not slot_exists(n):
 		return info
 	var f := FileAccess.open(slot_path(n), FileAccess.READ)
@@ -64,6 +98,7 @@ func slot_summary(n: int) -> Dictionary:
 	if typeof(d) != TYPE_DICTIONARY or not (d.get("completed") is Dictionary):
 		return info
 	info["exists"] = true
+	info["name"] = String(d.get("name", "")) if d.get("name") is String else ""
 	info["levels"] = d.completed.size()
 	var sc := 0
 	for id in d.completed:
@@ -126,7 +161,7 @@ func write() -> void:
 	f.close()
 	DirAccess.rename_absolute(tmp, path)
 
-## Laufender Feldzug (für „Fortsetzen“): nächstes Level, Leben, Credits, Sprit, Seed, mitfahrender Fahrgast.
+## Laufende Karriere (für „Fortsetzen“): nächstes Level, Leben, Credits, Sprit, Seed, mitfahrender Fahrgast.
 func campaign() -> Dictionary:
 	var c = data.get("campaign", {})
 	return c if c is Dictionary and c.has("level") else {}
@@ -141,7 +176,7 @@ func note_campaign_lives(n: int) -> void:
 		data.campaign["lives"] = n
 		write()
 
-## Neuer Feldzug: ohne Einbauten der Werkstatt (die gehören zum laufenden Feldzug, siehe lose_sector). Bestzeiten und Medaillen bleiben.
+## Neue Karriere: ohne Einbauten der Werkstatt (die gehören zur laufenden Karriere, siehe lose_sector). Bestzeiten und Medaillen bleiben.
 func reset_workshop() -> void:
 	if not data.get("workshop", {}).is_empty():
 		data["workshop"] = {}
@@ -184,7 +219,7 @@ func complete_level(id: String, time: float, money: float, earned := 0.0, medals
 	data.stats["credits_total"] = int(data.stats.get("credits_total", 0)) + int(earned)
 	write()
 
-## Community-Level: eigene Bestwerte je Level-ID (Inhalts-Hash), getrennt vom Feldzug; fehlt in älteren Spielständen.
+## Community-Level: eigene Bestwerte je Level-ID (Inhalts-Hash), getrennt von der Karriere; fehlt in älteren Spielständen.
 func community_entry() -> Dictionary:
 	if not (data.get("community") is Dictionary):
 		data["community"] = {}
@@ -256,6 +291,41 @@ func daily_entry() -> Dictionary:
 		data["daily"] = {}
 	return data.daily
 
+## Nachtschicht: Eintrag im Spielstand (Datum des letzten Versuchs, Note, Punkte, übrige Taxis), fehlt in älteren Spielständen.
+func shift_entry() -> Dictionary:
+	if not (data.get("shift") is Dictionary):
+		data["shift"] = {}
+	return data.shift
+
+## Ein Versuch pro Tag: Ist die Schicht von `date` schon begonnen, bleibt sie gesperrt (im Debug-Modus nie).
+func shift_used_today(date: String) -> bool:
+	if debug:
+		return false
+	var e := shift_entry()
+	return String(e.get("date", "")) == date and bool(e.get("used", false))
+
+## Schicht beginnt: der Tagesversuch ist verbraucht, auch wenn das Spiel vorzeitig endet (Debug-Modus: kein Verbrauch, keine Wertung).
+func shift_begin(date: String) -> void:
+	if debug:
+		return
+	data["shift"] = {"date": date, "used": true, "finished": false, "grade": "E", "score": 0, "taxis": 0, "maps": 0}
+	write()
+
+## Schicht beendet: Wertung des Tages und Bestwert festhalten. `results` sind die Kartenwertungen.
+func shift_record(date: String, res: Dictionary, results: Array) -> void:
+	if debug:
+		return
+	var score := int(round(float(res.score)))
+	data["shift"] = {"date": date, "used": true, "finished": true, "grade": String(res.grade), "score": score, "taxis": int(res.taxis), "maps": int(res.maps), "credits": int(round(float(res.get("credits", 0.0)))),
+		"results": results.map(func(r): return int(round(float(r.score)))), "times": results.map(func(r): return int(round(float(r.get("time", 0.0))))),
+		"hour": int(res.get("hour", 0)), "minute": int(res.get("minute", 0))}
+	var st: Dictionary = data.stats
+	st["shift_runs"] = int(st.get("shift_runs", 0)) + 1
+	if score > int(st.get("shift_best_score", 0)):
+		st["shift_best_score"] = score
+		st["shift_best_grade"] = String(res.grade)
+	write()
+
 ## Kartenvorrat des Tagesflugs: alle jemals geschafften Level (ohne Flugschule), die es noch gibt.
 func daily_pool(ids: Array) -> Array:
 	return ever_completed().keys().filter(func(id): return ids.has(id))
@@ -269,7 +339,7 @@ func shift_unlocked(ids: Array) -> bool:
 	var done := ever_completed()
 	return debug or ids.all(func(id): return done.has(id))
 
-## Game Over im Feldzug: Der Fortschritt des Sektors geht verloren, die Einbauten der Werkstatt und alle Credits auch.
+## Game Over in der Karriere: Der Fortschritt des Sektors geht verloren, die Einbauten der Werkstatt und alle Credits auch.
 ## Weiter geht es mit `first_level`, dem ersten Level des Sektors.
 func lose_sector(sector: int, first_level: String, run_seed: int) -> void:
 	var ever: Dictionary = data.get("ever", {})

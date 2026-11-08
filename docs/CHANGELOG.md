@@ -3,6 +3,74 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.0.0
+
+### Deutsch
+
+**Version 1.0**
+- GraviFare ist in Version 1.0 angekommen: 99 Level in 9 Sektoren, Karriere, Nachtschicht, Tagschicht, Werkstatt, Garage und Level-Editor, auf Deutsch und Englisch, mit Tastatur und Controller
+
+**Nachtschicht neu**
+- Eine Schicht aus 9 Karten, je eine pro Sektor von 1 bis 9; Karten, Aufträge und Schwerkraft stehen pro Tag fest und sind für alle gleich. Ein Versuch pro Tag, Start mit 5 Taxis
+- Nur Pflichtfahrgäste (3 Fahrten auf Karte 1 bis 7 auf Karte 9), keine Ungeduld, Lebensstationen außer Betrieb, kein Neustart einer Karte
+- Die Schwerkraft ändert sich von Karte zu Karte, bleibt aber immer fliegbar; es wird dunkler: 25 % auf Karte 1, 8 % mehr je Karte
+- Wertung je Karte bis 80 Punkte (Wartezeit 25 – in späteren Sektoren großzügiger –, Landungen mit Fahrgast 25, Hülle 20, knappe Vorbeiflüge bis 10), dazu 2 Punkte je übrigem Taxi (bis 10) und 1 Punkt je 1500 übrige Credits (bis 10): höchstens 100 Punkte und Noten von S bis E
+- Auswertung mit Tabelle aller Karten, Zeit je Karte und Gesamtzeit (ohne Wertung), Datum und Uhrzeit (24 h deutsch, 12 h englisch)
+- Knopf „Screenshot erstellen“ (Maus oder Y/E) speichert die Auswertung als `JJMMTT_nachtschicht_name.png` neben dem Spiel
+- Eigenes Finale der Nachtschicht: Anflug mit ausgefahrenem Fahrwerk, Ansage der Zentrale zur Note, der Fahrer steigt aus der Kuppel, springt aufs Pad, geht über die Brücke und winkt, dazu ein eigenes Musikstück als Schleife
+- Während die Auswertung steht, schweigen Triebwerk und Tankalarm
+
+**Tagschicht (früher Tagesflug)**
+- Jede Karte ist hell, auch aus dem dunklen Sektor
+- Je Wochentag eine Tagesregel, jede Woche neu gemischt: Windtag (Böen über die ganze Karte), Nebel (Sicht nur um das Taxi), Spiegelwelt, Dünner Tank (der Tank fasst nur die Hälfte, Sprit kostet mehr), Glasdach (die Hülle verträgt viel weniger), Eilfahrt (ungeduldige Fahrgäste), Rückenwind (60 % Schwerkraft mit leichten Böen)
+- Spiegelwelt spiegelt das ganze Bild, auch Schrift und Anzeigen – und damit die Steuerung links/rechts
+- Ein Tagesziel (Express, Präzision, Sauber oder Gewinn) mit Bronze, Silber und Gold
+- Serie und Gold belohnen mit neuen Lackierungen und Aufklebern (Sonne, Himmelblau, Medaille, Platin)
+- Vor dem Start erscheint ein Briefing mit Regel, Ziel, Wertung und Medaillen-Schwellen
+- Dein bester Flug des Tages fliegt als Geist mit; „Screenshot erstellen“ speichert die Auswertung als `JJMMTT_tagschicht_name.png`
+
+**Spielstände und Menüs**
+- Optionen, Levelauswahl, Musik, Garage, Statistik und die Level-Editor-Liste im Stil des Hauptmenüs: abgerundete dunkle Tafel, die Optionen mit Logo
+- Spielstände haben Namen; die Spielstandwahl ist überarbeitet (runde Karten, Name, Umbenennen)
+- Bildschirmtastatur: Fokus springt nicht mehr ins Leere, die Tastenreihen laufen im Kreis
+- Hauptmenü: Hilfetext unten links in einer Zeile, das Menü sitzt etwas höher
+
+**Sonstiges**
+- Der Hauptmodus heißt jetzt „Karriere“ statt „Feldzug“
+
+### English
+
+**Version 1.0**
+- GraviFare has reached version 1.0: 99 levels in 9 sectors, career, night shift, day shift, workshop, garage and level editor, in German and English, with keyboard and controller
+
+**Night shift reworked**
+- One shift of 9 maps, one from each sector 1 to 9; maps, jobs and gravity are fixed per day and the same for everyone. One attempt per day, starting with 5 taxis
+- Mandatory passengers only (3 rides on map 1 up to 7 on map 9), no impatience, life stations off, no restarting a map
+- Gravity changes from map to map but always stays flyable; it gets darker: 25 % on map 1, 8 % more per map
+- Score per map up to 80 points (waiting time 25 – more generous in later sectors –, landings with a passenger 25, hull 20, near misses up to 10), plus 2 points per taxi left (up to 10) and 1 point per 1500 credits left (up to 10): 100 points at most, grades from S to E
+- Results table with every map, time per map and total time (not scored), date and time (24 h in German, 12 h in English)
+- "Create screenshot" button (mouse or Y/E) saves the results as `YYMMDD_nachtschicht_name.png` next to the game
+- Own night-shift finale: approach with the landing gear extended, dispatch announcement for the grade, the driver climbs out of the dome, jumps down onto the pad, walks over the bridge and waves, with its own looping music track
+- While the results are on screen, the engine and the low-fuel alarm are silent
+
+**Day shift (formerly daily flight)**
+- Every map is brightly lit, even from the dark sector
+- One daily rule per weekday, reshuffled every week: windy day (gusts across the whole map), fog (you only see near the taxi), mirror world, thin tank (the tank holds only half, fuel costs more), glass roof (the hull takes far less), rush hour (impatient passengers), tailwind (60 % gravity with light gusts)
+- Mirror world flips the whole picture, text and displays too – and with it left/right on the controls
+- A daily goal (express, precision, clean or profit) with bronze, silver and gold
+- Streaks and gold unlock new paints and stickers (Sun, Sky Blue, Medal, Platinum)
+- A briefing before the start shows the rule, the goal, how it is scored and the medal thresholds
+- Your best flight of the day flies along as a ghost; "Create screenshot" saves the results as `YYMMDD_tagschicht_name.png`
+
+**Save slots and menus**
+- Options, level selection, music, garage, statistics and the level editor list in the style of the main menu: rounded dark panel, the options with the logo
+- Save slots have names; the slot selection has been redesigned (rounded cards, name, rename)
+- On-screen keyboard: focus no longer jumps into nothing, key rows wrap around
+- Main menu: help text at the bottom left on one line, the menu sits a little higher
+
+**Other**
+- The main mode is now called "Career" instead of "campaign"
+
 ## 0.9.12
 
 ### Deutsch
@@ -133,7 +201,7 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 
 **Fehlerbehebungen**
 - Erklärvideos zu neuen Spielelementen (Dornen, Tore, Magnete …) waren beim Einflug ins Level nicht zu sehen, nur die Stimme lief: Sie liegen jetzt über der Übergangsansicht
-- „Neues Spiel“ übernahm die Werkstatt-Einbauten des früheren Spielstands, und „Fortsetzen“ erschien schon ohne laufenden Feldzug: Ein neues Spiel beginnt jetzt ohne Einbauten, „Fortsetzen“ gibt es nur mit laufendem Feldzug (Bestzeiten und Medaillen bleiben)
+- „Neues Spiel“ übernahm die Werkstatt-Einbauten des früheren Spielstands, und „Fortsetzen“ erschien schon ohne laufende Karriere: Ein neues Spiel beginnt jetzt ohne Einbauten, „Fortsetzen“ gibt es nur mit laufender Karriere (Bestzeiten und Medaillen bleiben)
 
 **Spiel**
 - Das ausgefahrene Fahrwerk bremst das Taxi nicht mehr beim Fallen nach unten (Schwerkraft und Massenträgheit); nach oben und zur Seite bleibt die Bremswirkung als Feinmanöver-Feature
@@ -143,7 +211,7 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 
 **Bug fixes**
 - The explainer videos for newly introduced game elements (spikes, gates, magnets …) were hidden during the arrival flight, only the voice played: they now sit above the transition view
-- "New Game" kept the workshop upgrades from the previous save, and "Continue" appeared without a running campaign: a new game now starts without upgrades, "Continue" only shows with a running campaign (best times and medals are kept)
+- "New Game" kept the workshop upgrades from the previous save, and "Continue" appeared without a running career: a new game now starts without upgrades, "Continue" only shows with a running career (best times and medals are kept)
 
 **Game**
 - The extended landing gear no longer brakes the taxi when falling downwards (gravity and inertia); braking upwards and sideways stays as a fine-manoeuvre feature

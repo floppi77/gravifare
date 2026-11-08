@@ -1,12 +1,15 @@
 class_name SlotSelect
 extends Control
 ## Startbildschirm: drei Spielstände als Disketten nebeneinander, mittig. Links/Rechts wählt, A/Enter legt die Diskette ein;
-## darunter löscht „✕“ nach Rückfrage. `back` ist leer, solange noch kein Spielstand gewählt wurde.
+## darunter vergibt „✎“ einen Namen und „✕“ löscht nach Rückfrage. Ein freier Platz fragt beim ersten Mal nach einem Namen.
+## `back` ist leer, solange noch kein Spielstand gewählt wurde.
+const Osk := preload("res://src/ui/osk.gd")
 
 var chosen: Callable
 var back: Callable = Callable()
 var row: HBoxContainer
 var dialog: Control = null
+var osk: Control = null
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -38,18 +41,26 @@ func _build() -> void:
 		col.add_theme_constant_override("separation", 3)
 		var card := SlotCard.new()
 		card.setup(n, Save.slot_summary(n), n == Save.slot)
+		var used: bool = Save.slot_summary(n).exists
 		card.pressed.connect(func():
 			Sfx.play("ui_ok")
-			chosen.call(n))
+			if used:
+				chosen.call(n)
+			else:
+				_ask_name(n, true))
 		card.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
 		col.add_child(card)
-		var d := MenuKit.button("✕ " + tr("SLOT_DELETE"), _ask_delete.bind(n))
-		d.custom_minimum_size = Vector2(150, 16)
-		d.add_theme_font_size_override("font_size", 8)
-		d.modulate.a = 1.0 if Save.slot_summary(n).exists else 0.0
-		d.disabled = not Save.slot_summary(n).exists
-		d.focus_mode = Control.FOCUS_ALL if Save.slot_summary(n).exists else Control.FOCUS_NONE
-		col.add_child(d)
+		var btns := HBoxContainer.new()
+		btns.add_theme_constant_override("separation", 4)
+		for spec in [["✎ " + tr("SLOT_RENAME"), _ask_name.bind(n, false)], ["✕ " + tr("SLOT_DELETE"), _ask_delete.bind(n)]]:
+			var d := MenuKit.button(spec[0], spec[1])
+			d.custom_minimum_size = Vector2(73, 16)
+			d.add_theme_font_size_override("font_size", 8)
+			d.modulate.a = 1.0 if used else 0.0
+			d.disabled = not used
+			d.focus_mode = Control.FOCUS_ALL if used else Control.FOCUS_NONE
+			btns.add_child(d)
+		col.add_child(btns)
 		row.add_child(col)
 		if first == null or n == Save.slot:
 			first = card
@@ -88,6 +99,66 @@ func _ask_delete(n: int) -> void:
 	add_child(dialog)
 	_focus(no)
 
+## Name eines Spielstands eingeben. `create`: freier Platz, danach wird er gewählt (auch „Ohne Namen“).
+func _ask_name(n: int, create: bool) -> void:
+	row.visible = false
+	dialog = VBoxContainer.new()
+	dialog.alignment = BoxContainer.ALIGNMENT_CENTER
+	dialog.add_theme_constant_override("separation", 6)
+	dialog.position = Vector2(170, 130)
+	dialog.size = Vector2(300, 140)
+	dialog.add_child(MenuKit.title(tr("SLOT_NAME_TITLE") % n))
+	var edit := LineEdit.new()
+	edit.custom_minimum_size = Vector2(220, 22)
+	edit.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	edit.max_length = Shots.NAME_MAX
+	edit.text = Save.slot_summary(n).name
+	edit.placeholder_text = tr("SLOT_NAME_HINT")
+	edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	edit.add_theme_font_size_override("font_size", 11)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("#10142b")
+	sb.border_color = Color("#6fa8ff")
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(5)
+	sb.content_margin_left = 6.0
+	sb.content_margin_right = 6.0
+	edit.add_theme_stylebox_override("normal", sb)
+	edit.add_theme_stylebox_override("focus", sb)
+	dialog.add_child(edit)
+	var finish := func(name_text: String, proceed: bool):
+		Save.rename_slot(n, name_text)
+		if proceed:
+			chosen.call(n)
+		else:
+			_close_dialog()
+	edit.text_submitted.connect(func(t): finish.call(t, create))
+	var ok := MenuKit.button(tr("SLOT_OK"), func(): finish.call(edit.text, create))
+	dialog.add_child(ok)
+	dialog.add_child(MenuKit.button("⌨ " + tr("SLOT_KEYBOARD"), func(): _open_osk(edit)))
+	if create:
+		dialog.add_child(MenuKit.button(tr("SLOT_NO_NAME"), func(): chosen.call(n)))
+	dialog.add_child(MenuKit.button(tr("SLOT_NO"), _close_dialog))
+	add_child(dialog)
+	_focus(edit if Controls.last_device == "keyboard" else ok)
+
+## Controller: Bildschirmtastatur für den Namen.
+func _open_osk(edit: LineEdit) -> void:
+	if osk != null:
+		return
+	osk = Osk.new()
+	osk.text = edit.text
+	osk.max_len = Shots.NAME_MAX
+	osk.title_text = tr("SLOT_NAME_PROMPT")
+	osk.finished.connect(func(t: String, accepted: bool):
+		if osk != null:
+			osk.queue_free()
+			osk = null
+		if accepted:
+			edit.text = t
+		edit.grab_focus.call_deferred())
+	add_child(osk)
+
 func _close_dialog() -> void:
 	dialog.queue_free()
 	dialog = null
@@ -96,6 +167,8 @@ func _close_dialog() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
+		return
+	if osk != null:
 		return
 	if dialog != null:
 		get_viewport().set_input_as_handled()

@@ -17,6 +17,7 @@ var shift := false
 var keys: Array = []                       # [Button, Zeichen]
 var text_label: Label
 var shift_btn: Button
+var specials: Array = []                  # untere Reihe: [Button, Mitte x]
 var _styles := {}
 
 func _ready() -> void:
@@ -61,12 +62,51 @@ func _ready() -> void:
 		g.position = Vector2(4.0, (KEY_H + 2.0 - 10.0) * 0.5)
 		b.add_child(g)
 		b.alignment = HORIZONTAL_ALIGNMENT_RIGHT                   # Text rechts, damit das Symbol links Platz hat
+		specials.append([b, x + s[2] * 0.5])
 		if s[0] == tr("ED_OSK_SHIFT"):
 			shift_btn = b
 		x += s[2] + GAP
 	_hint_row(Vector2(112, 288), [["DPAD", tr("ED_OSK_H_MOVE")], ["A", tr("ED_OSK_H_TYPE")]])
+	_wire_focus()
 	_refresh()
 	(keys[10][0] as Button).grab_focus.call_deferred()          # Start auf „q“: die Buchstaben liegen am nächsten
+
+## Fokus ausdrücklich verdrahten: Die automatische Suche springt sonst auf Knöpfe hinter der Tastatur (ins Leere) oder zu weit entfernten Tasten.
+## Links/rechts laufen in der Reihe im Kreis, oben/unten gehen Reihe für Reihe; die untere Reihe (Groß/Leer/Löschen/OK/Abbruch) erreicht man von der Taste darüber.
+func _wire_focus() -> void:
+	var rows := ROWS.size()
+	for r in rows:
+		for c in 10:
+			var b: Button = keys[r * 10 + c][0]
+			b.focus_neighbor_left = b.get_path_to(keys[r * 10 + (c + 9) % 10][0])
+			b.focus_neighbor_right = b.get_path_to(keys[r * 10 + (c + 1) % 10][0])
+			b.focus_neighbor_top = b.get_path_to(keys[(r - 1) * 10 + c][0] if r > 0 else _special_under(c))
+			b.focus_neighbor_bottom = b.get_path_to(keys[(r + 1) * 10 + c][0] if r < rows - 1 else _special_under(c))
+	for i in specials.size():
+		var b: Button = specials[i][0]
+		b.focus_neighbor_left = b.get_path_to(specials[(i + specials.size() - 1) % specials.size()][0])
+		b.focus_neighbor_right = b.get_path_to(specials[(i + 1) % specials.size()][0])
+		var c := _column_over(float(specials[i][1]))
+		b.focus_neighbor_bottom = b.get_path_to(keys[c][0])
+		b.focus_neighbor_top = b.get_path_to(keys[(rows - 1) * 10 + c][0])
+
+## Spalte der Tastenreihe, die mittig über dem x-Wert liegt.
+func _column_over(cx: float) -> int:
+	var x0 := 112.0 + (416.0 - (10.0 * KEY_W + 9.0 * GAP)) * 0.5
+	return clampi(int((cx - x0) / (KEY_W + GAP)), 0, 9)
+
+## Knopf der unteren Reihe, der zur Spalte `c` am nächsten liegt.
+func _special_under(c: int) -> Button:
+	var x0 := 112.0 + (416.0 - (10.0 * KEY_W + 9.0 * GAP)) * 0.5
+	var cx := x0 + float(c) * (KEY_W + GAP) + KEY_W * 0.5
+	var best: Button = specials[0][0]
+	var bd := 1.0e9
+	for sp in specials:
+		var d := absf(float(sp[1]) - cx)
+		if d < bd:
+			bd = d
+			best = sp[0]
+	return best
 
 ## Hinweiszeile aus Controllersymbolen mit kurzem Text dahinter, mittig in der Tastaturbox.
 func _hint_row(pos: Vector2, items: Array) -> void:

@@ -4763,6 +4763,54 @@
    "text": "We're running out of time!",
    "seconds": 1.9,
    "engine": "drama3-fp8"
+  },
+  "de/d0_shift_S": {
+   "text": "Taxi sieben, hier Zentrale. Makellos! Die Nacht gehört dir. Feierabend!",
+   "seconds": 6.52
+  },
+  "de/d0_shift_A": {
+   "text": "Taxi sieben, hier Zentrale. Starke Schicht, kaum ein Kratzer. Gute Nacht!",
+   "seconds": 6.36
+  },
+  "de/d0_shift_B": {
+   "text": "Taxi sieben, hier Zentrale. Solide Arbeit heute Nacht. Ab ins Depot.",
+   "seconds": 5.16
+  },
+  "de/d0_shift_C": {
+   "text": "Taxi sieben, hier Zentrale. Schicht geschafft. Beim nächsten Mal landest du etwas sanfter.",
+   "seconds": 6.6
+  },
+  "de/d0_shift_D": {
+   "text": "Taxi sieben, hier Zentrale. Die Fahrgäste haben schon Netteres erlebt. Schlaf dich aus.",
+   "seconds": 6.84
+  },
+  "de/d0_shift_E": {
+   "text": "Taxi sieben, hier Zentrale. Hauptsache, du bist zurück. Morgen ist eine neue Nacht.",
+   "seconds": 6.52
+  },
+  "en/d0_shift_S": {
+   "text": "Taxi seven, dispatch here. Flawless! The night is yours. Clocking off!",
+   "seconds": 5.48
+  },
+  "en/d0_shift_A": {
+   "text": "Taxi seven, dispatch here. Strong shift, hardly a scratch. Good night!",
+   "seconds": 6.6
+  },
+  "en/d0_shift_B": {
+   "text": "Taxi seven, dispatch here. Solid work tonight. Back to the depot.",
+   "seconds": 5.88
+  },
+  "en/d0_shift_C": {
+   "text": "Taxi seven, dispatch here. Shift done. Try landing a bit softer next time.",
+   "seconds": 6.76
+  },
+  "en/d0_shift_D": {
+   "text": "Taxi seven, dispatch here. The passengers have had nicer rides. Get some sleep.",
+   "seconds": 6.2
+  },
+  "en/d0_shift_E": {
+   "text": "Taxi seven, dispatch here. The main thing is that you're back. Tomorrow is a new night.",
+   "seconds": 6.84
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

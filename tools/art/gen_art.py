@@ -343,7 +343,8 @@ def taxi_skins():
             Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + dst % name)
             return out
         for name, hue, sm, vm in (("neon", 318, 1.0, 1.0), ("mint", 150, 0.9, 1.0), ("night", 225, 0.9, 0.78),
-                                  ("sunset", 8, 1.0, 1.0), ("candy", 178, 0.85, 1.05), ("gold", 46, 0.7, 1.12)):
+                                  ("sunset", 8, 1.0, 1.0), ("candy", 178, 0.85, 1.05), ("gold", 46, 0.7, 1.12),
+                                  ("sky", 198, 0.55, 1.1), ("platinum", 215, 0.12, 1.18)):          # sky: Serie 7 Tage, platinum: Serie 14 Tage (Tagschicht)
             make(name, hue, sm, vm)
         # Wespe: dunkle Karosserie mit gelben Streifen
         out = make("wasp", 235, 0.35, 0.28)
@@ -381,7 +382,15 @@ def stickers():
     def crown(d):
         d.polygon([(4, 28), (4, 10), (12, 18), (18, 6), (24, 18), (32, 10), (32, 28)], fill=hexc("#ffcb3d"))
         d.rectangle([4, 27, 32, 31], fill=hexc("#e08a1e")); d.ellipse([16, 18, 20, 22], fill=hexc("#ff4d6d"))
-    for fn, nm in ((star, "star"), (bolt, "bolt"), (heart, "heart"), (flame, "flame"), (boom, "boom"), (crown, "crown")):
+    def sun(d):                                                                           # Serie 3 Tage (Tagschicht)
+        for i in range(12):
+            a = i * math.pi / 6
+            d.polygon([(18 + 9 * math.cos(a - 0.2), 18 + 9 * math.sin(a - 0.2)), (18 + 16 * math.cos(a), 18 + 16 * math.sin(a)), (18 + 9 * math.cos(a + 0.2), 18 + 9 * math.sin(a + 0.2))], fill=hexc("#ffb02e"))
+        d.ellipse([8, 8, 28, 28], fill=hexc("#ffd24a")); d.ellipse([11, 11, 19, 19], fill=hexc("#fff3b0"))
+    def medal(d):                                                                         # 5 Mal Gold in der Tagschicht
+        d.polygon([(9, 3), (17, 3), (21, 16), (13, 16)], fill=hexc("#4a7bff")); d.polygon([(27, 3), (19, 3), (15, 16), (23, 16)], fill=hexc("#ff4d6d"))
+        d.ellipse([6, 13, 30, 35], fill=hexc("#ffcb3d")); d.ellipse([10, 17, 26, 31], fill=hexc("#ffe27a")); d.polygon([(18, 19), (20, 23), (24, 23), (21, 26), (22, 30), (18, 27), (14, 30), (15, 26), (12, 23), (16, 23)], fill=hexc("#e08a1e"))
+    for fn, nm in ((star, "star"), (bolt, "bolt"), (heart, "heart"), (flame, "flame"), (boom, "boom"), (crown, "crown"), (sun, "sun"), (medal, "medal")):
         icon(fn, nm)
 
 # ------------------------------------------------------------------ Zapfsäule (16x32 Einheiten = 48x96 px; Kopf getrennt: 16x12 = 48x36 px)

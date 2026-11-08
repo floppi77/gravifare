@@ -106,7 +106,7 @@ func _draw_pads() -> void:
 		_pad_glow(p, y, col)
 		var plate := _draw_plate(p, y, col)
 		if p.life:
-			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.life_price(level.sector))
+			_draw_life_sign(cxm, y, run.lives >= Tuning.MAX_LIVES, run.money >= Tuning.life_price(level.sector), run.shift_mode)
 		if p.get("hospital", false):
 			_draw_hospital_sign(p, y)
 		if is_target:
@@ -903,14 +903,14 @@ func _gold_star(c: Vector2, r: float, fade: float) -> void:
 	draw_colored_polygon(pts, Color(1.0, 0.82, 0.2, fade))
 
 ## Lebens-Station: Herz und Preis über der Plattform (grau, wenn voll oder zu wenig Credits).
-func _draw_life_sign(cx: float, y: float, full: bool, can_pay: bool) -> void:
-	var ok := not full and can_pay
+func _draw_life_sign(cx: float, y: float, full: bool, can_pay: bool, off := false) -> void:
+	var ok := not full and can_pay and not off
 	var hc := Color("#ff6aa0") if ok else Color("#7a5a70")
 	var hy := y - 30.0 - (1.2 * sin(t * 3.0) if ok else 0.0)
 	draw_circle(Vector2(cx - 2.2, hy), 2.6, hc)
 	draw_circle(Vector2(cx + 2.2, hy), 2.6, hc)
 	draw_colored_polygon(PackedVector2Array([Vector2(cx - 4.7, hy + 0.9), Vector2(cx + 4.7, hy + 0.9), Vector2(cx, hy + 6.4)]), hc)
-	draw_string(Fonts.hud, Vector2(cx - 14.0, hy + 15.0), "¢%d" % int(Tuning.life_price(level.sector)) if not full else "MAX", HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color("#ffe14a") if ok else Color("#8a7a80"))
+	draw_string(Fonts.hud, Vector2(cx - 14.0, hy + 15.0), tr("SHIFT_LIFE_OFF_SIGN") if off else ("¢%d" % int(Tuning.life_price(level.sector)) if not full else "MAX"), HORIZONTAL_ALIGNMENT_CENTER, 28, 7, Color("#ffe14a") if ok else Color("#8a7a80"))
 
 ## Sprechblase mit der Zielplattform (Zahl) bzw. Pfeil nach oben für den Ausgang, nachdem das „!“ verklungen ist.
 func _draw_dest_bubble(pos: Vector2, dest: String, fade: float, mandatory: bool) -> void:

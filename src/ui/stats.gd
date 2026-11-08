@@ -39,17 +39,13 @@ func _ready() -> void:
 		["STAT_CRASHES", "%d" % int(st.get("crashes", 0))],
 		["STAT_PUMP", "%d / %d" % [int(st.get("pump_hits", 0)), int(st.get("pump_explosions", 0))]],
 		["STAT_SQUASH", "%d" % int(st.get("squashes", 0))],
-		["STAT_SHIFT", "%d" % int(st.get("shift_best", 0))],
-		["STAT_DAILY", "%d · %d" % [int(st.get("daily_best", 0)), Daily.current_streak(st, Daily.today())]],
+		["STAT_SHIFT", "%s · %d" % [String(st.get("shift_best_grade", "–")), int(st.get("shift_best_score", 0))] if int(st.get("shift_best_score", 0)) > 0 else "–"],
+		["STAT_SHIFT_TODAY", _shift_today()],
+		["STAT_DAILY", "%d · %d" % [int(st.get("day_golds", 0)), Daily.current_streak(st, Daily.today())]],
 		["STAT_TIME", "%d:%02d:%02d" % [secs / 3600, (secs / 60) % 60, secs % 60]],
 	]
 	var panel := Panel.new()
-	var sbf := StyleBoxFlat.new()
-	sbf.bg_color = Color(0.03, 0.04, 0.13, 0.82)
-	sbf.border_color = Color("#3a4580")
-	sbf.set_border_width_all(1)
-	sbf.set_corner_radius_all(4)
-	panel.add_theme_stylebox_override("panel", sbf)
+	panel.add_theme_stylebox_override("panel", MenuKit.panel_style(0.82))
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	move_child(panel, box.get_index())
@@ -92,3 +88,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()   # vor dem Szenenwechsel, danach hat der Knoten keinen Viewport mehr
 		Flow.to_menu()
+
+## Nachtschicht von heute: Note und Punkte, "–" wenn noch nicht geflogen.
+func _shift_today() -> String:
+	var e := Save.shift_entry()
+	if String(e.get("date", "")) != Daily.today() or not bool(e.get("finished", false)):
+		return "–"
+	return "%s · %d" % [String(e.get("grade", "E")), int(e.get("score", 0))]

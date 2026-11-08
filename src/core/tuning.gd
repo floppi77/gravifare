@@ -163,7 +163,7 @@ static func extra_slots(level_no: int) -> int:
 const BOARD_TIME := 0.9
 const EXIT_COUNTDOWN := 0.0
 
-# Kampagne: Leben, Sprit-Übernahme
+# Karriere: Leben, Sprit-Übernahme
 const START_LIVES := 5
 const MAX_LIVES := 5             # mehr als 5 Leben gibt es nie (auch nicht gekauft)
 const LIFE_PRICE := 1000.0       # Lebens-Station: ein Leben für 1000 Credits (Sektor 1)

@@ -136,3 +136,36 @@ static func load_best(id: String, slot := 0) -> Dictionary:
 		return {}
 	var d = JSON.parse_string(FileAccess.get_file_as_string(p))
 	return d if typeof(d) == TYPE_DICTIONARY and int(d.get("v", 0)) == VERSION else {}
+
+## Geist der Tagschicht: der beste Flug des heutigen Tages (eine Datei je Speicherplatz, am nächsten Tag ungültig). `score` = Wertung des Tagesziels.
+static func day_path(slot := 0) -> String:
+	return dir_for(slot) + "_day.json"
+
+static func save_day(d: Dictionary, slot: int, date: String, score: int) -> bool:
+	if not bool(d.get("result", {}).get("complete", false)):
+		return false
+	var old := load_day_file(slot)
+	if String(old.get("date", "")) == date and int(old.get("score", -1)) >= score:
+		return false
+	DirAccess.make_dir_recursive_absolute(dir_for(slot))
+	var f := FileAccess.open(day_path(slot) + ".tmp", FileAccess.WRITE)
+	if f == null:
+		return false
+	f.store_string(JSON.stringify({"date": date, "score": score, "replay": {"v": VERSION, "trace": d.get("trace", []), "level": d.get("level", "")}}))
+	f.close()
+	DirAccess.rename_absolute(day_path(slot) + ".tmp", day_path(slot))
+	return true
+
+static func load_day_file(slot := 0) -> Dictionary:
+	var p := day_path(slot)
+	if not FileAccess.file_exists(p):
+		return {}
+	var d = JSON.parse_string(FileAccess.get_file_as_string(p))
+	return d if typeof(d) == TYPE_DICTIONARY else {}
+
+## Flugspur des besten Flugs von `date` ([] wenn es keinen gibt).
+static func load_day(slot: int, date: String) -> Array:
+	var d := load_day_file(slot)
+	if String(d.get("date", "")) != date or typeof(d.get("replay")) != TYPE_DICTIONARY:
+		return []
+	return d.replay.get("trace", [])

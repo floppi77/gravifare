@@ -67,9 +67,16 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_layers)
 	Input.joy_connection_changed.connect(_on_joy_connection)
 	load_level(level_path)
+	for hold in OS.get_cmdline_user_args():
+		if hold.begins_with("--hold-action="):          # Dev: eine Eingabeaktion dauerhaft gedrückt halten (z. B. thrust_right), um die Steuerung ohne Hand zu prüfen
+			Input.action_press(hold.substr(14))
+	if Flow.daily and DayShift.mirrors_screen(Flow.daily_rule):
+		_enable_mirror_view()                  # Tagschicht-Regel Spiegelwelt: das ganze Bild wird gespiegelt
 	_release_carried()                         # Fortsetzen: Der gespeicherte Ausgangs-Fahrgast steigt aus und zahlt (sonst ginge sein Fahrpreis verloren)
-	if Flow.daily:
-		hud.flash_message(tr("MSG_DAILY") % Flow.daily_date, 5.0)
+	if Flow.daily and autopilot == null and not OS.get_cmdline_user_args().has("--autopilot") and not OS.get_cmdline_user_args().has("--no-brief"):
+		_open_briefing()                       # Tagschicht: Regel und Ziel stehen vor dem Start im Bild, erst A/Enter startet
+	elif Flow.daily:
+		hud.flash_message(tr("MSG_DAILY") % [Flow.daily_date, tr("DAY_RULE_" + Flow.daily_rule), tr("DAY_GOAL_" + Flow.daily_goal)], 8.0)
 	elif Flow.community:
 		hud.flash_message(tr("MSG_COMMUNITY"), 4.0)
 	elif Flow.practice:
@@ -182,15 +189,20 @@ func load_level(path: String) -> void:
 	if lvl == null:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
+	run.shift_mode = Flow.shift
 	if Flow.shift:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = Flow.run_seed + Flow.shift_maps * 131
-		lvl.jobs = Run.shift_jobs(lvl, Flow.shift_maps, rng)
+		NightShift.apply(lvl, Flow.shift_index(), Flow.shift_date)          # Schwerkraft, Dunkelheit und Aufträge der Schicht
+		run.extras_enabled = false                                                       # nur Pflichtfahrgäste
 	elif Flow.daily:
+		lvl = DayShift.apply(lvl, Flow.daily_rule, Flow.daily_date)          # Tagschicht: immer hell, dazu die Tagesregel (bei „Spiegelwelt“ ein gespiegeltes Level)
 		lvl.jobs = Daily.jobs_for(lvl, Flow.daily_date)
+		run.patience_k = DayShift.patience_k(Flow.daily_rule)
+		run.fuel_cap = DayShift.fuel_cap(Flow.daily_rule)
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
 	run.lives = Flow.lives
-	var mods := Workshop.mods_for({}) if Flow.daily or Flow.community else Workshop.mods(Save.data)      # Tagesflug und Community-Level: Serientaxi, damit Ergebnisse vergleichbar sind
+	var mods := Workshop.mods_for({}) if Flow.daily or Flow.community else Workshop.mods(Save.data)      # Tagschicht und Community-Level: Serientaxi, damit Ergebnisse vergleichbar sind
+	if Flow.daily:
+		mods = DayShift.mods(Flow.daily_rule, mods)
 	run.sim.apply_mods(mods)
 	replay = Replay.new()
 	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
@@ -252,7 +264,10 @@ func _setup_ghost(lvl: LevelData) -> void:
 	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	if best.has("sig") and String(best.sig) != Replay.sig_of(lvl):
 		best = {}                        # das Level wurde nach diesem Lauf geändert
-	ghost.bind(run, best.get("trace", []))
+	var trace: Array = best.get("trace", [])
+	if Flow.daily and Settings.values.ghost and autopilot == null:
+		trace = Replay.load_day(Save.slot, Flow.daily_date)          # Tagschicht: der beste Flug von heute fliegt als Geist mit
+	ghost.bind(run, trace)
 
 ## Tutorial-Sprecher: Clip der Zentrale abspielen (Fahrgast-Zurufe schweigen währenddessen); gibt Länge und Text zurück.
 func tutorial_speak(key: String) -> Dictionary:
@@ -468,8 +483,103 @@ func auto_pause() -> bool:
 	_set_paused(true)
 	return true
 
+var shot_busy := false
+var day_ghost_score := -1          # Tagschicht: Wertung dieses Flugs, wenn er der beste des Tages ist (Geist wird nach dem Ende des Replays gesichert)
+
+## Auswertung der Nachtschicht als Bild speichern: „JJMMTT_nachtschicht_name.png“ neben dem Spiel (sonst im Datenordner).
+## Der Knopf wird dabei kurz ausgeblendet.
+func _take_shift_shot() -> void:
+	if shot_busy:
+		return
+	shot_busy = true
+	hud.shot_hide = true
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	hud.shot_hide = false
+	var fname := Shots.day_file_name(Daily.today(), Save.slot_name(), Save.slot) if Flow.daily else Shots.shift_file_name(Daily.today(), Save.slot_name(), Save.slot)
+	var path := Shots.unique_path(Shots.target_dir(), fname)
+	if img != null and img.save_png(path) == OK:
+		Sfx.play("coin", -4.0)
+		hud.shot_note = path.get_file()
+		hud.shot_note_t = 6.0
+		hud.flash_message(tr("MSG_SHOT_SAVED") % path, 6.0)
+	else:
+		hud.flash_message(tr("MSG_SHOT_FAIL"), 4.0)
+	shot_busy = false
+
+## Spiegelwelt: Ein Vollbild-Shader über allem (HUD, Einspieler, Pausemenü) spiegelt das fertige Bild horizontal. Mausereignisse werden entsprechend gespiegelt weitergegeben,
+## damit Knöpfe dort reagieren, wo man sie sieht; der HUD rechnet seine Klickflächen mit `mouse_pos()` um.
+var mirror_view := false
+
+const MIRROR_SHADER := """
+shader_type canvas_item;
+uniform sampler2D screen : hint_screen_texture, filter_nearest;
+void fragment() {
+	COLOR = vec4(texture(screen, vec2(1.0 - SCREEN_UV.x, SCREEN_UV.y)).rgb, 1.0);
+}
+"""
+
+func _enable_mirror_view() -> void:
+	mirror_view = true
+	hud.mirror_view = true
+	var ml := CanvasLayer.new()
+	ml.layer = 100
+	add_child(ml)
+	var rect := ColorRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var sh := Shader.new()
+	sh.code = MIRROR_SHADER
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	rect.material = mat
+	ml.add_child(rect)
+
+func _input(event: InputEvent) -> void:
+	if mirror_view and event is InputEventMouse and not event.has_meta("gf_mirrored"):
+		var m := event.duplicate() as InputEventMouse
+		var w := get_viewport().get_visible_rect().size.x
+		m.position = Vector2(w - m.position.x, m.position.y)
+		m.global_position = Vector2(w - m.global_position.x, m.global_position.y)
+		m.set_meta("gf_mirrored", true)
+		get_viewport().set_input_as_handled()
+		get_viewport().push_input(m, true)
+
+## Briefing der Tagschicht (Regel, Ziel, Wertung, Serie, Belohnung); das Level steht, bis es bestätigt ist. Innerhalb einer Sitzung nur einmal je Start aus dem Menü (ein Neustart zeigt es nicht erneut).
+var briefing := false
+
+func _open_briefing() -> void:
+	if Flow.daily_briefed:
+		hud.flash_message(tr("MSG_DAILY") % [Flow.daily_date, tr("DAY_RULE_" + Flow.daily_rule), tr("DAY_GOAL_" + Flow.daily_goal)], 6.0)
+		return
+	var lang := TranslationServer.get_locale().substr(0, 2)
+	var lname: String = run.level.names.get(lang, run.level.id)
+	var stats: Dictionary = Save.data.stats
+	hud.brief = {"rule": Flow.daily_rule, "goal": Flow.daily_goal, "sub": "Level %d · %s · %s" % [run.level.number, lname, NightShift.format_stamp(Flow.daily_date, 12, 0, lang).split(",")[0]],
+		"target": run.time_target(), "streak": Daily.current_streak(stats, Flow.daily_date), "reward": DayShift.next_reward(stats, Save.data.get("unlocked", [])),
+		"ghost": not Replay.load_day(Save.slot, Flow.daily_date).is_empty() and Settings.values.ghost}
+	hud.briefing = true
+	briefing = true
+
+func _start_after_briefing() -> void:
+	briefing = false
+	hud.briefing = false
+	Flow.daily_briefed = true
+	Sfx.play("ui_ok", -4.0)
+	hud.flash_message(tr("MSG_DAILY") % [Flow.daily_date, tr("DAY_RULE_" + Flow.daily_rule), tr("DAY_GOAL_" + Flow.daily_goal)], 6.0)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if bay != null:
+		return
+	if briefing:
+		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and hud.brief_btn.has_point(hud.event_pos(event))):
+			get_viewport().set_input_as_handled()
+			_start_after_briefing()
+		elif event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+			get_viewport().set_input_as_handled()
+			Flow.to_menu()
 		return
 	if trans_t >= 0.0:
 		# Levelwechsel: A/Enter/B/Esc überspringen die Sequenz bis zum Einblenden; sonst keine Eingabe
@@ -491,6 +601,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			Flow.to_menu()
 	elif paused:
 		return
+	elif hud.shot_available() and (event.is_action_pressed("eject") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and hud.shot_btn.has_point(hud.event_pos(event)))):
+		get_viewport().set_input_as_handled()
+		_take_shift_shot()
 	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
 		get_viewport().set_input_as_handled()     # vor einem Szenenwechsel: danach hat der Knoten keinen Viewport mehr
 		if Flow.next_level_id() != "":
@@ -498,6 +611,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				_open_bay()         # Sektor geschafft: erst in die Werkstatt
 			else:
 				_begin_transition()     # Ergebnisansicht bestätigt: Levelwechsel-Sequenz starten
+		elif Flow.shift:
+			Flow.to_shift_finale()  # Schicht geflogen: eigenes Finale der Nachtschicht, nicht das der Karriere
 		elif hud.result.get("counted", false) and not Flow.daily and not Flow.community:
 			Flow.to_finale()        # letztes Level geschafft: Finale und Abspann
 		else:
@@ -516,6 +631,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			pass                                  # Tutorial: R startet nicht die ganze Flugschule neu (bewusst geht das über das Pausenmenü)
 		elif run.result == Run.Result.FAILED:
 			_lose_life()
+		elif Flow.shift:
+			pass                                  # Nachtschicht: ein Versuch, kein Neustart einer Karte
 		elif run.result == Run.Result.RUNNING and not run.level.tutorial and Time.get_ticks_msec() > restart_armed_until:
 			# freiwilliger Neustart mitten im Level: erst nach zweitem Druck (R liegt direkt neben E = Rauswerfen)
 			restart_armed_until = Time.get_ticks_msec() + RESTART_CONFIRM_MS
@@ -540,7 +657,7 @@ func _thrust_rumble() -> float:
 	return maxf(main, side)
 
 func _physics_process(_delta: float) -> void:
-	if paused:
+	if paused or briefing:
 		return
 	if trans_t >= 0.0:
 		_arrival_tick()
@@ -572,7 +689,10 @@ func _physics_process(_delta: float) -> void:
 	if bay == null:                          # in der Werkstatt steuert sie den Triebwerksklang selbst
 		var flying := run.result == Run.Result.RUNNING
 		Sfx.set_thrust(taxi.flame_main if flying else 0.0, absf(taxi.flame_side) if flying else 0.0)
-	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0:
+	var summary: bool = hud.summary_visible()        # Schicht-Auswertung im Bild: kein Triebwerk, kein Tankalarm, keine tickende Uhr mehr (Musik und Raumklang laufen weiter)
+	if summary:
+		Sfx.set_thrust(0.0, 0.0)
+	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0 and run.result == Run.Result.RUNNING and not summary:
 		warn_cd -= Tuning.TICK
 		if warn_cd <= 0.0:
 			Sfx.play("warn", -6.0)
@@ -614,11 +734,19 @@ func _physics_process(_delta: float) -> void:
 		hud.result["score"] = score
 		hud.result["best_score"] = maxi(score, Save.community_best_score(Flow.current_level) if Flow.community else Save.best_score(Flow.current_level))
 		if Flow.shift:
-			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schicht-Bestleistung
-			Flow.shift_fares += run.delivered + run.extras_delivered
-			Flow.shift_maps += 1
+			counted = false                  # Nachtschicht: eigene Aufträge, zählt nur für die Schichtnote
+			var mr := NightShift.map_result(run.shift_stats())
+			mr["id"] = Flow.current_level
+			mr["time"] = run.level_time
+			mr["number"] = run.level.number
+			mr["names"] = run.level.names
+			Flow.shift_results.append(mr)
+			Flow.shift_credits = run.money
+			hud.result["shift"] = mr
+			hud.result["shift_index"] = Flow.shift_index() + 1
+			hud.result["shift_final"] = Flow.finish_shift() if Flow.next_level_id() == "" else {}
 		elif Flow.community:
-			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, kein Feldzug, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
+			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, keine Karriere, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
 				Save.complete_community(Flow.current_level, run.level_time, score)
 			elif counted and _solved_by_hand():
 				Flow.note_editor_run(Flow.current_level, run.level_time, score)      # Entwurf: erst beim Speichern in den Spielstand (sonst sammelten verworfene Entwürfe Einträge)
@@ -627,17 +755,33 @@ func _physics_process(_delta: float) -> void:
 				hud.result["solved"] = true
 			counted = false
 		elif Flow.daily:
-			if counted:                      # Tagesflug: zählt nur für den Tagesbestwert und die Serie, nicht für Level und Medaillen
-				Daily.record(Save.daily_entry(), Save.data.stats, Flow.daily_date, score)
+			# Tagschicht: zählt nur für Tagesziel, Medaille, Serie und Geist, nicht für Level und Medaillen der Karriere
+			var ds := run.day_stats()
+			var gscore := DayShift.goal_score(Flow.daily_goal, ds) if counted else 0
+			var gmedal := DayShift.medal_of(Flow.daily_goal, gscore) if counted else 0
+			var entry := Save.daily_entry()
+			var day_prev := int(entry.get("best", 0)) if String(entry.get("date", "")) == Flow.daily_date else 0
+			if counted:
+				Daily.record(entry, Save.data.stats, Flow.daily_date, gscore, gmedal)
 				Save.write()
-			hud.result["best_score"] = int(Save.daily_entry().get("best", score))
+				if gscore > day_prev:
+					day_ghost_score = gscore                    # nach replay.finish() sichern
+			hud.result["day"] = {"rule": Flow.daily_rule, "goal": Flow.daily_goal, "score": gscore, "medal": gmedal, "best": int(entry.get("best", gscore)), "new_best": counted and gscore > day_prev,
+				"best_medal": int(entry.get("medal", gmedal)), "streak": Daily.current_streak(Save.data.stats, Flow.daily_date), "date": Flow.daily_date, "stats": ds}
+			hud.result["best_score"] = int(entry.get("best", gscore))
 			counted = false
 		if counted:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
+		if Flow.daily and day_ghost_score >= 0 and not Save.dev_session:
+			Replay.save_day(replay.to_dict(), Save.slot, Flow.daily_date, day_ghost_score)
 		if counted and not Save.dev_session:
 			Replay.save_if_best(replay.to_dict(), Save.slot)
-		_check_unlocks()
+		var fresh := _check_unlocks()
+		if hud.result.has("day"):
+			var dd: Dictionary = hud.result["day"]
+			dd["fresh"] = fresh.map(func(it): return String(it.name.get(TranslationServer.get_locale().substr(0, 2), it.id)))
+			dd["reward"] = DayShift.next_reward(Save.data.stats, Save.data.get("unlocked", []))
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() == "":
 			if not Flow.practice:
@@ -724,8 +868,8 @@ func _lose_life() -> void:
 		Flow.lives = 0
 		hud.game_over = true
 		if Flow.shift:
-			hud.shift_total = Flow.shift_fares + run.delivered + run.extras_delivered
-			Flow.finish_shift(run.delivered + run.extras_delivered)
+			Flow.shift_credits = run.money
+			hud.shift_final = Flow.finish_shift()
 		elif not Flow.practice:
 			hud.over_level = Flow.lose_sector(run.level.sector).number
 		return
@@ -812,17 +956,23 @@ func _add_shake(amp: float) -> void:
 ## Beinahe-Treffer: zügig an einem Hindernis vorbei (kein Kontakt) löst einen kurzen Kamerazoom mit leichter Zeitlupe aus.
 const NEAR_SPEED := 75.0
 const NEAR_GAP := 3.0
+const NEAR_GAP_SHIFT := 2.0         # Nachtschicht: enger, damit sich der Bonus nicht durch Hängen an Wänden einsammeln lässt
 const NEAR_ZOOM := 0.12
 var near_z := 0.0
 
 func _check_near_miss() -> void:
 	near_cd = maxf(0.0, near_cd - Tuning.TICK)
 	var s := run.sim
-	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < NEAR_SPEED or Settings.values.reduce_motion or trans_t >= 0.0:
+	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < NEAR_SPEED or trans_t >= 0.0 or (Settings.values.reduce_motion and not Flow.shift):
 		return
 	var lv := run.level
-	if lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(NEAR_GAP, NEAR_GAP)) and not lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(0.5, 0.5)):
-		_near_miss_fx()
+	var gap := NEAR_GAP_SHIFT if Flow.shift else NEAR_GAP
+	if lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(gap, gap)) and not lv.box_hits_solid(s.pos, Tuning.HULL_HALF + Vector2(0.5, 0.5)):
+		if Flow.shift:
+			run.note_near_miss()            # zählt für die Wertung, unabhängig von „Weniger Bewegung“
+			near_cd = 4.0
+		if not Settings.values.reduce_motion:
+			_near_miss_fx()
 
 func _near_miss_fx() -> void:
 	near_cd = 4.0
@@ -839,11 +989,13 @@ func _solved_by_hand() -> bool:
 	return Flow.community and Flow.return_to_editor != "" and not Flow.editor_autopilot and autopilot == null and not Save.dev_session \
 		and run.result == Run.Result.COMPLETE and run.delivered >= run.level.jobs.size()
 
-func _check_unlocks() -> void:
+func _check_unlocks() -> Array:
 	var lang := TranslationServer.get_locale().substr(0, 2)
-	for it in Cosmetics.check_unlocks():
+	var fresh: Array = Cosmetics.check_unlocks()
+	for it in fresh:
 		hud.flash_message(tr("MSG_UNLOCK") % it.name.get(lang, it.id), 4.0)
 		Sfx.play("exit", -4.0)
+	return fresh
 
 var voice_cd := 0.0
 var attendant_cd := 0.0
@@ -992,7 +1144,7 @@ func _on_event(e: Dictionary) -> void:
 			Sfx.play("coin")
 			Haptics.pulse(0.3, 0.4, 0.2)
 		"life_denied":
-			hud.flash_message(tr("MSG_LIFE_FULL") if e.full else tr("MSG_LIFE_POOR") % int(e.price), 2.6)
+			hud.flash_message(tr("MSG_LIFE_OFF") if e.get("off", false) else (tr("MSG_LIFE_FULL") if e.full else tr("MSG_LIFE_POOR") % int(e.price)), 2.6)
 		"out_of_fuel":
 			hud.flash_message(tr("MSG_OUT_OF_FUEL"), 2.5)
 			Haptics.pulse(0.5, 0.5, 0.3)
@@ -1085,7 +1237,7 @@ func _on_event(e: Dictionary) -> void:
 func _process(delta: float) -> void:
 	_clip_tick(delta)
 	_focus_tick(delta)
-	if run.result == Run.Result.RUNNING and not paused and trans_t < 0.0:
+	if run.result == Run.Result.RUNNING and not paused and not briefing and trans_t < 0.0:
 		Save.add_playtime(delta / maxf(Engine.time_scale, 0.05))
 	if slowmo_left > 0.0:
 		slowmo_left -= delta / maxf(Engine.time_scale, 0.05)
@@ -1172,7 +1324,10 @@ func _begin_transition() -> void:
 	if nl.gravity != Tuning.GRAVITY:
 		trans.info += "  ·  " + tr("TRANS_GRAVITY") % (nl.gravity / Tuning.GRAVITY)
 	if Flow.shift:
-		trans.info = tr("TRANS_SHIFT") % Flow.shift_fares
+		trans.info = tr("TRANS_SHIFT") % [Flow.shift_results.size() + 1, NightShift.MAPS]
+		var sidx: int = Flow.shift_plan.find(next_id)
+		trans.info += "  ·  " + tr("TRANS_GRAVITY") % (NightShift.gravity_for(nl, sidx, Flow.shift_date) / Tuning.GRAVITY)
+		trans.info += "  ·  " + tr("TRANS_DARK") % int(round(maxf(nl.dark, NightShift.dark_for(sidx)) * 100.0))
 	trans.skip_hint = tr("TRANS_SKIP")
 	arriving = false
 	trans_t = 0.0
@@ -1194,8 +1349,6 @@ func _begin_arrival() -> void:
 	arrive_done = false
 	Flow.current_level = next_id
 	level_path = Flow.level_path(next_id)
-	if Flow.shift:
-		Flow.shift_next = Flow._pick_shift_map(next_id)
 	load_level(level_path)
 	run.level.doors_forced_open = true      # beim Einflug stehen bewegliche Tore offen
 	run.level.movers_ignore = true          # … und Trümmer sind ausgeblendet (sie erscheinen mit dem Spielstart)

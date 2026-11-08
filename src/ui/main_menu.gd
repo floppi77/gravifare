@@ -15,7 +15,7 @@ var help: Label                    # Hilfetext zum gewählten oder überfahrenen
 var flags_col: Control = null      # Sprachflaggen, untereinander links neben dem Menü
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
-const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_COMMUNITY",
+const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_COMMUNITY",
 	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN"]
 
 func _ready() -> void:
@@ -31,8 +31,8 @@ func _ready() -> void:
 	box = VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
 	box.offset_left = 16.0
-	box.offset_top = -14.0                     # etwas nach oben: unten bleibt Platz für den Hilfetext
-	box.offset_bottom = -14.0
+	box.offset_top = -28.0                     # nach oben: unten bleibt eine Zeile für den Hilfetext frei
+	box.offset_bottom = -28.0
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 2)
 	box.grow_horizontal = Control.GROW_DIRECTION_END
@@ -48,10 +48,11 @@ func _ready() -> void:
 	notice.modulate.a = 0.0
 	stage.add_child(notice)
 	help = Label.new()
-	help.position = Vector2(16, 332)
-	help.size = Vector2(300, 24)
-	help.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help.position = Vector2(6, 344)                      # unten links, einzeilig bis zum Copyright (rechts), ohne das Menü zu überdecken
+	help.size = Vector2(462, 14)
+	help.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	help.autowrap_mode = TextServer.AUTOWRAP_OFF
+	help.clip_text = true
 	help.add_theme_font_size_override("font_size", 8)
 	help.add_theme_color_override("font_color", Color("#ffe9a0"))
 	help.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.1, 0.9))
@@ -73,8 +74,21 @@ func _ready() -> void:
 		show_community()
 	elif OS.get_cmdline_user_args().has("--music"):     # Dev: direkt den Musikplayer zeigen
 		show_music()
+	elif OS.get_cmdline_user_args().has("--options") or _options_page() != "":   # Dev: direkt die Optionen zeigen (--options=audio|controls|display|game)
+		show_options()
+		var pg := _options_page()
+		if pg != "":
+			options.call_deferred("show_" + pg)
+	elif OS.get_cmdline_user_args().has("--confirm"):   # Dev: die Nachfrage „Neues Spiel“ zeigen
+		show_new_confirm(func(): pass)
 	else:
 		show_main()
+
+func _options_page() -> String:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--options="):
+			return a.substr(10)
+	return ""
 
 func _clear() -> void:
 	for c in box.get_children():
@@ -119,14 +133,21 @@ func _menu_button(text: String, key: String, cb: Callable, small := false) -> Bu
 	return b
 
 func _bind_help(c: Control) -> void:
-	c.focus_entered.connect(func(): help.text = tr(String(c.get_meta("help", ""))))
-	c.mouse_entered.connect(func(): help.text = tr(String(c.get_meta("help", ""))))
+	c.focus_entered.connect(func(): help.text = _help_text(String(c.get_meta("help", ""))))
+	c.mouse_entered.connect(func(): help.text = _help_text(String(c.get_meta("help", ""))))
 	c.mouse_exited.connect(_help_for_focus)
+
+## Hilfetext eines Eintrags; bei der Tagschicht mit der heutigen Regel und dem Ziel.
+func _help_text(key: String) -> String:
+	if key == "HELP_DAILY":
+		var date := Daily.today()
+		return tr(key) % (tr("DAY_RULE_" + DayShift.rule_of(date)) + " · " + tr("DAY_GOAL_" + DayShift.goal_of(date)))
+	return tr(key)
 
 ## Nach dem Verlassen mit der Maus: wieder der Hilfetext des fokussierten Eintrags (oder keiner).
 func _help_for_focus() -> void:
 	var f := get_viewport().gui_get_focus_owner()
-	help.text = tr(String(f.get_meta("help", ""))) if f != null and f.has_meta("help") else ""
+	help.text = _help_text(String(f.get_meta("help", ""))) if f != null and f.has_meta("help") else ""
 
 ## Gesperrter Eintrag: der Hilfetext nennt den Grund (auch bei Maus-Überfahren eines ausgegrauten Knopfs).
 func _lock(b: Button, locked: bool) -> void:
@@ -141,9 +162,13 @@ func _next_open_level() -> String:
 			return id
 	return ids[0] if not ids.is_empty() else ""
 
-func show_main(focus_lang := "") -> void:
-	_hide_screen()
-	_clear()
+## Optionen und Nachfragen: Das Logo bleibt auf jeder Seite an derselben Stelle (die Spalte hat feste Höhe, der Inhalt beginnt oben); im Hauptmenü wird sie mittig angeordnet.
+func _pin_top(on: bool) -> void:
+	box.custom_minimum_size = Vector2(150, 330 if on else 0)
+	box.alignment = BoxContainer.ALIGNMENT_BEGIN if on else BoxContainer.ALIGNMENT_CENTER
+
+## Kopf aller Spaltenbildschirme: Logo, Untertitel und ein kleiner Abstand (Kinder 0–2; die Tafel dahinter beginnt erst bei Kind 3).
+func _header() -> void:
 	var mt := Control.new()
 	mt.set_script(load("res://src/ui/menu_title.gd"))
 	box.add_child(mt)
@@ -151,9 +176,15 @@ func show_main(focus_lang := "") -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 2)
 	box.add_child(spacer)
+
+func show_main(focus_lang := "") -> void:
+	_hide_screen()
+	_clear()
+	_pin_top(false)
+	_header()
 	var id := _next_open_level()
 	var ids := Flow.level_ids()
-	if not Save.campaign().is_empty():              # „Fortsetzen“ nur mit laufendem Feldzug; erledigte Level allein genügen nicht (neues Spiel, Tutorial)
+	if not Save.campaign().is_empty():              # „Fortsetzen“ nur mit laufender Karriere; erledigte Level allein genügen nicht (neues Spiel, Tutorial)
 		box.add_child(_menu_button(tr("MENU_CONTINUE"), "continue", func():
 			if not Flow.resume_campaign():
 				Flow.start_campaign(id)))
@@ -184,12 +215,16 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_MUSIC"), "music", show_music],
 			[tr("MENU_OPTIONS"), "options", show_options],
 			[tr("MENU_CREDITS"), "credits", func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
-			[tr("SLOT_CURRENT") % Save.slot, "slot", show_slots],
+			[Save.slot_label(), "slot", show_slots],
 			[tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL)],      # per Gamepad wie jeder Eintrag anwählbar
 			[tr("MENU_QUIT"), "quit", func(): get_tree().quit()]]:
 		grid.add_child(_menu_button(entry[0], entry[1], entry[2], true))
-	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagesflug: ab Sektor 1
+	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagschicht: ab Sektor 1
 	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln
+	if Save.shift_unlocked(ids) and Save.shift_used_today(Daily.today()):      # … und nur ein Versuch pro Tag
+		var sb := grid.get_child(1) as Button
+		sb.disabled = true
+		sb.set_meta("help", "HELP_SHIFT_DONE")
 	box.add_child(grid)
 	_link_grid(grid)
 	_equalize_grid.call_deferred(grid)
@@ -231,12 +266,7 @@ func _equalize_grid(grid: GridContainer) -> void:
 ## Dunkle Tafel hinter den Menüknöpfen (nicht hinter Logo und Untertitel): die Knöpfe liegen sonst direkt auf dem detailreichen Stadtbild.
 func _add_button_panel() -> void:
 	var panel := Panel.new()
-	var sbf := StyleBoxFlat.new()
-	sbf.bg_color = Color(0.03, 0.04, 0.13, 0.78)
-	sbf.border_color = Color("#3a4580")
-	sbf.set_border_width_all(1)
-	sbf.set_corner_radius_all(4)
-	panel.add_theme_stylebox_override("panel", sbf)
+	panel.add_theme_stylebox_override("panel", MenuKit.panel_style())
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stage.add_child(panel)
 	var fit := func():
@@ -283,13 +313,24 @@ func _show_screen(c: Control) -> void:
 	version.visible = c is SlotSelect
 	if screen != null:
 		screen.queue_free()
+	if screen_panel != null:
+		screen_panel.queue_free()
+		screen_panel = null
+	if not (c is SlotSelect or c is LevelEditor):          # der Editor braucht die ganze Fläche, die Spielstandwahl hat ihre eigene Gestaltung
+		screen_panel = MenuKit.screen_panel()
+		stage.add_child(screen_panel)
 	screen = c
 	stage.add_child(c)
+
+var screen_panel: Panel = null
 
 func _hide_screen() -> void:
 	if screen != null:
 		screen.queue_free()
 		screen = null
+	if screen_panel != null:
+		screen_panel.queue_free()
+		screen_panel = null
 	box.visible = true
 	version.visible = true
 
@@ -346,9 +387,11 @@ func show_slots() -> void:
 	ss.back = show_main if Save.slot != 0 else Callable()
 	_show_screen(ss)
 
-## Neues Spiel bei laufendem Feldzug: erst nachfragen, der Fortschritt des Laufs geht sonst verloren.
+## Neues Spiel bei laufender Karriere: erst nachfragen, der Fortschritt des Laufs geht sonst verloren.
 func show_new_confirm(start: Callable) -> void:
 	_clear()
+	_pin_top(true)
+	_header()
 	box.add_child(MenuKit.title(tr("MENU_NEW_CONFIRM")))
 	var sub := Label.new()
 	sub.text = tr("MENU_NEW_CONFIRM_SUB")
@@ -362,6 +405,8 @@ func show_new_confirm(start: Callable) -> void:
 
 func show_options() -> void:
 	_clear()
+	_pin_top(true)
+	_header()
 	options = MenuKit.options_panel(show_main, show_options)
 	box.add_child(options)
 	_focus_first()

@@ -36,9 +36,10 @@ func show_main(focus_lang := "") -> void:
 	_clear()
 	box.add_child(MenuKit.title(tr("HUD_PAUSED")))
 	box.add_child(MenuKit.button(tr("MENU_RESUME"), func(): game._set_paused(false)))
-	box.add_child(MenuKit.button(tr("MENU_RESTART"), func():
-		game._set_paused(false)
-		game.restart_level()))
+	if not Flow.shift:                     # Nachtschicht: ein Versuch, kein Neustart der Karte
+		box.add_child(MenuKit.button(tr("MENU_RESTART"), func():
+			game._set_paused(false)
+			game.restart_level()))
 	var ck: String = game.level_clip_key()
 	if ck != "":
 		box.add_child(MenuKit.button(tr("MENU_CLIP"), func():

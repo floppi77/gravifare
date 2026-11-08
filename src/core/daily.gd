@@ -6,9 +6,12 @@ class_name Daily
 const JOBS_LEVEL := 2                    # Länge der Auftragskette wie die dritte Karte einer Nachtschicht: 5 Fahrten + Ausgang
 const UNLOCK_LEVELS := 11                # freigeschaltet, sobald so viele Level geschafft sind (Sektor 1)
 
+## Dev: festes Datum statt der Systemzeit (--day-date=JJJJ-MM-TT), z. B. um die Regel eines Wochentags zu sehen.
+static var override_date := ""
+
 ## Heutiges Datum (Ortszeit) als "JJJJ-MM-TT".
 static func today() -> String:
-	return Time.get_date_string_from_system()
+	return override_date if override_date != "" else Time.get_date_string_from_system()
 
 ## Seed eines Tages: JJJJMMTT als Zahl (z. B. 20261103).
 static func seed_for(date: String) -> int:
@@ -44,17 +47,25 @@ static func level_of_day(d: Dictionary, pool: Array, date: String) -> String:
 	d["level"] = pick_level(pool, date)
 	d["best"] = 0
 	d["done"] = false
+	d["medal"] = 0
+	d["gold"] = false
 	return String(d.level)
 
-## Abgeschlossenen Tagesflug werten. `d` = Eintrag "daily", `stats` = Statistik; beide werden verändert.
-## Tage in Folge zählen nur abgeschlossene Tagesflüge; der beste Wert des Tages bleibt stehen.
-static func record(d: Dictionary, stats: Dictionary, date: String, score: int) -> void:
+## Abgeschlossene Tagschicht werten. `d` = Eintrag "daily", `stats` = Statistik; beide werden verändert. `score` = Wertung des Tagesziels, `medal` = 0–3 (siehe DayShift).
+## Tage in Folge zählen nur abgeschlossene Tagschichten; der beste Wert und die beste Medaille des Tages bleiben stehen, Gold zählt je Tag einmal.
+static func record(d: Dictionary, stats: Dictionary, date: String, score: int, medal := 0) -> void:
 	if String(d.get("date", "")) != date:
 		d["date"] = date
 		d["best"] = 0
 		d["done"] = false
+		d["medal"] = 0
+		d["gold"] = false
 	d["best"] = maxi(int(d.get("best", 0)), score)
-	stats["daily_best"] = maxi(int(stats.get("daily_best", 0)), score)
+	d["medal"] = maxi(int(d.get("medal", 0)), medal)
+	if medal >= 3 and not bool(d.get("gold", false)):
+		d["gold"] = true
+		stats["day_golds"] = int(stats.get("day_golds", 0)) + 1
+	stats["day_best_medal"] = maxi(int(stats.get("day_best_medal", 0)), medal)
 	if bool(d.get("done", false)):
 		return
 	d["done"] = true

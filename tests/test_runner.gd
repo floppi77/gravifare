@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -600,7 +600,7 @@ func _test_wrong_pad_rules() -> void:
 	check(not feed.call("marvin", 700), "Code: nach 3 Sekunden ungültig")
 	check(not feed.call("marxin", 100), "Code: Tippfehler zählt nicht")
 	check(feed.call("mmarvin", 100), "Code: Neuanfang nach falschem Buchstaben")
-	# Game Over im Feldzug
+	# Game Over in der Karriere
 	var sv3: Node = load("res://src/core/save.gd").new()
 	sv3.path = "user://test_save_over.json"
 	sv3.data.completed = {"s1_11": {}, "s2_01": {}, "s2_09": {}}
@@ -610,11 +610,11 @@ func _test_wrong_pad_rules() -> void:
 	check(sv3.data.completed.has("s1_11") and not sv3.data.completed.has("s2_01") and not sv3.data.completed.has("s2_09"), "Game Over: Sektor weg, frühere Sektoren bleiben")
 	check(sv3.data.campaign.level == "s2_01" and float(sv3.data.campaign.credits) == 0.0 and sv3.data.workshop.is_empty(), "Game Over: Sektoranfang, keine Credits, keine Einbauten")
 	check(sv3.ever_completed().has("s2_09"), "Game Over: Freischaltungen bleiben")
-	# Neuer Feldzug: Einbauten weg, Bestzeiten bleiben; „Fortsetzen“ nur mit laufendem Feldzug
+	# Neue Karriere: Einbauten weg, Bestzeiten bleiben; „Fortsetzen“ nur mit laufender Karriere
 	sv3.data["workshop"] = {"jets": 2, "hull": 1}
 	sv3.reset_workshop()
 	check(sv3.data.workshop.is_empty() and sv3.data.completed.has("s1_11"), "Neues Spiel: keine Einbauten, erledigte Level bleiben")
-	check(FileAccess.get_file_as_string("res://src/core/flow.gd").contains("Save.reset_workshop()") and FileAccess.get_file_as_string("res://src/ui/main_menu.gd").contains("if not Save.campaign().is_empty():"), "Neues Spiel: Werkstatt zurückgesetzt, Fortsetzen nur mit Feldzug")
+	check(FileAccess.get_file_as_string("res://src/core/flow.gd").contains("Save.reset_workshop()") and FileAccess.get_file_as_string("res://src/ui/main_menu.gd").contains("if not Save.campaign().is_empty():"), "Neues Spiel: Werkstatt zurückgesetzt, Fortsetzen nur mit Karriere")
 	check(not FileAccess.get_file_as_string("res://src/ui/main_menu.gd").contains("Flow.start_tutorial(first)"), "Neues Spiel startet direkt Level 1, nicht das Tutorial")
 	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
 	check(gsrc.contains("layer.layer = 45"), "Einspieler liegt über der Übergangsebene")
@@ -690,13 +690,13 @@ func _test_campaign_save() -> void:
 	sv2.slot = 1
 	sv2.load_save()
 	var c: Dictionary = sv2.campaign()
-	check(c.get("level", "") == "s1_05" and int(c.get("lives", 0)) == 3 and float(c.get("credits", 0)) == 420.0, "Feldzug (Level, Leben, Credits) wird gespeichert und geladen")
+	check(c.get("level", "") == "s1_05" and int(c.get("lives", 0)) == 3 and float(c.get("credits", 0)) == 420.0, "Karriere (Level, Leben, Credits) wird gespeichert und geladen")
 	sv2.clear_campaign()
 	var sv3: Node = load("res://src/core/save.gd").new()
 	sv3.path = sv.path
 	sv3.slot = 1
 	sv3.load_save()
-	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht den gespeicherten Feldzug")
+	check(sv3.campaign().is_empty(), "Neues Spiel / Game Over löscht die gespeicherte Karriere")
 	_rm(sv.path)
 	sv.free()
 	sv2.free()
@@ -1928,7 +1928,7 @@ func _test_landing_window_rules() -> void:
 			widths.append(int((p.x1 - p.x0) / Tuning.TILE))
 			all_widths[widths[widths.size() - 1]] = true
 		check(min_w >= Tuning.min_land_window(lvl.number) - 0.01 - (16.0 if f.get_basename() == "s3_04" else 0.0), "%s (Level %d): jedes Passagierpad hat ein freies Landefenster ≥ %.0f px (kleinstes %.0f px, Padbreiten %s Tiles)" % [lvl.id, lvl.number, Tuning.min_land_window(lvl.number), min_w, str(widths)])
-	check(all_widths.size() >= 3, "In der Kampagne kommen verschiedene Padgrößen vor (%s Tiles)" % str(all_widths.keys()))
+	check(all_widths.size() >= 3, "In der Karriere kommen verschiedene Padgrößen vor (%s Tiles)" % str(all_widths.keys()))
 
 func _test_taxi_scale() -> void:
 	check(absf(Tuning.HULL_HALF.x - 10.0 * Tuning.TAXI_SCALE) < 0.01 and absf(Tuning.FOOT_X - 8.0 * Tuning.TAXI_SCALE) < 0.01, "Taxi-Kollisionsmaße sind auf %.0f %% skaliert" % (Tuning.TAXI_SCALE * 100.0))
@@ -2306,7 +2306,7 @@ func _test_cosmetics_data() -> void:
 	check(names_ok, "Alle Kosmetik-Namen sind zweisprachig")
 	check(unlock_ok and free_paint, "Freischaltbedingungen haben gültige Statistik und Übersetzung; ein Standardtaxi ist frei")
 
-const Cosmetics_STATS := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all"]
+const Cosmetics_STATS := ["levels_done", "perfect_landings", "deliveries", "best_streak", "crashes", "pump_explosions", "stars_time", "stars_clean", "stars_pro", "stars_all", "daily_best_streak", "day_golds"]
 
 func _test_voice_lines_complete() -> void:
 	var f := FileAccess.open("res://data/voice_lines.json", FileAccess.READ)
@@ -2642,6 +2642,288 @@ func _test_shift_jobs() -> void:
 			check(r.complete, "Nachtschicht: Autopilot fliegt Zufallsaufträge auf %s (%.0f s, %s)" % [lvl.id, r.time, r.reason])
 	check(bad.is_empty() and flown >= 9, "Nachtschicht-Aufträge sind gültig %s" % str(bad.slice(0, 4)))
 
+func _test_night_shift() -> void:
+	var ids: Array = []
+	for f in DirAccess.open("res://data/levels").get_files():
+		if f.ends_with(".json") and f.begins_with("s"):
+			ids.append(f.get_basename())
+	ids.sort()
+	# Plan: 9 Karten, je eine pro Sektor in Reihenfolge, gleiches Datum = gleiche Schicht, andere Tage andere Karten
+	var p1 := NightShift.plan("2026-11-08", ids)
+	var p1b := NightShift.plan("2026-11-08", ids)
+	var in_order := p1.size() == NightShift.MAPS
+	for i in p1.size():
+		in_order = in_order and String(p1[i]).begins_with("s%d_" % (i + 1)) and ids.has(p1[i])
+	check(in_order and p1 == p1b, "Nachtschicht: 9 Karten, je eine pro Sektor in Reihenfolge, gleiches Datum gleiche Karten (%s)" % str(p1))
+	var differs := false
+	for d in ["2026-11-09", "2026-11-10", "2026-11-11", "2026-12-01"]:
+		differs = differs or NightShift.plan(d, ids) != p1
+	check(differs, "Nachtschicht: andere Tage haben andere Karten")
+	var fl: Node = load("res://src/core/flow.gd").new()
+	fl.shift = true
+	fl.shift_plan = p1
+	fl.current_level = String(p1[3])
+	var idx_ok: bool = fl.shift_index() == 3 and fl.next_level_id() == String(p1[4])
+	fl.current_level = String(p1[8])
+	idx_ok = idx_ok and fl.shift_index() == 8 and fl.next_level_id() == ""
+	fl.shift_credits = 4200.0
+	fl.lives = 3
+	fl.shift_results = [NightShift.map_result({"jobs": 1, "waits": [], "landings": [], "damage": 0.0, "near": 0})]
+	var fin: Dictionary = fl.finish_shift()
+	idx_ok = idx_ok and fl.shift and fl.shift_done and fl.next_level_id() == "" and is_equal_approx(float(fin.credits), 4200.0) and int(fin.taxis) == 3
+	idx_ok = idx_ok and fl.finish_shift().is_empty()                 # zweiter Aufruf ändert nichts
+	fl.free()
+	check(idx_ok, "Nachtschicht: Flow kennt Kartenindex und nächste Karte, nach Karte 9 ist Schluss")
+	# Dunkelheit: 25 % + 8 % je Karte, dunklere Level behalten ihren Wert
+	check(is_equal_approx(NightShift.dark_for(0), 0.25) and is_equal_approx(NightShift.dark_for(1), 0.33) and is_equal_approx(NightShift.dark_for(8), 0.89), "Nachtschicht: Dunkelheit steigt von 25 % um 8 % je Karte auf 89 %")
+	var l8 := LevelData.load_file("res://data/levels/s8_08.json")
+	var own_dark := l8.dark
+	NightShift.apply(l8, 7, "2026-11-08")
+	check(l8.dark == own_dark and own_dark > NightShift.dark_for(7), "Nachtschicht: ein dunkleres Level behält seinen eigenen Wert")
+	var l1 := LevelData.load_file("res://data/levels/s1_01.json")
+	NightShift.apply(l1, 0, "2026-11-08")
+	check(is_equal_approx(l1.dark, 0.25), "Nachtschicht: Karte 1 hat 25 % Dunkelheit")
+	# Schwerkraft: alle 99 Level, alle 9 Plätze, mehrere Tage: nie über der Fliegbarkeitsgrenze, nie unter 60 % des Sollwerts, immer eine Steigreserve
+	var bad_g := []
+	var seen_low := false
+	var seen_high := false
+	var early_spread := 0.0
+	for id in ids:
+		var base_lvl := LevelData.load_file("res://data/levels/%s.json" % id)
+		var limit := NightShift.gravity_limit(base_lvl)
+		check(limit >= base_lvl.gravity * NightShift.MIN_FACTOR, "%s: Schwerkraftgrenze %.0f liegt über dem Mindestwert" % [id, limit])
+		var zone_g := 1.0
+		var down := 0.0
+		for z in base_lvl.zones:
+			if z.kind == "gravity":
+				zone_g = maxf(zone_g, float(z.g))
+			elif z.kind == "wind":
+				down = maxf(down, (z.a as Vector2).y)
+		for idx in NightShift.MAPS:
+			for d in ["2026-11-08", "2026-11-09", "2026-12-24"]:
+				var g := NightShift.gravity_for(base_lvl, idx, d)
+				var floor_g := base_lvl.gravity * NightShift.MIN_FACTOR
+				var climb := Tuning.THRUST_UP - g * zone_g - down
+				if g > maxf(limit, floor_g) + 0.5 or g < floor_g - 1.0 or climb < 0.1 * Tuning.THRUST_UP or g > NightShift.HOVER_MAX + 0.5:
+					bad_g.append("%s/%d/%s=%.0f" % [id, idx, d, g])
+				seen_low = seen_low or g < base_lvl.gravity * 0.85
+				seen_high = seen_high or g > base_lvl.gravity * 1.15
+				if idx == 0 and limit >= base_lvl.gravity * 1.12:          # nur ungekappte Fälle: dort zeigt sich die Streuung
+					early_spread = maxf(early_spread, absf(g / base_lvl.gravity - 1.0))
+	check(bad_g.is_empty(), "Nachtschicht: Schwerkraft bleibt in allen Leveln fliegbar %s" % str(bad_g.slice(0, 4)))
+	check(seen_low and seen_high and early_spread <= 0.12, "Nachtschicht: Schwerkraft streut nach beiden Seiten, auf Karte 1 nur leicht (%.2f)" % early_spread)
+	var lg_a := LevelData.load_file("res://data/levels/s6_04.json")
+	check(NightShift.gravity_limit(lg_a) < 90.0, "Nachtschicht: Level mit starker Schwerkraftzone und Abwind begrenzt die Schwerkraft (%.0f)" % NightShift.gravity_limit(lg_a))
+	check(NightShift.gravity_for(LevelData.load_file("res://data/levels/s1_01.json"), 3, "2026-11-08") == NightShift.gravity_for(LevelData.load_file("res://data/levels/s1_01.json"), 3, "2026-11-08"), "Nachtschicht: Schwerkraft ist je Datum und Karte festgelegt")
+	# Aufträge: 3,3,4,4,5,5,6,6,7 Fahrten plus Ausgang, nie am gerade angeflogenen Pad, nur Pflichtfahrgäste
+	var counts := []
+	var chains_ok := true
+	for idx in NightShift.MAPS:
+		var lv := LevelData.load_file("res://data/levels/%s.json" % p1[idx])
+		var jobs := NightShift.jobs_for(lv, idx, "2026-11-08")
+		counts.append(jobs.size() - 1)
+		chains_ok = chains_ok and String(jobs[jobs.size() - 1].to) == "exit" and String(jobs[0].from) != NightShift.start_pad_id(lv)
+		for i in range(1, jobs.size()):
+			chains_ok = chains_ok and String(jobs[i].from) != String(jobs[i - 1].to)
+	check(counts == [3, 3, 4, 4, 5, 5, 6, 6, 7] and chains_ok, "Nachtschicht: 3 bis 7 Fahrten, Ausgang zuletzt, nie am gerade angeflogenen Pad %s" % str(counts))
+	# Wertung
+	var perfect := {"jobs": 3, "waits": [], "landings": [], "damage": 0.0, "near": 0}
+	for j in 3:
+		perfect.waits.append({"job": j, "wait": 1.0, "leg": 300.0})
+		if j < 2:
+			perfect.landings.append({"job": j, "vy": 10.0})        # Absetzen mit Fahrgast an Bord (der Ausgangs-Fahrgast fliegt durchs Tor): 3 Aufträge = 2 Landungen
+	var rp := NightShift.map_result(perfect)
+	check(is_equal_approx(float(rp.score), 70.0) and int(rp.soft) == 2 and int(rp.hard) == 0, "Nachtschicht: makellose Karte ergibt 70 Punkte ohne Bonus (%.1f)" % float(rp.score))
+	perfect["near"] = 9
+	check(is_equal_approx(float(NightShift.map_result(perfect).score), 80.0), "Nachtschicht: Vorbeiflug-Bonus ist bei 5 Vorbeiflügen (+10) gedeckelt")
+	var slow := perfect.duplicate(true)
+	slow["near"] = 0
+	for w in slow.waits:
+		w["wait"] = 500.0
+	check(float(NightShift.map_result(slow).wait) == 0.0 and float(NightShift.map_result(perfect).wait) == 1.0, "Nachtschicht: lange Wartezeit bringt 0, kurze volle Punkte")
+	var hard := perfect.duplicate(true)
+	for l in hard.landings:
+		l["vy"] = 45.0
+	check(int(NightShift.map_result(hard).hard) == 2 and float(NightShift.map_result(hard).landing) < 0.3, "Nachtschicht: harte Landungen zählen wenig")
+	var w_s1 := NightShift.wait_score(14.0, 400.0, 1)
+	var w_s9 := NightShift.wait_score(14.0, 400.0, 9)
+	check(w_s9 > w_s1 and w_s1 < 1.0 and NightShift.wait_score(14.0, 400.0) == w_s1 and is_equal_approx(NightShift.sector_factor(1), 1.0) and NightShift.sector_factor(9) > 1.4, "Nachtschicht: gleiche Wartezeit zählt in späteren Sektoren milder (S1 %.2f, S9 %.2f)" % [w_s1, w_s9])
+	var sec_stats := {"jobs": 1, "sector": 9, "waits": [{"job": 0, "wait": 14.0, "leg": 400.0}], "landings": [], "damage": 0.0, "near": 0}
+	var sec_stats1 := sec_stats.duplicate(true)
+	sec_stats1["sector"] = 1
+	check(float(NightShift.map_result(sec_stats).wait) > float(NightShift.map_result(sec_stats1).wait), "Nachtschicht: Kartenwertung bezieht den Sektor der Karte ein")
+	check(NightShift.landing_class(20.0) == 0 and NightShift.landing_class(30.0) == 1 and NightShift.landing_class(44.0) == 2, "Nachtschicht: Landungen sind weich, mittelmäßig oder hart")
+	var wrecked := perfect.duplicate(true)
+	wrecked["damage"] = 100.0
+	check(is_equal_approx(float(NightShift.map_result(wrecked).hull), 0.0), "Nachtschicht: ein zerstörtes Taxi bringt keine Hüllenpunkte")
+	var half := perfect.duplicate(true)
+	half.waits.pop_back()
+	half.landings = half.landings.slice(0, 1)
+	check(float(NightShift.map_result(half).score) < float(rp.score), "Nachtschicht: nicht beförderte Fahrgäste kosten Punkte")
+	var full := []
+	for i in NightShift.MAPS:
+		full.append(rp)
+	var fr := NightShift.final_result(full, 5)
+	check(fr.grade == "S" or fr.grade == "A", "Nachtschicht: makellose Schicht mit 5 Taxis ist mindestens A (%.1f %s)" % [float(fr.score), fr.grade])
+	check(NightShift.final_result(full, 5).score > NightShift.final_result(full, 1).score, "Nachtschicht: übrige Taxis zählen")
+	var c0 := NightShift.final_result(full, 5, 0.0)
+	var c5 := NightShift.final_result(full, 5, 5000.0)
+	var cmax := NightShift.final_result(full, 5, 99999.0)
+	var c3 := NightShift.final_result(full, 5, 4499.0)
+	check(is_equal_approx(float(c5.score) - float(c0.score), 3.0) and is_equal_approx(float(c3.score) - float(c0.score), 2.0) and is_equal_approx(float(cmax.score) - float(c0.score), NightShift.CREDIT_POINTS), "Nachtschicht: 1 Punkt je volle 1500 Credits, höchstens %d (¢5000 = %d, ¢4499 = %d)" % [int(NightShift.CREDIT_POINTS), int(c5.credit_points), int(c3.credit_points)])
+	check(float(NightShift.final_result(full, 5, 14999.0).credit_points) == 9.0 and float(NightShift.final_result(full, 5, 15000.0).credit_points) == 10.0, "Nachtschicht: ab ¢15000 alle 10 Credit-Punkte")
+	check(is_equal_approx(NightShift.MAP_MAX, NightShift.MAPS_POINTS) and is_equal_approx(NightShift.W_WAIT + NightShift.W_LANDING + NightShift.W_HULL + NightShift.NEAR_POINTS * NightShift.MAX_NEAR, 80.0), "Nachtschicht: eine Karte bringt höchstens 80 Punkte (25/25/20/10), die Gesamtwertung 100")
+	var best := []
+	for i in NightShift.MAPS:
+		var pm := perfect.duplicate(true)
+		pm["near"] = 5
+		best.append(NightShift.map_result(pm))
+	check(float(NightShift.final_result(best, 5, 99999.0).score) <= 100.0 and NightShift.final_result(best, 5, 99999.0).grade == "S", "Nachtschicht: bestmögliche Schicht ergibt S und höchstens 100 Punkte")
+	check(NightShift.final_result(full.slice(0, 4), 0).grade in ["D", "E"], "Nachtschicht: abgebrochene Schicht ohne Taxis wird schlecht benotet")
+	# Finale der Nachtschicht: Ansage je Note (gesprochen und als Untertitel), eigene Musik, Fahrer-Ablauf
+	var voice_ok := true
+	for g in ["S", "A", "B", "C", "D", "E"]:
+		for lang in ["de", "en"]:
+			voice_ok = voice_ok and ResourceLoader.exists("res://assets/audio/voice/%s/d0_shift_%s.ogg" % [lang, g])
+		voice_ok = voice_ok and String(get_root().get_node("Sfx").line_text("d0", "shift_" + g)) != ""
+	check(voice_ok, "Nachtschicht-Finale: Ansage der Zentrale zu jeder Note (S–E) in Deutsch und Englisch")
+	check(ResourceLoader.exists("res://assets/audio/music/night_A.ogg") and ResourceLoader.exists("res://assets/audio/music/night_B.ogg") and ResourceLoader.exists("res://assets/audio/music/night_C.ogg"), "Nachtschicht-Finale: eigenes Musikstück „night“ (drei Schichten)")
+	var night_len := (load("res://assets/audio/music/night_A.ogg") as AudioStream).get_length()
+	check(night_len > 50.0 and night_len < 70.0, "Nachtschicht-Finale: Musikstück dauert etwa eine Minute (%.0f s)" % night_len)
+	var fz: Control = load("res://src/ui/shift_finale.gd").new()
+	var fz_modes := {}
+	var fz_xp := -1.0
+	var fz_mono := true
+	var fz_gone := 0.0
+	var fz_ts := 0.0
+	while fz_ts < 40.0:
+		fz.t = fz_ts
+		var d: Dictionary = fz._driver_state()
+		fz_modes[String(d.mode)] = true
+		if d.mode != "gone" or fz_ts > fz.T_STAND:
+			fz_mono = fz_mono and float(d.x) >= fz_xp - 0.001
+			fz_xp = float(d.x)
+		if d.mode == "gone" and fz_ts > fz.T_WALK and fz_gone == 0.0:
+			fz_gone = fz_ts
+		fz_ts += 0.05
+	fz.t = fz.T_STAND - 0.1
+	var fz_before: Dictionary = fz._driver_state()
+	fz.t = fz.T_STAND + 0.2
+	var fz_rise: Dictionary = fz._driver_state()
+	fz.t = fz.T_TOP + 0.2
+	var fz_hop: Dictionary = fz._driver_state()
+	fz.t = fz.T_WALK + 0.5
+	var fz_walk: Dictionary = fz._driver_state()
+	check(fz_before.mode == "gone" and fz_rise.mode == "rise" and fz_hop.mode == "hop" and fz_walk.mode == "walk" and fz.T_DOOR < fz.T_STAND and fz.T_STAND < fz.T_TOP and fz.T_TOP < fz.T_GROUND and fz.T_GROUND < fz.T_TURN and fz.T_TURN < fz.T_WALK, "Nachtschicht-Finale: der Fahrer steht auf, steigt aus der Kuppel, springt aufs Pad, dreht sich und geht los")
+	check(fz_modes.has("rise") and fz_modes.has("hop") and fz_modes.has("land") and fz_modes.has("turn") and fz_modes.has("walk") and fz_modes.has("front") and fz_mono and fz_gone > 0.0 and fz_gone < 40.0, "Nachtschicht-Finale: Fahrer geht, dreht sich zur Kamera, bleibt stehen und läuft aus dem Bild (weg bei %.1f s)" % fz_gone)
+	fz.t = fz.T_WALK + (fz.STOP_X - fz.X_OUT) / fz.WALK_SPEED + 2.0
+	var fzw: Dictionary = fz._driver_state()
+	check(fzw.mode == "front" and fzw.wave and fzw.smile and absf(float(fzw.x) - fz.STOP_X) < 0.01, "Nachtschicht-Finale: vor dem Bildrand winkt der Fahrer und lächelt")
+	var frames_ok := true
+	for md in [{"mode": "walk", "ph": 3.0}, {"mode": "turn", "k": 0.5}, {"mode": "front", "u": 1.0, "wave": true, "smile": true}, {"mode": "front", "u": 1.0, "wave": false, "smile": false}, {"mode": "rise"}, {"mode": "hop"}, {"mode": "land"}]:
+		var fz_fr: int = fz._driver_frame(md)
+		frames_ok = frames_ok and fz_fr >= 0 and fz_fr < 17
+	var sheet_w: int = (load("res://assets/art/driver.png") as Texture2D).get_width()
+	check(frames_ok and sheet_w == 17 * 40, "Nachtschicht-Finale: Fahrerblatt hat 17 Bilder à 40 Pixel, alle Zustände zeigen ein vorhandenes Bild")
+	fz.t = 0.0
+	var fz_gs: float = fz._taxi_pos().y
+	fz.t = fz.T_LAND
+	check(is_equal_approx(fz._taxi_pos().y, fz.GROUND - 10.0 * fz.TAXI_S) and is_equal_approx(fz._taxi_pos().x, fz.LAND_X) and fz_gs < fz.GROUND - 10.0 * fz.TAXI_S, "Nachtschicht-Finale: das Taxi setzt auf dem Pad auf, Fußplatten auf der Fahrbahn")
+	fz.free()
+	check(NightShift.grade(95.0) == "S" and NightShift.grade(80.0) == "A" and NightShift.grade(65.0) == "B" and NightShift.grade(50.0) == "C" and NightShift.grade(40.0) == "D" and NightShift.grade(10.0) == "E", "Nachtschicht: Noten S bis E")
+	# Lauf: Geduld unbegrenzt, Lebensstation außer Betrieb, Zählwerte stimmen
+	var ls := LevelData.load_file("res://data/levels/s1_05.json")
+	var rl := Run.new()
+	rl.shift_mode = true
+	rl.extras_enabled = false
+	rl.start(ls)
+	rl.lives = 3
+	rl.money = 5000.0
+	_land_on(rl, "L")
+	var off := false
+	for i in int(2.0 / Tuning.TICK):
+		rl.step(Vector2.ZERO, true)
+		for e in rl.log:
+			if e.type == "life_denied" and e.get("off", false):
+				off = true
+	check(off and rl.lives == 3 and rl.money == 5000.0, "Nachtschicht: Lebensstation ist außer Betrieb (nichts abgebucht)")
+	var rw := Run.new()
+	rw.shift_mode = true
+	rw.extras_enabled = false
+	rw.start(LevelData.load_file("res://data/levels/s1_02.json"))
+	check(rw.main_patience > 1.0e6, "Nachtschicht: Pflichtfahrgäste verlieren nie die Geduld")
+	for _once in [0]:
+		var lvx := LevelData.load_file("res://data/levels/%s.json" % p1[0])
+		NightShift.apply(lvx, 0, "2026-11-08")
+		var rr := Run.new()
+		rr.shift_mode = true
+		rr.extras_enabled = false
+		rr.start(lvx, Tuning.FUEL_MAX)
+		var bot := Bot.new(rr)
+		for i in int(600.0 / Tuning.TICK):
+			var cmd := bot.decide()
+			rr.step(Replay.quantize(cmd[0]), cmd[1])
+			if rr.result != Run.Result.RUNNING:
+				break
+		if rr.result == Run.Result.COMPLETE:
+			var st := rr.shift_stats()
+			var mr := NightShift.map_result(st)
+			check(st.waits.size() == rr.delivered and st.landings.size() == rr.jobs.size() - 1 and float(mr.score) > 40.0 and rr.extras_delivered == 0, "Nachtschicht: Autopilot-Lauf zählt %d Abholungen, %d Landungen, %.0f Punkte" % [st.waits.size(), st.landings.size(), float(mr.score)])
+		else:
+			print("  (Nachtschicht: Autopilot schafft Karte 1 dieses Tages nicht – Zählwerte nicht geprüft)")
+	# Zeitanzeige und Datum: 24 h deutsch, 12 h englisch
+	check(NightShift.format_time(75.0) == "1:15" and NightShift.format_time(3725.0) == "1:02:05" and NightShift.format_time(0.0) == "0:00", "Nachtschicht: Dauer als m:ss bzw. h:mm:ss")
+	check(NightShift.format_stamp("2026-11-08", 14, 32, "de") == "08.11.2026, 14:32 Uhr" and NightShift.format_stamp("2026-11-08", 0, 5, "de") == "08.11.2026, 00:05 Uhr", "Nachtschicht: Datum und Uhrzeit deutsch im 24-Stunden-Format")
+	check(NightShift.format_stamp("2026-11-08", 14, 32, "en") == "11/08/2026, 2:32 PM" and NightShift.format_stamp("2026-11-08", 0, 5, "en") == "11/08/2026, 12:05 AM" and NightShift.format_stamp("2026-11-08", 12, 0, "en") == "11/08/2026, 12:00 PM", "Nachtschicht: Datum und Uhrzeit englisch im 12-Stunden-Format")
+	var timed := []
+	for tt in [65.0, 120.0, 30.0]:
+		var tm := NightShift.map_result({"jobs": 1, "waits": [], "landings": [], "damage": 0.0, "near": 0})
+		tm["time"] = tt
+		timed.append(tm)
+	var tr_res := NightShift.final_result(timed, 3, 0.0)
+	check(is_equal_approx(float(tr_res.total_time), 215.0), "Nachtschicht: Gesamtzeit ist die Summe der Kartenzeiten")
+	var slow_t := timed.duplicate(true)
+	slow_t[0]["time"] = 9999.0
+	check(is_equal_approx(float(NightShift.final_result(slow_t, 3, 0.0).score), float(tr_res.score)), "Nachtschicht: die Zeit ändert die Punkte nicht (ohne Wertung)")
+	# Screenshot-Name: JJMMTT_nachtschicht_name.png
+	check(Shots.shift_file_name("2026-11-08", "Floppi", 1) == "261108_nachtschicht_floppi.png", "Screenshot: Dateiname JJMMTT_nachtschicht_name.png (%s)" % Shots.shift_file_name("2026-11-08", "Floppi", 1))
+	check(Shots.shift_file_name("2026-11-08", "Jörg Müller-Süß!", 2) == "261108_nachtschicht_joerg_mueller-suess.png", "Screenshot: Name mit Umlauten, Leerzeichen und Sonderzeichen wird dateisicher (%s)" % Shots.shift_file_name("2026-11-08", "Jörg Müller-Süß!", 2))
+	check(Shots.shift_file_name("2026-12-24", "", 3) == "261224_nachtschicht_slot3.png" and Shots.shift_file_name("2026-12-24", "///", 1) == "261224_nachtschicht_slot1.png", "Screenshot: ohne brauchbaren Namen steht slotN")
+	var shot_dir := "user://test_shots"
+	DirAccess.make_dir_recursive_absolute(shot_dir)
+	var sp1 := Shots.unique_path(shot_dir, "a.png")
+	var sf := FileAccess.open(sp1, FileAccess.WRITE)
+	sf.store_string("x")
+	sf.close()
+	var sp2 := Shots.unique_path(shot_dir, "a.png")
+	check(sp1.ends_with("a.png") and sp2.ends_with("a_2.png"), "Screenshot: vorhandene Dateien werden nie überschrieben")
+	DirAccess.remove_absolute(sp1)
+	DirAccess.remove_absolute(shot_dir)
+	# Namen der Spielstände
+	var sn: Node = load("res://src/core/save.gd").new()
+	sn.slot_prefix = "user://test_slotname_"
+	sn.rename_slot(2, "  Floppi mit einem viel zu langen Namen  ")
+	var inf2: Dictionary = sn.slot_summary(2)
+	check(inf2.exists and String(inf2.name) == "Floppi mit einem v" .left(Shots.NAME_MAX), "Spielstand: Name wird vergeben, gekürzt und im Überblick angezeigt (%s)" % inf2.name)
+	sn.rename_slot(2, "Neu")
+	check(String(sn.slot_summary(2).name) == "Neu", "Spielstand: Name lässt sich ändern")
+	sn.select_slot(2)
+	check(sn.slot_name() == "Neu" and sn.slot_label() == "Neu", "Spielstand: gewählter Platz kennt seinen Namen")
+	sn.rename_slot(2, "Anna")
+	check(sn.slot_name() == "Anna" and String(sn.slot_summary(2).name) == "Anna", "Spielstand: Umbenennen des gewählten Platzes wird gespeichert")
+	check(String(sn.slot_summary(1).name) == "" and not sn.slot_exists(1), "Spielstand: unbenannte Plätze bleiben leer")
+	for i in range(1, 4):
+		DirAccess.remove_absolute("user://test_slotname_%d.json" % i)
+	sn.free()
+	# Spielstand: ein Versuch pro Tag, Debug unbegrenzt
+	var sv: Node = load("res://src/core/save.gd").new()
+	sv.path = ""
+	check(not sv.shift_used_today("2026-11-08"), "Nachtschicht: vor dem Start ist der Tag frei")
+	sv.data["shift"] = {"date": "2026-11-08", "used": true}
+	check(sv.shift_used_today("2026-11-08") and not sv.shift_used_today("2026-11-09"), "Nachtschicht: ein Versuch pro Tag")
+	sv.debug = true
+	check(not sv.shift_used_today("2026-11-08"), "Nachtschicht: im Debug-Modus unbegrenzt")
+
 func _test_level_styles() -> void:
 	# Level-Optik (Neon/Glas) hängt an der Level-ID: nur vorhandene Level, Zuordnung nach Namen, Physik unberührt (gleiche Karte)
 	var cm: Dictionary = load("res://src/game/level_style.gd").get_script_constant_map()
@@ -2730,7 +3012,7 @@ func _test_daily_flight() -> void:
 	Daily.record(d, st, "2026-11-03", 500)
 	check(int(d.best) == 650 and int(st.daily_days) == 1 and int(st.daily_streak) == 1, "Tagesflug: bester Versuch zählt, ein Tag (%d)" % int(d.best))
 	Daily.record(d, st, "2026-11-04", 300)
-	check(int(d.best) == 300 and int(st.daily_streak) == 2 and int(st.daily_best) == 650, "Tagesflug: neuer Tag, Serie 2, Rekord bleibt")
+	check(int(d.best) == 300 and int(st.daily_streak) == 2, "Tagesflug: neuer Tag, Serie 2")
 	check(Daily.current_streak(st, "2026-11-05") == 2 and Daily.current_streak(st, "2026-11-06") == 0, "Tagesflug: Serie verfällt nach einem ausgelassenen Tag")
 	Daily.record(d, st, "2026-11-07", 100)
 	check(int(st.daily_streak) == 1 and int(st.daily_best_streak) == 2 and int(st.daily_days) == 3, "Tagesflug: Lücke startet die Serie neu")
@@ -2847,7 +3129,7 @@ func _test_medals_need_all_jobs() -> void:
 
 func _test_practice_keeps_campaign() -> void:
 	var src := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(src.contains("if not Flow.practice:\n\t\tSave.set_campaign") and src.contains("elif not Flow.practice:\n\t\t\thud.over_level = Flow.lose_sector"), "Übungsflüge schreiben und löschen keinen Feldzug")
+	check(src.contains("if not Flow.practice:\n\t\tSave.set_campaign") and src.contains("elif not Flow.practice:\n\t\t\thud.over_level = Flow.lose_sector"), "Übungsflüge schreiben und löschen keine Karriere")
 
 func _test_controls_remap() -> void:
 	var c: Node = load("res://src/core/controls.gd").new()
@@ -3014,7 +3296,7 @@ func _test_save_slots() -> void:
 	var s2: Dictionary = sv.slot_summary(2)
 	check(s2.exists and s2.levels == 2 and s2.score == 300, "Platz-Übersicht: Level %d, Punkte %d" % [s2.levels, s2.score])
 	sv.set_campaign({"level": "s1_03", "lives": 3, "credits": 420.0, "fuel": 50.0})
-	check(sv.slot_summary(1).credits == 420 and sv.slot_summary(1).lives == 3, "Platz-Übersicht zeigt laufenden Feldzug (Credits, Leben)")
+	check(sv.slot_summary(1).credits == 420 and sv.slot_summary(1).lives == 3, "Platz-Übersicht zeigt laufende Karriere (Credits, Leben)")
 	var hand := FileAccess.open(sv.slot_path(3), FileAccess.WRITE)          # handeditierter Eintrag mit falschem Typ darf die Platzwahl nicht abstürzen lassen
 	hand.store_string(JSON.stringify({"completed": {"s1_01": 5, "s1_02": {"score": 40}}}))
 	hand.close()
@@ -3445,10 +3727,10 @@ func _test_community_store() -> void:
 func _test_community_isolated() -> void:
 	var flow: Node = get_root().get_node("Flow")
 	var save_src := FileAccess.get_file_as_string("res://src/core/save.gd")
-	check(flow.level_ids().size() == 99 and not flow.level_ids().any(func(i): return CL.is_valid_id(i)), "Community: die Level-Liste des Feldzugs bleibt bei 99 Originalen")
+	check(flow.level_ids().size() == 99 and not flow.level_ids().any(func(i): return CL.is_valid_id(i)), "Community: die Level-Liste der Karriere bleibt bei 99 Originalen")
 	var cid := "c_0123456789"
 	check(flow.level_path(cid) == CS.path_for(cid) and flow.level_path("s1_01") == "res://data/levels/s1_01.json", "Community: Wege der Original- und Community-Level sind getrennt")
-	# Spielmodus: keine Statistik, kein Feldzug, Bestwerte nur im eigenen Bereich (eigene Save-Instanz, der echte Spielstand bleibt unberührt)
+	# Spielmodus: keine Statistik, keine Karriere, Bestwerte nur im eigenen Bereich (eigene Save-Instanz, der echte Spielstand bleibt unberührt)
 	var sv: Node = load("res://src/core/save.gd").new()
 	sv.slot_prefix = "user://test_cm_save_"
 	sv.legacy_path = "user://gibt_es_nicht.json"
@@ -3467,7 +3749,7 @@ func _test_community_isolated() -> void:
 	sv.complete_community(cid, 80.0, 500)
 	sv.complete_community(cid, 95.0, 700)
 	check(sv.community_best_time(cid) == 80.0 and sv.community_best_score(cid) == 700 and sv.community_plays(cid) == 2, "Community: Bestzeit, Bestwert und Zähler je Level")
-	check(sv.data.completed.is_empty() and sv.campaign().is_empty(), "Community: Feldzugfortschritt (completed, campaign) bleibt unberührt")
+	check(sv.data.completed.is_empty() and sv.campaign().is_empty(), "Community: Karrierefortschritt (completed, campaign) bleibt unberührt")
 	var again: Node = load("res://src/core/save.gd").new()
 	again.slot_prefix = "user://test_cm_save_"
 	again.select_slot(1)
@@ -3615,6 +3897,11 @@ func _test_community_screen() -> void:
 	CS.dir = CS.DIR
 
 func _test_main_menu_help() -> void:
+	var mk = load("res://src/ui/menu_kit.gd")                 # zur Laufzeit laden: MenuKit kennt Autoloads, die beim Übersetzen des Testskripts noch fehlen
+	var panel_sb: StyleBoxFlat = mk.panel_style()
+	var screen_p: Panel = mk.screen_panel()
+	check(panel_sb.get_corner_radius(CORNER_TOP_LEFT) >= 6 and panel_sb.bg_color.a > 0.5 and screen_p.size.x >= 600.0 and screen_p.get_theme_stylebox("panel") != null, "Menüs: gemeinsame abgerundete Tafel wie hinter dem Hauptmenü")
+	screen_p.free()
 	var de := _read_json("res://data/i18n/de.json")
 	var en := _read_json("res://data/i18n/en.json")
 	var mm: GDScript = load("res://src/ui/main_menu.gd")
@@ -4251,6 +4538,28 @@ func _test_editor_blink_and_pad() -> void:
 	o._ready()                                              # nicht im Baum: Aufbau von Hand
 	check(o.keys.size() == 50 and o.text_label != null, "Bildschirmtastatur: 50 Zeichentasten und Textanzeige")
 	check(o != null and o.text == ed.name_edit.text, "Controller: A auf dem Namensfeld öffnet die Bildschirmtastatur mit dem bisherigen Text")
+	var kx: Button = o.keys[31][0]                            # „x“ (Reihe 4, Spalte 2)
+	var kus: Button = o.keys[43][0]                           # „_“ (Reihe 5, Spalte 4)
+	check(kx.text == "x" and kx.get_node(kx.focus_neighbor_right) == o.keys[32][0] and kx.get_node(kx.focus_neighbor_left) == o.keys[30][0], "Bildschirmtastatur: von „x“ geht links/rechts zur Nachbartaste (nicht ins Leere)")
+	check(kus.text == "_" and kus.get_node(kus.focus_neighbor_left) == o.keys[42][0] and kus.get_node(kus.focus_neighbor_right) == o.keys[44][0], "Bildschirmtastatur: von „_“ geht links/rechts zur Nachbartaste")
+	var wrap_ok := true
+	for r in 5:
+		var first: Button = o.keys[r * 10][0]
+		var last: Button = o.keys[r * 10 + 9][0]
+		wrap_ok = wrap_ok and first.get_node(first.focus_neighbor_left) == last and last.get_node(last.focus_neighbor_right) == first
+	check(wrap_ok, "Bildschirmtastatur: die Reihen laufen im Kreis")
+	var special_buttons: Array = o.specials.map(func(sp): return sp[0])
+	var rows_ok := true
+	for c in 10:
+		var top: Button = o.keys[c][0]
+		var bottom: Button = o.keys[40 + c][0]
+		rows_ok = rows_ok and top.get_node(top.focus_neighbor_bottom) == o.keys[10 + c][0] and bottom.get_node(bottom.focus_neighbor_top) == o.keys[30 + c][0] and special_buttons.has(bottom.get_node(bottom.focus_neighbor_bottom)) and special_buttons.has(top.get_node(top.focus_neighbor_top))
+	check(rows_ok, "Bildschirmtastatur: oben/unten gehen Reihe für Reihe, unter der letzten Reihe liegt die Leiste (Groß, Leer, Löschen, OK, Abbruch)")
+	var sp_ok := true
+	for i in o.specials.size():
+		var sb: Button = o.specials[i][0]
+		sp_ok = sp_ok and sb.get_node(sb.focus_neighbor_right) == o.specials[(i + 1) % o.specials.size()][0] and not sb.focus_neighbor_top.is_empty() and not sb.focus_neighbor_bottom.is_empty()
+	check(sp_ok, "Bildschirmtastatur: die untere Leiste ist links/rechts verbunden, oben/unten führen zurück auf die Tasten")
 	o.text = ""
 	o._press_char("q")
 	o._toggle_shift()
@@ -4939,3 +5248,157 @@ func _test_round50_draft_result() -> void:
 	CS._solved_dir = "?"
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tl)
+
+func _test_day_shift() -> void:
+	var game_script = load("res://src/game/game.gd")
+	var hud_script = load("res://src/game/hud.gd")
+	check(game_script != null and game_script.can_instantiate() and hud_script != null and hud_script.can_instantiate(), "Spielszene und HUD lassen sich übersetzen (keine Skriptfehler)")
+	# Wochentage und Regelplan
+	check(DayShift.weekday("2026-11-09") == 0 and DayShift.weekday("2026-11-14") == 5 and DayShift.weekday("2026-11-08") == 6, "Tagschicht: Wochentage (Mo = 0 … So = 6)")
+	var first_week: Array = []
+	for d in ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15"]:
+		first_week.append(DayShift.rule_of(d))
+	check(first_week == ["wind", "fog", "mirror", "fuel", "glass", "rush", "tailwind"] and DayShift.rule_of("2026-11-08") == "tailwind", "Tagschicht: erste Woche Mo Windtag, Di Nebel, Mi Spiegelwelt, Do Dünner Tank, Fr Glasdach, Sa Eilfahrt, So Rückenwind")
+	var plan_ok := true
+	var same_ok := true
+	var det_ok := true
+	var prev: Array = DayShift.week_order(0)
+	var orders := {}
+	for w in range(1, 80):
+		var o: Array = DayShift.week_order(w)
+		var sorted_o := o.duplicate()
+		sorted_o.sort()
+		var sorted_r := DayShift.RULES.duplicate()
+		sorted_r.sort()
+		plan_ok = plan_ok and sorted_o == sorted_r
+		for i in 7:
+			same_ok = same_ok and o[i] != prev[i]
+		same_ok = same_ok and o[0] != prev[6]
+		det_ok = det_ok and o == DayShift.week_order(w)
+		orders[JSON.stringify(o)] = true
+		prev = o
+	check(plan_ok and same_ok and det_ok, "Tagschicht: jede Woche neu gemischt, alle sieben Regeln, nie dieselbe Regel am selben Wochentag wie in der Vorwoche")
+	check(orders.size() > 60, "Tagschicht: die Wochenpläne wiederholen sich nicht (%d verschiedene in 79 Wochen)" % orders.size())
+	check(DayShift.week_of("2026-11-16") == 1 and DayShift.rule_of("2026-11-16") == String(DayShift.week_order(1)[0]) and DayShift.week_of("2026-11-15") == 0, "Tagschicht: Wochenwechsel am Montag")
+	# Tagesziel
+	var goals_ok := true
+	var date := "2026-11-10"
+	for i in 90:
+		var g := DayShift.goal_of(date)
+		goals_ok = goals_ok and DayShift.GOALS.has(g) and g == DayShift.goal_of(date) and g != DayShift.goal_of(Daily.yesterday(date))
+		date = Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_datetime_string(date + "T12:00:00")) + 86400)
+	check(goals_ok, "Tagschicht: Tagesziel aus dem Datum, gültig, nie dasselbe wie am Vortag")
+	# Wertung und Medaillen
+	var base := {"time": 56.0, "target": 70.0, "perfect": 3, "landings": 4, "damage": 0.0, "respawns": 0, "net": 520.0, "money_target": 400.0}
+	check(DayShift.goal_score("express", base) == 100 and DayShift.medal_of("express", 100) == 3 and DayShift.medal_of("express", 85) == 2 and DayShift.medal_of("express", 60) == 1 and DayShift.medal_of("express", 59) == 0, "Tagschicht: Express: 80 % des Zeitziels = 100 Punkte = Gold, Schwellen 60/85/100")
+	check(DayShift.goal_score("precision", base) == 75 and DayShift.medal_of("precision", 75) == 2 and DayShift.goal_score("clean", base) == 100 and DayShift.goal_score("profit", base) == 100, "Tagschicht: Präzision 3/4 = 75 (Silber), Sauber ohne Schaden 100, Gewinn am Ziel 100")
+	var dmg := base.duplicate()
+	dmg["damage"] = 30.0
+	dmg["respawns"] = 1
+	check(DayShift.goal_score("clean", dmg) == 45 and DayShift.medal_of("clean", 45) == 0, "Tagschicht: Schaden und verlorene Leben kosten Punkte im Ziel Sauber")
+	var slow := base.duplicate()
+	slow["time"] = 400.0
+	check(DayShift.goal_score("express", slow) < 30 and DayShift.goal_score("express", {"time": 0.0, "target": 70.0}) <= 150, "Tagschicht: langsam gibt wenig, die Wertung ist nach oben begrenzt")
+	# Regeln auf dem Level
+	var dark_lvl := LevelData.load_file("res://data/levels/s8_05.json")
+	check(dark_lvl.dark > 0.0, "Tagschicht: Testlevel aus dem dunklen Sektor ist dunkel")
+	var lit := DayShift.apply(LevelData.load_file("res://data/levels/s8_05.json"), "glass", "2026-11-13")
+	check(lit.dark == 0.0 and lit.fog == 0.0, "Tagschicht: alle Karten sind hell, auch aus dem dunklen Sektor")
+	var w0 := LevelData.load_file("res://data/levels/s2_05.json")
+	var wz := w0.zones.size()
+	var wl := DayShift.apply(LevelData.load_file("res://data/levels/s2_05.json"), "wind", "2026-11-09")
+	var gust_ok := wl.zones.size() == wz + 2
+	var gust_left := false
+	var gust_right := false
+	for z in wl.zones:
+		if z.kind == "wind" and (z.rect as Rect2).size.x >= float(wl.width) * Tuning.TILE - 1.0:
+			gust_left = gust_left or (z.a as Vector2).x < 0.0
+			gust_right = gust_right or (z.a as Vector2).x > 0.0
+	check(gust_ok and gust_left and gust_right, "Tagschicht: Windtag: Böen von links und rechts über die ganze Karte")
+	var fog_l := DayShift.apply(LevelData.load_file("res://data/levels/s2_05.json"), "fog", "2026-11-10")
+	check(fog_l.fog > 0.5 and fog_l.dark == 0.0, "Tagschicht: Nebel: Sichtweite begrenzt")
+	var orig_l := LevelData.load_file("res://data/levels/s2_05.json")
+	var mir_l := DayShift.apply(LevelData.load_file("res://data/levels/s2_05.json"), "mirror", "2026-11-11")
+	check(DayShift.mirrors_screen("mirror") and not DayShift.mirrors_screen("wind") and mir_l.spawn == orig_l.spawn and mir_l.rows == orig_l.rows and mir_l.id == orig_l.id, "Tagschicht: Spiegelwelt spiegelt das Bild (Schrift und Anzeigen mit), das Level bleibt im Original")
+	var fuel_l := DayShift.apply(LevelData.load_file("res://data/levels/s2_05.json"), "fuel", "2026-11-12")
+	check(is_equal_approx(fuel_l.fuel_price_max, orig_l.fuel_price_max * DayShift.FUEL_PRICE_K) and DayShift.entry_fuel("fuel") == 50.0 and DayShift.entry_fuel("wind") == Tuning.FUEL_MAX, "Tagschicht: Dünner Tank: halber Tank, teurerer Sprit")
+	var cap_run := Run.new()
+	cap_run.fuel_cap = DayShift.fuel_cap("fuel")
+	cap_run.start(LevelData.load_file("res://data/levels/s2_05.json"), 100.0, 0.0, 5)
+	var cap_start: float = cap_run.sim.fuel
+	cap_run.sim.fuel = 10.0
+	cap_run.sim.refuel(500.0)
+	var cap_ref: float = cap_run.sim.fuel
+	var full_run := Run.new()
+	full_run.start(LevelData.load_file("res://data/levels/s2_05.json"), 100.0, 0.0, 5)
+	check(is_equal_approx(cap_start, 50.0) and is_equal_approx(cap_ref, 50.0) and is_equal_approx(float(full_run.sim.fuel), Tuning.FUEL_MAX) and DayShift.fuel_cap("wind") == Tuning.FUEL_MAX, "Tagschicht: Dünner Tank fasst dauerhaft nur 50 % (Start und Nachtanken enden bei 50, sonst 100)")
+	var tw := DayShift.apply(LevelData.load_file("res://data/levels/s2_05.json"), "tailwind", "2026-11-15")
+	var tw_zones := 0
+	var tw_left := false
+	var tw_right := false
+	var tw_pulse := true
+	var tw_wide := true
+	for z in tw.zones:
+		if z.kind == "wind" and (z.rect as Rect2).size.x >= float(tw.width) * Tuning.TILE - 1.0:
+			tw_zones += 1
+			tw_left = tw_left or (z.a as Vector2).x < 0.0
+			tw_right = tw_right or (z.a as Vector2).x > 0.0
+			tw_pulse = tw_pulse and float(z.period) > float(z.on) and float(z.on) > 0.0 and absf((z.a as Vector2).x) <= DayShift.TAILWIND_ACCEL + 0.01
+	var tw_gust_time := 0
+	for k in 900:                                                                 # 90 s in Zehntelsekunden: an wie vielen Zeitpunkten weht es?
+		if tw.zone_accel(Vector2(100.0, 100.0), float(k) * 0.1).x != 0.0:
+			tw_gust_time += 1
+	check(is_equal_approx(tw.gravity, orig_l.gravity * DayShift.TAILWIND_GRAVITY_K) and tw_zones == 2 and tw_left and tw_right and tw_pulse and tw_gust_time > 250 and tw_gust_time < 550, "Tagschicht: Rückenwind: 60 % Schwerkraft, leichte Böen von links und rechts über die ganze Karte, nur pulsierend (weht an " + str(int(tw_gust_time / 9)) + " Prozent der Zeit)")
+	var gm := DayShift.mods("glass", {"burn": 1.0, "damage": 1.0, "land_vy": 40.0})
+	check(is_equal_approx(float(gm.damage), DayShift.GLASS_DAMAGE_K) and is_equal_approx(float(DayShift.mods("wind", {"damage": 1.0}).damage), 1.0), "Tagschicht: Glasdach: mehr Schaden an der Hülle")
+	var rl := LevelData.load_file("res://data/levels/s2_05.json")
+	var calm := Run.new()
+	calm.start(rl, -1.0, 0.0, 5)
+	var rushed := Run.new()
+	rushed.patience_k = DayShift.patience_k("rush")
+	rushed.start(LevelData.load_file("res://data/levels/s2_05.json"), -1.0, 0.0, 5)
+	check(rushed.main_patience < calm.main_patience and is_equal_approx(rushed.main_patience, calm.main_patience * DayShift.RUSH_PATIENCE_K), "Tagschicht: Eilfahrt: Fahrgäste verlieren schneller die Geduld")
+	# Zählwerte aus dem Lauf
+	check(calm.day_stats().has("landings") and calm.day_stats().has("money_target") and int(calm.day_stats().landings) == 0, "Tagschicht: Lauf liefert die Zählwerte für das Tagesziel")
+	# Serie, Gold, Belohnungen
+	var de_ := {}
+	var st_ := {}
+	Daily.record(de_, st_, "2026-11-09", 80, 2)
+	Daily.record(de_, st_, "2026-11-09", 100, 3)
+	Daily.record(de_, st_, "2026-11-09", 110, 3)
+	check(int(de_.best) == 110 and int(de_.medal) == 3 and int(st_.day_golds) == 1 and int(st_.daily_streak) == 1, "Tagschicht: Gold zählt je Tag einmal, Bestwert und beste Medaille bleiben")
+	Daily.record(de_, st_, "2026-11-10", 100, 3)
+	check(int(st_.day_golds) == 2 and int(st_.daily_streak) == 2 and int(st_.day_best_medal) == 3, "Tagschicht: zweiter Tag, zweites Gold, Serie 2")
+	check(DayShift.next_reward({}, []).item == "sun" and DayShift.next_reward({}, ["sun", "sky", "medal", "platinum"]).is_empty() and DayShift.next_reward({"daily_best_streak": 3}, ["sun"]).item == "sky", "Tagschicht: nächste Belohnung der Serie")
+	var cos: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/cosmetics.json"))
+	var rew_ok := true
+	for rw in DayShift.REWARDS:
+		var found := false
+		for it in cos.items:
+			if it.id == rw.item and it.unlock != null and it.unlock.stat == rw.stat and int(it.unlock.min) == int(rw.min):
+				found = true
+				rew_ok = rew_ok and ResourceLoader.exists("res://assets/art/%s_%s.png" % ["taxi" if it.kind == "paint" else "sticker", it.id])
+		rew_ok = rew_ok and found
+	check(rew_ok, "Tagschicht: Belohnungen der Serie stehen in der Kosmetik-Liste samt Grafik")
+	# Geist und Screenshot
+	var tr_trace := [1.0, 2.0, 0.0, 3.0, 4.0, 0.1]
+	var rec := {"result": {"complete": true}, "trace": tr_trace, "level": "s2_05"}
+	var slot := 97
+	DirAccess.remove_absolute(Replay.day_path(slot))
+	check(Replay.save_day(rec, slot, "2026-11-09", 80) and Replay.load_day(slot, "2026-11-09") == tr_trace and Replay.load_day(slot, "2026-11-10").is_empty(), "Tagschicht: Geist des besten Flugs von heute, am nächsten Tag leer")
+	check(not Replay.save_day(rec, slot, "2026-11-09", 70) and Replay.save_day(rec, slot, "2026-11-09", 90), "Tagschicht: nur ein besserer Flug ersetzt den Geist")
+	DirAccess.remove_absolute(Replay.day_path(slot))
+	check(Shots.day_file_name("2026-11-09", "Floppi", 1) == "261109_tagschicht_floppi.png" and Shots.shift_file_name("2026-11-08", "Floppi", 1) == "261108_nachtschicht_floppi.png", "Tagschicht: Screenshot-Dateiname JJMMTT_tagschicht_name.png")
+	# Texte
+	var de: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/de.json"))
+	var en: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/en.json"))
+	var txt_ok := true
+	for r in DayShift.RULES:
+		for k in ["DAY_RULE_" + r, "DAY_RULE_" + r + "_D"]:
+			txt_ok = txt_ok and de.has(k) and en.has(k)
+	for g in DayShift.GOALS:
+		for k in ["DAY_GOAL_" + g, "DAY_GOAL_" + g + "_D", "DAY_STAT_" + g]:
+			txt_ok = txt_ok and de.has(k) and en.has(k)
+	for m in 4:
+		txt_ok = txt_ok and de.has("DAY_MEDAL_%d" % m) and en.has("DAY_MEDAL_%d" % m)
+	check(txt_ok and String(de.MENU_DAILY) == "Tagschicht" and String(en.MENU_DAILY) == "Day shift", "Tagschicht: Namen, Regeln, Ziele und Medaillen in beiden Sprachen")
