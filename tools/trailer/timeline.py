@@ -32,6 +32,10 @@ TXT = {
         "built": "Gebaut mit Godot  ·  Built with Fish Audio",
         "good": "Viel Erfolg da draußen, Taxi 7.",
         "free": "Kostenlos für nicht-kommerzielle Nutzung",
+        "upgrade": "AUFRÜSTEN.",
+        "workshop": "WERKSTATT  ·  DÜSEN · HÜLLE · FAHRWERK",
+        "build": "BAU DEINE\nEIGENEN LEVEL.",
+        "editor": "LEVEL-EDITOR  ·  TESTFLUG  ·  TEILEN",
     },
     "en": {
         "gravity": "GRAVITY\nSHOWS NO MERCY.",
@@ -56,10 +60,20 @@ TXT = {
         "built": "Made with Godot  ·  Built with Fish Audio",
         "good": "Good luck out there, Taxi 7.",
         "free": "Free for non-commercial use",
+        "upgrade": "UPGRADE.",
+        "workshop": "WORKSHOP  ·  JETS · HULL · GEAR",
+        "build": "BUILD YOUR\nOWN LEVELS.",
+        "editor": "LEVEL EDITOR  ·  TEST FLIGHT  ·  SHARE",
     },
 }
 
 _traces = {}
+
+# Werkstatt-Aufnahme (ws_trailer.tscn, 60 fps): Tafel öffnet bei Frame 130, Käufe bei Frame 240 und 350
+WS_SHOP = 130 / 60.0
+WS_BUYS = (240 / 60.0, 350 / 60.0)
+# Editor-Aufnahme (ed_trailer.tscn): Frames, in denen ein Strich bzw. ein Objekt beginnt
+ED_STROKES = (31, 53, 75, 91, 103, 113, 123, 157, 179, 201, 223)
 
 
 def events(clip):
@@ -132,7 +146,7 @@ class Timeline:
 
     def pre(self, clip):
         """Aufnahmen ohne Bedienfeld gibt es je Sprache (en_n_…, en_trans); die mit Bedienfeld heißen h_… und h_en_…."""
-        return "en_" + clip if self.lang == "en" and (clip.startswith(("n_", "f_")) or clip == "trans") else clip
+        return "en_" + clip if self.lang == "en" and (clip.startswith(("n_", "f_")) or clip in ("trans", "ws", "ed")) else clip
 
     def landing(self, clip, n, dur, frac=0.7, speed=1.0, zoom=2.0, **kw):
         """Ausschnitt, in dem die n-te Landung bei Anteil `frac` der Dauer passiert."""
@@ -285,20 +299,20 @@ def build(lang):
     mont([("n_s3_04", 1)], BAR)
     tl.text("sectors", 10 * BAR, 11 * BAR, size=190, kind="slam"); hit(10 * BAR, 0.5, 0.8, False)
     # Tore, Hitze, Verkehr: Der Text steht jeweils über einem Bild, auf dem genau das zu sehen ist
-    tl.add(Shot(tl.pre("n_s2_04"), 16.4, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi fliegt an den Wandertoren vorbei
+    tl.add(Shot(tl.pre("n_s2_04"), 16.1, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi fliegt an den Wandertoren vorbei
     tl.text("gates", 11 * BAR, 12 * BAR, size=190, kind="slam"); hit(11 * BAR, 0.5, 0.8, False)
-    tl.add(Shot(tl.pre("n_s5_01"), 20.9, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))  # Taxi neben der glühenden Hitzezone
+    tl.add(Shot(tl.pre("n_s5_01"), 20.7, BAR, zoom=[(0, 2.3), (BAR, 2.6)], at=(0.5, 0.74)))  # Taxi neben der glühenden Hitzezone
     tl.text("heat", 12 * BAR, 13 * BAR, size=190, kind="slam", style=dict(fill=(255, 190, 110), glow=(255, 90, 30))); hit(12 * BAR, 0.5, 0.8, False)
-    tl.add(Shot(tl.pre("n_s7_05"), 12.3, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi zwischen Fremdfahrzeugen
+    tl.add(Shot(tl.pre("n_s7_05"), 12.0, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi zwischen Fremdfahrzeugen
     tl.text("traffic", 13 * BAR, 14 * BAR, size=190, kind="slam", style=dict(fill=(180, 235, 255), glow=(60, 150, 255))); hit(13 * BAR, 0.5, 0.8, False)
     mont([("n_s4_05", 0), ("n_s6_05", 0)], BAR / 2)
-    tl.add(Shot(tl.pre("n_s9_10"), 21.9, BAR, zoom=[(0, 2.0), (BAR, 2.4)], at=(0.5, 0.74)))                 # dunkles Level mit Hitze und Verkehr
+    tl.add(Shot(tl.pre("n_s9_10"), 21.5, BAR, zoom=[(0, 2.0), (BAR, 2.4)], at=(0.5, 0.74)))                 # dunkles Level mit Hitze und Verkehr
     tl.text("dark", 15 * BAR, 16 * BAR, size=150, kind="slam", style=dict(fill=(190, 225, 255), glow=(60, 130, 255))); hit(15 * BAR, 0.5, 0.8, False)
     # Zwischenspiel: Fluglehrer (HUD-Aufnahme, ruhiger)
     B1 = 16 * BAR
     hit(B1, 0.6, 0.6)
-    # das Ausgangstor oben öffnet sich (Spiel-Aufnahme: Tor ab 26,5 s offen), das Taxi fliegt darauf zu
-    tl.add(Shot(H + "s1_01", 26.55, 2 * BAR, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(960, 400), fix_to=(960, 330), grade=(1.12, 1.08, (1.0, 1.0, 1.02))), sfx_land=False)
+    # das Ausgangstor oben öffnet sich (Spiel-Aufnahme: Tor ab 25,77 s offen), das Taxi fliegt darauf zu
+    tl.add(Shot(H + "s1_01", 25.82, 2 * BAR, zoom=[(0, 1.0), (2 * BAR, 1.3)], cam="fix", fix=(960, 400), fix_to=(960, 330), grade=(1.12, 1.08, (1.0, 1.0, 1.02))), sfx_land=False)
     voice_gate = ("i0_tut_gate", 0.95)
     tl.voices.append((B1 + 0.25, voice_gate[0], voice_gate[1]))
     tl.text("teach", B1 + 0.2, B1 + 2.9, size=44, cy=858, kind="fade", style=dict(font=engine.FONT_B, fill=(255, 207, 51), glow=(255, 150, 30), spacing=6))
@@ -310,20 +324,48 @@ def build(lang):
     tl.text("land", 20 * BAR, 21 * BAR, size=170, kind="slam"); hit(20 * BAR, 0.5, 0.8, False)
     tl.add(L("f_s9_05", 0, BAR, frac=0.45, speed=1.0, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))         # Taxi landet an der Tankstelle und tankt (Start mit wenig Sprit)
     tl.text("fuel", 21 * BAR, 22 * BAR, size=170, kind="slam"); hit(21 * BAR, 0.5, 0.8, False)
-    tl.add(Shot(tl.pre("n_s5_04"), 29.1, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi neben dem Plasmastrahl
+    tl.add(Shot(tl.pre("n_s5_04"), 28.7, BAR, zoom=[(0, 2.2), (BAR, 2.6)], at=(0.5, 0.74)))                 # Taxi neben dem Plasmastrahl
     tl.text("survive", 22 * BAR, 23 * BAR, size=170, kind="slam", style=dict(fill=(255, 120, 90), glow=(255, 60, 30))); hit(22 * BAR, 0.5, 0.8, False)
     mont([("n_s6_05", 2)], BAR)
+    # ---------- Werkstatt und Level-Editor (je zwei Takte) ----------
+    W0 = 24 * BAR
+    tl.cursor = W0
+    hit(W0, 0.6, 0.7)
+    ws = tl.pre("ws")
+    ws_speed = 1.6                               # Zeitraffer: Einflug, Tafel, zwei Käufe und Fokuswechsel in zwei Takten
+    ws_src = WS_SHOP - 0.6                       # Taxi fährt auf der Hebebühne hoch, kurz danach öffnet die Tafel
+    tl.add(Shot(ws, ws_src, 2 * BAR, speed=ws_speed, zoom=[(0, 1.12), (2 * BAR, 1.0)], cam="fix", fix=(960, 560), nearest=False, bloom=0.4,
+                grade=(1.08, 1.05, (1.0, 1.0, 1.0))), sfx_land=False)
+    for b in WS_BUYS:                             # Käufe in der Aufnahme: Münzklang an derselben Stelle
+        u = (b - ws_src) / ws_speed
+        if 0.0 <= u <= 2 * BAR:
+            tl.sfx.append((W0 + u, "coin", 0.8))
+            tl.pulses.append((W0 + u, 0.35))
+    tl.text("upgrade", W0, W0 + BAR, size=170, cy=210, kind="slam", style=dict(fill=(255, 214, 120), glow=(255, 140, 40)))
+    tl.text("workshop", W0 + 0.5, W0 + 2 * BAR - 0.1, size=46, cy=1000, kind="fade", style=dict(font=engine.FONT_B, fill=(245, 248, 255), glow=(255, 150, 30), spacing=4))
+    E0 = W0 + 2 * BAR
+    hit(E0, 0.5, 0.7)
+    ed = tl.pre("ed")
+    ed_speed, ed_src = 1.25, 0.35                 # Zeitraffer: der ganze Aufbau (Felsen, Pads, Dornen, Objekte) in zwei Takten
+    tl.add(Shot(ed, ed_src, 2 * BAR, speed=ed_speed, zoom=[(0, 1.2), (2 * BAR, 1.27)], cam="fix", fix=(800, 455), nearest=False, bloom=0.35,
+                grade=(1.06, 1.05, (1.0, 1.0, 1.02))), sfx_land=False)
+    for f in ED_STROKES:                          # jeder Strich und jedes Objekt: leises Klicken
+        u = (f / 60.0 - ed_src) / ed_speed
+        if 0.0 <= u <= 2 * BAR:
+            tl.ticks.append(E0 + u)
+    tl.text("build", E0, E0 + 1.2 * BAR, size=140, kind="slam", style=dict(fill=(150, 240, 255), glow=(40, 150, 255)))
+    tl.text("editor", E0 + 0.5, E0 + 2 * BAR - 0.1, size=46, cy=1000, kind="fade", style=dict(font=engine.FONT_B, fill=(245, 248, 255), glow=(70, 120, 255), spacing=4))
+    X = 4 * BAR                                   # alles danach rückt um diese vier Takte nach hinten
     # ---------- Akt 3: Steigerung ----------
-    tl.cursor = 24 * BAR
-    hit(24 * BAR, 0.8, 1.0)
-    tl.text("every", 24 * BAR, 25.9 * BAR, size=120, kind="slam", style=dict(fill=(255, 255, 255), glow=(255, 190, 60)))
+    tl.cursor = 24 * BAR + X
+    hit(24 * BAR + X, 0.8, 1.0)
+    tl.text("every", 24 * BAR + X, 25.9 * BAR + X, size=120, kind="slam", style=dict(fill=(255, 255, 255), glow=(255, 190, 60)))
     mont([("n_s7_03", 2), ("n_s8_03", 2), ("n_s9_05", 1), ("n_s5_04", 2)], BAR / 2, speed=1.7, zoom=2.5)
     mont([("n_s3_04", 2), ("n_s2_04", 2), ("n_s4_05", 3), ("n_s6_05", 2)], BAR / 2, speed=1.7, zoom=3.0)
     mont([("n_s7_05", 0), ("n_s8_03", 3), ("n_s9_10", 2), ("n_s5_04", 3), ("n_s1_01", 2), ("n_s2_04", 0), ("n_s3_04", 0), ("n_s4_05", 2)], BEAT, speed=1.8, zoom=3.0, frac=0.6)
     for i in range(8):
-        tl.pulses.append((28 * BAR + i * BEAT, 0.6))
+        tl.pulses.append((28 * BAR + X + i * BEAT, 0.6))
     # Finale: Zeitlupe, perfekte Landung
-    F = 30 * BAR
     land_n = 1
     clip = tl.pre("n_s1_01")
     lt = events(clip)[0][land_n]
@@ -337,7 +379,7 @@ def build(lang):
     tl.sfx.append((touch, "perfect", 0.9))
     tl.voices.append((touch + 0.15, "f0_soft", 0.95))
     # ---------- Schluss: Logo ----------
-    E = tl.cursor              # = 32 Takte
+    E = tl.cursor              # = 36 Takte
     tl.drop_end = E
     tl.fades.append((E - 0.05, E, 1.0, 0.0))
     tl.impacts.append(E + 0.35)

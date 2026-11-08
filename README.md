@@ -33,7 +33,7 @@ eigener Grafik und eigenem Klang.
 
 <p align="center">
   <a href="docs/media/trailer_de.mp4"><img src="docs/media/trailer_thumb_de.jpg" alt="GraviFare – Trailer (Deutsch)" width="760"></a><br>
-  <sub>▶ Trailer ansehen (1080p60, 69 s) · <a href="docs/media/trailer_en.mp4">English version</a></sub>
+  <sub>▶ Trailer ansehen (1080p60, 76 s) · <a href="docs/media/trailer_en.mp4">English version</a></sub>
 </p>
 
 Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Autopilot-Flüge, aufgenommen mit Godots Movie Maker); Schnitt, Kamera und Effekte entstehen per Skript, siehe [tools/trailer](tools/trailer/README.md).
@@ -116,7 +116,7 @@ A homage to the flying-taxi genre, with its own world, levels, art and sound.
 
 <p align="center">
   <a href="docs/media/trailer_en.mp4"><img src="docs/media/trailer_thumb_en.jpg" alt="GraviFare – Trailer (English)" width="760"></a><br>
-  <sub>▶ Watch the trailer (1080p60, 69 s) · <a href="docs/media/trailer_de.mp4">Deutsche Version</a></sub>
+  <sub>▶ Watch the trailer (1080p60, 76 s) · <a href="docs/media/trailer_de.mp4">Deutsche Version</a></sub>
 </p>
 
 Everything in the trailer comes from the real game and its 99 handmade levels (autopilot flights recorded with Godot's Movie Maker); cutting, camera and effects are scripted, see [tools/trailer](tools/trailer/README.md) (German).

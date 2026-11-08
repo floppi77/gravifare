@@ -7,7 +7,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
 import engine
 from engine import W, H, FPS
-engine.CLIPS = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v2"))
+engine.CLIPS = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v3"))
 OUT = os.path.expanduser("~/.cache/gravifare-trailer/out")
 import timeline
 

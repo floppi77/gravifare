@@ -6,7 +6,7 @@ import engine, timeline, audio, sound
 
 lang = sys.argv[1]
 OUT = os.path.expanduser("~/.cache/gravifare-trailer/out")
-engine.CLIPS = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v2"))
+engine.CLIPS = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v3"))
 tl = timeline.build(lang)
 y = audio.build(lang, tl)
 wav = f"{OUT}/{lang}/audio.wav"
