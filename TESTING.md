@@ -3,13 +3,21 @@
 |---|---|
 | `godot --headless -s tests/test_runner.gd` | Physik, Landung, Schaden, Auftragsfluss, Autopilot je Level (Exit-Code ≠ 0 bei Fehlern) |
 | `python3 tools/level_hashes.py` | schreibt `data/levels.sha256` neu (nach gewollten Änderungen an den Originalleveln; der Test `_test_originals_unchanged` prüft sie) |
+| `godot --headless -s tools/make_replay_fixtures.gd [-- <Ordner>]` | Autopilot-Läufe mit Zusatzfahrgästen als Replays aufzeichnen (Fixtures für `_test_old_replays_valid`) |
+| `LV=s4_01,s4_02 godot --headless -s tools/levelmarks/measure_jobs.gd`, `python3 tools/levelmarks/mark_levels.py <jsonl> [--write]` | Zeiten je Auftrag messen, VIP/Notfall auswählen und markieren |
 | `godot --headless -s tools/run_bot.gd [-- s1_01]` | Autopilot fliegt Level mit echter Physik und meldet Zeit, Tank, Hülle |
-| `HF_HOME=<cache> <venv>/bin/python tools/audio/verify_voice.py --model medium` | prüft Sprachclips per lokaler Spracherkennung (Ziffernnormalisierung, Ähnlichkeit ≥ 0,88) |
+| `HF_HOME=<cache> <venv>/bin/python tools/audio/verify_voice.py --model medium` | prüft Sprachclips per lokaler Spracherkennung (Ziffernnormalisierung, Ähnlichkeit ≥ 0,88) ; Modell liegt z. B. unter `ws-dsh-intern/.bench/.hf`. Mit der PyAV-Version im venv `.venv/tts` schlägt das Dekodieren der OGGs fehl (`metadata_errors`); dann vorher per ffmpeg zu PCM wandeln. Stand 2026-11-10: die 8 neuen Clips (Runde 60/61) erkannt |
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Meilenstein M4, laufend):** über 3200 Prüfungen, alle bestanden (3213). Neu je Runde, jüngste zuerst:
+**Stand (Branch mechanik-grafik, 2026-11-10):** 3542 Prüfungen, alle bestanden (vorher 3449). Neu je Runde, jüngste zuerst:
 
+- **Runde 63:** Fels-Atlas je Sektor (768×144, Normal-Map, Funktionsfelder unverändert, Materialien verschieden, Außenecken rund), Fels nach Nachbarschaft und weicher Rand für Ultrawide (Quelltextprüfung)
+- **Runde 62:** Taxi 78×48 (1:1, Physikmaße unverändert, alle Lackierungen und leere Kuppel in 78×48, Aufkleber 20 px, alle Ansichten mit neuen Maßen), Verkehr 78×48 und `VEH_SIZE` 26×16
+- **Runde 61:** VIP und Notfall (Preis, Geduld, doppelter Abzug, Frist, Verlust mit/ohne Strafe, an Bord, nach dem Absetzen, eigener Zufallsstrom, Häufigkeit je Sektor, Geister-Kennung, Community-Feld, Editor-Schreibweise, Tag-/Nachtschicht ohne Typen, Einspieler mit Autopilot, Texte)
+- **Runde 60:** Regelstand der Läufe (alte Läufe aus `tests/fixtures/replays_v2/` rechnen exakt nach), Tankregel (zahlt, wer kann; kein Flackern; keine Sackgasse; alter Regelstand), Trinkgeld (2 %, höchstens drei je Fahrt, Sperrzeit, nur mit Fahrgast, nicht in der Nachtschicht, nicht im alten Regelstand). Der Autopilot löst S2-01, S3-04, S3-07, S4-08, S4-09, S5-03 und S9-06 mit der neuen Tankregel nicht (`BOT_FUEL_RULE_LEVELS`): Dort wird die Fliegbarkeit mit Regelstand 2 und die statische Lösbarkeit geprüft, das Ergebnis mit neuer Regel nur ausgegeben (Auftraggeber, 2026-11-10)
+- **Runde 59:** Nachtschicht nach Sektor 1–4, Hinweistext, Einspieler in Schichten nie „gesehen“
+- **Runde 58:** Game Over kostet je Einbau eine Stufe, Werkstattpreise 2700/6500/15000, Scheinwerfer (+15 % je Stufe, nur Darstellung, nur Karriere, Texte)
 - **Runde 50:** Testflug eines Entwurfs: Bestzeit, Bestwert und Flüge werden beim Speichern übernommen; Levelliste zeigt selbst gelöste Level ohne Eintrag als „von dir gelöst“
 - **Runde 52:** Tagschicht (Wochenplan der Regeln und Tagesziel, Spiegelwelt (Bild gespiegelt, Steuerung dadurch vertauscht), Regeln auf dem Level, Wertung und Medaillen des Ziels, Serie, Gold und Belohnungen, Geist, Screenshot-Name, Texte)
 - **Runde 51:** Nachtschicht (Tagesplan, Dunkelheit, Schwerkraftgrenzen für alle 99 Level, Auftragsketten, Wertung und Noten, Lebensstation aus, Ein-Versuch-Regel, Screenshot-Dateinamen, Namen der Spielstände, Wertung 80/10/10 mit Credits je 1500, Fahrer-Ablauf und Ansagen im Finale, Fokus der Bildschirmtastatur, gemeinsame Menütafel)
@@ -58,7 +66,7 @@ Screenshots/Menü: `godot --path . --rendering-driver opengl3 -- --level=s1_01 -
 **Grenzen:** Der Bot beweist Fliegbarkeit mit Sicherheitsrand, ersetzt aber keine spielerische Abnahme. Die Gamepad-Steuerung (Xbox-Layout) hat der Auftraggeber an echter Hardware gespielt und als herausragend bewertet (2026-11-01); Menüs und Spielgefühl prüft er laufend beim Spielen, automatisch messen lässt sich das nicht. Beim Autopiloten gilt „nicht bestanden“ immer als nicht bestanden.
 
 Dev-Flags (nach `--`): `--level=<id>`, `--shot=<png> --frames=<n>`, `--press=<aktion>@<frame>`, `--debug-open-exit`, `--dump-input`.
-Weitere Dev-Flags: `--scene=garage|credits|finale|menu`, `--slots`, `--levels`, `--seed=N`, `--debug-pump=N` (Schadensstufe 0–3), `--lives=N`, `--debug-destroy` (Taxi sofort zerstören), `--debug-squash` (Taxi auf wartenden Fahrgast senken), `--debug-input=x,y` (konstanter Schub), `--autopilot` (Bot fliegt im echten Spiel), `--debug-complete` (Level sofort abschließen), `--trans-t=<s>` (Levelwechsel-Zeitachse an Stelle s starten), `--lang=de|en` (Sprache nur für diesen Lauf), `--no-hud` (Bild ohne HUD). Läufe mit Autopilot/Debug-Flags schreiben **nie** den Speicherstand (`Save.dev_session`).
+Weitere Dev-Flags: `--ws-light=N` (Scheinwerfer-Stufe für Vergleichsbilder), `--scene=garage|credits|finale|menu`, `--slots`, `--levels`, `--seed=N`, `--debug-pump=N` (Schadensstufe 0–3), `--lives=N`, `--debug-destroy` (Taxi sofort zerstören), `--debug-squash` (Taxi auf wartenden Fahrgast senken), `--debug-input=x,y` (konstanter Schub), `--autopilot` (Bot fliegt im echten Spiel), `--debug-complete` (Level sofort abschließen), `--trans-t=<s>` (Levelwechsel-Zeitachse an Stelle s starten), `--lang=de|en` (Sprache nur für diesen Lauf), `--no-hud` (Bild ohne HUD). Läufe mit Autopilot/Debug-Flags schreiben **nie** den Speicherstand (`Save.dev_session`).
 
 Hinweis: `godot --minimized` öffnet das Fenster auf KDE/Wayland nicht minimiert; Fensterläufe erscheinen kurz im Vordergrund.
 
@@ -79,7 +87,7 @@ Musik: `python3 tools/audio/gen_music.py [thema]` (22 Themen × 3 Schichten, Not
 | `godot --headless -s tests/test_runner.gd` | alle Prüfungen (Physik, Aufträge, Regeln, Level, Daten, Audio-Assets, Speicherstand, Replay) |
 | `godot --headless -s tools/run_bot.gd [id …]` | Autopilot fliegt jedes Level komplett (Lösbarkeit ab Standard-Sprit) |
 | `godot --headless -s tools/level_report.gd` | Schwierigkeitsmetrik und Bot-Ergebnis je Level **ab Mindest-Sprit 35 %** |
-| `godot --headless -s tools/replay_check.gd` | gespeicherte Bestzeit-Replays nachrechnen und mit dem Ergebnis vergleichen |
+| `godot --headless -s tools/replay_check.gd` | gespeicherte Bestzeit-Replays nachrechnen und mit dem Ergebnis vergleichen (Wurzel und je Speicherplatz `s1`–`s3`; Läufe ohne `rules` mit Regelstand 2) |
 | `python3 tools/make_*.py` | Level-Erzeuger (ASCII-Raster → `data/levels/*.json`), `tools/levelkit.py` als Hilfsmodul |
 | `python3 tools/audio/gen_music.py [thema]` | Musik neu erzeugen (SID und Paula), Noten in `tools/audio/music_score.py` |
 | `.venv/tts/bin/python tools/audio/gen_voice.py [--clip de/f0_call] [--validate]` | Sprachclips erzeugen (Validierung braucht ein lokales Whisper-Modell) |

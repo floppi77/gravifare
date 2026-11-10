@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -132,6 +132,11 @@ const BOT_LENIENT := {"s9_11": [2, 90.0], "s8_03": [1, 75.0]}
 ## Von Hand gebaute Level (Stand 2026-11), die der Autopilot ab 35 % Sprit nicht oder nicht sauber schafft (lange Wartezeiten an Wandertoren, Strahlen und Fahrzeugbahnen,
 ## Zapfsäule weit weg). Der Entwickler hat sie alle selbst gelöst; für sie wird nur die statische Lösbarkeit geprüft. Alle anderen Level muss der Autopilot weiter lösen.
 const BOT_HAND_LEVELS := ["s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04"]
+## Runde 60: Level, die der Autopilot mit der strengen Tankregel (unter 35 % gratis nur ohne Geld) ab Mindest-Sprit nicht mehr löst. Er tankt erst, wenn
+## Credits da sind, zahlt dann auch unter 35 % und fliegt mit zu wenig Sprit los. Der Auftraggeber verlangt hier keine Autopilot-Lösung (2026-11-10);
+## geprüft wird die Fliegbarkeit mit Regelstand 2 (Tankregel und Aufträge wie bis 1.0.1) und die statische Lösbarkeit; das Ergebnis mit den neuen Regeln wird nur ausgegeben.
+const BOT_FUEL_RULE_LEVELS := ["s2_01", "s3_04", "s3_07", "s4_08", "s4_09", "s5_03", "s9_06"]
+
 ## Nachtschicht (Zufallsaufträge): zwei Handlevel, in denen der Autopilot mit beliebigen Aufträgen zu lange wartet.
 const SHIFT_HAND_LEVELS := ["s8_05", "s9_05", "s5_05"]
 
@@ -147,7 +152,12 @@ func _test_bot_solves_levels() -> void:
 		if BOT_HAND_LEVELS.has(f.get_basename()):
 			check(LevelMetrics.is_solvable(lvl), "%s: von Hand gebaut, Autopilot nicht verlangt; statisch lösbar" % lvl.id)
 			continue
-		var r := Bot.fly_level(lvl, 600.0, _bot_fuel(lvl))
+		var fuel_rule := BOT_FUEL_RULE_LEVELS.has(f.get_basename())
+		var r := Bot.fly_level(lvl, 600.0, _bot_fuel(lvl), false, false, Replay.LEGACY_RULES if fuel_rule else Run.RULES)
+		if fuel_rule:
+			var rn := Bot.fly_level(lvl, 600.0, _bot_fuel(lvl))
+			print("  info %s mit neuer Tankregel: %s (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, "Level abgeschlossen" if rn.complete else "nicht abgeschlossen", rn.time, rn.hull, rn.delivered, rn.jobs, rn.reason])
+			check(LevelMetrics.is_solvable(lvl), "%s: mit der neuen Tankregel kein Autopilot verlangt; statisch lösbar" % lvl.id)
 		var rr := Run.new()
 		rr.start(lvl)
 		var inc := 0.0
@@ -156,7 +166,7 @@ func _test_bot_solves_levels() -> void:
 		var cost: float = float(r.fuel_burned) * (lvl.fuel_price_min + lvl.fuel_price_max) * 0.5
 		check(inc >= cost * 0.90, "%s: Fahrpreise bei 55 %% Zufriedenheit (¢%d) decken den Sprit des Autopiloten (¢%d) bis auf 10 %%" % [lvl.id, int(inc), int(cost)])
 		var lenient: Array = BOT_LENIENT.get(String(lvl.id).to_lower().replace("-", "_"), [1, 90.0])
-		check(r.complete and not r.timed_out and r.hull > float(lenient[1]) and r.delivered + r.squashes >= r.jobs - int(lenient[0]), "Autopilot löst %s ab Start-Sprit %d%% (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(_bot_fuel(lvl)), r.time, r.hull, r.delivered, r.jobs, r.reason])
+		check(r.complete and not r.timed_out and r.hull > float(lenient[1]) and r.delivered + r.squashes >= r.jobs - int(lenient[0]), "Autopilot löst %s ab Start-Sprit %d%%%s (%.0f s, Hülle %.0f%%, %d/%d befördert, %s)" % [lvl.id, int(_bot_fuel(lvl)), " mit Regelstand 2" if fuel_rule else "", r.time, r.hull, r.delivered, r.jobs, r.reason])
 
 func _test_level_rules() -> void:
 	var dir := DirAccess.open("res://data/levels")
@@ -604,11 +614,15 @@ func _test_wrong_pad_rules() -> void:
 	var sv3: Node = load("res://src/core/save.gd").new()
 	sv3.path = "user://test_save_over.json"
 	sv3.data.completed = {"s1_11": {}, "s2_01": {}, "s2_09": {}}
-	sv3.data["workshop"] = {"jets": 2}
+	sv3.data["workshop"] = {"jets": 2, "hull": 1, "gear": 3, "light": 0}
 	sv3.data["campaign"] = {"level": "s2_10", "credits": 5000.0}
 	sv3.lose_sector(2, "s2_01", 7)
+	check(sv3.data.workshop == {"jets": 1, "gear": 2}, "Game Over: jeder Einbau verliert eine Stufe, nie unter 0 (%s)" % str(sv3.data.workshop))
+	sv3.lose_sector(2, "s2_01", 7)
+	sv3.lose_sector(2, "s2_01", 7)
+	check(sv3.data.workshop.is_empty() and Workshop.level_of(sv3.data, "gear") == 0, "Game Over: drei Game Over leeren auch die volle Stufe")
 	check(sv3.data.completed.has("s1_11") and not sv3.data.completed.has("s2_01") and not sv3.data.completed.has("s2_09"), "Game Over: Sektor weg, frühere Sektoren bleiben")
-	check(sv3.data.campaign.level == "s2_01" and float(sv3.data.campaign.credits) == 0.0 and sv3.data.workshop.is_empty(), "Game Over: Sektoranfang, keine Credits, keine Einbauten")
+	check(sv3.data.campaign.level == "s2_01" and float(sv3.data.campaign.credits) == 0.0 and int(sv3.data.campaign.lives) == Tuning.START_LIVES, "Game Over: Sektoranfang, keine Credits, 5 Leben")
 	check(sv3.ever_completed().has("s2_09"), "Game Over: Freischaltungen bleiben")
 	# Neue Karriere: Einbauten weg, Bestzeiten bleiben; „Fortsetzen“ nur mit laufender Karriere
 	sv3.data["workshop"] = {"jets": 2, "hull": 1}
@@ -618,7 +632,25 @@ func _test_wrong_pad_rules() -> void:
 	check(not FileAccess.get_file_as_string("res://src/ui/main_menu.gd").contains("Flow.start_tutorial(first)"), "Neues Spiel startet direkt Level 1, nicht das Tutorial")
 	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
 	check(gsrc.contains("layer.layer = 45"), "Einspieler liegt über der Übergangsebene")
-	check(not sv3.shift_unlocked(["s1_11", "s2_10"]) and sv3.shift_unlocked(["s1_11", "s2_01"]), "Nachtschicht erst nach allen Leveln")
+	check(not sv3.shift_unlocked(["s1_11", "s2_10"]) and sv3.shift_unlocked(["s1_11", "s2_01"]), "Nachtschicht erst nach allen Leveln der Sektoren 1–4")
+	var all_ids: Array = []
+	for sec in range(1, 10):
+		for i in range(1, 12):
+			all_ids.append("s%d_%02d" % [sec, i])
+	var ever4 := {}
+	for id in all_ids:
+		if int(String(id).substr(1, 1)) <= 4:
+			ever4[id] = true
+	sv3.data["ever"] = ever4.duplicate()
+	sv3.data.completed = {}
+	check(sv3.shift_unlocked(all_ids), "Nachtschicht: frei mit allen 44 Leveln der Sektoren 1–4, Sektor 5–9 ungespielt")
+	ever4.erase("s4_11")
+	sv3.data["ever"] = ever4
+	check(not sv3.shift_unlocked(all_ids), "Nachtschicht: ein fehlendes Level aus Sektor 4 sperrt")
+	for lang in ["de", "en"]:
+		var hj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		check(String(hj.HELP_SHIFT_LOCKED).contains("4") and not String(hj.HELP_SHIFT_LOCKED).contains("99"), "Nachtschicht: Hinweistext nennt Sektor 1–4 (%s)" % lang)
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community):") and FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community:"), "Nachtschicht: Einspieler starten nicht von selbst und gelten dort nie als gesehen (Quelltextprüfung)")
 	sv3.debug = true
 	check(sv3.shift_unlocked(["s9_11"]), "Debug gibt die Nachtschicht frei")
 	DirAccess.remove_absolute("user://test_save_over.json")
@@ -1932,6 +1964,23 @@ func _test_landing_window_rules() -> void:
 
 func _test_taxi_scale() -> void:
 	check(absf(Tuning.HULL_HALF.x - 10.0 * Tuning.TAXI_SCALE) < 0.01 and absf(Tuning.FOOT_X - 8.0 * Tuning.TAXI_SCALE) < 0.01, "Taxi-Kollisionsmaße sind auf %.0f %% skaliert" % (Tuning.TAXI_SCALE * 100.0))
+	# Runde 62: Taxi in Zielgröße 78×48 px, 1:1 bei 1080p (3 px je Einheit); Trefferfläche und Physik unverändert
+	check(Tuning.HULL_HALF == Vector2(8, 4) and is_equal_approx(Tuning.FOOT_X, 6.4) and is_equal_approx(Tuning.GEAR_LEN, 4.0), "Trefferfläche und Physikmaße unverändert (HULL_HALF 8×4, FOOT_X 6,4, GEAR_LEN 4)")
+	check(Tuning.TAXI_UNITS * 3.0 == Tuning.TAXI_PX and (Tuning.TAXI_RECT.size * Tuning.TAXI_SCALE).is_equal_approx(Tuning.TAXI_UNITS) and (Tuning.TAXI_RECT.position + Tuning.TAXI_RECT.size * 0.5).is_zero_approx(), "Taxi wird 1:1 gezeichnet (78×48 px = 26×16 Einheiten, mittig)")
+	var sizes_ok := true
+	for p in ["taxi", "taxi_std", "taxi_neon", "taxi_mint", "taxi_night", "taxi_sunset", "taxi_candy", "taxi_gold", "taxi_sky", "taxi_platinum", "taxi_wasp", "taxi_cockpit_empty"]:
+		var tx: Texture2D = load("res://assets/art/%s.png" % p)
+		sizes_ok = sizes_ok and tx != null and tx.get_size() == Tuning.TAXI_PX
+	check(sizes_ok, "Taxi, alle Lackierungen und die leere Kuppel in 78×48")
+	var st_ok := true
+	for id in ["star", "bolt", "heart", "flame", "boom", "crown", "sun", "medal"]:
+		var sm: Texture2D = load("res://assets/art/sticker_%s_s.png" % id)
+		st_ok = st_ok and sm != null and sm.get_width() == 20 and sm.get_height() == 20
+	check(st_ok and absf(Tuning.STICKER_RECT.size.x * Tuning.TAXI_SCALE * 3.0 - 20.0) < 0.05, "Aufkleber am Taxi in 20 px, 1:1 gezeichnet")
+	var tsrc := ""
+	for f in ["res://src/game/taxi_view.gd", "res://src/ui/finale.gd", "res://src/ui/shift_finale.gd", "res://src/game/transition_view.gd", "res://src/ui/menu_backdrop.gd", "res://src/game/ghost_view.gd"]:
+		tsrc += FileAccess.get_file_as_string(f)
+	check(not tsrc.contains("Rect2(-16, -10, 32, 20)") and not tsrc.contains("Rect2(-32, -20, 64, 40)") and tsrc.contains("Tuning.TAXI_RECT"), "Alle Ansichten zeichnen das Taxi mit den neuen Maßen (Quelltextprüfung)")
 	# Taxi passt mit Landetoleranz bequem auf das kleinste Pad: Fußabstand + Toleranz < Landefenster
 	var lvl := _lvl()
 	var s := TaxiSim.new()
@@ -2371,10 +2420,10 @@ func _test_figures_and_traffic_art() -> void:
 	var ok := true
 	for c in ["red", "blue", "green", "purple", "silver"]:
 		var t: Texture2D = load("res://assets/art/vehicle_%s.png" % c)
-		ok = ok and t != null and t.get_width() == 96 and t.get_height() == 60
-	check(ok, "Verkehr: fünf eigene Fahrzeuggrafiken in Taxi-Auflösung")
+		ok = ok and t != null and t.get_width() == int(Tuning.TAXI_PX.x) and t.get_height() == int(Tuning.TAXI_PX.y)
+	check(ok, "Verkehr: fünf eigene Fahrzeuggrafiken in Taxi-Auflösung (78×48)")
 	var pv = load("res://src/game/props_view.gd")
-	check(pv.VEH_SIZE.is_equal_approx(Vector2(32.0, 20.0) * Tuning.TAXI_SCALE), "Verkehr wird in Taxigröße gezeichnet")
+	check(pv.VEH_SIZE.is_equal_approx(Tuning.TAXI_UNITS), "Verkehr wird in Taxigröße gezeichnet (26 × 16 Einheiten, 1:1)")
 	var lvl := LevelData.from_dict({"id": "T-VEH", "sector": 7, "index": 1, "name": {"de": "t", "en": "t"}, "map": ["#####", "#...#", "#...#", "#####"], "jobs": [],
 		"movers": [{"kind": "vehicle", "path": [[0.5, 1.5], [4.5, 1.5]], "speed": 48.0, "phase": 0.0, "paint": 0}]})
 	var vm: Dictionary = lvl.movers[0] if not lvl.movers.is_empty() else {}
@@ -2562,9 +2611,20 @@ func _test_workshop_buy() -> void:
 	var fresh := {}
 	check(Workshop.price(fresh, "jets") == 2700 and Workshop.price(fresh, "jets", 1) == 2700, "Erste Werkstatt: Grundpreis")
 	check(Workshop.price(fresh, "jets", 2) == 2970 and Workshop.price(fresh, "hull", 3) == 3240 and Workshop.price(fresh, "gear", 8) == 4590, "Jede weitere Werkstatt: Stufe 1 +270 (10 % von 2700), linear")
-	check(Workshop.buy(fresh, "jets", 3000.0, 2) == 30.0 and Workshop.price(fresh, "jets", 2) == 8800 and Workshop.price(fresh, "jets", 3) == 9600, "Auch Stufe 2 steigt um 10 % ihres Preises je Werkstatt (8000 → 8800 → 9600)")
+	check(Workshop.buy(fresh, "jets", 3000.0, 2) == 30.0 and Workshop.price(fresh, "jets", 2) == 7150 and Workshop.price(fresh, "jets", 3) == 7800 and Workshop.price(fresh, "jets", 1) == 6500, "Auch Stufe 2 steigt um 10 % ihres Preises je Werkstatt (6500 → 7150 → 7800)")
 	fresh["workshop"]["jets"] = 2
-	check(Workshop.price(fresh, "jets", 4) == 26000 and Workshop.price(fresh, "jets", 1) == 20000, "…und Stufe 3 (20000 → 26000 in der vierten Werkstatt)")
+	check(Workshop.price(fresh, "jets", 4) == 19500 and Workshop.price(fresh, "jets", 1) == 15000, "…und Stufe 3 (15000 → 19500 in der vierten Werkstatt)")
+	check(Workshop.PRICES == [2700, 6500, 15000], "Werkstatt: Grundpreise 2700 / 6500 / 15000")
+	# Scheinwerfer: vierter Einbau, nur Darstellung, nur Karriere
+	var lt := {}
+	check(Workshop.ITEMS.has("light") and Workshop.price(lt, "light") == 2700 and Workshop.buy(lt, "light", 2700.0) == 0.0 and Workshop.level_of(lt, "light") == 1, "Scheinwerfer: vierter Einbau, kaufbar wie die anderen")
+	check(is_equal_approx(Workshop.light_k({}), 1.0) and is_equal_approx(Workshop.light_k(lt), 1.15) and is_equal_approx(Workshop.light_k_for(3), 1.45), "Scheinwerfer: Lichtkreis +15 % je Stufe (Stufe 3: ×1,45)")
+	check(Workshop.mods({"workshop": {"light": 3}}) == Workshop.mods_for({}), "Scheinwerfer ändert nichts an Physik, Verbrauch oder Schaden (Replays bleiben gleich)")
+	var gsrc_ws := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(gsrc_ws.contains("if Flow.shift or Flow.daily or Flow.community:\n\t\treturn 1.0") and gsrc_ws.contains("dark.light_k = headlight_k()") and FileAccess.get_file_as_string("res://src/game/dark_view.gd").contains("72.0 * light_k"), "Scheinwerfer: wirkt nur in der Karriere, nicht in Nacht- und Tagschicht oder Community-Leveln (Quelltextprüfung)")
+	for lang in ["de", "en"]:
+		var tj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		check(tj.has("WS_LIGHT") and tj.has("WS_LIGHT_DESC") and String(tj.get("WS_EFF_LIGHT", "")).contains("%d"), "Scheinwerfer: Texte %s" % lang)
 	check(Workshop.buy(fresh, "hull", 2800.0, 3) < 0.0 and Workshop.buy(fresh, "hull", 3240.0, 3) == 0.0, "Kauf in der dritten Werkstatt braucht den Preis mit Aufschlag")
 	var TV = load("res://src/game/transition_view.gd")
 	var slow := 9.0
@@ -5419,3 +5479,302 @@ func _test_day_shift() -> void:
 	for m in 4:
 		txt_ok = txt_ok and de.has("DAY_MEDAL_%d" % m) and en.has("DAY_MEDAL_%d" % m)
 	check(txt_ok and String(de.MENU_DAILY) == "Tagschicht" and String(en.MENU_DAILY) == "Day shift", "Tagschicht: Namen, Regeln, Ziele und Medaillen in beiden Sprachen")
+
+## Runde 60: Unter 35 % tankt die Station nur gratis, wenn das Geld nicht reicht; die Entscheidung gilt bis zum Abheben (kein Flackern).
+func _test_fuel_rule() -> void:
+	var mk := func(money: float, rules: int) -> Run:
+		var r := Run.new()
+		r.rules = rules
+		r.extras_enabled = false
+		r.start(_lvl(), -1.0, money, 5)
+		r.sim.fuel = 20.0
+		_land_on(r, "F")
+		return r
+	var a: Run = mk.call(500.0, Run.RULES)
+	for i in 240:
+		a._service_pad(Tuning.TICK)
+	check(a.money < 500.0 and a.sim.fuel > 20.0 and not a.free_latch, "Sprit unter 35 %%: wer zahlen kann, zahlt (¢%.2f übrig, Tank %.1f %%)" % [a.money, a.sim.fuel])
+	var b: Run = mk.call(0.0, Run.RULES)
+	for i in 240:
+		b._service_pad(Tuning.TICK)
+	check(b.money == 0.0 and b.sim.fuel > 20.0 and b.free_latch, "Ohne Geld tankt die Station unter 35 %% weiter gratis (Tank %.1f %%)" % b.sim.fuel)
+	b.money = 1000.0                      # unterdessen kommt Geld herein (Fahrgast im Häuschen): Entscheidung gilt bis zum Abheben
+	var m0 := b.money
+	b.sim.fuel = 25.0
+	for i in 30:
+		b._service_pad(Tuning.TICK)
+	check(b.money == m0 and b.free_latch, "Kein Flackern an der Geldgrenze: einmal gratis, bis zum Abheben gratis")
+	var c: Run = mk.call(0.0, Run.RULES)
+	for i in int(30.0 / Tuning.TICK):
+		c._service_pad(Tuning.TICK)
+	check(c.sim.fuel >= Tuning.EMERGENCY_FUEL - 0.01 and c.sim.fuel < Tuning.EMERGENCY_FUEL + 1.0, "Keine Sackgasse: ohne Geld bis 35 %% (%.1f %%), darüber nichts gratis" % c.sim.fuel)
+	var d: Run = mk.call(1.0, Run.RULES)       # Kleingeld: zahlt, solange es reicht, dann gratis
+	for i in 60:
+		d._service_pad(Tuning.TICK)
+	check(d.money < 1.0 and d.money >= 0.0 and d.free_latch and d.sim.fuel > 21.0, "Reicht das Geld mitten im Tanken nicht mehr, geht es gratis weiter (¢%.2f, Tank %.1f %%)" % [d.money, d.sim.fuel])
+	d.sim.state = TaxiSim.State.FLYING
+	d._service_pad(Tuning.TICK)
+	check(not d.free_latch, "Abheben hebt die Gratis-Entscheidung auf")
+	var e: Run = mk.call(500.0, Replay.LEGACY_RULES)
+	for i in 60:
+		e._service_pad(Tuning.TICK)
+	check(e.money == 500.0 and e.sim.fuel > 20.0, "Regelstand 2 (alte Läufe): unter 35 % immer gratis")
+	var f: Run = mk.call(500.0, Run.RULES)
+	f.sim.fuel = 60.0
+	var mf := f.money
+	for i in 120:
+		f._service_pad(Tuning.TICK)
+	check(f.money < mf, "Über 35 % kostet Sprit wie bisher")
+	var bsrc := FileAccess.get_file_as_string("res://src/core/bot.gd")
+	check(bsrc.contains("sim.fuel < Tuning.EMERGENCY_FUEL or run.money > 5.0"), "Autopilot tankt unter 35 % immer (gratis oder bezahlt)")
+
+## Runde 60: Beinahe-Treffer mit Fahrgast an Bord bringt ein kleines Trinkgeld, deterministisch in der Auftragslogik.
+func _near_spot(lv: LevelData) -> Vector2:
+	for y in range(40, int(lv.height * Tuning.TILE) - 40, 2):
+		for x in range(40, int(lv.width * Tuning.TILE) - 40, 2):
+			var p := Vector2(x, y) + Vector2(0.25, 0.25)
+			if lv.box_hits_solid(p, Tuning.HULL_HALF + Vector2(Tuning.NEAR_GAP, Tuning.NEAR_GAP)) and not lv.box_hits_solid(p, Tuning.HULL_HALF + Vector2(0.5, 0.5)) \
+					and not lv.box_hits_solid(p + Vector2(0, -12), Tuning.HULL_HALF) :
+				return p
+	return Vector2.INF
+
+func _test_near_tip() -> void:
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(_lvl(), -1.0, 0.0, 5)
+	var spot := _near_spot(r.level)
+	check(spot != Vector2.INF, "Beinahe-Treffer: Prüfstelle am Fels gefunden (%s)" % str(spot))
+	var place := func(rr: Run) -> void:
+		rr.sim.state = TaxiSim.State.FLYING
+		rr.sim.landed_pad = {}
+		rr.sim.pos = spot
+		rr.sim.vel = Vector2(90.0, 0.0)
+		rr.near_cd = 0.0
+		rr.log.clear()
+	place.call(r)
+	r._check_near_tip(Tuning.TICK)
+	check(r.log.size() == 1 and r.log[0].type == "near_miss" and float(r.log[0].tip) == 0.0 and r.money == 0.0, "Ohne Fahrgast: Beinahe-Treffer ohne Trinkgeld")
+	r.phase = Run.Phase.CARRYING
+	var fare := float(r.current_job().fare)
+	var tips: Array = []
+	for i in 5:
+		place.call(r)
+		r._check_near_tip(Tuning.TICK)
+		tips.append(float(r.log[0].tip) if not r.log.is_empty() else -1.0)
+	var want := maxf(1.0, roundf(fare * Tuning.NEAR_TIP_FRACTION))
+	check(tips == [want, want, want, 0.0, 0.0] and is_equal_approx(r.money, want * 3.0) and is_equal_approx(r.tips, want * 3.0), "Trinkgeld 2 %% des Grundfahrpreises (¢%d bei ¢%d), höchstens drei je Fahrt: %s" % [int(want), int(fare), str(tips)])
+	place.call(r)
+	r._check_near_tip(Tuning.TICK)
+	r.near_cd = Tuning.NEAR_COOLDOWN
+	r.log.clear()
+	r.sim.pos = spot
+	r._check_near_tip(Tuning.TICK)
+	check(r.log.is_empty(), "Sperrzeit: kein zweiter Beinahe-Treffer direkt danach")
+	r._finish_boarding(r.current_job())
+	place.call(r)
+	r._check_near_tip(Tuning.TICK)
+	check(float(r.log[0].tip) == want, "Neue Fahrt: wieder Trinkgeld")
+	place.call(r)
+	r.sim.vel = Vector2(40.0, 0.0)
+	r._check_near_tip(Tuning.TICK)
+	check(r.log.is_empty(), "Langsam vorbei zählt nicht")
+	var sh := Run.new()
+	sh.extras_enabled = false
+	sh.shift_mode = true
+	sh.start(_lvl(), -1.0, 0.0, 5)
+	sh.phase = Run.Phase.CARRYING
+	place.call(sh)
+	sh._check_near_tip(Tuning.TICK)
+	check(sh.log.is_empty() and sh.money == 0.0, "Nachtschicht: kein Trinkgeld, Wertung unverändert")
+	var old := Run.new()
+	old.rules = Replay.LEGACY_RULES
+	old.extras_enabled = false
+	old.start(_lvl(), -1.0, 0.0, 5)
+	old.phase = Run.Phase.CARRYING
+	place.call(old)
+	old._check_near_tip(Tuning.TICK)
+	check(old.log.is_empty() and old.money == 0.0, "Regelstand 2 (alte Läufe): kein Trinkgeld")
+	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
+	var rsrc := FileAccess.get_file_as_string("res://src/core/run.gd")
+	check(not rsrc.contains("reduce_motion") and rsrc.contains("_check_near_tip(dt)") and gsrc.contains("if not Flow.shift:\n\t\treturn                          # Erkennung und Trinkgeld in Run"), "Trinkgeld unabhängig von „Weniger Bewegung“, Erkennung außerhalb der Schicht in Run (Quelltextprüfung)")
+	check(gsrc.contains("const NEAR_GAP_SHIFT := 2.0") and gsrc.contains("run.note_near_miss()            # zählt für die Wertung"), "Nachtschicht zählt Vorbeiflüge wie bisher")
+
+## Runde 60: Läufe aus Version 1.0.1 (ohne „rules“) rechnen mit den alten Regeln exakt nach; neue Läufe tragen den neuen Regelstand.
+func _test_old_replays_valid() -> void:
+	var dir := DirAccess.open("res://tests/fixtures/replays_v2/")
+	var n := 0
+	for f in dir.get_files():
+		if not f.ends_with(".json"):
+			continue
+		var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/replays_v2/" + f))
+		var lvl := LevelData.load_file("res://data/levels/%s" % f)
+		var pl := Replay.play(lvl, d)
+		var res: Dictionary = d.result
+		check(not d.has("rules") and pl.complete == bool(res.complete) and absf(pl.time - float(res.time)) < 0.001 and absf(pl.money - float(res.money)) < 0.01 and pl.delivered == int(res.delivered),
+			"Alter Lauf %s (1.0.1) rechnet exakt nach: %.2f s, ¢%.2f, %d befördert" % [f.get_basename(), pl.time, pl.money, pl.delivered])
+		n += 1
+	check(n >= 6, "Alte Läufe geprüft: %d" % n)
+	check(Replay.new().to_dict().get("rules", 0) == Run.RULES, "Neue Läufe speichern den Regelstand %d" % Run.RULES)
+
+## Runde 61: Fahrgasttypen VIP (1,8-facher Preis, halbe Geduld, doppelter Abzug) und Notfall (doppelter Preis, Frist 1,3 × Richtzeit).
+func _kind_run(kind: String, rules := Run.RULES, types := true, job := 0) -> Run:
+	var lvl := LevelData.load_file("res://data/levels/s1_05.json")
+	if kind != "":
+		lvl.jobs[job]["kind"] = kind
+	var r := Run.new()
+	r.rules = rules
+	r.types_enabled = types
+	r.extras_enabled = false
+	r.start(lvl, -1.0, 0.0, 5)
+	return r
+
+func _test_passenger_kinds() -> void:
+	var plain := _kind_run("")
+	var v := _kind_run("vip")
+	var j0: Dictionary = plain.jobs[0]
+	var jv: Dictionary = v.jobs[0]
+	check(v.kind_of(jv) == "vip" and is_equal_approx(v.job_mult(jv) / plain.job_mult(j0), Tuning.VIP_FARE) and float(jv.fare) == float(j0.fare), "VIP: Fahrpreis 1,8-fach (über job_mult, Grundpreis unverändert)")
+	check(is_equal_approx(v.price_slope(jv), plain.price_slope(j0)) and is_equal_approx(v.price_slope(v.jobs[1]), plain.price_slope(plain.jobs[1])), "VIP ändert nicht, wie schnell Preise fallen")
+	check(v.actor != null and plain.actor != null and is_equal_approx(v.main_patience, plain.main_patience * Tuning.VIP_PATIENCE), "VIP: halbe Geduld (%.0f s statt %.0f s)" % [v.main_patience, plain.main_patience])
+	check(_kind_run("vip", Replay.LEGACY_RULES).kind_of(_kind_run("vip", Replay.LEGACY_RULES).jobs[0]) == "" and _kind_run("vip", Run.RULES, false).jobs[0].get("kind", "") == "", "Alte Läufe sowie Tag- und Nachtschicht: ohne Fahrgasttypen")
+	var last := plain.jobs.size() - 1
+	check(not _kind_run("emergency", Run.RULES, true, last).jobs[last].has("kind"), "Der Ausgangs-Fahrgast hat nie einen Typ")
+	# doppelter Abzug mit VIP an Bord
+	v.phase = Run.Phase.CARRYING
+	v.actor.state = PassengerActor.S.ABOARD
+	v._ride_hit({"amount": 5.0})
+	plain.phase = Run.Phase.CARRYING
+	plain.actor.state = PassengerActor.S.ABOARD
+	plain._ride_hit({"amount": 5.0})
+	check(is_equal_approx(v.pen_ride, 2.0 * plain.pen_ride) and plain.pen_ride > 0.0, "VIP: Treffer an Bord kostet doppelt (%.0f %% statt %.0f %%)" % [v.pen_ride * 100.0, plain.pen_ride * 100.0])
+	check(is_equal_approx(v._pen_k(jv), 2.0) and FileAccess.get_file_as_string("res://src/core/run.gd").contains("pen_drop = Tuning.landing_penalty(last_vy) * _pen_k(job)"), "VIP: harte Landung am Ziel kostet doppelt")
+	# Notfall
+	var e := _kind_run("emergency")
+	var je: Dictionary = e.jobs[0]
+	check(is_equal_approx(e.job_mult(je) / plain.job_mult(j0), Tuning.EMERGENCY_FARE) and is_equal_approx(e.deadline_of(je), e.par_of(je) * 1.3), "Notfall: doppelter Preis, Frist 1,3 × Richtzeit (%.1f s)" % e.deadline_of(je))
+	e.job_clock = 3.0
+	check(is_equal_approx(e.emergency_left(), e.deadline_of(je) - 3.0), "Notfall: Restzeit für die Anzeige")
+	e.job_clock = e.deadline_of(je) + 0.01
+	e.log.clear()
+	e._check_emergency()
+	check(e.missed == 1 and e.missed_due > 0.0 and e.job_index == 1 and e.log.any(func(x): return x.type == "emergency_expired"), "Notfall: Frist abgelaufen, Pflichtfahrgast verloren mit Strafe (¢%d)" % int(e.missed_due))
+	var e2 := _kind_run("emergency")
+	e2.phase = Run.Phase.CARRYING
+	e2.actor.state = PassengerActor.S.ABOARD
+	e2.job_clock = e2.deadline_of(e2.jobs[0]) + 0.01
+	e2._check_emergency()
+	check(e2.missed == 1 and e2.actor == null and e2.phase != Run.Phase.CARRYING, "Notfall: läuft die Frist an Bord ab, ist der Fahrgast weg (wie ein verletzter Patient)")
+	var e3 := _kind_run("emergency")
+	e3.phase = Run.Phase.DROPOFF
+	e3.job_clock = 999.0
+	e3._check_emergency()
+	check(e3.missed == 0, "Notfall: nach dem Absetzen zählt die Frist nicht mehr")
+	# Zusatzfahrgast mit Notfall: ohne Strafe
+	var lv5 := LevelData.load_file("res://data/levels/s1_05.json")
+	var x := Run.new()
+	x.start(lv5, -1.0, 100.0, 5)
+	x._spawn_extra("2", "3")
+	var ex: Dictionary = x.extras[0]
+	check(not ex.job.has("kind"), "Tutorial-/Skript-Zusatzfahrgäste (feste Pads) ohne Typ")
+	ex.job["kind"] = "emergency"
+	ex.clock = x.deadline_of(ex.job) + 0.01
+	var m0 := x.money
+	x._check_emergency()
+	check(x.extras.is_empty() and x.money == m0 and x.missed_due == 0.0 and x.missed == 0, "Zusatzfahrgast mit Notfall: Frist abgelaufen, weg, ohne Strafe")
+	# Zufall: eigener Strom, flow_rng bleibt unverschoben; Typen werden mit dem Sektor etwas häufiger
+	var counts := {}
+	var states: Array = []
+	for rules in [Replay.LEGACY_RULES, Run.RULES]:
+		var lvx := LevelData.load_file("res://data/levels/s9_03.json")
+		var rx := Run.new()
+		rx.rules = rules
+		rx.start(lvx, -1.0, 0.0, 77)
+		var n := 0
+		for i in 400:
+			rx._spawn_extra()
+			if not rx.extras.is_empty():
+				if rx.kind_of(rx.extras[0].job) != "":
+					n += 1
+				rx.extras.clear()
+		counts[rules] = n
+		states.append(rx.flow_rng.state)
+	check(states[0] == states[1], "Typen der Zusatzfahrgäste verschieben den bisherigen Zufallsstrom nicht")
+	check(int(counts[Replay.LEGACY_RULES]) == 0 and int(counts[Run.RULES]) > 400 * 0.10 and int(counts[Run.RULES]) < 400 * 0.28, "Sektor 9: etwa %d %% der Zusatzfahrgäste sind VIP oder Notfall (%d von 400)" % [int(Tuning.extra_kind_chance(9) * 100.0), int(counts[Run.RULES])])
+	check(Tuning.extra_kind_chance(1) < Tuning.extra_kind_chance(5) and Tuning.extra_kind_chance(5) < Tuning.extra_kind_chance(9) and Tuning.extra_kind_chance(1) <= 0.08, "Selten, mit jedem Sektor etwas häufiger (%.0f %% … %.0f %%)" % [Tuning.extra_kind_chance(1) * 100.0, Tuning.extra_kind_chance(9) * 100.0])
+	# Geister, Community-Format, Editor
+	var lk := LevelData.load_file("res://data/levels/s1_05.json")
+	var sig0 := Replay.sig_of(lk)
+	(lk.raw.jobs[0] as Dictionary)["kind"] = "vip"
+	check(Replay.sig_of(lk) == sig0, "Geister: der Fahrgasttyp ändert die Levelkennung nicht (alte Geister bleiben)")
+	var raw: Dictionary = _read_json("res://data/levels/s1_05.json")
+	raw.jobs[0]["kind"] = "vip"
+	raw.jobs[1]["kind"] = "zauberer"
+	raw.jobs[raw.jobs.size() - 1]["kind"] = "emergency"
+	var CLv = load("res://src/core/community_level.gd")
+	var cl: Dictionary = CLv.clean({"format": CLv.FORMAT, "version": CLv.VERSION, "level": raw})
+	check(cl.ok and String(cl.level.jobs[0].get("kind", "")) == "vip" and not cl.level.jobs[1].has("kind") and not cl.level.jobs[cl.level.jobs.size() - 1].has("kind"), "Community-Format: „kind“ vip/emergency bleibt, andere Werte und beim Ausgangs-Fahrgast entfallen")
+	var raw_old: Dictionary = _read_json("res://data/levels/s1_05.json")
+	var cl_old: Dictionary = load("res://src/core/community_level.gd").clean({"format": load("res://src/core/community_level.gd").FORMAT, "version": load("res://src/core/community_level.gd").VERSION, "level": raw_old})
+	check(cl_old.ok and not cl_old.level.jobs.any(func(jj): return jj.has("kind")), "Community-Format: Level ohne das Feld laden unverändert")
+	check(FileAccess.get_file_as_string("res://src/core/level_files.gd").contains('"gender", "fragile", "kind"]'), "Editor schreibt „kind“ an der Stelle der Originale")
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("run.types_enabled = not (Flow.shift or Flow.daily)"), "Tag- und Nachtschicht ohne VIP und Notfall (Quelltextprüfung)")
+	for lang in ["de", "en"]:
+		var tj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		check(tj.has("HUD_TAG_VIP") and String(tj.get("HUD_TAG_EMERGENCY_T", "")).contains("%d") and tj.has("MSG_EMERGENCY_LOST"), "Fahrgasttypen: Texte %s" % lang)
+	# Einspieler
+	var vl: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/voice_lines.json"))
+	var man: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/audio/voice/manifest.json"))
+	for k in ["vip", "emergency"]:
+		var d := IntroDemo.new()
+		check(d.setup(k), "Einspieler %s: lädt" % k)
+		var delivered := false
+		var min_hull := 100.0
+		while d.t < d.length:
+			d.step(1.0 / 30.0)
+			min_hull = minf(min_hull, d.run.sim.hull)
+			delivered = delivered or d.run.delivered > 0 or d.run.phase == Run.Phase.DROPOFF
+		check(d.run.kind_of(d.run.level.jobs[0]) == k and delivered and min_hull > 20.0 and d.run.missed == 0, "Einspieler %s: der Autopilot bringt den Fahrgast rechtzeitig ans Ziel" % k)
+		check(String(vl.i0.de.get("vid_" + k, "")) != "" and String(vl.i0.en.get("vid_" + k, "")) != "" and man.clips.has("de/i0_vid_" + k) and man.clips.has("en/i0_vid_" + k), "Einspieler %s: Text und Clip de/en" % k)
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("const KIND_CLIPS := [\"vip\", \"emergency\"]"), "Einspieler VIP/Notfall: beim ersten Fahrgast dieses Typs (Quelltextprüfung)")
+
+## Runde 63: eigenes Fels-Material je Sektor mit Rand- und Eckkacheln, gleiche Funktionsfelder, weicher Rand für Ultrawide.
+func _test_sector_tiles() -> void:
+	var func_img: Image = Image.load_from_file(ProjectSettings.globalize_path("res://tools/art/tiles_func.png"))
+	var means: Array = []
+	var same_func := true
+	var sizes := true
+	var normals := true
+	for n in range(1, 10):
+		var tex := SectorLook.tiles(n)
+		var img: Image = tex.get_image()
+		img.convert(Image.FORMAT_RGBA8)
+		sizes = sizes and img.get_width() == 768 and img.get_height() == 144
+		normals = normals and SectorLook.tiles_normal(n) != null and ResourceLoader.exists("res://assets/art/tiles_s%d_n.png" % n)
+		for i in 3:                                   # Plattform, Tankpad, Dornen: in allen Sektoren gleich
+			for y in range(0, 48, 3):
+				for x in range(0, 48, 3):
+					var pa := img.get_pixel((4 + i) * 48 + x, y)
+					var pb := func_img.get_pixel(i * 48 + x, y)
+					same_func = same_func and absf(pa.a - pb.a) < 0.01 and (pb.a < 0.01 or pa.is_equal_approx(pb))      # durchsichtige Pixel: Farbe egal (Import füllt den Alpharand)
+		var c := Color(0, 0, 0)
+		for y in range(0, 48, 2):
+			for x in range(0, 48, 2):
+				c += img.get_pixel(x, y)
+		means.append(c / 576.0)
+	check(sizes, "Fels-Atlas je Sektor 768×144 (Innenflächen, 16 Randkacheln, Innenecken)")
+	check(normals, "Normal-Map je Sektor")
+	check(same_func, "Plattform, Tankpad und Dornen behalten in allen Sektoren ihr Aussehen")
+	var distinct := true
+	for i in means.size():
+		for j in range(i + 1, means.size()):
+			var a: Color = means[i]
+			var b: Color = means[j]
+			distinct = distinct and (absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b)) > 0.03
+	check(distinct, "Jeder Sektor hat ein eigenes Material (mittlere Farbe paarweise verschieden)")
+	var img5: Image = SectorLook.tiles(5).get_image()
+	img5.convert(Image.FORMAT_RGBA8)
+	check(img5.get_pixel(15 * 48 + 24, 48 + 24).a > 0.99 and img5.get_pixel(3 * 48 + 47, 48).a < 0.01 and img5.get_pixel(3 * 48, 48 + 47).a > 0.99, "Randkacheln: Innen deckend, Außenecken abgerundet (nur dort durchsichtig)")
+	var wsrc := FileAccess.get_file_as_string("res://src/game/world_view.gd")
+	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_normal(level.sector)"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
+	var bsrc := FileAccess.get_file_as_string("res://src/game/workshop_bay.gd")
+	check(bsrc.contains("Rect2(idx * 48, 0, 48, 48)"), "Werkstatt nutzt weiter die erste Atlaszeile")

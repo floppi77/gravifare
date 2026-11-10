@@ -53,4 +53,5 @@ func _draw() -> void:
 		return
 	var tex: Texture2D = Cosmetics.paint_texture()
 	var s := Tuning.TAXI_SCALE
-	draw_texture_rect(tex, Rect2(lvl.spawn.x - 16.0 * s, lvl.spawn.y - 10.0 * s + 2.0, 32.0 * s, 20.0 * s), false, Color(1, 1, 1, 0.9))
+	var tr_ := Tuning.taxi_rect(s)
+	draw_texture_rect(tex, Rect2(lvl.spawn + tr_.position + Vector2(0, 2.0), tr_.size), false, Color(1, 1, 1, 0.9))

@@ -105,6 +105,15 @@ func sticker_texture(id := "") -> Texture2D:
 		return null
 	return _tex("res://assets/art/sticker_%s.png" % id)
 
+## Aufkleber in Taxigröße (20 px, 1:1 am Taxi im Spiel und in der Werkstatt; sticker_<id>_s.png aus tools/art/gen_art.py).
+func sticker_small_texture(id := "") -> Texture2D:
+	if id == "":
+		id = selected("sticker")
+	if id == "none":
+		return null
+	var p := "res://assets/art/sticker_%s_s.png" % id
+	return _tex(p) if ResourceLoader.exists(p) else _tex("res://assets/art/sticker_%s.png" % id)
+
 func _tex(path: String) -> Texture2D:
 	if not _tex_cache.has(path):
 		_tex_cache[path] = load(path) if ResourceLoader.exists(path) else null

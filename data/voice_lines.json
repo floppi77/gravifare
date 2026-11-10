@@ -273,7 +273,7 @@
    "tut_fly_ok": "Gut gemacht! Die Schwerkraft zieht dich ständig nach unten, und Schub kostet Sprit. Versuche zu gleiten.",
    "tut_gear": "Vor jeder Landung fährst du das Fahrwerk wieder aus, damit fliegt dein Taxi langsam und genau. Probier es aus!",
    "tut_fuel_low": "Oh nein! Dein Tank ist fast leer! Flieg zur Tankstelle, der orangefarbenen Plattform mit der Zapfsäule, und lande.",
-   "tut_refuel": "Solange du hier stehst und Credits besitzt, tankst du. Bis 35 Prozent geht das aufs Haus. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
+   "tut_refuel": "Solange du hier stehst, tankst du. Sprit kostet Credits. Nur wenn dein Geld nicht reicht, gibt es ihn bis 35 Prozent gratis, und gerade bist du pleite. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
    "tut_landing": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
    "tut_hard": "Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird.",
    "tut_job": "Jetzt zum Geschäft! Mika wartet an Plattform 2. Der Stern über ihr zeigt an, dass Mika ein Pflichtfahrgast ist. Hast du alle Pflichtfahrgäste eines Levels befördert, öffnet sich das Tor oben in der Mitte. Lande bei Mika und warte, bis sie einsteigt.",
@@ -290,7 +290,7 @@
    "tut_gate": "Das Tor ist offen. Flieg hindurch!",
    "tut_hud_price": "Treibstoffpreise schwanken, das kennst du sicher. Tanke möglichst dann, wenn der Preis niedrig ist.",
    "tut_gear_in": "Um das Fahrwerk einzufahren, drücke die A-Taste am Controller oder die Leertaste. Eingefahren fliegt dein Taxi schnell, ausgefahren langsam und genau.",
-   "tut_credit": "Über 35 Prozent kostet dich das Tanken Credits. Ich schreibe dir 500 Credits gut, tank also ruhig voll.",
+   "tut_credit": "Ab jetzt zahlst du. Wer Credits hat, zahlt jeden Tropfen, auch unter 35 Prozent. Ich schreibe dir 500 Credits gut, tank also ruhig voll.",
    "tut_price": "Der Spritpreis ändert sich regelmäßig, wie im echten Leben. Achte oben auf die Anzeige oder auf die Zapfsäule. Im Flugunterricht bleibt er jetzt fix.",
    "tut_crash_ok": "Zerstört! Ein Taxi weniger. Hättest du einen Fahrgast an Bord, wäre er jetzt verloren.",
    "tut_soft": "Nun lande sanft auf Plattform 3. Beide Kufen müssen auf der hellen Landeplattform stehen.",
@@ -319,7 +319,9 @@
    "vid_gravity": "Schwerkraftzonen verändern dein Gewicht. In der leichten Zone steigst du von selbst, in der schweren sinkst du. Korrigiere den Schub entsprechend.",
    "vid_wind_gust": "Böen sind Strömungen, die im Takt an- und ausgehen. Warte die Pause ab oder rechne mit dem Stoß.",
    "vid_traffic": "Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch Tunnelöffnungen in den Wänden. Bei einer Kollision nimmt dein Taxi Schaden. Warte eine Lücke ab und kreuze die Bahn.",
-   "vid_dark": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg."
+   "vid_dark": "Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
+   "vid_vip": "VIP-Fahrgäste erkennst du an der goldenen Krone. Sie zahlen fast das Doppelte, warten aber nur halb so lange. Harte Landungen und Treffer kosten mit ihnen doppelt so viel. Flieg schnell und sanft.",
+   "vid_emergency": "Notfall: Das rote Kreuz und die Zahl zeigen die Frist in Sekunden. Bring den Fahrgast vorher ans Ziel, dann zahlt er das Doppelte. Läuft die Zeit ab, ist er verloren."
   },
   "en": {
    "tut_welcome": "Welcome to flight school, Taxi 7! I will explain everything you need to know to pick up your passengers and bring them safely to their destination.",
@@ -332,7 +334,7 @@
    "tut_fly_ok": "Well done! Gravity constantly pulls you down, and thrust costs fuel. Try to glide.",
    "tut_gear": "Before every landing, extend the landing gear again, so your taxi flies slow and precise. Try it!",
    "tut_fuel_low": "Oh no! Your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land.",
-   "tut_refuel": "As long as you stand here and have credits, you refuel. Up to 35 percent it is on the house. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
+   "tut_refuel": "As long as you stand here, you refuel. Fuel costs credits. Only when you cannot pay, you get it free up to 35 percent, and right now you are broke. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
    "tut_landing": "Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
    "tut_hard": "Try it: dive down with full power and land so hard that the taxi is destroyed.",
    "tut_job": "Now to business! Mika is waiting at platform 2. The star above her shows that Mika is a mandatory passenger. Once you have delivered all mandatory passengers of a level, the gate at the top center opens. Land next to Mika and wait until she gets in.",
@@ -349,7 +351,7 @@
    "tut_gate": "The gate is open. Fly through it!",
    "tut_hud_price": "Fuel prices fluctuate, as you surely know. Refuel when the price is low.",
    "tut_gear_in": "To retract the landing gear, press the A button on the controller or the space bar. Retracted, your taxi flies fast; extended, slow and precise.",
-   "tut_credit": "Above 35 percent, refueling costs you credits. I will credit you 500 credits, so go ahead and fill up.",
+   "tut_credit": "From now on you pay. If you have credits, you pay for every drop, even below 35 percent. I will credit you 500 credits, so go ahead and fill up.",
    "tut_price": "The fuel price changes regularly, just like in real life. Watch the display at the top, or the pump. During flight training it stays fixed now.",
    "tut_crash_ok": "Destroyed! One taxi less. If you had a passenger on board, he would be lost now.",
    "tut_soft": "Now land gently on platform 3. Both skids must stand on the bright landing pad.",
@@ -378,7 +380,9 @@
    "vid_gravity": "Gravity zones change your weight. In the light zone you rise on your own, in the heavy zone you sink. Adjust your thrust accordingly.",
    "vid_wind_gust": "Gusts are currents that switch on and off on a beat. Wait for the pause or expect the push.",
    "vid_traffic": "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision damages your taxi. Wait for a gap and cross the lane.",
-   "vid_dark": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way."
+   "vid_dark": "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.",
+   "vid_vip": "You can spot VIP passengers by the golden crown. They pay almost double, but only wait half as long. Hard landings and hits cost twice as much with them on board. Fly fast and gently.",
+   "vid_emergency": "Emergency: the red cross and the number show the deadline in seconds. Get the passenger to the destination in time and you earn double the fare. If time runs out, the passenger is lost."
   }
  }
 }

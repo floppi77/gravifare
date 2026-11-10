@@ -132,7 +132,7 @@ func _draw_cars(front: bool) -> void:
 		if is_front != front:
 			continue
 		var dir := 1.0 if float(c.v) > 0.0 else -1.0
-		var sz := Vector2(32, 20) * float(c.s)
+		var sz := Vector2(32.5, 20) * float(c.s)
 		draw_set_transform(Vector2(c.x, c.y), 0.0, Vector2(dir, 1.0))
 		var tint := Color(0.55, 0.6, 0.95, c.a)
 		for i in 10:       # Abgasspur
@@ -153,7 +153,7 @@ func _draw_hero() -> void:
 	for i in 22:
 		var f := float(i) / 22.0
 		draw_rect(Rect2(-34.0 - i * 3.2, -1.0 + sin(t * 20.0 + i) * 0.5, 3.0, 2.0 - f), Color(1.0, 0.7 - f * 0.3, 0.3, (1.0 - f) * 0.55))
-	draw_texture_rect(taxi, Rect2(-32, -20, 64, 40), false)
+	draw_texture_rect(taxi, Tuning.taxi_rect(2.0), false)
 	if sticker != null:
 		draw_texture_rect(sticker, Rect2(-26.0, -8.4, 16.0, 16.0), false)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

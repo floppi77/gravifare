@@ -494,7 +494,7 @@ func _draw_movers() -> void:
 ## nicht betretbar (die Wand bleibt fest). Wird nach den Fahrzeugen gezeichnet und verdeckt so deren Ein- und Austritt.
 ## Verkehr: eigenes Fahrzeug („Pendlergleiter“, assets/art/vehicle_<farbe>.png) statt umgefärbter Taxis, in Taxigröße gezeichnet.
 const PAINTS := ["red", "blue", "green", "purple", "silver"]
-const VEH_SIZE := Vector2(32.0, 20.0) * Tuning.TAXI_SCALE       # wie das Taxi (25,6 × 16 Einheiten)
+const VEH_SIZE := Tuning.TAXI_UNITS       # wie das Taxi (26 × 16 Einheiten, 1:1)
 const VEH_BEAM_LEN := 12.0      # Länge des weißen Lichtkegels vor dem Fahrzeug
 const VEH_TAIL_LEN := 5.0       # Länge des roten Kegels hinter dem Fahrzeug
 var _paint_tex := {}
@@ -1086,5 +1086,5 @@ func _draw_reflections() -> void:
 			if h > -1.5 and h < 46.0:
 				var a := 0.34 * (1.0 - clampf(h, 0.0, 46.0) / 46.0)
 				draw_set_transform(Vector2(s.pos.x, 2.0 * surf - s.pos.y), -s.tilt, Vector2(Tuning.TAXI_SCALE, -Tuning.TAXI_SCALE))
-				draw_texture_rect_region(taxi_tex, Rect2(-16, -1, 32, 11), Rect2(0, 27, 96, 33), Color(0.7, 0.92, 1.0, a))
+				draw_texture_rect_region(taxi_tex, Tuning.TAXI_REFLECT_DST, Tuning.TAXI_REFLECT_SRC, Color(0.7, 0.92, 1.0, a))
 				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

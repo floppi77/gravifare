@@ -24,7 +24,7 @@ func slot_path(n: int) -> String:
 func _ready() -> void:
 	var want := 0
 	for a in OS.get_cmdline_user_args():
-		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark="):
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light="):
 			dev_session = true
 		if a.begins_with("--level=") or a.begins_with("--scene=") or a == "--levels" or a.begins_with("--shot="):
 			want = maxi(want, 1)                 # Dev-Aufrufe überspringen die Platzwahl (Platz 1)
@@ -334,12 +334,16 @@ func daily_pool(ids: Array) -> Array:
 func daily_unlocked(ids: Array) -> bool:
 	return debug or daily_pool(ids).size() >= Daily.UNLOCK_LEVELS
 
-## Nachtschicht: erst, wenn alle Level einmal geschafft wurden.
+## Nachtschicht: frei, sobald alle Level der Sektoren 1–4 je einmal geschafft wurden (`ids`: alle Level-IDs, die übrigen Sektoren zählen nicht).
+const SHIFT_UNLOCK_SECTORS := 4
 func shift_unlocked(ids: Array) -> bool:
 	var done := ever_completed()
-	return debug or ids.all(func(id): return done.has(id))
+	var need := ids.filter(func(id):
+		var sec := String(id).get_slice("_", 0).trim_prefix("s")
+		return String(id).begins_with("s") and sec.is_valid_int() and int(sec) <= SHIFT_UNLOCK_SECTORS)
+	return debug or (not need.is_empty() and need.all(func(id): return done.has(id)))
 
-## Game Over in der Karriere: Der Fortschritt des Sektors geht verloren, die Einbauten der Werkstatt und alle Credits auch.
+## Game Over in der Karriere: Der Fortschritt des Sektors geht verloren, alle Credits auch; jeder Einbau der Werkstatt verliert eine Stufe (nie unter 0).
 ## Weiter geht es mit `first_level`, dem ersten Level des Sektors.
 func lose_sector(sector: int, first_level: String, run_seed: int) -> void:
 	var ever: Dictionary = data.get("ever", {})
@@ -349,6 +353,6 @@ func lose_sector(sector: int, first_level: String, run_seed: int) -> void:
 		if String(id).begins_with(prefix):
 			data.completed.erase(id)
 	data["ever"] = ever
-	data["workshop"] = {}
+	data["workshop"] = Workshop.downgraded(data)
 	data["campaign"] = {"level": first_level, "lives": Tuning.START_LIVES, "fuel": Tuning.FUEL_MAX, "credits": 0.0, "seed": run_seed, "carry": {}}
 	write()

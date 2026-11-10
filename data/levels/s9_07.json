@@ -37,7 +37,8 @@
    "fare": 180,
    "par": 14,
    "passenger": "Mika",
-   "gender": "f"
+   "gender": "f",
+   "kind": "vip"
   },
   {
    "from": "6",

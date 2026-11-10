@@ -4,7 +4,8 @@ extends RefCounted
 ## Eingaben je Tick vollständig bestimmt, weil Run/TaxiSim deterministisch sind. Gespeichert wird lauflängenkodiert
 ## (RLE) als JSON; `play()` rechnet einen Lauf headless nach und liefert das Ergebnis (Verifikation, später Geist).
 
-const VERSION := 2            # 2: mit Geist-Spur und Werkstatt-Werten
+const VERSION := 2            # 2: mit Geist-Spur und Werkstatt-Werten (Regelstand des Laufs im Feld „rules“, siehe Run.RULES)
+const LEGACY_RULES := 2       # Läufe ohne „rules“ stammen aus Version ≤ 1.0.1 und werden mit den damaligen Regeln nachgerechnet
 const TRACE_HZ := 10.0        # Positionen je Sekunde für die Geisterfahrt
 const TRACE_FIELDS := 3       # x, y, Neigung
 const DIR := "user://replays/"
@@ -21,11 +22,19 @@ var ticks := 0
 var result: Dictionary = {}
 var trace: Array = []         # flach: x, y, Neigung je Abtastung
 var mods: Dictionary = {}     # Werkstatt-Einbauten des Laufs
+var rules := Run.RULES       # Regelstand, mit dem der Lauf geflogen wurde
 var sig := ""                 # Kennung des Leveldateiinhalts: Wurde das Level danach geändert, wird der Geist nicht mehr gezeigt (er flöge durch die alte Karte)
 
 ## Kennung des Levelinhalts (für `sig`).
+## Der Fahrgasttyp eines Auftrags („kind“, VIP/Notfall seit Runde 61) zählt nicht: Karte und Wege bleiben gleich, der Geist bleibt gültig.
 static func sig_of(lvl: LevelData) -> String:
-	return JSON.stringify(lvl.raw, "", true).sha256_text().substr(0, 12)
+	var raw: Dictionary = lvl.raw
+	if raw.get("jobs") is Array and (raw.jobs as Array).any(func(j): return j is Dictionary and j.has("kind")):
+		raw = raw.duplicate(true)
+		for j in raw.jobs:
+			if j is Dictionary:
+				j.erase("kind")
+	return JSON.stringify(raw, "", true).sha256_text().substr(0, 12)
 
 ## Eingaben werden auf 1/127 gerundet, damit Aufzeichnung und Wiedergabe exakt dieselben Werte rechnen.
 static func quantize(v: Vector2) -> Vector2:
@@ -44,6 +53,7 @@ func begin(id: String, run_seed: int, fuel_in: float, credits_in: float, carry_i
 	result = {}
 	trace = []
 	mods = {}
+	rules = Run.RULES
 
 ## Position für den Geist merken; das Spiel ruft es je Tick.
 func sample(p: Vector2, tilt: float) -> void:
@@ -71,11 +81,12 @@ func finish(res: Dictionary) -> void:
 
 func to_dict() -> Dictionary:
 	return {"v": VERSION, "level": level_id, "seed": seed, "fuel": fuel, "credits": credits, "carry": carry, "extras": extras,
-		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods, "sig": sig}
+		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods, "sig": sig, "rules": rules}
 
 ## Rechnet einen Lauf nach. Rückgabe: {complete, time, money, earned, delivered, ticks}.
 static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
 	var r := Run.new()
+	r.rules = int(d.get("rules", LEGACY_RULES))
 	r.extras_enabled = bool(d.get("extras", true))
 	r.start(lvl, float(d.get("fuel", -1.0)), float(d.get("credits", 0.0)), int(d.get("seed", -1)))
 	r.sim.apply_mods(d.get("mods", {}))

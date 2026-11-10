@@ -62,7 +62,8 @@
    "fare": 190,
    "par": 11,
    "passenger": "Jonas",
-   "gender": "m"
+   "gender": "m",
+   "kind": "vip"
   },
   {
    "from": "7",

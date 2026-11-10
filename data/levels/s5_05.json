@@ -45,7 +45,8 @@
    "fare": 150,
    "par": 21,
    "passenger": "Odo",
-   "gender": "m"
+   "gender": "m",
+   "kind": "vip"
   },
   {
    "from": "6",

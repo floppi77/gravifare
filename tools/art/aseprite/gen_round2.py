@@ -220,3 +220,24 @@ for i, n in enumerate(ICONS):
     sheet.alpha_composite(icon(n), (i * 18, 0))
 sheet.save(OUT + "stat_icons_raw.png")
 print("ok")
+
+# ------------------------------------------------------------------ Werkstatt-Symbol „Scheinwerfer“ (26×26, viertes Feld in ws_icons.png)
+# Farben wie die drei vorhandenen Symbole (Düse: Metall #7a80a8/#3d4166/#c9cfee, Glut #ffe066/#ffcb3d/#e8901f), links Licht, rechts Schatten.
+# Kontur entsteht in Aseprite (outline_smart, #0c0f24), deshalb 1 px Rand frei.
+lamp = Image.new("RGBA", (26, 26), (0, 0, 0, 0))
+d = ImageDraw.Draw(lamp)
+M_HI, M_MID, M_SH, M_LT = hexc("#c9cfee"), hexc("#7a80a8"), hexc("#3d4166"), hexc("#c8f4ff")
+d.rectangle([5, 19, 9, 21], fill=M_SH); d.rectangle([4, 22, 10, 23], fill=M_MID)          # Halter mit Fuß
+d.rectangle([6, 17, 8, 18], fill=M_MID)
+d.ellipse([2, 6, 13, 17], fill=M_MID)                                                        # Gehäuse, rund
+d.pieslice([2, 6, 13, 17], 20, 200, fill=M_SH)                                               # untere/rechte Hälfte im Schatten
+d.rectangle([4, 8, 7, 8], fill=M_HI); d.point((4, 9), fill=M_HI)                            # Glanzkante oben links
+d.rectangle([12, 7, 13, 16], fill=hexc("#3d4166")); d.rectangle([13, 8, 14, 15], fill=M_LT)  # Fassung und Glas
+d.rectangle([14, 10, 14, 13], fill=hexc("#ffffff"))
+d.polygon([(16, 10), (23, 8), (23, 15), (16, 13)], fill=hexc("#ffe066"))                     # Mittelstrahl
+d.polygon([(16, 8), (22, 3), (23, 5), (17, 9)], fill=hexc("#ffcb3d"))                        # oberer Strahl
+d.polygon([(16, 15), (22, 20), (23, 18), (17, 14)], fill=hexc("#ffcb3d"))                    # unterer Strahl
+d.rectangle([16, 11, 18, 12], fill=hexc("#ffffff"))
+lamp.save(OUT + "ws_light_raw.png")
+lamp.resize((26 * 8, 26 * 8), Image.NEAREST).save(OUT + "ws_light_prev.png")
+print("ok light")

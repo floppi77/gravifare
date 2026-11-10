@@ -134,11 +134,11 @@
  "tut_refuel": {
   "variante": "trocken",
   "de": {
-   "spoken": "Solange du hier stehst und Credits besitzt, tankst du. Bis fünfunddreißig Prozent geht das aufs Haus. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
+   "spoken": "Solange du hier stehst, tankst du. Sprit kostet Credits. Nur wenn dein Geld nicht reicht, gibt es ihn bis fünfunddreißig Prozent gratis, und gerade bist du pleite. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
    "direction": "[trocken, leicht ironisch, wie ein erfahrener Fluglehrer]"
   },
   "en": {
-   "spoken": "As long as you stand here and have credits, you refuel. Up to thirty-five percent it is on the house. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
+   "spoken": "As long as you stand here, you refuel. Fuel costs credits. Only when you cannot pay, you get it free up to thirty-five percent, and right now you are broke. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
    "direction": "[dry, slightly ironic, like an experienced flight instructor]"
   }
  },
@@ -156,11 +156,11 @@
  "tut_credit": {
   "variante": "ruhig",
   "de": {
-   "spoken": "Über fünfunddreißig Prozent kostet dich das Tanken Credits. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.",
+   "spoken": "Ab jetzt zahlst du. Wer Credits hat, zahlt jeden Tropfen, auch unter fünfunddreißig Prozent. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.",
    "direction": "[ruhig, freundlich, wie ein erfahrener Fluglehrer]"
   },
   "en": {
-   "spoken": "Above thirty-five percent, refueling costs you credits. I will credit you five hundred credits, so go ahead and fill up.",
+   "spoken": "From now on you pay. If you have credits, you pay for every drop, even below thirty-five percent. I will credit you five hundred credits, so go ahead and fill up.",
    "direction": "[calm, friendly, like an experienced flight instructor]"
   }
  },

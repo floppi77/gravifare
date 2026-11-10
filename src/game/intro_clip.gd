@@ -77,6 +77,10 @@ func _build_view() -> void:
 	props_node.set_script(load("res://src/game/props_view.gd"))
 	props_node.material = unlit
 	world.add_child(props_node)
+	var tags := Node2D.new()                                    # Kennzeichen VIP/Notfall wie im Spiel
+	tags.set_script(load("res://src/game/passenger_tags.gd"))
+	tags.material = unlit
+	world.add_child(tags)
 	taxi_node = Node2D.new()
 	taxi_node.set_script(load("res://src/game/taxi_view.gd"))
 	taxi_node.material = unlit
@@ -91,6 +95,7 @@ func _build_view() -> void:
 	cam.make_current()
 	tiles.setup(demo.run)
 	props_node.setup(demo.run)
+	tags.setup(demo.run)
 	taxi_node.bind(demo.run.sim)
 	taxi_node.sync_state()
 	taxi_node.reset_physics_interpolation()

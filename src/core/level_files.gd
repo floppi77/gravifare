@@ -27,7 +27,7 @@ const ORDER := {
 	"gravity": ["kind", "x", "y", "w", "h", "g", "period", "on", "phase"],
 	"magnet": ["kind", "cx", "cy", "r", "k", "period", "on", "phase", "cycle"],
 	"door": ["period", "open", "sweep", "gap", "phase", "glass", "orient"],
-	"job": ["from", "to", "fare", "par", "passenger", "gender", "fragile"]}
+	"job": ["from", "to", "fare", "par", "passenger", "gender", "fragile", "kind"]}
 
 # ---------------------------------------------------------------------------------------------------------------- Zugriff
 
@@ -89,7 +89,7 @@ static func _cmp(item: Variant, key_of: Callable) -> Variant:
 	return key_of.call(item) if key_of.is_valid() else item
 
 static func _job_key(j: Dictionary) -> Dictionary:
-	return {"from": j.get("from"), "to": j.get("to"), "fare": j.get("fare"), "passenger": j.get("passenger"), "gender": j.get("gender"), "fragile": bool(j.get("fragile", false))}
+	return {"from": j.get("from"), "to": j.get("to"), "fare": j.get("fare"), "passenger": j.get("passenger"), "gender": j.get("gender"), "fragile": bool(j.get("fragile", false)), "kind": String(j.get("kind", ""))}
 
 ## Neue Fassung der Datei: `raw` = bisheriger Inhalt, `base` = bereinigte Fassung davon (clean_of), `res` = geprüftes Ergebnis des Editors.
 ## Sektor und Index bleiben, wie sie sind (sie bestimmen die Levelnummer); die Mechanik-Liste bleibt unverändert.

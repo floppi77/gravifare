@@ -86,7 +86,8 @@
    "fare": 220,
    "par": 13,
    "passenger": "Nora",
-   "gender": "f"
+   "gender": "f",
+   "kind": "vip"
   },
   {
    "from": "2",

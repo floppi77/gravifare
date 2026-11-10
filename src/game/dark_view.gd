@@ -10,6 +10,7 @@ var run: Run
 var cam: Camera2D
 var rect: ColorRect
 var mat: ShaderMaterial
+var light_k := 1.0            # Scheinwerfer aus der Werkstatt (Workshop.light_k), nur in der Karriere; sonst 1
 
 const SHADER := """
 shader_type canvas_item;
@@ -85,7 +86,7 @@ func _process(_d: float) -> void:
 	var cones := PackedVector4Array()
 	var spreads := PackedFloat32Array()
 	var tp := _screen(run.sim.pos)
-	lights.append(Vector3(tp.x, tp.y, (56.0 if lv.fog > 0.0 else 72.0) + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
+	lights.append(Vector3(tp.x, tp.y, (56.0 if lv.fog > 0.0 else 72.0 * light_k) + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
 	for id in lv.pads:
 		var p: Dictionary = lv.pads[id]
 		var c := _screen(Vector2(float(p.center), float(p.row) * Tuning.TILE - 8.0))

@@ -20,10 +20,10 @@ class Preview extends Control:
 		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 5, c.y + 14), Vector2(c.x + 5, c.y + 14), Vector2(c.x, c.y + 14 + 10 * fl)]), Color("#ff8a2e"))
 		var mod := Color(0.62, 0.64, 0.78) if locked else Color.WHITE
 		if tex != null:
-			draw_texture_rect(tex, Rect2(c.x - 40, c.y - 25, 80, 50), false, mod)
+			draw_texture_rect(tex, Rect2(c.x - 39, c.y - 24, 78, 48), false, mod)
 		var st := Cosmetics.sticker_texture(sticker)
 		if st != null:
-			draw_texture_rect(st, Rect2(c.x - 32.5, c.y - 10.5, 20, 20), false, mod)
+			draw_texture_rect(st, Rect2(c.x - 31, c.y - 10, 20, 20), false, mod)
 		if locked:          # Schloss: Vorschau eines noch gesperrten Teils
 			var lc := Vector2(c.x + 34, c.y - 20)
 			draw_arc(lc + Vector2(0, -2), 3.2, PI, TAU, 10, Color("#c9cfee"), 1.6)
@@ -121,7 +121,7 @@ func _column(kind: String, x: float, head: String) -> void:
 		# Farbfeld der Lackierung bzw. Aufkleber am rechten Rand (gesperrt etwas gedämpft)
 		if kind == "paint":
 			var sw := ColorRect.new()
-			sw.color = Cosmetics.paint_texture(it.id).get_image().get_pixel(24, 24) * (Color(0.75, 0.75, 0.8) if not unlocked else Color.WHITE)
+			sw.color = Cosmetics.paint_texture(it.id).get_image().get_pixel(16, 20) * (Color(0.75, 0.75, 0.8) if not unlocked else Color.WHITE)
 			sw.position = Vector2(150, 4)
 			sw.size = Vector2(14, 10)
 			sw.mouse_filter = Control.MOUSE_FILTER_IGNORE

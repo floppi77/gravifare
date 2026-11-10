@@ -1093,7 +1093,8 @@ func _rebuild_jobs(force := false) -> void:
 			var line := _label("", Vector2(11, y), Vector2(133, 14), job_box)
 			line.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			line.add_theme_color_override("font_color", Color("#dfe4ff"))
-			_fit_text(line, tr("ED_J_LINE") % [String(j.from), to_text] + (" · " + tr("ED_J_FRAGILE_WORD") if fragile else ""), 7)
+			var kind_word: String = {"vip": tr("HUD_TAG_VIP"), "emergency": tr("HUD_TAG_EMERGENCY")}.get(String(j.get("kind", "")), "")      # Fahrgasttyp aus der Datei (im Editor nicht einstellbar)
+			_fit_text(line, tr("ED_J_LINE") % [String(j.from), to_text] + (" · " + tr("ED_J_FRAGILE_WORD") if fragile else "") + (" · " + kind_word if kind_word != "" else ""), 7)
 			continue
 		var bf := _button(String(j.from), _job_cycle.bind(i, "from"), Vector2(11, y), Vector2(24, bh), job_box, 7)
 		var arrow := _label("→", Vector2(36, y), Vector2(10, 14), job_box)

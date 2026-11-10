@@ -129,7 +129,7 @@ func _draw_taxi(a: float) -> void:
 	for i in 5:
 		var lx := -34.0 - len - float(i) * 26.0 - fmod(vt * 90.0, 26.0)
 		draw_rect(Rect2(lx, -7.0 + i * 3.4, 14.0 + i * 4.0, 0.67), Color(0.7, 0.85, 1.0, a * 0.35))
-	draw_texture_rect(taxi_tex, Rect2(-32, -20, 64, 40), false, Color(1, 1, 1, a))
+	draw_texture_rect(taxi_tex, Tuning.taxi_rect(2.0), false, Color(1, 1, 1, a))
 	if sticker_tex != null:
 		draw_texture_rect(sticker_tex, Rect2(-26.0, -8.4, 16.0, 16.0), false, Color(1, 1, 1, a))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

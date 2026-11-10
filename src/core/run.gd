@@ -95,6 +95,16 @@ var shift_mode := false           # Nachtschicht: keine Geduldgrenze, keine Lebe
 var shift_waits: Array = []       # je abgeholtem Fahrgast {job, wait, leg}: Wartezeit bis zur Landung am Abholpad und Anflugstrecke
 var shift_landings: Array = []    # je Landung mit Fahrgast an Bord {job, vy}: Sinkgeschwindigkeit beim Aufsetzen am Ziel
 var near_misses := 0              # knappe Vorbeiflüge in diesem Level (das Spiel meldet sie, siehe Game._check_near_miss)
+## Regelstand des Laufs. Gespeicherte Läufe (Bestzeiten, Geister) werden mit dem Stand nachgerechnet, mit dem sie geflogen wurden (Replay „rules“):
+## 2 = bis Version 1.0.1; 3 = Sprit unter 35 % nur gratis, wenn das Geld nicht reicht, Trinkgeld für Beinahe-Treffer, Fahrgasttypen VIP und Notfall.
+const RULES := 3
+var rules := RULES
+var free_latch := false           # Regelstand 3: Bei diesem Tankhalt reichte das Geld nicht, unter 35 % tankt die Station gratis (bis zum Abheben)
+var types_enabled := true         # Fahrgasttypen VIP und Notfall (Karriere, Community); Tag- und Nachtschicht schalten sie ab
+var type_rng := RandomNumberGenerator.new()       # eigener Zufallsstrom für die Typen der Zusatzfahrgäste: flow_rng bleibt unverschoben
+var near_cd := 0.0                # Sperrzeit nach einem Beinahe-Treffer (Trinkgeld)
+var near_tips := 0                # Trinkgelder der laufenden Fahrt (höchstens Tuning.NEAR_TIP_MAX)
+var tips := 0.0                   # Trinkgeld in diesem Level (Ergebnisansicht)
 var _shift_pick_job := -1         # Auftrag, dessen Abholung schon gezählt ist
 var _shift_drop_job := -1
 
@@ -107,6 +117,8 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 		if not lvl.tutorial:
 			jobs[i]["passenger"] = PassengerActor.rotated_name(lvl.number, i, String(jobs[i].get("gender", "f")))      # abwechslungsreiche Namen; Stimme und Aussehen bleiben
 	for j in jobs:
+		if rules < 3 or not types_enabled or not Tuning.PASSENGER_KINDS.has(String(j.get("kind", ""))) or is_exit_job(j):
+			j.erase("kind")                                                  # alte Läufe, Tag- und Nachtschicht: ohne VIP und Notfall
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
 		j["fare"] = snappedf(maxf(float(j.fare), min_fare(lvl, j)) * Tuning.INCOME_FACTOR, 1.0)
 	sim.setup(lvl)
@@ -160,6 +172,10 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	shift_waits.clear()
 	shift_landings.clear()
 	near_misses = 0
+	near_cd = 0.0
+	free_latch = false
+	near_tips = 0
+	tips = 0.0
 	_shift_pick_job = -1
 	_shift_drop_job = -1
 	level_time = 0.0
@@ -173,6 +189,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	price_base = snappedf(price_rng.randf_range(lvl.fuel_price_min, lvl.fuel_price_max), 0.01)
 	price_next_t = price_rng.randf_range(lvl.price_every.x, lvl.price_every.y)
 	flow_rng.seed = price_rng.seed + 17 + (seed if seed >= 0 else 0)
+	type_rng.seed = flow_rng.seed + 9311
 	extra_timer = flow_rng.randf_range(Tuning.EXTRA_FIRST_MIN, Tuning.EXTRA_FIRST_MAX)
 	actor = null
 	exit_countdown = -1.0
@@ -213,6 +230,8 @@ func _spawn_actor(instant: bool) -> void:
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
 	main_wait = 0.0
 	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), Tuning.MAIN_PATIENCE_FLOOR) * patience_k      # unabhängig von der Richtzeit (sonst ändern neue Richtzeiten den Ablauf)
+	if kind_of(job) == "vip":
+		main_patience *= Tuning.VIP_PATIENCE          # VIP: halbe Geduld (die Zufallszahl bleibt dieselbe)
 	if shift_mode:
 		main_patience = 1.0e9          # Nachtschicht: Pflichtfahrgäste warten, die Wartezeit fließt in die Wertung ein
 	if not respawn_keep_clock:
@@ -294,8 +313,9 @@ func _ride_hit(e: Dictionary) -> void:
 	if not ex.is_empty() and bool(ex.job.get("fragile", false)):
 		_extra_break(ex)            # Krankenpatient als Zusatzfahrgast
 		return
-	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.RIDE_HIT_PEN)
-	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * 100.0))})
+	var rk := _pen_k(ex.job if not ex.is_empty() else current_job())      # VIP an Bord: doppelter Abzug
+	pen_ride = minf(Tuning.RIDE_PEN_MAX * rk, pen_ride + Tuning.RIDE_HIT_PEN * rk)
+	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * rk * 100.0)), "vip": rk > 1.0})
 
 ## Zerbrechlicher Fahrgast verletzt: verlässt das Taxi, der Auftrag gilt als verpasst (wie ein verpasster Pflichtfahrgast).
 func _fragile_break(a: PassengerActor) -> void:
@@ -408,7 +428,74 @@ func job_mult(job: Dictionary) -> float:
 	var to_id := String(job.get("to", ""))
 	if to_id != "exit" and not level.pads.has(to_id):
 		return 1.0
-	return LevelMetrics.leg_mult(level, String(job.from), to_id)
+	return LevelMetrics.leg_mult(level, String(job.from), to_id) * kind_mult(job)
+
+# ---------------------------------------------------------------- Fahrgasttypen VIP und Notfall (Regelstand 3)
+## Typ eines Auftrags: "vip", "emergency" oder "".
+func kind_of(job: Dictionary) -> String:
+	return String(job.get("kind", ""))
+
+## Preisfaktor des Typs (VIP 1,8, Notfall 2,0); steckt in job_mult, damit Anzeige, Auszahlung und Strafe ihn kennen.
+func kind_mult(job: Dictionary) -> float:
+	match kind_of(job):
+		"vip": return Tuning.VIP_FARE
+		"emergency": return Tuning.EMERGENCY_FARE
+	return 1.0
+
+## Frist eines Notfalls in Sekunden (ab Erscheinen bis zum Absetzen am Ziel), sonst -1.
+func deadline_of(job: Dictionary) -> float:
+	return par_of(job) * Tuning.EMERGENCY_DEADLINE if kind_of(job) == "emergency" else -1.0
+
+## Restzeit des Notfalls im laufenden Auftrag (-1: kein Notfall oder Fahrgast noch nicht da / schon abgesetzt).
+func emergency_left() -> float:
+	var job := current_job()
+	if kind_of(job) != "emergency" or actor == null or phase == Phase.DROPOFF:
+		return -1.0
+	return maxf(0.0, deadline_of(job) - job_clock)
+
+## Restzeit eines Zusatzfahrgasts mit Notfall (-1 sonst).
+func extra_emergency_left(e: Dictionary) -> float:
+	if kind_of(e.job) != "emergency" or int(e.state) == ES.DROP:
+		return -1.0
+	return maxf(0.0, deadline_of(e.job) - float(e.clock))
+
+## Abzüge mit VIP an Bord zählen doppelt.
+func _pen_k(job: Dictionary) -> float:
+	return Tuning.VIP_PENALTY_K if kind_of(job) == "vip" else 1.0
+
+## Notfall: Läuft die Frist ab, bevor der Fahrgast am Ziel aussteigt, ist er verloren (Pflichtfahrgast wie verpasst, mit Strafe).
+## An Bord: er verlässt das Taxi wie ein verletzter Krankenpatient (kein Geld). Nicht in der Flugschule.
+func _check_emergency() -> void:
+	if level.tutorial:
+		return
+	var job := current_job()
+	if actor != null and kind_of(job) == "emergency" and phase != Phase.DROPOFF and job_clock >= deadline_of(job):
+		var a := actor
+		a.pay_info = {}
+		log.append({"type": "emergency_expired", "voice": a.voice_key(), "name": a.pname, "extra": false})
+		if phase == Phase.CARRYING or a.state == PassengerActor.S.ABOARD:
+			a.vanish_hurt(sim.pos.x, sim.pos.y)
+		else:
+			if phase == Phase.BOARDING:
+				a.abort_board()
+			a.squash()
+		leavers.append(a)
+		actor = null
+		_lose_job(a.pname)
+	for e in extras.duplicate():
+		if kind_of(e.job) == "emergency" and int(e.state) != ES.DROP and float(e.clock) >= deadline_of(e.job):
+			var ea: PassengerActor = e.actor
+			ea.pay_info = {}
+			log.append({"type": "emergency_expired", "voice": ea.voice_key(), "name": ea.pname, "extra": true})
+			if int(e.state) == ES.CARRY or ea.state == PassengerActor.S.ABOARD:
+				ea.vanish_hurt(sim.pos.x, sim.pos.y)
+			else:
+				if int(e.state) == ES.BOARD:
+					ea.abort_board()
+				ea.squash()
+			extras_missed += 1                 # Zusatzfahrgast: ohne Strafe
+			leavers.append(ea)
+			extras.erase(e)
 
 ## Voraussichtlicher Fahrpreis des laufenden Auftrags jetzt (ohne Landeabzug): tickt mit der Zeit herunter.
 func prospect() -> float:
@@ -427,10 +514,10 @@ func price_slope(job: Dictionary) -> float:
 		var n := 0
 		for j in jobs:
 			if not is_exit_job(j):
-				sum += float(j.get("fare", 50)) * job_mult(j)
+				sum += float(j.get("fare", 50)) * job_mult(j) / kind_mult(j)
 				n += 1
 		price_ref = maxf(sum / float(maxi(n, 1)), 1.0)
-	return clampf(0.6 + 0.4 * float(job.get("fare", 50)) * job_mult(job) / price_ref, 0.8, 1.3)
+	return clampf(0.6 + 0.4 * float(job.get("fare", 50)) * job_mult(job) / kind_mult(job) / price_ref, 0.8, 1.3)      # der Typ (VIP, Notfall) ändert nicht, wie schnell der Preis fällt
 
 var price_ref := 0.0
 
@@ -470,11 +557,14 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
 		return
+	_check_near_tip(dt)
 	if actor != null or respawn_keep_clock:
 		job_clock += dt
 	_step_actors(dt)
 	_heal_main_job()
 	_step_extras(dt)
+	if rules >= 3:
+		_check_emergency()
 	_update_prices(dt)
 	_check_pump(dt)
 	_check_squash()
@@ -861,6 +951,7 @@ func _service_pad(dt: float) -> void:
 	_service_extras()
 	if sim.state != TaxiSim.State.LANDED:
 		pump_warned = false
+		free_latch = false
 		if phase == Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
 				_finish_boarding(current_job())          # schon eingestiegen, Taxi startet gleichzeitig: er fliegt mit
@@ -881,8 +972,11 @@ func _service_pad(dt: float) -> void:
 			log.append({"type": "pump_out"})
 	elif pad.fuel and sim.fuel < sim.fuel_cap:
 		var want := minf(Tuning.REFUEL_RATE * dt, sim.fuel_cap - sim.fuel)
-		var free := sim.fuel < Tuning.EMERGENCY_FUEL
+		var low := sim.fuel < Tuning.EMERGENCY_FUEL
 		var cost := want * fuel_price()
+		if rules >= 3 and low and not free_latch and money < cost:
+			free_latch = true                  # Geld reicht nicht (mehr): bis 35 % tankt die Station gratis, bis zum Abheben (kein Flackern, wenn unterdessen Geld eingeht)
+		var free := low and (rules < 3 or free_latch)
 		if free:
 			sim.refuel(want)
 			refuel_tick = true
@@ -909,7 +1003,7 @@ func _service_pad(dt: float) -> void:
 			if not is_exit_job(job) and pad.id == String(job.to):
 				phase = Phase.DROPOFF
 				phase_timer = 0.0
-				pen_drop = Tuning.landing_penalty(last_vy)
+				pen_drop = Tuning.landing_penalty(last_vy) * _pen_k(job)       # harte Landung mit VIP: doppelter Abzug
 				_note_drop(job)
 				dropoff_clock = job_clock
 				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
@@ -938,6 +1032,35 @@ func _note_drop(_job: Dictionary) -> void:
 func note_near_miss() -> void:
 	near_misses += 1
 
+## Beinahe-Treffer mit Fahrgast an Bord: kleines Trinkgeld (Tuning.NEAR_TIP_FRACTION des Grundfahrpreises), höchstens NEAR_TIP_MAX je Fahrt, mit Sperrzeit.
+## Entsteht hier in der Auftragslogik (deterministisch, im Replay enthalten, unabhängig von „Weniger Bewegung“); das Spiel zeigt nur den Effekt
+## (Ereignis „near_miss“). Nicht in der Nachtschicht (dort zählt Game._check_near_miss wie bisher für die Wertung) und nicht in der Flugschule.
+func _check_near_tip(dt: float) -> void:
+	if rules < 3 or shift_mode or level.tutorial:
+		return
+	near_cd = maxf(0.0, near_cd - dt)
+	if near_cd > 0.0 or sim.state != TaxiSim.State.FLYING or sim.vel.length() < Tuning.NEAR_SPEED:
+		return
+	var gap := Tuning.NEAR_GAP
+	if not level.box_hits_solid(sim.pos, Tuning.HULL_HALF + Vector2(gap, gap)) or level.box_hits_solid(sim.pos, Tuning.HULL_HALF + Vector2(0.5, 0.5)):
+		return
+	near_cd = Tuning.NEAR_COOLDOWN
+	var ride: Dictionary = {}
+	if phase == Phase.CARRYING:
+		ride = current_job()
+	else:
+		var ex := _extra_aboard()
+		if not ex.is_empty() and int(ex.state) == ES.CARRY:
+			ride = ex.job
+	var tip := 0.0
+	if not ride.is_empty() and near_tips < Tuning.NEAR_TIP_MAX:
+		tip = maxf(1.0, roundf(float(ride.get("fare", 50)) * Tuning.NEAR_TIP_FRACTION))      # Grundfahrpreis (ohne VIP-/Notfall-Aufschlag)
+		near_tips += 1
+		money += tip
+		earned += tip
+		tips += tip
+	log.append({"type": "near_miss", "tip": tip})
+
 ## Zählwerte für das Tagesziel der Tagschicht (siehe DayShift.goal_score).
 func day_stats() -> Dictionary:
 	return {"time": level_time, "target": time_target(), "perfect": perfect_count, "landings": landing_count, "damage": damage_taken, "respawns": respawns,
@@ -950,6 +1073,7 @@ func shift_stats() -> Dictionary:
 ## Fahrgast ist eingestiegen: Fahrt beginnt (auch wenn das Taxi im selben Tick schon abhebt: sonst bliebe er unsichtbar an Bord hängen).
 func _finish_boarding(job: Dictionary) -> void:
 	phase = Phase.CARRYING
+	near_tips = 0                     # neue Fahrt: wieder bis zu drei Trinkgelder
 	var dest := "exit" if is_exit_job(job) else String(job.to)
 	log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest})
 	if is_exit_job(job):
@@ -1248,11 +1372,17 @@ func _spawn_extra(force_from := "", force_to := "") -> void:
 	if medical:
 		job["fragile"] = true
 		job["fare"] = snappedf(base_fare * 1.25, 5.0)
+	var roll := type_rng.randf()                     # eigener Strom: je Zusatzfahrgast genau ein Wurf, flow_rng bleibt unverändert
+	var roll_kind := type_rng.randf()
+	if rules >= 3 and types_enabled and not medical and not level.tutorial and force_from == "" and roll < Tuning.extra_kind_chance(level.sector):
+		job["kind"] = "vip" if roll_kind < 0.5 else "emergency"
 	var a := PassengerActor.new()
 	a.setup(job, level.pads[from_id], 100 + extra_count, false)
 	var pat := flow_rng.randf_range(Tuning.EXTRA_PATIENCE_MIN, Tuning.EXTRA_PATIENCE_MAX) * patience_k
+	if kind_of(job) == "vip":
+		pat *= Tuning.VIP_PATIENCE
 	extras.append({"job": job, "actor": a, "state": ES.WAIT, "clock": 0.0, "patience": pat, "patience_max": pat, "pen_pick": 0.0, "timer": 0.0})
-	log.append({"type": "extra_appeared", "name": ident.name, "pad": from_id, "to": to_id})
+	log.append({"type": "extra_appeared", "name": ident.name, "pad": from_id, "to": to_id, "kind": kind_of(job)})
 
 func _step_extras(dt: float) -> void:
 	if not extras_active():
@@ -1298,6 +1428,7 @@ func _step_extras(dt: float) -> void:
 				e.clock += dt
 				if a.state == PassengerActor.S.ABOARD:
 					e.state = ES.CARRY
+					near_tips = 0
 					log.append({"type": "boarded", "job": -1, "voice": a.voice_key(), "name": a.pname, "dest": String(e.job.to), "extra": true})
 			ES.CARRY:
 				e.clock += dt
@@ -1332,7 +1463,7 @@ func _service_extras() -> void:
 		if int(aboard.state) == ES.CARRY and String(aboard.job.to) == String(pad.id):
 			aboard.state = ES.DROP
 			aboard.timer = 0.0
-			var pen_drop_x := Tuning.landing_penalty(last_vy)
+			var pen_drop_x := Tuning.landing_penalty(last_vy) * _pen_k(aboard.job)
 			var info := _make_pay_info(aboard.job, float(aboard.clock), float(aboard.pen_pick), pen_drop_x)
 			info["extra"] = true
 			info["job"] = -1

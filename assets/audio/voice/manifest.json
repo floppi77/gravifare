@@ -1861,10 +1861,10 @@
    "spoken": "Oh nein! Dein Tank ist fast leer! Flieg zur Tankstelle, der orangefarbenen Plattform mit der Zapfsäule, und lande."
   },
   "de/i0_tut_refuel": {
-   "text": "Solange du hier stehst und Credits besitzt, tankst du. Bis 35 Prozent geht das aufs Haus. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
-   "seconds": 17.23,
+   "text": "Solange du hier stehst, tankst du. Sprit kostet Credits. Nur wenn dein Geld nicht reicht, gibt es ihn bis 35 Prozent gratis, und gerade bist du pleite. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!",
+   "seconds": 19.83,
    "engine": "drama3-fp8",
-   "spoken": "Solange du hier stehst und Credits besitzt, tankst du. Bis fünfunddreißig Prozent geht das aufs Haus. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!"
+   "spoken": "Solange du hier stehst, tankst du. Sprit kostet Credits. Nur wenn dein Geld nicht reicht, gibt es ihn bis fünfunddreißig Prozent gratis, und gerade bist du pleite. Achte auf die Zapfsäule: Rammst du sie, ist der Tankwart nicht glücklich und hebt die Preise. Vermeide das, vertrau mir!"
   },
   "de/i0_tut_landing": {
    "text": "Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.",
@@ -2005,10 +2005,10 @@
    "spoken": "Oh no! Your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land."
   },
   "en/i0_tut_refuel": {
-   "text": "As long as you stand here and have credits, you refuel. Up to 35 percent it is on the house. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
-   "seconds": 14.35,
+   "text": "As long as you stand here, you refuel. Fuel costs credits. Only when you cannot pay, you get it free up to 35 percent, and right now you are broke. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!",
+   "seconds": 17.41,
    "engine": "drama3-fp8",
-   "spoken": "As long as you stand here and have credits, you refuel. Up to thirty-five percent it is on the house. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!"
+   "spoken": "As long as you stand here, you refuel. Fuel costs credits. Only when you cannot pay, you get it free up to thirty-five percent, and right now you are broke. Watch out for the pump: if you ram it, the attendant is not happy and raises the prices. Avoid that, trust me!"
   },
   "en/i0_tut_landing": {
    "text": "Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.",
@@ -2245,10 +2245,10 @@
    "spoken": "Um das Fahrwerk einzufahren, drücke die A-Taste am Controller oder die Leertaste. Eingefahren fliegt dein Taxi schnell, ausgefahren langsam und genau."
   },
   "de/i0_tut_credit": {
-   "text": "Über 35 Prozent kostet dich das Tanken Credits. Ich schreibe dir 500 Credits gut, tank also ruhig voll.",
-   "seconds": 8.68,
+   "text": "Ab jetzt zahlst du. Wer Credits hat, zahlt jeden Tropfen, auch unter 35 Prozent. Ich schreibe dir 500 Credits gut, tank also ruhig voll.",
+   "seconds": 10.4,
    "engine": "drama3-fp8",
-   "spoken": "Über fünfunddreißig Prozent kostet dich das Tanken Credits. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll."
+   "spoken": "Ab jetzt zahlst du. Wer Credits hat, zahlt jeden Tropfen, auch unter fünfunddreißig Prozent. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll."
   },
   "de/i0_tut_price": {
    "text": "Der Spritpreis ändert sich regelmäßig, wie im echten Leben. Achte oben auf die Anzeige oder auf die Zapfsäule. Im Flugunterricht bleibt er jetzt fix.",
@@ -2299,10 +2299,10 @@
    "spoken": "To retract the landing gear, press the A button on the controller or the space bar. Retracted, your taxi flies fast; extended, slow and precise."
   },
   "en/i0_tut_credit": {
-   "text": "Above 35 percent, refueling costs you credits. I will credit you 500 credits, so go ahead and fill up.",
-   "seconds": 6.97,
+   "text": "From now on you pay. If you have credits, you pay for every drop, even below 35 percent. I will credit you 500 credits, so go ahead and fill up.",
+   "seconds": 11.28,
    "engine": "drama3-fp8",
-   "spoken": "Above thirty-five percent, refueling costs you credits. I will credit you five hundred credits, so go ahead and fill up."
+   "spoken": "From now on you pay. If you have credits, you pay for every drop, even below thirty-five percent. I will credit you five hundred credits, so go ahead and fill up."
   },
   "en/i0_tut_price": {
    "text": "The fuel price changes regularly, just like in real life. Watch the display at the top, or the pump. During flight training it stays fixed now.",
@@ -4811,6 +4811,22 @@
   "en/d0_shift_E": {
    "text": "Taxi seven, dispatch here. The main thing is that you're back. Tomorrow is a new night.",
    "seconds": 6.84
+  },
+  "de/i0_vid_vip": {
+   "text": "VIP-Fahrgäste erkennst du an der goldenen Krone. Sie zahlen fast das Doppelte, warten aber nur halb so lange. Harte Landungen und Treffer kosten mit ihnen doppelt so viel. Flieg schnell und sanft.",
+   "seconds": 12.06
+  },
+  "en/i0_vid_vip": {
+   "text": "You can spot VIP passengers by the golden crown. They pay almost double, but only wait half as long. Hard landings and hits cost twice as much with them on board. Fly fast and gently.",
+   "seconds": 10.54
+  },
+  "de/i0_vid_emergency": {
+   "text": "Notfall: Das rote Kreuz und die Zahl zeigen die Frist in Sekunden. Bring den Fahrgast vorher ans Ziel, dann zahlt er das Doppelte. Läuft die Zeit ab, ist er verloren.",
+   "seconds": 11.02
+  },
+  "en/i0_vid_emergency": {
+   "text": "Emergency: the red cross and the number show the deadline in seconds. Get the passenger to the destination in time and you earn double the fare. If time runs out, the passenger is lost.",
+   "seconds": 11.04
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",

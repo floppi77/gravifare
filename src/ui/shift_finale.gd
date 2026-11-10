@@ -180,7 +180,7 @@ func _draw_taxi() -> void:
 		for sx in [-1.0, 1.0]:
 			draw_rect(Rect2(sx * 5.0 - 1.0, 10.0, 2.0, 4.0 * fl * fade), Color(1.0, 0.7, 0.25, 0.85 * fade))
 			draw_rect(Rect2(sx * 5.0 - 0.5, 10.0, 1.0, 2.5 * fl * fade), Color(1.0, 0.97, 0.8, 0.9 * fade))
-	draw_texture_rect(taxi_empty if t >= T_STAND else taxi, Rect2(-16, -10, 32, 20), false)         # ab dem Aufstehen sitzt niemand mehr in der Kuppel
+	draw_texture_rect(taxi_empty if t >= T_STAND else taxi, Tuning.TAXI_RECT, false)         # ab dem Aufstehen sitzt niemand mehr in der Kuppel
 	if t >= T_DOOR and t < T_TOP:                                       # die Kuppel leuchtet kurz auf, solange er aussteigt
 		var da := sin(clampf((t - T_DOOR) / (T_TOP - T_DOOR), 0.0, 1.0) * PI)
 		draw_circle(Vector2(0.0, -4.0), 11.0, Color(1.0, 0.95, 0.7, 0.28 * da))

@@ -285,6 +285,8 @@ static func _clean_jobs(v: Variant, res: Dictionary) -> Array:
 			"gender": "m" if _str(d.get("gender")) == "m" else "f"}
 		if _bool(d.get("fragile")):
 			j["fragile"] = true
+		if Tuning.PASSENGER_KINDS.has(_str(d.get("kind"))):
+			j["kind"] = _str(d.get("kind"))      # Fahrgasttyp (VIP, Notfall); unbekannte Werte entfallen, ältere Level haben das Feld nicht
 		out.append(j)
 	return out
 
@@ -444,6 +446,8 @@ static func _check_structure(lvl: Dictionary, jobs_in: Array, res: Dictionary) -
 			"passenger": String(j.get("passenger", "")) if String(j.get("passenger", "")) != "" else "?", "gender": String(j.get("gender", "f"))}
 		if bool(j.get("fragile", false)):
 			o["fragile"] = true
+		if j.has("kind") and String(j.to) != "exit":
+			o["kind"] = String(j.kind)
 		out.append(o)
 	lvl["jobs"] = out
 	lvl.erase("job_seed")                         # die Aufträge stehen jetzt fest in der Datei

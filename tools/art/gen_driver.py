@@ -281,7 +281,8 @@ def cockpit_patch():
     reflection = (drv_a[..., 0] > 250) & (drv_a[..., 1] > 250) & (drv_a[..., 2] > 250)
     teal = (drv_a[..., 0] == 0x1f) & (drv_a[..., 1] == 0x7f) & (drv_a[..., 2] == 0x92)
     figure = mask & ~reflection & ~teal
-    for px in ((45, 14), (50, 14)):                                     # weiße Glanzpunkte der Augen gehören zur Figur
+    eyes = ((37, 11), (41, 11)) if figure.shape[1] == 78 else ((45, 14), (50, 14))      # Taxi 78×48 (Runde 62) bzw. früher 96×60
+    for px in eyes:                                                     # weiße Glanzpunkte der Augen gehören zur Figur
         figure[px[1], px[0]] = True
     patch = np.zeros_like(bare_a)
     patch[figure] = bare_a[figure]

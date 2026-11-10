@@ -354,10 +354,28 @@ def taxi_skins():
         Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(OUT + dst % "wasp")
         Image.open(OUT + src).save(OUT + dst % "std")
 
-def stickers():
+class _Scaled:
+    """Zeichenfläche, die alle Koordinaten mit k multipliziert: dieselben Formen, neu gerastert in kleinerer Pixelgröße (kein Verkleinern des Bilds)."""
+    def __init__(self, d, k):
+        self.d, self.k = d, k
+    def polygon(self, pts, fill=None):
+        self.d.polygon([(x * self.k, y * self.k) for x, y in pts], fill=fill)
+    def ellipse(self, box, fill=None):
+        self.d.ellipse([round(v * self.k) for v in box], fill=fill)
+    def rectangle(self, box, fill=None):
+        self.d.rectangle([round(v * self.k) for v in box], fill=fill)
+
+STICKER_SMALL = 20      # Aufkleber am Taxi im Spiel: 20 px = 6,67 Einheiten, 1:1 bei 1080p (Runde 62; das große Bild bleibt für Garage, Menü, Werkstatt)
+
+def stickers(small_only=False):
     def icon(draw_fn, name):
-        im = Image.new("RGBA", (36, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(im); draw_fn(d)
-        add_outline(im, thick=1).save(OUT + "sticker_%s.png" % name)
+        if not small_only:
+            im = Image.new("RGBA", (36, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(im); draw_fn(d)
+            add_outline(im, thick=1).save(OUT + "sticker_%s.png" % name)
+        sm = Image.new("RGBA", (STICKER_SMALL, STICKER_SMALL), (0, 0, 0, 0))
+        draw_fn(_Scaled(ImageDraw.Draw(sm), (STICKER_SMALL - 2) / 36.0))
+        sm2 = Image.new("RGBA", (STICKER_SMALL, STICKER_SMALL), (0, 0, 0, 0)); sm2.alpha_composite(sm, (1, 1))
+        add_outline(sm2, thick=1).save(OUT + "sticker_%s_s.png" % name)
     import math
     def star(d):
         pts = []

@@ -70,7 +70,8 @@
    "fare": 170,
    "par": 11,
    "passenger": "Ines",
-   "gender": "f"
+   "gender": "f",
+   "kind": "vip"
   },
   {
    "from": "4",

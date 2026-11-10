@@ -78,7 +78,7 @@ func _draw_taxi() -> void:
 	else:
 		draw_rect(Rect2(p + Vector2(-18.0, 13.0 * s), Vector2(36, 2)), Color(0.2, 0.08, 0.05, 0.35))
 	draw_set_transform(Stage.margin(self) + p, tilt, Vector2(s, s))
-	draw_texture_rect(taxi, Rect2(-16, -10, 32, 20), false)
+	draw_texture_rect(taxi, Tuning.TAXI_RECT, false)
 	draw_set_transform(Stage.margin(self))
 
 ## Funkspruch als Untertitel (Stimme d0).

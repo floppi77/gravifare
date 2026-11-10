@@ -34,6 +34,7 @@ var arrive_prev := Vector2.ZERO
 @onready var bg: Control = $Backdrop/Bg
 @onready var world_tiles: Node2D = $World/Tiles
 @onready var props: Node2D = $World/Props
+var tags: Node2D                                    # Kennzeichen VIP/Notfall (passenger_tags.gd)
 @onready var fx: Node2D = $World/Fx
 @onready var trans: Control = $Trans/Root
 var dark: Control
@@ -124,6 +125,7 @@ func _ready() -> void:
 		if ua2.begins_with("--dark="):               # Dev: Dunkelheit in jedem Level ansehen
 			run.level.dark = float(ua2.substr(7))
 			dark.setup(run, cam)
+	dark.light_k = headlight_k()
 	if OS.get_cmdline_user_args().has("--debug-extra"):      # Dev: Zusatzfahrgast sofort
 		run.extra_timer = 0.3
 	if OS.get_cmdline_user_args().has("--no-hud"):      # Dev: Bild ohne HUD (Vorschaubilder der Levelauswahl)
@@ -178,6 +180,16 @@ func _setup_look() -> void:
 	layer.add_child(rect)
 	add_child(layer)
 
+## Scheinwerfer der Werkstatt: nur in der Karriere. Nachtschicht, Tagschicht und Community-Level fliegen ohne ihn, damit Wertungen vergleichbar bleiben.
+## Dev: `--ws-light=N` setzt die Stufe für Vergleichsbilder, ohne den Spielstand zu ändern.
+func headlight_k() -> float:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--ws-light="):
+			return Workshop.light_k_for(int(a.get_slice("=", 1)))
+	if Flow.shift or Flow.daily or Flow.community:
+		return 1.0
+	return Workshop.light_k(Save.data)
+
 ## Level neu starten: Der Ausgangs-Fahrgast des Vorlevels steigt erneut aus, sein Fahrpreis geht durch den Neustart nicht verloren.
 func restart_level() -> void:
 	load_level(level_path)
@@ -190,6 +202,7 @@ func load_level(path: String) -> void:
 		push_error("Level konnte nicht geladen werden: " + path)
 		return
 	run.shift_mode = Flow.shift
+	run.types_enabled = not (Flow.shift or Flow.daily)              # VIP und Notfall nur in Karriere und Community-Leveln
 	if Flow.shift:
 		NightShift.apply(lvl, Flow.shift_index(), Flow.shift_date)          # Schwerkraft, Dunkelheit und Aufträge der Schicht
 		run.extras_enabled = false                                                       # nur Pflichtfahrgäste
@@ -222,6 +235,13 @@ func load_level(path: String) -> void:
 	dark.setup(run, cam)
 	world_tiles.setup(run)
 	props.setup(run)
+	if tags == null:
+		tags = Node2D.new()
+		tags.set_script(load("res://src/game/passenger_tags.gd"))
+		tags.material = props.material                                  # wie Figur und Betrag (unbeleuchtet)
+		props.get_parent().add_child(tags)
+		props.get_parent().move_child(tags, props.get_index() + 1)     # über Figur und Betrag
+	tags.setup(run)
 	if level_style == null:
 		level_style = Node2D.new()
 		level_style.set_script(load("res://src/game/level_style.gd"))
@@ -340,7 +360,7 @@ func start_clip(k: String) -> void:
 	if clip != null:
 		return
 	var seen: Array = Save.data.get("seen_clips", [])
-	if not seen.has(k):
+	if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community):      # nur die Karriere merkt „gesehen“: in den Schichten offen sind auch noch unbekannte Sektoren
 		seen.append(k)
 		Save.data["seen_clips"] = seen
 		Save.write()
@@ -364,7 +384,26 @@ func start_clip(k: String) -> void:
 		paused = false
 		Music.duck(0.0))
 
+## Einspieler zu VIP und Notfall: nicht an ein Level gebunden, sondern beim ersten wartenden Fahrgast dieses Typs (Pflicht- oder Zusatzfahrgast).
+const KIND_CLIPS := ["vip", "emergency"]
+func _kind_clip_tick() -> void:
+	if clip_pending != "" or clip != null or not Settings.values.hints or Flow.shift or Flow.daily or Flow.community or run.level.tutorial:
+		return
+	var seen: Array = Save.data.get("seen_clips", [])
+	var waiting: Array = []
+	if run.actor != null and run.phase == Run.Phase.WAITING:
+		waiting.append(run.kind_of(run.current_job()))
+	for e in run.extras:
+		if int(e.state) == Run.ES.WAIT:
+			waiting.append(run.kind_of(e.job))
+	for k in KIND_CLIPS:
+		if waiting.has(k) and not seen.has(k):
+			clip_pending = k
+			clip_delay = 0.8
+			return
+
 func _clip_tick(delta: float) -> void:
+	_kind_clip_tick()
 	if clip_pending == "" or clip != null or paused or trans_t >= 0.0 or run.result != Run.Result.RUNNING:
 		return
 	if Sfx.voice_player.playing:
@@ -954,14 +993,18 @@ func _add_shake(amp: float) -> void:
 		shake = maxf(shake, amp)
 
 ## Beinahe-Treffer: zügig an einem Hindernis vorbei (kein Kontakt) löst einen kurzen Kamerazoom mit leichter Zeitlupe aus.
-const NEAR_SPEED := 75.0
-const NEAR_GAP := 3.0
+## Außerhalb der Nachtschicht erkennt ihn die Auftragslogik (Run._check_near_tip, mit Trinkgeld) und meldet ihn als Ereignis „near_miss“;
+## in der Nachtschicht zählt er wie bisher hier für die Wertung (unverändert: engerer Abstand, auch ohne Fahrgast, kein Trinkgeld).
+const NEAR_SPEED := Tuning.NEAR_SPEED
+const NEAR_GAP := Tuning.NEAR_GAP
 const NEAR_GAP_SHIFT := 2.0         # Nachtschicht: enger, damit sich der Bonus nicht durch Hängen an Wänden einsammeln lässt
 const NEAR_ZOOM := 0.12
 var near_z := 0.0
 
 func _check_near_miss() -> void:
 	near_cd = maxf(0.0, near_cd - Tuning.TICK)
+	if not Flow.shift:
+		return                          # Erkennung und Trinkgeld in Run (Ereignis „near_miss“, siehe _on_event)
 	var s := run.sim
 	if near_cd > 0.0 or s.state != TaxiSim.State.FLYING or s.vel.length() < NEAR_SPEED or trans_t >= 0.0 or (Settings.values.reduce_motion and not Flow.shift):
 		return
@@ -974,14 +1017,15 @@ func _check_near_miss() -> void:
 		if not Settings.values.reduce_motion:
 			_near_miss_fx()
 
-func _near_miss_fx() -> void:
+func _near_miss_fx(show_text := true) -> void:
 	near_cd = 4.0
 	slowmo_left = 0.4
 	Engine.time_scale = 0.6
 	AudioServer.playback_speed_scale = 0.92
 	Sfx.play("near_miss", -2.0)
 	Haptics.pulse(0.2, 0.2, 0.1)
-	hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
+	if show_text:
+		hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
 
 ## Neu freigeschaltete Lackierungen/Aufkleber melden (Toast + Ton).
 ## Zählt dieser Flug als Handlösung für den Editor? Nur ein Testflug aus dem Editor, ohne Autopilot und ohne Entwicklerschalter, bei dem alle Aufträge befördert wurden.
@@ -1051,6 +1095,13 @@ func _on_event(e: Dictionary) -> void:
 	if tutorial != null:
 		tutorial.on_event(e)
 	match e.type:
+		"near_miss":
+			if float(e.get("tip", 0.0)) > 0.0:
+				hud.flash_message(tr("MSG_NEAR_TIP") % int(e.tip), 1.2)
+			if not Settings.values.reduce_motion:
+				_near_miss_fx(float(e.get("tip", 0.0)) <= 0.0)
+			else:
+				near_cd = Tuning.NEAR_COOLDOWN
 		"perfect":
 			hud.flash_message(tr("MSG_PERFECT") % e.streak, 1.4)
 			Sfx.play("perfect", -4.0, 1.0 + 0.06 * float(mini(int(e.streak), Tuning.COMBO_MAX) - 1))      # jede weitere perfekte Landung klingt höher
@@ -1124,6 +1175,12 @@ func _on_event(e: Dictionary) -> void:
 			_patient_lost(e)
 		"job_missed":
 			hud.flash_message(tr("MSG_JOB_MISSED") % [e.name, int(e.fee)], 3.0)
+		"emergency_expired":
+			Sfx.play_voice(e.voice, "angry")
+			hud.subtitle(e.name, tr("VOICE_ANGRY"), 1.8)
+			if bool(e.get("extra", false)):
+				hud.flash_message(tr("MSG_EMERGENCY_LOST") % e.name, 3.0)      # Pflichtfahrgast: die Meldung „verpasst“ mit Strafe folgt
+			Haptics.pulse(0.2, 0.3, 0.15)
 		"ejected":
 			hud.flash_message(tr("MSG_EJECTED") % e.name, 2.4)
 			if e.lethal:

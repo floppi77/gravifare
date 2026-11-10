@@ -2,11 +2,11 @@
 
 Diese Grafiken sind in Aseprite (über den Aseprite-MCP) gezeichnet und werden **nicht** von `tools/art/gen_art.py` erzeugt:
 
-- `assets/art/taxi.png` (96×60). `gen_art.py` leitet daraus nur die Lackierungen `taxi_<name>.png` per Farbtausch ab.
+- `assets/art/taxi.png` (78×48 seit Runde 62, vorher 96×60). `gen_art.py` leitet daraus nur die Lackierungen `taxi_<name>.png` per Farbtausch ab.
 - `assets/art/passengers.png` (240×504): 14 Figuren × 10 Frames à 24×36, **eine Figur je Fahrgaststimme**.
 - `assets/art/vehicle_<farbe>.png` (96×60): Verkehrsfahrzeug „Pendlergleiter“ in Rot, Blau, Grün, Lila, Silber.
 - `assets/art/shelters.png` (684×60): Haltestelle je Sektor, 72×60 im Abstand von 76 px (Sektor 1 links).
-- `assets/art/life_icon.png` (32×20, HUD-Leben; Lackierungen `life_<name>.png` leitet `gen_art.taxi_skins()` ab), `stat_icons.png` (13 × 18 px), `ws_icons.png` (3 × 26 px).
+- `assets/art/life_icon.png` (32×20, HUD-Leben; Lackierungen `life_<name>.png` leitet `gen_art.taxi_skins()` ab), `stat_icons.png` (13 × 18 px), `ws_icons.png` (4 × 26 px: Düsen, Hülle, Fahrwerk, Scheinwerfer; das vierte Feld aus `gen_round2.py` → `ws_light_raw.png`, Kontur in Aseprite).
 
 - `assets/art/driver.png` (680×56, 17 Bilder à 40×56) und `taxi_cockpit_empty.png` (96×60): Fahrer fürs Finale der Nachtschicht und die leere Kuppel. Ablauf: `python3 tools/art/gen_driver.py pre` (Grundflächen und Schattierung nach `build/aseprite-workspace/gf_driver/`), `aseprite -b --script tools/art/aseprite/build_driver.lua` (baut `driver.aseprite` mit Ebenen `body` und `outline`, Kontur in abgedunkelter Nachbarfarbe, Tags walk/stand/turn/front/wave/jump/land), `python3 tools/art/gen_driver.py export` (Blatt nach `assets/art/`), `… cockpit` (leere Kuppel aus `taxi.aseprite`). Farben und Formen wie der Fahrer in `taxi.aseprite`.
 
@@ -40,6 +40,12 @@ Eigene Arbeit, keine Fremdassets.
 
 Die Zeilenfolge steht in `PassengerActor.LOOK_VOICE`. Zeilen 0–3 sind die vier ursprünglichen Figuren, damit ein im Spielstand gespeicherter Fahrgast seine Figur behält.
 
+## Taxi und Verkehr in 78×48 (Runde 62)
+
+1. `python3 tools/art/aseprite/gen_taxi78.py .` (Grundformen nach `build/aseprite-workspace/gf_polish/taxi78/`, Maße von Hand gesetzt) bzw. `gen_vehicle.py .` (jetzt 78×48).
+2. In Aseprite wie unten: Ebenen `metal`, `fins`, `hull`, `glass`, `detail`, `driver` stempeln und mit denselben Rampen und Lichtwinkeln schattieren (Glanzpunkt Rumpf und Glas je 3 px), flach speichern, Kontur `outline_smart` single `#0c0f24`, exportieren nach `assets/art/taxi.png`; Quelle mit Ebenen `taxi.aseprite`. Fahrzeug analog (`vehicle.aseprite`, Export als `vehicle/v2_red.png`, dann `finish.py vehicles`).
+3. Lackierungen: `python3 -c "import sys; sys.path.insert(0,'tools/art'); import gen_art; gen_art.taxi_skins()"`, leere Kuppel: `python3 tools/art/gen_driver.py cockpit`, Aufkleber in Taxigröße: `gen_art.stickers(small_only=True)`.
+
 ## Ablauf (Aseprite-MCP)
 
 1. `python3 tools/art/aseprite/gen_parts.py .`, `gen_figures.py .` bzw. `gen_vehicle.py .`
@@ -57,9 +63,9 @@ Die Zeilenfolge steht in `PassengerActor.LOOK_VOICE`. Zeilen 0–3 sind die vier
 
 ## Zu beachten
 
-- Im Spiel wird bei 1080p verkleinert (Taxi und Verkehr 0,8×, Fahrgäste ≈ 0,85×, nächster Nachbar). Einzelne Pixelzeilen fallen dabei weg; feine 1-px-Schrift zerfällt. 1440p und 4K vergrößern nur.
-- Code zeichnet auf feste Stellen der Taxi-Textur: Hauptdüse unten bei y ≈ 55, Seitenflammen an x 0/95, Fahrwerk und Lampe um (45, 51), Aufkleber über x 9–33 / y 17–41, die Spiegelung im Boden nutzt nur die Zeilen 27–60. Umriss und diese Stellen beibehalten.
-- Beim Fahrzeug zeichnet der Code die Düsenflamme am Heck (Textur x 0, y ≈ 32) und den Scheinwerfer an der Nase (x ≈ 91, y ≈ 36). Die Trefferfläche ist 21×10 Einheiten, die Grafik 25,6×16; der Autopilot plant mit 26×12 Sicherheitsabstand.
+- Taxi und Verkehr sind seit Runde 62 in Zielgröße gezeichnet (78×48 px = 26×16 Einheiten, 1:1 bei 1080p). Fahrgäste werden bei 1080p weiter auf ≈ 0,85× verkleinert (nächster Nachbar). 1440p und 4K vergrößern nur.
+- Code zeichnet auf feste Stellen der Taxi-Textur (78×48): Düsenöffnung unten y 41–44, Seitenflammen an x 0/77, Lampe über der Düse um (38, 40), Aufkleber über x 8–28 / y 14–34 (`sticker_*_s.png`, 20 px), die Spiegelung im Boden nutzt die Zeilen 22–47 (`Tuning.TAXI_REFLECT_SRC`). Umriss und diese Stellen beibehalten.
+- Beim Fahrzeug (78×48) zeichnet der Code die Düsenflamme am Heck (Textur x 0, y ≈ 26) und den Scheinwerfer an der Nase (x ≈ 74, y ≈ 29). Die Trefferfläche ist 21×10 Einheiten, die Grafik 26×16; der Autopilot plant mit 26×12 Sicherheitsabstand.
 - Die Taxi-Lackierungen tauschen alle Pixel mit Farbton 0,04–0,18, Sättigung > 0,4 und Helligkeit > 0,35. Neue Orange-/Gelbtöne außerhalb des Rumpfs werden mit umgefärbt (gewollt bei der Fahrermütze); die Düsenglut liegt bewusst darunter.
 - Laufbilder (Frames 4–9) blicken nach rechts und werden für links gespiegelt, deshalb Licht von oben statt von der Seite.
 - Ein Blatt mit allen Figuren: Die Aseprite-Kontur läuft an Framegrenzen in den Nachbarframe; `finish.py figures` entfernt genau diese Pixel.

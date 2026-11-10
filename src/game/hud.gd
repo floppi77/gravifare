@@ -151,13 +151,13 @@ func _draw() -> void:
 	var txt := ""
 	var ex_aboard := run._extra_aboard()
 	if not ex_aboard.is_empty():
-		var xf: String = tr("HUD_TAG_FRAGILE") + " " if ex_aboard.job.get("fragile", false) else ""
+		var xf: String = (tr("HUD_TAG_FRAGILE") + " " if ex_aboard.job.get("fragile", false) else "") + _kind_tag(ex_aboard.job, run.extra_emergency_left(ex_aboard))
 		txt = tr("HUD_TAG_EXTRA") + "  " + xf + (tr("HUD_DELIVER_H") % ex_aboard.actor.pname if run.target_pad() == "H" else tr("HUD_DELIVER") % [ex_aboard.actor.pname, run.target_pad()])
 	elif job.is_empty():
 		txt = tr("HUD_GO_EXIT") if run.exit_open else ""
 	else:
 		var who: String = job.get("passenger", "?")
-		var frag: String = tr("HUD_TAG_FRAGILE") + " " if job.get("fragile", false) else ""
+		var frag: String = (tr("HUD_TAG_FRAGILE") + " " if job.get("fragile", false) else "") + _kind_tag(job, run.emergency_left())
 		if run.phase == Run.Phase.CARRYING and run.is_exit_job(job):
 			txt = tr("HUD_TAG_MAIN") + "  " + frag + tr("HUD_TO_EXIT") % who
 		elif run.phase == Run.Phase.CARRYING or run.phase == Run.Phase.DROPOFF:
@@ -752,3 +752,10 @@ func _star(c: Vector2, r: float, col: Color, filled: bool) -> void:
 	else:
 		draw_colored_polygon(pts, Color(col.r, col.g, col.b, 0.35))
 		draw_polyline(pts + PackedVector2Array([pts[0]]), col, 0.7)
+
+## Kennzeichen des Fahrgasttyps in der Auftragszeile: „VIP“ bzw. „NOTFALL 23 s“ (Text, damit auch ohne Farbsehen eindeutig).
+func _kind_tag(job: Dictionary, left: float) -> String:
+	match run.kind_of(job):
+		"vip": return tr("HUD_TAG_VIP") + " "
+		"emergency": return (tr("HUD_TAG_EMERGENCY_T") % int(ceilf(left)) if left >= 0.0 else tr("HUD_TAG_EMERGENCY")) + " "
+	return ""

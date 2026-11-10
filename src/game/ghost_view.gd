@@ -28,4 +28,4 @@ func _draw() -> void:
 	var a := Vector2(trace[i * 3], trace[i * 3 + 1])
 	var b := Vector2(trace[(i + 1) * 3], trace[(i + 1) * 3 + 1])
 	draw_set_transform(a.lerp(b, f), lerpf(trace[i * 3 + 2], trace[(i + 1) * 3 + 2], f), Vector2.ONE)
-	draw_texture_rect(tex, Rect2(-12.8, -8, 25.6, 16), false, Color(0.6, 0.97, 1.0, 0.27))
+	draw_texture_rect(tex, Rect2(-Tuning.TAXI_UNITS * 0.5, Tuning.TAXI_UNITS), false, Color(0.6, 0.97, 1.0, 0.27))      # wie das Taxi, 1:1

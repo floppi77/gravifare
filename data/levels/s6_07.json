@@ -37,7 +37,8 @@
    "fare": 150,
    "par": 25,
    "passenger": "Mika",
-   "gender": "f"
+   "gender": "f",
+   "kind": "emergency"
   },
   {
    "from": "2",
@@ -85,7 +86,8 @@
    "fare": 210,
    "par": 25,
    "passenger": "Nora",
-   "gender": "f"
+   "gender": "f",
+   "kind": "vip"
   },
   {
    "from": "3",

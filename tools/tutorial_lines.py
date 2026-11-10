@@ -22,8 +22,8 @@ T["tut_gear"] = ('Vor jeder Landung fährst du das Fahrwerk wieder aus, mit der 
                  'Before every landing you extend the landing gear again, with the space bar or the A button. The taxi then flies slower and more precisely. Extend it now.')
 T["tut_fuel_low"] = ("Oh, dein Tank ist fast leer! Flieg zur Tankstelle, der orangen Plattform mit der Zapfsäule, und lande dort.",
                      "Oh, your tank is almost empty! Fly to the gas station, the orange platform with the pump, and land there.")
-T["tut_refuel"] = ('Solange du hier stehst, tankst du. Bis fünfunddreißig Prozent tankt die Station notfalls umsonst. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.',
-                   'While you sit here, you refuel. Up to thirty-five percent the station refuels for free in an emergency. Never bump the pump: after three touches it explodes.')
+T["tut_refuel"] = ('Solange du hier stehst, tankst du. Sprit kostet Credits. Nur wenn dein Geld nicht reicht, gibt es ihn bis fünfunddreißig Prozent gratis. Stoße nie gegen die Zapfsäule: Nach drei Berührungen explodiert sie.',
+                   'While you sit here, you refuel. Fuel costs credits. Only when you cannot pay, you get it free up to thirty-five percent. Never bump the pump: after three touches it explodes.')
 T["tut_landing"] = ('Jetzt zur Landung. Landest du langsam und gerade, ist alles gut. Bist du schneller, nimmt dein Taxi Schaden, und bei zu hohem Tempo ist das Taxi sofort zerstört. Schäden kosten dich am Levelende Reparaturgeld.',
                     'Now for landing. If you land slowly and level, all is well. If you are faster, your taxi takes damage, and at too high a speed the taxi is destroyed at once. Damage costs you repair money at the end of a level.')
 T["tut_hard"] = ('Probier es aus: Stürz dich jetzt mit voller Kraft nach unten und lande so hart, dass das Taxi zerstört wird. Hier kostet das nichts.',
@@ -54,8 +54,8 @@ T["tut_hud_price"] = ('Und hier der Spritpreis an der Tankstelle. Er schwankt, t
                       'And here is the fuel price at the gas station. It fluctuates, so refuel when it is low if you can.')
 T["tut_gear_in"] = ('Dein Fahrwerk ist noch ausgefahren. Zum Losfliegen fährst du es mit der Leertaste ein, am Controller mit der A-Taste. Eingefahren fliegt das Taxi schnell, ausgefahren langsam und genau. Drück die Taste jetzt.',
                     'Your landing gear is still extended. To take off, retract it with the space bar, or the A button on a controller. Retracted, the taxi flies fast; extended, slow and precise. Press the button now.')
-T["tut_credit"] = ('Darüber kostet der Sprit Geld. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.',
-                   'Above that, fuel costs money. I am crediting you five hundred credits, so go ahead and fill up.')
+T["tut_credit"] = ('Ab jetzt zahlst du. Wer Credits hat, zahlt jeden Tropfen, auch unter fünfunddreißig Prozent. Ich schreibe dir fünfhundert Credits gut, tank also ruhig voll.',
+                   'From now on you pay. If you have credits, you pay for every drop, even below thirty-five percent. I am crediting you five hundred credits, so go ahead and fill up.')
 T["tut_price"] = ('Der Spritpreis ändert sich regelmäßig, so wie gerade eben. Achte oben auf die Anzeige. Im Flugunterricht lasse ich ihn jetzt in Ruhe.',
                   'The fuel price changes regularly, just like it did a moment ago. Keep an eye on the display at the top. In flight school I will leave it alone from now on.')
 T["tut_crash_ok"] = ('Zerstört! Normalerweise kostet dich das ein Leben, und ein Fahrgast an Bord ist verloren. Hier bekommst du sofort ein neues Taxi.',
@@ -117,3 +117,7 @@ V["vid_traffic"] = ("Verkehr: Fremde Fahrzeuge fliegen auf festen Routen durch T
                     "Traffic: other vehicles fly fixed routes through tunnel openings in the walls. A collision damages your taxi. Wait for a gap and cross the lane.")
 V["vid_dark"] = ("Dunkelheit. Nur dein Taxi, die Plattformen und das Tor leuchten. Fahrzeuge, Meteoriten und Strahlen verraten sich durch ihr Licht. Merk dir den Weg.",
                  "Darkness. Only your taxi, the platforms and the gate are lit. Vehicles, meteors and beams give themselves away by their light. Remember the way.")
+V["vid_vip"] = ('VIP-Fahrgäste erkennst du an der goldenen Krone. Sie zahlen fast das Doppelte, warten aber nur halb so lange. Harte Landungen und Treffer kosten mit ihnen doppelt so viel. Flieg schnell und sanft.',
+               'You can spot VIP passengers by the golden crown. They pay almost double, but only wait half as long. Hard landings and hits cost twice as much with them on board. Fly fast and gently.')
+V["vid_emergency"] = ('Notfall: Das rote Kreuz und die Zahl zeigen die Frist in Sekunden. Bring den Fahrgast vorher ans Ziel, dann zahlt er das Doppelte. Läuft die Zeit ab, ist er verloren.',
+                     'Emergency: the red cross and the number show the deadline in seconds. Get the passenger to the destination in time and you earn double the fare. If time runs out, the passenger is lost.')

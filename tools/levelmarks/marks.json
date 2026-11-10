@@ -1,0 +1,948 @@
+{
+ "s4_01": {
+  "number": 34,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.0,
+   "drop": 8.7,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_02": {
+  "number": 35,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 3.7,
+   "drop": 15.1,
+   "par": 15.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_03": {
+  "number": 36,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.0,
+   "drop": 9.6,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_04": {
+  "number": 37,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 3.9,
+   "drop": 52.0,
+   "par": 42.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_05": {
+  "number": 38,
+  "bot_complete": true,
+  "vip": {
+   "job": 1,
+   "wait": 2.0,
+   "drop": 17.1,
+   "par": 18.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_06": {
+  "number": 39,
+  "bot_complete": true,
+  "vip": {
+   "job": 4,
+   "wait": 4.2,
+   "drop": 27.5,
+   "par": 18.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_07": {
+  "number": 40,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 3.0,
+   "drop": 29.5,
+   "par": 24.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_08": {
+  "number": 41,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.7,
+   "drop": 21.7,
+   "par": 20.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_09": {
+  "number": 42,
+  "bot_complete": true,
+  "vip": {
+   "job": 4,
+   "wait": 2.0,
+   "drop": 11.6,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_10": {
+  "number": 43,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.6,
+   "drop": 12.5,
+   "par": 16.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s4_11": {
+  "number": 44,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 1.4,
+   "drop": 19.3,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_01": {
+  "number": 45,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 1.7,
+   "drop": 12.0,
+   "par": 24.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_02": {
+  "number": 46,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 2.3,
+   "drop": 11.5,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_03": {
+  "number": 47,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 4.0,
+   "drop": 11.3,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_04": {
+  "number": 48,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 9.6,
+   "drop": 23.9,
+   "par": 22.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_05": {
+  "number": 49,
+  "bot_complete": true,
+  "vip": {
+   "job": 1,
+   "wait": 2.2,
+   "drop": 23.3,
+   "par": 21.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_06": {
+  "number": 50,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.5,
+   "drop": 9.7,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_07": {
+  "number": 51,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 1.3,
+   "drop": 16.0,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_08": {
+  "number": 52,
+  "bot_complete": true,
+  "vip": {
+   "job": 1,
+   "wait": 2.0,
+   "drop": 19.5,
+   "par": 14.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_09": {
+  "number": 53,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.0,
+   "drop": 10.8,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_10": {
+  "number": 54,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.7,
+   "drop": 27.6,
+   "par": 14.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s5_11": {
+  "number": 55,
+  "bot_complete": true,
+  "vip": {
+   "job": 0,
+   "wait": 7.2,
+   "drop": 23.1,
+   "par": 14.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_01": {
+  "number": 56,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.0,
+   "drop": 33.1,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 5,
+   "drop": 15.5,
+   "par": 27.0,
+   "chosen": "Autopilot",
+   "deadline": 35.1,
+   "margin": 19.6
+  }
+ },
+ "s6_02": {
+  "number": 57,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 1.6,
+   "drop": 19.8,
+   "par": 19.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_03": {
+  "number": 58,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.0,
+   "drop": 8.2,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 4,
+   "drop": 22.1,
+   "par": 21.0,
+   "chosen": "Autopilot",
+   "deadline": 27.3,
+   "margin": 5.2
+  }
+ },
+ "s6_04": {
+  "number": 59,
+  "bot_complete": true,
+  "vip": {
+   "job": 1,
+   "wait": 2.0,
+   "drop": 24.6,
+   "par": 39.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_05": {
+  "number": 60,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.6,
+   "drop": 9.2,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 4,
+   "drop": 20.3,
+   "par": 19.0,
+   "chosen": "Autopilot",
+   "deadline": 24.7,
+   "margin": 4.4
+  }
+ },
+ "s6_06": {
+  "number": 61,
+  "bot_complete": true,
+  "vip": {
+   "job": 4,
+   "wait": 2.9,
+   "drop": 24.3,
+   "par": 28.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_07": {
+  "number": 62,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 1.7,
+   "drop": 27.3,
+   "par": 25.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 0,
+   "drop": 26.6,
+   "par": 25.0,
+   "chosen": "Autopilot",
+   "deadline": 32.5,
+   "margin": 5.9
+  }
+ },
+ "s6_08": {
+  "number": 63,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 2.0,
+   "drop": 12.1,
+   "par": 19.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_09": {
+  "number": 64,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 2.0,
+   "drop": 8.6,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 4,
+   "drop": 14.0,
+   "par": 18.0,
+   "chosen": "Autopilot",
+   "deadline": 23.4,
+   "margin": 9.4
+  }
+ },
+ "s6_10": {
+  "number": 65,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 2.0,
+   "drop": 18.4,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s6_11": {
+  "number": 66,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 1.0,
+   "drop": 27.6,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 3,
+   "drop": 13.4,
+   "par": 31.0,
+   "chosen": "Autopilot",
+   "deadline": 40.3,
+   "margin": 26.9
+  }
+ },
+ "s7_01": {
+  "number": 67,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 1.6,
+   "drop": 10.8,
+   "par": 10.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s7_02": {
+  "number": 68,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.0,
+   "drop": 11.0,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 4,
+   "drop": 23.4,
+   "par": 35.0,
+   "chosen": "Autopilot",
+   "deadline": 45.5,
+   "margin": 22.1
+  }
+ },
+ "s7_03": {
+  "number": 69,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 2.0,
+   "drop": 11.0,
+   "par": 18.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s7_04": {
+  "number": 70,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 1.6,
+   "drop": 9.7,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 5,
+   "drop": 12.0,
+   "par": 22.0,
+   "chosen": "Autopilot",
+   "deadline": 28.6,
+   "margin": 16.6
+  }
+ },
+ "s7_05": {
+  "number": 71,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 2.4,
+   "drop": 12.5,
+   "par": 13.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s7_06": {
+  "number": 72,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 8.0,
+   "drop": 28.2,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 5,
+   "drop": 6.3,
+   "par": 10.0,
+   "chosen": "Autopilot",
+   "deadline": 13.0,
+   "margin": 6.7
+  }
+ },
+ "s7_07": {
+  "number": 73,
+  "bot_complete": true,
+  "vip": {
+   "job": 3,
+   "wait": 1.5,
+   "drop": 20.5,
+   "par": 11.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s7_08": {
+  "number": 74,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 2.6,
+   "drop": 22.3,
+   "par": 16.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 6,
+   "drop": 11.1,
+   "par": 14.0,
+   "chosen": "Autopilot",
+   "deadline": 18.2,
+   "margin": 7.1
+  }
+ },
+ "s7_09": {
+  "number": 75,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 2.0,
+   "drop": 10.7,
+   "par": 39.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s7_10": {
+  "number": 76,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 7.1,
+   "drop": 19.0,
+   "par": 15.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 0,
+   "drop": 27.7,
+   "par": 28.0,
+   "chosen": "Autopilot",
+   "deadline": 36.4,
+   "margin": 8.7
+  }
+ },
+ "s7_11": {
+  "number": 77,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 1.1,
+   "drop": 8.9,
+   "par": 17.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s8_01": {
+  "number": 78,
+  "bot_complete": false,
+  "vip": {
+   "job": 1,
+   "wait": 26.0,
+   "drop": 32.3,
+   "par": 17.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 0,
+   "drop": 18.4,
+   "par": 15.0,
+   "chosen": "Autopilot",
+   "deadline": 19.5,
+   "margin": 1.1
+  }
+ },
+ "s8_02": {
+  "number": 79,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 5.1,
+   "drop": 14.0,
+   "par": 16.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s8_03": {
+  "number": 80,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 2.0,
+   "drop": 11.9,
+   "par": 13.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 4,
+   "drop": 13.0,
+   "par": 23.0,
+   "chosen": "Autopilot",
+   "deadline": 29.9,
+   "margin": 16.9
+  }
+ },
+ "s8_04": {
+  "number": 81,
+  "bot_complete": true,
+  "vip": {
+   "job": 2,
+   "wait": 1.2,
+   "drop": 10.2,
+   "par": 12.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s8_05": {
+  "number": 82,
+  "bot_complete": false,
+  "vip": {
+   "job": 3,
+   "wait": 4.7,
+   "drop": 34.3,
+   "par": 34.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 1,
+   "drop": 27.5,
+   "par": 32.0,
+   "chosen": "Autopilot",
+   "deadline": 41.6,
+   "margin": 14.1
+  }
+ },
+ "s8_06": {
+  "number": 83,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 7.3,
+   "drop": 61.4,
+   "par": 17.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s8_07": {
+  "number": 84,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 2.5,
+   "drop": 25.5,
+   "par": 19.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 5,
+   "drop": 18.1,
+   "par": 23.0,
+   "chosen": "Autopilot",
+   "deadline": 29.9,
+   "margin": 11.8
+  }
+ },
+ "s8_08": {
+  "number": 85,
+  "bot_complete": true,
+  "vip": {
+   "job": 5,
+   "wait": 2.0,
+   "drop": 8.5,
+   "par": 15.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s8_09": {
+  "number": 86,
+  "bot_complete": false,
+  "vip": {
+   "job": 1,
+   "wait": 7.0,
+   "drop": 27.9,
+   "par": 21.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 2,
+   "drop": 8.4,
+   "par": 17.0,
+   "chosen": "Autopilot",
+   "deadline": 22.1,
+   "margin": 13.7
+  }
+ },
+ "s8_10": {
+  "number": 87,
+  "bot_complete": false,
+  "vip": {
+   "job": 4,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 25.0,
+   "chosen": "statisch"
+  },
+  "emergency": null
+ },
+ "s8_11": {
+  "number": 88,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 10.9,
+   "drop": 19.6,
+   "par": 18.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 5,
+   "drop": 12.8,
+   "par": 16.0,
+   "chosen": "Autopilot",
+   "deadline": 20.8,
+   "margin": 8.0
+  }
+ },
+ "s9_01": {
+  "number": 89,
+  "bot_complete": false,
+  "vip": {
+   "job": 3,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 18.0,
+   "chosen": "statisch"
+  },
+  "emergency": null
+ },
+ "s9_02": {
+  "number": 90,
+  "bot_complete": false,
+  "vip": {
+   "job": 5,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 19.0,
+   "chosen": "statisch"
+  },
+  "emergency": {
+   "job": 1,
+   "drop": -1.0,
+   "par": 24.0,
+   "chosen": "statisch",
+   "deadline": 31.2,
+   "margin": null
+  }
+ },
+ "s9_03": {
+  "number": 91,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 7.0,
+   "drop": 37.5,
+   "par": 17.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s9_04": {
+  "number": 92,
+  "bot_complete": false,
+  "vip": {
+   "job": 3,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 21.0,
+   "chosen": "statisch"
+  },
+  "emergency": null
+ },
+ "s9_05": {
+  "number": 93,
+  "bot_complete": false,
+  "vip": {
+   "job": 5,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 11.0,
+   "chosen": "statisch"
+  },
+  "emergency": {
+   "job": 0,
+   "drop": 16.5,
+   "par": 26.0,
+   "chosen": "Autopilot",
+   "deadline": 33.8,
+   "margin": 17.3
+  }
+ },
+ "s9_06": {
+  "number": 94,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 6.2,
+   "drop": 44.3,
+   "par": 12.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 3,
+   "drop": 57.8,
+   "par": 33.0,
+   "chosen": "Autopilot",
+   "deadline": 42.9,
+   "margin": -14.9
+  }
+ },
+ "s9_07": {
+  "number": 95,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 6.8,
+   "drop": 29.1,
+   "par": 14.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s9_08": {
+  "number": 96,
+  "bot_complete": false,
+  "vip": {
+   "job": 0,
+   "wait": 26.2,
+   "drop": 55.1,
+   "par": 18.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": null
+ },
+ "s9_09": {
+  "number": 97,
+  "bot_complete": true,
+  "vip": {
+   "job": 6,
+   "wait": 2.9,
+   "drop": 10.6,
+   "par": 23.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 7,
+   "drop": 9.7,
+   "par": 26.0,
+   "chosen": "Autopilot",
+   "deadline": 33.8,
+   "margin": 24.1
+  }
+ },
+ "s9_10": {
+  "number": 98,
+  "bot_complete": false,
+  "vip": {
+   "job": 1,
+   "wait": 17.8,
+   "drop": 26.2,
+   "par": 23.0,
+   "chosen": "Autopilot"
+  },
+  "emergency": {
+   "job": 0,
+   "drop": 26.0,
+   "par": 23.0,
+   "chosen": "Autopilot",
+   "deadline": 29.9,
+   "margin": 3.9
+  }
+ },
+ "s9_11": {
+  "number": 99,
+  "bot_complete": false,
+  "vip": {
+   "job": 3,
+   "wait": -1.0,
+   "drop": -1.0,
+   "par": 32.0,
+   "chosen": "statisch"
+  },
+  "emergency": null
+ }
+}

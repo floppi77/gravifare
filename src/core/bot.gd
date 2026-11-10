@@ -568,8 +568,10 @@ func _sweep_track(ch: String, gate: Dictionary) -> float:
 	var lim := 140.0 if (pro and (features.track or features.crossfast)) else 80.0
 	return clampf(vg + (c - sim.pos.y) * 4.0, -lim, lim)
 
-static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false) -> Dictionary:
+## `rules`: Regelstand der Auftragslogik (Run.RULES; 2 = Tankregel und Aufträge wie bis 1.0.1, für den Nachweis der Fliegbarkeit, siehe Testläufer).
+static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false, rules := Run.RULES) -> Dictionary:
 	var r := Run.new()
+	r.rules = rules
 	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional
 	r.start(lvl, fuel_in)
 	var bot := Bot.new(r, pro_mode)
@@ -577,6 +579,7 @@ static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, rec
 	if record:
 		rep = Replay.new()
 		rep.begin(lvl.id, -1, fuel_in, 0.0, {}, false)
+		rep.rules = rules
 	var ticks := int(max_seconds / Tuning.TICK)
 	var stuck_pos := r.sim.pos
 	var stuck_ticks := 0

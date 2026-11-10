@@ -240,16 +240,45 @@ def hospital():
         jobs=[{"from": "1", "to": "H", "fare": 100, "par": 30, "passenger": "Mika", "gender": "f", "fragile": True}])
 
 
+@demo
+def vip():
+    r = blank()
+    put(r, 6, 17, 12, 17, "1")
+    put(r, 6, 18, 12, 19, "#")
+    r[16][8] = "S"
+    put(r, 27, 15, 33, 15, "2")
+    put(r, 27, 16, 33, 19, "#")
+    return level("vip", r, ("VIP-Fahrgast", "VIP passenger"), {
+        "focus": [320, 200], "zoom": 1.4, "length": 12.0,
+        "script": [{"t": 0, "mode": "bot"}]},
+        jobs=[{"from": "1", "to": "2", "fare": 100, "par": 30, "passenger": "Mika", "gender": "f", "kind": "vip"}])
+
+
+@demo
+def emergency():
+    r = blank()
+    put(r, 6, 17, 12, 17, "1")
+    put(r, 6, 18, 12, 19, "#")
+    r[16][8] = "S"
+    put(r, 16, 8, 23, 19, "#")
+    put(r, 27, 17, 33, 17, "2")
+    put(r, 27, 18, 33, 19, "#")
+    return level("emergency", r, ("Notfall", "Emergency"), {
+        "focus": [320, 200], "zoom": 1.3, "length": 13.0,
+        "script": [{"t": 0, "mode": "bot"}]},
+        jobs=[{"from": "1", "to": "2", "fare": 100, "par": 14, "passenger": "Odo", "gender": "m", "kind": "emergency"}])
+
+
 def main():
     names = sys.argv[1:] or list(DEMOS)
     os.makedirs("data/intros", exist_ok=True)
     for n in names:
         json.dump(DEMOS[n](), open("data/intros/%s.json" % n, "w"), indent=1, ensure_ascii=False)
         print("geschrieben:", n)
-    idx = {"8": "spikes", "14": "doors", "34": "magnet_pull", "35": "magnet_push", "37": "magnet_pulse", "45": "heat",
-           "47": "heat_pulse", "56": "wind", "57": "gravity", "58": "wind_gust", "23": "debris", "25": "moving_pad", "27": "hospital",
-           "29": "meteors", "33": "slider", "46": "beam", "67": "traffic", "78": "dark"}
-    json.dump(idx, open("data/intros/index.json", "w"), indent=1)
+    idx = {"8": "spikes", "14": "doors", "19": "beam", "23": "debris", "25": "moving_pad", "27": "hospital", "29": "meteors", "33": "slider",
+           "34": "magnet_pull", "35": "magnet_push", "37": "magnet_pulse", "45": "heat", "47": "heat_pulse", "56": "wind", "57": "gravity",
+           "58": "wind_gust", "67": "traffic", "78": "dark"}      # „beam“ seit Runde 38 bei Level 19 (Neonlabyrinth)
+    json.dump(idx, open("data/intros/index.json", "w"), indent=1)      # VIP und Notfall laufen nicht je Level, sondern beim ersten Fahrgast dieses Typs (Game._kind_clip_tick)
 
 
 if __name__ == "__main__":

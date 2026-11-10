@@ -77,7 +77,8 @@
    "fare": 200,
    "par": 19,
    "passenger": "Ben",
-   "gender": "m"
+   "gender": "m",
+   "kind": "vip"
   },
   {
    "from": "5",

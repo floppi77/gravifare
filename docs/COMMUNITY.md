@@ -65,7 +65,7 @@ Ein kleines Beispiel zum Ausprobieren und Abschauen: [`community/zwergenhafen.gf
 
 ## Regeln der Prüfung
 
-Genau ein Start `S`, ein Ausgangstor `E` mittig oben, 2 bis 9 Passagierpads mit fortlaufenden Nummern ab 1 und mindestens 4 Feldern Breite, Aufträge zwischen vorhandenen Pads (zerbrechliche Fahrgäste dürfen zum Krankenhaus `H`), der erste Fahrgast wartet nicht auf dem Start-Pad und keiner auf dem letzten Ziel-Pad, und jede Fahrt braucht einen Flugweg. Ein fehlender Platz für den Unterstand eines Pads ist nur eine Warnung.
+Genau ein Start `S`, ein Ausgangstor `E` mittig oben, 2 bis 9 Passagierpads mit fortlaufenden Nummern ab 1 und mindestens 4 Feldern Breite, Aufträge zwischen vorhandenen Pads (zerbrechliche Fahrgäste dürfen zum Krankenhaus `H`), der erste Fahrgast wartet nicht auf dem Start-Pad und keiner auf dem letzten Ziel-Pad, und jede Fahrt braucht einen Flugweg. Ein fehlender Platz für den Unterstand eines Pads ist nur eine Warnung. Ein Auftrag darf optional `"kind": "vip"` oder `"kind": "emergency"` tragen (Fahrgasttyp VIP bzw. Notfall, nicht beim Ausgangs-Fahrgast); andere Werte entfallen beim Einlesen, Level ohne das Feld laden unverändert. Im Editor wird der Typ angezeigt und beim Speichern behalten, aber nicht eingestellt.
 
 ## Lizenz
 
@@ -97,7 +97,7 @@ A small example to try and learn from: [`community/zwergenhafen.gflevel`](commun
 
 ## Validation rules
 
-Exactly one start `S`, one exit gate `E` centred at the top, 2 to 9 passenger pads numbered from 1 without gaps and at least 4 tiles wide, jobs between existing pads (fragile passengers may go to the hospital `H`), the first passenger does not wait on the start pad and none on the previous destination pad, and every trip needs a flight path. A pad without room for its shelter is only a warning.
+Exactly one start `S`, one exit gate `E` centred at the top, 2 to 9 passenger pads numbered from 1 without gaps and at least 4 tiles wide, jobs between existing pads (fragile passengers may go to the hospital `H`), the first passenger does not wait on the start pad and none on the previous destination pad, and every trip needs a flight path. A pad without room for its shelter is only a warning. A job may optionally carry `"kind": "vip"` or `"kind": "emergency"` (passenger type VIP or emergency, not for the exit passenger); other values are dropped on import, levels without the field load unchanged. The editor shows the type and keeps it when saving but does not set it.
 
 ## Licence
 

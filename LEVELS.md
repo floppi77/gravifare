@@ -1,6 +1,6 @@
 # LEVELS – Leveldesign-Matrix
 
-Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N; jedes Pad hat Platz für einen Wartebereich-Unterstand (2 Tiles Luft über einem Padende); das Ausgangstor liegt mittig oben und öffnet erst, wenn der **Ausgangs-Fahrgast** (letzter Auftrag, `to: "exit"`) an Bord ist; jeder Auftrag hat einen eigenen Fahrgast; der erste Fahrgast wartet nicht auf dem Startpad, und jeder Fahrgast beginnt an einem anderen Pad, als der vorherige endete; unter dem Torblock bleiben mindestens 96 px Durchflug. Das Tankpad (`F`) braucht eine 2 Tiles hohe Zapfsäule (`P`) am Padende und ein freies Landefenster ≥ 28 px; Preisbereich je Level optional (`fuel`). Jedes Level muss der Bot **ab dem Mindest-Sprit (35 %)** lösen. **Pads sind unterschiedlich groß** (5 bis 8 Tiles; je kleiner, desto schwieriger), aber jedes Passagierpad hat ein **freies Landefenster** neben dem Wartebereich, mindestens 34 px in Level 1–3, **sinkend bis 20 px in Level 99** (`Tuning.min_land_window`, Test) – späte Level dürfen deutlich kleinere Plattformen haben. Die Grenze gilt je Pad: **Größere Pads im selben Level sind erlaubt, unterschiedlich große Pads innerhalb eines Levels dürfen gemischt auftreten.**
+Verbindliche Regeln: Pad-Nummern sind fortlaufend 1..N; jedes Pad hat Platz für einen Wartebereich-Unterstand (2 Tiles Luft über einem Padende); das Ausgangstor liegt mittig oben und öffnet erst, wenn der **Ausgangs-Fahrgast** (letzter Auftrag, `to: "exit"`) an Bord ist; jeder Auftrag hat einen eigenen Fahrgast; der erste Fahrgast wartet nicht auf dem Startpad, und jeder Fahrgast beginnt an einem anderen Pad, als der vorherige endete; unter dem Torblock bleiben mindestens 96 px Durchflug. Das Tankpad (`F`) braucht eine 2 Tiles hohe Zapfsäule (`P`) am Padende und ein freies Landefenster ≥ 28 px; Preisbereich je Level optional (`fuel`). Jedes Level muss der Bot **ab dem Mindest-Sprit (35 %)** lösen; seit Runde 60 (unter 35 % gratis nur ohne Geld) gilt das für die in TESTING.md geführten Level nur mit dem Regelstand 2 (Fliegbarkeit), siehe dort. **Pads sind unterschiedlich groß** (5 bis 8 Tiles; je kleiner, desto schwieriger), aber jedes Passagierpad hat ein **freies Landefenster** neben dem Wartebereich, mindestens 34 px in Level 1–3, **sinkend bis 20 px in Level 99** (`Tuning.min_land_window`, Test) – späte Level dürfen deutlich kleinere Plattformen haben. Die Grenze gilt je Pad: **Größere Pads im selben Level sind erlaubt, unterschiedlich große Pads innerhalb eines Levels dürfen gemischt auftreten.**
 
 Status: **99 von 99 Leveln vorhanden** (alle Sektoren komplett). Erzeuger: `tools/make_level_s1_01.py`, `tools/make_s1_02_03.py`, `tools/make_s1_04_11.py` (Pars dort als Tabelle), `tools/make_s2.py`, `tools/make_s3.py`, `tools/make_s4.py` (Pars je Sektor in `tools/sN_pars.json` = Bot-Zeit × 1,3 + 8 s). Sektor 2: `tools/make_s2.py`; **Sektor 3–5 prozedural**: `python3 tools/build_sector.py 3|4|5` (Grundriss-Generator `tools/procgen.py`, Bausteine `tools/levelparts.py`, Bot-Messung `tools/batch_eval.gd`; Pars = Bot-Zeit × 1,3 + 8 s). Übersichtsbilder: `docs/levels/`.
 
@@ -60,7 +60,7 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S1-09 | Nadelspitzen (Säulen über Dornenfeld) | Odo 3→2, Lena 4→3, Mika 2→4, Jonas 1→2, Ines 4→1, Mika 3→Ausgang | 1: 6, 2–4: 5 | 90.2 | 16 px | 3754 px | 34 px | bestanden (101 s, Tank 17 %) | – |
 | S1-10 | Tanknot (Tankturm hoch oben) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→1, Mika 2→Ausgang | 1: 7, 2–4: 5 | 91.6 | 20 px | 4390 px | 34 px | bestanden (142 s, Tank 55 %) | – |
 | S1-11 | **Meisterprüfung** (Bunker, 2-Tiles-Tunnel, Dornen, Tankturm) | Lena 3→2, Odo 4→3, Mika 2→4, Jonas 1→3, Ines 4→2, Mika 3→Ausgang | 1: 6, 2–4: 5 | 97.4 | 8 px | 4374 px | 34 px | bestanden (118 s, Tank 67 %) | – |
-| S2-01 | Schluchteingang (spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→Ausgang | 100.3 | 12 px | 5294 px | 34 px | bestanden (142 s, Tank 48 %) | – |
+| S2-01 | Schluchteingang (spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 3→Ausgang | 100.3 | 12 px | 5294 px | 34 px | bestanden (142 s, Tank 48 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S2-02 | Neonallee (spikes) | Mika 3→4, Odo 2→3, Lena 4→2, Jonas 1→3, Ines 2→4, Ben 1→Ausgang | 109.2 | 16 px | 6131 px | 34 px | bestanden (184 s, Tank 47 %) | – |
 | S2-03 | Erste Schleuse (doors, spikes) | Mika 3→1, Odo 2→4, Lena 1→3, Jonas 4→2, Ines 3→4, Ben 3→Ausgang | 101.6 | 20 px | 3627 px | 34 px | bestanden (161 s, Tank 35 %) | – |
 | S2-04 | Zwillingsschleuse (doors, spikes, chicane) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 2→Ausgang | 102.6 | 20 px | 3689 px | 34 px | bestanden (162 s, Tank 68 %) | – |
@@ -74,10 +74,10 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S3-01 (Level 23) | Schrottplatz (chicane, spikes, debris) | Mika 3→5, Odo 1→3, Lena 1→4, Jonas 2→5, Ines 2→5, Ben 4→Ausgang | 118.5 | 8 px | 3902 px | 34 px | bestanden (244 s, Tank 53 %) | – |
 | S3-02 (Level 24) | Kranbahn (chicane, spikes, debris) | Mika 2→1, Odo 5→1, Lena 4→3, Jonas 2→1, Ines 3→1, Ben 5→Ausgang | 119.8 | 20 px | 5679 px | 34 px | bestanden (160 s, Tank 33 %) | – |
 | S3-03 (Level 25) | Fließband (chicane, spikes, debris, moving_pads, life_station) + Lebens-Station | Mika 2→3, Odo 1→2, Lena 1→5, Jonas 1→4, Ines 1→4, Ben 5→Ausgang | 116.8 | 20 px | 3514 px | 34 px | bestanden (114 s, Tank 27 %) | – |
-| S3-04 (Level 26) | Trümmerfeld (chicane, spikes, debris) | Mika 3→1, Odo 5→3, Lena 1→3, Jonas 1→3, Ines 2→5, Ben 4→Ausgang | 117.3 | 12 px | 4175 px | 34 px | bestanden (130 s, Tank 57 %) | – |
+| S3-04 (Level 26) | Trümmerfeld (chicane, spikes, debris) | Mika 3→1, Odo 5→3, Lena 1→3, Jonas 1→3, Ines 2→5, Ben 4→Ausgang | 117.3 | 12 px | 4175 px | 34 px | bestanden (130 s, Tank 57 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S3-05 (Level 27) | Notfallflug (chicane, spikes, debris, medical) + Krankentransport | Mika 4→2, Odo 4→Krankenhaus, Lena 5→4, Jonas 5→Krankenhaus, Ines 1→3, Ben 1→Ausgang | 118.5 | 16 px | 3662 px | 34 px | bestanden (134 s, Tank 53 %) | – |
 | S3-06 (Level 28) | Doppelfähre (chicane, spikes, debris, moving_pads) | Mika 5→4, Odo 1→3, Lena 1→4, Jonas 2→4, Ines 2→5, Ben 2→Ausgang | 123.7 | 16 px | 4010 px | 18 px | bestanden (121 s, Tank 30 %) | – |
-| S3-07 (Level 29) | Meteorregen (chicane, spikes, debris, moving_pads, meteors) | Mika 3→2, Odo 4→2, Lena 5→1, Jonas 4→3, Ines 2→3, Ben 5→Ausgang | 125.8 | 8 px | 3776 px | 18 px | bestanden (224 s, Tank 53 %) | – |
+| S3-07 (Level 29) | Meteorregen (chicane, spikes, debris, moving_pads, meteors) | Mika 3→2, Odo 4→2, Lena 5→1, Jonas 4→3, Ines 2→3, Ben 5→Ausgang | 125.8 | 8 px | 3776 px | 18 px | bestanden (224 s, Tank 53 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S3-08 (Level 30) | Altmetall (chicane, spikes, debris, meteors, life_station) + Lebens-Station | Mika 4→2, Odo 1→4, Lena 2→1, Jonas 4→5, Ines 1→3, Ben 4→Ausgang | 126.8 | 16 px | 3945 px | 18 px | bestanden (146 s, Tank 49 %) | – |
 | S3-09 (Level 31) | Lazarettgürtel (chicane, spikes, debris, moving_pads, medical) + Krankentransport | Mika 3→2, Odo 4→Krankenhaus, Lena 5→1, Jonas 2→Krankenhaus, Ines 1→5, Ben 3→Ausgang | 127.3 | 16 px | 4303 px | 18 px | bestanden (190 s, Tank 56 %) | – |
 | S3-10 (Level 32) | Schrottpresse (chicane, spikes, debris, moving_pads, meteors, medical) + Krankentransport | Mika 4→3, Odo 5→Krankenhaus, Lena 2→5, Jonas 2→Krankenhaus, Ines 4→1, Ben 4→Ausgang | 128.6 | 12 px | 2295 px | 18 px | bestanden (146 s, Tank 25 %) | – |
@@ -89,13 +89,13 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S4-05 (Level 38) | Magnetschacht (chicane, spikes, debris, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 3→2, Odo 1→2, Lena 3→2, Jonas 6→2, Ines 5→1, Ben 4→2, Nora 5→Ausgang | 141.9 | 16 px | 4167 px | 18 px | bestanden (144 s, Tank 24 %) | – |
 | S4-06 (Level 39) | Feldlinien (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 3→5, Odo 6→3, Lena 2→6, Jonas 5→4, Ines 2→3, Ben 5→6, Nora 1→Ausgang | 143.1 | 24 px | 4865 px | 18 px | bestanden (175 s, Tank 23 %) | – |
 | S4-07 (Level 40) | Polwechsel (chicane, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields, life_station) + Lebens-Station | Mika 4→3, Odo 6→3, Lena 4→6, Jonas 5→3, Ines 5→1, Ben 4→2, Nora 6→Ausgang | 144.3 | 8 px | 4894 px | 18 px | bestanden (157 s, Tank 39 %) | – |
-| S4-08 (Level 41) | Dynamo (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 6→4, Odo 5→1, Lena 2→4, Jonas 3→1, Ines 6→3, Ben 5→6, Nora 5→Ausgang | 146.8 | 16 px | 5143 px | 18 px | bestanden (196 s, Tank 47 %) | – |
-| S4-09 (Level 42) | Rettungsfeld (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields, medical) + Krankentransport | Mika 4→6, Odo 3→Krankenhaus, Lena 5→3, Jonas 6→4, Ines 2→6, Ben 4→Krankenhaus, Nora 5→Ausgang | 151.1 | 12 px | 4876 px | 18 px | bestanden (184 s, Tank 62 %) | – |
+| S4-08 (Level 41) | Dynamo (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 6→4, Odo 5→1, Lena 2→4, Jonas 3→1, Ines 6→3, Ben 5→6, Nora 5→Ausgang | 146.8 | 16 px | 5143 px | 18 px | bestanden (196 s, Tank 47 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
+| S4-09 (Level 42) | Rettungsfeld (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields, medical) + Krankentransport | Mika 4→6, Odo 3→Krankenhaus, Lena 5→3, Jonas 6→4, Ines 2→6, Ben 4→Krankenhaus, Nora 5→Ausgang | 151.1 | 12 px | 4876 px | 18 px | bestanden (184 s, Tank 62 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S4-10 (Level 43) | Magnetträger (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 3→5, Odo 6→3, Lena 5→6, Jonas 1→2, Ines 5→1, Ben 4→2, Nora 3→Ausgang | 151.2 | 8 px | 4181 px | 18 px | bestanden (165 s, Tank 29 %) | – |
 | S4-11 (Level 44) | Magnetmeister (chicane, spikes, debris, moving_pads, magnets, pulsing_fields, repel_fields, attract_fields) | Mika 3→1, Odo 3→5, Lena 1→5, Jonas 3→4, Ines 6→5, Ben 1→3, Nora 2→Ausgang | 149.3 | 12 px | 3716 px | 18 px | bestanden (132 s, Tank 33 %) | – |
 | S5-01 (Level 45) | Glutschacht (chicane, spikes, debris, heat) | Mika 6→7, Odo 5→3, Lena 6→7, Jonas 1→2, Ines 1→2, Ben 4→2, Nora 1→Ausgang | 152.7 | 8 px | 6072 px | 18 px | bestanden (177 s, Tank 67 %) | – |
 | S5-02 (Level 46) | Plasmastrahl (chicane, spikes, debris, heat, beams, magnets, attract_fields) | Mika 4→6, Odo 3→1, Lena 2→7, Jonas 2→4, Ines 2→6, Ben 5→3, Nora 6→Ausgang | 153.1 | 12 px | 4527 px | 18 px | bestanden (173 s, Tank 31 %) | – |
-| S5-03 (Level 47) | Hitzewelle (chicane, spikes, debris, heat, pulsing_heat, beams, magnets, attract_fields) | Mika 4→1, Odo 3→4, Lena 6→2, Jonas 5→6, Ines 3→7, Ben 2→3, Nora 1→Ausgang | 158.9 | 8 px | 4689 px | 18 px | bestanden (173 s, Tank 61 %) | – |
+| S5-03 (Level 47) | Hitzewelle (chicane, spikes, debris, heat, pulsing_heat, beams, magnets, attract_fields) | Mika 4→1, Odo 3→4, Lena 6→2, Jonas 5→6, Ines 3→7, Ben 2→3, Nora 1→Ausgang | 158.9 | 8 px | 4689 px | 18 px | bestanden (173 s, Tank 61 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S5-04 (Level 48) | Taktgeber (chicane, spikes, debris, heat, pulsing_heat, beams, life_station) + Lebens-Station | Mika 4→2, Odo 7→5, Lena 7→4, Jonas 3→6, Ines 3→1, Ben 7→2, Nora 6→Ausgang | 159.9 | 8 px | 7369 px | 18 px | bestanden (210 s, Tank 47 %) | – |
 | S5-05 (Level 49) | Hochofen (chicane, spikes, debris, heat, pulsing_heat, magnets, attract_fields, beams) | Mika 7→6, Odo 4→5, Lena 6→3, Jonas 2→5, Ines 2→5, Ben 1→2, Nora 6→Ausgang | 161.6 | 8 px | 5003 px | 18 px | bestanden (158 s, Tank 30 %) | – |
 | S5-06 (Level 50) | Sonnenschmiede (chicane, spikes, debris, heat, pulsing_heat, beams, magnets, attract_fields) | Mika 3→2, Odo 7→6, Lena 1→6, Jonas 4→6, Ines 5→2, Ben 6→2, Nora 3→Ausgang | 164.5 | 12 px | 4938 px | 18 px | bestanden (191 s, Tank 65 %) | – |
@@ -142,9 +142,81 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S9-03 (Level 91) | Gravitationslinse (chicane, debris, traffic, beams, currents, gusts, magnets, attract_fields, medical, darkness) + Krankentransport | Mika 6→4, Odo 3→4, Lena 3→1, Jonas 3→Krankenhaus, Ines 7→5, Ben 6→3, Nora 2→5, Tarek 6→2, Mika 6→Ausgang | 294.7 | 20 px | 6122 px | 18 px | bestanden (225 s, Tank 23 %) | – |
 | S9-04 (Level 92) | Zeitdehnung (chicane, debris, traffic, heat, beams, currents, gusts, magnets, attract_fields, darkness) | Mika 7→2, Odo 5→3, Lena 2→3, Jonas 5→1, Ines 4→5, Ben 7→4, Nora 7→6, Tarek 2→3, Mika 7→Ausgang | 296.3 | 20 px | 5858 px | 18 px | bestanden (260 s, Tank 36 %) | – |
 | S9-05 (Level 93) | Singularität (chicane, debris, traffic, heat, beams, currents, gusts, magnets, pulsing_fields, repel_fields, attract_fields, darkness) | Mika 2→3, Odo 1→6, Lena 4→2, Jonas 5→7, Ines 3→6, Ben 7→4, Nora 6→2, Tarek 6→1, Mika 2→Ausgang | 294.6 | 24 px | 4377 px | 18 px | bestanden (213 s, Tank 36 %) | – |
-| S9-06 (Level 94) | Photonenring (chicane, spikes, debris, traffic, beams, currents, gusts, magnets, attract_fields, medical, darkness) + Krankentransport | Mika 4→5, Odo 6→Krankenhaus, Lena 4→5, Jonas 3→2, Ines 1→2, Ben 1→7, Nora 1→2, Tarek 1→6, Mika 1→Ausgang | 298.1 | 20 px | 5412 px | 18 px | bestanden (215 s, Tank 25 %) | – |
+| S9-06 (Level 94) | Photonenring (chicane, spikes, debris, traffic, beams, currents, gusts, magnets, attract_fields, medical, darkness) + Krankentransport | Mika 4→5, Odo 6→Krankenhaus, Lena 4→5, Jonas 3→2, Ines 1→2, Ben 1→7, Nora 1→2, Tarek 1→6, Mika 1→Ausgang | 298.1 | 20 px | 5412 px | 18 px | bestanden (215 s, Tank 25 %); mit der strengen Tankregel (Runde 60) nicht verlangt, geprüft mit Regelstand 2 | – |
 | S9-07 (Level 95) | Gezeitenkraft (chicane, spikes, debris, traffic, heat, beams, currents, gusts, magnets, attract_fields, darkness) | Mika 5→7, Odo 6→7, Lena 1→7, Jonas 1→2, Ines 1→4, Ben 5→2, Nora 1→4, Tarek 3→6, Mika 1→Ausgang | 302.9 | 20 px | 5658 px | 18 px | bestanden (200 s, Tank 24 %) | – |
 | S9-08 (Level 96) | Gravitationswelle (chicane, spikes, debris, traffic, heat, beams, currents, gusts, magnets, attract_fields, darkness) | Mika 4→3, Odo 7→6, Lena 3→7, Jonas 6→2, Ines 4→5, Ben 6→3, Nora 1→6, Tarek 2→5, Mika 1→Ausgang | 304.9 | 16 px | 5153 px | 18 px | bestanden (260 s, Tank 38 %) | – |
 | S9-09 (Level 97) | Quantenschaum (chicane, debris, traffic, heat, beams, currents, gusts, magnets, attract_fields, darkness) | Mika 7→4, Odo 1→5, Lena 4→6, Jonas 1→4, Ines 3→1, Ben 5→6, Nora 2→5, Tarek 6→7, Mika 2→Ausgang | 318.4 | 8 px | 5412 px | 18 px | bestanden (212 s, Tank 30 %) | – |
 | S9-10 (Level 98) | Wurmloch (chicane, debris, traffic, heat, beams, currents, gusts, magnets, attract_fields, darkness) | Mika 4→7, Odo 5→4, Lena 7→3, Jonas 2→5, Ines 7→1, Ben 5→6, Nora 5→6, Tarek 2→6, Mika 1→Ausgang | 316.0 | 8 px | 5081 px | 18 px | bestanden (244 s, Tank 55 %) | – |
 | S9-11 (Level 99) | Letzter Halt (attract_fields, beams, chicane, currents, darkness, debris, gravity, gusts, heat, magnets, meteors, pulsing_fields, pulsing_heat, repel_fields, sliders, spikes, traffic) | Mika 2→1, Odo 2→7, Lena 1→4, Jonas 3→6, Ines 4→1, Ben 3→4, Nora 5→4, Tarek 1→4, Mika 6→Ausgang | 351.0 | 16 px | 7540 px | 18 px | bestanden (368 s, Tank 65 %) | – |
+
+## Fahrgasttypen VIP und Notfall (Runde 61)
+Pflichtfahrgäste mit Typ (`"kind"` am Auftrag, nur dieses Feld ergänzt; Karten, Routen, Richtzeiten und Zeitziele unverändert): ein VIP je Level ab Sektor 4, ein Notfall in jedem zweiten Level ab Sektor 6 (gerade Nummern; Level 93 statt 92, weil der Autopilot in 92 keinen Auftrag misst), nie der Ausgangs-Auftrag, kein Krankentransport. Auswahl und Messwerte: `tools/levelmarks/` (`measure_jobs.gd`, `mark_levels.py`, `marks.json`). Notfall-Frist = 1,3 × Richtzeit vom Erscheinen bis zum Absetzen; Reserve = Frist − Zeit des Autopiloten ab Mindest-Sprit. „statisch“: Der Autopilot kommt in diesem Handlevel nicht bis zu diesem Auftrag; VIP = kürzester Anflug, Notfall = längste Richtzeit (aus der Handzeit).
+
+| Level | VIP | Notfall |
+|---|---|---|
+| 34 | Auftrag 3 | – |
+| 35 | Auftrag 4 | – |
+| 36 | Auftrag 4 | – |
+| 37 | Auftrag 6 | – |
+| 38 | Auftrag 2 | – |
+| 39 | Auftrag 5 | – |
+| 40 | Auftrag 4 | – |
+| 41 | Auftrag 3 | – |
+| 42 | Auftrag 5 | – |
+| 43 | Auftrag 4 | – |
+| 44 | Auftrag 4 | – |
+| 45 | Auftrag 3 | – |
+| 46 | Auftrag 6 | – |
+| 47 | Auftrag 6 | – |
+| 48 | Auftrag 3 | – |
+| 49 | Auftrag 2 | – |
+| 50 | Auftrag 4 | – |
+| 51 | Auftrag 3 | – |
+| 52 | Auftrag 2 | – |
+| 53 | Auftrag 4 | – |
+| 54 | Auftrag 3 | – |
+| 55 | Auftrag 1 | – |
+| 56 | Auftrag 3 | Auftrag 6: Frist 35.1 s (Richtzeit 27 s), Autopilot 15.5 s, Reserve 19.6 s |
+| 57 | Auftrag 4 | – |
+| 58 | Auftrag 4 | Auftrag 5: Frist 27.3 s (Richtzeit 21 s), Autopilot 22.1 s, Reserve 5.2 s |
+| 59 | Auftrag 2 | – |
+| 60 | Auftrag 4 | Auftrag 5: Frist 24.7 s (Richtzeit 19 s), Autopilot 20.3 s, Reserve 4.4 s |
+| 61 | Auftrag 5 | – |
+| 62 | Auftrag 7 | Auftrag 1: Frist 32.5 s (Richtzeit 25 s), Autopilot 26.6 s, Reserve 5.9 s |
+| 63 | Auftrag 6 | – |
+| 64 | Auftrag 7 | Auftrag 5: Frist 23.4 s (Richtzeit 18 s), Autopilot 14.0 s, Reserve 9.4 s |
+| 65 | Auftrag 4 | – |
+| 66 | Auftrag 6 | Auftrag 4: Frist 40.3 s (Richtzeit 31 s), Autopilot 13.4 s, Reserve 26.9 s |
+| 67 | Auftrag 7 | – |
+| 68 | Auftrag 3 | Auftrag 5: Frist 45.5 s (Richtzeit 35 s), Autopilot 23.4 s, Reserve 22.1 s |
+| 69 | Auftrag 6 | – |
+| 70 | Auftrag 3 | Auftrag 6: Frist 28.6 s (Richtzeit 22 s), Autopilot 12.0 s, Reserve 16.6 s |
+| 71 | Auftrag 7 | – |
+| 72 | Auftrag 1 | Auftrag 6: Frist 13.0 s (Richtzeit 10 s), Autopilot 6.3 s, Reserve 6.7 s |
+| 73 | Auftrag 4 | – |
+| 74 | Auftrag 3 | Auftrag 7: Frist 18.2 s (Richtzeit 14 s), Autopilot 11.1 s, Reserve 7.1 s |
+| 75 | Auftrag 7 | – |
+| 76 | Auftrag 6 | Auftrag 1: Frist 36.4 s (Richtzeit 28 s), Autopilot 27.7 s, Reserve 8.7 s |
+| 77 | Auftrag 6 | – |
+| 78 | Auftrag 2 | Auftrag 1: Frist 19.5 s (Richtzeit 15 s), Autopilot 18.4 s, Reserve 1.1 s |
+| 79 | Auftrag 1 | – |
+| 80 | Auftrag 6 | Auftrag 5: Frist 29.9 s (Richtzeit 23 s), Autopilot 13.0 s, Reserve 16.9 s |
+| 81 | Auftrag 3 | – |
+| 82 | Auftrag 4 | Auftrag 2: Frist 41.6 s (Richtzeit 32 s), Autopilot 27.5 s, Reserve 14.1 s |
+| 83 | Auftrag 1 | – |
+| 84 | Auftrag 7 | Auftrag 6: Frist 29.9 s (Richtzeit 23 s), Autopilot 18.1 s, Reserve 11.8 s |
+| 85 | Auftrag 6 | – |
+| 86 | Auftrag 2 | Auftrag 3: Frist 22.1 s (Richtzeit 17 s), Autopilot 8.4 s, Reserve 13.7 s |
+| 87 | Auftrag 5 (statisch) | – |
+| 88 | Auftrag 7 | Auftrag 6: Frist 20.8 s (Richtzeit 16 s), Autopilot 12.8 s, Reserve 8.0 s |
+| 89 | Auftrag 4 (statisch) | – |
+| 90 | Auftrag 6 (statisch) | Auftrag 2: Frist 31.2 s (Richtzeit 24 s), Autopilot nicht gemessen |
+| 91 | Auftrag 1 | – |
+| 92 | Auftrag 4 (statisch) | – |
+| 93 | Auftrag 6 (statisch) | Auftrag 1: Frist 33.8 s (Richtzeit 26 s), Autopilot 16.5 s, Reserve 17.3 s |
+| 94 | Auftrag 1 | Auftrag 4: Frist 42.9 s (Richtzeit 33 s), Autopilot 57.8 s, Reserve -14.9 s |
+| 95 | Auftrag 1 | – |
+| 96 | Auftrag 1 | – |
+| 97 | Auftrag 7 | Auftrag 8: Frist 33.8 s (Richtzeit 26 s), Autopilot 9.7 s, Reserve 24.1 s |
+| 98 | Auftrag 2 | Auftrag 1: Frist 29.9 s (Richtzeit 23 s), Autopilot 26.0 s, Reserve 3.9 s |
+| 99 | Auftrag 4 (statisch) | – |

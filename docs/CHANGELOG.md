@@ -3,6 +3,52 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## Nächste Version (Entwurf, Branch mechanik-grafik)
+
+### Deutsch
+
+**Karriere und Werkstatt**
+- Game Over kostet nicht mehr alle Einbauten: Jeder Einbau verliert eine Stufe. Sektor-Neustart, 5 Leben und 0 Credits bleiben
+- Werkstatt günstiger: 2.700 / 6.500 / 15.000 Credits (je weiterer Werkstatt 10 % mehr)
+- Neuer Einbau „Scheinwerfer“: größerer Lichtkreis um das Taxi in dunklen Leveln, +15 % je Stufe, nur in der Karriere
+- Tanken: Unter 35 % gibt es Sprit nur noch gratis, wenn das Geld nicht reicht – wer zahlen kann, zahlt. Ohne Geld tankt die Station wie bisher bis 35 %
+- Knapp vorbei mit Fahrgast an Bord bringt ein kleines Trinkgeld (2 % des Fahrpreises, höchstens drei Mal je Fahrt)
+
+**Neue Fahrgäste**
+- VIP (goldene Krone): zahlt fast das Doppelte, wartet nur halb so lange, harte Landungen und Treffer kosten doppelt
+- Notfall (rotes Kreuz mit Frist in Sekunden): zahlt das Doppelte, muss vor Ablauf der Frist am Ziel sein
+- Beide als seltene Zusatzfahrgäste in allen Sektoren und als Pflichtfahrgäste in den Leveln ab Sektor 4 (VIP) bzw. 6 (Notfall); je ein Einspieler beim ersten Auftreten
+
+**Nachtschicht**
+- Frei, sobald alle Level der Sektoren 1 bis 4 geschafft sind (vorher alle 99)
+
+**Grafik**
+- Das Taxi ist in seiner echten Größe neu gezeichnet und erscheint pixelgenau (vorher verkleinert, dabei fielen Pixelzeilen weg); Lackierungen, Aufkleber, Werkstatt, Garage und der Verkehr ziehen mit
+- Jeder Sektor hat sein eigenes Felsmaterial – Metallplatten, Kristallfels, Rost und Flickblech, vereister Stahl, Basalt mit Glutadern, bewachsener Unterwasserstahl, Beton und Fliesen, überwucherter Stein, rissiges Gestein – mit Kanten, runden Ecken und Abwechslung im Inneren
+- Ultrawide (21:9, 32:9): Das Spielfeld läuft an den Seiten weich in den Hintergrund aus statt hart zu enden
+
+### English
+
+**Career and workshop**
+- Game over no longer removes all upgrades: every upgrade loses one level. Sector restart, 5 lives and 0 credits stay
+- Cheaper workshop: 2,700 / 6,500 / 15,000 credits (10 % more at each further workshop)
+- New upgrade "Headlight": a larger circle of light around the taxi in dark levels, +15 % per level, career only
+- Refuelling: below 35 % fuel is only free when you cannot pay – whoever can pay, pays. Without money the station still fills up to 35 %
+- A close call with a passenger on board earns a small tip (2 % of the fare, at most three times per trip)
+
+**New passengers**
+- VIP (golden crown): pays almost double, only waits half as long, hard landings and hits cost double
+- Emergency (red cross with a deadline in seconds): pays double, must reach the destination before the deadline
+- Both appear as rare extra passengers in all sectors and as required passengers in levels from sector 4 (VIP) and 6 (emergency); one intro clip each on first appearance
+
+**Night shift**
+- Unlocked once all levels of sectors 1 to 4 are completed (previously all 99)
+
+**Graphics**
+- The taxi is redrawn at its real size and shows pixel-perfect (it used to be scaled down, losing pixel rows); paint jobs, stickers, workshop, garage and traffic follow
+- Every sector has its own rock material – metal plates, crystal rock, rust and patched sheet metal, icy steel, basalt with glowing veins, overgrown underwater steel, concrete and tiles, overgrown stone, cracked rock – with edges, rounded corners and variety inside
+- Ultrawide (21:9, 32:9): the playfield fades softly into the background at the sides instead of ending abruptly
+
 ## 1.0.1
 
 ### Deutsch

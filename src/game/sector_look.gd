@@ -1,6 +1,6 @@
 class_name SectorLook
 extends RefCounted
-## Bildsprache je Sektor: Fels-Material (tiles_sN.png, tools/art/gen_sector_tiles.py), Kantenfarben und Tonwert des Hintergrunds.
+## Bildsprache je Sektor: Fels-Material (tiles_sN.png mit Rand- und Eckkacheln, tools/art/gen_sector_tiles.py), Kantenfarben und Tonwert des Hintergrunds.
 ## Funktionsfarben (Plattformen, Tankpad, Gefahren) bleiben in allen Sektoren gleich. Der Hintergrund tritt durch weniger Sättigung
 ## und Kontrast sowie Dunst in Sektorfarbe zurück, damit die Spielfläche führt.
 
@@ -27,3 +27,8 @@ static func of(sector: int) -> Dictionary:
 static func tiles(sector: int) -> Texture2D:
 	var p := "res://assets/art/tiles_s%d.png" % sector
 	return load(p if ResourceLoader.exists(p) else "res://assets/art/tiles_s1.png")
+
+## Normal-Map zum Fels-Atlas des Sektors (tiles_sN_n.png, Runde 63); fehlt sie, die von Sektor 1.
+static func tiles_normal(sector: int) -> Texture2D:
+	var p := "res://assets/art/tiles_s%d_n.png" % sector
+	return load(p if ResourceLoader.exists(p) else "res://assets/art/tiles_s1_n.png")

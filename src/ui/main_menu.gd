@@ -220,7 +220,7 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_QUIT"), "quit", func(): get_tree().quit()]]:
 		grid.add_child(_menu_button(entry[0], entry[1], entry[2], true))
 	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagschicht: ab Sektor 1
-	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln
+	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln der Sektoren 1–4
 	if Save.shift_unlocked(ids) and Save.shift_used_today(Daily.today()):      # … und nur ein Versuch pro Tag
 		var sb := grid.get_child(1) as Button
 		sb.disabled = true

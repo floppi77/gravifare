@@ -138,7 +138,7 @@ func _enter_course() -> void:
 		gates.start()
 
 func _enter_credit() -> void:
-	run.money += 500.0                        # ab 35 % kostet Sprit Geld: Guthaben reicht in der Übung zum Volltanken
+	run.money += 500.0                        # mit Geld in der Kasse kostet jeder Tropfen, auch unter 35 %: Guthaben reicht in der Übung zum Volltanken
 
 func _enter_price() -> void:
 	run.force_price_change()                  # ein einziger, sichtbarer Preiswechsel; danach bleibt der Preis fest (prices_frozen)

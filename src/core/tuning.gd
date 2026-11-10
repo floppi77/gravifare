@@ -27,6 +27,18 @@ const GEAR_FALL_FACTOR := 0.6    # Fahrwerk nach unten: nur 60 % der Dämpfung u
 
 # Hülle
 const TAXI_SCALE := 0.8           # Taxi 20 % kleiner als im ersten Entwurf (mehr Platz auf den Pads)
+## Taxi-Grafik (Runde 62): taxi.png ist 78×48 px = 26×16 Einheiten (3 px je Einheit, 1:1 bei 1080p, vorher 96×60 mit 0,8 verkleinert gezeichnet).
+## Der Taxi-Knoten zeichnet weiter in Entwurfsmaßen (Maßstab TAXI_SCALE): dort ist TAXI_RECT das Bild. Trefferfläche und Physik (HULL_HALF, FOOT_X, GEAR_LEN) bleiben.
+const TAXI_PX := Vector2(78, 48)
+const TAXI_UNITS := Vector2(26.0, 16.0)                                   # TAXI_PX / 3
+const TAXI_RECT := Rect2(-16.25, -10.0, 32.5, 20.0)                       # TAXI_UNITS / TAXI_SCALE, mittig
+const STICKER_RECT := Rect2(-12.92, -4.17, 8.333, 8.333)                  # Aufkleber am Rumpf (sticker_*_s.png, 20 px): Texturpixel x 8–28, y 14–34
+const TAXI_REFLECT_SRC := Rect2(0, 22, 78, 26)                           # Bodenspiegelung: untere Bildhälfte (Zeilen 22–47) …
+const TAXI_REFLECT_DST := Rect2(-16.25, -0.83, 32.5, 10.83)               # … an derselben Stelle wie im Bild (Entwurfsmaße)
+
+## Taxi-Bild in Entwurfsmaßen, mit `k` vergrößert (Übergang und Hauptmenü zeichnen es doppelt so groß).
+static func taxi_rect(k := 1.0) -> Rect2:
+	return Rect2(TAXI_RECT.position * k, TAXI_RECT.size * k)
 const HULL_HALF := Vector2(8, 4)
 const FOOT_X := 6.4
 const GEAR_LEN := 4.0
@@ -88,7 +100,25 @@ const PRICE_HARD_CAP := 1.6       # Obergrenze (× Maximalpreis) auch bei Berüh
 const PUMP_TOUCHES_TO_BREAK := 3
 const PUMP_TOUCH_COOLDOWN := 1.2
 const PUMP_BOOM_DELAY := 0.7
-const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station immer kostenlos
+const EMERGENCY_FUEL := 35.0     # bis hierhin tankt die Station kostenlos, wenn das Geld nicht reicht (ab Regelstand 3; vorher immer)
+# Beinahe-Treffer (Run._check_near_tip): zügig (≥ NEAR_SPEED) und höchstens NEAR_GAP px am Fels vorbei, ohne Berührung
+const NEAR_SPEED := 75.0
+const NEAR_GAP := 3.0
+const NEAR_COOLDOWN := 4.0
+const NEAR_TIP_FRACTION := 0.02  # Trinkgeld: 2 % des Grundfahrpreises des Fahrgasts an Bord
+const NEAR_TIP_MAX := 3          # höchstens drei Trinkgelder je Fahrt
+# Fahrgasttypen (Run.kind_of; Level-JSON: Auftrag mit "kind": "vip" | "emergency"; Zusatzfahrgäste per Zufall)
+const PASSENGER_KINDS := ["vip", "emergency"]
+const VIP_FARE := 1.8            # VIP: Fahrpreis 1,8-fach …
+const VIP_PATIENCE := 0.5        # … halbe Geduld …
+const VIP_PENALTY_K := 2.0       # … und harte Landung/Treffer mit VIP an Bord kosten doppelten Abzug
+const EMERGENCY_FARE := 2.0      # Notfall: doppelter Fahrpreis …
+const EMERGENCY_DEADLINE := 1.3  # … und eine Frist von 1,3 × Richtzeit (vom Erscheinen bis zum Absetzen)
+const EXTRA_KIND_BASE := 0.06    # Zusatzfahrgast ist VIP oder Notfall: 6 % in Sektor 1 …
+const EXTRA_KIND_STEP := 0.015   # … +1,5 % je Sektor (Sektor 9: 18 %), je zur Hälfte VIP und Notfall
+
+static func extra_kind_chance(sector: int) -> float:
+	return EXTRA_KIND_BASE + EXTRA_KIND_STEP * float(clampi(sector, 1, 9) - 1)
 
 # Belohnungen: Auftrags-Fahrpreise sinken ab Level 5 (Zusatzfahrgäste werden nötig, um im Plus zu bleiben)
 const FARE_SCALE_EARLY := 1.0

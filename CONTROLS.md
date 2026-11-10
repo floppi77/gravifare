@@ -17,7 +17,8 @@ Levelwechsel-Sequenz: A/Enter/B/Esc/Start überspringen die Weltraumfahrt.
 **Neustart mitten im Level** braucht einen zweiten Druck (R / Back) innerhalb von 2 Sekunden. **Landeassistent:** Mit ausgefahrenem Fahrwerk über einer Plattform erscheint neben dem Taxi ein Feld mit Symbol, Grenzmarke und Haken/Warnzeichen; abschaltbar unter Optionen → Spiel. Die Gamepad-Belegung wurde nicht verändert.
 
 
-**Werkstatt, Nachtschicht:** Beide im Hauptmenü. Der Geist der Bestzeit lässt sich unter Optionen → Spiel abschalten.
+**Werkstatt, Nachtschicht:** Die Werkstatt öffnet nach jedem Sektor (vier Einbauten, auch der Scheinwerfer: Steuerkreuz/Pfeile wählen, A/Enter kauft, B/Esc verlässt). Die Nachtschicht steht im Hauptmenü und ist frei, sobald alle Level der Sektoren 1–4 geschafft sind. Der Geist der Bestzeit lässt sich unter Optionen → Spiel abschalten.
 
 **Tutorial:** B (Gamepad) oder U (Tastatur) überspringt den laufenden Text.
 **Landen:** Nur die helle Landeplatte auf dem Pad zählt; beide Kufen müssen darauf stehen.
+**Fahrgasttypen:** VIP (Krone) und Notfall (Kreuz mit Frist in Sekunden) werden über der Figur, über dem Taxi (Frist an Bord) und in der Auftragszeile als Text angezeigt; keine neuen Tasten.

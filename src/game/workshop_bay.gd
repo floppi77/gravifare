@@ -19,6 +19,8 @@ const LIFT_X := 170.0
 const LIFT_LOW := 298.0
 const LIFT_HIGH := 232.0
 const TAXI_H := 26.0                  # Abstand Rumpfmitte zur Bühne
+const TW := 39.0                      # halbe Taxibreite: Bild 78×48 Hallen-Einheiten (3-fach wie im Spiel, Runde 62)
+const TH := 24.0
 const HATCH_W := 72.0
 
 var sector := 1
@@ -36,7 +38,7 @@ var look: Dictionary
 var tiles: Texture2D
 var taxi_tex: Texture2D
 var sticker_tex: Texture2D
-var ws_icons: Texture2D = preload("res://assets/art/ws_icons.png")     # Düsen, Panzerhülle, Fahrwerk (26 px je Symbol, tools/art/aseprite)
+var ws_icons: Texture2D = preload("res://assets/art/ws_icons.png")     # Düsen, Panzerhülle, Fahrwerk, Scheinwerfer (26 px je Symbol, tools/art/aseprite)
 var focus_item := ""                  # fokussierter Einbau: das Taxi zeigt das passende Teil
 var desc_label: Label
 
@@ -46,7 +48,7 @@ func _ready() -> void:
 	look = SectorLook.of(sector)
 	tiles = SectorLook.tiles(sector)
 	taxi_tex = Cosmetics.paint_texture()
-	sticker_tex = Cosmetics.sticker_texture()
+	sticker_tex = Cosmetics.sticker_small_texture()       # 20 px wie am Taxi im Spiel
 	var stage := Stage.make(self)
 	panel = Control.new()
 	panel.position = Vector2(340, 0)
@@ -111,11 +113,13 @@ func _build(focus_id: String) -> void:
 		_focus(focus_id)
 
 ## Einbau als Karte mit Symbol, drei Stufenfeldern, Wirkung jetzt → nächste Stufe und farbigem Preis.
-const WS_IDX := {"jets": 0, "hull": 1, "gear": 2}
+const WS_IDX := {"jets": 0, "hull": 1, "gear": 2, "light": 3}
+const WS_ACCENT := [Color("#ff9a3a"), Color("#35c8e0"), Color("#ffcb3d"), Color("#fff1a8")]
 func _effect(id: String, l: int) -> String:
 	match id:
 		"jets": return tr("WS_EFF_JETS") % int(round(Workshop.JETS_STEP * 100.0 * l))
 		"hull": return tr("WS_EFF_HULL") % int(round(Workshop.HULL_STEP * 100.0 * l))
+		"light": return tr("WS_EFF_LIGHT") % int(round(Workshop.LIGHT_STEP * 100.0 * l))
 		_: return tr("WS_EFF_GEAR") % int(round(Workshop.GEAR_STEP * l))
 
 class Pips extends Control:
@@ -141,7 +145,7 @@ func _item_card(id: String) -> PanelContainer:
 	var l := Workshop.level_of(Save.data, id)
 	var price := Workshop.price(Save.data, id, sector)
 	var can := l < Workshop.MAX_LEVEL and wallet >= float(price)
-	var accent: Color = [Color("#ff9a3a"), Color("#35c8e0"), Color("#ffcb3d")][WS_IDX[id]]
+	var accent: Color = WS_ACCENT[WS_IDX[id]]
 	var card := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.05, 0.06, 0.16, 0.92)
@@ -371,7 +375,7 @@ func _draw_hall_details() -> void:
 	for id in Workshop.ITEMS:
 		var l := Workshop.level_of(Save.data, id)
 		for k in Workshop.MAX_LEVEL:
-			draw_rect(Rect2(mon.position.x + 6 + k * 6, mon.position.y + 31 + i * 4, 5, 2.67), g if k < l else Color(g, 0.18))
+			draw_rect(Rect2(mon.position.x + 6 + k * 6, mon.position.y + 29 + i * 3.4, 5, 2.4), g if k < l else Color(g, 0.18))
 		i += 1
 	if int(t * 2.0) % 2 == 0:
 		draw_rect(Rect2(mon.end.x - 8, mon.position.y + 4, 3, 3), g)
@@ -415,28 +419,34 @@ func _draw_taxi() -> void:
 	var c := taxi_pos
 	if flame > 0.0:
 		var fl := (0.7 + 0.3 * sin(t * 40.0)) * flame
-		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 7, c.y + 16), Vector2(c.x + 7, c.y + 16), Vector2(c.x, c.y + 16 + 26.0 * fl)]), Color(1.0, 0.55, 0.2, 0.9))
-		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 3, c.y + 16), Vector2(c.x + 3, c.y + 16), Vector2(c.x, c.y + 16 + 14.0 * fl)]), Color(1.0, 0.94, 0.65))
+		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 6, c.y + 20), Vector2(c.x + 6, c.y + 20), Vector2(c.x, c.y + 20 + 22.0 * fl)]), Color(1.0, 0.55, 0.2, 0.9))
+		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 3, c.y + 20), Vector2(c.x + 3, c.y + 20), Vector2(c.x, c.y + 20 + 12.0 * fl)]), Color(1.0, 0.94, 0.65))
 	else:
 		for s in [-1.0, 1.0]:                      # Fahrwerk steht auf der Bühne
-			draw_rect(Rect2(c.x + 24.0 * s - 1.5, c.y + 16.0, 3.0, TAXI_H - 16.0), Color("#3a4580"))
-			draw_rect(Rect2(c.x + 24.0 * s - 5.0, c.y + TAXI_H - 2.0, 10.0, 2.0), Color("#c9cfee"))
+			draw_rect(Rect2(c.x + 20.0 * s - 1.5, c.y + 14.0, 3.0, TAXI_H - 14.0), Color("#3a4580"))
+			draw_rect(Rect2(c.x + 20.0 * s - 5.0, c.y + TAXI_H - 2.0, 10.0, 2.0), Color("#c9cfee"))
 	var pulse := 0.5 + 0.5 * sin(t * 5.0)
 	if state == S.SHOP and focus_item == "gear":       # Fahrwerk: Federbeine leuchten
 		for s in [-1.0, 1.0]:
-			draw_rect(Rect2(c.x + 24.0 * s - 3.0, c.y + 14.0, 6.0, TAXI_H - 14.0), Color(1.0, 0.8, 0.25, 0.35 + 0.35 * pulse))
+			draw_rect(Rect2(c.x + 20.0 * s - 3.0, c.y + 12.0, 6.0, TAXI_H - 12.0), Color(1.0, 0.8, 0.25, 0.35 + 0.35 * pulse))
 	if taxi_tex != null:
-		draw_texture_rect(taxi_tex, Rect2(c.x - 48.0, c.y - 30.0, 96.0, 60.0), false)
+		draw_texture_rect(taxi_tex, Rect2(c.x - TW, c.y - TH, TW * 2.0, TH * 2.0), false)
 	if state == S.SHOP and focus_item == "jets":       # Düsen: Glühen an der Hauptdüse und an den Seitenkapseln
-		for q in [Vector2(c.x, c.y + 24.0), Vector2(c.x - 47.0, c.y), Vector2(c.x + 47.0, c.y)]:
+		for q in [Vector2(c.x, c.y + 19.0), Vector2(c.x - 38.0, c.y), Vector2(c.x + 38.0, c.y)]:
 			draw_circle(q, 9.0, Color(1.0, 0.6, 0.2, 0.16 + 0.14 * pulse))
 			draw_arc(q, 6.0 + 2.0 * pulse, 0, TAU, 20, Color(1.0, 0.75, 0.3, 0.55 + 0.35 * pulse), 1.4)
 	if state == S.SHOP and focus_item == "hull":       # Panzerhülle: Schildschimmer um den Rumpf
-		draw_arc(Vector2(c.x, c.y + 2.0), 46.0, PI * 1.08, PI * 1.92, 32, Color(0.35, 0.85, 1.0, 0.35 + 0.4 * pulse), 2.0)
-		draw_arc(Vector2(c.x, c.y + 2.0), 50.0, PI * 1.12, PI * 1.88, 32, Color(0.35, 0.85, 1.0, 0.15 + 0.2 * pulse), 1.4)
-		draw_arc(Vector2(c.x, c.y - 4.0), 46.0, PI * 0.12, PI * 0.88, 32, Color(0.35, 0.85, 1.0, 0.25 + 0.3 * pulse), 2.0)
+		draw_arc(Vector2(c.x, c.y + 2.0), 38.0, PI * 1.08, PI * 1.92, 32, Color(0.35, 0.85, 1.0, 0.35 + 0.4 * pulse), 2.0)
+		draw_arc(Vector2(c.x, c.y + 2.0), 42.0, PI * 1.12, PI * 1.88, 32, Color(0.35, 0.85, 1.0, 0.15 + 0.2 * pulse), 1.4)
+		draw_arc(Vector2(c.x, c.y - 4.0), 38.0, PI * 0.12, PI * 0.88, 32, Color(0.35, 0.85, 1.0, 0.25 + 0.3 * pulse), 2.0)
+	if state == S.SHOP and focus_item == "light":      # Scheinwerfer: Lichtkreis um das Taxi wächst je Stufe
+		var lk := Workshop.light_k(Save.data)
+		for k in 3:
+			draw_circle(Vector2(c.x, c.y + 4.0), 40.0 * lk * (1.0 - 0.22 * k), Color(1.0, 0.95, 0.7, 0.05 + 0.03 * pulse))
+		draw_arc(Vector2(c.x, c.y + 4.0), 40.0 * Workshop.light_k_for(mini(Workshop.level_of(Save.data, "light") + 1, Workshop.MAX_LEVEL)), 0, TAU, 40, Color(1.0, 0.92, 0.55, 0.35 + 0.35 * pulse), 1.4)
+		draw_circle(Vector2(c.x, c.y + 16.0), 2.6, Color(1.0, 0.97, 0.8, 0.7 + 0.3 * pulse))
 	if sticker_tex != null:
-		draw_texture_rect(sticker_tex, Rect2(c.x - 39.0, c.y - 12.6, 24.0, 24.0), false)
+		draw_texture_rect(sticker_tex, Rect2(c.x - TW + 8.0, c.y - TH + 14.0, 20.0, 20.0), false)      # Texturpixel x 8, y 14 wie am Taxi
 
 func _draw_roof(m: Vector2) -> void:
 	var x0 := -ceilf(m.x / TILE) * TILE
