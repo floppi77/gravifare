@@ -88,7 +88,7 @@ Godot 4.7.x und die passenden Exportvorlagen vorausgesetzt:
 ```bash
 godot --headless --import                # einmal nach dem Checkout
 godot --path .                           # Spiel starten
-godot --headless -s tests/test_runner.gd # Tests (über 2700 Prüfungen)
+godot --headless -s tests/test_runner.gd # Tests (über 3400 Prüfungen)
 tools/export_release.sh                  # Pakete für Linux, Windows, macOS nach build/release/
 ```
 
@@ -143,7 +143,7 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
 - **Career with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
   (jets, hull, tank …). Game over resets the sector.
-- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (one map a day with fixed jobs and prices),
+- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (a brightly lit map every day with a daily rule – windy day, fog, mirror world, thin tank, glass roof, rush hour, tailwind – and a daily goal with bronze, silver and gold, a streak with rewards and a ghost),
   and a **garage** with paint jobs and stickers.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
@@ -171,7 +171,7 @@ Requires Godot 4.7.x and the matching export templates:
 ```bash
 godot --headless --import                # once after checkout
 godot --path .                           # run the game
-godot --headless -s tests/test_runner.gd # tests (over 2700 checks)
+godot --headless -s tests/test_runner.gd # tests (over 3400 checks)
 tools/export_release.sh                  # packages for Linux, Windows, macOS in build/release/
 ```
 

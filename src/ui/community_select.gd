@@ -57,7 +57,7 @@ func _ready() -> void:
 	main.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	main.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(main)
-	main.add_child(_at(MenuKit.title(tr("CM_TITLE"), 16), Vector2(0, 8), Vector2(640, 20)))
+	main.add_child(_at(MenuKit.screen_title(tr("CM_TITLE")), Vector2(0, 3), Vector2(640, 26)))
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	main.add_child(_at(scroll, Vector2(16, 36), Vector2(290, 214)))

@@ -18,7 +18,7 @@ var bar_fill: ColorRect
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(MenuKit.dim_rect(0.62))
-	add_child(_at(MenuKit.title(tr("MENU_MUSIC"), 16), Vector2(0, 8), Vector2(640, 20)))
+	add_child(_at(MenuKit.screen_title(tr("MENU_MUSIC")), Vector2(0, 3), Vector2(640, 26)))
 	tracks = TrackList.all()
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 12)

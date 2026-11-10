@@ -237,6 +237,13 @@ static func version_label() -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	return l
 
+## Titel aller Menübildschirme: immer dieselbe Pixel-Schrift (Jersey 10) in derselben Größe; `size` nur dort, wo wenig Platz ist (Spalte im Hauptmenü).
+const TITLE_SIZE := 26
+static func screen_title(text: String, size := TITLE_SIZE) -> Label:
+	var l := title(text, size)
+	l.add_theme_font_override("font", Fonts.title)
+	return l
+
 static func title(text: String, size := 16) -> Label:
 	var l := Label.new()
 	l.text = text

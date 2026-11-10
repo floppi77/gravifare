@@ -8,8 +8,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Meilenstein M4, laufend):** über 3200 Prüfungen, alle bestanden (3213). Neu je Runde, jüngste zuerst:
+**Stand (Meilenstein M4, laufend):** über 3400 Prüfungen, alle bestanden (3476). Neu je Runde, jüngste zuerst:
 
+- **Runde 57:** Pixelgrafik der Hindernisse (Kachelblatt, Warnfarben, Mindestgrößen), Linien im Pixelraster (Ringe symmetrisch, keine Vektorlinien), Leben im Hintergrund (Deckkraft, Stillstand, feste Folge), Menütitel, Garage, Optionsknöpfe
 - **Runde 50:** Testflug eines Entwurfs: Bestzeit, Bestwert und Flüge werden beim Speichern übernommen; Levelliste zeigt selbst gelöste Level ohne Eintrag als „von dir gelöst“
 - **Runde 52:** Tagschicht (Wochenplan der Regeln und Tagesziel, Spiegelwelt (Bild gespiegelt, Steuerung dadurch vertauscht), Regeln auf dem Level, Wertung und Medaillen des Ziels, Serie, Gold und Belohnungen, Geist, Screenshot-Name, Texte)
 - **Runde 51:** Nachtschicht (Tagesplan, Dunkelheit, Schwerkraftgrenzen für alle 99 Level, Auftragsketten, Wertung und Noten, Lebensstation aus, Ein-Versuch-Regel, Screenshot-Dateinamen, Namen der Spielstände, Wertung 80/10/10 mit Credits je 1500, Fahrer-Ablauf und Ansagen im Finale, Fokus der Bildschirmtastatur, gemeinsame Menütafel)

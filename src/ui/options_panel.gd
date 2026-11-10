@@ -37,7 +37,14 @@ func _clear() -> void:
 		remove_child(c)
 		c.queue_free()
 
+## Knöpfe so breit wie die Tafel (der Spalte des Menüs), nicht in einer festen schmalen Breite in der Mitte.
+func _fit_buttons() -> void:
+	for c in get_children():
+		if c is Button:
+			(c as Button).size_flags_horizontal = Control.SIZE_FILL
+
 func _focus() -> void:
+	_fit_buttons()
 	await get_tree().process_frame
 	for c in find_children("*", "Button", true, false):
 		c.grab_focus()
@@ -57,7 +64,7 @@ func _toggle(label_key: String, setting: String, on_change := Callable()) -> But
 func show_root() -> void:
 	page = "root"
 	_clear()
-	add_child(MenuKit.title(tr("MENU_OPTIONS")))
+	add_child(MenuKit.screen_title(tr("MENU_OPTIONS"), 20))
 	add_child(MenuKit.button(tr("OPT_CAT_AUDIO"), show_audio))
 	add_child(MenuKit.button(tr("OPT_CAT_CONTROLS"), show_controls))
 	add_child(MenuKit.button(tr("OPT_CAT_DISPLAY"), show_display))
@@ -68,7 +75,7 @@ func show_root() -> void:
 func show_audio() -> void:
 	page = "audio"
 	_clear()
-	add_child(MenuKit.title(tr("OPT_CAT_AUDIO")))
+	add_child(MenuKit.screen_title(tr("OPT_CAT_AUDIO"), 20))
 	add_child(MenuKit.slider_row(tr("OPT_MASTER"), Settings.values.master, func(x): Settings.set_value("master", x)))
 	add_child(MenuKit.slider_row(tr("OPT_MUSIC"), Settings.values.music, func(x): Settings.set_value("music", x)))
 	add_child(MenuKit.slider_row(tr("OPT_SFX"), Settings.values.sfx, func(x): Settings.set_value("sfx", x)))
@@ -80,7 +87,7 @@ func show_audio() -> void:
 func show_controls() -> void:
 	page = "controls"
 	_clear()
-	add_child(MenuKit.title(tr("OPT_CAT_CONTROLS")))
+	add_child(MenuKit.screen_title(tr("OPT_CAT_CONTROLS"), 20))
 	add_child(MenuKit.button(tr("OPT_BINDINGS"), show_bindings))
 	add_child(MenuKit.slider_row(tr("OPT_DEADZONE"), Settings.values.deadzone, func(x): Settings.set_value("deadzone", clampf(x, 0.05, 0.9))))
 	add_child(MenuKit.slider_row(tr("OPT_VIBRATION"), Settings.values.vibration, func(x):
@@ -99,7 +106,7 @@ func show_controls() -> void:
 func show_display() -> void:
 	page = "display"
 	_clear()
-	add_child(MenuKit.title(tr("OPT_CAT_DISPLAY")))
+	add_child(MenuKit.screen_title(tr("OPT_CAT_DISPLAY"), 20))
 	add_child(_toggle("OPT_FULLSCREEN", "fullscreen"))
 	add_child(_toggle("OPT_VSYNC", "vsync"))
 	var fps := MenuKit.button("", func(): pass)
@@ -121,7 +128,7 @@ func show_display() -> void:
 func show_game() -> void:
 	page = "game"
 	_clear()
-	add_child(MenuKit.title(tr("OPT_CAT_GAME")))
+	add_child(MenuKit.screen_title(tr("OPT_CAT_GAME"), 20))
 	var lang := MenuKit.button("", func(): pass)
 	var lr := func():
 		var code: String = TranslationServer.get_locale().substr(0, 2)
@@ -146,7 +153,7 @@ func show_bindings() -> void:
 	page = "bindings"
 	_clear()
 	listen = {}
-	add_child(MenuKit.title(tr("OPT_BINDINGS")))
+	add_child(MenuKit.screen_title(tr("OPT_BINDINGS"), 20))
 	var head := HBoxContainer.new()
 	head.alignment = BoxContainer.ALIGNMENT_CENTER
 	head.add_theme_constant_override("separation", 3)

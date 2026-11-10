@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_round57_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -2399,6 +2399,104 @@ func _test_round54_visuals() -> void:
 	check(names.size() >= 5, "Erster Fahrgast heißt nicht in jedem Sektor gleich (%d Namen)" % names.size())
 	var dv := FileAccess.get_file_as_string("res://src/game/dark_view.gd")
 	check(dv.contains("uniform vec4 cones[16]") and dv.contains("kein runder Schein"), "Dunkelheit: Fahrzeuge leuchten mit Kegeln statt rundum")
+
+## Runde 57: Pixelgrafik für Hindernisse, Linien im Pixelraster, Leben im Hintergrund, Menüs.
+func _src(path: String) -> String:
+	return FileAccess.get_file_as_string(path)
+
+func _body(src: String, from: String, to: String) -> String:
+	var a := src.find(from)
+	var b := src.find(to, a + 1)
+	return src.substr(a, (b if b > a else src.length()) - a)
+
+func _test_round57_visuals() -> void:
+	# 1) Trümmer, Schieber, Plattformen aus Kacheln (movers.png: 10 Spalten × 3 Zeilen à 12 px)
+	var mv: Texture2D = load("res://assets/art/movers.png")
+	check(mv != null and mv.get_width() == 120 and mv.get_height() == 36, "Hindernis-Kacheln: 10 × 3 Stücke à 12 px")
+	var img := mv.get_image()
+	var has := func(row: int, col: int, pred: Callable) -> bool:
+		for y in 12:
+			for x in 12:
+				var c := img.get_pixel(col * 12 + x, row * 12 + y)
+				if c.a > 0.5 and pred.call(c):
+					return true
+		return false
+	var orange := func(c: Color) -> bool: return c.r > 0.9 and c.g > 0.55 and c.g < 0.8 and c.b < 0.3
+	var yellow := func(c: Color) -> bool: return c.r > 0.9 and c.g > 0.7 and c.b < 0.35
+	var turq := func(c: Color) -> bool: return c.r < 0.3 and c.g > 0.8 and c.b > 0.75
+	check(has.call(0, 1, orange), "Trümmer behalten den orangen Warnrand")
+	check(has.call(1, 7, yellow), "Schieber behalten den gelben Warnstreifen unten")
+	check(has.call(2, 1, turq), "Plattformen behalten die türkise Landeleiste")
+	check(img.get_pixel(0, 0).a < 0.1 and img.get_pixel(12 * 2 + 11, 0).a < 0.1, "Trümmer: Ecken sind abgeschrägt (Brocken statt Lineal)")
+	var minpx := 9999
+	var kinds := {}
+	for id in ["s3_03", "s3_11", "s4_06", "s9_03", "s9_11"]:
+		var l := LevelData.load_file("res://data/levels/%s.json" % id)
+		for m in l.movers:
+			if m.kind in ["debris", "slider", "pad"]:
+				kinds[m.kind] = true
+				minpx = mini(minpx, mini(roundi(m.rect.size.x * 3.0), roundi(m.rect.size.y * 3.0)))
+	check(kinds.size() == 3 and minpx >= 24, "Alle Hindernisarten der Level sind mindestens zwei Kacheln groß (kleinstes Maß %d Bildpunkte)" % minpx)
+	var pv := _src("res://src/game/props_view.gd")
+	check(pv.contains("_draw_mover_box(0 if m.kind") and pv.contains("assets/art/movers.png") and not pv.contains("col.lightened(0.12)"), "props_view setzt Hindernisse aus Kacheln zusammen")
+	check(pv.contains("var r: Rect2 = m.rect") and pv.contains("_draw_mover_box(2, r"), "Fläche der Kacheln ist die Trefferfläche m.rect (Logik unberührt)")
+	# 2) Linien im Pixelraster
+	var wind := _body(pv, "func _draw_wind", "func _timer_arc")
+	var timer := _body(pv, "func _timer_arc", "func _draw_heat")
+	var magnet := _body(pv, "func _draw_magnet", "func _draw_movers")
+	var vehicle := _body(pv, "func _draw_vehicle(m", "func _draw_beam")
+	for part in [["Wind", wind], ["Takt-Anzeige", timer], ["Magnet", magnet], ["Verkehrspfad", vehicle]]:
+		var code: String = part[1]
+		var vec := code.contains("draw_arc(") or code.contains("draw_polyline(") or code.contains("draw_line(")
+		check(not vec and code.contains("PixelDraw."), "%s: keine Vektorlinien mehr, nur Pixelraster" % part[0])
+	var tv := _src("res://src/game/transition_view.gd")
+	check(not tv.contains("draw_colored_polygon(") and tv.contains("PixelDraw.jet(") and tv.contains("taxi_tex.get_size()") and not tv.contains("Rect2(-32, -20, 64, 40)"), "Zwischensequenz: Flamme aus Pixelzeilen, Taxigröße aus der Textur")
+	check(_src("res://src/ui/menu_backdrop.gd").contains("taxi.get_size()") and not _src("res://src/ui/menu_backdrop.gd").contains("Rect2(-32, -20, 64, 40)"), "Menühintergrund: Taxigröße aus der Textur")
+	var pd := load("res://src/game/pixel_draw.gd")
+	check(absf(pd.snap(7.4) * 3.0 - roundf(pd.snap(7.4) * 3.0)) < 0.0001 and absf(pd.snap(-2.13) * 3.0 - roundf(pd.snap(-2.13) * 3.0)) < 0.0001, "PixelDraw.snap liegt auf dem Raster von 1/3 Einheit")
+	for rr in [[10.5, 13.5], [0.0, 9.0], [29.0, 32.0]]:
+		var runs: Array = pd.ring_runs(rr[0], rr[1])
+		var set := {}
+		var area := 0
+		for run in runs:
+			for i in int(run[2]):
+				set[Vector2i(int(run[0]) + i, int(run[1]))] = true
+				area += 1
+		var sym := true
+		for p in set:
+			sym = sym and set.has(Vector2i(-1 - p.x, p.y)) and set.has(Vector2i(p.x, -1 - p.y))
+		var want: float = PI * (rr[1] * rr[1] - rr[0] * rr[0])
+		check(sym and absf(float(area) - want) / want < 0.1, "Pixelring %s: symmetrisch, Fläche %d ≈ %.0f" % [str(rr), area, want])
+	# 3) Leben im Hintergrund
+	var ok_alpha := true
+	var ok_det := true
+	var ok_still := true
+	var ok_move := false
+	for n in range(1, 10):
+		var a: Array = BackdropLife.make(n)
+		var b: Array = BackdropLife.make(n)
+		ok_det = ok_det and str(a) == str(b) and a.size() >= 5
+		ok_alpha = ok_alpha and BackdropLife.max_alpha(a) <= 0.151 and BackdropLife.MAX_ALPHA <= 0.15
+		for it in a:
+			ok_still = ok_still and BackdropLife.pos_at(it, Vector2(640, 360), 0.0, true).is_equal_approx(BackdropLife.pos_at(it, Vector2(640, 360), 123.4, true))
+			if String(it.k) == "car":
+				ok_move = ok_move or not BackdropLife.pos_at(it, Vector2(640, 360), 0.0, false).is_equal_approx(BackdropLife.pos_at(it, Vector2(640, 360), 5.0, false))
+	check(ok_det, "Hintergrundleben: je Sektor feste Folge mit Verkehr, Blinklichtern und Teilchen")
+	check(ok_alpha, "Hintergrundleben: Deckkraft höchstens 15 %")
+	check(ok_still, "Hintergrundleben: bei „Weniger Bewegung“ steht alles still")
+	check(ok_move, "Hintergrundleben: ohne die Einstellung fährt der Verkehr")
+	var bd := _src("res://src/game/backdrop.gd")
+	check(bd.contains("BackdropLife.draw(") and bd.contains("reduce_motion") and bd.contains("const DIM := {1: 0.30, 2: 0.46, 3: 0.30, 4: 0.30, 5: 0.22, 6: 0.22, 7: 0.58, 8: 0.30, 9: 0.12}"), "Hintergrund: Leben über dem Bild, Abdunklung unverändert")
+	# 4) Menüs
+	var all_ok := true
+	for f in ["garage", "stats", "level_select", "music_room", "community_select", "slot_select", "pause_menu", "options_panel"]:
+		var src := _src("res://src/ui/%s.gd" % f)
+		all_ok = all_ok and src.contains("screen_title(") and not src.contains('MenuKit.title(tr("MENU_')
+	check(all_ok, "Alle Menütitel nutzen dieselbe Schrift (MenuKit.screen_title)")
+	check(_src("res://src/ui/menu_kit.gd").contains("static func screen_title") and _src("res://src/ui/menu_kit.gd").contains("Fonts.title"), "screen_title setzt die Pixel-Schrift")
+	var gr := _src("res://src/ui/garage.gd")
+	check(gr.contains("preview.size = Vector2(250, 235)") and gr.contains("tex.get_size()") and not gr.contains("Rect2(c.x - 40, c.y - 25, 80, 50)"), "Garage: große Taxi-Vorschau in der Mitte, Größe aus der Textur")
+	check(_src("res://src/ui/options_panel.gd").contains("func _fit_buttons") and _src("res://src/ui/options_panel.gd").contains("SIZE_FILL"), "Optionen: Knöpfe so breit wie die Tafel")
 
 func _key(code: int) -> InputEventKey:
 	var e := InputEventKey.new()
