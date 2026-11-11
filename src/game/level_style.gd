@@ -1,17 +1,19 @@
 extends Node2D
 ## Optische Sonderbehandlung einzelner Level nach ihrem Namen (rein Optik, Physik und Kollision bleiben unberührt).
-## "neon": Leuchtröhren entlang der Felskanten, Leuchtschilder in der Felsmasse, flackernde Röhren (Neonallee, Neonfinale, Neonlabyrinth).
+## "neon": Leuchtröhren entlang der Felskanten, Leuchtreklame in der Felsmasse (Schrift und Bildzeichen aus Röhren auf dunklen Tafeln, siehe
+## neon_signs.gd), farbiges Licht der Schilder auf Fels und Taxi, flackernde Röhren (Neonallee, Neonfinale, Neonlabyrinth).
 ## "glass": Glasfassade mit Scheibenfeldern, Rahmen, Spiegelungen und wanderndem Lichtreflex.
-## Gezeichnet wird additiv und unbeleuchtet, zwischen Fels und Requisiten: Plattformen, Taxi und Gefahren bleiben darüber gut lesbar.
+## Gezeichnet wird additiv und unbeleuchtet (Tafeln normal), zwischen Fels und Requisiten: Plattformen, Taxi und Gefahren bleiben darüber gut lesbar.
+## Alle Röhren liegen im Pixelraster (1/3 Einheit, wie Runde 57).
 
 const T := 16.0
 const PX := 1.0 / 3.0
 
-## Stil je Level-ID. "pal" = Farbfamilie der Röhren, "signs" = Anteil Schilder (je mehr, desto dichter), "flick" = Anteil flackernder Röhren.
+## Stil je Level-ID. "pal" = Farbfamilie der Röhren, "max" = höchstens so viele Schilder, "flick" = Anteil flackernder Kantenröhren.
 const STYLES := {
-	"S2-02": {"kind": "neon", "pal": ["#ff4fd8", "#4fd8ff", "#b46bff"], "signs": 26, "flick": 0.10},                                # Neonallee: ruhige Reklameallee
-	"S2-06": {"kind": "neon", "pal": ["#ff4fd8", "#ffb347", "#4fd8ff", "#ff6bb5"], "signs": 14, "flick": 0.22},                      # Neonfinale: dichter, heller, nervöser
-	"S2-08": {"kind": "neon", "pal": ["#4fd8ff", "#7b6bff", "#42ffc8"], "signs": 20, "flick": 0.16},                                 # Neonlabyrinth: kühles Blau-Grün mit Richtungspfeilen
+	"S2-02": {"kind": "neon", "pal": ["#ff4fd8", "#4fd8ff", "#b46bff"], "max": 8, "flick": 0.10},                                    # Neonallee: ruhige Reklameallee
+	"S2-06": {"kind": "neon", "pal": ["#ff4fd8", "#ffb347", "#4fd8ff", "#ff6bb5"], "max": 11, "flick": 0.22},                        # Neonfinale: dichter, heller, nervöser
+	"S2-08": {"kind": "neon", "pal": ["#4fd8ff", "#7b6bff", "#42ffc8"], "max": 9, "flick": 0.16},                                    # Neonlabyrinth: kühles Blau-Grün, ruhig an den Strahlen
 	"S2-11": {"kind": "glass"},
 }
 
@@ -21,6 +23,9 @@ var lv: LevelData
 var anim: Node2D
 var tubes_anim: Array = []         # [a, b, Color, Phase] flackernde Röhren
 var panes: Array = []              # [Rect2, Phase] Scheibenfelder für den wandernden Reflex
+var signs: Array = []              # Leuchtreklame (NeonSigns.plan), je Element zusätzlich "tex" und "at"
+var boards: Node2D                 # dunkle Tafeln (normal gemischt, unter den Röhren)
+var lights: Array = []             # [PointLight2D, Schild, Grundenergie]
 var t := 0.0
 
 static func applies_to(id: String) -> bool:
@@ -38,7 +43,17 @@ func setup(level: LevelData) -> void:
 	kind = String(style.get("kind", ""))
 	tubes_anim.clear()
 	panes.clear()
+	signs.clear()
+	for l in lights:
+		(l[0] as Node).queue_free()
+	lights.clear()
 	visible = kind != ""
+	if boards == null:
+		boards = Boards.new()
+		boards.owner_style = self
+		add_child(boards)
+	if kind == "neon":
+		_build_signs()
 	if anim == null:
 		anim = Anim.new()
 		anim.owner_style = self
@@ -48,12 +63,61 @@ func setup(level: LevelData) -> void:
 		anim.material = material
 	set_process(kind != "")
 	queue_redraw()
+	boards.queue_redraw()
 	anim.queue_redraw()
+
+func _build_signs() -> void:
+	signs = NeonSigns.plan(lv, style)
+	var Fx := load("res://src/game/fx.gd")
+	for s in signs:
+		for it in s.items:
+			var b: Array = NeonSigns.bake(it)
+			if not b.is_empty():
+				it["tex"] = b[0]
+				it["at"] = b[1]
+		var r: Rect2 = s.board
+		var big: bool = s.kind == "main"
+		var l: PointLight2D = Fx.make_light(s.col, maxf(r.size.x, r.size.y) * 0.9 + 26.0, 0.0)
+		l.position = r.get_center()
+		add_child(l)
+		lights.append([l, s, 1.1 if big else 0.75])
+
+## Helligkeit eines Elements (Zeichen `g`) eines Schilds zur Zeit t: ruhig mit leisem Surren, ein sterbender Buchstabe, oder Aus-und-Einschalten
+## Zeichen für Zeichen (alle 13–18 s). Bei „Weniger Bewegung“ immer voll.
+func sign_level(s: Dictionary, g: int) -> float:
+	if Settings.values.reduce_motion:
+		return 1.0
+	var ph: float = s.phase
+	var hum := 1.0 - 0.05 * absf(sin(t * 23.0 + ph * 7.0))
+	match String(s.mode):
+		"dying":
+			var dead := int(ph * 100.0) % maxi(s.items.size() - 1, 1)
+			if g == dead:
+				var w := sin(t * 7.0 + ph * 40.0) * sin(t * 1.9 + ph * 17.0)
+				return 0.12 if w < -0.5 else hum * (0.75 + 0.25 * absf(sin(t * 3.1 + ph)))
+		"cycle":
+			var period := 13.0 + fmod(ph * 10.0, 5.0)
+			var u := fmod(t + ph * 50.0, period)
+			if u < 0.6:
+				return 0.1
+			if g >= 0 and u < 0.6 + 0.16 * float(g + 1):
+				return 0.1
+	return hum
+
+func _process_lights() -> void:
+	for e in lights:
+		var l: PointLight2D = e[0]
+		var s: Dictionary = e[1]
+		var sum := 0.0
+		for it in s.items:
+			sum += sign_level(s, int(it.glyph))
+		l.energy = float(e[2]) * sum / float(maxi(s.items.size(), 1))
 
 func _process(delta: float) -> void:
 	if Settings.values.reduce_motion:
 		return
 	t += delta
+	_process_lights()
 	anim.queue_redraw()
 
 func _h(x: int, y: int, k: int) -> int:
@@ -80,12 +144,12 @@ func _pal(h: int) -> Color:
 	var p: Array = style.pal
 	return Color(String(p[h % p.size()]))
 
-## Eine Leuchtröhre von a nach b: weiter Schein, enger Schein, heller Kern (additiv).
+## Eine Leuchtröhre von a nach b im Pixelraster (additiv): Schein in zwei Stufen (9 und 5 Bildpunkte), Röhre 3 Bildpunkte, heller Kern 1 Bildpunkt.
 func _tube(c: CanvasItem, a: Vector2, b: Vector2, col: Color, k: float) -> void:
-	c.draw_line(a, b, Color(col.r, col.g, col.b, 0.16 * k), 9.0)
-	c.draw_line(a, b, Color(col.r, col.g, col.b, 0.34 * k), 4.5)
-	c.draw_line(a, b, Color(col.r, col.g, col.b, 1.0 * k), 2.0)
-	c.draw_line(a, b, Color(1, 1, 1, 0.8 * k), 0.8)
+	PixelDraw.line(c, a, b, Color(col.r, col.g, col.b, 0.10 * k), 9)
+	PixelDraw.line(c, a, b, Color(col.r, col.g, col.b, 0.22 * k), 5)
+	PixelDraw.line(c, a, b, Color(col.r, col.g, col.b, 0.9 * k), 3)
+	PixelDraw.line(c, a, b, Color(1, 1, 1, 0.75 * k), 1)
 
 ## Lichtschein, der von der Röhre in den Raum fällt.
 func _spill(c: CanvasItem, from: Vector2, to: Vector2, depth: Vector2, col: Color, k: float) -> void:
@@ -116,8 +180,6 @@ func _draw_neon() -> void:
 					if h % 6 != 0:
 						_add_tube(horizontal, o, s, i, d, h, flick)
 				run = 0
-	_draw_signs()
-	_draw_plates()
 
 func _add_tube(horizontal: bool, o: int, s: int, e: int, d: Array, h: int, flick: float) -> void:
 	var col := _pal(h >> 4)
@@ -138,78 +200,6 @@ func _add_tube(horizontal: bool, o: int, s: int, e: int, d: Array, h: int, flick
 		return
 	_tube(self, a, b, col, 1.0)
 	_spill(self, a, b, n * 14.0, col, 1.0)
-
-## Leuchtschilder in der Felsmasse: Rahmen mit Zeichen (Pfeil, Balken, Ring, Streifen).
-func _draw_signs() -> void:
-	var taken := {}
-	var step: int = int(style.signs)
-	for y in range(1, lv.height - 2):
-		for x in range(1, lv.width - 3):
-			var h := _h(x, y, 11)
-			if h % step != 0:
-				continue
-			var ok := true
-			for yy in range(y - 1, y + 3):                # 3x2 Zellen Fels plus ein Feld Rand ringsum
-				for xx in range(x - 1, x + 4):
-					if not _rock(xx, yy) or taken.has(Vector2i(xx, yy)):
-						ok = false
-			if not ok:
-				continue
-			for yy in range(y - 1, y + 3):
-				for xx in range(x - 1, x + 4):
-					taken[Vector2i(xx, yy)] = true
-			_sign(Rect2(x * T + 2.0, y * T + 2.0, 3.0 * T - 4.0, 2.0 * T - 4.0), h)
-
-## Kleine Schilder (2x1 Zellen) für schmale Felswände, in denen kein großes Schild Platz hat.
-func _draw_plates() -> void:
-	var step: int = maxi(int(style.signs) / 2, 4)
-	for y in range(1, lv.height - 1):
-		var x := 1
-		while x < lv.width - 2:
-			var h := _h(x, y, 17)
-			if h % step == 0 and _rock(x, y) and _rock(x + 1, y) and _rock(x, y - 1) and _rock(x + 1, y - 1):
-				var r := Rect2(x * T + 2.5, y * T + 3.5, 2.0 * T - 5.0, T - 7.0)
-				var col := _pal(h >> 3)
-				var pts := PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y), r.position])
-				for i in 4:
-					_tube(self, pts[i], pts[i + 1], col, 0.75)
-				var col2 := _pal((h >> 3) + 1)
-				var m := r.get_center()
-				if (h >> 5) % 2 == 0:
-					_tube(self, Vector2(r.position.x + 5, m.y), Vector2(r.end.x - 5, m.y), col2, 0.8)
-				else:
-					_tube(self, Vector2(m.x - 3, m.y - 2.5), Vector2(m.x + 3, m.y), col2, 0.8)
-					_tube(self, Vector2(m.x - 3, m.y + 2.5), Vector2(m.x + 3, m.y), col2, 0.8)
-				x += 3
-			else:
-				x += 1
-
-func _sign(r: Rect2, h: int) -> void:
-	var col := _pal(h >> 3)
-	var pts := PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y), r.position])
-	for i in 4:
-		_tube(self, pts[i], pts[i + 1], col, 0.8)
-	var mid := r.get_center()
-	var col2 := _pal((h >> 3) + 1)
-	match (h >> 6) % 4:
-		0:                                                 # Pfeil
-			_tube(self, Vector2(r.position.x + 8, mid.y), Vector2(r.end.x - 8, mid.y), col2, 0.9)
-			_tube(self, Vector2(r.end.x - 16, mid.y - 7), Vector2(r.end.x - 8, mid.y), col2, 0.9)
-			_tube(self, Vector2(r.end.x - 16, mid.y + 7), Vector2(r.end.x - 8, mid.y), col2, 0.9)
-		1:                                                 # Balkenreihe
-			for i in 4:
-				var yy := r.position.y + 7.0 + i * (r.size.y - 14.0) / 3.0
-				_tube(self, Vector2(r.position.x + 8, yy), Vector2(r.end.x - 8 - float((h >> (i + 8)) % 3) * 9.0, yy), col2, 0.8)
-		2:                                                 # Ring
-			var pc := PackedVector2Array()
-			for i in 17:
-				pc.append(mid + Vector2(cos(TAU * i / 16.0), sin(TAU * i / 16.0)) * (r.size.y * 0.32))
-			for i in 16:
-				_tube(self, pc[i], pc[i + 1], col2, 0.85)
-		_:                                                 # Schrägstreifen
-			for i in 4:
-				var xx := r.position.x + 9.0 + i * 8.0
-				_tube(self, Vector2(xx, r.end.y - 6), Vector2(xx + 8, r.position.y + 6), col2, 0.8)
 
 # ---------------------------------------------------------------- Glas
 
@@ -281,6 +271,15 @@ class Anim extends Node2D:
 		if s == null or s.lv == null:
 			return
 		if s.kind == "neon":
+			for sg in s.signs:
+				for it in sg.items:
+					if not it.has("tex"):
+						continue
+					var f: float = s.sign_level(sg, int(it.glyph)) * float(it.get("dim", 1.0))
+					var tx: Texture2D = it.tex
+					draw_texture_rect(tx, Rect2(it.at, tx.get_size() / float(NeonSigns.PPU)), false, Color(1, 1, 1, f))
+				if sg.mode == "chase":
+					_chase(sg, s)
 			for e in s.tubes_anim:
 				var ph: float = e[3]
 				var f := 1.0
@@ -306,3 +305,52 @@ class Anim extends Node2D:
 				if d < 120.0:
 					var a := (1.0 - d / 120.0) * 0.16
 					draw_rect(r.grow(-1.0), Color(0.85, 0.97, 1.0, a))
+
+	## Lauflicht im Rahmen des Hauptschilds: Lämpchen alle 4 Einheiten, jedes dritte leuchtet, die Reihe wandert (bei „Weniger Bewegung“ steht sie).
+	func _chase(sg: Dictionary, s: Node2D) -> void:
+		var r: Rect2 = (sg.board as Rect2).grow(-2.0)
+		var per := 2.0 * (r.size.x + r.size.y)
+		var n := int(per / 4.0)
+		var shift := 0 if Settings.values.reduce_motion else int(s.t * 7.0)
+		var col: Color = sg.col2
+		for i in n:
+			var d := float(i) * per / float(n)
+			var p: Vector2
+			if d < r.size.x:
+				p = r.position + Vector2(d, 0)
+			elif d < r.size.x + r.size.y:
+				p = Vector2(r.end.x, r.position.y + d - r.size.x)
+			elif d < 2.0 * r.size.x + r.size.y:
+				p = Vector2(r.end.x - (d - r.size.x - r.size.y), r.end.y)
+			else:
+				p = Vector2(r.position.x, r.end.y - (d - 2.0 * r.size.x - r.size.y))
+			p = PixelDraw.snap2(p)
+			var on := (i + shift) % 3 == 0
+			var a := 1.0 if on else 0.22
+			PixelDraw.rect(self, Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(col.r, col.g, col.b, 0.25 * a))
+			PixelDraw.rect(self, Rect2(p - Vector2(1, 1) / 3.0, Vector2(2, 2) / 3.0), Color(1, 1, 1, 0.9 * a) if on else Color(col.r, col.g, col.b, 0.5))
+
+## Dunkle Tafeln der Leuchtreklame (normal gemischt, vom Licht der Welt beleuchtet): Schatten, Platte, Kanten, Schrauben, Halter.
+class Boards extends Node2D:
+	var owner_style: Node2D
+
+	func _draw() -> void:
+		var s := owner_style
+		if s == null or s.kind != "neon":
+			return
+		for sg in s.signs:
+			var r: Rect2 = sg.board
+			PixelDraw.rect(self, Rect2(r.position + Vector2(1, 1), r.size), Color(0, 0, 0, 0.45))
+			if sg.kind == "kana":                                                   # Halter oben und unten
+				for x in [r.position.x + 3.0, r.end.x - 5.0]:
+					PixelDraw.rect(self, Rect2(x, r.position.y - 3.0, 2.0, 3.0), Color(0.2, 0.19, 0.27))
+					PixelDraw.rect(self, Rect2(x, r.end.y, 2.0, 3.0), Color(0.2, 0.19, 0.27))
+			PixelDraw.rect(self, r, Color(0.05, 0.04, 0.085))
+			PixelDraw.rect(self, Rect2(r.position, Vector2(r.size.x, 1.0 / 3.0)), Color(0.2, 0.18, 0.3))
+			PixelDraw.rect(self, Rect2(r.position, Vector2(1.0 / 3.0, r.size.y)), Color(0.14, 0.12, 0.22))
+			PixelDraw.rect(self, Rect2(Vector2(r.position.x, r.end.y - 1.0 / 3.0), Vector2(r.size.x, 1.0 / 3.0)), Color(0.015, 0.01, 0.03))
+			PixelDraw.rect(self, Rect2(Vector2(r.end.x - 1.0 / 3.0, r.position.y), Vector2(1.0 / 3.0, r.size.y)), Color(0.02, 0.015, 0.04))
+			if sg.kind == "main":
+				PixelDraw.rect(self, r.grow(-4.0), Color(0.07, 0.05, 0.12))
+			for c in [r.position + Vector2(1.34, 1.34), Vector2(r.end.x - 2.0, r.position.y + 1.34), Vector2(r.position.x + 1.34, r.end.y - 2.0), r.end - Vector2(2.0, 2.0)]:
+				PixelDraw.rect(self, Rect2(PixelDraw.snap2(c), Vector2(2.0, 2.0) / 3.0), Color(0.36, 0.34, 0.46))

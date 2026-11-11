@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -5876,3 +5876,58 @@ func _test_sector_tiles() -> void:
 	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_normal(level.sector)"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
 	var bsrc := FileAccess.get_file_as_string("res://src/game/workshop_bay.gd")
 	check(bsrc.contains("Rect2(idx * 48, 0, 48, 48)"), "Werkstatt nutzt weiter die erste Atlaszeile")
+
+func _test_neon_signs() -> void:
+	# Runde 64: Leuchtreklame der Neon-Level – nur in sichtbarem Fels, ohne Überschneidung, an Strahlen ruhig und nicht in deren Farben
+	var NS: GDScript = load("res://src/game/neon_signs.gd")
+	var styles: Dictionary = load("res://src/game/level_style.gd").get_script_constant_map().STYLES
+	var t0 := Time.get_ticks_msec()
+	for id in ["S2-02", "S2-06", "S2-08"]:
+		var lv := LevelData.load_file("res://data/levels/%s.json" % id.to_lower().replace("-", "_"))
+		var signs: Array = NS.plan(lv, styles[id])
+		check(signs.size() >= 6 and signs.size() <= int(styles[id].max), "%s: %d Leuchtschilder (mindestens 6, höchstens %d)" % [id, signs.size(), int(styles[id].max)])
+		var kinds := {}
+		var rock_ok := true
+		var board_ok := true
+		var strokes_ok := true
+		var overlap := false
+		for i in signs.size():
+			var sg: Dictionary = signs[i]
+			kinds[sg.kind] = true
+			var c: Rect2i = sg.cells
+			for y in range(c.position.y, c.end.y):
+				for x in range(c.position.x, c.end.x):
+					rock_ok = rock_ok and lv.cell(x, y) == "#" and y >= 1 and y <= lv.height - 2
+			var area := Rect2(Vector2(c.position) * 16.0, Vector2(c.size) * 16.0)
+			var b: Rect2 = sg.board
+			board_ok = board_ok and area.grow(0.34).encloses(b) and b.size.x >= 12.0 and b.size.y >= 10.0
+			for it in sg.items:
+				for st in it.strokes:
+					for p in st:
+						strokes_ok = strokes_ok and b.grow(0.01).has_point(p)
+			for j in range(i + 1, signs.size()):
+				overlap = overlap or c.intersects(signs[j].cells)
+		check(rock_ok, "%s: Schilder liegen nur auf Fels in sichtbaren Reihen (nie auf Luftraum, Plattformen, Toren, Dornen)" % id)
+		check(board_ok, "%s: jede Tafel liegt in ihren Feldern" % id)
+		check(strokes_ok, "%s: alle Röhren liegen auf ihrer Tafel" % id)
+		check(not overlap, "%s: Schilder überschneiden sich nicht" % id)
+		check(kinds.has("kana") and kinds.has("banner") and kinds.has("picto"), "%s: Katakana, Banner und Bildzeichen vorhanden" % id)
+		if id == "S2-02":
+			check(kinds.has("main"), "Neonallee: Hauptschild mit Lauflicht im großen Felsblock")
+		var hz: Dictionary = NS._hazard_zones(lv)
+		for sg in signs:
+			if NS._hits(hz.beams, sg.board):
+				var col: Color = sg.col
+				var pink := col.r > 0.8 and col.b > 0.5 and col.g < 0.5
+				var cyan := col.b > 0.8 and col.g > 0.7 and col.r < 0.5
+				check(sg.mode == "steady" and not pink and not cyan, "%s: Schild an einem Neon-Strahl flackert nicht und leuchtet nicht in Strahlfarben" % id)
+		# Rastern: Pixelbild mit Kern und Schein, Ursprung im Raster
+		var baked: Array = NS.bake(signs[0].items[0])
+		check(baked.size() == 2 and (baked[0] as Texture2D).get_width() > 10 and absf((baked[1] as Vector2).x * 3.0 - roundf((baked[1] as Vector2).x * 3.0)) < 0.001, "%s: Röhren werden als Pixelbild im Raster gerastert" % id)
+	var ms := Time.get_ticks_msec() - t0
+	print("    Leuchtreklame planen + rastern (3 Level, ein Bild): %d ms" % ms)
+	var src := FileAccess.get_file_as_string("res://src/game/level_style.gd")
+	var tube := src.substr(src.find("func _tube("), 400)
+	check(tube.contains("PixelDraw.line") and not tube.contains("draw_line"), "Neon-Kantenröhren liegen im Pixelraster (keine Vektorlinien)")
+	check(src.contains("reduce_motion") and src.contains("func sign_level"), "Leuchtreklame: Flackern und Lauflicht stehen bei „Weniger Bewegung“ still")
+

@@ -12,6 +12,7 @@
 
 **Stand (main mit mechanik-grafik und grafik-fleiss, 2026-11-11):** 3569 Prüfungen, alle bestanden (vor beiden Branches 3449). Neu je Runde, jüngste zuerst:
 
+- **Runde 64:** Leuchtreklame der Neon-Level (nur auf sichtbarem Fels, Tafeln in ihren Feldern, Röhren auf der Tafel, keine Überschneidung, Katakana/Banner/Bildzeichen vorhanden, Hauptschild in der Neonallee, an Strahlen ruhig und nicht in Strahlfarben, Rastern im Pixelraster), Kantenröhren im Pixelraster, „Weniger Bewegung“
 - **Runde 63:** Fels-Atlas je Sektor (768×144, Normal-Map, Funktionsfelder unverändert, Materialien verschieden, Außenecken rund), Fels nach Nachbarschaft und weicher Rand für Ultrawide (Quelltextprüfung)
 - **Runde 62:** Taxi 78×48 (1:1, Physikmaße unverändert, alle Lackierungen und leere Kuppel in 78×48, Aufkleber 20 px, alle Ansichten mit neuen Maßen), Verkehr 78×48 und `VEH_SIZE` 26×16
 - **Runde 61:** VIP und Notfall (Preis, Geduld, doppelter Abzug, Frist, Verlust mit/ohne Strafe, an Bord, nach dem Absetzen, eigener Zufallsstrom, Häufigkeit je Sektor, Geister-Kennung, Community-Feld, Editor-Schreibweise, Tag-/Nachtschicht ohne Typen, Einspieler mit Autopilot, Texte)

@@ -3,6 +3,32 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.1.1
+
+### Deutsch
+
+**Grafik**
+- Neon-Schluchten mit echter Leuchtreklame: Neonallee (13), Neonfinale (17) und Neonlabyrinth (19) tragen Schilder mit Schrift aus Leuchtröhren – waagerechte Banner (HOTEL, NOODLES, BAR, LIVE, TAXI …), senkrechte Katakana-Tafeln (ラーメン, タクシー, ネオン …), Bildzeichen (Cocktail, Ramen, Blitz, Auge, Planet …) und ein großes Hauptschild mit Lauflicht
+- Röhren pixelgenau mit hellem Kern, Bloom und gestuftem Schein auf dunklen Tafeln mit Schrauben und Haltern; die Schilder werfen farbiges Licht auf Fels und Taxi
+- Einzelne Buchstaben flackern oder sterben kurz weg, manche Schilder schalten sich Zeichen für Zeichen neu ein; bei „Weniger Bewegung“ leuchtet alles ruhig
+- Neben den Neon-Strahlen im Neonlabyrinth bleiben die Schilder ruhig und meiden deren Farben, neben Dornen gibt es kein Rosa – Warnungen bleiben eindeutig
+- Nur Optik: Karten, Kollision, Physik und Zeiten sind unverändert
+
+**Sonstiges**
+- Neue Screenshots auf der Projektseite (u. a. Neon-Schluchten, Notfall, Werkstatt mit Scheinwerfer)
+
+### English
+
+**Graphics**
+- Neon Canyons with real neon signs: Neon Avenue (13), Neon Finale (17) and Neon Labyrinth (19) carry signs lettered in glowing tubes – horizontal banners (HOTEL, NOODLES, BAR, LIVE, TAXI …), vertical katakana boards (ラーメン, タクシー, ネオン …), pictograms (cocktail, ramen, lightning, eye, planet …) and a large main sign with chasing lights
+- Pixel-perfect tubes with a bright core, bloom and stepped glow on dark boards with bolts and brackets; the signs cast coloured light onto rock and taxi
+- Single letters flicker or briefly die, some signs switch back on letter by letter; with "Reduce motion" everything glows steadily
+- Next to the neon beams in the Neon Labyrinth the signs stay steady and avoid the beam colours, next to spikes there is no pink – warnings stay clear
+- Visual only: maps, collision, physics and times are unchanged
+
+**Other**
+- New screenshots on the project page (including Neon Canyons, emergency passengers, workshop with headlight)
+
 ## 1.1.0
 
 ### Deutsch

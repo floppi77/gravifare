@@ -21,7 +21,7 @@ A hover-taxi arcade game in Godot 4.7 – inertia, gravity, precise landings.</p
 # Deutsch
 
 <p align="center">
-  <img src="docs/media/de/sector3.jpg" alt="Sektor 3" width="860">
+  <img src="docs/media/de/neon.jpg" alt="Sektor 2 – Neonfinale mit Leuchtreklame" width="860">
 </p>
 
 GraviFare ist ein 2D-Arcade-Taxispiel: Du fliegst ein Schwebetaxi durch **99 Level in 9 Sektoren**, holst Fahrgäste ab,
@@ -48,10 +48,12 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 | **Flugschule mit Fluglehrer (Stimme, Untertitel, Hinweise)** | **Sektor 1 – Fahrgäste, Tankstelle, Tor** |
 | ![Sektor 3 – bewegliche Plattformen](docs/media/de/sector3.jpg) | ![Sektor 6](docs/media/de/sector6.jpg) |
 | **Sektor 3 – bewegliche Plattformen** | **Sektor 6** |
+| ![Neon-Schluchten – Leuchtreklame aus Röhren](docs/media/de/neon.jpg) | ![Notfall – Fahrgast mit Frist und Countdown](docs/media/de/emergency.jpg) |
+| **Neon-Schluchten – Leuchtreklame aus Röhren** | **Notfall – Fahrgast mit Frist und Countdown** |
 | ![Nachtschicht – im Dunkeln leuchten nur Lampen und Scheinwerfer](docs/media/de/night.jpg) | ![Garage – Lackierungen und Aufkleber](docs/media/de/garage.jpg) |
 | **Nachtschicht – im Dunkeln leuchten nur Lampen und Scheinwerfer** | **Garage – Lackierungen und Aufkleber** |
-| ![Werkstatt – Düsen, Hülle und Fahrwerk aufrüsten](docs/media/de/workshop.jpg) | ![Level-Editor – eigene Level bauen, testen und teilen](docs/media/de/editor.jpg) |
-| **Werkstatt – Düsen, Hülle und Fahrwerk aufrüsten** | **Level-Editor – eigene Level bauen, testen und teilen** |
+| ![Werkstatt – Düsen, Hülle, Fahrwerk und Scheinwerfer aufrüsten](docs/media/de/workshop.jpg) | ![Level-Editor – eigene Level bauen, testen und teilen](docs/media/de/editor.jpg) |
+| **Werkstatt – Düsen, Hülle, Fahrwerk und Scheinwerfer aufrüsten** | **Level-Editor – eigene Level bauen, testen und teilen** |
 
 ## Was drinsteckt
 
@@ -105,7 +107,7 @@ mit Qwen3-TTS (Apache-2.0); die Fluglehrer-Stimme im Tutorial und zehn weitere F
 # English
 
 <p align="center">
-  <img src="docs/media/en/sector3.jpg" alt="Sector 3" width="860">
+  <img src="docs/media/en/neon.jpg" alt="Sector 2 – Neon Finale with neon signs" width="860">
 </p>
 
 GraviFare is a 2D arcade taxi game: you fly a hover taxi through **99 levels in 9 sectors**, pick up passengers, drop them
@@ -131,10 +133,12 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 | **Flight school with an instructor (voice, subtitles, hints)** | **Sector 1 – passengers, fuel station, gate** |
 | ![Sector 3 – moving platforms](docs/media/en/sector3.jpg) | ![Sector 6](docs/media/en/sector6.jpg) |
 | **Sector 3 – moving platforms** | **Sector 6** |
+| ![Neon Canyons – neon signs made of tubes](docs/media/en/neon.jpg) | ![Emergency – passenger with a deadline and countdown](docs/media/en/emergency.jpg) |
+| **Neon Canyons – neon signs made of tubes** | **Emergency – passenger with a deadline and countdown** |
 | ![Night shift – in the dark only lamps and headlights glow](docs/media/en/night.jpg) | ![Garage – paint jobs and stickers](docs/media/en/garage.jpg) |
 | **Night shift – in the dark only lamps and headlights glow** | **Garage – paint jobs and stickers** |
-| ![Workshop – upgrade jets, hull and landing gear](docs/media/en/workshop.jpg) | ![Level editor – build, test and share your own levels](docs/media/en/editor.jpg) |
-| **Workshop – upgrade jets, hull and landing gear** | **Level editor – build, test and share your own levels** |
+| ![Workshop – upgrade jets, hull, landing gear and headlight](docs/media/en/workshop.jpg) | ![Level editor – build, test and share your own levels](docs/media/en/editor.jpg) |
+| **Workshop – upgrade jets, hull, landing gear and headlight** | **Level editor – build, test and share your own levels** |
 
 ## What's inside
 
