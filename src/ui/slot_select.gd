@@ -19,9 +19,9 @@ func _ready() -> void:
 	add_child(logo)
 	logo.position = Vector2(170, 10)
 	logo.size = Vector2(300, 90)
-	var head := MenuKit.title(tr("SLOT_TITLE"), 14)
-	head.position = Vector2(0, 100)
-	head.size = Vector2(640, 20)
+	var head := MenuKit.screen_title(tr("SLOT_TITLE"))
+	head.position = Vector2(0, 98)
+	head.size = Vector2(640, 26)
 	add_child(head)
 	row = HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER

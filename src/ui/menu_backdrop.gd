@@ -132,7 +132,7 @@ func _draw_cars(front: bool) -> void:
 		if is_front != front:
 			continue
 		var dir := 1.0 if float(c.v) > 0.0 else -1.0
-		var sz := Vector2(32.5, 20) * float(c.s)
+		var sz := taxi.get_size() / 3.0 * float(c.s)          # Größe aus der Textur, nicht fest eingetragen (das Taxi wird neu gezeichnet)
 		draw_set_transform(Vector2(c.x, c.y), 0.0, Vector2(dir, 1.0))
 		var tint := Color(0.55, 0.6, 0.95, c.a)
 		for i in 10:       # Abgasspur
@@ -150,10 +150,11 @@ func _draw_hero() -> void:
 	var x := lerpf(-50.0, 700.0 * _wf, k)
 	var y := 96.0 + sin(k * TAU * 1.5) * 10.0
 	draw_set_transform(Vector2(x, y), 0.14 * cos(k * TAU * 1.5), Vector2.ONE)
+	var ts := taxi.get_size() * (2.0 / 3.0)                                   # 96×60 → 64×40 Einheiten, aus der Textur gerechnet
 	for i in 22:
 		var f := float(i) / 22.0
-		draw_rect(Rect2(-34.0 - i * 3.2, -1.0 + sin(t * 20.0 + i) * 0.5, 3.0, 2.0 - f), Color(1.0, 0.7 - f * 0.3, 0.3, (1.0 - f) * 0.55))
-	draw_texture_rect(taxi, Tuning.taxi_rect(2.0), false)
+		draw_rect(Rect2(-ts.x * 0.5 - 2.0 - i * 3.2, -1.0 + sin(t * 20.0 + i) * 0.5, 3.0, 2.0 - f), Color(1.0, 0.7 - f * 0.3, 0.3, (1.0 - f) * 0.55))
+	draw_texture_rect(taxi, Rect2(-ts * 0.5, ts), false)
 	if sticker != null:
-		draw_texture_rect(sticker, Rect2(-26.0, -8.4, 16.0, 16.0), false)
+		draw_texture_rect(sticker, Rect2(Vector2(-0.40625 * ts.x, -0.21 * ts.y), Vector2.ONE * 0.25 * ts.x), false)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

@@ -15,6 +15,9 @@ var cam_ref: Camera2D
 var lvl: LevelData
 var full_img: Texture2D
 var dim := 0.3
+var life: Array = []                # Leben im Hintergrund (BackdropLife): ferner Verkehr, Blinklichter, Teilchen
+var life_sector := 1
+var life_t := 0.0
 
 func setup(l: LevelData) -> void:
 	lvl = l
@@ -22,6 +25,8 @@ func setup(l: LevelData) -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--bg="):         # Dev: Hintergrund eines anderen Sektors ansehen
 			n = int(a.substr(5))
+	life_sector = n
+	life = BackdropLife.make(n)
 	var fp := "res://assets/art/bg_s%d.png" % n
 	full_img = load(fp) if ResourceLoader.exists(fp) else null
 	var lk := SectorLook.of(n)
@@ -47,7 +52,9 @@ func _tex(n: int, layer: String) -> Texture2D:
 		p = "res://assets/art/bg_s1_%s.png" % layer
 	return load(p)
 
-func _process(_d: float) -> void:
+func _process(d: float) -> void:
+	if not Settings.values.reduce_motion:          # „Weniger Bewegung“: das Leben im Hintergrund steht still
+		life_t += d
 	queue_redraw()
 
 func _draw() -> void:
@@ -64,11 +71,13 @@ func _draw() -> void:
 		var x := -(w - vs.x) * 0.5 - roundf(off.x * PARALLAX * 3.0) / 3.0
 		var y := -(h - vs.y) * 0.5 - roundf(off.y * PARALLAX * 3.0) / 3.0
 		draw_texture_rect(full_img, Rect2(x, y, w, h), false, Color(1.0 - dim, 1.0 - dim, 1.0 - dim))
+		BackdropLife.draw(self, life, life_sector, vs, off, life_t, Settings.values.reduce_motion)           # über dem Bild, hinter dem Spielfeld
 		return
 	draw_texture_rect(far, full, false)
 	_layer(mid, off, 0.08, 0.86)
 	_haze(off)
 	_layer(near, off, 0.18, 1.0)
+	BackdropLife.draw(self, life, life_sector, vs, off, life_t, Settings.values.reduce_motion)
 
 func _layer(tex: Texture2D, off: Vector2, k: float, alpha: float) -> void:
 	var x := -roundf(off.x * k * 3.0) / 3.0

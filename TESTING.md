@@ -10,7 +10,7 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Branch mechanik-grafik, 2026-11-10):** 3542 Prüfungen, alle bestanden (vorher 3449). Neu je Runde, jüngste zuerst:
+**Stand (main mit mechanik-grafik und grafik-fleiss, 2026-11-11):** 3569 Prüfungen, alle bestanden (vor beiden Branches 3449). Neu je Runde, jüngste zuerst:
 
 - **Runde 63:** Fels-Atlas je Sektor (768×144, Normal-Map, Funktionsfelder unverändert, Materialien verschieden, Außenecken rund), Fels nach Nachbarschaft und weicher Rand für Ultrawide (Quelltextprüfung)
 - **Runde 62:** Taxi 78×48 (1:1, Physikmaße unverändert, alle Lackierungen und leere Kuppel in 78×48, Aufkleber 20 px, alle Ansichten mit neuen Maßen), Verkehr 78×48 und `VEH_SIZE` 26×16
@@ -18,6 +18,7 @@
 - **Runde 60:** Regelstand der Läufe (alte Läufe aus `tests/fixtures/replays_v2/` rechnen exakt nach), Tankregel (zahlt, wer kann; kein Flackern; keine Sackgasse; alter Regelstand), Trinkgeld (2 %, höchstens drei je Fahrt, Sperrzeit, nur mit Fahrgast, nicht in der Nachtschicht, nicht im alten Regelstand). Der Autopilot löst S2-01, S3-04, S3-07, S4-08, S4-09, S5-03 und S9-06 mit der neuen Tankregel nicht (`BOT_FUEL_RULE_LEVELS`): Dort wird die Fliegbarkeit mit Regelstand 2 und die statische Lösbarkeit geprüft, das Ergebnis mit neuer Regel nur ausgegeben (Auftraggeber, 2026-11-10)
 - **Runde 59:** Nachtschicht nach Sektor 1–4, Hinweistext, Einspieler in Schichten nie „gesehen“
 - **Runde 58:** Game Over kostet je Einbau eine Stufe, Werkstattpreise 2700/6500/15000, Scheinwerfer (+15 % je Stufe, nur Darstellung, nur Karriere, Texte)
+- **Runde 57:** Pixelgrafik der Hindernisse (Kachelblatt, Warnfarben, Mindestgrößen), Linien im Pixelraster (Ringe symmetrisch, keine Vektorlinien), Leben im Hintergrund (Deckkraft, Stillstand, feste Folge), Menütitel, Garage, Optionsknöpfe
 - **Runde 50:** Testflug eines Entwurfs: Bestzeit, Bestwert und Flüge werden beim Speichern übernommen; Levelliste zeigt selbst gelöste Level ohne Eintrag als „von dir gelöst“
 - **Runde 52:** Tagschicht (Wochenplan der Regeln und Tagesziel, Spiegelwelt (Bild gespiegelt, Steuerung dadurch vertauscht), Regeln auf dem Level, Wertung und Medaillen des Ziels, Serie, Gold und Belohnungen, Geist, Screenshot-Name, Texte)
 - **Runde 51:** Nachtschicht (Tagesplan, Dunkelheit, Schwerkraftgrenzen für alle 99 Level, Auftragsketten, Wertung und Noten, Lebensstation aus, Ein-Versuch-Regel, Screenshot-Dateinamen, Namen der Spielstände, Wertung 80/10/10 mit Credits je 1500, Fahrer-Ablauf und Ansagen im Finale, Fokus der Bildschirmtastatur, gemeinsame Menütafel)

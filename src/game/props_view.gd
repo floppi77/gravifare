@@ -264,7 +264,7 @@ func _draw_zones() -> void:
 					var yy := r.position.y + (f if heavy else 1.0 - f) * r.size.y
 					var xx := r.position.x + 9.0 + float(i) * 18.0
 					var s := 3.0 if heavy else -3.0
-					draw_polyline(PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 1.0)
+					PixelDraw.polyline(self, PackedVector2Array([Vector2(xx - 3.0, yy - s), Vector2(xx, yy + s), Vector2(xx + 3.0, yy - s)]), Color(1, 1, 1, 0.35 * al), 3)
 
 ## Strömung als Wind: wehende Schlieren in Windrichtung (schneller bei stärkerem Wind), kleine Wirbel, Pfeilspitzen an der Austrittskante.
 ## Böen sind aus nur ein schwaches Flimmern und blenden vor dem Einschalten auf.
@@ -310,11 +310,11 @@ func _draw_wind(z: Dictionary, on: bool) -> void:
 		var a1 := p1.clamp(r.position, r.end)
 		if a0.distance_to(a1) < 1.5:
 			continue
-		draw_line(a1, a0, Color(0.85, 0.95, 1.0, (0.5 + 0.45 * h2) * al), 1.3)
-		draw_line(a1.lerp(a0, 0.5), a0, Color(1.0, 1.0, 1.0, 0.5 * al), 1.0)
+		PixelDraw.line(self, a1, a0, Color(0.85, 0.95, 1.0, (0.5 + 0.45 * h2) * al), 4)          # Pixelraster: Breite 4 Bildpunkte, Enden auf 1/3 Einheit
+		PixelDraw.line(self, a1.lerp(a0, 0.5), a0, Color(1.0, 1.0, 1.0, 0.5 * al), 2)
 		# kleiner Wirbel am Schlierenkopf
 		if i % 4 == 0 and inside.has_point(p0):
-			draw_arc(p0 + dir * 2.0, 2.2, 0.0, TAU * 0.8, 10, Color(0.9, 0.97, 1.0, 0.5 * al), 0.8)
+			PixelDraw.arc(self, p0 + dir * 2.0, 2.2, 0.0, TAU * 0.8, Color(0.9, 0.97, 1.0, 0.5 * al), 2)
 	# Pfeilspitzen an der Austrittskante
 	var tip_n := maxi(1, int(across / 14.0))
 	for k in tip_n:
@@ -322,7 +322,7 @@ func _draw_wind(z: Dictionary, on: bool) -> void:
 		var base: Vector2 = r.position + (Vector2(along if sgn > 0.0 else 0.0, across * u) if horiz else Vector2(across * u, along if sgn > 0.0 else 0.0))
 		var perp := Vector2(-dir.y, dir.x)
 		var back := base - dir * 5.0
-		draw_polyline(PackedVector2Array([back + perp * 3.0, base, back - perp * 3.0]), Color(0.9, 0.97, 1.0, 0.45 * al), 1.0)
+		PixelDraw.polyline(self, PackedVector2Array([back + perp * 3.0, base, back - perp * 3.0]), Color(0.9, 0.97, 1.0, 0.45 * al), 3)
 	_timer_arc(r.get_center(), z, 7.0)
 
 ## Takt-Anzeige pulsierender Zonen: ein Ring um den Mittelpunkt. Grün und schrumpfend = noch aktiv; gelb und wachsend = kommt gleich wieder.
@@ -333,14 +333,14 @@ func _timer_arc(c: Vector2, z: Dictionary, rad: float) -> void:
 		var cy: Vector2 = level.zone_cycle(z, level.clock)
 		var cols := [Color(1.0, 0.45, 0.55, 0.9), Color(1.0, 0.85, 0.3, 0.8), Color(0.4, 0.8, 1.0, 0.9), Color(1.0, 0.85, 0.3, 0.8)]
 		var on_now := int(cy.x) % 2 == 0
-		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((1.0 - cy.y) if on_now else cy.y), 28, cols[int(cy.x)], 1.6 if on_now else 1.2)
+		PixelDraw.arc(self, c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((1.0 - cy.y) if on_now else cy.y), cols[int(cy.x)], 5 if on_now else 4)
 		return
 	var p := fposmod(level.clock + float(z.phase), float(z.period))
 	var on_t := float(z.on)
 	if p < on_t:
-		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * (1.0 - p / on_t), 28, Color(0.5, 1.0, 0.6, 0.9), 1.6)
+		PixelDraw.arc(self, c, rad, -PI * 0.5, -PI * 0.5 + TAU * (1.0 - p / on_t), Color(0.5, 1.0, 0.6, 0.9), 5)
 	else:
-		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((p - on_t) / (float(z.period) - on_t)), 28, Color(1.0, 0.85, 0.3, 0.8), 1.2)
+		PixelDraw.arc(self, c, rad, -PI * 0.5, -PI * 0.5 + TAU * ((p - on_t) / (float(z.period) - on_t)), Color(1.0, 0.85, 0.3, 0.8), 4)
 
 ## Hitzezone als Lavablase: unregelmäßiger, wabernder Klumpen aus Magma mit Kruste, Rissen, aufsteigenden Blasen, Tropfen und
 ## Funken, dazu Hitzeflimmern. Pulsierende Auslässe sind aus erkaltet (dunkles Gestein mit glimmenden Rissen) und kündigen das
@@ -454,7 +454,7 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 			var rr := lerpf(7.0, R * 0.96, u)
 			var aa := ang + sin(u * PI) * 0.55
 			pts.append(c + Vector2(cos(aa), sin(aa)) * rr)
-		draw_polyline(pts, Color(hot.r, hot.g, hot.b, 0.16 * al), 1.0)
+		PixelDraw.polyline(self, pts, Color(hot.r, hot.g, hot.b, 0.16 * al), 2)
 	# Partikel strömen hinein (Anziehung) oder hinaus (Abstoßung)
 	for i in 28:
 		var h := fmod(float(i) * 0.6180339, 1.0)
@@ -465,23 +465,23 @@ func _draw_magnet(z: Dictionary, on: bool) -> void:
 		var p := c + Vector2(cos(ang + u * 0.6), sin(ang + u * 0.6)) * rr
 		var tail := Vector2(cos(ang + u * 0.6), sin(ang + u * 0.6)) * (4.0 if attract else -4.0)
 		var fade := sin(fr * PI)
-		draw_line(p, p + tail, Color(hot.r, hot.g, hot.b, 0.85 * fade * al), 1.2)
+		PixelDraw.line(self, p, p + tail, Color(hot.r, hot.g, hot.b, 0.85 * fade * al), 3)
 	# Wellenringe
 	for i in 3:
 		var f := fmod(ts * 0.5 + float(i) / 3.0, 1.0)
 		var rr := R * ((1.0 - f) if attract else f)
-		draw_arc(c, rr, 0.0, TAU, 48, Color(hot.r, hot.g, hot.b, 0.5 * sin(f * PI) * al), 1.0)
+		PixelDraw.ring(self, c, rr, Color(hot.r, hot.g, hot.b, 0.5 * sin(f * PI) * al), 3)
 	# Kern: metallische Kugel mit Hufeisen und Polkappen
-	draw_circle(c, 6.5, Color(0.04, 0.05, 0.14, 0.9 * al))
-	draw_circle(c, 5.0, Color(0.32, 0.35, 0.5, al))
-	draw_circle(c + Vector2(-1.2, -1.4), 2.0, Color(0.85, 0.9, 1.0, 0.7 * al))
+	PixelDraw.disc(self, c, 6.5, Color(0.04, 0.05, 0.14, 0.9 * al))
+	PixelDraw.disc(self, c, 5.0, Color(0.32, 0.35, 0.5, al))
+	PixelDraw.disc(self, c + Vector2(-1.2, -1.4), 2.0, Color(0.85, 0.9, 1.0, 0.7 * al))
 	var rot := ts * 0.8 * (1.0 if attract else -1.0)
-	draw_arc(c, 8.5, rot + 0.5, rot + PI - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
-	draw_arc(c, 8.5, rot + PI + 0.5, rot + TAU - 0.5, 14, Color(0.7, 0.74, 0.9, al), 2.4)
+	PixelDraw.arc(self, c, 8.5, rot + 0.5, rot + PI - 0.5, Color(0.7, 0.74, 0.9, al), 7)
+	PixelDraw.arc(self, c, 8.5, rot + PI + 0.5, rot + TAU - 0.5, Color(0.7, 0.74, 0.9, al), 7)
 	for sgn in [1.0, -1.0]:
 		var ep := c + Vector2(cos(rot + (0.5 if sgn > 0.0 else PI + 0.5)), sin(rot + (0.5 if sgn > 0.0 else PI + 0.5))) * 8.5
-		draw_circle(ep, 2.0, Color(1.0, 0.3, 0.35, al) if sgn > 0.0 else Color(0.35, 0.6, 1.0, al))
-	draw_circle(c, 2.2 + 0.6 * sin(t * 6.0), Color(hot.r, hot.g, hot.b, 0.9 * al))
+		PixelDraw.disc(self, ep, 2.0, Color(1.0, 0.3, 0.35, al) if sgn > 0.0 else Color(0.35, 0.6, 1.0, al))    # Polkappen: rot = Nordpol, blau = Südpol
+	PixelDraw.disc(self, c, 2.2 + 0.6 * sin(t * 6.0), Color(hot.r, hot.g, hot.b, 0.9 * al))
 	_timer_arc(c, z, 13.0)
 
 func _draw_movers() -> void:
@@ -532,8 +532,8 @@ func _draw_vehicle_portals() -> void:
 				var cx := r.position.x + 2.0 + f * (r.size.x - 6.0)
 				var cy := r.get_center().y
 				var d := 1.0 if (dir.x > 0.0) == entry else -1.0
-				draw_polyline(PackedVector2Array([Vector2(cx - d * 2.0, cy - 3.0), Vector2(cx + d * 1.5, cy), Vector2(cx - d * 2.0, cy + 3.0)]), Color(col.r, col.g, col.b, 0.7 * (1.0 - absf(f - 0.5) * 1.2)), 1.0)
-			draw_circle(Vector2(inner + 0.7, r.get_center().y), 1.2, Color(0.4, 1.0, 0.5, 0.6 + 0.4 * sin(t * 6.0)) if entry else Color(1.0, 0.4, 0.3, 0.6 + 0.4 * sin(t * 6.0)))
+				PixelDraw.polyline(self, PackedVector2Array([Vector2(cx - d * 2.0, cy - 3.0), Vector2(cx + d * 1.5, cy), Vector2(cx - d * 2.0, cy + 3.0)]), Color(col.r, col.g, col.b, 0.7 * (1.0 - absf(f - 0.5) * 1.2)), 3)
+			PixelDraw.disc(self, Vector2(inner + 0.7, r.get_center().y), 1.2, Color(0.4, 1.0, 0.5, 0.6 + 0.4 * sin(t * 6.0)) if entry else Color(1.0, 0.4, 0.3, 0.6 + 0.4 * sin(t * 6.0)))
 
 func _draw_movers_main() -> void:
 	for m in level.movers:
@@ -550,38 +550,79 @@ func _draw_movers_main() -> void:
 			_draw_vehicle(m)
 			continue
 		if m.kind == "pad":
-			# Schiene über den ganzen Fahrweg
-			var rail_y := r.end.y + 1.0
-			draw_rect(Rect2(float(m.x) - float(m.ax), rail_y, float(m.w) + 2.0 * float(m.ax), 1.5), Color("#2a3266"))
-			draw_rect(r, Color("#161c45"))
-			draw_rect(Rect2(r.position.x, r.position.y + 3.0, r.size.x, r.size.y - 3.0), Color("#2a3266"))
-			draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 3.0), Color("#35e0d2"))
-			for i in int(r.size.x / 16.0):
-				draw_rect(Rect2(r.position.x + 3.0 + i * 16.0, r.position.y + 9.0, 10.0, 2.0), Color("#0c0f24"))
-			draw_rect(r, Color("#7f8fe0"), false, 0.8)
-			if m.spikes:
-				var sr := level.pad_spike_rect(m)
-				var sx := sr.position.x
-				while sx < sr.end.x - 1.0:
-					draw_colored_polygon(PackedVector2Array([Vector2(sx, sr.position.y), Vector2(sx + 8.0, sr.position.y), Vector2(sx + 4.0, sr.end.y)]), Color("#ff6f91"))
-					draw_line(Vector2(sx + 4.0, sr.position.y), Vector2(sx + 4.0, sr.end.y - 1.0), Color("#ffe0e8"), 0.7)
-					sx += 8.0
+			_draw_pad_mover(m, r)
 			continue
-		var col := Color("#3b3f5e") if m.kind == "debris" else Color("#232a52")
-		draw_rect(r, col)
-		draw_rect(Rect2(r.position.x + 1.5, r.position.y + 1.5, r.size.x - 3.0, r.size.y - 3.0), col.lightened(0.12))
-		# Nieten und Kratzer
-		for i in int(maxf(r.size.x / 8.0, 1.0)):
-			draw_rect(Rect2(r.position.x + 2.0 + i * 8.0, r.position.y + 2.5 + float((i * 5) % 3), 1.5, 1.5), Color("#0c0f24"))
-		var warn := Color("#ffb02e") if m.kind == "debris" else Color("#ffc23a")
-		draw_rect(r, warn, false, 1.0)
-		if m.kind == "slider":
-			var n := int(r.size.x / 6.0)
-			for i in n:
-				if i % 2 == 0:
-					draw_rect(Rect2(r.position.x + i * 6.0, r.end.y - 3.0, 6.0, 3.0), warn)
-		else:
-			draw_colored_polygon(PackedVector2Array([r.position + Vector2(0, 0), r.position + Vector2(5, 0), r.position + Vector2(0, 5)]), Color("#0c0f24"))
+		_draw_mover_box(0 if m.kind == "debris" else 1, r, int(m.x) * 7 + int(m.y) * 13)
+
+## Pixel-Hindernisse (Trümmer, Schieber, fahrende Plattformen) aus dem Kachelblatt assets/art/movers.png (tools/art/gen_movers.py): neun Stücke
+## (Ecken, Kanten, Füllung) in 12 × 12 Bildpunkten (4 Einheiten), 1 Bildpunkt = 1/3 Einheit. Zeile 0 Trümmer, 1 Schieber, 2 Plattform.
+## Jede Größe entsteht aus denselben Stücken; die Fläche ist genau die der Trefferfläche `r`, nur auf das Raster gelegt.
+const MOVER_TEX: Texture2D = preload("res://assets/art/movers.png")
+const MV := 12
+var _slice_cache := {}
+
+## Aufteilung einer Länge in Bildpunkten in Stücke [Start, Länge, Art]: Art 0 Anfang, 1 Mitte, 2 Ende (das letzte Mittelstück wird gekürzt).
+func _slices(n: int) -> Array:
+	n = maxi(n, 2 * MV)
+	if _slice_cache.has(n):
+		return _slice_cache[n]
+	var out: Array = [[0, MV, 0]]
+	var pos := MV
+	while pos < n - MV:
+		out.append([pos, mini(MV, n - MV - pos), 1])
+		pos += MV
+	out.append([n - MV, MV, 2])
+	_slice_cache[n] = out
+	return out
+
+func _draw_mover_box(row: int, r: Rect2, seed: int) -> void:
+	var o := PixelDraw.snap2(r.position)
+	var xs := _slices(roundi(r.size.x * 3.0))
+	var ys := _slices(roundi(r.size.y * 3.0))
+	for j in ys.size():
+		var sy: Array = ys[j]
+		for i in xs.size():
+			var sx: Array = xs[i]
+			var cell := int(sy[2]) * 3 + int(sx[2])                   # 0–8: oben/Mitte/unten × links/Mitte/rechts
+			if cell == 4 and ((i * 7 + j * 13 + seed) % 3 + 3) % 3 == 0:
+				cell = 9                                              # zweite Füllung (Risse, schlichte Platte), damit sich nichts wiederholt
+			draw_texture_rect_region(MOVER_TEX, Rect2(o + Vector2(float(sx[0]), float(sy[0])) * PixelDraw.PX, Vector2(float(sx[1]), float(sy[1])) * PixelDraw.PX),
+					Rect2(cell * MV, row * MV, int(sx[1]), int(sy[1])))
+
+## Fahrende Plattform: Schiene über den ganzen Fahrweg, Platte mit türkiser Landeleiste, optional Dornen unten (rosa, Spitzen nach unten).
+func _draw_pad_mover(m: Dictionary, r: Rect2) -> void:
+	var rail_y := r.end.y + 1.0
+	var rx := float(m.x) - float(m.ax)
+	var rw := float(m.w) + 2.0 * float(m.ax)
+	PixelDraw.rect(self, Rect2(rx, rail_y, rw, 1.0), Color("#2a3266"))
+	PixelDraw.rect(self, Rect2(rx, rail_y + 1.0, rw, PX), Color("#0c0f24"))
+	PixelDraw.rect(self, Rect2(rx, rail_y, rw, PX), Color("#4a5596"))
+	var tie := rx
+	while tie < rx + rw:                                           # Schwellen im Abstand von 8 Einheiten
+		PixelDraw.rect(self, Rect2(tie, rail_y - PX, PX * 2.0, PX * 5.0), Color("#1a2150"))
+		tie += 8.0
+	_draw_mover_box(2, r, int(m.x) * 7 + int(m.y) * 13)
+	if m.spikes:
+		var sr := level.pad_spike_rect(m)
+		var sx := sr.position.x
+		while sx < sr.end.x - 1.0:
+			_pixel_spike(Vector2(sx, sr.position.y), 8.0, sr.size.y)
+			sx += 8.0
+
+## Eine Dorne aus Pixelzeilen: Grundlinie oben, Spitze nach unten; linke Hälfte hell, rechte dunkler, ein heller Kiel in der Mitte.
+func _pixel_spike(base: Vector2, w: float, h: float) -> void:
+	var w_px := maxi(roundi(w * 3.0), 2)
+	var h_px := maxi(roundi(h * 3.0), 1)
+	var x0 := roundi(base.x * 3.0)
+	var y0 := roundi(base.y * 3.0)
+	for k in h_px:
+		var half := maxf(float(w_px) * 0.5 * (1.0 - (float(k) + 0.5) / float(h_px)), 0.5)
+		var half_i := maxi(roundi(half), 1)
+		var cx := x0 + w_px / 2
+		var y := float(y0 + k) * PX
+		draw_rect(Rect2(float(cx - half_i) * PX, y, float(half_i) * PX, PX), Color("#ff6f91"))
+		draw_rect(Rect2(float(cx) * PX, y, float(half_i) * PX, PX), Color("#d94f74"))
+		draw_rect(Rect2(float(cx - 1) * PX, y, PX, PX), Color("#ffe0e8") if k < h_px - 1 else Color("#ffc0d0"))
 
 ## Verkehr: Fahrzeuge sind kleine Taxis wie das eigene (gleiche Grafik in anderen Lackierungen) mit Triebwerksflamme und Scheinwerferkegel; der Pfad
 ## ist eine gestrichelte Leuchtlinie mit Richtungspfeilen. Auf senkrechten Abschnitten stehen die Fahrzeuge hochkant.
@@ -599,10 +640,10 @@ func _draw_vehicle(m: Dictionary) -> void:
 			var n := int(ln / 12.0)
 			for k in n:
 				var u := fmod(float(k) * 12.0 + t * 14.0, ln)
-				draw_line(a0 + dir * u, a0 + dir * minf(u + 4.0, ln), Color(0.45, 0.85, 1.0, 0.2), 1.0)
+				PixelDraw.line(self, a0 + dir * u, a0 + dir * minf(u + 4.0, ln), Color(0.45, 0.85, 1.0, 0.2), 3)
 			var mid := a0 + seg * 0.5
 			var perp := Vector2(-dir.y, dir.x)
-			draw_polyline(PackedVector2Array([mid - dir * 3.0 + perp * 2.5, mid + dir * 1.5, mid - dir * 3.0 - perp * 2.5]), Color(0.5, 0.9, 1.0, 0.3), 1.0)
+			PixelDraw.polyline(self, PackedVector2Array([mid - dir * 3.0 + perp * 2.5, mid + dir * 1.5, mid - dir * 3.0 - perp * 2.5]), Color(0.5, 0.9, 1.0, 0.3), 3)
 	var st := level.vehicle_state(m, level.clock)
 	if not st.visible:
 		return

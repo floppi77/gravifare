@@ -12,23 +12,31 @@ class Preview extends Control:
 		t += d
 		queue_redraw()
 	func _draw() -> void:
-		var c := Vector2(size.x * 0.5, size.y * 0.5 + sin(t * 1.8) * 2.5)
-		draw_rect(Rect2(c.x - 50, c.y + 24, 100, 3), Color(0.2, 0.9, 0.85, 0.5))
-		draw_rect(Rect2(c.x - 40, c.y + 27, 80, 2), Color(0.2, 0.9, 0.85, 0.2))
+		# Das Taxi füllt die leere Mitte: Größe aus der Textur (nie fest eingetragen), Vergrößerung in Schritten von 1/3 (ein Texturpunkt = ganze Bildschirmpunkte bei 1080p)
 		var tex := Cosmetics.paint_texture(paint)
+		var tsz: Vector2 = tex.get_size() if tex != null else Vector2(96.0, 60.0)
+		var s := floorf(minf(size.x * 0.9 / tsz.x, size.y * 0.55 / tsz.y) * 3.0) / 3.0
+		var hs := tsz * s * 0.5                                   # halbe Taxigröße in Einheiten
+		var c := PixelDraw.snap2(Vector2(size.x * 0.5, size.y * 0.42 + sin(t * 1.8) * 2.5))
+		var fy := size.y * 0.42 + hs.y - 1.0                    # Landefeld unter dem Taxi (bleibt stehen, nur das Taxi schwebt)
+		PixelDraw.rect(self, Rect2(size.x * 0.5 - hs.x * 1.25, fy, hs.x * 2.5, 3.0), Color(0.2, 0.9, 0.85, 0.5))
+		PixelDraw.rect(self, Rect2(size.x * 0.5 - hs.x, fy + 3.0, hs.x * 2.0, 2.0), Color(0.2, 0.9, 0.85, 0.2))
 		var fl := 0.7 + 0.3 * sin(t * 40.0)
-		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 5, c.y + 14), Vector2(c.x + 5, c.y + 14), Vector2(c.x, c.y + 14 + 10 * fl)]), Color("#ff8a2e"))
+		var nz := c + Vector2(0.0, tsz.y * 0.28 * s)              # Düse: 28 % der Bildhöhe unter der Mitte (78×48: 13,4 Texel)
+		PixelDraw.jet(self, nz, Vector2.DOWN, 12.0 * s * fl, 6.0 * s, Color("#ff8a2e"))
+		PixelDraw.jet(self, nz, Vector2.DOWN, 12.0 * s * fl * 0.55, 3.0 * s, Color("#ffe14a"))
 		var mod := Color(0.62, 0.64, 0.78) if locked else Color.WHITE
 		if tex != null:
-			draw_texture_rect(tex, Rect2(c.x - 39, c.y - 24, 78, 48), false, mod)
+			draw_texture_rect(tex, Rect2(c - hs, hs * 2.0), false, mod)
 		var st := Cosmetics.sticker_texture(sticker)
 		if st != null:
-			draw_texture_rect(st, Rect2(c.x - 31, c.y - 10, 20, 20), false, mod)
+			draw_texture_rect(st, Rect2(c + Vector2(-31.0, -10.0) * s, Vector2(20.0, 20.0) * s), false, mod)      # Aufkleberfeld des Taxis 78×48: Texel x 8, y 14, 20 groß
 		if locked:          # Schloss: Vorschau eines noch gesperrten Teils
-			var lc := Vector2(c.x + 34, c.y - 20)
-			draw_arc(lc + Vector2(0, -2), 3.2, PI, TAU, 10, Color("#c9cfee"), 1.6)
-			draw_rect(Rect2(lc.x - 5, lc.y - 1, 10, 8), Color("#ffcb3d"))
-			draw_rect(Rect2(lc.x - 1, lc.y + 1.5, 2, 3), Color("#0c0f24"))
+			var k := s / 0.8333
+			var lc := c + Vector2(0.85 * hs.x, -0.8 * hs.y)
+			draw_arc(lc + Vector2(0, -2) * k, 3.2 * k, PI, TAU, 10, Color("#c9cfee"), 1.6 * k)
+			draw_rect(Rect2(lc.x - 5.0 * k, lc.y - 1.0 * k, 10.0 * k, 8.0 * k), Color("#ffcb3d"))
+			draw_rect(Rect2(lc.x - 1.0 * k, lc.y + 1.5 * k, 2.0 * k, 3.0 * k), Color("#0c0f24"))
 
 const Stage := preload("res://src/core/stage.gd")
 var stage: Control                # zentrierte 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
@@ -54,13 +62,13 @@ func _ready() -> void:
 	add_child(dim)
 	stage = Stage.make(self)
 	stage.add_child(MenuKit.screen_panel())                  # Tafel wie hinter dem Hauptmenü
-	var title := MenuKit.title(tr("MENU_GARAGE"), 36)
+	var title := MenuKit.screen_title(tr("MENU_GARAGE"))
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	title.offset_top = 6
+	title.offset_top = 4
 	stage.add_child(title)
 	preview = Preview.new()
-	preview.position = Vector2(220, 40)
-	preview.size = Vector2(200, 90)
+	preview.position = Vector2(195, 40)                       # die leere Mitte zwischen den Spalten
+	preview.size = Vector2(250, 235)
 	preview.paint = Cosmetics.selected("paint")
 	preview.sticker = Cosmetics.selected("sticker")
 	stage.add_child(preview)

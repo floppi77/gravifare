@@ -18,7 +18,7 @@ func _ready() -> void:
 	add_child(MenuKit.dim_rect(0.62))
 	ids = Flow.level_ids()
 	sector = _start_sector()
-	add_child(_at(MenuKit.title(tr("MENU_LEVELS"), 16), Vector2(0, 8), Vector2(640, 20)))
+	add_child(_at(MenuKit.screen_title(tr("MENU_LEVELS")), Vector2(0, 3), Vector2(640, 26)))
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 4)

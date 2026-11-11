@@ -21,7 +21,7 @@ func _ready() -> void:
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.add_theme_constant_override("separation", 3)
 	add_child(box)
-	box.add_child(MenuKit.title(tr("MENU_STATS"), 36))
+	box.add_child(MenuKit.screen_title(tr("MENU_STATS")))
 	var st: Dictionary = Save.data.stats
 	var medals := 0
 	for id in Save.data.completed:
