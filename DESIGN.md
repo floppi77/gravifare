@@ -609,4 +609,4 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Weicher Rand für Ultrawide** (`world_view._draw_soft_edge`): Bei 21:9 und 32:9 läuft der äußere Fels links und rechts über fünf Kacheln dunkler und durchsichtiger aus und geht ins Hintergrundbild über; Öffnungen der Außenwand bleiben offen. Bei 16:9 liegt der Rand außerhalb des Bildes.
 - **Level-Editor** zeichnet mit derselben Felsschicht (`world_view.gd`), die Werkstatt nutzt weiter die erste Atlaszeile.
 - **Vorschaubilder** neu: `assets/art/levels/*.jpg` (`tools/make_level_shots.sh`), `docs/levels/sektor_*.jpg` (`tools/make_sector_sheets.sh`).
-
+- **Version 1.1.0** (`Flow.VERSION`, `export_presets.cfg`): Runden 57–63 zusammen, Änderungsliste in `docs/CHANGELOG.md`.

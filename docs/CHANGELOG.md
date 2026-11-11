@@ -3,7 +3,7 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
-## Nächste Version (Entwurf, Branch mechanik-grafik)
+## 1.1.0
 
 ### Deutsch
 
@@ -26,6 +26,9 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 - Das Taxi ist in seiner echten Größe neu gezeichnet und erscheint pixelgenau (vorher verkleinert, dabei fielen Pixelzeilen weg); Lackierungen, Aufkleber, Werkstatt, Garage und der Verkehr ziehen mit
 - Jeder Sektor hat sein eigenes Felsmaterial – Metallplatten, Kristallfels, Rost und Flickblech, vereister Stahl, Basalt mit Glutadern, bewachsener Unterwasserstahl, Beton und Fliesen, überwucherter Stein, rissiges Gestein – mit Kanten, runden Ecken und Abwechslung im Inneren
 - Ultrawide (21:9, 32:9): Das Spielfeld läuft an den Seiten weich in den Hintergrund aus statt hart zu enden
+- Hindernisse in Pixelgrafik: Trümmer, Schieber und fahrende Plattformen aus eigenem Kachelblatt mit Warnfarben; Wind, Strömung, Magnetfelder, Schwerkraftpfeile und Verkehrspfade liegen sauber im Pixelraster statt als weiche Linien
+- Leben im Hintergrund: ferner Verkehr, Blinklichter und Teilchen je Sektor, dezent und bei „Weniger Bewegung“ still
+- Menüs: einheitliche Titel in Pixelschrift, die Garage zeigt das Taxi groß mit Landefeld, Optionsknöpfe füllen die Tafel
 
 ### English
 
@@ -48,6 +51,9 @@ The text of each section is used in the GitHub release notes ("Neu in x" / "What
 - The taxi is redrawn at its real size and shows pixel-perfect (it used to be scaled down, losing pixel rows); paint jobs, stickers, workshop, garage and traffic follow
 - Every sector has its own rock material – metal plates, crystal rock, rust and patched sheet metal, icy steel, basalt with glowing veins, overgrown underwater steel, concrete and tiles, overgrown stone, cracked rock – with edges, rounded corners and variety inside
 - Ultrawide (21:9, 32:9): the playfield fades softly into the background at the sides instead of ending abruptly
+- Obstacles in pixel art: debris, sliders and moving platforms from their own tile sheet with warning colours; wind, currents, magnetic fields, gravity arrows and traffic paths sit cleanly on the pixel grid instead of soft lines
+- Life in the background: distant traffic, blinking lights and particles per sector, subtle and still with "Reduce motion"
+- Menus: consistent pixel-font titles, the garage shows the taxi large on a landing pad, option buttons fill the panel
 
 ## 1.0.1
 

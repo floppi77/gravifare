@@ -59,7 +59,7 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
   Fremdverkehr, wechselnde Schwerkraft. Jedes Level wurde von Hand gebaut, abgestimmt und selbst durchgeflogen – nichts davon ist zufallsgeneriert.
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
 - **Karriere mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
-  (Düsen, Hülle, Tank …). Game Over setzt den Sektor zurück.
+  (Düsen, Hülle, Fahrwerk, Scheinwerfer). Game Over setzt den Sektor zurück, jeder Einbau verliert eine Stufe. Fahrgäste mit Sonderwünschen: **VIP** (zahlt fast doppelt, wenig Geduld) und **Notfall** (doppelter Preis, Frist in Sekunden).
 - **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
   **Garage** mit Lackierungen und Aufklebern.
 - **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
@@ -142,7 +142,7 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
   changing gravity. Every level was built, tuned and flown through by hand – nothing is procedurally generated.
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
 - **Career with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
-  (jets, hull, tank …). Game over resets the sector.
+  (jets, hull, landing gear, headlight). Game over resets the sector and every upgrade loses one level. Special passengers: **VIP** (pays almost double, little patience) and **Emergency** (double fare, deadline in seconds).
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (a brightly lit map every day with a daily rule – windy day, fog, mirror world, thin tank, glass roof, rush hour, tailwind – and a daily goal with bronze, silver and gold, a streak with rewards and a ghost),
   and a **garage** with paint jobs and stickers.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
