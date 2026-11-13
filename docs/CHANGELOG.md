@@ -3,6 +3,18 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.2.1
+
+### Deutsch
+
+**Credits**
+- Die Credits nennen jetzt richtig, wer die Level gemacht hat: floppi hat alle 99 Level von Hand gebaut und selbst durchgeflogen. Unter „Entwicklung“ standen sie fälschlich bei der KI-unterstützten Programmierung
+
+### English
+
+**Credits**
+- The credits now correctly name who made the levels: floppi built and flew all 99 levels by hand. They were wrongly listed under the AI-assisted development
+
 ## 1.2.0
 
 ### Deutsch

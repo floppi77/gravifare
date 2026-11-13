@@ -1,5 +1,5 @@
 # CREDITS
-Spielidee: floppi. Eigenentwicklung: Code, Level und generierte Pixel-Art (`tools/art/`). Entwickelt mit Claude Code.
+Spielidee: floppi. Alle 99 Level hat floppi von Hand gebaut und selbst durchgeflogen. Eigenentwicklung: Code und generierte Pixel-Art (`tools/art/`). Entwickelt mit Claude Code.
 Eingebunden sind Schriften (OFL), lokal erzeugte Sprachausgabe und KI-generierte Hintergrundbilder (Angabe des Entwicklers) – Herkunft und Lizenzen siehe THIRD_PARTY_LICENSES.md. Geplant: Instrumentensamples (CC0).
 Das Logo (`logo.png`) ist ebenfalls KI-generiert. Bilder und Logo sind laut Entwickler frei verwendbar und stehen unter keiner Lizenz.
 

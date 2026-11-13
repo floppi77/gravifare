@@ -28,6 +28,20 @@
   [
    "head",
    {
+    "de": "Level",
+    "en": "Levels"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "floppi – alle 99 Level von Hand gebaut und selbst durchgeflogen",
+    "en": "floppi – all 99 levels built and flown by hand"
+   }
+  ],
+  [
+   "head",
+   {
     "de": "Entwicklung",
     "en": "Development"
    }
@@ -35,8 +49,8 @@
   [
    "line",
    {
-    "de": "Programmierung, Pixel-Art, Level, Sounddesign",
-    "en": "Programming, pixel art, levels, sound design"
+    "de": "Programmierung, Pixel-Art, Sounddesign",
+    "en": "Programming, pixel art, sound design"
    }
   ],
   [
