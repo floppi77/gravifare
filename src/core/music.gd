@@ -23,8 +23,11 @@ func _ready() -> void:
 	fade_out.bus = "Music"
 	add_child(fade_out)
 
-## Thema für eine Levelnummer (1..99): wechselt alle 5 Level (t00 = Level 1–5 … t19 = Level 96–99).
+## Thema für eine Levelnummer (1..99): wechselt alle 5 Level (t00 = Level 1–5 … t19 = Level 96–98); Level 99 hat ein eigenes Thema
+## (t99, endlose Steigerung ohne Auflösung, tools/audio/gen_music_99.py).
 static func theme_for_level(level_no: int) -> String:
+	if level_no == 99:
+		return "t99"
 	return "t%02d" % clampi((level_no - 1) / 5, 0, 19)
 
 func play_theme(theme: String) -> void:

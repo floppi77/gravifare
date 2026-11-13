@@ -73,9 +73,11 @@ const PICTOS := {
 
 ## Inhalte je Stil: Wörter (waagerecht), Katakana (senkrecht), kurze Wörter für kleine Tafeln, Bildzeichen, Hauptschild (Bild + Wort).
 const CONTENT := {
+	"S2-01": {"words": ["WELCOME", "TAXI", "NEON"], "kana": ["ネオン", "タクシー"], "small": ["OPEN", "24H", "TAXI"],
+			  "pictos": ["ufo", "heart", "cocktail"], "main": ["ufo", "TAXI"]},
 	"S2-02": {"words": ["HOTEL", "RAMEN", "NOODLES", "BAR", "OPEN"], "kana": ["ホテル", "ラーメン", "バー"], "small": ["OPEN", "24H", "BAR"],
 			  "pictos": ["cocktail", "ramen", "heart"], "main": ["cocktail", "HOTEL"]},
-	"S2-06": {"words": ["CLUB", "LIVE", "TAXI", "NEON", "24H"], "kana": ["ネオン", "タクシー", "クラス"], "small": ["LIVE", "24H", "CLUB"],
+	"S2-11": {"words": ["CLUB", "LIVE", "TAXI", "NEON", "24H"], "kana": ["ネオン", "タクシー", "クラス"], "small": ["LIVE", "24H", "CLUB"],
 			  "pictos": ["bolt", "eye", "ufo"], "main": ["bolt", "CLUB"]},
 	"S2-08": {"words": ["SUSHI", "ORBIT", "VOID", "TAXI"], "kana": ["ネオン", "スシ", "タクシー"], "small": ["VOID", "24H", "OPEN"],
 			  "pictos": ["planet", "cat", "eye"], "main": ["planet", "ORBIT"]},
@@ -237,11 +239,13 @@ static func _mode(h: int, board: Rect2, hazards: Dictionary, flick: float) -> St
 static func _cells_rect(r: Rect2i) -> Rect2:
 	return Rect2(Vector2(r.position) * T, Vector2(r.size) * T)
 
-static func _pick(list: Array, used: Dictionary, h: int, fits: Callable) -> String:
+static func _pick(list: Array, used: Dictionary, h: int, fits: Callable, reuse := true) -> String:
 	for k in list.size():
 		var s: String = list[(h + k) % list.size()]
 		if not used.has(s) and fits.call(s):
 			return s
+	if not reuse:
+		return ""                          # Katakana und Banner: jedes Wort nur einmal je Level (Abwechslung, Runde 67)
 	for k in list.size():
 		var s: String = list[(h + k) % list.size()]
 		if fits.call(s):
@@ -255,7 +259,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 			var gs := 12.0 if r.size.x >= 2 else 8.0                          # Zeichengröße (Einheiten); schmale Tafel passt in eine Spalte
 			var pitch := gs + 3.0
 			var cap := float(mini(r.size.y, 7)) * T - 8.0
-			var word := _pick(content.kana, used, h, func(s): return float(s.length()) * pitch + 8.0 <= cap)
+			var word := _pick(content.kana, used, h, func(s): return float(s.length()) * pitch + 8.0 <= cap, false)
 			if word == "":
 				return {}
 			used[word] = true
@@ -279,7 +283,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 			var pitch := 4.0 * s + (3.0 if big else 2.0)
 			var cap := float(mini(r.size.x, 9)) * T - 8.0
 			var list: Array = content.words if big else content.small
-			var word := _pick(list, used, h, func(w): return float(w.length()) * pitch + (10.0 if big else 6.0) <= cap)
+			var word := _pick(list, used, h, func(w): return float(w.length()) * pitch + (10.0 if big else 6.0) <= cap, not big)
 			if word == "":
 				return {}
 			used[word] = true

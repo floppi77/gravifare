@@ -3,6 +3,62 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.2.0
+
+### Deutsch
+
+**Regeln**
+- Harte Landung: Es zählt nur noch die Landung beim Absetzen, mit Fahrgast an Bord – das Abholen kostet nichts mehr. Der Abzug beginnt erst, wenn die Landeampel gelb wird (mit Weichem Fahrwerk entsprechend später), bis 30 % an der Grenze
+- Beim Bezahlen steht der Abzug getrennt nach Grund: „Harte Landung“, „Treffer“ und „Falsche Plattform“ (vorher hieß alles „Harte Landung“)
+- Lava trifft deutlich härter: 9 Schaden alle 0,25 s, schon wenn der Rumpf die Zone berührt
+- Der letzte Fahrgast lässt nur noch halb so viel Zeit bis zum Verlassen des Levels (mindestens 22,5 s)
+- Notfälle: Die Frist steigt je Sektor von 0,65 × Richtzeit (Sektor 1) bis 1,15 × (Sektor 9), vorher überall 1,3 ×
+- Zeitstern: Es zählen ganze Sekunden, so wie die Ergebnistafel sie zeigt (94 s bei „Ziel ≤ 94 s“ bekam vorher manchmal keinen Stern)
+- Meisterstern in Sektor 1 schon bei 100 % des Einkommensziels (ab Sektor 2 weiter 110 %)
+- Bestzeiten und Geister aus älteren Versionen rechnen weiter mit ihren damaligen Regeln
+
+**Level**
+- Neonfinale ist jetzt das letzte Level der Neon-Schluchten (Level 22), die Glasfassade Level 17
+- Schluchteingang (Level 12) bekommt Leuchtreklame, und auf allen Neon-Schildern wiederholen sich Wörter nicht mehr
+- Level 52, 85, 93 und 96 überarbeitet, neue Vorschaubilder in der Levelauswahl
+
+**Nachtschicht**
+- Jede Karte bekommt eine Note von S bis E, in der Auswertung und in der Schlusstabelle; die Noten sind farbig (S Gold, A Grün … E Rot)
+
+**Klang und Musik**
+- Level 99 hat ein eigenes Stück: „Endloser Aufstieg“ – eine Steigerung, die nie aufgelöst wird und trotzdem nahtlos weiterläuft; auch im Musikplayer
+- Eine perfekte Landung klingt beim Aufsetzen anders: gedämpft, mit Zischen der Federbeine und Einrasten (nicht nach kurzem Hüpfen)
+
+**Bedienung**
+- Spielstandsauswahl mit Gamepad: Name und Löschen sind jetzt für alle drei Spielstände erreichbar (Name ↔ Löschen über alle Plätze, hoch zur Diskette, runter zu „Zurück“)
+
+### English
+
+**Rules**
+- Hard landing: only the landing at drop-off, with a passenger on board, counts – picking up no longer costs anything. The deduction only starts when the landing gauge turns yellow (later with Soft landing gear), up to 30 % at the limit
+- At payment the deduction is listed by reason: "Hard landing", "Hits" and "Wrong platform" (previously everything was called "Hard landing")
+- Lava hits much harder: 9 damage every 0.25 s, as soon as the hull touches it
+- The last passenger only gives half the time before the level is left (at least 22.5 s)
+- Emergencies: the deadline rises per sector from 0.65 × par time (sector 1) to 1.15 × (sector 9), previously 1.3 × everywhere
+- Time star: whole seconds count, exactly as shown on the result screen (94 s at "target ≤ 94 s" sometimes did not earn a star)
+- Master star in sector 1 already at 100 % of the income target (110 % from sector 2 on)
+- Best times and ghosts from older versions are still replayed with their original rules
+
+**Levels**
+- Neon Finale is now the last level of the Neon Canyons (level 22), Glass Facade is level 17
+- Canyon Mouth (level 12) gets neon signs, and words no longer repeat on the neon signs
+- Levels 52, 85, 93 and 96 reworked, new previews in level select
+
+**Night shift**
+- Every map gets a grade from S to E, on its result and in the final table; grades are coloured (S gold, A green … E red)
+
+**Sound and music**
+- Level 99 has its own track: "Endless Ascent" – a rise that never resolves and still loops seamlessly; also in the music player
+- A perfect landing sounds different on touchdown: cushioned, with a hiss of the landing gear and a click into place (not after a short hop)
+
+**Controls**
+- Save slot screen with a gamepad: Name and Delete can now be reached for all three slots (Name ↔ Delete across all slots, up to the disk, down to "Back")
+
 ## 1.1.1
 
 ### Deutsch

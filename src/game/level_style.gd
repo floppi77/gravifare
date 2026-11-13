@@ -1,7 +1,7 @@
 extends Node2D
 ## Optische Sonderbehandlung einzelner Level nach ihrem Namen (rein Optik, Physik und Kollision bleiben unberührt).
 ## "neon": Leuchtröhren entlang der Felskanten, Leuchtreklame in der Felsmasse (Schrift und Bildzeichen aus Röhren auf dunklen Tafeln, siehe
-## neon_signs.gd), farbiges Licht der Schilder auf Fels und Taxi, flackernde Röhren (Neonallee, Neonfinale, Neonlabyrinth).
+## neon_signs.gd), farbiges Licht der Schilder auf Fels und Taxi, flackernde Röhren (Schluchteingang, Neonallee, Neonlabyrinth, Neonfinale).
 ## "glass": Glasfassade mit Scheibenfeldern, Rahmen, Spiegelungen und wanderndem Lichtreflex.
 ## Gezeichnet wird additiv und unbeleuchtet (Tafeln normal), zwischen Fels und Requisiten: Plattformen, Taxi und Gefahren bleiben darüber gut lesbar.
 ## Alle Röhren liegen im Pixelraster (1/3 Einheit, wie Runde 57).
@@ -11,10 +11,11 @@ const PX := 1.0 / 3.0
 
 ## Stil je Level-ID. "pal" = Farbfamilie der Röhren, "max" = höchstens so viele Schilder, "flick" = Anteil flackernder Kantenröhren.
 const STYLES := {
+	"S2-01": {"kind": "neon", "pal": ["#4fd8ff", "#ff4fd8", "#ffb347"], "max": 7, "flick": 0.08},                                    # Schluchteingang: die ersten Schilder, Willkommen
 	"S2-02": {"kind": "neon", "pal": ["#ff4fd8", "#4fd8ff", "#b46bff"], "max": 8, "flick": 0.10},                                    # Neonallee: ruhige Reklameallee
-	"S2-06": {"kind": "neon", "pal": ["#ff4fd8", "#ffb347", "#4fd8ff", "#ff6bb5"], "max": 11, "flick": 0.22},                        # Neonfinale: dichter, heller, nervöser
+	"S2-06": {"kind": "glass"},                                                                                                       # Glasfassade (Level 17, seit Runde 67)
 	"S2-08": {"kind": "neon", "pal": ["#4fd8ff", "#7b6bff", "#42ffc8"], "max": 9, "flick": 0.16},                                    # Neonlabyrinth: kühles Blau-Grün, ruhig an den Strahlen
-	"S2-11": {"kind": "glass"},
+	"S2-11": {"kind": "neon", "pal": ["#ff4fd8", "#ffb347", "#4fd8ff", "#ff6bb5"], "max": 11, "flick": 0.22},                        # Neonfinale (Level 22): dichter, heller, nervöser
 }
 
 var kind := ""

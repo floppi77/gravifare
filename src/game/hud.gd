@@ -136,7 +136,7 @@ func _draw() -> void:
 		if gauge_override.size() == rows.size():
 			r = float(gauge_override[i])
 		var ratio: float = clampf(r, 0.0, 2.0)
-		var col := Color("#5dff9a") if ratio <= 0.7 else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
+		var col := Color("#5dff9a") if ratio <= Tuning.GAUGE_GREEN else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
 		_gauge_row(i, ratio, col)
 	# Countdown des letzten Pflichtfahrgasts: unter dem Tor, ab 10 s rot blinkend
 	if run.exit_countdown > 0.0 and run.result == Run.Result.RUNNING:
@@ -324,7 +324,7 @@ func _draw_result() -> void:
 	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
 	draw_string(ui, Vector2(px, py + 33.0), (tr("COMMUNITY_TAG") + " · " + lname if Flow.community else "Level %d · %s" % [run.level.number, lname]), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfee"))
 	# Medaillen als drei Karten
-	var items := [["time", tr("MEDAL_TIME"), tr("MEDAL_TIME_D")], ["clean", tr("MEDAL_CLEAN"), tr("MEDAL_CLEAN_D")], ["pro", tr("MEDAL_PRO"), tr("MEDAL_PRO_D")]]
+	var items := [["time", tr("MEDAL_TIME"), tr("MEDAL_TIME_D")], ["clean", tr("MEDAL_CLEAN"), tr("MEDAL_CLEAN_D")], ["pro", tr("MEDAL_PRO"), tr("MEDAL_PRO_D") % int(round(Tuning.pro_share(run.level.sector) * 100.0))]]
 	var cw := 112.0
 	var gap := (pw - 28.0 - cw * 3.0) / 2.0
 	for i in items.size():
@@ -341,7 +341,7 @@ func _draw_result() -> void:
 	var rx := px + pw * 0.5 + 8.0
 	var colw := pw * 0.5 - 24.0
 	draw_string(ui, Vector2(lx, py + 100.0), tr("RES_H_TIME"), HORIZONTAL_ALIGNMENT_LEFT, colw, 8, Color("#7c86bb"))
-	var t_ok := float(result.time) <= float(result.target)
+	var t_ok := Run.time_ok(float(result.time), float(result.target))      # wie die Medaille: ganze Sekunden, wie angezeigt
 	draw_string(font, Vector2(lx, py + 120.0), "%d s" % int(result.time), HORIZONTAL_ALIGNMENT_LEFT, colw, 18, Color("#5dff9a") if t_ok else Color("#ff9a7a"))
 	var bar_y := py + 128.0
 	var frac := clampf(float(result.time) / maxf(float(result.target) * 1.5, 1.0), 0.0, 1.0)
@@ -473,6 +473,8 @@ func _draw_shift_summary(fin: Dictionary, aborted: bool) -> void:
 			if k == 4:
 				col = share_color(cells[k] / mx).lerp(Color("#ffe14a"), 0.35)
 			draw_string(font if k == 4 else ui, Vector2(rx[k] - 50.0, yy), txt, HORIZONTAL_ALIGNMENT_RIGHT, 50.0, 10 if k == 4 else 9, col)
+		var rg := NightShift.map_grade(float(r.score))                  # Note der Karte links neben den Punkten
+		draw_string(font, Vector2(rx[4] - 42.0, yy), rg, HORIZONTAL_ALIGNMENT_LEFT, 12.0, 10, grade_color(rg))
 	var ty := hy + 20.0 + float(NightShift.MAPS) * row_h
 	draw_rect(Rect2(px + 18.0, ty - 9.0, tx - px - 18.0, 1.0), Color("#2a3266"))
 	draw_string(ui, Vector2(px + 34.0, ty + 3.0), tr("SHIFT_TOTAL_TIME"), HORIZONTAL_ALIGNMENT_LEFT, 150.0, 9, Color("#7c86bb"))
@@ -734,6 +736,9 @@ func _draw_shift_result() -> void:
 	draw_string(ui, Vector2(px + 26.0, by + 13.0), tr("SHIFT_MAP_SCORE"), HORIZONTAL_ALIGNMENT_LEFT, 120.0, 8, Color("#7c86bb"))
 	_num_of(Vector2(px + 26.0, by + 36.0), "%d" % int(round(float(m.score))), tr("SHIFT_OF") % int(NightShift.MAP_MAX), 22, share_color(float(m.score) / NightShift.MAP_MAX).lerp(Color("#ffe14a"), 0.35))
 	draw_string(ui, Vector2(px + 26.0, by + 47.0), tr("SHIFT_TAXIS_LEFT") % Flow.lives, HORIZONTAL_ALIGNMENT_LEFT, 150.0, 8, Color("#8a93c9"))
+	var mg := NightShift.map_grade(float(m.score))                      # Note der Karte, farbig wie die Schichtnote
+	draw_string(ui, Vector2(px + 140.0, by + 13.0), tr("SHIFT_MAP_GRADE"), HORIZONTAL_ALIGNMENT_CENTER, 50.0, 8, Color("#7c86bb"))
+	draw_string(font, Vector2(px + 140.0, by + 44.0), mg, HORIZONTAL_ALIGNMENT_CENTER, 50.0, 30, grade_color(mg))
 	draw_string(ui, Vector2(px + 200.0, by + 22.0), tr("SHIFT_MAP_TIME") % NightShift.format_time(float(m.get("time", 0.0))), HORIZONTAL_ALIGNMENT_LEFT, 180.0, 9, Color("#9aa6dd"))
 	draw_string(ui, Vector2(px + 200.0, by + 38.0), tr("SHIFT_NEXT") % [int(result.get("shift_index", 1)) + 1, NightShift.MAPS], HORIZONTAL_ALIGNMENT_LEFT, 180.0, 9, Color("#a9b8ff"))
 	var blink := 0.65 + 0.35 * sin(result_age * 4.0)

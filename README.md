@@ -21,7 +21,7 @@ A hover-taxi arcade game in Godot 4.7 – inertia, gravity, precise landings.</p
 # Deutsch
 
 <p align="center">
-  <img src="docs/media/de/neon.jpg" alt="Sektor 2 – Neonfinale mit Leuchtreklame" width="860">
+  <img src="docs/media/de/neon.jpg" alt="Sektor 2 – Neon-Schluchten mit Leuchtreklame" width="860">
 </p>
 
 GraviFare ist ein 2D-Arcade-Taxispiel: Du fliegst ein Schwebetaxi durch **99 Level in 9 Sektoren**, holst Fahrgäste ab,
@@ -66,7 +66,7 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
   **Garage** mit Lackierungen und Aufklebern.
 - **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
-- **Soundtrack** mit 22 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
+- **Soundtrack** mit 23 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
 - **Anzeige:** 16:9, 1440p/2160p und Ultrawide, drei Speicherplätze.
 
@@ -151,7 +151,7 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
   and a **garage** with paint jobs and stickers.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
-- **Soundtrack** of 22 music themes with three layers each (C64 and Amiga sound) and a music player.
+- **Soundtrack** of 23 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).
 - **Display:** 16:9, 1440p/2160p and ultrawide, three save slots.
 

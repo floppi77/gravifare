@@ -87,6 +87,8 @@ var missed_fees := 0.0            # bezahlte Strafen (Ergebnisansicht)
 var missed_due := 0.0             # Strafen für verpasste/gerammte/rausgeworfene Pflichtfahrgäste: werden am Levelende abgezogen
 var ejected := 0                  # rausgeworfene Fahrgäste (Sauber-Medaille entfällt)
 var pen_ride := 0.0               # Abzug dieser Fahrt: falsche Plattform, Schaden mit Fahrgast an Bord
+var pen_hit_sum := 0.0            # Anteile davon (vor der Obergrenze), nur für die Meldung beim Bezahlen
+var pen_wrong_sum := 0.0
 var wrong_pad_last := ""          # zuletzt bemeckerte Plattform (ein Hüpfer beim Abheben ist noch dieselbe Landung)
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
@@ -96,8 +98,10 @@ var shift_waits: Array = []       # je abgeholtem Fahrgast {job, wait, leg}: War
 var shift_landings: Array = []    # je Landung mit Fahrgast an Bord {job, vy}: Sinkgeschwindigkeit beim Aufsetzen am Ziel
 var near_misses := 0              # knappe Vorbeiflüge in diesem Level (das Spiel meldet sie, siehe Game._check_near_miss)
 ## Regelstand des Laufs. Gespeicherte Läufe (Bestzeiten, Geister) werden mit dem Stand nachgerechnet, mit dem sie geflogen wurden (Replay „rules“):
-## 2 = bis Version 1.0.1; 3 = Sprit unter 35 % nur gratis, wenn das Geld nicht reicht, Trinkgeld für Beinahe-Treffer, Fahrgasttypen VIP und Notfall.
-const RULES := 3
+## 2 = bis Version 1.0.1; 3 = Sprit unter 35 % nur gratis, wenn das Geld nicht reicht, Trinkgeld für Beinahe-Treffer, Fahrgasttypen VIP und Notfall;
+## 4 = Landeabzug nur beim Absetzen (mit Fahrgast an Bord) und erst ab Gelb der Landeampel, Lava 9 Schaden je 0,25 s schon bei Berührung des Rumpfs.
+##     Dazu: Ausgangszeit halbiert (mind. 22,5 s bzw. 1,1 × Richtzeit), Notfall-Frist je Sektor 0,65 … 1,15 × Richtzeit.
+const RULES := 4
 var rules := RULES
 var free_latch := false           # Regelstand 3: Bei diesem Tankhalt reichte das Geld nicht, unter 35 % tankt die Station gratis (bis zum Abheben)
 var types_enabled := true         # Fahrgasttypen VIP und Notfall (Karriere, Community); Tag- und Nachtschicht schalten sie ab
@@ -122,6 +126,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 		j["fare"] = snappedf(float(j.get("fare", 50)) * fscale, 1.0)      # Level-Daten bleiben unverändert
 		j["fare"] = snappedf(maxf(float(j.fare), min_fare(lvl, j)) * Tuning.INCOME_FACTOR, 1.0)
 	sim.setup(lvl)
+	sim.rules = rules
 	sim.fuel_cap = fuel_cap
 	if fuel_in >= 0.0:
 		sim.fuel = clampf(maxf(fuel_in, minf(Tuning.MIN_START_FUEL, fuel_cap)), 0.0, fuel_cap)
@@ -160,7 +165,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	extras_missed = 0
 	extra_earned = 0.0
 	taxi_damage = 0.0
-	pen_ride = 0.0
+	_reset_ride_pen()
 	fuel_dead_t = 0.0
 	fuel_fail = false
 	missed = 0
@@ -238,8 +243,14 @@ func _spawn_actor(instant: bool) -> void:
 		job_clock = 0.0
 	respawn_keep_clock = false
 	if is_exit_job(job) and exit_countdown < 0.0 and not level.tutorial:
-		exit_countdown = maxf(Tuning.EXIT_COUNTDOWN_MIN, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR)      # der letzte Pflichtfahrgast will raus: Zeit läuft
+		exit_countdown = _exit_time(job)       # der letzte Pflichtfahrgast will raus: Zeit läuft
 		pending_log.append({"type": "exit_countdown"})
+
+## Zeit bis zum automatischen Verlassen des Levels, sobald der letzte Pflichtfahrgast erscheint. Regelstand 4: halbiert.
+func _exit_time(job: Dictionary) -> float:
+	if rules >= 4:
+		return maxf(Tuning.EXIT_COUNTDOWN_MIN_V4, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR_V4)
+	return maxf(Tuning.EXIT_COUNTDOWN_MIN, par_of(job) * Tuning.EXIT_COUNTDOWN_PAR_FACTOR)
 
 ## Pads, über denen jetzt kein Meteorit fallen darf: Abhol- und Zielpad des laufenden Auftrags, das Pad unter dem Taxi und das Ziel eines Zusatzfahrgasts.
 func _meteor_avoid() -> Array:
@@ -300,6 +311,7 @@ func _check_wrong_pad(pad_id: String, flown := true) -> void:
 		return              # kurzer Stick-Ausschlag: Taxi hebt ab und sackt zurück, kein zweites Meckern
 	wrong_pad_last = pad_id
 	pen_ride = minf(Tuning.RIDE_PEN_MAX, pen_ride + Tuning.WRONG_PAD_PEN)
+	pen_wrong_sum += Tuning.WRONG_PAD_PEN
 	log.append({"type": "wrong_pad", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.WRONG_PAD_PEN * 100.0))})
 
 func _ride_hit(e: Dictionary) -> void:
@@ -315,6 +327,7 @@ func _ride_hit(e: Dictionary) -> void:
 		return
 	var rk := _pen_k(ex.job if not ex.is_empty() else current_job())      # VIP an Bord: doppelter Abzug
 	pen_ride = minf(Tuning.RIDE_PEN_MAX * rk, pen_ride + Tuning.RIDE_HIT_PEN * rk)
+	pen_hit_sum += Tuning.RIDE_HIT_PEN * rk
 	log.append({"type": "ride_damage", "voice": a.voice_key(), "name": a.pname, "pct": int(round(Tuning.RIDE_HIT_PEN * rk * 100.0)), "vip": rk > 1.0})
 
 ## Zerbrechlicher Fahrgast verletzt: verlässt das Taxi, der Auftrag gilt als verpasst (wie ein verpasster Pflichtfahrgast).
@@ -444,7 +457,9 @@ func kind_mult(job: Dictionary) -> float:
 
 ## Frist eines Notfalls in Sekunden (ab Erscheinen bis zum Absetzen am Ziel), sonst -1.
 func deadline_of(job: Dictionary) -> float:
-	return par_of(job) * Tuning.EMERGENCY_DEADLINE if kind_of(job) == "emergency" else -1.0
+	if kind_of(job) != "emergency":
+		return -1.0
+	return par_of(job) * (Tuning.emergency_deadline(level.sector) if rules >= 4 else Tuning.EMERGENCY_DEADLINE)
 
 ## Restzeit des Notfalls im laufenden Auftrag (-1: kein Notfall oder Fahrgast noch nicht da / schon abgesetzt).
 func emergency_left() -> float:
@@ -673,7 +688,7 @@ func _lose_job(pname: String, extra_fee := 0.0) -> void:
 	respawn_keep_clock = false
 	pen_pick = 0.0
 	pen_drop = 0.0
-	pen_ride = 0.0
+	_reset_ride_pen()
 	phase = Phase.WAITING
 	phase_timer = 0.0
 	if job_index >= jobs.size():
@@ -763,13 +778,17 @@ func _evaluate_landing(e: Dictionary) -> void:
 	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
 	landing_count += 1
-	if flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
+	if perfect_landing(e):
 		streak += 1
 		perfect_count += 1
 		best_streak = maxi(best_streak, streak)
 		log.append({"type": "perfect", "streak": streak})
 	else:
 		_break_streak()
+
+## Zählt diese Landung als perfekt (weich, gerade, waagerecht, nach echtem Flug)? Das Spiel wählt danach den Aufsetzklang.
+func perfect_landing(e: Dictionary) -> bool:
+	return _flown(e) and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT
 
 ## Echter Flug seit dem Abheben, kein Hüpfer auf der Stelle.
 func _flown(e: Dictionary) -> bool:
@@ -993,8 +1012,8 @@ func _service_pad(dt: float) -> void:
 				actor.board(sim.pos.x)
 				phase = Phase.BOARDING
 				phase_timer = 0.0
-				pen_pick = Tuning.landing_penalty(last_vy)
-				pen_ride = 0.0
+				pen_pick = _land_pen(last_vy, true)
+				_reset_ride_pen()
 				_note_pickup(job)
 		Phase.BOARDING:
 			if actor != null and actor.state == PassengerActor.S.ABOARD:
@@ -1003,7 +1022,7 @@ func _service_pad(dt: float) -> void:
 			if not is_exit_job(job) and pad.id == String(job.to):
 				phase = Phase.DROPOFF
 				phase_timer = 0.0
-				pen_drop = Tuning.landing_penalty(last_vy) * _pen_k(job)       # harte Landung mit VIP: doppelter Abzug
+				pen_drop = _land_pen(last_vy) * _pen_k(job)       # harte Landung mit VIP: doppelter Abzug
 				_note_drop(job)
 				dropoff_clock = job_clock
 				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
@@ -1082,8 +1101,24 @@ func _finish_boarding(job: Dictionary) -> void:
 		log.append({"type": "exit_open"})
 
 func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_dropoff := 0.0) -> Dictionary:
+	# Aufteilung für die Meldung: Landung, Treffer, falsche Plattform (die Fahrtanteile im Verhältnis ihrer Summen, nach der Obergrenze)
+	var raw := pen_hit_sum + pen_wrong_sum
+	var hit := pen_ride * pen_hit_sum / raw if raw > 0.0 else 0.0
 	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "slope": price_slope(job), "base": base_clock,
-		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff) * (1.0 - pen_ride), "combo": streak, "job": job_index, "name": String(job.get("passenger", ""))}
+		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff) * (1.0 - pen_ride), "combo": streak, "job": job_index, "name": String(job.get("passenger", "")),
+		"pen_land": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "pen_hit": hit, "pen_wrong": pen_ride - hit}
+
+func _reset_ride_pen() -> void:
+	pen_ride = 0.0
+	pen_hit_sum = 0.0
+	pen_wrong_sum = 0.0
+
+## Landeabzug einer Landung. Regelstand 4: die Landung zum Abholen kostet nichts (noch kein Fahrgast an Bord), sonst ab Gelb der Landeampel
+## (mit der Sinkrate des Werkstatt-Fahrwerks); ältere Läufe wie damals.
+func _land_pen(vy: float, pickup := false) -> float:
+	if rules >= 4:
+		return 0.0 if pickup else Tuning.landing_penalty(vy, sim.land_vy, rules)
+	return Tuning.landing_penalty(vy, Tuning.LAND_VY, rules)
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
 func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
@@ -1102,7 +1137,7 @@ func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
 	elif not bool(l.pay_info.get("carry", false)):
 		delivered += 1
 		job_times.append(total_time)
-	log.append({"type": "delivered", "extra": is_extra, "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname})
+	log.append({"type": "delivered", "extra": is_extra, "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "pen_land": float(l.pay_info.get("pen_land", pen)), "pen_hit": float(l.pay_info.get("pen_hit", 0.0)), "pen_wrong": float(l.pay_info.get("pen_wrong", 0.0)), "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname})
 	l.pay_info = {}
 
 ## Beim Levelende noch laufende Fahrgäste gelten als angekommen (Rest-Gehzeit wird eingerechnet).
@@ -1119,7 +1154,7 @@ func _deliver(job: Dictionary) -> void:
 	job_index += 1
 	pen_pick = 0.0
 	pen_drop = 0.0
-	pen_ride = 0.0
+	_reset_ride_pen()
 	phase = Phase.WAITING
 	phase_timer = 0.0
 	if job_index >= jobs.size():
@@ -1166,7 +1201,7 @@ func _respawn_after_crash() -> void:
 	if lost:
 		# Pflichtfahrgast mit dem Taxi verloren: der Auftrag gilt als verpasst (Strafe, ein Pflichtfahrgast weniger).
 		# War es der letzte (Ausgangs-)Fahrgast, bleibt das Tor offen.
-		pen_ride = 0.0
+		_reset_ride_pen()
 		var lost_name: String = actor.pname
 		log.append({"type": "passenger_lost", "name": lost_name, "pad": String(current_job().get("from", ""))})
 		actor = null
@@ -1181,7 +1216,7 @@ func _respawn_after_crash() -> void:
 			actor = null
 			pen_pick = 0.0
 			pen_drop = 0.0
-			pen_ride = 0.0
+			_reset_ride_pen()
 			_lose_job(lost_name2)
 	phase = Phase.WAITING
 	phase_timer = 0.0
@@ -1259,6 +1294,10 @@ func time_target() -> float:
 		sum_par += par_of(j)
 	return sum_par + Tuning.TARGET_SLACK_PER_JOB * float(jobs.size())
 
+## Zeitziel erreicht? In ganzen Sekunden, wie die Ergebnistafel sie zeigt (94,7 s „94 s“ gegen Ziel 94,3 s „≤ 94 s“ zählt als geschafft).
+static func time_ok(t: float, target: float) -> bool:
+	return floori(t) <= floori(target)
+
 func money_target() -> float:
 	var sum := 0.0
 	for j in jobs:
@@ -1267,12 +1306,12 @@ func money_target() -> float:
 	return sum
 
 ## ⏱ Zeit: im Zeitziel, kein Pflichtfahrgast verpasst · ♥ Sauber: kein Pflichtfahrgast verpasst, kein Leben verloren, nie Fahrgast/Zapfsäule getroffen, ≤ 10 % Hüllenschaden ·
-## ★ Meister: ≥ 110 % des Einkommensziels und mindestens Serie 2.
+## ★ Meister: ≥ 110 % des Einkommensziels (Sektor 1: 100 %, Tuning.pro_share) und mindestens Serie 2.
 func medals() -> Dictionary:
 	return {
-		"time": level_time <= time_target() and missed == 0,
+		"time": time_ok(level_time, time_target()) and missed == 0,
 		"clean": missed == 0 and respawns == 0 and squashes == 0 and ejected == 0 and pump_touches == 0 and damage_taken <= 10.0,
-		"pro": earned >= money_target() * 1.1 and best_streak >= 2,
+		"pro": earned >= money_target() * Tuning.pro_share(level.sector) and best_streak >= 2,
 	}
 
 # ---------------------------------------------------------------- Zusatzfahrgäste (ab Level 5)
@@ -1463,7 +1502,7 @@ func _service_extras() -> void:
 		if int(aboard.state) == ES.CARRY and String(aboard.job.to) == String(pad.id):
 			aboard.state = ES.DROP
 			aboard.timer = 0.0
-			var pen_drop_x := Tuning.landing_penalty(last_vy) * _pen_k(aboard.job)
+			var pen_drop_x := _land_pen(last_vy) * _pen_k(aboard.job)
 			var info := _make_pay_info(aboard.job, float(aboard.clock), float(aboard.pen_pick), pen_drop_x)
 			info["extra"] = true
 			info["job"] = -1
@@ -1479,5 +1518,5 @@ func _service_extras() -> void:
 	if w != null and w.actor.state == PassengerActor.S.WAITING and not extra_locked:
 		w.actor.board(sim.pos.x)
 		w.state = ES.BOARD
-		w.pen_pick = Tuning.landing_penalty(last_vy)
-		pen_ride = 0.0
+		w.pen_pick = _land_pen(last_vy, true)
+		_reset_ride_pen()

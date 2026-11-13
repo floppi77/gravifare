@@ -65,12 +65,12 @@ Spalte „Einzelabnahme“: Eine förmliche Abnahme je Level gibt es nicht, „�
 | S2-03 | Erste Schleuse (doors, spikes) | Mika 3→1, Odo 2→4, Lena 1→3, Jonas 4→2, Ines 3→4, Ben 3→Ausgang | 101.6 | 20 px | 3627 px | 34 px | bestanden (161 s, Tank 35 %) | – |
 | S2-04 | Zwillingsschleuse (doors, spikes, chicane) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 2→Ausgang | 102.6 | 20 px | 3689 px | 34 px | bestanden (162 s, Tank 68 %) | – |
 | S2-05 | Rushhour (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 103.6 | 20 px | 4811 px | 34 px | bestanden (212 s, Tank 46 %) | – |
-| S2-06 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 112.3 | 8 px | 5687 px | 34 px | bestanden (202 s, Tank 68 %) | – |
+| S2-06 | Glasfassade (**Sweep-Glasschleusen**, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 113.2 | 12 px | 5980 px | 34 px | bestanden (211 s, Tank 45 %) | – |
 | S2-07 | Fallgitter (doors, spikes) | Mika 2→4, Odo 3→1, Lena 4→3, Jonas 1→2, Ines 3→4, Ben 1→Ausgang | 104.0 | 8 px | 3973 px | 34 px | bestanden (172 s, Tank 47 %) | – |
 | S2-08 | Neonlabyrinth (doors, spikes, **Neon-Strahlen**) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 3→1, Ben 2→Ausgang | 104.7 | 16 px | 5723 px | 34 px | bestanden (194 s, Tank 33 %) | – |
 | S2-09 | Schleusenkammer (doors) + Lebens-Station | Mika 3→2, Odo 4→3, Lena 1→4, Jonas 2→3, Ines 4→1, Ben 3→Ausgang | 110.7 | 8 px | 6525 px | 34 px | bestanden (185 s, Tank 68 %) | – |
 | S2-10 | Doppelschleuse (doors; Pad 2 auf dem Vorsprung links oben) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→2, Ines 4→1, Ben 4→Ausgang | 116.5 | 4 px | 6816 px | 34 px | bestanden (240 s, Tank 52 %) | – |
-| S2-11 | Glasfassade (**Sweep-Glasschleusen**, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 113.2 | 12 px | 5980 px | 34 px | bestanden (211 s, Tank 45 %) | – |
+| S2-11 | Neonfinale (doors, spikes) | Mika 3→2, Odo 4→3, Lena 2→4, Jonas 1→3, Ines 4→2, Ben 1→Ausgang | 112.3 | 8 px | 5687 px | 34 px | bestanden (202 s, Tank 68 %) | – |
 | S3-01 (Level 23) | Schrottplatz (chicane, spikes, debris) | Mika 3→5, Odo 1→3, Lena 1→4, Jonas 2→5, Ines 2→5, Ben 4→Ausgang | 118.5 | 8 px | 3902 px | 34 px | bestanden (244 s, Tank 53 %) | – |
 | S3-02 (Level 24) | Kranbahn (chicane, spikes, debris) | Mika 2→1, Odo 5→1, Lena 4→3, Jonas 2→1, Ines 3→1, Ben 5→Ausgang | 119.8 | 20 px | 5679 px | 34 px | bestanden (160 s, Tank 33 %) | – |
 | S3-03 (Level 25) | Fließband (chicane, spikes, debris, moving_pads, life_station) + Lebens-Station | Mika 2→3, Odo 1→2, Lena 1→5, Jonas 1→4, Ines 1→4, Ben 5→Ausgang | 116.8 | 20 px | 3514 px | 34 px | bestanden (114 s, Tank 27 %) | – |

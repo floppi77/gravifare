@@ -29,6 +29,7 @@ var air_path := 0.0          # zurückgelegte Strecke seit dem letzten Abheben (
 var burn_k := 1.0            # Werkstatt: Verbrauchsfaktor, Aufprallschaden-Faktor, erlaubte Sinkrate
 var damage_k := 1.0
 var land_vy := Tuning.LAND_VY
+var rules := 4               # Regelstand (Run.rules): ab 4 trifft Lava schon am Rumpf und mit Tuning.HEAT_DAMAGE
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -144,14 +145,19 @@ func _beam_burn() -> void:
 		state = State.DESTROYED
 		events.append({"type": "destroyed"})
 
-## Hitzezone: solange das Taxi darin fliegt, alle 0,25 s Hüllenschaden.
+## Hitzezone (Lava): solange das Taxi sie berührt, alle 0,25 s Hüllenschaden. Regelstand 4: Rumpf berührt die Zone, 9 Schaden;
+## bis Regelstand 3: Mittelpunkt in der Zone, 3 Schaden.
 func _heat(dt: float) -> void:
 	heat_cd = maxf(0.0, heat_cd - dt)
-	if heat_cd > 0.0 or state == State.DESTROYED or level.zones.is_empty() or not level.heat_at(pos, time):
+	if heat_cd > 0.0 or state == State.DESTROYED or level.zones.is_empty():
 		return
+	var hot := level.heat_at(pos, time, Tuning.HULL_HALF) if rules >= 4 else level.heat_at(pos, time)
+	if not hot:
+		return
+	var dmg := Tuning.HEAT_DAMAGE if rules >= 4 else Tuning.HEAT_DAMAGE_V3
 	heat_cd = 0.25
-	hull -= Tuning.HEAT_DAMAGE
-	events.append({"type": "damage", "amount": Tuning.HEAT_DAMAGE, "speed": 0.0, "heat": true})
+	hull -= dmg
+	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "heat": true})
 	if hull <= 0.0:
 		hull = 0.0
 		state = State.DESTROYED

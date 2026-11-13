@@ -88,7 +88,7 @@ func _draw_gauge() -> void:
 	draw_circle(c, 1.1, ncol)
 
 static func tone(ratio: float) -> Color:
-	return GREEN if ratio <= 0.7 else (YELLOW if ratio <= 1.0 else RED)
+	return GREEN if ratio <= Tuning.GAUGE_GREEN else (YELLOW if ratio <= 1.0 else RED)
 
 ## Plattform unter dem Taxi (Fahrwerk-Fußpunkt), nächste zuerst; leer, wenn keine in Reichweite liegt.
 func _pad_below(s: TaxiSim) -> Dictionary:

@@ -36,6 +36,8 @@ func _build() -> void:
 		row.remove_child(c)
 		c.queue_free()
 	var first: Control = null
+	var cards: Array = []           # je Platz die Diskette
+	var slot_btns: Array = []       # je Platz [Name, Löschen] (leer bei freiem Platz)
 	for n in range(1, Save.SLOTS + 1):
 		var col := VBoxContainer.new()
 		col.add_theme_constant_override("separation", 3)
@@ -50,6 +52,8 @@ func _build() -> void:
 				_ask_name(n, true))
 		card.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
 		col.add_child(card)
+		cards.append(card)
+		var pair: Array = []
 		var btns := HBoxContainer.new()
 		btns.add_theme_constant_override("separation", 4)
 		for spec in [["✎ " + tr("SLOT_RENAME"), _ask_name.bind(n, false)], ["✕ " + tr("SLOT_DELETE"), _ask_delete.bind(n)]]:
@@ -60,17 +64,66 @@ func _build() -> void:
 			d.disabled = not used
 			d.focus_mode = Control.FOCUS_ALL if used else Control.FOCUS_NONE
 			btns.add_child(d)
+			if used:
+				pair.append(d)
+		slot_btns.append(pair)
 		col.add_child(btns)
 		row.add_child(col)
 		if first == null or n == Save.slot:
 			first = card
+	var bb: Control = null
 	if back.is_valid():
-		var bb := MenuKit.button(tr("MENU_BACK"), func(): back.call())
+		bb = MenuKit.button(tr("MENU_BACK"), func(): back.call())
 		bb.position = Vector2(256, 334)
 		add_child(bb)
+	_link_focus(cards, slot_btns, bb, cards.find(first))
 	_focus(first)
 
+## Steuerkreuz/Pfeiltasten (Runde 66): Disketten links/rechts untereinander, runter zum „Name“ des Platzes; in der Knopfreihe
+## links/rechts über alle Plätze hinweg (Name ↔ Löschen ↔ Name ↔ Löschen …, freie Plätze werden übersprungen), hoch zur Diskette,
+## runter zu „Zurück“. Die automatische Suche nach Nachbarn fand die kleinen Knöpfe nicht.
+func _link_focus(cards: Array, slot_btns: Array, bb: Control, cur: int) -> void:
+	var chain: Array = []           # alle Knöpfe der Reihe in Leserichtung
+	var owner_card := {}
+	for i in cards.size():
+		for b in slot_btns[i]:
+			chain.append(b)
+			owner_card[b] = cards[i]
+	for i in cards.size():
+		var c: Control = cards[i]
+		c.focus_neighbor_left = c.get_path_to(cards[i - 1]) if i > 0 else NodePath(".")
+		c.focus_neighbor_right = c.get_path_to(cards[i + 1]) if i < cards.size() - 1 else NodePath(".")
+		c.focus_neighbor_top = NodePath(".")
+		var down: Control = null
+		if not slot_btns[i].is_empty():
+			down = slot_btns[i][0]
+		else:                       # freier Platz: zum nächstgelegenen Knopf (rechts zuerst), sonst „Zurück“
+			for k in range(1, cards.size()):
+				for j in [i + k, i - k]:
+					if down == null and j >= 0 and j < cards.size() and not slot_btns[j].is_empty():
+						down = slot_btns[j][0]
+			if down == null:
+				down = bb
+		c.focus_neighbor_bottom = c.get_path_to(down) if down != null else NodePath(".")
+	for i in chain.size():
+		var b: Control = chain[i]
+		b.focus_neighbor_left = b.get_path_to(chain[i - 1]) if i > 0 else NodePath(".")
+		b.focus_neighbor_right = b.get_path_to(chain[i + 1]) if i < chain.size() - 1 else NodePath(".")
+		b.focus_neighbor_top = b.get_path_to(owner_card[b])
+		b.focus_neighbor_bottom = b.get_path_to(bb) if bb != null else NodePath(".")
+		b.focus_previous = b.focus_neighbor_left
+		b.focus_next = b.focus_neighbor_right
+	if bb != null:
+		var up: Control = cards[maxi(cur, 0)]                 # hoch: „Name“ des aktuellen Platzes, sonst seine Diskette
+		if cur >= 0 and not slot_btns[cur].is_empty():
+			up = slot_btns[cur][0]
+		bb.focus_neighbor_top = bb.get_path_to(up)
+		bb.focus_neighbor_left = NodePath(".")
+		bb.focus_neighbor_right = NodePath(".")
+
 func _focus(c: Control) -> void:
+	if not is_inside_tree():
+		return                      # Test: Aufbau außerhalb des Baums
 	await get_tree().process_frame
 	if c != null and is_instance_valid(c):
 		c.grab_focus()

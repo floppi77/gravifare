@@ -2,7 +2,7 @@ extends Node
 ## Autoload "Sfx": Audiobusse (Master/Music/SFX/Voice) mit getrennten Lautstärken, Einmal-Effekte
 ## und die Schub-Schleifen. Fehlende Dateien werden übersprungen (Spiel läuft stumm weiter).
 
-const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "transit", "ui_move", "ui_ok", "pump_hit", "pump_boom", "price_tick", "near_miss", "perfect", "scream_f", "scream_m", "splat", "flatline", "shatter", "plasma_warn", "meteor_warn", "exit_tick", "exit_tick_fast"]
+const NAMES := ["land", "gear", "crash", "hit", "warn", "coin", "board", "exit", "transit", "ui_move", "ui_ok", "pump_hit", "pump_boom", "price_tick", "near_miss", "perfect", "scream_f", "scream_m", "splat", "flatline", "shatter", "plasma_warn", "meteor_warn", "exit_tick", "exit_tick_fast", "land_perfect"]
 var streams := {}
 var thrust_player: AudioStreamPlayer
 var side_player: AudioStreamPlayer

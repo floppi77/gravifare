@@ -858,7 +858,7 @@ var field_msg_t := -99.0
 func _field_feedback() -> void:
 	if not run.level.has_zones() or run.sim.state != TaxiSim.State.FLYING:
 		return
-	if run.level.heat_at(run.sim.pos, run.sim.time) and run.sim.time - heat_msg_t > 5.0:
+	if run.level.heat_at(run.sim.pos, run.sim.time, Tuning.HULL_HALF if run.rules >= 4 else Vector2.ZERO) and run.sim.time - heat_msg_t > 5.0:
 		heat_msg_t = run.sim.time
 		hud.flash_message(tr("MSG_HEAT"), 1.8)
 	var za := run.level.zone_accel(run.sim.pos, run.sim.time)
@@ -1113,7 +1113,10 @@ func _on_event(e: Dictionary) -> void:
 			hud.flash_message(tr("MSG_STREAK_LOST"), 1.2)
 		"landed":
 			_passenger_reaction(e)
-			Sfx.play("land", -4.0)
+			if run.perfect_landing(e):
+				Sfx.play("land_perfect", -3.0)           # perfekte Landung: gedämpftes Aufsetzen, Zischen, Einrasten (nicht nach einem Hüpfer)
+			else:
+				Sfx.play("land", -4.0)
 			taxi.burst_puff(0.6)
 			Haptics.pulse(0.15, clampf(float(e.vy) / 48.0, 0.0, 1.0) * 0.8, 0.12)
 			if float(e.vy) > 35.0:
@@ -1137,8 +1140,16 @@ func _on_event(e: Dictionary) -> void:
 				msg += "  ★%d" % int(e.combo)
 			Save.count_event("deliveries")
 			_check_unlocks()
-			if e.penalty > 0.005:
-				msg += "  " + tr("MSG_HARD") % int(round(e.penalty * 100.0))
+			# Abzüge nach Grund: Landung (beim Absetzen), Treffer mit Fahrgast an Bord, Landung an falscher Plattform
+			var pl := float(e.get("pen_land", e.penalty))
+			var ph := float(e.get("pen_hit", 0.0))
+			var pw := float(e.get("pen_wrong", 0.0))
+			if pl > 0.005:
+				msg += "  " + tr("MSG_HARD") % int(round(pl * 100.0))
+			if ph > 0.005:
+				msg += "  " + tr("MSG_PEN_HIT") % int(round(ph * 100.0))
+			if pw > 0.005:
+				msg += "  " + tr("MSG_PEN_WRONG") % int(round(pw * 100.0))
 			hud.flash_message(msg, 3.0)
 			Sfx.play("coin")
 			Sfx.play_voice(e.voice, "thanks")

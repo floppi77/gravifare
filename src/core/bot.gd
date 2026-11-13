@@ -58,7 +58,7 @@ func _near_spikes(p: Vector2) -> bool:
 	return level.box_hits_char(p, Tuning.HULL_HALF + Vector2(5, 5), "^")
 
 func _unsafe_wait(p: Vector2) -> bool:
-	return _near_spikes(p) or level.heat_at(p, level.clock)
+	return _near_spikes(p) or level.heat_at(p, level.clock, Tuning.HULL_HALF + Vector2(3, 3))
 
 func _accel_to_input(a_des: Vector2) -> Vector2:
 	# a_des: gewünschte Beschleunigung (px/s²). Rückgabe: Eingabevektor.
@@ -503,7 +503,7 @@ func _pro_escape(v_des: Vector2, half: Vector2, pads_too: bool, skip: String) ->
 			level.movers_ignore = true
 			var wall := level.box_hits_solid(look, Tuning.HULL_HALF + Vector2(4, 4))
 			level.movers_ignore = prev_ig
-			if wall or _near_spikes(look) or level.heat_at(look, level.clock):
+			if wall or _near_spikes(look) or level.heat_at(look, level.clock, Tuning.HULL_HALF + Vector2(3, 3)):
 				continue
 			if level.movers_collide_traj(sim.pos, sim.vel, vd, half, level.clock, 1.2, pads_too, skip):
 				continue

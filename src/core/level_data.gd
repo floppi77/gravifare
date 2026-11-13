@@ -272,9 +272,11 @@ func _scan_zones(list: Array) -> void:
 		zones.append(z)
 
 ## Hitzezone (Sektor 5): Rechteck, in dem die Hülle verbrennt; optional pulsierend (Dampfauslass).
-func heat_at(p: Vector2, t: float) -> bool:
+## `half` > 0: Treffer, sobald der Kasten (Rumpf) um p die Zone berührt (Regelstand 4), sonst nur der Punkt p.
+func heat_at(p: Vector2, t: float, half := Vector2.ZERO) -> bool:
+	var box := Rect2(p - half, half * 2.0)
 	for z in zones:
-		if z.kind == "heat" and (z.rect as Rect2).has_point(p) and zone_active(z, t):
+		if z.kind == "heat" and zone_active(z, t) and ((z.rect as Rect2).intersects(box) if half != Vector2.ZERO else (z.rect as Rect2).has_point(p)):
 			return true
 	return false
 

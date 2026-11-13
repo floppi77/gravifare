@@ -72,7 +72,8 @@ const SLIDER_DAMAGE := 30.0       # Schieber (große bewegliche Blöcke): Quetsc
 const PADSLAB_DAMAGE := 8.0       # seitliches Anstoßen an eine fahrende Landeplattform
 const VEHICLE_DAMAGE := 18.0      # Fahrzeug (Verkehr): Schaden je Berührung
 const BEAM_DAMAGE := 12.0         # Plasmastrahl: Schaden alle 0,3 s im Strahl
-const HEAT_DAMAGE := 3.0          # Hitzezone: Schaden alle 0,25 s
+const HEAT_DAMAGE := 9.0          # Hitzezone (Lava): Schaden alle 0,25 s, sobald der Rumpf die Zone berührt (Regelstand 4)
+const HEAT_DAMAGE_V3 := 3.0       # bis Regelstand 3: 3 alle 0,25 s, nur wenn der Mittelpunkt des Taxis in der Zone liegt
 const METEOR_DAMAGE := 20.0       # Meteorit: Schaden je Treffer
 const MOVER_COOLDOWN := 0.6
 const OUT_OF_FUEL_TIME := 3.0     # Sekunden mit leerem Tank (außer an einer funktionierenden Zapfsäule), dann Taxi verloren
@@ -113,7 +114,9 @@ const VIP_FARE := 1.8            # VIP: Fahrpreis 1,8-fach …
 const VIP_PATIENCE := 0.5        # … halbe Geduld …
 const VIP_PENALTY_K := 2.0       # … und harte Landung/Treffer mit VIP an Bord kosten doppelten Abzug
 const EMERGENCY_FARE := 2.0      # Notfall: doppelter Fahrpreis …
-const EMERGENCY_DEADLINE := 1.3  # … und eine Frist von 1,3 × Richtzeit (vom Erscheinen bis zum Absetzen)
+const EMERGENCY_DEADLINE := 1.3  # … und eine Frist von 1,3 × Richtzeit (vom Erscheinen bis zum Absetzen), bis Regelstand 3
+const EMERGENCY_DEADLINE_S1 := 0.65   # ab Regelstand 4: Frist je Sektor, Sektor 1 = 0,65 × Richtzeit …
+const EMERGENCY_DEADLINE_S9 := 1.15   # … gleichmäßig steigend bis Sektor 9 = 1,15 × Richtzeit
 const EXTRA_KIND_BASE := 0.06    # Zusatzfahrgast ist VIP oder Notfall: 6 % in Sektor 1 …
 const EXTRA_KIND_STEP := 0.015   # … +1,5 % je Sektor (Sektor 9: 18 %), je zur Hälfte VIP und Notfall
 
@@ -206,11 +209,14 @@ const PAY_MAX := 1.4             # Faktor bei sofortiger Zustellung
 const PAY_MIN := 0.35            # Untergrenze bei sehr langer Fahrt
 const PAY_SLOPE := 0.4           # Faktor sinkt um 0,6 je ganzer Richtzeit (par); bei par genau 1,0
 const LAND_PENALTY_MAX := 0.30
+const GAUGE_GREEN := 0.7         # Landeampel grün bis 70 % der erlaubten Sinkrate; ab Regelstand 4 beginnt erst dort der Landeabzug
 const WRONG_PAD_PEN := 0.15      # Fahrpreisabzug je Landung an falscher Plattform mit Fahrgast an Bord
 const RIDE_HIT_PEN := 0.08       # Fahrpreisabzug je Hüllenschaden mit Fahrgast an Bord
 const RIDE_PEN_MAX := 0.5
-const EXIT_COUNTDOWN_MIN := 45.0       # Sekunden, die der letzte Pflichtfahrgast (will raus) Zeit lässt, bis das Level automatisch verlassen wird
-const EXIT_COUNTDOWN_PAR_FACTOR := 2.2   # lange Level bekommen mehr: 2,2 × Richtzeit des Ausgangs-Auftrags
+const EXIT_COUNTDOWN_MIN := 45.0       # Sekunden, die der letzte Pflichtfahrgast (will raus) Zeit lässt, bis das Level automatisch verlassen wird (bis Regelstand 3)
+const EXIT_COUNTDOWN_PAR_FACTOR := 2.2   # lange Level bekommen mehr: 2,2 × Richtzeit des Ausgangs-Auftrags (bis Regelstand 3)
+const EXIT_COUNTDOWN_MIN_V4 := 22.5     # ab Regelstand 4 halbiert: mindestens 22,5 s …
+const EXIT_COUNTDOWN_PAR_FACTOR_V4 := 1.1   # … bzw. 1,1 × Richtzeit des Ausgangs-Auftrags
 const EXIT_HURRY_AT := [20.0, 10.0, 5.0]  # Restsekunden, bei denen der letzte Fahrgast zur Eile drängt
 const EXIT_TIMEOUT_FEE_FACTOR := 1.2     # Strafzahlung bei Zeitablauf: 120 % des Fahrpreises des Ausgangs-Fahrgasts
 const MISSED_FEE_BASE := 4.0      # Strafe für einen verlorenen Pflichtfahrgast (verpasst, gerammt, rausgeworfen): 4-facher Fahrpreis in Sektor 1 …
@@ -237,8 +243,22 @@ static func time_factor(t: float, par: float, slope_k := 1.0) -> float:
 	var ratio := t / maxf(par, 1.0) * slope_k
 	return clampf(1.0 + (1.0 - ratio) * PAY_SLOPE, PAY_MIN, PAY_MAX)
 
-static func landing_penalty(vy: float) -> float:
-	return clampf((vy - LAND_SOFT_VY) / (LAND_VY - LAND_SOFT_VY), 0.0, 1.0) * LAND_PENALTY_MAX
+## Landeabzug (Anteil des Fahrpreises). Regelstand 4: linear ab dem Ende des grünen Ampelbereichs (GAUGE_GREEN × erlaubte Sinkrate, mit
+## Werkstatt-Fahrwerk) bis zur erlaubten Sinkrate; bis Regelstand 3 ab „weich“ (LAND_SOFT_VY) bis zum Grundlimit LAND_VY.
+## Meisterstern: nötiger Anteil am Einkommensziel. In Sektor 1 genügen 100 % (dort zahlt oft nur ein Fahrgast im Level, der Anflug vom Start
+## zählt mit; 110 % wären kaum zu schaffen), ab Sektor 2 sind es 110 %.
+static func pro_share(sector: int) -> float:
+	return 1.0 if sector <= 1 else 1.1
+
+## Notfall-Frist als Vielfaches der Richtzeit (Regelstand 4): Sektor 1 = 0,65, gleichmäßig steigend bis Sektor 9 = 1,15.
+static func emergency_deadline(sector: int) -> float:
+	return lerpf(EMERGENCY_DEADLINE_S1, EMERGENCY_DEADLINE_S9, clampf(float(sector - 1) / 8.0, 0.0, 1.0))
+
+static func landing_penalty(vy: float, land_vy := LAND_VY, rules := 4) -> float:
+	if rules < 4:
+		return clampf((vy - LAND_SOFT_VY) / (LAND_VY - LAND_SOFT_VY), 0.0, 1.0) * LAND_PENALTY_MAX
+	var start := land_vy * GAUGE_GREEN
+	return clampf((vy - start) / maxf(land_vy - start, 0.001), 0.0, 1.0) * LAND_PENALTY_MAX
 
 ## Kleinstes erlaubtes Landefenster für ein Level: bis Level 27 mindestens 34 px (Pads ab 5 Tiles), ab Level 28 darf
 ## es auf 18 px sinken (Pads mit 4 Tiles) – schmale Plattformen sind in Sektor 3 und später gewollt.

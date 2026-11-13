@@ -260,7 +260,24 @@ def shatter():
     x += np.sin(2 * np.pi * 120 * tt) * np.exp(-tt * 30) * 0.4
     save("shatter", np.tanh(x) * 0.8)
 
+def land_perfect():
+    """Perfekte Landung (Runde 67): gedämpftes, kurzes Aufsetzen statt des dumpfen Schlags, sanftes Zischen der Federbeine und ein sauberes
+    Einrasten (zwei helle Klicks, dazu ein warmer Quint-Akkord, der kurz nachklingt). Eigener Zufallsstrom: die übrigen Klänge bleiben bitgleich."""
+    r = np.random.default_rng(11)
+    d = 0.75; tt = t(d)
+    thump = np.sin(2 * np.pi * (110 - 45 * np.minimum(tt / 0.12, 1.0)) * tt) * np.exp(-tt * 22) * 0.55          # weiches, kurzes Aufsetzen
+    hiss_env = np.interp(tt, [0.0, 0.04, 0.16, 0.42], [0.0, 1.0, 0.55, 0.0])
+    hiss = sos(r.standard_normal(len(tt)), "bandpass", [1800, 5200], 2) * hiss_env * 0.16                          # Federbeine: „pfff“
+    x = thump + hiss
+    for t0, f in ((0.045, 2350.0), (0.075, 3130.0)):                                                              # Einrasten
+        m = tt > t0
+        x[m] += np.sin(2 * np.pi * f * (tt[m] - t0)) * np.exp(-(tt[m] - t0) * 90) * 0.28
+    m = tt > 0.07
+    for f, a in ((523.25, 0.10), (783.99, 0.08), (1046.5, 0.05)):                                                 # warmer Nachklang (C-G-C)
+        x[m] += np.sin(2 * np.pi * f * (tt[m] - 0.07)) * np.exp(-(tt[m] - 0.07) * 7) * a * np.minimum((tt[m] - 0.07) / 0.01, 1.0)
+    save("land_perfect", np.tanh(x * 1.2) * 0.8)
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter, land_perfect): f()
     print(sorted(os.listdir(OUT)))

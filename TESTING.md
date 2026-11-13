@@ -12,6 +12,9 @@
 
 **Stand (main mit mechanik-grafik und grafik-fleiss, 2026-11-11):** 3569 Prüfungen, alle bestanden (vor beiden Branches 3449). Neu je Runde, jüngste zuerst:
 
+- **Runde 67:** Ausgangszeit halbiert, Notfall-Frist je Sektor (0,65 … 1,15 ×, alte Läufe 1,3 ×), Zeitstern in ganzen Sekunden, Note je Nachtschicht-Karte, Neonfinale Level 22 / Glasfassade Level 17 mit Funksprüchen, Leuchtreklame in Level 12, Autopilot-Prüfung mit Regelstand 3, wo Regelstand 4 ihn überfordert
+- **Runde 66:** Spielstandsauswahl mit Steuerkreuz (Name ↔ Löschen über alle Plätze, hoch/runter), Level-99-Thema t99 (drei Schichten, eigenes Thema nur für Level 99, Musikplayer 23 Stücke, frei mit Level 99)
+- **Runde 65:** Regelstand 4 (grüne Landung ohne Abzug, Abholen ohne Abzug, Fahrwerk verschiebt die Schwelle, alte Formel für Regelstand 3), Aufteilung des Abzugs nach Grund, Lava am Rumpf mit 9 je Tick, Läufe mit Regelstand 3 aus 1.1.1 rechnen exakt nach (`tests/fixtures/replays_v3/`)
 - **Runde 64:** Leuchtreklame der Neon-Level (nur auf sichtbarem Fels, Tafeln in ihren Feldern, Röhren auf der Tafel, keine Überschneidung, Katakana/Banner/Bildzeichen vorhanden, Hauptschild in der Neonallee, an Strahlen ruhig und nicht in Strahlfarben, Rastern im Pixelraster), Kantenröhren im Pixelraster, „Weniger Bewegung“
 - **Runde 63:** Fels-Atlas je Sektor (768×144, Normal-Map, Funktionsfelder unverändert, Materialien verschieden, Außenecken rund), Fels nach Nachbarschaft und weicher Rand für Ultrawide (Quelltextprüfung)
 - **Runde 62:** Taxi 78×48 (1:1, Physikmaße unverändert, alle Lackierungen und leere Kuppel in 78×48, Aufkleber 20 px, alle Ansichten mit neuen Maßen), Verkehr 78×48 und `VEH_SIZE` 26×16

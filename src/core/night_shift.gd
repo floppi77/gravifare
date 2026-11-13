@@ -165,8 +165,12 @@ static func map_result(stats: Dictionary) -> Dictionary:
 	return {
 		"score": score, "wait": wait_part, "landing": landing_part, "hull": hull_part, "bonus": bonus, "near": near,
 		"soft": counts[0], "medium": counts[1], "hard": counts[2], "avg_wait": wait_total / float(maxi(1, waits_n)),
-		"jobs": n, "carried": waits_n, "damage": float(stats.get("damage", 0.0)),
+		"jobs": n, "carried": waits_n, "damage": float(stats.get("damage", 0.0)), "grade": map_grade(score),
 	}
+
+## Note einer einzelnen Karte (S–E): dieselben Schwellen wie die Schicht, gemessen am Anteil an MAP_MAX Punkten.
+static func map_grade(score: float) -> String:
+	return grade(score / MAP_MAX * 100.0)
 
 ## Gesamtwertung: `maps` sind die Ergebnisse der geflogenen Karten (weniger als 9 = abgebrochen), `taxis` die übrigen Taxis,
 ## `credits` das Guthaben am Schichtende.
