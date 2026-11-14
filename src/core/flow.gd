@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "1.2.2"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "1.3.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""

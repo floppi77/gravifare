@@ -9,3 +9,4 @@ Das Logo (`logo.png`) ist ebenfalls KI-generiert. Bilder und Logo sind laut Entw
 
 **Seit Runde 58–63 (eigene Arbeit, keine Fremdassets):** Taxi und Verkehrsfahrzeug in 78×48, Scheinwerfer-Symbol der Werkstatt (Aseprite über den MCP, Quellen in `tools/art/aseprite/`), Aufkleber in Taxigröße und Fels-Materialien der neun Sektoren (per Code, `tools/art/gen_art.py`, `tools/art/gen_sector_tiles.py`). Neue Sprachclips: Fluglehrer `tut_refuel`, `tut_credit` (Fish Audio Drama 3, **Built with Fish Audio**), Einspieler `vid_vip`, `vid_emergency` (Qwen3-TTS-Klon, Apache-2.0).
 
+**Seit Runde 68 (eigene Arbeit, keine Fremdassets):** Hintergründe des Zwischenflugs je Sektor (`assets/art/transit/`): Motive als per Skript gebaute Blender-Szenen (Cycles), Schwarzes Loch per eigener Strahlverfolgung, Nebel und Pixelstil in Python (`tools/art/transit/`). Sie sind nicht KI-generiert.

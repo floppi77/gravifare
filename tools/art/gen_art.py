@@ -499,7 +499,7 @@ def flags():
     d = ImageDraw.Draw(en); d.line([W, 0, 0, H], fill=hexc("#0c0f24"), width=2)
     finish(en, "flag_en.png")
 
-# ------------------------------------------------------------------ Weltraum-Zwischensequenz
+# ------------------------------------------------------------------ Weltraum-Zwischensequenz (Ersatzhintergrund; je Sektor siehe tools/art/transit/)
 def space():
     W, H = 1920, 1080
     yy = np.linspace(0, 1, H)[:, None]
@@ -512,34 +512,6 @@ def space():
     thr = np.tile(BAYER, (H // 4 + 1, W // 4 + 1))[:H, :W]
     q = np.floor(base / (255 / 24.0) + thr[:, :, None]) * (255 / 24.0)
     Image.fromarray(np.clip(q, 0, 255).astype(np.uint8)).convert("RGBA").save(OUT + "space_bg.png")
-    def planet(name, light_dir, pal_a, pal_b, bands, ring, seed):
-        S = 192; r = 78
-        yy2, xx2 = np.mgrid[0:S, 0:S]
-        cx = cy = S / 2
-        dist = np.sqrt((xx2 - cx) ** 2 + (yy2 - cy) ** 2)
-        inside = dist <= r
-        light = np.clip(((xx2 - cx) * light_dir[0] + (yy2 - cy) * light_dir[1]) / r * 0.5 + 0.55, 0, 1)
-        band = np.sin((yy2 - cy) / bands + fbm(S, S, seed, 4) * 5) * 0.5 + 0.5
-        col = np.array(pal_a)[None, None, :] * (1 - band[:, :, None] * 0.5) + np.array(pal_b)[None, None, :] * band[:, :, None] * 0.5
-        col = col * (0.22 + 0.9 * light[:, :, None])
-        th = np.tile(BAYER, (S // 4 + 1, S // 4 + 1))[:S, :S]
-        col = np.floor(col / 16.0 + th[:, :, None]) * 16.0
-        im = Image.new("RGBA", (S, S), (0, 0, 0, 0)); ar = np.array(im)
-        ar[inside, :3] = np.clip(col, 0, 255).astype(np.uint8)[inside]; ar[inside, 3] = 255
-        im = Image.fromarray(ar); d = ImageDraw.Draw(im)
-        # Kantenaufhellung (Atmosphäre)
-        rim = Image.new("RGBA", (S, S), (0, 0, 0, 0)); rd = ImageDraw.Draw(rim)
-        rd.ellipse([cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1], outline=hexc("#bfe8ff", 90), width=2)
-        im.alpha_composite(rim)
-        if ring:
-            rg = Image.new("RGBA", (S, S), (0, 0, 0, 0)); gd = ImageDraw.Draw(rg)
-            for k, c in enumerate((hexc("#e8d9b0", 200), hexc("#b89a70", 170))):
-                gd.ellipse([8 - k * 3, cy - 14 - k * 2, S - 8 + k * 3, cy + 14 + k * 2], outline=c, width=3)
-            im.alpha_composite(rg)
-        im.save(OUT + name)
-    planet("planet_1.png", (-0.6, -0.5), (90, 180, 210), (40, 90, 150), 9.0, True, 41)
-    planet("planet_2.png", (0.6, -0.4), (120, 170, 90), (150, 110, 70), 7.0, False, 43)
-    planet("planet_3.png", (-0.5, 0.5), (230, 120, 110), (140, 50, 90), 12.0, False, 47)
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)

@@ -1,7 +1,7 @@
 extends Control
 ## Levelwechsel-Overlay. Zeitachse t (Sekunden):
 ##   0 – 2,0   altes Level blendet in den Weltraum aus
-##   2,0 – 5,6 Zwischensequenz: Taxi fliegt durchs All (Sterne, Planeten, Titelkarte)
+##   2,0 – 5,6 Zwischensequenz: Taxi fliegt durchs All (Sektor-Hintergrund in Tiefenebenen, Sterne, Titelkarte)
 ##   5,6 – 7,6 neues Level blendet ein; darunter fliegt das Taxi zur Startplattform
 ## Zeichnet nur; die Steuerung (Laden, Anflug, Überspringen) liegt in game.gd.
 
@@ -13,7 +13,7 @@ const T_END := 7.6
 
 var t := -1.0
 var last_t := -1.0
-var vt := -1.0                    # Anzeigezeit: läuft weiter, auch wenn die Zeitachse t auf den Funkspruch wartet (Taxi, Planeten und Sterne bleiben in Bewegung)
+var vt := -1.0                    # Anzeigezeit: läuft weiter, auch wenn die Zeitachse t auf den Funkspruch wartet (Taxi, Ebenen und Sterne bleiben in Bewegung)
 var title_sector := ""
 var title_level := ""
 var info := ""
@@ -23,12 +23,48 @@ var radio_t0 := 2.15
 var radio_len := 3.0
 var radio_age := 0.0              # Sekunden seit Beginn des Funkspruchs (unabhängig von der Flugzeit: Text bleibt, bis die Sprache zu Ende ist)
 var skip_hint := ""
-var space_bg: Texture2D = preload("res://assets/art/space_bg.png")
+var space_bg: Texture2D = preload("res://assets/art/space_bg.png")      # ohne Sektor (z. B. unbekannter Sektor): alter Nebel
 var taxi_tex: Texture2D = Cosmetics.paint_texture()
 var sticker_tex: Texture2D = Cosmetics.sticker_texture()
-var planets: Array[Texture2D] = [preload("res://assets/art/planet_1.png"), preload("res://assets/art/planet_2.png"), preload("res://assets/art/planet_3.png")]
-## [Startzeit, y, Größe (Einheiten), Planet, Geschwindigkeit]
-const PLANET_SCHEDULE := [[0.6, 72.0, 128.0, 0, 62.0], [2.7, 250.0, 192.0, 1, 95.0], [4.3, 118.0, 64.0, 2, 80.0]]
+## Hintergrund je Zielsektor (Runde 68): Grund + Motiv-Ebenen von hinten nach vorn, [Name, Mitziehfaktor relativ zum Sternscroll].
+## Erzeugt mit tools/art/transit/ (Blender-Szenen, Strahlverfolgung des Schwarzen Lochs, Nebel/Komposition in Python).
+## Ebenen sind 3200×1080 (1066⅔ × 360 Einheiten) und werden füllend über die Referenzbreite COVER_W gezeichnet; die Breite darüber
+## hinaus ist Reserve für das Mitziehen (auch bei Ultrawide keine Ränder).
+const LAYERS := {
+	1: [["base", 0.012], ["giant", 0.03], ["home", 0.05], ["harbor", 0.11]],
+	2: [["base", 0.012], ["crystals", 0.10]],
+	3: [["base", 0.012], ["wreck", 0.05], ["scrap", 0.12]],
+	4: [["base", 0.012], ["magnetar", 0.04], ["moon", 0.09]],
+	5: [["base", 0.012], ["forge", 0.08], ["embers", 0.16]],
+	6: [["base", 0.012], ["planet", 0.03], ["moon", 0.08]],
+	7: [["base", 0.012], ["station", 0.06], ["city", 0.13]],
+	8: [["base", 0.012], ["planet", 0.03], ["moon", 0.06], ["spores", 0.15]],
+	9: [["base", 0.012]],
+}
+const COVER_W := 2560.0 / 3.0     # Referenzbreite in Einheiten (Bild füllt die Ansicht wie ein 2560×1080-Bild)
+const SCROLL_MID := 820.0         # Sternscroll zur Mitte des Flugs (Titelkarte): dann stehen die Motive an ihrer gezeichneten Stelle
+var layers: Array = []            # [Texture2D, Faktor]
+## Zielsektor der Sequenz: bestimmt den Hintergrund (Flug zu Level 11 zeigt Sektor 1, Anflug auf Level 12 Sektor 2).
+var sector := 0:
+	set(v):
+		sector = v
+		layers = layer_list(v)
+
+static func layer_path(sec: int, name: String) -> String:
+	return "res://assets/art/transit/transit_s%d_%s.png" % [sec, name]
+
+static func layer_list(sec: int) -> Array:
+	var out: Array = []
+	for e in LAYERS.get(sec, []):
+		var p := layer_path(sec, e[0])
+		if ResourceLoader.exists(p):
+			out.append([load(p), float(e[1])])
+	return out
+
+## Seitliche Verschiebung einer Ebene (Einheiten vor der Skalierung): vor der Flugmitte rechts, danach links.
+static func layer_shift(scroll_now: float, factor: float) -> float:
+	return -(scroll_now - SCROLL_MID) * factor
+
 var stars: Array = []
 var scroll := 0.0
 const Stage := preload("res://src/core/stage.gd")      # Ränder bei Ultrawide/hohen Fenstern: Weltraum füllt alles, Texte bleiben auf 640×360
@@ -63,6 +99,8 @@ func _process(delta: float) -> void:
 		vt = -1.0
 	else:
 		var restarted := t < last_t - 0.001                       # neue Sequenz: Anzeigezeit beginnt wieder bei t
+		if vt < 0.0 or restarted:
+			scroll = 0.0                                           # Mitziehen der Ebenen gilt je Sequenz
 		vt = maxf(vt + delta, t) if vt >= 0.0 and not restarted else t          # nie hinter t (Überspringen springt vor), bleibt aber beim Warten nicht stehen
 		scroll += flight_speed() * delta
 		queue_redraw()
@@ -74,18 +112,31 @@ func _draw() -> void:
 		return
 	var white := Color(1, 1, 1, a)
 	var m := Stage.margin(self)
-	draw_texture_rect(space_bg, Rect2(-m, Stage.view(self)), false, white)
-	_draw_planets(a)
-	_draw_stars(a)
+	var vw := Stage.view(self)
+	if layers.is_empty():
+		draw_texture_rect(space_bg, Rect2(-m, vw), false, white)
+		_draw_stars(a, [0, 1, 2])
+	else:
+		var k := maxf(vw.x / COVER_W, vw.y / 360.0)          # füllend, Seitenverhältnis bleibt (Ultrawide, hohe Fenster)
+		for i in layers.size():
+			var tex: Texture2D = layers[i][0]
+			var sz: Vector2 = tex.get_size() / 3.0 * k
+			var dx := layer_shift(scroll, float(layers[i][1])) * k
+			draw_texture_rect(tex, Rect2(-m + (vw - sz) * 0.5 + Vector2(dx, 0.0), sz), false, white)
+			if i == 0:
+				_draw_stars(a, [0])                     # ferne Sterne liegen hinter Planeten und Stationen
+		_draw_stars(a, [1, 2])
 	if vt >= T_OUT - 0.4 and vt < T_IN + 0.3:
 		_draw_taxi(a)
 	_draw_titles(a)
 
-func _draw_stars(a: float) -> void:
+func _draw_stars(a: float, which: Array) -> void:
 	var sp := flight_speed()
 	var cols := [Color(0.65, 0.7, 1.0), Color(0.9, 0.92, 1.0), Color(1.0, 0.95, 0.8)]
 	for s in stars:
 		var layer: int = s[2]
+		if not which.has(layer):
+			continue
 		var factor: float = [0.25, 0.6, 1.4][layer]
 		var vs := Stage.view(self)
 		var m := Stage.margin(self)
@@ -98,15 +149,6 @@ func _draw_stars(a: float) -> void:
 			var ln: float = (sp - 60.0) * 0.12 * (0.5 + float(s[3]))
 			draw_rect(Rect2(x, y, ln, size * 0.67), Color(c.r, c.g, c.b, c.a * 0.55))
 		draw_rect(Rect2(x, y, size, size), c)
-
-func _draw_planets(a: float) -> void:
-	for p in PLANET_SCHEDULE:
-		var mx := Stage.margin(self).x
-		var x: float = 700.0 + mx - (vt - float(p[0])) * float(p[4])
-		var sz: float = p[2]
-		if x < -sz - mx or x > 720.0 + mx:
-			continue
-		draw_texture_rect(planets[int(p[3])], Rect2(PixelDraw.snap(x - sz * 0.5), PixelDraw.snap(float(p[1]) - sz * 0.5), sz, sz), false, Color(1, 1, 1, a))      # Pixelraster: Lage auf 1/3 Einheit, Größe ein Vielfaches
 
 ## Fortschritt 0..1 des Taxiflugs → Wegstrecke 0..1: Mindesttempo 55 % des Mittelwerts, nie Stillstand.
 static func taxi_path(p: float) -> float:

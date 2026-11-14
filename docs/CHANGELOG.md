@@ -3,6 +3,22 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.3.0
+
+### Deutsch
+
+**Grafik**
+- Jeder Sektor hat jetzt einen eigenen Hintergrund für den Flug zwischen den Leveln, passend zum Ziel: Heimatplanet mit Hafenstation, Neon-Kristalle, Schrottgürtel mit Frachterwrack, Magnetar mit Feldlinien und Polarlicht, Sonne mit orbitaler Schmiede, Ozeanplanet mit Gezeitenstrom, Ringstation über goldenen Wolken, Ringplanet in der Finsternis und ein Schwarzes Loch mit echter Lichtablenkung
+- Die Motive liegen in Tiefenebenen und ziehen je nach Entfernung mit (Parallaxe); ferne Sterne liegen hinter den Planeten
+- Die alten, immer gleichen Planeten im Zwischenflug entfallen
+
+### English
+
+**Graphics**
+- Every sector now has its own background for the flight between levels, matching the destination: home planet with a harbour station, neon crystals, a scrap belt with a freighter wreck, a magnetar with field lines and aurora, a sun with an orbital forge, an ocean planet with a tidal stream, a ring station above golden clouds, a ringed planet in eclipse and a black hole with real light bending
+- The scenery sits in depth layers and drifts at its own speed (parallax); distant stars stay behind the planets
+- The old, always identical planets of the transit flight are gone
+
 ## 1.2.2
 
 ### Deutsch

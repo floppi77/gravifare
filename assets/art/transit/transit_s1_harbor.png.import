@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://uwk27lt27xgi"
-path="res://.godot/imported/planet_3.png-69b999ecb20bc44254765ae491a9b0d5.ctex"
+uid="uid://dnstqjrs6texy"
+path="res://.godot/imported/transit_s1_harbor.png-7f51fb52970367ed75d37a76f9b9be40.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/planet_3.png"
-dest_files=["res://.godot/imported/planet_3.png-69b999ecb20bc44254765ae491a9b0d5.ctex"]
+source_file="res://assets/art/transit/transit_s1_harbor.png"
+dest_files=["res://.godot/imported/transit_s1_harbor.png-7f51fb52970367ed75d37a76f9b9be40.ctex"]
 
 [params]
 

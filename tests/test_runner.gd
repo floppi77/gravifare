@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -323,6 +323,48 @@ func _test_transition_timeline() -> void:
 	check(tv.overlay_alpha() > a1 and tv.T_OUT == 2.0, "Ausblenden dauert 2 s und steigt monoton")
 	check(absf((tv.T_IN - tv.T_OUT) - 3.6) < 0.01 and absf((tv.T_END - tv.T_IN) - 2.0) < 0.01, "Sequenz: 2 s aus, 3,6 s Weltraum, 2 s ein")
 	tv.free()
+
+func _test_transit_backgrounds() -> void:
+	## Runde 68: Zwischenflug-Hintergrund je Zielsektor aus Tiefenebenen mit Parallaxe; alte Planeten entfallen.
+	var TV = load("res://src/game/transition_view.gd")
+	var files_ok := true
+	var order_ok := true
+	for sec in range(1, 10):
+		var lst: Array = TV.LAYERS.get(sec, [])
+		files_ok = files_ok and lst.size() >= 1 and lst[0][0] == "base"
+		var last_f := -1.0
+		for e in lst:
+			var tex: Texture2D = load(TV.layer_path(sec, e[0])) if ResourceLoader.exists(TV.layer_path(sec, e[0])) else null
+			files_ok = files_ok and tex != null and tex.get_size() == Vector2(3200, 1080)
+			order_ok = order_ok and float(e[1]) > last_f and float(e[1]) <= 0.2
+			last_f = float(e[1])
+		check(TV.layer_list(sec).size() == lst.size(), "Zwischenflug Sektor %d: %d Ebenen geladen" % [sec, lst.size()])
+	check(files_ok, "Zwischenflug: Grund + Ebenen je Sektor vorhanden, 3200×1080 (Reserve fürs Mitziehen)")
+	check(order_ok, "Zwischenflug: Ebenen von hinten nach vorn, nähere ziehen schneller mit (höchstens 0,2 × Sternscroll)")
+	check(TV.layer_list(0).is_empty() and TV.layer_list(42).is_empty(), "Unbekannter Sektor: Ersatznebel statt Ebenen")
+	check(is_equal_approx(TV.layer_shift(TV.SCROLL_MID, 0.1), 0.0) and TV.layer_shift(0.0, 0.1) > 0.0 and TV.layer_shift(2000.0, 0.1) < 0.0, "Ebenen stehen zur Flugmitte an ihrer Stelle, kommen von rechts, ziehen nach links")
+	var reserve: float = (3200.0 / 3.0 - TV.COVER_W) * 0.5
+	var base_ok := true
+	for sc in [0.0, 800.0, 1600.0, 2600.0]:
+		for sec in range(1, 10):
+			base_ok = base_ok and absf(TV.layer_shift(sc, float(TV.LAYERS[sec][0][1]))) < reserve
+	check(base_ok, "Grund verschiebt sich höchstens um die Reserve (%.0f Einheiten): keine Ränder, auch bei Ultrawide" % reserve)
+	var tv = TV.new()
+	tv.t = 4.0
+	tv._process(0.5)
+	tv.t = -1.0
+	tv._process(0.016)
+	tv.t = 0.0
+	tv._process(0.016)
+	check(tv.scroll < 5.0, "Mitziehen beginnt je Sequenz neu (%.1f)" % tv.scroll)
+	tv.sector = 3
+	check(tv.layers.size() == TV.LAYERS[3].size(), "Sektor setzen lädt dessen Ebenen")
+	tv.free()
+	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
+	var tsrc := FileAccess.get_file_as_string("res://src/game/transition_view.gd")
+	check(gsrc.contains("trans.sector = nl.sector"), "Hintergrund richtet sich nach dem Zielsektor (Quelltextprüfung)")
+	check(LevelData.load_file("res://data/levels/s1_11.json").sector == 1 and LevelData.load_file("res://data/levels/s2_01.json").sector == 2, "Flug zu Level 11 zeigt Sektor 1, Anflug auf Level 12 Sektor 2")
+	check(not tsrc.contains("planet_") and not ResourceLoader.exists("res://assets/art/planet_1.png"), "Alte Planeten der Zwischensequenz entfallen")
 
 func _read_json(path: String) -> Dictionary:
 	var f := FileAccess.open(path, FileAccess.READ)

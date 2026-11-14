@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0yagcawyi8oe"
-path="res://.godot/imported/planet_1.png-52b1466e92a759bb54141640eed5bf10.ctex"
+uid="uid://c51xepbb5k3el"
+path="res://.godot/imported/transit_s1_giant.png-ce1b8a5a196d122b290be7a6dcfba338.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/planet_1.png"
-dest_files=["res://.godot/imported/planet_1.png-52b1466e92a759bb54141640eed5bf10.ctex"]
+source_file="res://assets/art/transit/transit_s1_giant.png"
+dest_files=["res://.godot/imported/transit_s1_giant.png-ce1b8a5a196d122b290be7a6dcfba338.ctex"]
 
 [params]
 

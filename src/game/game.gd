@@ -1386,6 +1386,7 @@ func _begin_transition() -> void:
 		Flow.carry_passenger = {"name": "Odo", "look": 2, "gender": "m"}
 	var nl := LevelData.load_file(Flow.level_path(next_id))
 	var lang := TranslationServer.get_locale().substr(0, 2)
+	trans.sector = nl.sector                    # Hintergrund des Zielsektors
 	trans.title_sector = tr("TRANS_SECTOR") % [nl.sector, tr("SECTOR_%d" % nl.sector)]
 	trans.title_level = tr("TRANS_LEVEL") % [(nl.sector - 1) * 11 + nl.index, nl.names.get(lang, nl.id)]
 	trans.info = tr("TRANS_FARES") % int(run.money)
