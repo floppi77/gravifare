@@ -53,6 +53,8 @@
  "TRANS_LEVEL": "Level %d – %s",
  "TRANS_FARES": "Earned: ¢ %d",
  "TRANS_SKIP": "A / Enter: skip",
+ "SPLASH_BY": "A GAME BY",
+ "SPLASH_MADE_WITH": "MADE WITH",
  "SECTOR_1": "Star Harbor",
  "SECTOR_2": "Neon Canyons",
  "SECTOR_3": "Scrap Belt",

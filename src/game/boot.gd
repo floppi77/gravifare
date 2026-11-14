@@ -1,5 +1,9 @@
 extends Node
-## Einstiegspunkt: Hauptmenü, oder direkt ein Level mit --level=<id> (Entwicklung/Screenshots).
+## Einstiegspunkt: Startbildschirm und Hauptmenü, oder direkt ein Level mit --level=<id> (Entwicklung/Screenshots).
+## Mit Entwicklerschaltern geht es ohne Startbildschirm direkt ins Menü (außer mit --splash).
+
+const SPLASH := "res://src/ui/splash.tscn"
+const Splash := preload("res://src/ui/splash.gd")
 
 func _ready() -> void:
 	var shift_run := false
@@ -40,4 +44,5 @@ func _ready() -> void:
 			Flow.current_level = Flow.resolve_level(a.substr(8))
 			get_tree().change_scene_to_file.call_deferred(Flow.GAME)
 			return
-	get_tree().change_scene_to_file.call_deferred(Flow.MENU)
+	# Normaler Start: erst der Startbildschirm (Studio, Spiellogo, Godot), der danach ins Hauptmenü wechselt
+	get_tree().change_scene_to_file.call_deferred(SPLASH if Splash.wanted(OS.get_cmdline_user_args()) else Flow.MENU)

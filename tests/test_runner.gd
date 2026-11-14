@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -323,6 +323,83 @@ func _test_transition_timeline() -> void:
 	check(tv.overlay_alpha() > a1 and tv.T_OUT == 2.0, "Ausblenden dauert 2 s und steigt monoton")
 	check(absf((tv.T_IN - tv.T_OUT) - 3.6) < 0.01 and absf((tv.T_END - tv.T_IN) - 2.0) < 0.01, "Sequenz: 2 s aus, 3,6 s Weltraum, 2 s ein")
 	tv.free()
+
+func _test_splash() -> void:
+	## Runde 69: Startbildschirm (Studio Quantum Abacus Games, GraviFare-Logo mit Glanzstreifen, „Made with Godot“) vor dem Hauptmenü.
+	var SP = load("res://src/ui/splash.gd")
+	check(SP.wanted(PackedStringArray()), "Startbildschirm: normaler Start ohne Schalter zeigt ihn")
+	check(not SP.wanted(PackedStringArray(["--level=3"])) and not SP.wanted(PackedStringArray(["--shot=x.png", "--frames=9"])), "Startbildschirm: Entwicklerschalter gehen direkt weiter")
+	check(SP.wanted(PackedStringArray(["--lang=en", "--splash"])), "Startbildschirm: --splash erzwingt ihn")
+	var boot := FileAccess.get_file_as_string("res://src/game/boot.gd")
+	check(boot.contains("Splash.wanted(OS.get_cmdline_user_args())") and boot.contains("res://src/ui/splash.tscn"), "Startbildschirm: Spielstart führt über ihn ins Hauptmenü")
+	var proj := FileAccess.get_file_as_string("res://project.godot")
+	check(proj.contains("boot_splash/show_image=false"), "Startbildschirm: kein zweites Godot-Logo im Engine-Bootbild")
+	var lic := FileAccess.get_file_as_string("res://THIRD_PARTY_LICENSES.md")
+	check(lic.contains("Andrea Calabró") and lic.contains("CC BY 4.0") and lic.contains("godot_logo"), "Startbildschirm: Godot-Logo mit Urheber und Lizenz im Inventar")
+	var gtex: Texture2D = load("res://assets/art/splash/godot_logo.png")
+	check(gtex != null and absf(gtex.get_size().aspect() - 959.99998 / 388.125) < 0.01, "Startbildschirm: Godot-Logo im Seitenverhältnis der SVG-Vorlage (%.3f)" % (gtex.get_size().aspect() if gtex != null else 0.0))
+	var fn: Node = get_root().get_node("Fonts")
+	if fn.title == null:
+		fn._ready()                           # Schriften laden, damit die Maße der Schriftzüge echt sind
+	var sv: Node = get_root().get_node("Settings")
+	var prev_rm: bool = sv.values.reduce_motion
+	sv.values.reduce_motion = false
+	var scene: PackedScene = load("res://src/ui/splash.tscn")
+	var s: Control = scene.instantiate()
+	s._ready()
+	var lay: Dictionary = s._lay
+	var gr: Rect2 = lay.godot
+	var studio_l: float = lay.emblem.x - 150.0 * SP.ES - (SP.ORBIT.x - 150.0) * SP.ES
+	check(absf((studio_l + gr.end.x) * 0.5 - 320.0) < 0.5, "Startbildschirm: Studio und Godot bilden ein zentriertes Paar (Mitte %.1f)" % ((studio_l + gr.end.x) * 0.5))
+	check(lay.text_w > 120.0 and lay.text_w < 170.0, "Startbildschirm: Schriftzug des Studios in erwarteter Breite (%.1f)" % lay.text_w)
+	check(gr.position.x - (lay.tx + lay.text_w) > 50.0 and lay.div > lay.tx + lay.text_w and lay.div < gr.position.x, "Startbildschirm: Abstand und Trenner zwischen Studio und Godot")
+	check(studio_l >= 8.0 and gr.end.x <= 632.0, "Startbildschirm: untere Reihe passt auf die 640er-Fläche")
+	check(absf(gr.size.aspect() - gtex.get_size().aspect()) < 0.005 and gr.size.y == SP.GODOT_H, "Startbildschirm: Godot-Logo unverzerrt gezeichnet")
+	check(SP.LOGO_C.y + SP.LOGO_W / SP.LOGO_CROP.size.aspect() * 0.5 < 240.0 and SP.ROW_Y > 240.0, "Startbildschirm: Spiellogo in den oberen zwei Dritteln, Studio und Godot im unteren Drittel")
+	var lg := Image.load_from_file(ProjectSettings.globalize_path("res://assets/art/logo.png"))
+	var crop_ok := lg != null and lg.get_pixelv(Vector2i(SP.LOGO_CROP.position) + Vector2i(SP.LOGO_CROP.size.x * 0.5, SP.LOGO_CROP.size.y * 0.5)).a > 0.0
+	check(crop_ok, "Startbildschirm: Ausschnitt des Spiellogos liegt im Bild")
+	check(s.fade.color.a > 0.99, "Startbildschirm: beginnt schwarz")
+	s.t = 1.6
+	s._apply()
+	check(float(s.shine.get_shader_parameter("sweep")) > 0.0 and float(s.shine.get_shader_parameter("sweep")) < 1.0, "Startbildschirm: Glanzstreifen läuft bei 1,6 s über das Logo")
+	s.t = 3.0
+	s._apply()
+	check(float(s.shine.get_shader_parameter("sweep")) < 0.0 and s.fade.color.a < 0.01 and absf(s.logo.modulate.a - 1.0) < 0.01, "Startbildschirm: zwischen den Glanzstreifen ruhig, voll sichtbar")
+	var echo := InputEventKey.new()
+	echo.pressed = true
+	echo.echo = true
+	echo.keycode = KEY_ENTER
+	s._input(echo)
+	var motion := InputEventMouseMotion.new()
+	s._input(motion)
+	var axis := InputEventJoypadMotion.new()
+	axis.axis_value = 1.0
+	s._input(axis)
+	check(not s.leaving, "Startbildschirm: gehaltene Taste (Wiederholung), Mausbewegung und Stick überspringen nicht")
+	var pad := InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_A
+	pad.pressed = true
+	s._input(pad)
+	check(s.leaving and absf(s.out_dur - SP.SKIP_FADE) < 0.001, "Startbildschirm: Controllerknopf überspringt mit kurzer Blende")
+	s.free()
+	var s2: Control = scene.instantiate()
+	s2._ready()
+	s2.t = SP.T_END - 0.01
+	s2._process(0.02)
+	check(s2.leaving and absf(s2.out_dur - SP.FADE_OUT) < 0.001, "Startbildschirm: wechselt nach %.1f s von selbst" % SP.T_END)
+	s2.free()
+	sv.values.reduce_motion = true
+	var s3: Control = scene.instantiate()
+	s3._ready()
+	s3.t = 1.6
+	s3._apply()
+	var still_scale: Vector2 = s3.logo.scale
+	s3.t = 0.4
+	s3._apply()
+	check(float(s3.shine.get_shader_parameter("sweep")) < 0.0 and s3.logo.scale == still_scale, "Startbildschirm: „Weniger Bewegung“ ohne Glanzstreifen und Zoom")
+	s3.free()
+	sv.values.reduce_motion = prev_rm
 
 func _test_transit_backgrounds() -> void:
 	## Runde 68: Zwischenflug-Hintergrund je Zielsektor aus Tiefenebenen mit Parallaxe; alte Planeten entfallen.

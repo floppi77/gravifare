@@ -2,6 +2,8 @@
 | Asset | Herkunft | Lizenz | Modifikation | Export | Status |
 |---|---|---|---|---|---|
 | Godot Engine 4.7.2 | godotengine.org | MIT | – | Laufzeit | in Benutzung (Lizenztexte beim Export beilegen) |
+| Godot-Logo (`assets/art/splash/godot_logo.png`, Quelle `tools/art/splash/godot_logo_large_color_dark.svg`) | godotengine.org/press („Large horizontal logo“, für dunkle Hintergründe), geladen 2026-11-14; © 2017 Andrea Calabró (laut `COPYRIGHT.txt` des Godot-Repos) | CC BY 4.0; Pressekit erlaubt das Logo im Startbildschirm, ohne Empfehlung durch die Godot-Entwickler anzudeuten, nicht verzerren | unverändert gerastert (200 px hoch), Seitenverhältnis erhalten | ja | in Benutzung (Startbildschirm; Nennung in den Credits) |
+| Studiologo „Quantum Abacus Games“ (Startbildschirm) | eigene Gestaltung, im Spiel gezeichnet (`src/ui/splash.gd`), Schriften Oxanium und Jersey 10 | eigene Arbeit | – | ja | in Benutzung |
 | tiles_s1–s9, floppy_1–3, taxi, passengers, bg_s1_* | eigene Skripte `tools/art` | eigene Arbeit | – | ja | in Benutzung |
 | Hintergrundbilder `bg_s1`–`bg_s9`, `bg_menu` (1920×1080, 10 Motive) | KI-generiert (Angabe des Entwicklers, 2026-11-01); Prompts/Exportdatum nicht archiviert | keine Lizenz, frei verwendbar (Angabe des Entwicklers, 2026-11-01) | Zuschnitt (Zoom 1,06), Abdunklung je Sektor, Parallax | ja | in Benutzung |
 | `logo.png` (Hauptmenü-Logo) | KI-generiert (Angabe des Entwicklers, 2026-11-01); Prompts nicht archiviert | keine Lizenz, frei verwendbar (Angabe des Entwicklers, 2026-11-01) | Zuschnitt | ja | in Benutzung |

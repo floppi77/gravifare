@@ -3,6 +3,22 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.4.0
+
+### Deutsch
+
+**Startbildschirm**
+- Neuer Startbildschirm vor dem Hauptmenü: das GraviFare-Logo mit wanderndem Glanzstreifen, darunter das Studio „Quantum Abacus Games“ mit animiertem Neon-Abakus und „Made with Godot“
+- Jede Taste, jeder Controllerknopf und jeder Mausklick überspringt ihn; mit „Weniger Bewegung“ gibt es nur sanfte Überblendungen
+- Das Godot-Logo ist in den Credits mit Urheber und Lizenz genannt
+
+### English
+
+**Splash screen**
+- New splash screen before the main menu: the GraviFare logo with a travelling shine, below it the studio "Quantum Abacus Games" with an animated neon abacus and "Made with Godot"
+- Any key, controller button or mouse click skips it; with "Reduce motion" it only fades
+- The Godot logo is credited with its author and licence in the credits
+
 ## 1.3.0
 
 ### Deutsch

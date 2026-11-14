@@ -53,6 +53,8 @@
  "TRANS_LEVEL": "Level %d – %s",
  "TRANS_FARES": "Verdient: ¢ %d",
  "TRANS_SKIP": "A / Enter: überspringen",
+ "SPLASH_BY": "EIN SPIEL VON",
+ "SPLASH_MADE_WITH": "MADE WITH",
  "SECTOR_1": "Sternenhafen",
  "SECTOR_2": "Neon-Schluchten",
  "SECTOR_3": "Schrottgürtel",

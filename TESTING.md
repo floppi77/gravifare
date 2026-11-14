@@ -10,7 +10,10 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (main mit mechanik-grafik und grafik-fleiss, 2026-11-11):** 3569 Prüfungen, alle bestanden (vor beiden Branches 3449). Neu je Runde, jüngste zuerst:
+**Stand (Version 1.4.0, 2026-11-14):** 3673 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+
+- **Runde 69:** Startbildschirm (`_test_splash`): Start mit/ohne Entwicklerschalter, Godot-Bootbild aus, Lizenzeintrag und Seitenverhältnis des Godot-Logos, Studio und Godot als zentriertes Paar mit Abstand, Spiellogo oben, Glanzstreifen, Überspringen (Knopf ja; Tastenwiederholung, Mausbewegung, Stick nein), automatischer Wechsel, „Weniger Bewegung“. Ansicht: `godot --path . -- --splash --splash-t=3.5 --shot=out.png --frames=30`
+- **Runde 68:** Zwischenflug-Hintergründe je Zielsektor (`_test_transit_backgrounds`)
 
 - **Runde 67:** Ausgangszeit halbiert, Notfall-Frist je Sektor (0,65 … 1,15 ×, alte Läufe 1,3 ×), Zeitstern in ganzen Sekunden, Note je Nachtschicht-Karte, Neonfinale Level 22 / Glasfassade Level 17 mit Funksprüchen, Leuchtreklame in Level 12, Autopilot-Prüfung mit Regelstand 3, wo Regelstand 4 ihn überfordert
 - **Runde 66:** Spielstandsauswahl mit Steuerkreuz (Name ↔ Löschen über alle Plätze, hoch/runter), Level-99-Thema t99 (drei Schichten, eigenes Thema nur für Level 99, Musikplayer 23 Stücke, frei mit Level 99)
