@@ -129,12 +129,12 @@ const BOT_FUEL_OVERRIDE := {"s4_05": 38.0, "s8_08": 38.0, "s9_05": 40.0, "s5_11"
 ## ein Pflichtfahrgast mehr darf verloren gehen (Geduld) bzw. die Hülle bis 75 % sinken. Für Menschen bleiben die Level lösbar, der Bot ist hier nur langsamer.
 ## Runde 65: Lava trifft schon am Rumpf (9 je 0,25 s); in Level 50 und 51 streift der Autopilot die pulsierende Lava über Pad 6 bzw. am Engpass,
 ## liefert aber alle Fahrgäste ab. Dort genügt eine Resthülle über 45 %.
-## Level 52 (s5_08) hat der Entwickler am 2026-11-13 von Hand umgebaut (Lava und Plattform versetzt): seitdem in BOT_HAND_LEVELS.
+## Level 52 (s5_08) hat der Entwickler am 2026-11-13 von Hand umgebaut (Lava und Plattform versetzt): seitdem in BOT_HAND_LEVELS; ebenso Level 69, 75, 76 (2026-11-14, Balance Sektor 7).
 const BOT_LENIENT := {"s9_11": [2, 90.0], "s8_03": [1, 75.0], "s5_06": [1, 45.0], "s5_07": [1, 45.0]}
 
 ## Von Hand gebaute Level (Stand 2026-11), die der Autopilot ab 35 % Sprit nicht oder nicht sauber schafft (lange Wartezeiten an Wandertoren, Strahlen und Fahrzeugbahnen,
 ## Zapfsäule weit weg). Der Entwickler hat sie alle selbst gelöst; für sie wird nur die statische Lösbarkeit geprüft. Alle anderen Level muss der Autopilot weiter lösen.
-const BOT_HAND_LEVELS := ["s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04"]
+const BOT_HAND_LEVELS := ["s7_03", "s7_09", "s7_10", "s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04"]
 ## Runde 60: Level, die der Autopilot mit der strengen Tankregel (unter 35 % gratis nur ohne Geld) ab Mindest-Sprit nicht mehr löst. Er tankt erst, wenn
 ## Credits da sind, zahlt dann auch unter 35 % und fliegt mit zu wenig Sprit los. Der Auftraggeber verlangt hier keine Autopilot-Lösung (2026-11-10);
 ## geprüft wird die Fliegbarkeit mit Regelstand 2 (Tankregel und Aufträge wie bis 1.0.1) und die statische Lösbarkeit; das Ergebnis mit den neuen Regeln wird nur ausgegeben.
@@ -6019,7 +6019,7 @@ func _test_rules4_landing_and_lava() -> void:
 		check(int(d.rules) == 3 and pl.complete == bool(res.complete) and absf(pl.time - float(res.time)) < 0.001 and absf(pl.money - float(res.money)) < 0.01,
 			"Lauf mit Regelstand 3 %s rechnet exakt nach: %.2f s, ¢%.2f" % [f.get_basename(), pl.time, pl.money])
 		n += 1
-	check(n >= 7, "Läufe mit Regelstand 3 geprüft: %d" % n)
+	check(n >= 6, "Läufe mit Regelstand 3 geprüft: %d" % n)        # Level 70 (s7_04) seit 1.2.2 umgebaut: sein alter Lauf entfällt
 
 func _test_slot_select_pad_nav() -> void:
 	# Runde 66: Spielstandsauswahl mit Steuerkreuz – runter zu „Name“, in der Knopfreihe Name ↔ Löschen über alle Plätze, hoch zur Diskette

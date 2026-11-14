@@ -3,6 +3,18 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.2.2
+
+### Deutsch
+
+**Level**
+- Balanceanpassungen in Sektor 7 (Level 69, 70, 71, 74, 75 und 76), neue Vorschaubilder in der Levelauswahl
+
+### English
+
+**Levels**
+- Balance changes in sector 7 (levels 69, 70, 71, 74, 75 and 76), new previews in level select
+
 ## 1.2.1
 
 ### Deutsch
