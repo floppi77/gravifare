@@ -33,7 +33,7 @@ static func _depths(lv: LevelData) -> Dictionary:
 	return d
 
 static func draw(c: CanvasItem, lv: LevelData) -> void:
-	var look := SectorLook.of(lv.sector)
+	var look := SectorLook.of(lv.look())
 	var dep := _depths(lv)
 	var shade: Color = look.shade
 	for y in lv.height:
@@ -65,11 +65,11 @@ static func draw(c: CanvasItem, lv: LevelData) -> void:
 			var px := x * T
 			var py := y * T
 			if d >= 2:
-				_inner(c, lv.sector, x, y, px, py)
+				_inner(c, lv.look(), x, y, px, py)
 			if y > 0 and lv.cell(x, y - 1) == ".":
-				_top(c, lv.sector, x, y, px, py)
+				_top(c, lv.look(), x, y, px, py)
 			if y + 1 < lv.height and lv.cell(x, y + 1) == ".":
-				_under(c, lv.sector, x, y, px, py + T)
+				_under(c, lv.look(), x, y, px, py + T)
 
 static func _fade(c: CanvasItem, x: float, y: float, w: float, h: float, top: Color, bot: Color) -> void:
 	c.draw_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + w, y), Vector2(x + w, y + h), Vector2(x, y + h)]), PackedColorArray([top, top, bot, bot]))

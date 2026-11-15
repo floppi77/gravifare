@@ -32,6 +32,9 @@ func start(g: Node, k: String) -> bool:
 	demo = IntroDemo.new()
 	if not demo.setup(k):
 		return false
+	var grun = g.get("run")                            # Bildsprache des Sektors, in dem der Einspieler läuft (Physik und Regeln des Demos bleiben)
+	if grun != null and grun.level != null and not grun.level.tutorial:
+		demo.level.look_sector = grun.level.look()
 	set_anchors_preset(Control.PRESET_TOP_LEFT)       # feste 640×360-Fläche; die CanvasLayer verschiebt sie in die Mitte (siehe game.gd)
 	size = VIEW
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -51,18 +54,19 @@ func _build_view() -> void:
 	sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	sv.transparent_bg = false
 	add_child(sv)
-	var bg := ColorRect.new()
-	bg.size = VIEW
-	var sh := Shader.new()
-	sh.code = "shader_type canvas_item;\nvoid fragment() {\n\tCOLOR = vec4(mix(vec3(0.03, 0.04, 0.13), vec3(0.14, 0.1, 0.28), UV.y), 1.0);\n}\n"
-	var mat := ShaderMaterial.new()
-	mat.shader = sh
-	bg.material = mat
 	var bgl := CanvasLayer.new()
 	bgl.layer = -5
 	bgl.follow_viewport_enabled = false
-	bgl.add_child(bg)
 	sv.add_child(bgl)
+	var bg := Control.new()                                     # Hintergrundbild des Sektors wie im Spiel (vorher ein leerer Farbverlauf)
+	bg.set_script(load("res://src/game/backdrop.gd"))
+	bg.size = VIEW
+	bgl.add_child(bg)
+	bg.setup(demo.level)
+	var veil := ColorRect.new()                                 # leichter Schleier: Taxi und Vorführung bleiben vor hellen Bildern klar
+	veil.size = VIEW
+	veil.color = Color(0.02, 0.03, 0.1, 0.28)
+	bgl.add_child(veil)
 	var amb := CanvasModulate.new()
 	amb.color = Color(0.86, 0.9, 1.0)
 	sv.add_child(amb)
@@ -187,6 +191,7 @@ func _draw() -> void:
 		var lines := _wrap(Fonts.ui, text, r.size.x - 18.0, 9)
 		var h := 8.0 + float(lines.size()) * 11.0
 		var y := r.end.y + 12.0
+		draw_rect(Rect2(-mg.x, y - 4.0, get_viewport_rect().size.x, VIEW.y + mg.y - y + 4.0), Color(0.01, 0.01, 0.05, f))      # Auftragszeile des HUD ganz abdecken statt halb durchscheinen
 		draw_rect(Rect2(r.position.x, y, r.size.x, h), Color(0.04, 0.06, 0.16, 0.9 * f))
 		draw_rect(Rect2(r.position.x, y, r.size.x, 1.0), Color(1.0, 0.88, 0.58, 0.55 * f))
 		for i in lines.size():

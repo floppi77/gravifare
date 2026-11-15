@@ -10,8 +10,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Version 1.4.0, 2026-11-14):** 3673 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Version 1.5.0, 2026-11-15):** 3704 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
 
+- **Runde 70:** Sektor 2 mit fünf Pflichtfahrgästen und kürzeren Zeitzielen, Fortschritt je Sektor (`Progress`), Wrackteile für alle Trümmergrößen der Level, Einspieler in der Bildsprache des Sektors (`LevelData.look()`), Landeassistent weicht Wimpeln und Preisschildern aus, Pausetafel, weicher Rand, Texte (`_test_round70`)
 - **Runde 69:** Startbildschirm (`_test_splash`): Start mit/ohne Entwicklerschalter, Godot-Bootbild aus, Lizenzeintrag und Seitenverhältnis des Godot-Logos, Studio und Godot als zentriertes Paar mit Abstand, Spiellogo oben, Glanzstreifen, Überspringen (Knopf ja; Tastenwiederholung, Mausbewegung, Stick nein), automatischer Wechsel, „Weniger Bewegung“. Ansicht: `godot --path . -- --splash --splash-t=3.5 --shot=out.png --frames=30`
 - **Runde 68:** Zwischenflug-Hintergründe je Zielsektor (`_test_transit_backgrounds`)
 

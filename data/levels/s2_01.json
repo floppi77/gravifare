@@ -48,14 +48,6 @@
    "gender": "m"
   },
   {
-   "from": "2",
-   "to": "4",
-   "fare": 140,
-   "par": 16,
-   "passenger": "Lena",
-   "gender": "f"
-  },
-  {
    "from": "1",
    "to": "3",
    "fare": 150,

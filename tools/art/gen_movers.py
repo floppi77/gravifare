@@ -47,7 +47,7 @@ def hsh(u, v, s=0):
 # --- Farben je Art -------------------------------------------------------------------------------------------------------------------------
 DEB = dict(body=hexc("#3b3f5e"), hi=hexc("#555b82"), lo=hexc("#2a2d47"), dk=hexc("#1c1e33"),
            rim_hi=hexc("#ffcf6e"), rim=hexc("#ffb02e"), rim_lo=hexc("#c9701a"), cut=2)
-SLI = dict(body=hexc("#232a52"), hi=hexc("#38427a"), lo=hexc("#171c3c"), dk=hexc("#0f1330"),
+SLI = dict(body=hexc("#2f3a74"), hi=hexc("#5868b4"), lo=hexc("#1d2552"), dk=hexc("#10143a"),
            rim_hi=hexc("#fff0a0"), rim=hexc("#ffc23a"), rim_lo=hexc("#c98f1a"), cut=1)
 PAD = dict(body=hexc("#2a3266"), hi=hexc("#3f4a8c"), lo=hexc("#1c2250"), dk=hexc("#12173a"),
            rim_hi=hexc("#c4cdff"), rim=hexc("#7f8fe0"), rim_lo=hexc("#566098"), cut=1,
@@ -117,11 +117,23 @@ def px(kind, dl, dr, dt, db, u, v, var):
                 det = k["rim_hi"]
             elif (u, v) in ((6, 2), (5, 3), (6, 3)):
                 det = k["dk"]
-    elif kind == 1:                                     # Schieber: Plattenfugen, Nieten, Warnstreifen unten
-        if d >= 3 and (v == 0 or (u == 0 and var == 0)):
-            det = k["lo"]
-        if d >= 4 and (u, v) in ((2, 3), (9, 3)) and var == 0:
-            det = k["rim_hi"]
+    elif kind == 1:                                     # Schieber: schwere Panzerplatten mit Fase, Bolzen bzw. Lüftungsschlitzen, Warnstreifen unten
+        if d >= 3:
+            if v == 11 or u == 11:
+                det = k["dk"]                           # Fuge zwischen den Platten
+            elif v == 0 or u == 0:
+                det = k["hi"]                           # Lichtkante oben/links
+            elif v == 10 or u == 10:
+                det = k["lo"]                           # Schattenkante unten/rechts
+            elif var == 0:
+                if (u, v) in ((2, 2), (8, 2), (2, 8), (8, 8)):
+                    det = k["rim_hi"]                   # vier Bolzen je Platte
+                elif (u, v) in ((3, 3), (9, 3), (3, 9), (9, 9)):
+                    det = k["dk"]
+            elif v in (3, 5, 7) and 2 <= u <= 8:
+                det = k["dk"]                           # Lüftungsschlitze
+            elif v in (4, 6, 8) and 2 <= u <= 8:
+                det = mix(k["body"], k["hi"], 0.5)
         if db in range(1, 9) and dl >= 1 and dr >= 1:
             stripe = ((u + db) % 12) < 6
             det = k["rim"] if stripe else k["dk"]

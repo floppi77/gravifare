@@ -64,14 +64,6 @@
    "gender": "m"
   },
   {
-   "from": "4",
-   "to": "2",
-   "fare": 160,
-   "par": 34,
-   "passenger": "Ines",
-   "gender": "f"
-  },
-  {
    "from": "1",
    "to": "exit",
    "fare": 170,

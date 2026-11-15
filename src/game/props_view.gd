@@ -74,7 +74,7 @@ func _draw_pads() -> void:
 		# Wartebereich-Unterstand, Pfosten mit Signalbaken nur am freien Ende
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
-			draw_texture_rect_region(shelter_tex, shelter, Rect2((clampi(level.sector, 1, 9) - 1) * 76, 0, 72, 60))
+			draw_texture_rect_region(shelter_tex, shelter, Rect2((clampi(level.look(), 1, 9) - 1) * 76, 0, 72, 60))
 			_light_shelter(shelter, id)
 			var rx := shelter.get_center().x
 			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
@@ -552,7 +552,32 @@ func _draw_movers_main() -> void:
 		if m.kind == "pad":
 			_draw_pad_mover(m, r)
 			continue
+		if m.kind == "debris" and _draw_debris_piece(r, int(m.x) * 7 + int(m.y) * 13):
+			continue
 		_draw_mover_box(0 if m.kind == "debris" else 1, r, int(m.x) * 7 + int(m.y) * 13)
+
+## Trümmer in den Größen der Level (16 × 32, 32 × 16 und 16 × 16 Einheiten) sind ganze Wrackteile aus assets/art/debris.png (tools/art/gen_debris.py):
+## Frachtcontainer, Rumpfplatte oder Solarpaneel, je Brocken fest nach seiner Lage gewählt. Die Fläche ist genau die Trefferfläche `r`.
+## Andere Größen (Gemeinschaftslevel) gibt es nicht als Bild: dann false, und das Kachelblatt setzt sie zusammen.
+const DEBRIS_TEX: Texture2D = preload("res://assets/art/debris.png")
+const DEBRIS_S := 48
+const DEBRIS_L := 96
+
+func _draw_debris_piece(r: Rect2, seed: int) -> bool:
+	var w := roundi(r.size.x * 3.0)
+	var h := roundi(r.size.y * 3.0)
+	var v := posmod(seed, 3)
+	var src: Rect2
+	if w == DEBRIS_S and h == DEBRIS_L:
+		src = Rect2(v * DEBRIS_S, 0, DEBRIS_S, DEBRIS_L)
+	elif w == DEBRIS_L and h == DEBRIS_S:
+		src = Rect2(3 * DEBRIS_S, v * DEBRIS_S, DEBRIS_L, DEBRIS_S)
+	elif w == DEBRIS_S and h == DEBRIS_S:
+		src = Rect2(0, DEBRIS_L, DEBRIS_S, DEBRIS_S)
+	else:
+		return false
+	draw_texture_rect_region(DEBRIS_TEX, Rect2(PixelDraw.snap2(r.position), Vector2(w, h) * PixelDraw.PX), src)
+	return true
 
 ## Pixel-Hindernisse (Trümmer, Schieber, fahrende Plattformen) aus dem Kachelblatt assets/art/movers.png (tools/art/gen_movers.py): neun Stücke
 ## (Ecken, Kanten, Füllung) in 12 × 12 Bildpunkten (4 Einheiten), 1 Bildpunkt = 1/3 Einheit. Zeile 0 Trümmer, 1 Schieber, 2 Plattform.
@@ -890,7 +915,7 @@ func _draw_actor(a: PassengerActor) -> void:
 	if a.wave_t <= 0.0 and not a.angry and dest != "" and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
 		_draw_dest_bubble(pos, dest, a.fade, run.extra_of(a).is_empty())
 	if a.wave_t > 0.0 or a.angry:
-		var bx := pos.x + 4.0
+		var bx := pos.x + (4.0 if a.angry else 17.0)          # Winken: am Platz der Zielblase, rechts neben dem Betrag (lag vorher auf dem Preisschild)
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
 		var bubble := Color("#ff4d6d") if a.angry else Color("#ffe14a")
 		var label := "#!" if a.angry else "!"

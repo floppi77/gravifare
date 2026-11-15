@@ -14,9 +14,56 @@ const PANEL := Color(0.05, 0.06, 0.15, 0.86)
 var run: Run
 var t := 0.0
 
+var flag_rects: Array = []        # Wimpel der Plattformen (Weltkoordinaten): das Feld weicht ihnen aus
+var chip_place := 0               # 0 rechts, 1 links, 2 oben, 3 rechts oben, 4 links oben
+
 func bind(r: Run) -> void:
 	run = r
+	flag_rects.clear()
+	for f in r.level.pad_flags():
+		flag_rects.append(f.rect)
 	sync_state()
+
+const CHIP_SIZE := Vector2(30.0, 17.0)
+
+const PLACES := 5
+
+## Lage des Felds relativ zum Taxi: rechts, links, über dem Taxi, rechts oben, links oben.
+static func chip_offset(place: int) -> Vector2:
+	return [Vector2(14.0, -12.0), Vector2(-14.0 - CHIP_SIZE.x, -12.0), Vector2(-CHIP_SIZE.x * 0.5, -32.0),
+		Vector2(14.0, -31.0), Vector2(-14.0 - CHIP_SIZE.x, -31.0)][place]
+
+## Flächen, die das Feld nicht verdecken soll: Wimpel sowie Preisschild, Stern und Zielblase wartender oder aussteigender Fahrgäste.
+func _busy_rects() -> Array:
+	var out: Array = flag_rects.duplicate()
+	if run != null:
+		for a in run._all_actors():
+			if a != null and a.state != PassengerActor.S.ABOARD and a.state != PassengerActor.S.GONE:
+				out.append(Rect2(a.x - 14.0, a.surface_y - 33.0, 38.0, 34.0))
+	return out
+
+## Erste freie Lage in der Reihenfolge rechts, links, oben, rechts oben, links oben; die bisherige bleibt, solange sie frei ist, damit das
+## Feld nicht springt. Ist nichts frei, gewinnt die Lage mit der kleinsten verdeckten Fläche.
+static func pick_place(taxi: Vector2, busy: Array, level_w: float, current := 0) -> int:
+	var order := [current]
+	for p in PLACES:
+		if p != current:
+			order.append(p)
+	var best := -1
+	var best_cover := INF
+	for p in order:
+		var r := Rect2(taxi + chip_offset(p), CHIP_SIZE)
+		if r.position.x < 2.0 or r.end.x > level_w - 2.0:
+			continue
+		var cover := 0.0
+		for b in busy:
+			cover += r.intersection(b).get_area()
+		if cover <= 0.0:
+			return p
+		if cover < best_cover:
+			best_cover = cover
+			best = p
+	return best if best >= 0 else (0 if taxi.x < level_w - 60.0 else 1)
 
 ## Einmal pro Physik-Tick (wie das Taxi), damit die Interpolation beide Knoten gleich glättet.
 func sync_state() -> void:
@@ -158,11 +205,11 @@ func _draw_chip(s: TaxiSim, a: float) -> void:
 	var r: float = rs[worst]
 	var col := tone(r)
 	col.a = a
-	var side := 1.0 if s.pos.x < float(s.level.pixel_size().x) - 60.0 else -1.0          # am rechten Rand nach links ausweichen
-	var w := 30.0
-	var h := 17.0
-	var x0 := 14.0 if side > 0.0 else -14.0 - w
-	var y0 := -12.0
+	chip_place = pick_place(s.pos, _busy_rects(), float(s.level.pixel_size().x), chip_place)      # weicht Wimpeln, Preisschildern und dem Bildrand aus
+	var w := CHIP_SIZE.x
+	var h := CHIP_SIZE.y
+	var x0 := chip_offset(chip_place).x
+	var y0 := chip_offset(chip_place).y
 	draw_rect(Rect2(x0, y0, w, h), Color(PANEL.r, PANEL.g, PANEL.b, PANEL.a * a))
 	draw_rect(Rect2(x0, y0, w, h), col, false, 0.67)
 	var ix := x0 + 7.0

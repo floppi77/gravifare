@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -323,6 +323,105 @@ func _test_transition_timeline() -> void:
 	check(tv.overlay_alpha() > a1 and tv.T_OUT == 2.0, "Ausblenden dauert 2 s und steigt monoton")
 	check(absf((tv.T_IN - tv.T_OUT) - 3.6) < 0.01 and absf((tv.T_END - tv.T_IN) - 2.0) < 0.01, "Sequenz: 2 s aus, 3,6 s Weltraum, 2 s ein")
 	tv.free()
+
+## Runde 70: Sektor 2 kürzer, Fortschritt je Sektor, Wrackteile, Einspieler im Sektorbild, Landeassistent weicht aus, Pausetafel, weicher Rand.
+func _test_round70() -> void:
+	# 1) Sektor 2: je Level ein Pflichtfahrgast weniger (Level 15 mit seinen kurzen Fahrten bleibt), Zeitziele entsprechend kürzer
+	var total := 0.0
+	var counts := []
+	for i in range(1, 12):
+		var l := LevelData.load_file("res://data/levels/s2_%02d.json" % i)
+		var r := Run.new()
+		r.extras_enabled = false
+		r.start(l)
+		total += r.time_target()
+		counts.append(l.jobs.size())
+	check(counts == [5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5], "Sektor 2: fünf Pflichtfahrgäste je Level (Level 15 unverändert sieben) %s" % str(counts))
+	check(total < 1500.0 and total > 1300.0, "Sektor 2: Summe der Zeitziele %d s (vorher 1887 s)" % int(total))
+	# 2) Fortschritt je Sektor
+	var ids := []
+	for sec in range(1, 10):
+		for i in range(1, 12):
+			ids.append("s%d_%02d" % [sec, i])
+	var full := {"time": true, "clean": true, "pro": true}
+	var done := {"s1_01": {"medals": full}, "s1_02": {"medals": {"time": true, "clean": false, "pro": false}}, "s2_01": {}, "s3_05": {"medals": full}}
+	var p1 := Progress.sector(ids, done, 1)
+	var p2 := Progress.sector(ids, done, 2)
+	check(Progress.sector_ids(ids, 3).size() == 11 and Progress.sector_ids(ids, 3)[0] == "s3_01" and Progress.sector_ids(ids, 9)[10] == "s9_11", "Fortschritt: elf Level je Sektor")
+	check(p1.done == 2 and p1.total == 11 and p1.stars == 4 and p1.stars_max == 33, "Fortschritt Sektor 1: 2 von 11, 4 von 33 Sternen")
+	check(p2.done == 1 and p2.stars == 0 and Progress.sector(ids, done, 4).done == 0, "Fortschritt: Level ohne Medaillen zählt als geschafft, leerer Sektor 0")
+	var all := Progress.of(ids, done)
+	check(all.done == 4 and all.total == 99 and all.stars == 7 and all.stars_max == 297, "Fortschritt gesamt: 4 von 99, 7 von 297 Sternen")
+	var gold := {}
+	for id in Progress.sector_ids(ids, 5):
+		gold[id] = {"medals": full}
+	check(Progress.gold(Progress.sector(ids, gold, 5)) and not Progress.gold(p1) and absf(Progress.share(p1) - 2.0 / 11.0) < 0.001 and Progress.share(Progress.of([], {})) == 0.0, "Fortschritt: Gold nur mit allen Sternen, Anteil stimmt, leere Liste ohne Fehler")
+	var ls := _src("res://src/ui/level_select.gd")
+	check(ls.contains("Progress.sector(ids, Save.data.completed, n)") and ls.contains("LVL_PROGRESS_ALL") and ls.contains("bars.append"), "Levelauswahl zeigt Fortschritt je Reiter, je Sektor und gesamt")
+	# 3) Trümmer als Wrackteile
+	var dt: Texture2D = load("res://assets/art/debris.png")
+	check(dt != null and dt.get_width() == 240 and dt.get_height() == 144, "Wrackteile: Blatt 240 × 144")
+	var img := dt.get_image()
+	var rects := [Rect2i(0, 0, 48, 96), Rect2i(48, 0, 48, 96), Rect2i(96, 0, 48, 96), Rect2i(144, 0, 96, 48), Rect2i(144, 48, 96, 48), Rect2i(144, 96, 96, 48), Rect2i(0, 96, 48, 48)]
+	var frames_ok := true
+	var varied := {}
+	for rc in rects:
+		var c0 := img.get_pixel(rc.position.x, rc.position.y)
+		var rim := img.get_pixel(rc.position.x + rc.size.x / 2, rc.position.y + 1)
+		var edge := img.get_pixel(rc.position.x + rc.size.x / 2, rc.position.y)
+		var mid := img.get_pixel(rc.position.x + rc.size.x / 2, rc.position.y + rc.size.y / 2)
+		frames_ok = frames_ok and c0.a < 0.1 and edge.a > 0.9 and edge.r < 0.1 and rim.r > 0.9 and rim.g > 0.6 and rim.b < 0.5 and mid.a > 0.9
+		var cols := {}
+		for y in range(rc.position.y + 6, rc.end.y - 6, 3):
+			for x in range(rc.position.x + 6, rc.end.x - 6, 3):
+				cols[img.get_pixel(x, y).to_html()] = true
+		varied[rc] = cols.size()
+		frames_ok = frames_ok and cols.size() >= 8
+	check(frames_ok, "Wrackteile: sieben Bilder mit Kontur, abgeschrägter Ecke, orangem Warnrand und gezeichnetem Inneren %s" % str(varied.values()))
+	var pv := _src("res://src/game/props_view.gd")
+	check(pv.contains("_draw_debris_piece(r, ") and pv.contains("assets/art/debris.png") and pv.contains("_draw_mover_box(0 if m.kind"), "Trümmer: Wrackteil in den Levelgrößen, sonst weiter das Kachelblatt")
+	var sizes := {}
+	for f in DirAccess.get_files_at("res://data/levels"):
+		if f.ends_with(".json"):
+			for m in LevelData.load_file("res://data/levels/" + f).movers:
+				if m.kind == "debris":
+					sizes[Vector2i(roundi(m.rect.size.x * 3.0), roundi(m.rect.size.y * 3.0))] = true
+	var known := true
+	for sz in sizes:
+		known = known and [Vector2i(48, 96), Vector2i(96, 48), Vector2i(48, 48)].has(sz)
+	check(known and sizes.size() >= 2, "Alle Trümmer der 99 Level haben ein Wrackteil in ihrer Größe %s" % str(sizes.keys()))
+	# 4) Einspieler in der Bildsprache des Sektors
+	var ld := LevelData.load_file("res://data/levels/s5_01.json")
+	check(ld.look() == 5, "Bildsprache: ohne Vorgabe der eigene Sektor")
+	ld.look_sector = 3
+	check(ld.look() == 3 and ld.sector == 5 and ld.number == 45, "Bildsprache eines anderen Sektors ändert weder Sektor noch Levelnummer")
+	var ic := _src("res://src/game/intro_clip.gd")
+	check(ic.contains("demo.level.look_sector = grun.level.look()") and ic.contains("res://src/game/backdrop.gd") and not ic.contains("mix(vec3(0.03, 0.04, 0.13)"), "Einspieler: Hintergrund und Fels des laufenden Sektors statt Farbverlauf")
+	check(ic.contains("Auftragszeile des HUD ganz abdecken"), "Einspieler: Untertitel deckt die Auftragszeile")
+	for path in ["res://src/game/world_view.gd", "res://src/game/world_decor.gd", "res://src/game/backdrop.gd"]:
+		check(not _src(path).contains(".sector"), "%s zeichnet nach look() statt nach sector" % path.get_file())
+	# 5) Landeassistent weicht aus
+	var la = load("res://src/game/landing_assist.gd")
+	var taxi := Vector2(208, 128)
+	check(la.pick_place(taxi, [], 640.0, 0) == 0 and la.pick_place(taxi, [], 640.0, 1) == 1, "Landeassistent: freie Lage bleibt (kein Springen)")
+	var flag := Rect2(222, 128, 14, 10)
+	check(la.pick_place(taxi, [flag], 640.0, 0) == 1, "Landeassistent: Wimpel rechts, also links")
+	var tag := Rect2(172, 114, 38, 34)
+	var got: int = la.pick_place(taxi, [flag, tag], 640.0, 0)
+	var chip := Rect2(taxi + la.chip_offset(got), la.CHIP_SIZE)
+	check(got >= 2 and not chip.intersects(flag) and not chip.intersects(tag), "Landeassistent: Wimpel rechts und Preisschild links, also nach oben (Lage %d)" % got)
+	check(la.pick_place(Vector2(630, 128), [], 640.0, 0) == 1 and la.pick_place(Vector2(8, 128), [], 640.0, 1) == 0, "Landeassistent: bleibt im Bild (am rechten Rand links, am linken rechts)")
+	var wall := Rect2(0, 0, 640, 360)
+	check(la.pick_place(taxi, [wall], 640.0, 2) >= 0 and la.pick_place(taxi, [wall], 640.0, 2) < la.PLACES, "Landeassistent: alles belegt, trotzdem eine gültige Lage")
+	# 6) Pausetafel, weicher Rand, Texte, Winken
+	check(_src("res://src/ui/pause_menu.gd").contains("MenuKit.panel_style(0.88)"), "Pausemenü liegt auf einer Tafel")
+	var wv := _src("res://src/game/world_view.gd")
+	check(wv.contains("func _soft_tone") and not wv.contains("draw_rect(Rect2(cx * T, 0, T, level.height * T)"), "Weicher Rand: Verlauf je Kachel, kein Band über die volle Höhe")
+	for lang in ["de", "en"]:
+		var tx: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
+		check(not String(tx.HUD_LIFE_LOST).to_lower().contains("taxi") and String(tx.HUD_LIFE_LOST).contains("%d"), "%s: Taxiverlust-Tafel nennt „Taxi verloren“ nur einmal" % lang)
+		check(String(tx.LVL_PROGRESS).count("%d") == 4 and String(tx.LVL_PROGRESS_ALL).count("%d") == 4, "%s: Fortschrittstexte mit vier Zahlen" % lang)
+	check(pv.contains("var bx := pos.x + (4.0 if a.angry else 17.0)"), "Winke-Blase liegt neben dem Preisschild, nicht darauf")
 
 func _test_splash() -> void:
 	## Runde 69: Startbildschirm (Studio Quantum Abacus Games, GraviFare-Logo mit Glanzstreifen, „Made with Godot“) vor dem Hauptmenü.
@@ -6020,7 +6119,7 @@ func _test_sector_tiles() -> void:
 	img5.convert(Image.FORMAT_RGBA8)
 	check(img5.get_pixel(15 * 48 + 24, 48 + 24).a > 0.99 and img5.get_pixel(3 * 48 + 47, 48).a < 0.01 and img5.get_pixel(3 * 48, 48 + 47).a > 0.99, "Randkacheln: Innen deckend, Außenecken abgerundet (nur dort durchsichtig)")
 	var wsrc := FileAccess.get_file_as_string("res://src/game/world_view.gd")
-	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_normal(level.sector)"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
+	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_normal(level.look())"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
 	var bsrc := FileAccess.get_file_as_string("res://src/game/workshop_bay.gd")
 	check(bsrc.contains("Rect2(idx * 48, 0, 48, 48)"), "Werkstatt nutzt weiter die erste Atlaszeile")
 

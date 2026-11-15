@@ -16,10 +16,10 @@ func _ready() -> void:
 func setup(r: Run) -> void:
 	run = r
 	level = r.level
-	look = SectorLook.of(level.sector)
+	look = SectorLook.of(level.look())
 	var ct := CanvasTexture.new()
-	ct.diffuse_texture = SectorLook.tiles(level.sector)
-	ct.normal_texture = SectorLook.tiles_normal(level.sector)
+	ct.diffuse_texture = SectorLook.tiles(level.look())
+	ct.normal_texture = SectorLook.tiles_normal(level.look())
 	tiles_tex = ct
 	queue_redraw()
 
@@ -126,16 +126,31 @@ func _draw_world() -> void:
 ## Nur Darstellung: Kollision und Kamera bleiben, wie sie sind.
 const SOFT_EDGE := 5
 func _draw_soft_edge() -> void:
-	var shade: Color = look.shade
+	var tex_size: Vector2 = tiles_tex.get_size()
 	for side in [-1, 1]:
+		var edge_x: int = 0 if side < 0 else level.width - 1
 		for k in range(1, SOFT_EDGE + 1):
 			var cx: int = -k if side < 0 else level.width - 1 + k
-			var edge_x: int = 0 if side < 0 else level.width - 1
-			var a := pow(1.0 - float(k - 1) / float(SOFT_EDGE), 1.6)
-			var dim := lerpf(0.82, 0.45, float(k - 1) / float(SOFT_EDGE - 1))
+			var near := _soft_tone(float(k - 1))             # zur Karte hin
+			var far := _soft_tone(float(k))                  # nach außen
+			var left := far if side < 0 else near
+			var right := near if side < 0 else far
+			var cols := PackedColorArray([left, right, right, left])
 			for cy in level.height:
 				if not level.is_solid_cell(edge_x, cy):
 					continue                          # Öffnungen in der Außenwand (Verkehr) bleiben offen
 				var h := int(absi((cx * 83492791) ^ (cy * 2654435761)) >> 4)
-				draw_texture_rect_region(tiles_tex, Rect2(cx * T, cy * T, T, T), Rect2([7, 8, 9, 10, 11][h % 5] * 48, 0, 48, 48), Color(dim, dim, dim * 1.05, a))
-			draw_rect(Rect2(cx * T, 0, T, level.height * T), Color(shade.r, shade.g, shade.b, (1.0 - a) * 0.35))
+				var u0 := float([7, 8, 9, 10, 11][h % 5] * 48) / tex_size.x
+				var u1 := u0 + 48.0 / tex_size.x
+				var v1 := 48.0 / tex_size.y
+				var x := float(cx) * T
+				var y := float(cy) * T
+				draw_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + T, y), Vector2(x + T, y + T), Vector2(x, y + T)]), cols,
+						PackedVector2Array([Vector2(u0, 0.0), Vector2(u1, 0.0), Vector2(u1, v1), Vector2(u0, v1)]), tiles_tex)
+
+## Farbe des Randfelsens im Abstand `d` Kacheln von der Karte: stufenlos dunkler und durchsichtiger, außen ganz weg.
+## (Vorher je Spalte ein fester Wert und ein dunkles Band über die volle Höhe: bei 32:9 sah man fünf Streifen.)
+func _soft_tone(d: float) -> Color:
+	var u := clampf(d / float(SOFT_EDGE), 0.0, 1.0)
+	var dim := lerpf(0.82, 0.4, u)
+	return Color(dim, dim, dim * 1.05, pow(1.0 - u, 1.6))

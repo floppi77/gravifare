@@ -12,6 +12,15 @@ var head: Label
 var preview: LevelPreview
 var info_name: Label
 var info_stats: Label
+var bars: Array = []            # je Sektor-Reiter: Füllbalken des Fortschritts
+var prog_sector: Label
+var prog_bar: ColorRect
+var prog_total: Label
+
+const BAR_W := 30.0
+const PROG_W := 290.0
+const COL_BAR := Color("#5dff9a")
+const COL_GOLD := Color("#ffd24a")
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -29,6 +38,14 @@ func _ready() -> void:
 		row.add_child(b)
 		tabs.append(b)
 	add_child(_at(row, Vector2(0, 32), Vector2(640, 20)))
+	var x0 := 320.0 - (9.0 * BAR_W + 8.0 * 4.0) * 0.5          # unter jedem Reiter: geschaffte Level des Sektors als Balken (Gold = alle Sterne)
+	for n in range(1, 10):
+		var p := Progress.sector(ids, Save.data.completed, n)
+		var bx := x0 + float(n - 1) * (BAR_W + 4.0)
+		add_child(_at(_rect(Color(0.1, 0.12, 0.28, 0.9)), Vector2(bx, 52.0), Vector2(BAR_W, 2.0)))
+		var fill := _rect(COL_GOLD if Progress.gold(p) else COL_BAR)
+		add_child(_at(fill, Vector2(bx, 52.0), Vector2(BAR_W * Progress.share(p), 2.0)))
+		bars.append(fill)
 	head = _at(MenuKit.title("", 12), Vector2(16, 56), Vector2(290, 16))
 	add_child(head)
 	grid = GridContainer.new()
@@ -43,6 +60,18 @@ func _ready() -> void:
 	info_stats = Label.new()
 	info_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_at(info_stats, Vector2(322, 247), Vector2(302, 40)))
+	prog_sector = Label.new()                                   # Fortschritt des gewählten Sektors und insgesamt, unter den Levelkarten
+	prog_sector.add_theme_font_size_override("font_size", 9)
+	add_child(_at(prog_sector, Vector2(16, 254), Vector2(PROG_W, 12)))
+	add_child(_at(_rect(Color(0.1, 0.12, 0.28, 0.9)), Vector2(16, 268), Vector2(PROG_W, 3)))
+	prog_bar = _rect(COL_BAR)
+	add_child(_at(prog_bar, Vector2(16, 268), Vector2(0, 3)))
+	prog_total = Label.new()
+	prog_total.add_theme_font_size_override("font_size", 8)
+	prog_total.add_theme_color_override("font_color", Color("#a9b8ff"))
+	add_child(_at(prog_total, Vector2(16, 274), Vector2(PROG_W, 12)))
+	var all := Progress.of(ids, Save.data.completed)
+	prog_total.text = tr("LVL_PROGRESS_ALL") % [all.done, all.total, all.stars, all.stars_max]
 	var hint := Label.new()
 	hint.text = tr("LVL_SWITCH") + "\n" + tr("LVL_PRACTICE")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -52,6 +81,12 @@ func _ready() -> void:
 	add_child(_at(bb, Vector2(256, 327), Vector2(128, 19)))
 	_open(sector)
 	_focus_first_level()
+
+func _rect(col: Color) -> ColorRect:
+	var r := ColorRect.new()
+	r.color = col
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return r
 
 func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	c.position = pos
@@ -77,6 +112,10 @@ func _open(n: int) -> void:
 	for i in tabs.size():
 		tabs[i].modulate = Color(1.25, 1.2, 0.8) if i + 1 == n else Color.WHITE
 	head.text = tr("LVL_SECTOR") % [n, tr("SECTOR_%d" % n)]
+	var p := Progress.sector(ids, Save.data.completed, n)
+	prog_sector.text = tr("LVL_PROGRESS") % [p.done, p.total, p.stars, p.stars_max]
+	prog_bar.size.x = PROG_W * Progress.share(p)
+	prog_bar.color = COL_GOLD if Progress.gold(p) else COL_BAR
 	for c in grid.get_children():
 		grid.remove_child(c)
 		c.queue_free()

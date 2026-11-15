@@ -21,7 +21,7 @@ var life_t := 0.0
 
 func setup(l: LevelData) -> void:
 	lvl = l
-	var n := l.sector
+	var n := l.look()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--bg="):         # Dev: Hintergrund eines anderen Sektors ansehen
 			n = int(a.substr(5))

@@ -3,6 +3,46 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.5.0
+
+### Deutsch
+
+**Spiel**
+- Sektor 2 (Neon-Schluchten) ist kürzer: In zehn der elf Level gibt es einen Pflichtfahrgast weniger (fünf statt sechs), die Zeitziele sinken entsprechend. Karten und Routen sind unverändert; Bestzeit-Geister dieser Level beginnen neu
+- Levelauswahl zeigt den Fortschritt: ein Balken unter jedem Sektor (Gold, wenn alle Sterne geholt sind), dazu geschaffte Level und Sterne des Sektors und insgesamt
+- Der Landeassistent am Taxi weicht Wimpeln und Preisschildern aus, statt sie zu verdecken
+
+**Grafik**
+- Trümmer sind jetzt Wrackteile: Frachtcontainer, Rumpfplatte mit geborstenem Bullauge und Solarpaneel statt flacher Platten; Schieber sind Panzerplatten mit Bolzen und Lüftungsschlitzen. Trefferflächen unverändert
+- Die Einspieler zu neuen Spielelementen laufen vor Hintergrund und Fels des jeweiligen Sektors statt vor einer leeren Fläche
+- Das Pausemenü liegt auf einer dunklen Tafel wie die übrigen Menüs
+- Ultrawide (21:9, 32:9): Der Rand des Spielfelds läuft stufenlos aus, ohne sichtbare Streifen
+- Vorschaubilder der Levelauswahl für alle Level mit Trümmern und Schiebern neu
+
+**Behoben**
+- Die Winke-Blase eines wartenden Fahrgasts verdeckte sein Preisschild und das Ziel
+- Der Untertitel der Einspieler ließ die Auftragszeile halb durchscheinen
+- Die Meldung beim Taxiverlust nannte „Taxi verloren“ doppelt
+
+### English
+
+**Game**
+- Sector 2 (Neon Canyons) is shorter: ten of its eleven levels need one mandatory passenger fewer (five instead of six), and the time targets drop accordingly. Maps and routes are unchanged; best-time ghosts for these levels start over
+- The level select shows your progress: a bar under each sector (gold once every star is earned), plus cleared levels and stars for the sector and in total
+- The landing assist next to the taxi moves out of the way of pennants and fare tags instead of covering them
+
+**Graphics**
+- Debris is now wreckage: a cargo container, a hull plate with a shattered porthole and a solar panel instead of flat slabs; sliders are armour plates with bolts and vents. Hitboxes are unchanged
+- The intro clips for new game elements play in front of the backdrop and rock of their sector instead of an empty screen
+- The pause menu sits on a dark panel like the other menus
+- Ultrawide (21:9, 32:9): the edge of the playfield fades out smoothly, without visible bands
+- New level-select previews for every level with debris or sliders
+
+**Fixed**
+- A waiting passenger's waving bubble covered the fare tag and destination
+- The intro clip subtitle let the job line show through
+- The message after losing a taxi said "Taxi lost" twice
+
 ## 1.4.0
 
 ### Deutsch

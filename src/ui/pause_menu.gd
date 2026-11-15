@@ -4,19 +4,27 @@ extends Control
 
 var game: Node
 var box: VBoxContainer
+var frame: PanelContainer
 var in_sub := false
 
 func _ready() -> void:
 	theme = MenuKit.make_theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	var center := CenterContainer.new()                # dunkle Tafel wie in den übrigen Menüs: Knöpfe stehen nicht mehr lose über dem Level
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(center)
+	frame = PanelContainer.new()
+	var sb := MenuKit.panel_style(0.88)
+	sb.set_content_margin_all(12)
+	frame.add_theme_stylebox_override("panel", sb)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(frame)
 	box = VBoxContainer.new()
-	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 4)
-	add_child(box)
+	frame.add_child(box)
 	show_main()
 
 func _clear() -> void:

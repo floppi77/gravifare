@@ -40,14 +40,6 @@
    "gender": "f"
   },
   {
-   "from": "4",
-   "to": "3",
-   "fare": 130,
-   "par": 29,
-   "passenger": "Odo",
-   "gender": "m"
-  },
-  {
    "from": "1",
    "to": "4",
    "fare": 140,

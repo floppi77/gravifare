@@ -7,6 +7,7 @@ const SOLID := "#"
 
 var id := ""
 var sector := 1
+var look_sector := 0            # nur Darstellung: Fels, Hintergrund und Haltestellen eines anderen Sektors (Einspieler); 0 = eigener Sektor
 var index := 1
 var number := 1                # Levelnummer 1..99
 var names := {}
@@ -48,6 +49,10 @@ var dark := 0.0                  # Sektor 8: Dunkelheit (0 = hell … 1 = fast s
 var movers_ignore := false       # Planung/Zeichnen: Mover gelten als nicht vorhanden
 var pump_aware := false          # Planung (Zuschauer-Autopilot): Zapfsäulen samt Kopf sind Hindernisse (sonst zählt jede Berührung zum Zerstören der Station)
 var sweep_core := false          # Planung: fahrende Pads sperren nur den Bereich, den die Platte in jeder Stellung belegt (statt ihres ganzen Fahrwegs)
+
+## Sektor, dessen Bildsprache gezeichnet wird (Regeln und Physik folgen immer `sector`).
+func look() -> int:
+	return look_sector if look_sector > 0 else sector
 
 static func load_file(path: String) -> LevelData:
 	var f := FileAccess.open(path, FileAccess.READ)

@@ -32,14 +32,6 @@
  ],
  "jobs": [
   {
-   "from": "2",
-   "to": "4",
-   "fare": 120,
-   "par": 35,
-   "passenger": "Mika",
-   "gender": "f"
-  },
-  {
    "from": "3",
    "to": "1",
    "fare": 130,
