@@ -329,9 +329,9 @@ def _hsv2rgb(h, s_, v):
     return out
 
 def taxi_skins():
-    """Lackierungen per Farbtausch der gelb-orangen Karosserie: taxi_<name>.png aus taxi.png und das Leben-Symbol life_<name>.png
-    aus life_icon.png (beide in Aseprite gezeichnet, tools/art/aseprite)."""
-    for src, dst, stripe in (("taxi.png", "taxi_%s.png", 6), ("life_icon.png", "life_%s.png", 3)):
+    """Lackierungen des Leben-Symbols per Farbtausch der gelb-orangen Karosserie: life_<name>.png aus life_icon.png (in Aseprite
+    gezeichnet, tools/art/aseprite). Das Taxi selbst und seine Lackierungen erzeugt seit Runde 71 tools/art/gen_taxi.py in allen Größen."""
+    for src, dst, stripe in (("life_icon.png", "life_%s.png", 3),):
         base = np.array(Image.open(OUT + src).convert("RGBA")).astype(float)
         rgb = base[..., :3] / 255.0
         h, s_, v = _rgb2hsv(rgb)
@@ -366,6 +366,11 @@ class _Scaled:
         self.d.rectangle([round(v * self.k) for v in box], fill=fill)
 
 STICKER_SMALL = 20      # Aufkleber am Taxi im Spiel: 20 px = 6,67 Einheiten, 1:1 bei 1080p (Runde 62; das große Bild bleibt für Garage, Menü, Werkstatt)
+STICKER_SCALES = (2, 3, 4, 5, 6)      # Bildschirmpunkte je Einheit (720p … 2160p): je Größe eigens gerastert wie das Taxi (Runde 71)
+
+def sticker_px(n):
+    """Kantenlänge des Aufklebers am Taxi bei n Bildschirmpunkten je Einheit."""
+    return int(round(STICKER_SMALL * n / 3.0))
 
 def stickers(small_only=False):
     def icon(draw_fn, name):
@@ -376,6 +381,17 @@ def stickers(small_only=False):
         draw_fn(_Scaled(ImageDraw.Draw(sm), (STICKER_SMALL - 2) / 36.0))
         sm2 = Image.new("RGBA", (STICKER_SMALL, STICKER_SMALL), (0, 0, 0, 0)); sm2.alpha_composite(sm, (1, 1))
         add_outline(sm2, thick=1).save(OUT + "sticker_%s_s.png" % name)
+        # alle Größen untereinander (sticker_<name>_sizes.png, 40 px breit): fürs Taxi im Level, 1:1 in jeder Auflösung
+        sheet = Image.new("RGBA", (sticker_px(max(STICKER_SCALES)), sum(sticker_px(n) for n in STICKER_SCALES)), (0, 0, 0, 0))
+        y = 0
+        for n in STICKER_SCALES:
+            px, th = sticker_px(n), (1 if n < 5 else 2)
+            a = Image.new("RGBA", (px, px), (0, 0, 0, 0))
+            draw_fn(_Scaled(ImageDraw.Draw(a), (px - 2 * th) / 36.0))
+            b = Image.new("RGBA", (px, px), (0, 0, 0, 0)); b.alpha_composite(a, (th, th))
+            sheet.alpha_composite(add_outline(b, thick=th), (0, y))
+            y += px
+        sheet.save(OUT + "sticker_%s_sizes.png" % name)
     import math
     def star(d):
         pts = []

@@ -2,8 +2,11 @@ extends Node2D
 ## Taxi-Darstellung: Rumpf-Sprite, Fahrwerk, Düsenflammen, Beschädigung.
 
 var sim: TaxiSim
-var tex: Texture2D = Cosmetics.paint_texture()
-var sticker: Texture2D = Cosmetics.sticker_small_texture()        # 20 px, 1:1 am Taxi
+var tex: Texture2D = Cosmetics.paint_texture()                    # 78×48 (nur noch Rückfall; gezeichnet wird die Größe des Bildschirms)
+var sticker: Texture2D = Cosmetics.sticker_small_texture()
+var size_n := 0                   # Größe des Taxis in Bildschirmpunkten je Einheit, zuletzt gezeichnet
+var frame := {}
+var sticker_frame := {}
 var t := 0.0
 var flame_main := 0.0
 var flame_down := 0.0
@@ -167,9 +170,14 @@ func _draw() -> void:
 	var mod := Color.WHITE
 	if flash > 0.0:
 		mod = Color(1, 0.4 + 0.6 * (1.0 - flash), 0.4 + 0.6 * (1.0 - flash))
-	draw_texture_rect(tex, Tuning.TAXI_RECT, false, mod)            # 78×48 px = 26×16 Einheiten: 1:1 bei 1080p
-	if sticker != null:
-		draw_texture_rect(sticker, Tuning.STICKER_RECT, false, mod)
+	var n := Cosmetics.pick_size(Cosmetics.pixel_scale(self))       # 720p … 2160p: je Bildschirmskalierung das eigens gerasterte Taxi, 1:1
+	if n != size_n:
+		size_n = n
+		frame = Cosmetics.taxi_frame(n)
+		sticker_frame = Cosmetics.sticker_frame(n)
+	draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src, mod)
+	if not sticker_frame.is_empty():
+		draw_texture_rect_region(sticker_frame.tex, Tuning.sticker_rect(int(sticker_frame.n), int(sticker_frame.src.size.x)), sticker_frame.src, mod)
 	# Schadenanzeige: Funken/Rauch
 	if hurt > 0.45 and int(t * 8.0) % 2 == 0:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))

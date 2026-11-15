@@ -216,8 +216,7 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_OPTIONS"), "options", show_options],
 			[tr("MENU_CREDITS"), "credits", func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
 			[Save.slot_label(), "slot", show_slots],
-			[tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL)],      # per Gamepad wie jeder Eintrag anwählbar
-			[tr("MENU_QUIT"), "quit", func(): get_tree().quit()]]:
+			[tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL)]]:      # per Gamepad wie jeder Eintrag anwählbar
 		grid.add_child(_menu_button(entry[0], entry[1], entry[2], true))
 	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagschicht: ab Sektor 1
 	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln der Sektoren 1–4
@@ -227,7 +226,11 @@ func show_main(focus_lang := "") -> void:
 		sb.set_meta("help", "HELP_SHIFT_DONE")
 	box.add_child(grid)
 	_link_grid(grid)
-	_equalize_grid.call_deferred(grid)
+	# „Beenden“ allein in der letzten Zeile, mittig unter beiden Spalten (elf Einträge hätten es links allein stehen lassen)
+	var quit_btn := _menu_button(tr("MENU_QUIT"), "quit", func(): get_tree().quit(), true)
+	quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(quit_btn)
+	_equalize_grid.call_deferred(grid, quit_btn)
 	if Save.debug:
 		box.add_child(_menu_button(tr("DEBUG_LEAVE"), "debug", func():
 			Flow.set_debug(false)
@@ -254,7 +257,7 @@ func _link_grid(grid: GridContainer) -> void:
 
 ## Alle Knöpfe des Nebenmenüs so breit wie der breiteste (z. B. „Ko-fi: Unterstützen“), damit beide Spalten gleich aussehen.
 ## Erst im Baum gemessen, weil die Schrift aus dem Theme kommt.
-func _equalize_grid(grid: GridContainer) -> void:
+func _equalize_grid(grid: GridContainer, extra: Control = null) -> void:
 	if not is_instance_valid(grid):
 		return
 	var w := 0.0
@@ -262,6 +265,8 @@ func _equalize_grid(grid: GridContainer) -> void:
 		w = maxf(w, (c as Control).get_combined_minimum_size().x)
 	for c in grid.get_children():
 		(c as Control).custom_minimum_size.x = w
+	if is_instance_valid(extra):
+		extra.custom_minimum_size.x = w            # so breit wie eine Spalte, mittig unter dem Gitter
 
 ## Dunkle Tafel hinter den Menüknöpfen (nicht hinter Logo und Untertitel): die Knöpfe liegen sonst direkt auf dem detailreichen Stadtbild.
 func _add_button_panel() -> void:

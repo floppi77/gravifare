@@ -267,7 +267,7 @@ func _draw_driver() -> void:
 	var shadow := true
 	if st.mode == "rise" or st.mode == "hop":
 		# Kopfmitte des Fahrers in der Kuppel (Pixel 48/15 des Taxis, 3 Pixel je Einheit): 0 / -5 Einheiten über der Taxi-Mitte
-		var seat := Vector2(tp.x - w * 0.5, tp.y - 5.0 * TAXI_S - 20.5 * DRIVER_S)
+		var seat := Vector2(tp.x - w * 0.5, tp.y - 4.4 * TAXI_S - 20.5 * DRIVER_S)      # Runde 71: der Kopf sitzt im neuen Taxi 0,6 Einheiten tiefer
 		if st.mode == "rise":
 			pos = seat - Vector2(0.0, RISE * _ease(float(st.k)))
 			var clip_y := tp.y + (27.0 / 3.0 - 10.0) * TAXI_S              # Unterkante der Kuppel

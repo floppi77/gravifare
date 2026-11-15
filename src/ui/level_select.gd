@@ -2,6 +2,7 @@ class_name LevelSelect
 extends Control
 ## Levelauswahl: je Sektor eine Seite mit elf Levelkarten und einer Vorschau (Grundriss, Name, Medaillen, Bestwerte).
 ## Sektorwechsel über die Reiter oder LB/RB bzw. Bild auf/ab; B/Esc geht zurück. Mit laufender Karriere ist ein Start ein Übungsflug.
+## Die Reiter (SectorTab) füllen sich von links in der Sektorfarbe, je mehr Level des Sektors geschafft sind; der gewählte ist gelb umrandet.
 
 var back: Callable
 var ids: Array = []
@@ -12,15 +13,12 @@ var head: Label
 var preview: LevelPreview
 var info_name: Label
 var info_stats: Label
-var bars: Array = []            # je Sektor-Reiter: Füllbalken des Fortschritts
 var prog_sector: Label
-var prog_bar: ColorRect
 var prog_total: Label
+var frame: Panel                 # Rahmen der Vorschau in der Sektorfarbe
 
-const BAR_W := 30.0
-const PROG_W := 290.0
-const COL_BAR := Color("#5dff9a")
-const COL_GOLD := Color("#ffd24a")
+const TAB_W := 64.0
+const TAB_GAP := 4.0
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -30,46 +28,51 @@ func _ready() -> void:
 	add_child(_at(MenuKit.screen_title(tr("MENU_LEVELS")), Vector2(0, 3), Vector2(640, 26)))
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 4)
-	for n in range(1, 10):
-		var b := MenuKit.button(str(n), _open.bind(n))
-		b.custom_minimum_size = Vector2(30, 19)
-		b.focus_entered.connect(_open.bind(n))
-		row.add_child(b)
-		tabs.append(b)
-	add_child(_at(row, Vector2(0, 32), Vector2(640, 20)))
-	var x0 := 320.0 - (9.0 * BAR_W + 8.0 * 4.0) * 0.5          # unter jedem Reiter: geschaffte Level des Sektors als Balken (Gold = alle Sterne)
+	row.add_theme_constant_override("separation", int(TAB_GAP))
 	for n in range(1, 10):
 		var p := Progress.sector(ids, Save.data.completed, n)
-		var bx := x0 + float(n - 1) * (BAR_W + 4.0)
-		add_child(_at(_rect(Color(0.1, 0.12, 0.28, 0.9)), Vector2(bx, 52.0), Vector2(BAR_W, 2.0)))
-		var fill := _rect(COL_GOLD if Progress.gold(p) else COL_BAR)
-		add_child(_at(fill, Vector2(bx, 52.0), Vector2(BAR_W * Progress.share(p), 2.0)))
-		bars.append(fill)
-	head = _at(MenuKit.title("", 12), Vector2(16, 56), Vector2(290, 16))
-	add_child(head)
+		var b := SectorTab.new()
+		b.number = n
+		b.done = int(p.done)
+		b.total = int(p.total)
+		b.gold = Progress.gold(p)
+		b.accent = sector_color(n)
+		b.custom_minimum_size = Vector2(TAB_W, 26)
+		b.pressed.connect(func():
+			Sfx.play("ui_ok")
+			_open(n))
+		b.focus_entered.connect(func():
+			Sfx.play("ui_move", -6.0)
+			_open(n))
+		row.add_child(b)
+		tabs.append(b)
+	add_child(_at(row, Vector2(0, 30), Vector2(640, 26)))
+	head = MenuKit.title("", 12)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	add_child(_at(head, Vector2(16, 59), Vector2(200, 16)))
+	prog_sector = Label.new()                                   # Fortschritt des gewählten Sektors, rechts neben dem Namen
+	prog_sector.add_theme_font_size_override("font_size", 9)
+	prog_sector.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(_at(prog_sector, Vector2(156, 62), Vector2(150, 12)))
 	grid = GridContainer.new()
 	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
-	add_child(_at(grid, Vector2(16, 76), Vector2(290, 200)))
+	add_child(_at(grid, Vector2(16, 79), Vector2(290, 200)))
+	frame = Panel.new()
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_at(frame, Vector2(320, 59), Vector2(306, 174)))
 	preview = LevelPreview.new()
-	add_child(_at(preview, Vector2(322, 58), Vector2(302, 168)))
-	info_name = _at(MenuKit.title("", 12), Vector2(322, 230), Vector2(302, 16))
+	add_child(_at(preview, Vector2(322, 61), Vector2(302, 170)))
+	info_name = _at(MenuKit.title("", 12), Vector2(322, 236), Vector2(302, 16))
 	add_child(info_name)
 	info_stats = Label.new()
 	info_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(_at(info_stats, Vector2(322, 247), Vector2(302, 40)))
-	prog_sector = Label.new()                                   # Fortschritt des gewählten Sektors und insgesamt, unter den Levelkarten
-	prog_sector.add_theme_font_size_override("font_size", 9)
-	add_child(_at(prog_sector, Vector2(16, 254), Vector2(PROG_W, 12)))
-	add_child(_at(_rect(Color(0.1, 0.12, 0.28, 0.9)), Vector2(16, 268), Vector2(PROG_W, 3)))
-	prog_bar = _rect(COL_BAR)
-	add_child(_at(prog_bar, Vector2(16, 268), Vector2(0, 3)))
-	prog_total = Label.new()
+	add_child(_at(info_stats, Vector2(322, 253), Vector2(302, 40)))
+	prog_total = Label.new()                                    # Gesamtfortschritt unter den Levelkarten
 	prog_total.add_theme_font_size_override("font_size", 8)
 	prog_total.add_theme_color_override("font_color", Color("#a9b8ff"))
-	add_child(_at(prog_total, Vector2(16, 274), Vector2(PROG_W, 12)))
+	add_child(_at(prog_total, Vector2(16, 258), Vector2(290, 12)))
 	var all := Progress.of(ids, Save.data.completed)
 	prog_total.text = tr("LVL_PROGRESS_ALL") % [all.done, all.total, all.stars, all.stars_max]
 	var hint := Label.new()
@@ -82,11 +85,10 @@ func _ready() -> void:
 	_open(sector)
 	_focus_first_level()
 
-func _rect(col: Color) -> ColorRect:
-	var r := ColorRect.new()
-	r.color = col
-	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return r
+## Farbe eines Sektors in der Levelauswahl: die Kantenfarbe seines Felsens, etwas kräftiger (Reiter, Kartenstreifen, Vorschaurahmen).
+static func sector_color(n: int) -> Color:
+	var c: Color = SectorLook.of(n).edge
+	return Color.from_hsv(c.h, minf(c.s * 1.25, 1.0), minf(c.v * 1.08, 1.0))
 
 func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 	c.position = pos
@@ -110,12 +112,17 @@ func _open(n: int) -> void:
 		return
 	sector = n
 	for i in tabs.size():
-		tabs[i].modulate = Color(1.25, 1.2, 0.8) if i + 1 == n else Color.WHITE
+		(tabs[i] as SectorTab).selected = i + 1 == n
+	var col := sector_color(n)
 	head.text = tr("LVL_SECTOR") % [n, tr("SECTOR_%d" % n)]
+	head.add_theme_color_override("font_color", col.lightened(0.35))
 	var p := Progress.sector(ids, Save.data.completed, n)
 	prog_sector.text = tr("LVL_PROGRESS") % [p.done, p.total, p.stars, p.stars_max]
-	prog_bar.size.x = PROG_W * Progress.share(p)
-	prog_bar.color = COL_GOLD if Progress.gold(p) else COL_BAR
+	var sb := MenuKit.panel_style(0.0, 4)
+	sb.border_color = col
+	sb.set_border_width_all(2)
+	frame.add_theme_stylebox_override("panel", sb)
+	var campaign_id := String(Save.campaign().get("level", ""))
 	for c in grid.get_children():
 		grid.remove_child(c)
 		c.queue_free()
@@ -123,14 +130,17 @@ func _open(n: int) -> void:
 	for i in range((n - 1) * 11, mini(n * 11, ids.size())):
 		var id: String = ids[i]
 		var lvl := LevelData.load_file(Flow.level_path(id))
-		var text := "%02d" % (lvl.number if lvl != null else i + 1)
-		if Save.is_completed(id):
-			var mm := Save.medals_of(id)
-			text += " " + ("★" if mm.time else "☆") + ("★" if mm.clean else "☆") + ("★" if mm.pro else "☆")
-		var b := MenuKit.button(text, func(): Flow.start_selected(id))
-		b.custom_minimum_size = Vector2(92, 40)
-		b.disabled = not Save.is_unlocked(ids, i)
-		b.focus_mode = Control.FOCUS_ALL                   # gesperrte Level bleiben ansteuerbar, damit die Vorschau sie zeigt
+		var b := LevelCard.new()
+		b.number = lvl.number if lvl != null else i + 1
+		b.accent = col
+		b.current = id == campaign_id
+		b.medals = Save.medals_of(id) if Save.is_completed(id) else {}
+		b.state = LevelCard.State.DONE if Save.is_completed(id) else (LevelCard.State.OPEN if Save.is_unlocked(ids, i) else LevelCard.State.LOCKED)
+		b.pressed.connect(func():
+			Sfx.play("ui_ok")
+			Flow.start_selected(id))
+		b.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
+		b.disabled = not Save.is_unlocked(ids, i)                  # gesperrte Level bleiben ansteuerbar, damit die Vorschau sie zeigt
 		b.focus_entered.connect(_show.bind(lvl, id, i))
 		b.mouse_entered.connect(_show.bind(lvl, id, i))
 		grid.add_child(b)

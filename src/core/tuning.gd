@@ -37,6 +37,20 @@ const TAXI_REFLECT_SRC := Rect2(0, 22, 78, 26)                           # Boden
 const TAXI_REFLECT_DST := Rect2(-16.25, -0.83, 32.5, 10.83)               # … an derselben Stelle wie im Bild (Entwurfsmaße)
 
 ## Taxi-Bild in Entwurfsmaßen, mit `k` vergrößert (Übergang und Hauptmenü zeichnen es doppelt so groß).
+## Bodenspiegelung in der Größe n: erste gespiegelte Bildzeile (entspricht Zeile 22 der 78×48-Fassung) und das Zielrechteck in Entwurfsmaßen.
+static func reflect_row(n: int) -> int:
+	return roundi(22.0 * n / 3.0)
+
+static func reflect_dst(n: int) -> Rect2:
+	var y := float(reflect_row(n)) / float(n)
+	return Rect2(TAXI_RECT.position.x, (y - TAXI_UNITS.y * 0.5) / TAXI_SCALE, TAXI_RECT.size.x, (TAXI_UNITS.y - y) / TAXI_SCALE)
+
+## Aufkleber am Rumpf in der Größe n (Bildschirmpunkte je Einheit), in Entwurfsmaßen: linke obere Ecke bei Texturpunkt (8, 14) der 78×48-Fassung,
+## auf ganze Punkte der Größe n gelegt; `px` = Kantenlänge des Aufklebers in dieser Größe.
+static func sticker_rect(n: int, px: int) -> Rect2:
+	var pos := Vector2(roundf(8.0 * n / 3.0), roundf(14.0 * n / 3.0)) / float(n) - TAXI_UNITS * 0.5
+	return Rect2(pos / TAXI_SCALE, Vector2(px, px) / float(n) / TAXI_SCALE)
+
 static func taxi_rect(k := 1.0) -> Rect2:
 	return Rect2(TAXI_RECT.position * k, TAXI_RECT.size * k)
 const HULL_HALF := Vector2(8, 4)

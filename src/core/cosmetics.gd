@@ -114,6 +114,69 @@ func sticker_small_texture(id := "") -> Texture2D:
 	var p := "res://assets/art/sticker_%s_s.png" % id
 	return _tex(p) if ResourceLoader.exists(p) else _tex("res://assets/art/sticker_%s.png" % id)
 
+# ------------------------------------------------------------------ Taxi in der Pixelgröße des Bildschirms (Runde 71)
+## Das Spiel skaliert ganzzahlig: 720p = 2, 1080p = 3, 1440p = 4, 1800p = 5, 2160p = 6 Bildschirmpunkte je Einheit. Das Taxi und sein Aufkleber
+## liegen für jede dieser Größen eigens gerastert vor (taxi_sizes/<lack>.png, sticker_<id>_sizes.png; tools/art/gen_taxi.py, gen_art.py),
+## damit sie im Level immer 1:1 erscheinen statt ungleichmäßig gestreckt.
+const TAXI_SIZES := [2, 3, 4, 5, 6]
+const TAXI_UNITS := Vector2(26, 16)
+const STICKER_BASE := 20            # Aufkleber bei 3 Punkten je Einheit
+
+## Bildschirmpunkte je Welteinheit, mit denen `node` gerade gezeichnet wird (Fensterskalierung × Kamerazoom).
+func pixel_scale(node: CanvasItem) -> float:
+	if node == null or not node.is_inside_tree():
+		return 3.0
+	var vp := node.get_viewport()
+	return absf(vp.get_final_transform().get_scale().x * vp.get_canvas_transform().get_scale().x)
+
+## Vorhandene Größe für eine Skalierung: genau passend, sonst ein Teiler (8 → 4, 9 → 3, 10 → 5, 12 → 6: ganze Vielfache), sonst die größte.
+static func pick_size(scale: float) -> int:
+	var n := maxi(2, roundi(scale))
+	if n <= 6:
+		return n
+	for k in [6, 5, 4, 3, 2]:
+		if n % k == 0:
+			return k
+	return 6
+
+static func _sheet_y(n: int, unit: Callable) -> int:
+	var y := 0
+	for k in TAXI_SIZES:
+		if k == n:
+			break
+		y += int(unit.call(k))
+	return y
+
+## Ausschnitt des Taxis in der Größe `n`: {tex, src (Bildpunkte im Blatt), n}. Fehlt das Blatt, das 78×48-Bild.
+func taxi_frame(n: int, id := "") -> Dictionary:
+	if id == "":
+		id = selected("paint")
+	if not TAXI_SIZES.has(n):
+		n = 3
+	var sheet := _tex("res://assets/art/taxi_sizes/%s.png" % id)
+	if sheet == null:
+		var t := paint_texture(id)
+		return {"tex": t, "src": Rect2(Vector2.ZERO, t.get_size()), "n": 3}
+	return {"tex": sheet, "src": Rect2(0, _sheet_y(n, func(k): return TAXI_UNITS.y * k), TAXI_UNITS.x * n, TAXI_UNITS.y * n), "n": n}
+
+static func sticker_px(n: int) -> int:
+	return roundi(STICKER_BASE * n / 3.0)
+
+## Ausschnitt des Aufklebers in der Größe `n` ({} ohne Aufkleber): {tex, src, n}.
+func sticker_frame(n: int, id := "") -> Dictionary:
+	if id == "":
+		id = selected("sticker")
+	if id == "none":
+		return {}
+	if not TAXI_SIZES.has(n):
+		n = 3
+	var sheet := _tex("res://assets/art/sticker_%s_sizes.png" % id)
+	if sheet == null:
+		var t := sticker_small_texture(id)
+		return {} if t == null else {"tex": t, "src": Rect2(Vector2.ZERO, t.get_size()), "n": 3}
+	var px := sticker_px(n)
+	return {"tex": sheet, "src": Rect2(0, _sheet_y(n, func(k): return sticker_px(k)), px, px), "n": n}
+
 func _tex(path: String) -> Texture2D:
 	if not _tex_cache.has(path):
 		_tex_cache[path] = load(path) if ResourceLoader.exists(path) else null

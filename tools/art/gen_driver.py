@@ -10,7 +10,7 @@ Schritte (aus der Projektwurzel):
    python3 tools/art/gen_driver.py pre        -> build/aseprite-workspace/gf_driver/frame_00.png … frame_16.png (ohne Kontur)
    (Aseprite: driver.aseprite aus den Bildern bauen, Kontur mit outline_smart, Tags setzen – siehe tools/art/aseprite/README.md)
    python3 tools/art/gen_driver.py export     -> assets/art/driver.png aus build/aseprite-workspace/gf_driver/driver.aseprite (Blatt, ein Bild je 40 px)
-   python3 tools/art/gen_driver.py cockpit    -> assets/art/taxi_cockpit_empty.png (leere Kuppel des Taxis, aus taxi.aseprite)
+   (die leere Kuppel taxi_cockpit_empty.png schreibt seit Runde 71 tools/art/gen_taxi.py zusammen mit dem Taxi)
    python3 tools/art/gen_driver.py flat       -> Notlösung ohne Aseprite: driver.png mit einfacher Kontur direkt aus Python"""
 import math, os, subprocess, sys, tempfile
 import numpy as np
@@ -310,8 +310,7 @@ if __name__ == "__main__":
         subprocess.run(["aseprite", "-b", ws + "driver.aseprite", "--sheet", "assets/art/driver.png", "--sheet-type", "horizontal"], check=True, stdout=subprocess.DEVNULL)
         print("driver.png aus Aseprite exportiert")
     elif what == "cockpit":
-        cockpit_patch().save("assets/art/taxi_cockpit_empty.png")
-        print("taxi_cockpit_empty.png ok")
+        sys.exit("taxi_cockpit_empty.png entsteht seit Runde 71 mit dem Taxi: python3 tools/art/gen_taxi.py")
     elif what == "flat":
         sheet = Image.new("RGBA", (FW * N, FH))
         for i, f in enumerate(frames()):

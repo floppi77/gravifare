@@ -1152,5 +1152,8 @@ func _draw_reflections() -> void:
 			if h > -1.5 and h < 46.0:
 				var a := 0.34 * (1.0 - clampf(h, 0.0, 46.0) / 46.0)
 				draw_set_transform(Vector2(s.pos.x, 2.0 * surf - s.pos.y), -s.tilt, Vector2(Tuning.TAXI_SCALE, -Tuning.TAXI_SCALE))
-				draw_texture_rect_region(taxi_tex, Tuning.TAXI_REFLECT_DST, Tuning.TAXI_REFLECT_SRC, Color(0.7, 0.92, 1.0, a))
+				var fr := Cosmetics.taxi_frame(Cosmetics.pick_size(Cosmetics.pixel_scale(self)))      # dieselbe Größe wie das Taxi darüber
+				var r0 := Tuning.reflect_row(int(fr.n))
+				var src := Rect2(fr.src.position.x, fr.src.position.y + r0, fr.src.size.x, fr.src.size.y - r0)
+				draw_texture_rect_region(fr.tex, Tuning.reflect_dst(int(fr.n)), src, Color(0.7, 0.92, 1.0, a))
 				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

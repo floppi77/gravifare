@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -357,7 +357,7 @@ func _test_round70() -> void:
 		gold[id] = {"medals": full}
 	check(Progress.gold(Progress.sector(ids, gold, 5)) and not Progress.gold(p1) and absf(Progress.share(p1) - 2.0 / 11.0) < 0.001 and Progress.share(Progress.of([], {})) == 0.0, "Fortschritt: Gold nur mit allen Sternen, Anteil stimmt, leere Liste ohne Fehler")
 	var ls := _src("res://src/ui/level_select.gd")
-	check(ls.contains("Progress.sector(ids, Save.data.completed, n)") and ls.contains("LVL_PROGRESS_ALL") and ls.contains("bars.append"), "Levelauswahl zeigt Fortschritt je Reiter, je Sektor und gesamt")
+	check(ls.contains("Progress.sector(ids, Save.data.completed, n)") and ls.contains("LVL_PROGRESS_ALL") and ls.contains("SectorTab.new()"), "Levelauswahl zeigt Fortschritt je Reiter, je Sektor und gesamt")
 	# 3) Trümmer als Wrackteile
 	var dt: Texture2D = load("res://assets/art/debris.png")
 	check(dt != null and dt.get_width() == 240 and dt.get_height() == 144, "Wrackteile: Blatt 240 × 144")
@@ -422,6 +422,115 @@ func _test_round70() -> void:
 		check(not String(tx.HUD_LIFE_LOST).to_lower().contains("taxi") and String(tx.HUD_LIFE_LOST).contains("%d"), "%s: Taxiverlust-Tafel nennt „Taxi verloren“ nur einmal" % lang)
 		check(String(tx.LVL_PROGRESS).count("%d") == 4 and String(tx.LVL_PROGRESS_ALL).count("%d") == 4, "%s: Fortschrittstexte mit vier Zahlen" % lang)
 	check(pv.contains("var bx := pos.x + (4.0 if a.angry else 17.0)"), "Winke-Blase liegt neben dem Preisschild, nicht darauf")
+
+## Runde 71: Taxi in jeder Pixelgröße (720p bis 2160p), Aufkleber je Größe, Levelauswahl mit gefüllten Sektor-Reitern.
+func _test_round71() -> void:
+	var cos_script = load("res://src/core/cosmetics.gd")
+	var cos = root.get_node("Cosmetics")
+	# 1) Größenwahl: 720p = 2 … 2160p = 6, darüber ganze Vielfache
+	var picks := {1.0: 2, 2.0: 2, 3.0: 3, 3.36: 3, 4.0: 4, 4.48: 4, 5.0: 5, 6.0: 6, 6.72: 6, 8.0: 4, 9.0: 3, 10.0: 5, 12.0: 6, 7.0: 6, 11.0: 6}
+	var picks_ok := true
+	for sc in picks:
+		picks_ok = picks_ok and cos_script.pick_size(sc) == picks[sc]
+	check(picks_ok, "Taxi-Größe je Bildschirmskalierung: 720p 2, 1080p 3, 1440p 4, 1800p 5, 2160p 6, darüber ein Teiler")
+	# 2) Blätter aller Lackierungen: 156 × 320, fünf Größen untereinander, jede füllt ihren Platz
+	var skins := ["std", "neon", "mint", "night", "sunset", "candy", "gold", "sky", "platinum", "wasp"]
+	var sheets_ok := true
+	var same_78 := true
+	var cap := Color("#ff7a2e")
+	var cap_ok := true
+	var paint_differs := true
+	var std_img: Image = (load("res://assets/art/taxi_sizes/std.png") as Texture2D).get_image()
+	for id in skins:
+		var sheet: Texture2D = load("res://assets/art/taxi_sizes/%s.png" % id)
+		sheets_ok = sheets_ok and sheet != null and sheet.get_size() == Vector2(156, 320)
+		if sheet == null:
+			continue
+		var img := sheet.get_image()
+		var y := 0
+		for n in [2, 3, 4, 5, 6]:
+			var fr: Dictionary = cos.taxi_frame(n, id)
+			sheets_ok = sheets_ok and fr.tex == sheet and fr.src == Rect2(0, y, 26 * n, 16 * n) and int(fr.n) == n
+			var used := img.get_region(Rect2i(0, y, 26 * n, 16 * n)).get_used_rect()
+			var t := 1 if n < 5 else 2
+			sheets_ok = sheets_ok and used.position.x <= t and used.end.x >= 26 * n - t and used.position.y <= 2 * t and used.end.y >= 15 * n       # reicht von Rand zu Rand
+			sheets_ok = sheets_ok and img.get_pixel(26 * n, y).a < 0.01 if n < 6 else sheets_ok                                                     # rechts daneben leer
+			var has_cap := false                                         # Mütze des Fahrers bleibt bei jeder Lackierung orange
+			for py in range(y, y + 16 * n):
+				for px in range(9 * n, 17 * n):
+					var cp := img.get_pixel(px, py)
+					if cp.is_equal_approx(cap) or cp.is_equal_approx(Color("#e05a1c")) or cp.is_equal_approx(Color("#ffa868")):
+						has_cap = true
+			cap_ok = cap_ok and has_cap
+			y += 16 * n
+		var one: Image = (load("res://assets/art/taxi_%s.png" % id) as Texture2D).get_image()
+		one.convert(Image.FORMAT_RGBA8)
+		for py in 48:                                                # nur sichtbare Punkte vergleichen (der Import füllt die Farbe durchsichtiger Ränder auf)
+			for px in 78:
+				var a := one.get_pixel(px, py)
+				var b := img.get_pixel(px, 32 + py)
+				same_78 = same_78 and is_equal_approx(a.a, b.a) and (a.a < 0.5 or a.is_equal_approx(b))
+		if id != "std":
+			paint_differs = paint_differs and std_img.get_pixel(35, 174).a > 0.9 and not img.get_pixel(35, 174).is_equal_approx(std_img.get_pixel(35, 174))      # linke Schulter in Größe 5
+	check(sheets_ok, "Taxi: zehn Lackierungen, je fünf Größen (52×32 bis 156×96) in einem Blatt, jede füllt ihre Fläche")
+	check(same_78, "Taxi: taxi_<lack>.png ist genau die Größe 3 aus dem Blatt (Garage, Werkstatt, Menü und Level zeigen dasselbe Taxi)")
+	check(cap_ok and paint_differs, "Lackierungen färben nur den Lack: Mütze bleibt orange, Rumpf wechselt")
+	var empty: Image = (load("res://assets/art/taxi_cockpit_empty.png") as Texture2D).get_image()
+	var eu := empty.get_used_rect()
+	check(empty.get_size() == Vector2i(78, 48) and eu.size.x > 6 and eu.size.x < 26 and eu.position.x > 26 and eu.end.x < 52 and eu.end.y < 24, "Leere Kuppel: Flicken nur dort, wo der Fahrer sitzt %s" % str(eu))
+	# 3) Aufkleber je Größe, auf ganzen Bildpunkten platziert
+	var st_ok := true
+	for id in ["star", "bolt", "heart", "flame", "boom", "crown", "sun", "medal"]:
+		var sh: Texture2D = load("res://assets/art/sticker_%s_sizes.png" % id)
+		st_ok = st_ok and sh != null and sh.get_size() == Vector2(40, 13 + 20 + 27 + 33 + 40)
+		for n in [2, 3, 4, 5, 6]:
+			var fr: Dictionary = cos.sticker_frame(n, id)
+			var px: int = cos_script.sticker_px(n)
+			st_ok = st_ok and not fr.is_empty() and fr.src.size == Vector2(px, px)
+			var rc: Rect2 = Tuning.sticker_rect(n, px)
+			var on_px := (rc.position * Tuning.TAXI_SCALE + Tuning.TAXI_UNITS * 0.5) * float(n)
+			st_ok = st_ok and absf(on_px.x - roundf(on_px.x)) < 0.01 and absf(on_px.y - roundf(on_px.y)) < 0.01 and absf(rc.size.x * Tuning.TAXI_SCALE * n - px) < 0.01
+	check(st_ok and cos.sticker_frame(3, "none").is_empty(), "Aufkleber: je Größe eigens gerastert (13, 20, 27, 33, 40 px), 1:1 und auf ganzen Bildpunkten")
+	check(Tuning.sticker_rect(3, 20).is_equal_approx(Tuning.STICKER_RECT) or (Tuning.sticker_rect(3, 20).position - Tuning.STICKER_RECT.position).length() < 0.02, "Aufkleber in Größe 3 sitzt, wo er bisher saß")
+	var refl_ok := true
+	for n in [2, 3, 4, 5, 6]:
+		var d: Rect2 = Tuning.reflect_dst(n)
+		refl_ok = refl_ok and Tuning.reflect_row(n) > 6 * n and Tuning.reflect_row(n) < 9 * n and absf(d.end.y - Tuning.TAXI_RECT.end.y) < 0.01 and d.size.x == Tuning.TAXI_RECT.size.x
+	check(refl_ok and (Tuning.reflect_dst(3).position - Tuning.TAXI_REFLECT_DST.position).length() < 0.02, "Bodenspiegelung: untere Bildhälfte in jeder Größe, in Größe 3 wie bisher")
+	var tv := _src("res://src/game/taxi_view.gd")
+	check(tv.contains("Cosmetics.pick_size(Cosmetics.pixel_scale(self))") and tv.contains("draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src") and _src("res://src/game/ghost_view.gd").contains("Cosmetics.taxi_frame(") and _src("res://src/game/props_view.gd").contains("Tuning.reflect_dst("), "Taxi, Geist und Spiegelung zeichnen die Größe des Bildschirms")
+	var ga := _src("res://tools/art/gen_art.py")
+	check(ga.contains('for src, dst, stripe in (("life_icon.png", "life_%s.png", 3),):') and FileAccess.file_exists("res://tools/art/gen_taxi.py"), "gen_art leitet nur noch die Leben-Symbole ab; das Taxi kommt aus gen_taxi.py")
+	# 4) Levelauswahl: Reiter füllen sich von links, gewählter Sektor hervorgehoben
+	var tab = load("res://src/ui/sector_tab.gd").new()
+	tab.total = 11
+	tab.done = 0
+	var w0: float = tab.fill_width(62.0)
+	tab.done = 1
+	var w1: float = tab.fill_width(62.0)
+	tab.done = 6
+	var w6: float = tab.fill_width(62.0)
+	tab.done = 10
+	var w10: float = tab.fill_width(62.0)
+	tab.done = 11
+	var w11: float = tab.fill_width(62.0)
+	check(w0 == 0.0 and w1 >= 3.0 and w1 < w6 and w6 == roundf(62.0 * 6.0 / 11.0) and w6 < w10 and w10 <= 59.0 and w11 == 62.0, "Sektor-Reiter: Füllung wächst mit den geschafften Leveln (0 leer, 11 voll, dazwischen sichtbar unterscheidbar)")
+	tab.accent = Color("#b98a52")
+	tab.gold = false
+	var c_plain: Color = tab.fill_color()
+	tab.gold = true
+	check(c_plain == Color("#b98a52") and tab.fill_color() == tab.GOLD and tab.custom_minimum_size.x >= 60.0, "Sektor-Reiter: Farbe des Sektors, Gold mit allen Sternen")
+	tab.free()
+	var card = load("res://src/ui/level_card.gd").new()
+	card.medals = {"time": true, "clean": false, "pro": true}
+	check(card.star_count() == 2 and card.star_points(Vector2.ZERO, 6.0).size() == 10, "Levelkarte: Sterne aus den Medaillen")
+	card.free()
+	var ls := _src("res://src/ui/level_select.gd")
+	check(ls.contains("SectorTab.new()") and ls.contains("LevelCard.new()") and ls.contains(".selected = i + 1 == n") and not ls.contains("ColorRect") and not ls.contains("prog_bar"), "Levelauswahl: gefüllte Reiter und Karten statt Balken, gewählter Sektor markiert")
+	var cols := {}
+	for n in range(1, 10):
+		cols[load("res://src/ui/level_select.gd").sector_color(n).to_html()] = true
+	check(cols.size() == 9, "Jeder Sektor hat in der Levelauswahl eine eigene Farbe")
 
 func _test_splash() -> void:
 	## Runde 69: Startbildschirm (Studio Quantum Abacus Games, GraviFare-Logo mit Glanzstreifen, „Made with Godot“) vor dem Hauptmenü.
