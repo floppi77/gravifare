@@ -48,8 +48,8 @@
    "gender": "f"
   },
   {
-   "from": "4",
-   "to": "3",
+   "from": "3",
+   "to": "4",
    "fare": 60,
    "par": 18,
    "passenger": "Pia",
@@ -64,18 +64,18 @@
    "gender": "m"
   },
   {
-   "from": "2",
+   "from": "1",
    "to": "3",
    "fare": 60,
-   "par": 14,
+   "par": 20,
    "passenger": "Tarek",
    "gender": "m"
   },
   {
-   "from": "2",
-   "to": "3",
+   "from": "1",
+   "to": "4",
    "fare": 60,
-   "par": 14,
+   "par": 21,
    "passenger": "Amara",
    "gender": "f"
   },

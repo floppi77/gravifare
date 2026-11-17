@@ -3,6 +3,28 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.6.1
+
+### Deutsch
+
+**Spiel**
+- Keine wiederholten Aufträge mehr: In Nachtschicht, Tagschicht und Tagesflug kommt dieselbe Fahrt (z. B. 5 → 7) nie zweimal hintereinander, und solange es freie Fahrten gibt, auch nicht zweimal in einem Level
+- Auch in der Karriere: In 23 Levels wurden doppelte Fahrten durch andere ersetzt, Strecken und Richtzeiten bleiben ähnlich. Bestzeit-Geister dieser Level beginnen neu
+
+**Grafik**
+- Dunkle Level (Sektor 8, Nachtschicht, Nebel): Plattformen leuchten nicht mehr, nur noch die Zielplattform und die Ampellampen der Häuschen
+- Neue Bilder der Projektseite (HUD mit den neuen Anzeigen, neues Taxi)
+
+### English
+
+**Game**
+- No more repeated jobs: in Night Shift, Day Shift and the daily flight the same ride (e.g. 5 → 7) never comes twice in a row, and as long as free rides remain, not twice in a level either
+- Career too: in 23 levels duplicate rides were replaced by other ones, distances and par times stay similar. Best-time ghosts for these levels start over
+
+**Graphics**
+- Dark levels (sector 8, night shift, fog): platforms no longer glow, only the target platform and the shelter lamps do
+- New project page images (HUD with the new gauges, new taxi)
+
 ## 1.6.0
 
 ### Deutsch

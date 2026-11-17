@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -476,6 +476,47 @@ func _test_round74() -> void:
 		if e.get("type", "") == "job_missed":
 			shown = float(e.fee)
 	check(shown == 40.0 and rn.missed_due >= 1000.0, "Meldung „verpasst“ nennt ¢40 (Deckel), nicht die volle Strafe")
+
+## Runde 76: keine wiederholten Aufträge (Nacht-/Tagschicht und Tagesflug, Karriere-Level)
+func _test_round76() -> void:
+	var repeat_bad := []
+	var consec_bad := []
+	var checked := 0
+	for f in DirAccess.open("res://data/levels").get_files():
+		if not f.ends_with(".json"):
+			continue
+		var lvl := LevelData.load_file("res://data/levels/" + f)
+		var pads: int = lvl.pads.keys().filter(func(id): return lvl.is_passenger_pad(id)).size()
+		for seed_n in range(0, 24):
+			var rng := RandomNumberGenerator.new()
+			rng.seed = hash("%s%d" % [f, seed_n])
+			var n := 3 + seed_n % 5                                  # 3 … 7 Fahrten (Nachtschicht-Länge)
+			var jobs := Run.chain_jobs(lvl, n, rng)
+			var seen := {}
+			for i in jobs.size() - 1:                                # ohne den Ausgangs-Fahrgast
+				var key := "%s>%s" % [jobs[i].from, jobs[i].to]
+				if i > 0 and key == "%s>%s" % [jobs[i - 1].from, jobs[i - 1].to]:
+					consec_bad.append("%s/%d" % [f, seed_n])
+				if seen.has(key) and pads >= 4:
+					repeat_bad.append("%s/%d" % [f, seed_n])
+				seen[key] = true
+			checked += 1
+	check(checked > 2000 and consec_bad.is_empty(), "Schichtaufträge: nie dieselbe Fahrt zweimal hintereinander (%d Ketten) %s" % [checked, str(consec_bad.slice(0, 4))])
+	check(repeat_bad.is_empty(), "Schichtaufträge: auf Karten mit mindestens vier Pads kommt keine Fahrt zweimal vor %s" % str(repeat_bad.slice(0, 4)))
+	var camp_bad := []
+	for f in DirAccess.open("res://data/levels").get_files():            # Karriere-Level: jede Fahrt der Pflichtfahrgäste nur einmal, nie zweimal in Folge
+		if not f.ends_with(".json"):
+			continue
+		var cl := LevelData.load_file("res://data/levels/" + f)
+		var seen_c := {}
+		for i in cl.jobs.size():
+			var kc := "%s>%s" % [cl.jobs[i].from, cl.jobs[i].to]
+			if seen_c.has(kc) or (i > 0 and String(cl.jobs[i].from) == String(cl.jobs[i - 1].to)):
+				camp_bad.append("%s/%d" % [f, i])
+			seen_c[kc] = true
+	check(camp_bad.is_empty(), "Karriere-Level: keine Fahrt kommt zweimal vor, kein Fahrgast erscheint auf dem Pad, auf dem das Taxi steht %s" % str(camp_bad.slice(0, 4)))
+	var tag := _src("res://src/core/run.gd")
+	check(tag.contains("used.has(from_id + \">\" + to_id)"), "chain_jobs wählt Wiederholungen aus den noch freien Fahrten neu")
 
 func _test_round72() -> void:
 	var cos_script = load("res://src/core/cosmetics.gd")
@@ -3141,7 +3182,7 @@ func _test_round54_visuals() -> void:
 	check(names.size() >= 5, "Erster Fahrgast heißt nicht in jedem Sektor gleich (%d Namen)" % names.size())
 	var dv := FileAccess.get_file_as_string("res://src/game/dark_view.gd")
 	check(dv.contains("uniform vec4 cones[16]") and dv.contains("kein runder Schein"), "Dunkelheit: Fahrzeuge leuchten mit Kegeln statt rundum")
-	check(dv.contains("PAD_DIM := 13.0") and dv.contains("run.target_pad()") and dv.contains("if String(id) == goal:"), "Dunkelheit: nur die Zielplattform leuchtet voll (Radius 38), die übrigen schwach (Radius 13, Nebel 9)")
+	check(not dv.contains("PAD_DIM") and dv.contains("run.target_pad()") and dv.contains("if String(id) == goal:"), "Dunkelheit: nur die Zielplattform leuchtet (Radius 38), die übrigen Plattformen gar nicht (Ampellampe bleibt)")
 
 ## Runde 57: Pixelgrafik für Hindernisse, Linien im Pixelraster, Leben im Hintergrund, Menüs.
 func _src(path: String) -> String:
@@ -6420,7 +6461,7 @@ func _test_old_replays_valid() -> void:
 		check(not d.has("rules") and pl.complete == bool(res.complete) and absf(pl.time - float(res.time)) < 0.001 and absf(pl.money - float(res.money)) < 0.01 and pl.delivered == int(res.delivered),
 			"Alter Lauf %s (1.0.1) rechnet exakt nach: %.2f s, ¢%.2f, %d befördert" % [f.get_basename(), pl.time, pl.money, pl.delivered])
 		n += 1
-	check(n >= 6, "Alte Läufe geprüft: %d" % n)
+	check(n >= 5, "Alte Läufe geprüft: %d" % n)        # S2-04 und S6-02 seit 1.6.1 umgebaut (keine doppelten Fahrten): ihre alten Läufe entfallen
 	check(Replay.new().to_dict().get("rules", 0) == Run.RULES, "Neue Läufe speichern den Regelstand %d" % Run.RULES)
 
 ## Runde 61: Fahrgasttypen VIP (1,8-facher Preis, halbe Geduld, doppelter Abzug) und Notfall (doppelter Preis, Frist 1,3 × Richtzeit).
@@ -6707,7 +6748,7 @@ func _test_rules4_landing_and_lava() -> void:
 		check(int(d.rules) == 3 and pl.complete == bool(res.complete) and absf(pl.time - float(res.time)) < 0.001 and absf(pl.money - float(res.money)) < 0.01,
 			"Lauf mit Regelstand 3 %s rechnet exakt nach: %.2f s, ¢%.2f" % [f.get_basename(), pl.time, pl.money])
 		n += 1
-	check(n >= 6, "Läufe mit Regelstand 3 geprüft: %d" % n)        # Level 70 (s7_04) seit 1.2.2 umgebaut: sein alter Lauf entfällt
+	check(n >= 4, "Läufe mit Regelstand 3 geprüft: %d" % n)        # Level 70 (s7_04) seit 1.2.2, S2-04 und S6-02 seit 1.6.1 umgebaut: ihre alten Läufe entfallen
 
 func _test_slot_select_pad_nav() -> void:
 	# Runde 66: Spielstandsauswahl mit Steuerkreuz – runter zu „Name“, in der Knopfreihe Name ↔ Löschen über alle Plätze, hoch zur Diskette

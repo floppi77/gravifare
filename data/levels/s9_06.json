@@ -51,7 +51,7 @@
   },
   {
    "from": "4",
-   "to": "5",
+   "to": "2",
    "fare": 200,
    "par": 10,
    "passenger": "Lena",
@@ -84,7 +84,7 @@
   },
   {
    "from": "1",
-   "to": "2",
+   "to": "3",
    "fare": 240,
    "par": 22,
    "passenger": "Nora",

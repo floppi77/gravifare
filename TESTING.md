@@ -10,8 +10,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Version 1.6.0, Runde 75, 2026-11-17):** 3819 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Version 1.6.1, Runde 76, 2026-11-17):** 3819 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
 
+- **Runde 76:** keine wiederholten Aufträge in Schichten, Tagesflug und Karriere (`_test_round76`)
 - **Dunkle Level:** nur die Zielplattform leuchtet voll (`_test_sector_look`-Umfeld, Quelltextprüfung)
 - **Runde 75:** Ergebnisansicht nach dem Level neu geordnet: Texte DE/EN, Abrechnung in einer Karte, Abdunklung bis zum Fensterrand, alle Sonderfälle (nicht gewertet, selbst gelöst, Gemeinschaftslevel, letztes Level) bleiben, Dev-Schalter (`_test_round75`). Ansicht: `--level=s1_03 --debug-result=<all|none|uncounted|solved|last> --shot=out.png --frames=40`, dazu `--lang=en`; geprüft in 1280x720, 1920x1080, 2560x1440, 3840x2160 und 3440x1440
 - **Runde 74:** Strafe für verlorene Fahrgäste: Faktor 2 in allen Sektoren, Deckel 40 % des Guthabens (Karriere und Nachtschicht), kleine Strafen voll, keine Regelstand-Abhängigkeit, Meldung zeigt den gedeckelten Betrag (`_test_round74`)

@@ -215,11 +215,32 @@ static func chain_jobs(lvl: LevelData, n: int, rng: RandomNumberGenerator) -> Ar
 	if ids.size() < 2:
 		return lvl.jobs
 	var prev_to := NightShift.start_pad_id(lvl)         # nie auf dem Pad erscheinen, auf dem das Taxi gerade steht
+	var used := {}                                       # schon vergebene Fahrten "von>nach": keine Fahrt kommt zweimal vor (nie direkt hintereinander, solange es freie Fahrten gibt)
+	var prev_key := ""
 	for i in n + 1:
 		var froms := ids.filter(func(id): return id != prev_to)
 		var from_id: String = froms[rng.randi() % froms.size()]
 		var tos := ids.filter(func(id): return id != from_id)
 		var to_id: String = tos[rng.randi() % tos.size()] if i < n else "exit"
+		if i < n and used.has(from_id + ">" + to_id):         # Wiederholung: aus den noch freien Fahrten wählen (Ketten ohne Wiederholung bleiben unverändert)
+			var free: Array = []
+			var not_same: Array = []
+			for f in froms:
+				for t in ids:
+					if t != f:
+						var k: String = f + ">" + t
+						if not used.has(k):
+							free.append([f, t])
+						if k != prev_key:
+							not_same.append([f, t])
+			var pool: Array = free if not free.is_empty() else not_same           # alle vergeben (lange Kette auf wenigen Pads): wenigstens nicht zweimal in Folge
+			if not pool.is_empty():
+				var pick: Array = pool[rng.randi() % pool.size()]
+				from_id = pick[0]
+				to_id = pick[1]
+		if i < n:
+			prev_key = from_id + ">" + to_id
+			used[prev_key] = true
 		var gender := "f" if rng.randf() < 0.5 else "m"
 		out.append({"from": from_id, "to": to_id, "fare": 60, "par": snappedf(14.0 + LevelMetrics.leg_length(lvl, from_id, to_id) / 38.0, 1.0),
 			"passenger": PassengerActor.rotated_name(rng.randi() % 99, i, gender), "gender": gender})

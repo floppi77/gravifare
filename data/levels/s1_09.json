@@ -48,7 +48,7 @@
    "gender": "m"
   },
   {
-   "from": "1",
+   "from": "4",
    "to": "3",
    "fare": 60,
    "par": 13,
@@ -65,7 +65,7 @@
   },
   {
    "from": "4",
-   "to": "1",
+   "to": "2",
    "fare": 60,
    "par": 18,
    "passenger": "Milan",

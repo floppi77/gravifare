@@ -65,9 +65,9 @@
   },
   {
    "from": "1",
-   "to": "4",
+   "to": "3",
    "fare": 160,
-   "par": 19,
+   "par": 22,
    "passenger": "Ines",
    "gender": "f"
   },
