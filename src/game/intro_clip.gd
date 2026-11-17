@@ -25,6 +25,8 @@ var fade := 0.0
 var closing := false
 var title := ""
 var text := ""
+var hull_gauge := HudGauges.new()      # Hüllenanzeige wie im HUD (Demos, die Schaden zeigen)
+var over: Control
 
 func start(g: Node, k: String) -> bool:
 	game = g
@@ -122,6 +124,10 @@ func _build_view() -> void:
 	tex.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	tex.position = SCREEN.position
 	tex.size = SCREEN.size
+	over = Control.new()                 # liegt über dem Bild der Demo: was hier in _draw() steht, verdeckt das Bild sonst
+	over.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	over.draw.connect(_draw_over)
+	add_child(over)
 
 func _input(event: InputEvent) -> void:
 	if closing:
@@ -154,7 +160,16 @@ func _process(delta: float) -> void:
 		fade = move_toward(fade, 1.0, delta * 3.5)
 		if t >= total + 0.4:
 			_close()
+	if demo != null and demo.run != null:
+		hull_gauge.update(delta, 1.0, demo.run.sim.hull / Tuning.HULL_MAX)
 	queue_redraw()
+	if over != null:
+		over.queue_redraw()
+
+## Über dem Bild der Demo: die Hüllenanzeige (dieselbe wie im HUD), wenn die Demo Schaden zeigt.
+func _draw_over() -> void:
+	if fade > 0.6 and demo != null and bool(demo.data.get("show_hull", false)):
+		hull_gauge.draw_hull(over, Vector2(SCREEN.end.x - 74.0, SCREEN.position.y + 5.0), demo.run.sim.hull / Tuning.HULL_MAX)
 
 func _draw() -> void:
 	if fade <= 0.01:
@@ -174,15 +189,6 @@ func _draw() -> void:
 	var blink := 0.5 + 0.5 * sin(t * 5.0)
 	draw_circle(r.position + Vector2(9.0, 9.0), 2.6, Color(1.0, 0.25, 0.25, (0.5 + 0.5 * blink) * f))
 	draw_string(hud, r.position + Vector2(15.0, 12.0), tr("CLIP_TAG"), HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(1, 1, 1, 0.8 * f))
-	# Rücklicht-Anzeige: Hülle, wenn das Demo Schaden zeigt
-	if bool(demo.data.get("show_hull", false)):
-		var hx := r.end.x - 86.0
-		var hy := r.position.y + 6.0
-		draw_rect(Rect2(hx - 1.0, hy - 1.0, 72.0, 10.0), Color("#10142b"))
-		draw_rect(Rect2(hx, hy, 70.0, 8.0), Color("#232a52"))
-		var hf := clampf(demo.run.sim.hull / Tuning.HULL_MAX, 0.0, 1.0)
-		draw_rect(Rect2(hx, hy, 70.0 * hf, 8.0), Color("#5dff9a") if hf > 0.35 else Color("#ff4d6d"))
-		draw_string(hud, Vector2(hx + 2.0, hy + 7.0), tr("HUD_HULL"), HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color.WHITE)
 	# Zeilenraster über dem Bild (leichter Videoeffekt)
 	for i in int(r.size.y / 3.0):
 		draw_rect(Rect2(r.position.x, r.position.y + float(i) * 3.0, r.size.x, 1.0), Color(0, 0, 0, 0.07 * f))

@@ -107,6 +107,14 @@ func _ready() -> void:
 			run.pump_touches = int(a.substr(13))
 			if run.pump_touches >= 3:
 				run.pump_boom_t = 0.05
+	for ag in OS.get_cmdline_user_args():
+		if ag.begins_with("--debug-fuel="):         # Dev: Tankfüllung setzen (Anzeige in allen Zuständen ansehen)
+			run.sim.fuel = clampf(float(ag.substr(13)), 0.0, run.sim.fuel_cap)
+		if ag.begins_with("--debug-hull="):         # Dev: Hülle setzen
+			run.sim.hull = clampf(float(ag.substr(13)), 1.0, Tuning.HULL_MAX)
+		if ag.begins_with("--debug-hit="):          # Dev: nach einer halben Sekunde N Hülle abziehen (Nachlauf der Hüllenanzeige ansehen)
+			var hit_amount := float(ag.substr(12))
+			get_tree().create_timer(0.5).timeout.connect(func(): run.sim.hull = maxf(1.0, run.sim.hull - hit_amount))
 	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
@@ -136,7 +144,10 @@ func _ready() -> void:
 		run.sim.state = TaxiSim.State.FLYING
 		run.sim.landed_pad = {}
 		run.sim.pos = run.level.exit_rect().get_center()
-	_queue_clip(0.9)                           # Szenenstart (Menü): Einspieler nach kurzer Pause; bei Übergangsflügen in _end_transition
+	for ua4 in OS.get_cmdline_user_args():
+		if ua4 == "--debug-result" or ua4.begins_with("--debug-result="):      # Dev: Ergebnisansicht sofort mit Beispielwerten (all/none/uncounted/solved/last)
+			_debug_result(ua4.substr(15) if ua4.length() > 15 else "all")
+	_queue_clip(0.9)                          # Szenenstart (Menü): Einspieler nach kurzer Pause; bei Übergangsflügen in _end_transition
 	for ua3 in OS.get_cmdline_user_args():
 		if ua3.begins_with("--clip="):           # Dev: Einspieler sofort zeigen
 			clip_pending = ua3.substr(7)
@@ -735,6 +746,7 @@ func _physics_process(_delta: float) -> void:
 		warn_cd -= Tuning.TICK
 		if warn_cd <= 0.0:
 			Sfx.play("warn", -6.0)
+			hud.fuel_ping()                           # die Tankanzeige blitzt im Takt des Alarms
 			warn_cd = lerpf(0.12, 1.0, clampf(run.sim.fuel / 25.0, 0.0, 1.0))        # je leerer der Tank, desto schneller piept es
 	else:
 		warn_cd = 0.0
@@ -1026,6 +1038,25 @@ func _near_miss_fx(show_text := true) -> void:
 	Haptics.pulse(0.2, 0.2, 0.1)
 	if show_text:
 		hud.flash_message(tr("MSG_NEAR_MISS"), 1.0)
+
+## Dev (`--debug-result=…`): Ergebnisansicht sofort zeigen, mit Beispielwerten statt eines echten Flugs. Speichert nichts
+## (completion_saved ist gesetzt, damit die Abschlusslogik nicht läuft). Varianten: all, none, uncounted, solved, last.
+func _debug_result(variant: String) -> void:
+	run.result = Run.Result.COMPLETE
+	completion_saved = true
+	var all := variant != "none" and variant != "uncounted"
+	var counted := variant != "uncounted"
+	hud.result = {"counted": counted, "time": 87.4 if all else 131.2, "target": 96.0, "best": 91.0 if variant != "none" else 84.0,
+		"medals": {"time": all, "clean": all and variant != "solved", "pro": all}, "money_target": 520.0,
+		"earned": 612.0 if counted else 0.0, "repair": 0.0 if all else 46.0, "taxi_fees": 0.0 if variant != "none" else 120.0,
+		"missed_fees": 0.0 if variant != "none" else 88.0, "delivered": 4 if counted else 0, "jobs": 4, "extras": 2 if counted else 0, "balance": 2384.0}
+	hud.result["net"] = float(hud.result.earned) - float(hud.result.repair) - float(hud.result.taxi_fees) - float(hud.result.missed_fees)
+	hud.result["score"] = 1089 if all else (152 if counted else 0)
+	hud.result["best_score"] = 1089 if all else 940
+	if variant == "solved":
+		hud.result["solved"] = true
+	hud.result_age = 0.0
+	hud.next_exists = variant != "last"
 
 ## Neu freigeschaltete Lackierungen/Aufkleber melden (Toast + Ton).
 ## Zählt dieser Flug als Handlösung für den Editor? Nur ein Testflug aus dem Editor, ohne Autopilot und ohne Entwicklerschalter, bei dem alle Aufträge befördert wurden.

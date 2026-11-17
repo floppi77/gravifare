@@ -6,7 +6,11 @@ extends RefCounted
 ## Gezeichnet wird in level_style.gd: dunkle Tafeln normal, die Röhren additiv darüber.
 
 const T := 16.0
-const PPU := 3                         # Bildpunkte je Einheit (1080p)
+const PPU := 3                         # Bildpunkte je Einheit in der Größe 3 (1080p); gerastert wird in der Größe n des Bildschirms (PixelScale)
+static var _n := 3                     # Größe der laufenden Planung (plan/bake setzen sie)
+
+static func _sn(v: Vector2) -> Vector2:
+	return PixelDraw.snap2(v, _n)
 
 # ---------------------------------------------------------------- Zeichen (Striche im Raster)
 
@@ -87,7 +91,8 @@ const CONTENT := {
 
 ## Legt die Schilder fest. Ergebnis: Liste von Schildern {kind, cells: Rect2i, board: Rect2 (Einheiten), col, col2, mode, phase, items}.
 ## items: [{strokes (Einheiten, absolut), w_px, col, glyph: Index für Flackern}] – die Röhren eines Zeichens bilden ein Element.
-static func plan(lv: LevelData, style: Dictionary) -> Array:
+static func plan(lv: LevelData, style: Dictionary, n := 3) -> Array:
+	_n = n
 	var content: Dictionary = CONTENT.get(lv.id, CONTENT["S2-02"])
 	var pal: Array = style.get("pal", ["#ff4fd8", "#4fd8ff"])
 	var max_signs: int = int(style.get("max", 9))
@@ -269,7 +274,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 			var y0 := r.position.y + (r.size.y - cells_h) / 2
 			var cells := Rect2i(r.position.x, y0, r.size.x, cells_h)
 			var area := _cells_rect(cells)
-			var board := Rect2(PixelDraw.snap2(Vector2(area.get_center().x - bw * 0.5, area.get_center().y - bh * 0.5)), Vector2(bw, bh))
+			var board := Rect2(_sn(Vector2(area.get_center().x - bw * 0.5, area.get_center().y - bh * 0.5)), Vector2(bw, bh))
 			var col := _color(pal, h >> 4, board, hazards)
 			var items: Array = []
 			for i in word.length():
@@ -293,7 +298,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 			var x0 := r.position.x + (r.size.x - cells_w) / 2
 			var cells := Rect2i(x0, r.position.y, cells_w, r.size.y)
 			var area := _cells_rect(cells)
-			var board := Rect2(PixelDraw.snap2(area.get_center() - Vector2(bw, bh) * 0.5), Vector2(bw, bh))
+			var board := Rect2(_sn(area.get_center() - Vector2(bw, bh) * 0.5), Vector2(bw, bh))
 			var col := _color(pal, h >> 4, board, hazards)
 			var items: Array = []
 			var pad := 7.0 if big else 4.0
@@ -312,7 +317,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 				return {}
 			used[name] = true
 			var area := _cells_rect(r)
-			var board := Rect2(PixelDraw.snap2(area.position + Vector2(2, 2)), area.size - Vector2(4, 4))
+			var board := Rect2(_sn(area.position + Vector2(2, 2)), area.size - Vector2(4, 4))
 			var col := _color(pal, h >> 4, board, hazards)
 			var items: Array = [{"strokes": _place(_picto_strokes(name), board.position + Vector2(4, 4), (board.size.x - 8.0) / 8.0), "w_px": 3, "col": col, "glyph": 0}]
 			items.append({"strokes": _frame(board.grow(-1.5)), "w_px": 2, "col": _color(pal, (h >> 4) + 1, board, hazards, _hex(col)), "glyph": -1, "dim": 0.5})
@@ -323,7 +328,7 @@ static func _make(kind: String, r: Rect2i, content: Dictionary, pal: Array, used
 static func _make_main(cells: Rect2i, main: Array, pal: Array, hazards: Dictionary, idx: int) -> Dictionary:
 	var h := _h(cells.position.x, cells.position.y, 53 + idx)
 	var area := _cells_rect(cells)
-	var board := Rect2(PixelDraw.snap2(area.position + Vector2(3, 3)), area.size - Vector2(6, 6))
+	var board := Rect2(_sn(area.position + Vector2(3, 3)), area.size - Vector2(6, 6))
 	var col := _color(pal, h >> 4, board, hazards)
 	var col2 := _color(pal, (h >> 4) + 1, board, hazards, _hex(col))
 	var word: String = main[1]
@@ -336,10 +341,10 @@ static func _make_main(cells: Rect2i, main: Array, pal: Array, hazards: Dictiona
 	var items: Array = []
 	var pic := minf(board.size.x - 16.0, board.size.y - 6.0 * s - 22.0)
 	var pc := Vector2(board.get_center().x - pic * 0.5, board.position.y + 7.0)
-	items.append({"strokes": _place(_picto_strokes(main[0]), PixelDraw.snap2(pc), pic / 8.0), "w_px": 3, "col": col2, "glyph": 0})
+	items.append({"strokes": _place(_picto_strokes(main[0]), _sn(pc), pic / 8.0), "w_px": 3, "col": col2, "glyph": 0})
 	var ty := board.end.y - 6.0 * s - 8.0
 	for i in word.length():
-		var o := PixelDraw.snap2(Vector2(board.get_center().x - ww * 0.5 + float(i) * pitch, ty))
+		var o := _sn(Vector2(board.get_center().x - ww * 0.5 + float(i) * pitch, ty))
 		items.append({"strokes": _place(LATIN.get(word[i], []), o, s), "w_px": 3, "col": col, "glyph": i + 1})
 	return {"kind": "main", "cells": cells, "board": board, "col": col, "col2": col2, "mode": "chase", "phase": float(h % 997) * 0.013, "items": items}
 
@@ -352,15 +357,15 @@ static func _place(strokes: Array, origin: Vector2, scale: float) -> Array:
 	for st in strokes:
 		var pts := PackedVector2Array()
 		for p in st:
-			pts.append(PixelDraw.snap2(origin + Vector2(float(p[0]), float(p[1])) * scale))
+			pts.append(_sn(origin + Vector2(float(p[0]), float(p[1])) * scale))
 		out.append(pts)
 	return out
 
 static func _frame(r: Rect2) -> Array:
 	var c := 2.0                                                            # abgerundete Ecken der Röhre
-	return [PackedVector2Array([PixelDraw.snap2(r.position + Vector2(c, 0)), PixelDraw.snap2(Vector2(r.end.x - c, r.position.y)), PixelDraw.snap2(Vector2(r.end.x, r.position.y + c)),
-		PixelDraw.snap2(Vector2(r.end.x, r.end.y - c)), PixelDraw.snap2(Vector2(r.end.x - c, r.end.y)), PixelDraw.snap2(Vector2(r.position.x + c, r.end.y)),
-		PixelDraw.snap2(Vector2(r.position.x, r.end.y - c)), PixelDraw.snap2(Vector2(r.position.x, r.position.y + c)), PixelDraw.snap2(r.position + Vector2(c, 0))])]
+	return [PackedVector2Array([_sn(r.position + Vector2(c, 0)), _sn(Vector2(r.end.x - c, r.position.y)), _sn(Vector2(r.end.x, r.position.y + c)),
+		_sn(Vector2(r.end.x, r.end.y - c)), _sn(Vector2(r.end.x - c, r.end.y)), _sn(Vector2(r.position.x + c, r.end.y)),
+		_sn(Vector2(r.position.x, r.end.y - c)), _sn(Vector2(r.position.x, r.position.y + c)), _sn(r.position + Vector2(c, 0))])]
 
 static func _picto_strokes(name: String) -> Array:
 	match name:
@@ -394,7 +399,7 @@ static func _picto_strokes(name: String) -> Array:
 
 ## Rastert die Röhren eines Elements als Pixelbild: Kern `w_px` Bildpunkte in der Röhrenfarbe, heller Mittelstrich (über der Glüh-Schwelle,
 ## daher mit Bloom), Schein in drei Stufen. Ergebnis: [ImageTexture, Ursprung in Einheiten].
-static func bake(item: Dictionary) -> Array:
+static func bake(item: Dictionary, n := 3) -> Array:
 	var strokes: Array = item.strokes
 	var lo := Vector2(INF, INF)
 	var hi := Vector2(-INF, -INF)
@@ -404,18 +409,19 @@ static func bake(item: Dictionary) -> Array:
 			hi = hi.max(p)
 	if lo.x == INF:
 		return []
-	var glow := 6                                                           # Scheinbreite in Bildpunkten
-	var ox := roundi(lo.x * PPU) - glow - 2
-	var oy := roundi(lo.y * PPU) - glow - 2
-	var w := roundi(hi.x * PPU) - ox + glow + 3
-	var h := roundi(hi.y * PPU) - oy + glow + 3
+	var glow := 2 * n                                                       # Scheinbreite in Bildpunkten (2 Einheiten)
+	var k3 := 3.0 / float(n)                                                # Abstände in Bildpunkten der Größe 3 umrechnen
+	var ox := roundi(lo.x * n) - glow - 2
+	var oy := roundi(lo.y * n) - glow - 2
+	var w := roundi(hi.x * n) - ox + glow + 3
+	var h := roundi(hi.y * n) - oy + glow + 3
 	var core := PackedByteArray()
 	core.resize(w * h)
-	var wpx: int = int(item.w_px)
+	var wpx: int = PixelDraw.scaled_w(int(item.w_px), n)
 	for st in strokes:
 		var pts: PackedVector2Array = st
 		for i in pts.size() - 1:
-			_raster_line(core, w, h, roundi(pts[i].x * PPU) - ox, roundi(pts[i].y * PPU) - oy, roundi(pts[i + 1].x * PPU) - ox, roundi(pts[i + 1].y * PPU) - oy, wpx)
+			_raster_line(core, w, h, roundi(pts[i].x * n) - ox, roundi(pts[i].y * n) - oy, roundi(pts[i + 1].x * n) - ox, roundi(pts[i + 1].y * n) - oy, wpx)
 	# Abstand zum nächsten Röhrenpunkt (Chebyshev-artig, zwei Durchläufe), daraus der gestufte Schein
 	var dist := PackedInt32Array()
 	dist.resize(w * h)
@@ -451,11 +457,11 @@ static func bake(item: Dictionary) -> Array:
 			elif core[i] == 1:
 				img.set_pixel(x, y, Color(col.r, col.g, col.b, 0.95))
 			else:
-				var d := float(dist[i]) * 0.5                                # Bildpunkte
-				if d <= float(glow):
+				var d := float(dist[i]) * 0.5 * k3                           # Bildpunkte der Größe 3
+				if d <= 6.0:
 					var a := 0.42 if d <= 1.5 else (0.24 if d <= 3.0 else (0.12 if d <= 4.5 else 0.05))
 					img.set_pixel(x, y, Color(col.r, col.g, col.b, a))
-	return [ImageTexture.create_from_image(img), Vector2(ox, oy) / float(PPU)]
+	return [ImageTexture.create_from_image(img), Vector2(ox, oy) / float(n), n]
 
 ## Linie mit Dicke `wpx` ins Raster: Außenpunkte 1 (Farbe), die mittlere Spur 2 (heller Kern).
 static func _raster_line(buf: PackedByteArray, w: int, h: int, x0: int, y0: int, x1: int, y1: int, wpx: int) -> void:

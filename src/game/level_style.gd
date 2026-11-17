@@ -7,7 +7,8 @@ extends Node2D
 ## Alle Röhren liegen im Pixelraster (1/3 Einheit, wie Runde 57).
 
 const T := 16.0
-const PX := 1.0 / 3.0
+var PX := 1.0 / 3.0                    # ein Bildschirmpunkt in Einheiten (1/n)
+var _sign_n := 3                       # Größe, in der die Leuchtreklame gerade geplant und gerastert ist
 
 ## Stil je Level-ID. "pal" = Farbfamilie der Röhren, "max" = höchstens so viele Schilder, "flick" = Anteil flackernder Kantenröhren.
 const STYLES := {
@@ -68,14 +69,16 @@ func setup(level: LevelData) -> void:
 	anim.queue_redraw()
 
 func _build_signs() -> void:
-	signs = NeonSigns.plan(lv, style)
+	_sign_n = PixelScale.size_for(self)
+	signs = NeonSigns.plan(lv, style, _sign_n)
 	var Fx := load("res://src/game/fx.gd")
 	for s in signs:
 		for it in s.items:
-			var b: Array = NeonSigns.bake(it)
+			var b: Array = NeonSigns.bake(it, _sign_n)
 			if not b.is_empty():
 				it["tex"] = b[0]
 				it["at"] = b[1]
+				it["n"] = b[2]
 		var r: Rect2 = s.board
 		var big: bool = s.kind == "main"
 		var l: PointLight2D = Fx.make_light(s.col, maxf(r.size.x, r.size.y) * 0.9 + 26.0, 0.0)
@@ -115,6 +118,8 @@ func _process_lights() -> void:
 		l.energy = float(e[2]) * sum / float(maxi(s.items.size(), 1))
 
 func _process(delta: float) -> void:
+	if kind == "neon" and PixelScale.size_for(self) != _sign_n:      # anderer Bildschirm oder Zoom: Schilder in der neuen Pixelgröße planen und rastern
+		setup(lv)
 	if Settings.values.reduce_motion:
 		return
 	t += delta
@@ -133,6 +138,7 @@ func _rock(x: int, y: int) -> bool:
 func _draw() -> void:
 	if lv == null:
 		return
+	PX = PixelDraw.px_of(self)
 	match kind:
 		"neon":
 			_draw_neon()
@@ -235,7 +241,7 @@ func _draw_glass() -> void:
 			var top := Color(cyan.r, cyan.g, cyan.b, 0.30)
 			var bot := Color(cyan.r, cyan.g, cyan.b, 0.0)
 			draw_polygon(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), PackedColorArray([top, top, bot, bot]))
-			draw_rect(r, Color(0.7, 0.88, 1.0, 0.55), false, 1.34)       # Rahmen
+			draw_rect(r, Color(0.7, 0.88, 1.0, 0.55), false, PixelDraw.wsnap(self, 1.34))       # Rahmen
 			var h := _h(px, py, 5)
 			var o := float(h % 20)                                            # zwei Spiegelstreifen schräg über der Scheibe
 			for k in 2:
@@ -253,14 +259,14 @@ func _draw_glass() -> void:
 			var gx := x * T
 			var gy := y * T
 			if _open(x, y - 1):
-				draw_line(Vector2(gx, gy - PX), Vector2(gx + T, gy - PX), Color(cyan.r, cyan.g, cyan.b, 0.75), 1.34)
+				draw_line(Vector2(gx, gy - PX), Vector2(gx + T, gy - PX), Color(cyan.r, cyan.g, cyan.b, 0.75), PixelDraw.wsnap(self, 1.34))
 				draw_line(Vector2(gx, gy + 2.0), Vector2(gx + T, gy + 2.0), Color(white.r, white.g, white.b, 0.18), PX)
 			if _open(x, y + 1):
-				draw_line(Vector2(gx, gy + T + PX), Vector2(gx + T, gy + T + PX), Color(cyan.r, cyan.g, cyan.b, 0.4), 1.34)
+				draw_line(Vector2(gx, gy + T + PX), Vector2(gx + T, gy + T + PX), Color(cyan.r, cyan.g, cyan.b, 0.4), PixelDraw.wsnap(self, 1.34))
 			if _open(x - 1, y):
-				draw_line(Vector2(gx - PX, gy), Vector2(gx - PX, gy + T), Color(cyan.r, cyan.g, cyan.b, 0.6), 1.34)
+				draw_line(Vector2(gx - PX, gy), Vector2(gx - PX, gy + T), Color(cyan.r, cyan.g, cyan.b, 0.6), PixelDraw.wsnap(self, 1.34))
 			if _open(x + 1, y):
-				draw_line(Vector2(gx + T + PX, gy), Vector2(gx + T + PX, gy + T), Color(cyan.r, cyan.g, cyan.b, 0.3), 1.34)
+				draw_line(Vector2(gx + T + PX, gy), Vector2(gx + T + PX, gy + T), Color(cyan.r, cyan.g, cyan.b, 0.3), PixelDraw.wsnap(self, 1.34))
 
 # ---------------------------------------------------------------- Animation
 
@@ -278,7 +284,7 @@ class Anim extends Node2D:
 						continue
 					var f: float = s.sign_level(sg, int(it.glyph)) * float(it.get("dim", 1.0))
 					var tx: Texture2D = it.tex
-					draw_texture_rect(tx, Rect2(it.at, tx.get_size() / float(NeonSigns.PPU)), false, Color(1, 1, 1, f))
+					draw_texture_rect(tx, Rect2(it.at, tx.get_size() / float(it.get("n", NeonSigns.PPU))), false, Color(1, 1, 1, f))
 				if sg.mode == "chase":
 					_chase(sg, s)
 			for e in s.tubes_anim:
@@ -325,11 +331,11 @@ class Anim extends Node2D:
 				p = Vector2(r.end.x - (d - r.size.x - r.size.y), r.end.y)
 			else:
 				p = Vector2(r.position.x, r.end.y - (d - 2.0 * r.size.x - r.size.y))
-			p = PixelDraw.snap2(p)
+			p = PixelDraw.snap2_to(self, p)
 			var on := (i + shift) % 3 == 0
 			var a := 1.0 if on else 0.22
 			PixelDraw.rect(self, Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(col.r, col.g, col.b, 0.25 * a))
-			PixelDraw.rect(self, Rect2(p - Vector2(1, 1) / 3.0, Vector2(2, 2) / 3.0), Color(1, 1, 1, 0.9 * a) if on else Color(col.r, col.g, col.b, 0.5))
+			PixelDraw.rect(self, Rect2(p - Vector2(1, 1) * PixelDraw.px_of(self), Vector2(2, 2) * PixelDraw.px_of(self)), Color(1, 1, 1, 0.9 * a) if on else Color(col.r, col.g, col.b, 0.5))
 
 ## Dunkle Tafeln der Leuchtreklame (normal gemischt, vom Licht der Welt beleuchtet): Schatten, Platte, Kanten, Schrauben, Halter.
 class Boards extends Node2D:
@@ -347,11 +353,11 @@ class Boards extends Node2D:
 					PixelDraw.rect(self, Rect2(x, r.position.y - 3.0, 2.0, 3.0), Color(0.2, 0.19, 0.27))
 					PixelDraw.rect(self, Rect2(x, r.end.y, 2.0, 3.0), Color(0.2, 0.19, 0.27))
 			PixelDraw.rect(self, r, Color(0.05, 0.04, 0.085))
-			PixelDraw.rect(self, Rect2(r.position, Vector2(r.size.x, 1.0 / 3.0)), Color(0.2, 0.18, 0.3))
-			PixelDraw.rect(self, Rect2(r.position, Vector2(1.0 / 3.0, r.size.y)), Color(0.14, 0.12, 0.22))
-			PixelDraw.rect(self, Rect2(Vector2(r.position.x, r.end.y - 1.0 / 3.0), Vector2(r.size.x, 1.0 / 3.0)), Color(0.015, 0.01, 0.03))
-			PixelDraw.rect(self, Rect2(Vector2(r.end.x - 1.0 / 3.0, r.position.y), Vector2(1.0 / 3.0, r.size.y)), Color(0.02, 0.015, 0.04))
+			PixelDraw.rect(self, Rect2(r.position, Vector2(r.size.x, PixelDraw.px_of(self))), Color(0.2, 0.18, 0.3))
+			PixelDraw.rect(self, Rect2(r.position, Vector2(PixelDraw.px_of(self), r.size.y)), Color(0.14, 0.12, 0.22))
+			PixelDraw.rect(self, Rect2(Vector2(r.position.x, r.end.y - PixelDraw.px_of(self)), Vector2(r.size.x, PixelDraw.px_of(self))), Color(0.015, 0.01, 0.03))
+			PixelDraw.rect(self, Rect2(Vector2(r.end.x - PixelDraw.px_of(self), r.position.y), Vector2(PixelDraw.px_of(self), r.size.y)), Color(0.02, 0.015, 0.04))
 			if sg.kind == "main":
 				PixelDraw.rect(self, r.grow(-4.0), Color(0.07, 0.05, 0.12))
 			for c in [r.position + Vector2(1.34, 1.34), Vector2(r.end.x - 2.0, r.position.y + 1.34), Vector2(r.position.x + 1.34, r.end.y - 2.0), r.end - Vector2(2.0, 2.0)]:
-				PixelDraw.rect(self, Rect2(PixelDraw.snap2(c), Vector2(2.0, 2.0) / 3.0), Color(0.36, 0.34, 0.46))
+				PixelDraw.rect(self, Rect2(PixelDraw.snap2_to(self, c), Vector2(2.0, 2.0) * PixelDraw.px_of(self)), Color(0.36, 0.34, 0.46))

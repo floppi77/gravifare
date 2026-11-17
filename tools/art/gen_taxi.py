@@ -306,12 +306,13 @@ def _driver(c, glass):
     c.put(glass & (A >= 2.05) & (A < 2.42) & (Y >= 4.5) & (Y < 5.15), SKD)         # Ohren
     # Augen: dunkle Pupillen, ab 1440p mit Glanzpunkt oben links
     pw = 1 if n < 4 else 2
-    eh = 1 if n < 3 else (2 if n < 5 else 3)
-    ey = 4.35 if n > 2 else 4.0
-    eye = c.box(-0.8 - pw / (2.0 * n), ey, pw, eh, False)
+    eh = 1 if n < 3 else (2 if n < 6 else 3)
+    ey = 4.35 if n > 3 else 4.0                                   # 1080p: eine Zeile höher, sonst laufen Auge, Mundwinkel und Mund zu einer Linie zusammen
+    ex = 0.8 if n != 3 else 1.1                                   # … und einen Punkt weiter außen
+    eye = c.box(-ex - pw / (2.0 * n), ey, pw, eh, False)
     c.put(eye | eye[:, ::-1], INK)
     if n >= 4:
-        gm = c.box(-0.8 - pw / (2.0 * n), ey, 1, 1, False)
+        gm = c.box(-ex - pw / (2.0 * n), ey, 1, 1, False)
         c.put(gm | np.roll(gm[:, ::-1], -(pw - 1), axis=1), hexc("#ffffff"))
     cs = max(1, c.px(0.34))
     c.put(c.box(-1.5 - cs / (2.0 * n), 5.15 if n > 2 else 5.0, cs, max(1, cs - (1 if cs > 1 else 0))), CHEEK)

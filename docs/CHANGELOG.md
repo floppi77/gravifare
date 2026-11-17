@@ -3,6 +3,40 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.6.0
+
+### Deutsch
+
+**Grafik**
+- Alles im Level wird in der Pixelgröße des Bildschirms eigens gezeichnet (720p bis 2160p, 2 bis 6 Bildschirmpunkte je Einheit) und nicht mehr gestreckt: Taxi, Fels und Plattformen aller Sektoren, Zapfsäulen, Tore, Schieber, Wrackteile, Fahrgäste, Haltestellen, fremde Fahrzeuge, Leuchtreklame und die Taxi-Symbole der Leben. Linien und Schatten liegen auf ganzen Bildpunkten, bei 1440p und 1800p gibt es keine ungleichmäßigen Pixel mehr
+- Fahrgäste, Haltestellen und fremde Fahrzeuge sind neu gezeichnet (Front- und Seitenansichten mit durchgehenden Details wie der Haarspange); Trefferflächen und Spielverhalten bleiben gleich
+- Neue Tank- und Hüllenanzeige: Der Tank ist hellgrün, wird orange, wenn er knapp wird (Schwelle des Tankalarms), und rot in den letzten 10 %. Die Hülle hat eine eigene Form und eigene Farben (blau, violett, magenta). Beim Piepen des Tankalarms blitzt die Anzeige im selben Takt auf, ein Treffer zeigt kurz, wie viel Hülle er gekostet hat. Auch in den Einspielern sichtbar
+- Neues Taxi in jeder Pixelgröße, auch in der Garage und im HUD
+- Dunkle Level (Sektor 8, Nachtschicht, Nebel) sind weniger hell: Nur noch die Zielplattform leuchtet kräftig, alle übrigen Plattformen nur schwach
+- Levelauswahl: Die Sektor-Reiter füllen sich von links in der Sektorfarbe, der gewählte Sektor ist klar zu erkennen; gezeichnete Levelkarten mit Sternen und Schloss
+- Ergebnisansicht nach dem Level neu geordnet: abgedunkelter Hintergrund bis zum Fensterrand, Kopfband, drei Medaillenkarten, eine Karte für die Zeit und eine Abrechnung als Rechnung (Fahrpreise, Reparatur, Ersatztaxi, Verpasst, Ergebnis), Abzüge von 0 gedämpft
+
+**Spiel**
+- Verlorene Pflichtfahrgäste (verpasst, gerammt, rausgeworfen) kosten in allen Sektoren den doppelten Fahrpreis, vorher das 4- bis 12-fache. Dazu nehmen alle Strafen eines Levels höchstens 40 % des Guthabens, das Konto fällt dadurch nicht mehr auf 0. Gilt für Karriere, Nachtschicht und Tagschicht, auch für laufende Spielstände; Reparatur und Ersatztaxi bleiben wie bisher
+- Die Meldungen zur Strafe nennen den Betrag, der tatsächlich abgezogen wird
+- Bestzeit-Läufe bleiben gültig, ihre Strafen werden mit den neuen Regeln nachgerechnet
+
+### English
+
+**Graphics**
+- Everything in the level is now drawn in the pixel size of your screen (720p to 2160p, 2 to 6 screen pixels per unit) instead of being stretched: taxi, rock and platforms of every sector, fuel pumps, gates, sliders, wreckage, passengers, shelters, other vehicles, neon signs and the taxi icons for lives. Lines and shadows sit on whole pixels, so 1440p and 1800p no longer show uneven pixels
+- Passengers, shelters and other vehicles are redrawn (front and side views with consistent details such as the hair clip); hitboxes and gameplay are unchanged
+- New fuel and hull gauges: the tank is bright green, turns orange as it runs low (the same threshold as the low-fuel alarm) and red in the last 10 %. The hull has its own shape and colours (blue, violet, magenta). The gauge flashes in time with the alarm beeps, and a hit briefly shows how much hull it cost. Also shown in the intro clips
+- New taxi in every pixel size, in the garage and the HUD as well
+- Dark levels (sector 8, night shift, fog) are less bright: only the target platform glows strongly, all other platforms only faintly
+- Level select: the sector tabs fill from the left in the sector colour, the selected sector is easy to spot; drawn level cards with stars and a lock
+- The result screen after a level is reorganised: darkened background out to the window edge, header band, three medal cards, one card for the time and a payout card laid out as a sum (fares, repairs, replacement taxi, lost, net result), zero deductions shown muted
+
+**Game**
+- Lost mandatory passengers (missed, rammed, ejected) now cost twice the fare in every sector, instead of 4 to 12 times. In addition, all penalties of a level take at most 40 % of your credits, so the balance no longer drops to 0. Applies to Career, Night Shift and Day Shift, including saves in progress; repairs and the replacement taxi are unchanged
+- The penalty messages show the amount that is actually deducted
+- Best-time runs stay valid; their penalties are recalculated with the new rules
+
 ## 1.5.0
 
 ### Deutsch

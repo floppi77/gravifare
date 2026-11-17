@@ -6,7 +6,6 @@ extends RefCounted
 ## Bei „Weniger Bewegung“ steht alles still (Verkehr und Teilchen an festen Stellen, die Blinklichter leuchten dauerhaft schwach).
 
 const MAX_ALPHA := 0.15
-const PX := 1.0 / 3.0
 
 ## Je Sektor: Verkehr {n, v (Einheiten/s), hull (Farbton des Rumpfs), front, rear}, Blinklichter {n, cols}, Teilchen {kind, n, col}.
 ## Teilchenarten: spark (steigt auf, flackert), ember (steigt langsam, schwankt), bubble (steigt, schwankt), spore (schwebt, pulsiert), mote (treibt seitlich), fall (sinkt).
@@ -80,8 +79,10 @@ static func pos_at(it: Dictionary, vs: Vector2, t: float, still: bool) -> Vector
 static func draw(ci: CanvasItem, things: Array, sector: int, vs: Vector2, off: Vector2, t: float, still: bool) -> void:
 	var look: Dictionary = LOOK[clampi(sector, 1, 9)]
 	var tt := 0.0 if still else t
-	var ox := -roundf(off.x * 0.04 * 3.0) * PX
-	var oy := -roundf(off.y * 0.04 * 3.0) * PX
+	var PX := PixelDraw.px_of(ci)                       # ein Bildschirmpunkt (1/n Einheit)
+	var nf := float(PixelDraw.n_of(ci))
+	var ox := -roundf(off.x * 0.04 * nf) * PX
+	var oy := -roundf(off.y * 0.04 * nf) * PX
 	for it in things:
 		var a := MAX_ALPHA * float(it.a)
 		var p := pos_at(it, vs, t, still) + Vector2(ox, oy)
@@ -118,4 +119,5 @@ static func draw(ci: CanvasItem, things: Array, sector: int, vs: Vector2, off: V
 				_px(ci, p.x, p.y, sz, sz, Color(c2.r, c2.g, c2.b, clampf(al, 0.0, MAX_ALPHA)))
 
 static func _px(ci: CanvasItem, x: float, y: float, w: float, h: float, col: Color) -> void:
-	ci.draw_rect(Rect2(roundf(x * 3.0) * PX, roundf(y * 3.0) * PX, w, h), col)
+	var nf := float(PixelDraw.n_of(ci))
+	ci.draw_rect(Rect2(roundf(x * nf) / nf, roundf(y * nf) / nf, w, h), col)

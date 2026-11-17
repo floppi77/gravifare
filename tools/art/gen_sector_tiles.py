@@ -1,7 +1,8 @@
 """Fels-Materialien der neun Sektoren (Runde 63): je Sektor ein eigenes Material passend zu Name und Hintergrund, dazu Kanten- und Eckkacheln nach
-Nachbarschaft und Abwandlungen im Inneren. Schreibt assets/art/tiles_sN.png (768×144) und die Normal-Map tiles_sN_n.png.
+Nachbarschaft und Abwandlungen im Inneren. Schreibt assets/art/tiles_sN.png (768×144, Größe 3: Werkstatt, Menü) und die Normal-Map tiles_sN_n.png sowie je Pixelgröße 2–6 (Runde 72)
+tiles_sN_sizes.png / tiles_sN_n_sizes.png: die fünf Atlanten untereinander (1536 × 960), im Level 1:1 in jeder Auflösung.
 
-Atlas (Kachel 48 px = 16 Einheiten, 3 px je Einheit):
+Atlas (Kachel 48 px = 16 Einheiten, 3 px je Einheit; in der Größe n 16·n px, alle Maße unten in Pixeln der Größe 3 und mit n/3 umgerechnet):
   Zeile 0: 0–3 Innenflächen, 4 Plattform, 5 Tankpad, 6 Dornen (4–6 unverändert aus tiles_s1.png vor Runde 63: Funktionsfarben bleiben gleich),
            7–9 tiefe Innenflächen, 10–15 weitere Abwandlungen (selten, nur tief im Fels). Die Werkstatt nutzt weiter die Felder 0–9 dieser Zeile.
   Zeile 1: Randkacheln, Spalte = Maske der offenen Nachbarn (1 = oben, 2 = rechts, 4 = unten, 8 = links), 0 = Innenfläche ohne Merkmale.
@@ -11,18 +12,26 @@ Eigene Arbeit, nur numpy/Pillow, fester Zufallssamen (Ausgabe bitgleich). Aufruf
 import math, os, sys
 import numpy as np
 from PIL import Image, ImageDraw
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sizekit import Sc, SIZES, stack, rnd
+import gen_art
 
-T = 48
+N = 3                                      # Pixelgröße, die gerade gebaut wird (build setzt sie)
+T = 48                                     # Kantenlänge einer Kachel in Pixeln der Größe N (16·N)
+
+def S(v):
+    """Länge in Pixeln der Größe 3 → Pixel der Größe N, mindestens 1."""
+    return max(1, rnd(v * N / 3.0))
+
 COLS, ROWS = 16, 3
 OUT = "assets/art/"
-FUNC = "tools/art/tiles_func.png"          # Plattform, Tankpad, Dornen (48×144 je Zeile): Funktionsfarben, unverändert für alle Sektoren
-LEGACY_S1 = "tools/art/tiles_s1_legacy.png"  # Metallplatten des Sternenhafens (bisheriges tiles_s1.png, Felder 0–3 und 7–9)
 
 def hexc(h):
     h = h.lstrip("#"); return np.array([int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)], dtype=float)
 
-def pnoise(seed, beta=2.2, size=T):
+def pnoise(seed, beta=2.2, size=None):
     """Kachelbares Rauschen (periodisch in beiden Richtungen) über eine 1/f^beta-Filterung im Frequenzraum, normiert auf 0..1."""
+    size = size or T
     rng = np.random.default_rng(seed)
     w = rng.normal(size=(size, size))
     f = np.fft.fft2(w)
@@ -41,12 +50,16 @@ def ramp(cols, v, seed=0):
     idx = np.clip((v * len(cols)).astype(int), 0, len(cols) - 1)
     return c[idx]
 
+def band_edges(coord, k):
+    """Wahr an jedem Punkt, an dem eine von k gleich breiten Bändern über die Kachel (T) beginnt (Fugen; bei N = 3 sind das die alten Spalten/Zeilen)."""
+    return (coord * k) // T != ((coord - 1) * k) // T
+
 # ------------------------------------------------------------------ Materialien je Sektor
-# base(seed) -> (rgb 48×48×3) kachelbar; feature(img, rng, k) zeichnet Merkmale der Abwandlung k (Abstand 6 px zum Rand)
+# base(seed) -> (rgb T×T×3) kachelbar; feature(d, rng, k) zeichnet Merkmale der Abwandlung k (Abstand 6 Punkte zum Rand), d ist eine Sc-Fläche
 # edge: Farben für Kanten (ink = Kontur, cap = Licht der Oberkante, side = Seitenfase, under = Unterseite)
 
 def mat_metal(seed):
-    return None      # Sternenhafen: bisherige Metallplatten (siehe LEGACY_S1)
+    return None      # Sternenhafen: Metallplatten aus gen_art.tile_set
 
 def mat_crystal(seed):
     n = pnoise(seed, 2.6); m = pnoise(seed + 1, 1.6)
@@ -61,11 +74,12 @@ def mat_rust(seed):
     streak = np.tile(pnoise(seed + 4, 3.0)[0:1, :], (T, 1))      # senkrechte Rostläufe
     v = np.clip(0.5 * n + 0.3 * s + 0.2 * streak, 0, 1)
     rgb = ramp(["#2a1610", "#3e2214", "#5a3018", "#77401c", "#93562a", "#a8703a"], v, seed)
-    for y in (0, 47):                                             # Blechstoß mit Nieten an der Kachelgrenze (periodisch)
+    for y in (0, T - 1):                                          # Blechstoß mit Nieten an der Kachelgrenze (periodisch)
         rgb[y, :] = hexc("#2a1610")
-    for x in range(6, 48, 12):
-        for y in (2, 45):
-            rgb[y, x] = hexc("#c08a52"); rgb[y + 1 if y == 2 else y - 1, x] = hexc("#2a1610")
+    ry = S(2)
+    for x in range(2 * N, T, 4 * N):                              # alle 4 Einheiten
+        for y in (ry, T - 1 - ry):
+            rgb[y, x] = hexc("#c08a52"); rgb[y + 1 if y == ry else y - 1, x] = hexc("#2a1610")
     return rgb
 
 def mat_icesteel(seed):
@@ -75,14 +89,20 @@ def mat_icesteel(seed):
     rgb = ramp(["#1c2a3a", "#26384c", "#30465c", "#3c566e", "#4a6880"], v, seed)
     frost = pnoise(seed + 6, 1.1) > 0.78
     rgb[frost] = rgb[frost] * 0.4 + hexc("#cfe6f5") * 0.6
-    rgb[0, :] = hexc("#5a7890"); rgb[24, :] = hexc("#5a7890")     # Plattenstöße (Periode 24)
-    rgb[23, :] = hexc("#16202c"); rgb[47, :] = hexc("#16202c")
+    h = T // 2
+    rgb[0, :] = hexc("#5a7890"); rgb[h, :] = hexc("#5a7890")      # Plattenstöße (Periode 8 Einheiten)
+    rgb[h - 1, :] = hexc("#16202c"); rgb[T - 1, :] = hexc("#16202c")
     return rgb
 
 def mat_basalt(seed):
     n = pnoise(seed, 2.8)
     yy, xx = np.mgrid[0:T, 0:T]
-    col = ((xx + (yy // 16) * 8) % 16 == 0) | ((yy % 16 == 0) & (((xx + (yy // 16) * 8) // 16) % 2 == 0))       # Säulenfugen, versetzt
+    rowb = (yy * 3) // T                                          # drei Bänder, je Band um die halbe Säulenbreite versetzt
+    off = rowb * (T / 6.0)
+    cidx = np.floor((xx + off) * 3.0 / T)
+    vjoint = cidx != np.floor((xx - 1 + off) * 3.0 / T)
+    rstart = band_edges(yy, 3)
+    col = vjoint | (rstart & (cidx % 2 == 0))                     # Säulenfugen, versetzt
     v = np.clip(n, 0, 1)
     rgb = ramp(["#120e10", "#1c1618", "#262022", "#302a2a", "#3a3232"], v, seed)
     rgb[col] = hexc("#0a0708")
@@ -92,8 +112,8 @@ def mat_reefsteel(seed):
     n = pnoise(seed, 2.6)
     v = np.clip(n, 0, 1)
     rgb = ramp(["#0c2426", "#123234", "#184042", "#1e4e50", "#265c5c"], v, seed)
-    rgb[0, :] = hexc("#2e6a68"); rgb[47, :] = hexc("#081a1c")     # Plattenstoß
-    rgb[:, 0] = hexc("#2e6a68"); rgb[:, 47] = hexc("#081a1c")
+    rgb[0, :] = hexc("#2e6a68"); rgb[T - 1, :] = hexc("#081a1c")  # Plattenstoß
+    rgb[:, 0] = hexc("#2e6a68"); rgb[:, T - 1] = hexc("#081a1c")
     algae = pnoise(seed + 7, 1.4) > 0.72
     rgb[algae] = rgb[algae] * 0.45 + hexc("#2f7a3a") * 0.55
     return rgb
@@ -103,16 +123,18 @@ def mat_concrete(seed):
     v = np.clip(n, 0, 1)
     rgb = ramp(["#2c2620", "#36302a", "#403a32", "#4a443a", "#544c42"], v, seed)
     yy, xx = np.mgrid[0:T, 0:T]
-    grout = (yy % 12 == 11) | ((xx + (yy // 12 % 2) * 6) % 12 == 11)        # Fliesenraster mit versetzten Reihen (Periode 48)
+    q = 4 * N                                                     # Fliese 4 Einheiten
+    grout = (yy % q == q - 1) | ((xx + (yy // q % 2) * (q // 2)) % q == q - 1)        # Fliesenraster mit versetzten Reihen
     rgb[grout] = rgb[grout] * 0.55
     return rgb
 
 def mat_stone(seed):
     n = pnoise(seed, 2.4)
     yy, xx = np.mgrid[0:T, 0:T]
-    row = yy // 16
-    off = np.array([0, 9, 4])[row]
-    joint = (yy % 16 == 15) | (((xx + off) % 24) == 23)               # Quader, je Reihe versetzt (Periode 48)
+    row = (yy * 3) // T
+    off = np.array([0, 3 * N, rnd(4 * N / 3.0)])[row]
+    q = 8 * N
+    joint = band_edges(yy + 1, 3) | (((xx + off) % q) == q - 1)   # Quader, je Reihe versetzt; Lager an jedem Bandende
     v = np.clip(n, 0, 1)
     rgb = ramp(["#141a16", "#1c241e", "#242e26", "#2c382e", "#344236"], v, seed)
     rgb[joint] = hexc("#0a0f0c")
@@ -128,7 +150,7 @@ def mat_void(seed):
     rgb[crack] = hexc("#5a3aa8")
     return rgb
 
-# Merkmale der Abwandlungen ------------------------------------------------
+# Merkmale der Abwandlungen (Entwurfspunkte der Größe 3, d setzt sie um) ----------------------------------
 def f_crystal(d, rng, k):
     for _ in range(1 + k % 3):
         cx, cy = rng.integers(10, 38), rng.integers(12, 38)
@@ -205,34 +227,38 @@ SECTORS = {
 
 # ------------------------------------------------------------------ Kanten
 def edge_tile(base, mask, cfg):
-    """Randkachel: Grundmaterial plus Kontur, Fasen und abgerundete Außenecken an den offenen Seiten (mask: 1 oben, 2 rechts, 4 unten, 8 links)."""
+    """Randkachel: Grundmaterial plus Kontur, Fasen und abgerundete Außenecken an den offenen Seiten (mask: 1 oben, 2 rechts, 4 unten, 8 links).
+    Breiten wachsen mit der Pixelgröße (2 Punkte bei Größe 3 = 0,67 Einheiten)."""
     a = np.dstack([base.copy(), np.full((T, T), 255.0)])
     ink, cap, side, under = hexc(cfg["ink"]), hexc(cfg["cap"]), hexc(cfg["side"]), hexc(cfg["under"])
     n_, e_, s_, w_ = mask & 1, mask & 2, mask & 4, mask & 8
     def blend(region, col, k):
         a[region, :3] = a[region, :3] * (1 - k) + col * k
     yy, xx = np.mgrid[0:T, 0:T]
+    w2, w3, w4, w5, w6, w7 = S(2), S(3), S(4), S(5), S(6), S(7)
     if s_:
-        blend((yy >= T - 7) & (yy < T - 2), under, 0.45)
-        blend((yy >= T - 2), ink, 1.0)
+        blend((yy >= T - w7) & (yy < T - w2), under, 0.45)
+        blend((yy >= T - w2), ink, 1.0)
     if e_:
-        blend((xx >= T - 5) & (xx < T - 2), under, 0.35)
-        blend((xx >= T - 2), ink, 1.0)
+        blend((xx >= T - w5) & (xx < T - w2), under, 0.35)
+        blend((xx >= T - w2), ink, 1.0)
     if w_:
-        blend((xx >= 2) & (xx < 4), side, 0.55)
-        blend((xx < 2), ink, 1.0)
+        blend((xx >= w2) & (xx < w4), side, 0.55)
+        blend((xx < w2), ink, 1.0)
     if n_:
-        blend((yy >= 2) & (yy < 4), cap, 0.85)
-        blend((yy >= 4) & (yy < 6), cap, 0.30)
-        blend((yy < 2), ink, 1.0)
-    r = 5                                                            # Außenecken runden: Pixel außerhalb des Viertelkreises werden durchsichtig
+        blend((yy >= w2) & (yy < w4), cap, 0.85)
+        blend((yy >= w4) & (yy < w6), cap, 0.30)
+        blend((yy < w2), ink, 1.0)
+    r = 5 * N / 3.0                                                  # Außenecken runden: Pixel außerhalb des Viertelkreises werden durchsichtig
+    r = int(round(r))
+    ringw = 1.6 * N / 3.0
     for (open_a, open_b, cx, cy) in ((n_, w_, r, r), (n_, e_, T - 1 - r, r), (s_, w_, r, T - 1 - r), (s_, e_, T - 1 - r, T - 1 - r)):
         if open_a and open_b:
             dx = xx - cx; dy = yy - cy
             quad = ((xx < cx) if cx < T / 2 else (xx > cx)) & ((yy < cy) if cy < T / 2 else (yy > cy))
             dist = np.sqrt(dx * dx + dy * dy)
             a[quad & (dist > r + 0.5), 3] = 0
-            ring = quad & (dist > r - 1.6) & (dist <= r + 0.5)
+            ring = quad & (dist > r - ringw) & (dist <= r + 0.5)
             a[ring, :3] = ink
     return a
 
@@ -242,25 +268,28 @@ def inner_corner(which, cfg):
     ink, cap = hexc(cfg["ink"]), hexc(cfg["cap"])
     cx = T - 1 if which in (0, 1) else 0
     cy = 0 if which in (0, 3) else T - 1
-    for d in range(3):
-        for e in range(3 - d):
+    size = N                                                         # Dreieck von 1 Einheit (3 Punkte bei Größe 3)
+    thr = max(1, rnd(2 * N / 3.0))
+    for d in range(size):
+        for e in range(size - d):
             x = cx - d if cx else cx + d
             y = cy + e if cy == 0 else cy - e
-            a[y, x, :3] = ink if d + e < 2 else (cap if cy == 0 else ink * 1.4)
+            a[y, x, :3] = ink if d + e < thr else (cap if cy == 0 else ink * 1.4)
             a[y, x, 3] = 255
     return a
 
 def normal_map(img):
-    """Normal-Map wie gen_art.tiles_normal: Relief aus der Helligkeit, je Kachel getrennt."""
+    """Normal-Map wie gen_art.tiles_normal: Relief aus der Helligkeit, je Kachel getrennt. Weichzeichner und Steigung wachsen mit der Pixelgröße mit."""
     from scipy.ndimage import gaussian_filter, sobel
     a = np.array(img).astype(float)
     out = np.zeros_like(a); out[..., 0] = 128; out[..., 1] = 128; out[..., 2] = 255; out[..., 3] = 255
+    f = N / 3.0
     for r in range(ROWS):
         for c in range(COLS):
             tile = a[r * T:(r + 1) * T, c * T:(c + 1) * T]
             lum = (0.3 * tile[..., 0] + 0.59 * tile[..., 1] + 0.11 * tile[..., 2]) / 255.0
-            h = gaussian_filter(lum, 0.8, mode="wrap" if r == 0 else "nearest")
-            dx = sobel(h, axis=1, mode="nearest") / 8.0; dy = sobel(h, axis=0, mode="nearest") / 8.0
+            h = gaussian_filter(lum, 0.8 * f, mode="wrap" if r == 0 else "nearest")
+            dx = sobel(h, axis=1, mode="nearest") / 8.0 * f; dy = sobel(h, axis=0, mode="nearest") / 8.0 * f
             nx, ny, nz = -dx * 3.0, dy * 3.0, np.ones_like(h)
             ln = np.sqrt(nx * nx + ny * ny + nz * nz)
             blk = (np.stack([nx / ln, ny / ln, nz / ln], axis=2) * 0.5 + 0.5) * 255.0
@@ -268,49 +297,44 @@ def normal_map(img):
             out[r * T:(r + 1) * T, c * T:(c + 1) * T, :3] = blk
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
-def build(sector):
+def build(sector, n):
+    """Fels-Atlas des Sektors in der Pixelgröße n: (Atlas, Normal-Map)."""
+    global N, T
+    N, T = n, 16 * n
     cfg = SECTORS[sector]
     atlas = Image.new("RGBA", (COLS * T, ROWS * T), (0, 0, 0, 0))
-    func = Image.open(FUNC).convert("RGBA")
-    for i, c in enumerate((4, 5, 6)):
-        atlas.paste(func.crop((i * T, 0, (i + 1) * T, T)), (c * T, 0))
+    func = gen_art.tile_set(n)
+    for c in (4, 5, 6):
+        atlas.paste(func[c], (c * T, 0))
     if sector == 1:
-        legacy = Image.open(LEGACY_S1).convert("RGBA")
-        base = np.array(legacy.crop((7 * T, 0, 8 * T, T))).astype(float)[..., :3]        # tiefes Paneel 7 als Grund der Randkacheln
+        base = np.array(func[7]).astype(float)[..., :3]                  # tiefes Paneel 7 als Grund der Randkacheln
         for c in (0, 1, 2, 3, 7, 8, 9):
-            atlas.paste(legacy.crop((c * T, 0, (c + 1) * T, T)), (c * T, 0))
+            atlas.paste(func[c], (c * T, 0))
         for c in range(10, 16):
-            atlas.paste(legacy.crop(((7 + c % 3) * T, 0, (8 + c % 3) * T, T)), (c * T, 0))
+            atlas.paste(func[7 + c % 3], (c * T, 0))
     else:
         base = cfg["mat"](sector * 1000)
         for c in (0, 1, 2, 3, 7, 8, 9) + tuple(range(10, 16)):
             im = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8)).convert("RGBA")
             if c not in (0, 7):                                     # 0 und 7 ohne Merkmale: ruhige Flächen
                 rng = np.random.default_rng(sector * 100 + c)
-                cfg["feat"](ImageDraw.Draw(im), rng, c)
+                cfg["feat"](Sc(im, n), rng, c)
             atlas.paste(im, (c * T, 0))
     for m in range(16):
         t = edge_tile(base, m, cfg) if m else np.dstack([base, np.full((T, T), 255.0)])
         atlas.paste(Image.fromarray(np.clip(t, 0, 255).astype(np.uint8), "RGBA"), (m * T, T))
     for k in range(4):
         atlas.paste(Image.fromarray(np.clip(inner_corner(k, cfg), 0, 255).astype(np.uint8), "RGBA"), (k * T, 2 * T))
-    atlas.save(OUT + "tiles_s%d.png" % sector)
-    normal_map(atlas).save(OUT + "tiles_s%d_n.png" % sector)
-    print("tiles_s%d.png" % sector)
+    return atlas, normal_map(atlas)
 
-def prepare():
-    """Einmalig: Funktionsfelder und Metallplatten aus dem bisherigen tiles_s1.png (480×48) sichern; danach wird tiles_s1.png neu geschrieben."""
-    if os.path.exists(FUNC) and os.path.exists(LEGACY_S1):
-        return
-    old = Image.open(OUT + "tiles_s1.png").convert("RGBA")
-    assert old.size == (480, 48), "tiles_s1.png ist schon im neuen Format; Sicherung fehlt"
-    old.save(LEGACY_S1)
-    f = Image.new("RGBA", (3 * T, T))
-    for i, c in enumerate((4, 5, 6)):
-        f.paste(old.crop((c * T, 0, (c + 1) * T, T)), (i * T, 0))
-    f.save(FUNC)
+def build_files(sector):
+    by = {n: build(sector, n) for n in SIZES}
+    by[3][0].save(OUT + "tiles_s%d.png" % sector)
+    by[3][1].save(OUT + "tiles_s%d_n.png" % sector)
+    stack({n: by[n][0] for n in SIZES}).save(OUT + "tiles_s%d_sizes.png" % sector)
+    stack({n: by[n][1] for n in SIZES}).save(OUT + "tiles_s%d_n_sizes.png" % sector)
+    print("tiles_s%d (Größen %s)" % (sector, ", ".join(str(n) for n in SIZES)))
 
 if __name__ == "__main__":
-    prepare()
     for s in ([int(a) for a in sys.argv[1:]] or range(1, 10)):
-        build(s)
+        build_files(s)

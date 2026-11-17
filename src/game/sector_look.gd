@@ -32,3 +32,15 @@ static func tiles(sector: int) -> Texture2D:
 static func tiles_normal(sector: int) -> Texture2D:
 	var p := "res://assets/art/tiles_s%d_n.png" % sector
 	return load(p if ResourceLoader.exists(p) else "res://assets/art/tiles_s1_n.png")
+
+## Fels-Atlas des Sektors mit allen Pixelgrößen untereinander (tiles_sN_sizes.png, Runde 72; Blattformat siehe PixelScale) und seine Normal-Map.
+## Die Atlanten sind 16 × 3 Kacheln zu 16 Einheiten, also 256 × 48 Einheiten je Größe.
+const TILES_UNITS := Vector2(256, 48)
+
+static func tiles_sized(sector: int) -> Texture2D:
+	var p := "res://assets/art/tiles_s%d_sizes.png" % sector
+	return load(p if ResourceLoader.exists(p) else "res://assets/art/tiles_s1_sizes.png")
+
+static func tiles_sized_normal(sector: int) -> Texture2D:
+	var p := "res://assets/art/tiles_s%d_n_sizes.png" % sector
+	return load(p if ResourceLoader.exists(p) else "res://assets/art/tiles_s1_n_sizes.png")

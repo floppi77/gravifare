@@ -13,15 +13,20 @@ Schritte (aus der Projektwurzel):
    python3 tools/art/gen_movers.py pre      -> build/aseprite-workspace/gf_movers/{body,detail,outline}.png (Ebenen des Blatts)
    aseprite -b --script tools/art/aseprite/build_movers.lua   -> movers.aseprite (Ebenen body, detail, outline) und movers_flat.png
    python3 tools/art/gen_movers.py export   -> kopiert movers_flat.png nach assets/art/movers.png
+   python3 tools/art/gen_movers.py sizes    -> assets/art/movers_sizes.png: dieselben Stücke für die Pixelgrößen 2–6 untereinander (Runde 72;
+                                               Kachel 4 Einheiten = 4·n Bildpunkte, Maße der Details werden je Größe umgesetzt, bei n = 3 das Blatt oben)
    python3 tools/art/gen_movers.py flat     -> Notlösung ohne Aseprite: alle Ebenen direkt zusammengesetzt nach assets/art/movers.png
 Eigene Arbeit, keine Fremdassets."""
-import os, shutil, sys
+import math, os, shutil, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from PIL import Image
+from sizekit import SIZES, stack
 
 P = 12                       # Kantenlänge einer Kachel in Bildpunkten
 COLS, ROWS = 10, 3
 WS = "build/aseprite-workspace/gf_movers/"
 OUT = "assets/art/movers.png"
+OUT_SIZES = "assets/art/movers_sizes.png"
 BIG = 99                     # „weit weg vom Rand“
 
 
@@ -67,11 +72,32 @@ def side_of(dl, dr, dt, db):
     return "R"
 
 
-def px(kind, dl, dr, dt, db, u, v, var):
-    """Ein Bildpunkt eines Hindernisses. dl/dr/dt/db = Abstand zum linken/rechten/oberen/unteren Rand (0 = äußerster Punkt).
+def W(v, n):
+    """Länge in Bildpunkten der Größe 3 (1 Punkt = 1/3 Einheit) → Bildpunkte der Größe n, mindestens 1."""
+    return max(1, int(math.floor(v * n / 3.0 + 0.5)))
+
+
+def rect_of(u0, u1, v0, v1, n):
+    """Entwurfspunkte u0..u1 × v0..v1 (einschließlich, Größe 3) → Bildpunktbereiche der Größe n (mindestens ein Bildpunkt je Richtung)."""
+    f = n / 3.0
+    def rng(a, b):
+        lo = int(math.floor(a * f + 0.5))
+        return lo, lo + max(1, int(math.floor((b - a + 1) * f + 0.5))) - 1        # gleich lange Spanne = gleich viele Bildpunkte
+    return rng(u0, u1), rng(v0, v1)
+
+
+def inside(x, y, u0, u1, v0, v1, n):
+    (xa, xb), (ya, yb) = rect_of(u0, u1, v0, v1, n)
+    return xa <= x <= xb and ya <= y <= yb
+
+
+def px(kind, dl, dr, dt, db, u, v, var, n=3):
+    """Ein Bildpunkt eines Hindernisses in der Größe n. dl/dr/dt/db = Abstand zum linken/rechten/oberen/unteren Rand (0 = äußerster Punkt),
+    u, v = Lage in der Kachel. Alle Maße stehen in Bildpunkten der Größe 3 und werden mit W()/rect_of() umgesetzt.
     Gibt (body, detail, outline) zurück, jeweils ein RGBA oder None."""
     k = KINDS[kind]
-    cut = k["cut"]
+    P = 4 * n
+    cut = W(k["cut"], n) if k["cut"] > 1 else 1
     # abgeschnittene Ecken: ein Brocken ist kein Lineal
     for a, b in ((dl, dt), (dr, dt), (dl, db), (dr, db)):
         if a + b < cut:
@@ -82,7 +108,7 @@ def px(kind, dl, dr, dt, db, u, v, var):
         return None, None, OL
     side = side_of(dl, dr, dt, db)
     lit = side in ("T", "L")
-    rim_w = 1 if kind == 2 else 2
+    rim_w = 1 if kind == 2 else W(2, n)
     body = det = None
     # Warnrand
     if d <= rim_w:
@@ -100,65 +126,70 @@ def px(kind, dl, dr, dt, db, u, v, var):
             body = mix(k["body"], k["hi"], 0.4)         # leichtes Korn
         elif hsh(u, v, kind + 7) > 0.88:
             body = mix(k["body"], k["lo"], 0.55)
+    d3, d4 = W(3, n), W(4, n)
+    def at(pts):                                        # Entwurfspunkte (u, v) der Größe 3
+        return any(inside(u, v, a, a, b, b, n) for a, b in pts)
     # Art-spezifische Einzelheiten
     if kind == 0:                                       # Trümmer: Gruben und Späne, in der zweiten Füllung Risse und eine Niete
-        if d >= 4 and var == 0:
-            if (u, v) in ((7, 6), (8, 6), (7, 7), (3, 9)):
+        if d >= d4 and var == 0:
+            if at(((7, 6), (8, 6), (7, 7), (3, 9))):
                 det = k["dk"]
-            elif (u, v) in ((8, 7), (4, 3)):
+            elif at(((8, 7), (4, 3))):
                 det = k["hi"]
-        if d >= 3 and var == 1:
-            crack = {(2, 9), (3, 8), (4, 8), (5, 7), (6, 6), (7, 6), (8, 5), (9, 3), (10, 2)}
-            if (u, v) in crack:
+        if d >= d3 and var == 1:
+            crack = ((2, 9), (3, 8), (4, 8), (5, 7), (6, 6), (7, 6), (8, 5), (9, 3), (10, 2))
+            if at(crack):
                 det = k["dk"]
-            elif (u, v) in {(3, 9), (5, 8), (7, 7), (9, 4)}:
+            elif at(((3, 9), (5, 8), (7, 7), (9, 4))):
                 det = k["lo"]
-            elif (u, v) == (5, 2):
+            elif at(((5, 2),)):
                 det = k["rim_hi"]
-            elif (u, v) in ((6, 2), (5, 3), (6, 3)):
+            elif at(((6, 2), (5, 3), (6, 3))):
                 det = k["dk"]
     elif kind == 1:                                     # Schieber: schwere Panzerplatten mit Fase, Bolzen bzw. Lüftungsschlitzen, Warnstreifen unten
-        if d >= 3:
-            if v == 11 or u == 11:
+        if d >= d3:
+            if v == P - 1 or u == P - 1:
                 det = k["dk"]                           # Fuge zwischen den Platten
             elif v == 0 or u == 0:
                 det = k["hi"]                           # Lichtkante oben/links
-            elif v == 10 or u == 10:
+            elif v == P - 2 or u == P - 2:
                 det = k["lo"]                           # Schattenkante unten/rechts
             elif var == 0:
-                if (u, v) in ((2, 2), (8, 2), (2, 8), (8, 8)):
+                if at(((2, 2), (8, 2), (2, 8), (8, 8))):
                     det = k["rim_hi"]                   # vier Bolzen je Platte
-                elif (u, v) in ((3, 3), (9, 3), (3, 9), (9, 9)):
+                elif at(((3, 3), (9, 3), (3, 9), (9, 9))):
                     det = k["dk"]
-            elif v in (3, 5, 7) and 2 <= u <= 8:
+            elif any(inside(u, v, 2, 8, r, r, n) for r in (3, 5, 7)):
                 det = k["dk"]                           # Lüftungsschlitze
-            elif v in (4, 6, 8) and 2 <= u <= 8:
+            elif any(inside(u, v, 2, 8, r, r, n) for r in (4, 6, 8)):
                 det = mix(k["body"], k["hi"], 0.5)
-        if db in range(1, 9) and dl >= 1 and dr >= 1:
-            stripe = ((u + db) % 12) < 6
+        if 1 <= db <= W(8, n) and dl >= 1 and dr >= 1:
+            stripe = ((u + db) % (4 * n)) < 2 * n       # Warnstreifen, 45 Grad, Periode 4 Einheiten
             det = k["rim"] if stripe else k["dk"]
-            if db == 8:
+            if db == W(8, n):
                 det = k["rim_lo"] if stripe else OL
             if stripe and db == 1:
                 det = k["rim_lo"]
     else:                                               # Plattform: türkise Landeleiste oben, Lüftungsschlitze
-        if 1 <= dt <= 8 and dl >= 1 and dr >= 1 and not (dl + dt < 3 or dr + dt < 3):
+        s8 = W(8, n)
+        if 1 <= dt <= s8 and dl >= 1 and dr >= 1 and not (dl + dt < d3 or dr + dt < d3):
             if dt == 1:
                 det = k["strip_hi"]
-            elif dt == 8:
+            elif dt == s8:
                 det = k["strip_lo"]
             else:
                 det = k["strip"]
-                if dt in (2, 3) and (u % 6) == 0:       # kleine Markierungen auf der Leiste
+                if max(2, W(2, n)) <= dt <= max(W(3, n), 2) and (u % (2 * n)) == 0:       # kleine Markierungen auf der Leiste
                     det = k["strip_hi"]
-        elif d >= 3 and dt > 9 and var == 0 and v in (5, 6) and 1 <= u <= 9:
+        elif d >= d3 and dt > W(9, n) and var == 0 and inside(u, v, 1, 9, 5, 6, n):
             det = k["dk"]
 
     return body, det, None
 
 
-def cell(kind, col):
-    """Kachel: Ebenen body, detail, outline als Bilder."""
+def cell(kind, col, n=3):
+    """Kachel: Ebenen body, detail, outline als Bilder (4 Einheiten = 4n Bildpunkte)."""
+    P = 4 * n
     layers = [Image.new("RGBA", (P, P), (0, 0, 0, 0)) for _ in range(3)]
     ct = col in (0, 1, 2)
     cb = col in (6, 7, 8)
@@ -171,18 +202,19 @@ def cell(kind, col):
             dr = (P - 1 - x) if cr else BIG
             dt = y if ct else BIG
             db = (P - 1 - y) if cb else BIG
-            res = px(kind, dl, dr, dt, db, x, y, var)
+            res = px(kind, dl, dr, dt, db, x, y, var, n)
             for i in range(3):
                 if res[i] is not None:
                     layers[i].putpixel((x, y), res[i])
     return layers
 
 
-def sheet():
+def sheet(n=3):
+    P = 4 * n
     out = [Image.new("RGBA", (COLS * P, ROWS * P), (0, 0, 0, 0)) for _ in range(3)]
     for kind in range(ROWS):
         for col in range(COLS):
-            for i, im in enumerate(cell(kind, col)):
+            for i, im in enumerate(cell(kind, col, n)):
                 out[i].paste(im, (col * P, kind * P))
     return out
 
@@ -207,6 +239,9 @@ def main():
     elif mode == "flat":
         flatten(sheet()).save(OUT)
         print("->", OUT, "(ohne Aseprite)")
+    elif mode == "sizes":                              # je Pixelgröße gerastert (Runde 72): die fünf Blätter untereinander, 40 × 12 Einheiten je Größe
+        stack({n: flatten(sheet(n)) for n in SIZES}).save(OUT_SIZES)
+        print("->", OUT_SIZES)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -424,6 +424,360 @@ func _test_round70() -> void:
 	check(pv.contains("var bx := pos.x + (4.0 if a.angry else 17.0)"), "Winke-Blase liegt neben dem Preisschild, nicht darauf")
 
 ## Runde 71: Taxi in jeder Pixelgröße (720p bis 2160p), Aufkleber je Größe, Levelauswahl mit gefüllten Sektor-Reitern.
+## Runde 74: Strafen für verlorene Fahrgäste – 2-facher Fahrpreis in allen Sektoren, höchstens 40 % des Guthabens, in allen Modi und für alte Läufe.
+## Runde 75: Ergebnisansicht nach dem Level neu geordnet (Medaillen, Zeit | Abrechnung, Kontostand | Punkte).
+func _test_round75() -> void:
+	for lang in ["de", "en"]:
+		var tx := _read_json("res://data/i18n/%s.json" % lang)
+		for k in ["RES_FARES", "RES_NET_ROW", "RES_H_LEDGER"]:
+			check(String(tx.get(k, "")) != "", "Ergebnisansicht: Text %s in %s" % [k, lang])
+		check(String(tx.get("RES_NET", "")).contains("%+d"), "Alter Text RES_NET bleibt unverändert (%s)" % lang)
+	var hud := _src("res://src/game/hud.gd")
+	var body := hud.substr(hud.find("func _draw_result()"), hud.find("var _box_cache") - hud.find("func _draw_result()"))
+	check(body.contains("tr(\"RES_FARES\")") and body.contains("tr(\"RES_NET_ROW\")") and body.contains("tr(\"RES_H_LEDGER\")"), "Abrechnung als Rechnung: Fahrpreise, Abzüge, Ergebnis in einer Karte")
+	check(body.contains("_full_rect()") and body.contains("_shift_panel("), "Ergebnisansicht dunkelt bis zum Fensterrand ab (Ultrawide) und nutzt die abgerundete Tafel")
+	check(body.contains("\"–\""), "Abzüge von 0 erscheinen gedämpft als „–“")
+	for key in ["RES_NOT_COUNTED", "MSG_NOT_COUNTED", "RES_SOLVED", "RES_NEW_BEST", "COMMUNITY_TAG", "RES_CONTINUE", "RES_TO_MENU", "MEDAL_PRO_D"]:
+		check(body.contains(key), "Ergebnisansicht behält %s" % key)
+	check(_src("res://src/core/save.gd").contains("a.begins_with(\"--debug-result\")") and _src("res://src/game/game.gd").contains("func _debug_result("), "Dev-Schalter --debug-result zeigt die Ansicht und speichert nichts")
+
+func _test_round74() -> void:
+	check(Tuning.MISSED_FEE_CAP == 0.4 and Tuning.missed_fee_factor(1) == 2.0 and Tuning.missed_fee_factor(9) == 2.0, "Strafe: Faktor 2 in allen Sektoren, Deckel 40 % des Guthabens")
+	for shift in [false, true]:                                      # Karriere/Tagschicht und Nachtschicht: dieselbe Regel
+		var r := Run.new()
+		r.start(_lvl(), -1.0, 5500.0, 1)
+		r.shift_mode = shift
+		r.missed_due = 9000.0                                        # weit mehr, als der Deckel zulässt
+		r._finish_level()
+		check(r.money == 5500.0 - 2200.0 and r.missed_fees == 2200.0, "Strafe nimmt höchstens 40 %% des Guthabens (¢5500 → ¢3300, nie 0)%s" % (" – Nachtschicht" if shift else ""))
+		var r2 := Run.new()
+		r2.start(_lvl(), -1.0, 5500.0, 1)
+		r2.shift_mode = shift
+		r2.missed_due = 500.0                                        # kleine Strafe wird voll abgezogen
+		r2._finish_level()
+		check(r2.missed_fees == 500.0, "Kleine Strafen werden voll abgezogen (Deckel greift nur oben)")
+	var src := _src("res://src/core/run.gd")
+	check(src.count("Tuning.MISSED_FEE_CAP") == 3 and not src.contains("Regelstand 5"), "Deckel gilt am Levelende, bei verletzten Zusatzpatienten und in der Anzeige, ohne Regelstand: auch alte Läufe")
+	# Meldung zeigt den tatsächlich abgezogenen Betrag (gedeckelt, nach Abzug der schon fälligen Strafen)
+	var rm := Run.new()
+	rm.start(_lvl(), -1.0, 1000.0, 1)                                # Deckel 400
+	check(rm.due_share(150.0) == 150.0, "Anzeige: kleine Strafe voll")
+	rm.missed_due = 300.0
+	check(rm.due_share(150.0) == 100.0, "Anzeige: nur der Rest bis zum Deckel (300 fällig, 150 neu → 100)")
+	rm.missed_due = 500.0
+	check(rm.due_share(150.0) == 0.0, "Anzeige: über dem Deckel nichts mehr")
+	var rn := Run.new()
+	rn.start(_lvl(), -1.0, 100.0, 1)                                 # Deckel 40
+	rn.jobs = [{"fare": 500.0, "from": "A", "to": "B"}]
+	rn.job_index = 0
+	rn._lose_job("Mika")
+	var shown := -1.0
+	for e in rn.log:
+		if e.get("type", "") == "job_missed":
+			shown = float(e.fee)
+	check(shown == 40.0 and rn.missed_due >= 1000.0, "Meldung „verpasst“ nennt ¢40 (Deckel), nicht die volle Strafe")
+
+func _test_round72() -> void:
+	var cos_script = load("res://src/core/cosmetics.gd")
+	# Schritt 1: gemeinsame Größenwahl und Blattformat
+	var ps = load("res://src/core/pixel_scale.gd")
+	var picks := {1.0: 2, 2.0: 2, 3.0: 3, 3.36: 3, 4.0: 4, 4.48: 4, 5.0: 5, 6.0: 6, 6.72: 6, 8.0: 4, 9.0: 3, 10.0: 5, 12.0: 6, 7.0: 6, 11.0: 6}
+	var picks_ok := true
+	for sc in picks:
+		picks_ok = picks_ok and ps.pick(sc) == picks[sc] and cos_script.pick_size(sc) == picks[sc]
+	check(picks_ok, "PixelScale: Größenwahl 2 … 6 (Cosmetics.pick_size leitet dorthin)")
+	var units := Vector2(26, 16)
+	var rects_ok: bool = ps.sheet_rect(2, units) == Rect2(0, 0, 52, 32) and ps.sheet_rect(3, units) == Rect2(0, 32, 78, 48) and ps.sheet_rect(4, units) == Rect2(0, 80, 104, 64) and ps.sheet_rect(5, units) == Rect2(0, 144, 130, 80) and ps.sheet_rect(6, units) == Rect2(0, 224, 156, 96) and ps.sheet_size(units) == Vector2i(156, 320)
+	check(rects_ok, "PixelScale: Blattformat (Größen 2 … 6 untereinander) deckt sich mit dem Taxiblatt 156 × 320")
+	var cos = root.get_node("Cosmetics")
+	var fr: Dictionary = cos.taxi_frame(4, "std")
+	check(fr.src == ps.sheet_rect(4, cos_script.TAXI_UNITS), "Taxi nutzt dieselbe Stelle für sein Blatt")
+	var tv := _src("res://src/game/taxi_view.gd")
+	check(tv.contains("PixelScale.size_for(self)") and not tv.contains("Cosmetics.pixel_scale(self)"), "taxi_view fragt PixelScale")
+	# Schritt 2: Raster 1/n
+	var pd = load("res://src/game/pixel_draw.gd")
+	check(pd.scaled_w(1, 2) == 1 and pd.scaled_w(1, 3) == 1 and pd.scaled_w(1, 4) == 1 and pd.scaled_w(1, 5) == 2 and pd.scaled_w(1, 6) == 2 and pd.scaled_w(3, 4) == 4 and pd.scaled_w(3, 6) == 6, "Strichstärke: 1 Punkt bis 1440p, darüber 2; 3 Punkte bleiben 1 Einheit")
+	var snaps_ok := true
+	for n in [2, 3, 4, 5, 6]:
+		for v in [0.37, 1.0, 5.55, 12.31]:
+			var q: float = pd.snap(v, n) * n
+			snaps_ok = snaps_ok and absf(q - roundf(q)) < 0.0001
+	check(snaps_ok, "PixelDraw.snap legt auf ganze Bildpunkte jeder Größe")
+	var views_ok := true
+	for f in ["props_view", "level_style", "world_view", "passenger_tags", "world_decor"]:
+		var src := _src("res://src/game/%s.gd" % f)
+		views_ok = views_ok and not src.contains("const PX := 1.0 / 3.0") and src.contains("PX = ")
+	for f in ["backdrop_life"]:
+		var src2 := _src("res://src/game/%s.gd" % f)
+		views_ok = views_ok and not src2.contains("const PX") and src2.contains("PixelDraw.px_of(ci)")
+	check(views_ok, "Ansichten rechnen mit dem Raster 1/n (PX aus PixelDraw.px_of, keine feste Konstante)")
+	var pds := _src("res://src/game/pixel_draw.gd")
+	check(not pds.contains("* 3.0") and pds.contains("n_of(ci)"), "PixelDraw: kein festes Raster von 1/3 mehr")
+	check(_src("res://src/game/neon_signs.gd").contains("static func plan(lv: LevelData, style: Dictionary, n := 3)") and _src("res://src/game/level_style.gd").contains("_sign_n"), "Leuchtreklame wird in der Pixelgröße des Bildschirms geplant und gerastert")
+	check(_src("res://src/game/landing_assist.gd").contains("PixelDraw.wsnap("), "Landeassistent: Linienbreiten auf ganzen Bildpunkten")
+	# Schritt 3: Blätter je Pixelgröße
+	var look = load("res://src/game/sector_look.gd")
+	var tiles_ok := true
+	var same3 := true
+	var func_ok := true
+	for sec in range(1, 10):
+		var sheet: Texture2D = look.tiles_sized(sec)
+		var norm: Texture2D = look.tiles_sized_normal(sec)
+		tiles_ok = tiles_ok and sheet.get_size() == Vector2(1536, 960) and norm.get_size() == Vector2(1536, 960)
+		var img := sheet.get_image()
+		var base: Image = look.tiles(sec).get_image()
+		var r3: Rect2 = ps.sheet_rect(3, look.TILES_UNITS)
+		var reg := img.get_region(Rect2i(r3))
+		reg.convert(Image.FORMAT_RGBA8)
+		base.convert(Image.FORMAT_RGBA8)
+		same3 = same3 and reg.get_size() == base.get_size()
+		for yy in range(0, 144, 2):                                          # durchsichtige Bildpunkte vergleichen nur die Deckkraft
+			for xx in range(0, 768, 2):
+				var c1 := reg.get_pixel(xx, yy)
+				var c2 := base.get_pixel(xx, yy)
+				same3 = same3 and (c1 == c2 or (c1.a < 0.01 and c2.a < 0.01))
+		for n in [2, 3, 4, 5, 6]:
+			var t: int = 16 * n
+			var r: Rect2 = ps.sheet_rect(n, look.TILES_UNITS)
+			var ox := int(r.position.x)
+			var oy := int(r.position.y)
+			var pad := img.get_pixel(ox + 4 * t + t / 2, oy + 1)          # Plattform: türkise Oberkante
+			var fuel := img.get_pixel(ox + 5 * t + t / 2, oy + t - 2)       # Tankpad: orange Streifen oder dunkel, aber nie türkis
+			var spike := img.get_pixel(ox + 6 * t + t / 2, oy + t - 2)      # Dornen: rosa Sockel
+			func_ok = func_ok and pad.g > pad.r and pad.b > pad.r and spike.r > spike.g and spike.r > 0.4 and fuel.r > fuel.b
+			for k in range(0, t, maxi(1, t / 8)):                           # Innenfläche (Feld 0) deckend
+				tiles_ok = tiles_ok and img.get_pixel(ox + k, oy + k).a > 0.99
+	check(tiles_ok, "Fels-Atlas je Sektor: 1536 × 960, fünf Größen, Innenflächen deckend, Normal-Maps gleich groß")
+	check(same3, "Fels-Atlas Größe 3 bleibt pixelgleich zum bisherigen Atlas (Werkstatt, Menü)")
+	check(func_ok, "Funktionsfelder (Plattform türkis, Tankpad gelb-schwarz, Dornen rosa) in jeder Größe")
+	var wv := _src("res://src/game/world_view.gd")
+	check(wv.contains("SectorLook.tiles_sized(level.look())") and wv.contains("PixelScale.sheet_rect(_n, SectorLook.TILES_UNITS)") and wv.contains("PixelScale.size_for(self) != _n"), "Level zeichnet den Fels aus dem Blatt der Bildschirmgröße und neu, wenn sie wechselt")
+	var mv: Texture2D = load("res://assets/art/movers_sizes.png")
+	var mv_ok := mv.get_size() == Vector2(240, 240)
+	var mimg := mv.get_image()
+	var warn_ok := true
+	for n in [2, 3, 4, 5, 6]:
+		var r: Rect2 = ps.sheet_rect(n, Vector2(40, 12))
+		var cnt := 0                                                         # Warnrand der Trümmer (orange) in Zeile 0, Spalte 1 (oben)
+		var cell: int = 4 * n
+		for x in cell:
+			for y in cell:
+				var c := mimg.get_pixel(int(r.position.x) + cell + x, int(r.position.y) + y)
+				if c.a > 0.5 and c.r > 0.9 and c.g > 0.55 and c.b < 0.5:
+					cnt += 1
+		warn_ok = warn_ok and cnt >= cell
+	check(mv_ok and warn_ok, "Hindernis-Kacheln: 240 × 240, je Größe mit orangem Warnrand der Trümmer")
+	var db: Texture2D = load("res://assets/art/debris_sizes.png")
+	var dimg := db.get_image()
+	var deb_ok := db.get_size() == Vector2(480, 960)
+	var d3: Rect2 = ps.sheet_rect(3, Vector2(80, 48))
+	var old: Image = (load("res://assets/art/debris.png") as Texture2D).get_image()
+	deb_ok = deb_ok and dimg.get_region(Rect2i(d3)).get_data().size() == old.get_data().size()
+	for n in [2, 3, 4, 5, 6]:
+		var r: Rect2 = ps.sheet_rect(n, Vector2(80, 48))
+		var rim := 0
+		for y in range(0, 32 * n):
+			var c := dimg.get_pixel(int(r.position.x) + 1, int(r.position.y) + y)         # Warnrand links am stehenden Container (Kontur x = 0)
+			if c.a > 0.5 and c.r > 0.7 and c.b < 0.5:
+				rim += 1
+		deb_ok = deb_ok and rim > 20 * n
+	check(deb_ok, "Trümmer-Blatt: 480 × 960, in jeder Größe mit Warnrand")
+	var pv := _src("res://src/game/props_view.gd")
+	check(pv.contains("movers_sizes.png") and pv.contains("debris_sizes.png") and pv.contains("PixelScale.sheet_rect(n, MOVER_UNITS)") and pv.contains("PixelScale.sheet_rect(n, DEBRIS_UNITS)"), "Hindernisse werden aus den Größenblättern gezeichnet")
+	var pump_ok := (load("res://assets/art/pump_base_sizes.png") as Texture2D).get_size() == Vector2(96, 640) and (load("res://assets/art/pump_head_sizes.png") as Texture2D).get_size() == Vector2(132, 320)
+	var gate_ok := (load("res://assets/art/gate_frame_sizes.png") as Texture2D).get_size() == Vector2(384, 640) and (load("res://assets/art/gate_leaf_sizes.png") as Texture2D).get_size() == Vector2(174, 520)
+	var gimg := (load("res://assets/art/gate_frame_sizes.png") as Texture2D).get_image()
+	for n in [2, 3, 4, 5, 6]:
+		var r: Rect2 = ps.sheet_rect(n, Vector2(64, 32))
+		var inner := gimg.get_pixel(int(r.position.x) + 32 * n, int(r.position.y) + 16 * n)         # Öffnung ist durchsichtig
+		gate_ok = gate_ok and inner.a < 0.01
+	check(pump_ok and gate_ok, "Zapfsäule (Säule 16 × 32, Kopf 22 × 16) und Tor (64 × 32, Flügel 29 × 26 Einheiten) je Größe, Torfenster offen")
+	check(pv.contains("GATE_INNER := Rect2(3, 3, 58, 26)") and pv.contains("pump_base_sizes.png") and pv.contains("gate_frame_sizes.png"), "props_view zeichnet Zapfsäule und Tor aus den Größenblättern")
+	# Schritt 4: Fahrgäste je Pixelgröße
+	var ps_tex: Texture2D = load("res://assets/art/passengers_sizes.png")
+	var pimg := ps_tex.get_image()
+	var fig_ok := ps_tex.get_size() == Vector2(420, 2800)
+	var differ_ok := true
+	var feet_ok := true
+	for n in [2, 3, 4, 5, 6]:
+		var sr: Rect2 = ps.sheet_rect(n, Vector2(70, 140))
+		for fig in 14:
+			var seen := {}
+			for fi in 10:
+				var ox: int = int(sr.position.x) + fi * 7 * n
+				var oy: int = int(sr.position.y) + fig * 10 * n
+				var cnt := 0
+				var sig := 0
+				for y in range(0, 10 * n, maxi(1, n / 2)):
+					for x in range(0, 7 * n, maxi(1, n / 2)):
+						var c := pimg.get_pixel(ox + x, oy + y)
+						if c.a > 0.5:
+							cnt += 1
+							sig = (sig * 31 + int(c.r * 255.0) + int(c.g * 255.0) * 7 + y * 3 + x) % 1000003
+				fig_ok = fig_ok and cnt > 20
+				seen[sig] = true
+				var shoe := false                                                        # unterste Zeilen: Schuhe oder Füße am Boden
+				for x in range(0, 7 * n):
+					if pimg.get_pixel(ox + x, oy + 10 * n - 2).a > 0.5:
+						shoe = true
+				feet_ok = feet_ok and shoe
+			differ_ok = differ_ok and seen.size() >= 8
+	check(fig_ok, "Fahrgastblatt: 420 × 2800 (fünf Größen, 14 Figuren, 10 Bilder), jedes Bild gefüllt")
+	check(differ_ok and feet_ok, "Jede Figur zeigt in jeder Größe unterschiedliche Bilder (Blinzeln, Winken, Laufen) und steht am Boden")
+	check(pv.contains("passengers_sizes.png") and pv.contains("_pass_src(") and pv.contains("PixelDraw.snap_to(self, pos.x - PASS_IMG.x * 0.5)"), "Fahrgäste werden 1:1 aus dem Größenblatt auf ganzen Bildpunkten gezeichnet")
+	# Schritt 4: Haltestellen und Verkehr je Pixelgröße
+	var sh_tex: Texture2D = load("res://assets/art/shelters_sizes.png")
+	var veh_tex: Texture2D = load("res://assets/art/vehicles_sizes.png")
+	var shimg := sh_tex.get_image()
+	var vimg := veh_tex.get_image()
+	var sh_ok := sh_tex.get_size() == Vector2(1080, 340) and veh_tex.get_size() == Vector2(780, 320)
+	var door_ok := true
+	var veh_ok := true
+	for n in [2, 3, 4, 5, 6]:
+		var sr: Rect2 = ps.sheet_rect(n, Vector2(180, 17))
+		for k in 9:
+			var ox: int = int(sr.position.x) + k * 20 * n
+			var oy: int = int(sr.position.y)
+			var lit_door := shimg.get_pixel(ox + 10 * n, oy + 15 * n)                  # Tür: warmes Licht
+			door_ok = door_ok and lit_door.a > 0.99 and lit_door.r > 0.85 and lit_door.b < 0.8
+			sh_ok = sh_ok and shimg.get_pixel(ox + 10 * n, oy + 2 * n).a > 0.99          # Dach/Schild deckend
+		var vr: Rect2 = ps.sheet_rect(n, Vector2(130, 16))
+		for k in 5:
+			var vx: int = int(vr.position.x) + k * 26 * n
+			var vy: int = int(vr.position.y)
+			var cnt := 0
+			for y in range(0, 16 * n, maxi(1, n / 2)):
+				for x in range(0, 26 * n, maxi(1, n / 2)):
+					if vimg.get_pixel(vx + x, vy + y).a > 0.5:
+						cnt += 1
+			veh_ok = veh_ok and cnt > 60 and vimg.get_pixel(vx + 13 * n, vy + 3).a < 0.1 + 1.0 * 0.0 + 0.9 and vimg.get_pixel(vx + 13 * n, vy + 9 * n).a > 0.99
+	check(sh_ok and door_ok, "Haltestellen: 9 Stück zu 20 × 17 Einheiten in jeder Größe, Dach deckend, Tür mit warmem Licht")
+	check(veh_ok, "Verkehr: 5 Fahrzeuge zu 26 × 16 Einheiten in jeder Größe, Rumpf deckend")
+	check(pv.contains("shelters_sizes.png") and pv.contains("vehicles_sizes.png") and pv.contains("_vehicle_src(") and pv.contains("snap2_to(self, c)"), "props_view zeichnet Haltestellen und Verkehr aus den Größenblättern (Fahrzeug bei Geradeausfahrt auf ganzen Bildpunkten)")
+	# Schritt 4: Leben-Symbole je Pixelgröße
+	var life_tex: Texture2D = load("res://assets/art/life_sizes.png")
+	var limg := life_tex.get_image()
+	var life_ok := life_tex.get_size() == Vector2(600, 120)
+	var cos_l = root.get_node("Cosmetics")
+	for n in [2, 3, 4, 5, 6]:
+		for id in ["std", "neon", "mint", "night", "sunset", "candy", "gold", "sky", "platinum", "wasp"]:
+			var lf: Dictionary = cos_l.life_frame(n, id)
+			var src: Rect2 = lf.src
+			var cnt := 0
+			for y in range(0, 6 * n, maxi(1, n / 2)):
+				for x in range(0, 10 * n, maxi(1, n / 2)):
+					if limg.get_pixel(int(src.position.x) + x, int(src.position.y) + y).a > 0.5:
+						cnt += 1
+			life_ok = life_ok and lf.tex == life_tex and src.size == Vector2(10 * n, 6 * n) and cnt > 15
+	var std_c: Rect2 = cos_l.life_frame(4, "std").src
+	var neon_c: Rect2 = cos_l.life_frame(4, "neon").src
+	var diff := 0                                                                      # Lackierungen unterscheiden sich in vielen Bildpunkten
+	for y in 24:
+		for x in 40:
+			if limg.get_pixel(int(std_c.position.x) + x, int(std_c.position.y) + y) != limg.get_pixel(int(neon_c.position.x) + x, int(neon_c.position.y) + y):
+				diff += 1
+	life_ok = life_ok and diff > 80
+	check(life_ok, "Leben-Symbol: 10 Lackierungen zu 10 × 6 Einheiten in jeder Größe, Lackierungen unterscheiden sich")
+	check(_src("res://src/game/hud.gd").contains("Cosmetics.life_frame(PixelScale.size_for(self))") and _src("res://src/game/hud.gd").contains("Rect2(204 + i * 11, 5, 10, 6)"), "HUD zeichnet die Leben 1:1 aus dem Größenblatt")
+
+## Runde 73: Tank- und Hüllenanzeige als Instrumente mit Zustandsfarben.
+func _test_round73() -> void:
+	var hg = load("res://src/game/hud_gauges.gd")
+	var ps = load("res://src/core/pixel_scale.gd")
+	# Farben des Tanks: hellgrün – orange – rot (letzte 10 %)
+	var full: Color = hg.fuel_color(1.0)
+	check(full == hg.FUEL_FULL_C and hg.fuel_color(0.5) == full and full.g > 0.9 and full.g > full.r + 0.3 and full.g > full.b + 0.5, "Tank voll bis halb: hellgrün")
+	var low: Color = hg.fuel_color(0.25)
+	check(low == hg.FUEL_LOW_C and hg.fuel_color(0.11) == low and low.r > 0.9 and low.g > 0.4 and low.g < 0.75 and low.b < 0.3, "Tank ab 25 % bis über 10 %: orange")
+	var crit: Color = hg.fuel_color(0.10)
+	check(crit == hg.FUEL_CRIT_C and hg.fuel_color(0.0) == crit and crit.r > 0.9 and crit.g < 0.35 and crit.b < 0.35, "Tank in den letzten 10 %: rot")
+	var mid: Color = hg.fuel_color(0.375)
+	check(mid.r > full.r and mid.g > low.g and hg.fuel_color(0.3).g < mid.g, "Tank zwischen 50 % und 25 %: stufenloser Übergang von Grün nach Orange")
+	check(hg.fuel_state(0.6) == 0 and hg.fuel_state(0.25) == 1 and hg.fuel_state(0.2) == 1 and hg.fuel_state(0.1) == 2 and hg.fuel_state(0.0) == 2, "Tankzustand: gut, knapp, Reserve")
+	# Orange setzt dort ein, wo der Tankalarm beginnt; der Ton selbst ist unverändert
+	var game_src := _src("res://src/game/game.gd")
+	check(is_equal_approx(hg.FUEL_LOW * Tuning.FUEL_MAX, 25.0) and game_src.contains("if run.sim.fuel < 25.0 and run.sim.fuel > 0.0 and run.result == Run.Result.RUNNING and not summary:"), "Orange-Schwelle = Schwelle des Tankalarms (25)")
+	check(game_src.contains("Sfx.play(\"warn\", -6.0)") and game_src.contains("warn_cd = lerpf(0.12, 1.0, clampf(run.sim.fuel / 25.0, 0.0, 1.0))"), "Tankalarm unverändert: gleicher Ton, gleiche Lautstärke, gleiche Folge")
+	check(game_src.contains("hud.fuel_ping()"), "Anzeige blitzt im Takt des Alarms (Quelltextprüfung)")
+	# Hülle: eigene Farbfamilie, in jedem Zustand weit weg von den Tankfarben
+	check(hg.hull_color(1.0) == hg.HULL_OK_C and hg.hull_color(0.7) == hg.HULL_OK_C and hg.hull_color(0.5) == hg.HULL_WORN_C and hg.hull_color(0.36) == hg.HULL_WORN_C and hg.hull_color(0.35) == hg.HULL_CRIT_C and hg.hull_color(0.0) == hg.HULL_CRIT_C, "Hülle: eisblau, violett, ab 35 % magenta")
+	check(hg.hull_state(0.9) == 0 and hg.hull_state(0.45) == 1 and hg.hull_state(0.35) == 2, "Hüllenzustand: heil, angeschlagen, kritisch")
+	var apart := 1.0
+	for fc in [hg.FUEL_FULL_C, hg.FUEL_MID_C, hg.FUEL_LOW_C, hg.FUEL_CRIT_C]:
+		for hc in [hg.HULL_OK_C, hg.HULL_WORN_C, hg.HULL_CRIT_C]:
+			var dh := absf((fc as Color).h - (hc as Color).h)
+			apart = minf(apart, minf(dh, 1.0 - dh))
+	check(apart >= 0.1, "Farbton jeder Hüllenfarbe liegt mindestens 36° von jeder Tankfarbe entfernt (%.2f)" % apart)
+	# Füllung: leer und voll genau, dazwischen stetig; die Hülle ist schräg
+	var fill_ok := true
+	var lean_ok := true
+	for n in ps.SIZES:
+		var rows: int = 6 * n
+		fill_ok = fill_ok and hg.fill_px(0.0, n, 0, rows, hg.SLANT) == 0 and hg.fill_px(1.0, n, rows - 1, rows, hg.SLANT) == 50 * n and hg.fill_px(0.5, n, 0, 1, 0.0) == 25 * n
+		var last := 0
+		for i in 101:
+			var e: int = hg.fill_px(float(i) / 100.0, n, rows / 2, rows, hg.SLANT)
+			fill_ok = fill_ok and e >= last
+			last = e
+		lean_ok = lean_ok and hg.fill_px(0.5, n, 0, rows, hg.SLANT) > hg.fill_px(0.5, n, rows - 1, rows, hg.SLANT) and hg.fill_px(0.5, n, 0, rows, 0.0) == hg.fill_px(0.5, n, rows - 1, rows, 0.0)
+	check(fill_ok, "Füllung: 0 → nichts, 1 → ganzes Fenster, stetig wachsend, in jeder Pixelgröße")
+	check(lean_ok, "Hülle: schräge Kante (Panzerplatten), Tank: senkrechte Kante (Flüssigkeit)")
+	# Blatt: fünf Größen untereinander, Fenster leer, Fugen und Symbole vorhanden
+	var img := Image.load_from_file(ProjectSettings.globalize_path("res://assets/art/hud_gauges_sizes.png"))
+	check(img != null and img.get_size() == ps.sheet_size(hg.BLOCK) and img.get_size() == Vector2i(408, 1200), "Blatt hud_gauges_sizes.png: 408 × 1200 (Größen 2 … 6)")
+	var sheet_ok := true
+	for n in ps.SIZES:
+		var back: Rect2 = hg.src(n, 0)
+		var wc: Vector2i = Vector2i(back.position + (hg.WINDOW.position + hg.WINDOW.size * Vector2(0.4, 0.3)) * float(n))
+		sheet_ok = sheet_ok and img.get_pixelv(wc).is_equal_approx(hg.GLASS_C)                                    # Tank hinten: leeres Glas
+		sheet_ok = sheet_ok and img.get_pixelv(wc + Vector2i(0, 12 * n)).a < 0.01                                 # Tank vorn: dort durchsichtig
+		sheet_ok = sheet_ok and img.get_pixelv(wc + Vector2i(0, 24 * n)).is_equal_approx(hg.GLASS_C)              # Hülle hinten
+		var seams := 0
+		var yy: int = int(back.position.y) + 36 * n + int((hg.WINDOW.position.y + 3.0) * n)
+		var was := false
+		for x in range(int(hg.WINDOW.position.x) * n, int(hg.WINDOW.end.x) * n):
+			var on := img.get_pixel(x, yy).is_equal_approx(hg.GLASS_C)
+			if on and not was:
+				seams += 1
+			was = on
+		sheet_ok = sheet_ok and seams == hg.PLATES - 1                                                            # Hülle vorn: neun Fugen = zehn Platten
+		for icon in 2:
+			var lit := 0
+			var ir: Rect2 = hg.src(n, 4, Rect2(icon * 12, 0, 12, 12))
+			for y in int(ir.size.y):
+				for x in int(ir.size.x):
+					if img.get_pixel(int(ir.position.x) + x, int(ir.position.y) + y).a > 0.9:
+						lit += 1
+			sheet_ok = sheet_ok and lit > 20 * n * n and lit < 80 * n * n
+	check(sheet_ok, "Blatt: leeres Fenster, durchsichtige Vorderseite, neun Plattenfugen und beide Symbole in jeder Größe")
+	# Ablauf: Blitz im Takt des Alarms, Nachlauf nach einem Treffer, Tanken
+	var g = hg.new()
+	g.update(0.016, 0.2, 1.0)
+	g.ping()
+	check(g.ping_t == 1.0, "ping(): Anzeige blitzt")
+	g.update(0.1, 0.2, 1.0)
+	check(g.ping_t > 0.3 and g.ping_t < 0.8 and g.refuel_t == 0.0, "Blitz klingt ab; Tank fällt nicht → kein Tankstreifen")
+	g.update(0.016, 0.22, 1.0)
+	check(g.refuel_t > 0.0, "steigender Tank: Tankstreifen läuft")
+	g.update(0.016, 0.22, 0.7)
+	check(g.hit_t == 1.0 and is_equal_approx(g.hull_trail, 1.0), "Treffer: verlorenes Stück bleibt stehen")
+	for i in 20:
+		g.update(0.016, 0.22, 0.7)
+	check(is_equal_approx(g.hull_trail, 1.0), "… zunächst unverändert")
+	for i in 120:
+		g.update(0.016, 0.22, 0.7)
+	check(is_equal_approx(g.hull_trail, 0.7), "… und schmilzt dann auf den echten Wert")
+	g.update(0.016, 0.22, 1.0)
+	check(is_equal_approx(g.hull_trail, 1.0), "neue Hülle (Reparatur, neues Taxi): kein Nachlauf")
+	# Einbau: HUD und Einspieler nutzen die Instrumente, die Flugschule zeigt auf die richtigen Flächen
+	var hud_src := _src("res://src/game/hud.gd")
+	check(hud_src.contains("gauges.draw_fuel(self, GAUGE_FUEL") and hud_src.contains("gauges.draw_hull(self, GAUGE_HULL") and not hud_src.contains("func _bar("), "HUD zeichnet beide Instrumente, der alte Balken ist entfernt")
+	check(_src("res://src/game/intro_clip.gd").contains("hull_gauge.draw_hull(over,"), "Einspieler zeigt dieselbe Hüllenanzeige")
+	var hud_script = load("res://src/game/hud.gd")
+	var tut = load("res://src/game/tutorial.gd")
+	check((tut.R_FUEL as Rect2).encloses(Rect2(hud_script.GAUGE_FUEL, hg.SIZE)) and (tut.R_HULL as Rect2).encloses(Rect2(hud_script.GAUGE_HULL, hg.SIZE)), "Flugschule: Hervorhebung umschließt Tank- und Hüllenanzeige")
+	check(Rect2(hud_script.GAUGE_HULL, hg.SIZE).end.x <= 145.0 and Rect2(hud_script.GAUGE_HULL, hg.SIZE).end.y <= 16.0 and hud_script.GAUGE_FUEL == hud_script.GAUGE_FUEL.round(), "Instrumente bleiben im oberen Randstreifen, vor dem Kontostand, auf ganzen Einheiten")
+
 func _test_round71() -> void:
 	var cos_script = load("res://src/core/cosmetics.gd")
 	var cos = root.get_node("Cosmetics")
@@ -498,7 +852,7 @@ func _test_round71() -> void:
 		refl_ok = refl_ok and Tuning.reflect_row(n) > 6 * n and Tuning.reflect_row(n) < 9 * n and absf(d.end.y - Tuning.TAXI_RECT.end.y) < 0.01 and d.size.x == Tuning.TAXI_RECT.size.x
 	check(refl_ok and (Tuning.reflect_dst(3).position - Tuning.TAXI_REFLECT_DST.position).length() < 0.02, "Bodenspiegelung: untere Bildhälfte in jeder Größe, in Größe 3 wie bisher")
 	var tv := _src("res://src/game/taxi_view.gd")
-	check(tv.contains("Cosmetics.pick_size(Cosmetics.pixel_scale(self))") and tv.contains("draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src") and _src("res://src/game/ghost_view.gd").contains("Cosmetics.taxi_frame(") and _src("res://src/game/props_view.gd").contains("Tuning.reflect_dst("), "Taxi, Geist und Spiegelung zeichnen die Größe des Bildschirms")
+	check(tv.contains("PixelScale.size_for(self)") and tv.contains("draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src") and _src("res://src/game/ghost_view.gd").contains("Cosmetics.taxi_frame(") and _src("res://src/game/props_view.gd").contains("Tuning.reflect_dst("), "Taxi, Geist und Spiegelung zeichnen die Größe des Bildschirms")
 	var ga := _src("res://tools/art/gen_art.py")
 	check(ga.contains('for src, dst, stripe in (("life_icon.png", "life_%s.png", 3),):') and FileAccess.file_exists("res://tools/art/gen_taxi.py"), "gen_art leitet nur noch die Leben-Symbole ab; das Taxi kommt aus gen_taxi.py")
 	# 4) Levelauswahl: Reiter füllen sich von links, gewählter Sektor hervorgehoben
@@ -895,8 +1249,8 @@ func _test_missed_job() -> void:
 	var due := r.missed_due
 	var want := 0.0
 	for j in r.jobs:
-		want += float(j.fare) * r.job_mult(j) * 4.0
-	check(absf(due - want) < float(lvl.jobs.size()) and r.money == 100.0, "Jeder verlorene Pflichtfahrgast: 4-facher Fahrpreis, erst am Levelende fällig (¢%d, Kasse unverändert)" % int(due))
+		want += float(j.fare) * r.job_mult(j) * Tuning.missed_fee_factor(lvl.sector)
+	check(absf(due - want) < float(lvl.jobs.size()) and r.money == 100.0, "Jeder verlorene Pflichtfahrgast: 2-facher Fahrpreis, erst am Levelende fällig (¢%d, Kasse unverändert)" % int(due))
 	r._finish_level()
 	check(r.missed_due == 0.0 and r.missed_fees > 0.0 and r.money < 100.0, "Am Levelende wird die Strafe abgezogen (−¢%d)" % int(r.missed_fees))
 
@@ -1292,7 +1646,7 @@ func _test_fragile_and_meteors() -> void:
 	r._ride_hit({"amount": 5.0})
 	check(r.actor == null and r.missed == 1 and r.pen_ride == 0.0, "Beschädigung an Bord: zerbrechlicher Fahrgast weg, Auftrag verpasst")
 	check(r.log.any(func(e): return e.type == "patient_lost" and float(e.fee) > 0.0), "Patient verloren: Ereignis mit Strafbetrag für Bild und Ton")
-	check(r.missed_due >= price - 1.0 and r.missed_due >= float(r.jobs[0].fare) * 4.0, "Verlorener Krankenpatient kostet mindestens den 4-fachen Fahrpreis und den aktuellen Preis (¢%d von ¢%d)" % [int(r.missed_due), int(price)])
+	check(r.missed_due >= price - 1.0 and r.missed_due >= float(r.jobs[0].fare) * 2.0, "Verlorener Krankenpatient kostet mindestens den 2-fachen Fahrpreis und den aktuellen Preis (¢%d von ¢%d)" % [int(r.missed_due), int(price)])
 	check(r.log.any(func(e): return e.type == "fragile_broke") and r.log.any(func(e): return e.type == "job_missed"), "Ereignisse fragile_broke und job_missed werden gemeldet")
 	var r2 := Run.new()
 	r2.extras_enabled = false
@@ -2266,7 +2620,7 @@ func _test_squash_passenger() -> void:
 			break
 	check(squashed, "Taxi auf dem Kopf eines Fahrgasts: er schimpft (squashed)")
 	check(r.actor == null and r.leavers.size() == 1 and r.leavers[0].angry, "Der Fahrgast flieht verärgert in den Unterstand")
-	check(r.missed == 1 and r.job_index == 1 and r.missed_due >= float(r.jobs[0].fare) * 4.0 and not replaced, "Gerammter Pflichtfahrgast ist verloren: einer weniger, 4-fache Strafe am Levelende (¢%d)" % int(r.missed_due))
+	check(r.missed == 1 and r.job_index == 1 and r.missed_due >= float(r.jobs[0].fare) * 2.0 and not replaced, "Gerammter Pflichtfahrgast ist verloren: einer weniger, 2-fache Strafe am Levelende (¢%d)" % int(r.missed_due))
 	# Gegenprobe: aufsteigendes Taxi und gelandetes Taxi treffen niemanden
 	var r2 := Run.new()
 	r2.start(lvl)
@@ -2278,7 +2632,7 @@ func _test_squash_passenger() -> void:
 	_land_on(r2, String(r2.current_job().from))
 	r2.step(Vector2.ZERO, true)
 	check(r2.actor != null and r2.squashes == 0, "Gelandetes Taxi (Einsteigen) zählt nie als Kollision")
-	check(Tuning.missed_fee_factor(1) == 4.0 and Tuning.missed_fee_factor(2) == 5.0 and Tuning.missed_fee_factor(9) == 12.0, "Strafe je Pflichtfahrgast: Sektor 1 4-fach, je Sektor ein Vielfaches mehr")
+	check(Tuning.missed_fee_factor(1) == 2.0 and Tuning.missed_fee_factor(5) == 2.0 and Tuning.missed_fee_factor(9) == 2.0, "Strafe je Pflichtfahrgast: in allen Sektoren der 2-fache Fahrpreis (Runde 74)")
 
 func _test_landing_window_rules() -> void:
 	## Die Untergrenze gilt je Pad (Level 1–3: 34 px, bis Level 99 sinkend auf 20 px). Größere Pads im selben Level sind
@@ -2787,6 +3141,7 @@ func _test_round54_visuals() -> void:
 	check(names.size() >= 5, "Erster Fahrgast heißt nicht in jedem Sektor gleich (%d Namen)" % names.size())
 	var dv := FileAccess.get_file_as_string("res://src/game/dark_view.gd")
 	check(dv.contains("uniform vec4 cones[16]") and dv.contains("kein runder Schein"), "Dunkelheit: Fahrzeuge leuchten mit Kegeln statt rundum")
+	check(dv.contains("PAD_DIM := 13.0") and dv.contains("run.target_pad()") and dv.contains("if String(id) == goal:"), "Dunkelheit: nur die Zielplattform leuchtet voll (Radius 38), die übrigen schwach (Radius 13, Nebel 9)")
 
 ## Runde 57: Pixelgrafik für Hindernisse, Linien im Pixelraster, Leben im Hintergrund, Menüs.
 func _src(path: String) -> String:
@@ -2826,7 +3181,7 @@ func _test_round57_visuals() -> void:
 				minpx = mini(minpx, mini(roundi(m.rect.size.x * 3.0), roundi(m.rect.size.y * 3.0)))
 	check(kinds.size() == 3 and minpx >= 24, "Alle Hindernisarten der Level sind mindestens zwei Kacheln groß (kleinstes Maß %d Bildpunkte)" % minpx)
 	var pv := _src("res://src/game/props_view.gd")
-	check(pv.contains("_draw_mover_box(0 if m.kind") and pv.contains("assets/art/movers.png") and not pv.contains("col.lightened(0.12)"), "props_view setzt Hindernisse aus Kacheln zusammen")
+	check(pv.contains("_draw_mover_box(0 if m.kind") and pv.contains("assets/art/movers_sizes.png") and not pv.contains("col.lightened(0.12)"), "props_view setzt Hindernisse aus Kacheln zusammen")
 	check(pv.contains("var r: Rect2 = m.rect") and pv.contains("_draw_mover_box(2, r"), "Fläche der Kacheln ist die Trefferfläche m.rect (Logik unberührt)")
 	# 2) Linien im Pixelraster
 	var wind := _body(pv, "func _draw_wind", "func _timer_arc")
@@ -6228,7 +6583,7 @@ func _test_sector_tiles() -> void:
 	img5.convert(Image.FORMAT_RGBA8)
 	check(img5.get_pixel(15 * 48 + 24, 48 + 24).a > 0.99 and img5.get_pixel(3 * 48 + 47, 48).a < 0.01 and img5.get_pixel(3 * 48, 48 + 47).a > 0.99, "Randkacheln: Innen deckend, Außenecken abgerundet (nur dort durchsichtig)")
 	var wsrc := FileAccess.get_file_as_string("res://src/game/world_view.gd")
-	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_normal(level.look())"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
+	check(wsrc.contains("_tile(m, cx, cy, 1)") and wsrc.contains("_draw_soft_edge()") and wsrc.contains("SectorLook.tiles_sized_normal(level.look())"), "Fels nach Nachbarschaft, weicher Rand links und rechts für Ultrawide (Quelltextprüfung)")
 	var bsrc := FileAccess.get_file_as_string("res://src/game/workshop_bay.gd")
 	check(bsrc.contains("Rect2(idx * 48, 0, 48, 48)"), "Werkstatt nutzt weiter die erste Atlaszeile")
 
@@ -6278,7 +6633,13 @@ func _test_neon_signs() -> void:
 				check(sg.mode == "steady" and not pink and not cyan, "%s: Schild an einem Neon-Strahl flackert nicht und leuchtet nicht in Strahlfarben" % id)
 		# Rastern: Pixelbild mit Kern und Schein, Ursprung im Raster
 		var baked: Array = NS.bake(signs[0].items[0])
-		check(baked.size() == 2 and (baked[0] as Texture2D).get_width() > 10 and absf((baked[1] as Vector2).x * 3.0 - roundf((baked[1] as Vector2).x * 3.0)) < 0.001, "%s: Röhren werden als Pixelbild im Raster gerastert" % id)
+		check(baked.size() == 3 and (baked[0] as Texture2D).get_width() > 10 and absf((baked[1] as Vector2).x * 3.0 - roundf((baked[1] as Vector2).x * 3.0)) < 0.001, "%s: Röhren werden als Pixelbild im Raster gerastert" % id)
+		for n in [2, 4, 5, 6]:                                              # Runde 72: in jeder Pixelgröße auf ganzen Bildpunkten
+			var plan_n: Array = NS.plan(lv, styles[id], n)
+			var bk: Array = NS.bake(plan_n[0].items[0], n)
+			var on_grid: bool = absf((bk[1] as Vector2).x * n - roundf((bk[1] as Vector2).x * n)) < 0.001 and absf((bk[1] as Vector2).y * n - roundf((bk[1] as Vector2).y * n)) < 0.001
+			var board_grid: bool = absf(plan_n[0].board.position.x * n - roundf(plan_n[0].board.position.x * n)) < 0.001
+			check(bk.size() == 3 and on_grid and board_grid, "%s: Reklame in Größe %d auf ganzen Bildpunkten" % [id, n])
 	var ms := Time.get_ticks_msec() - t0
 	print("    Leuchtreklame planen + rastern (3 Level, ein Bild): %d ms" % ms)
 	var src := FileAccess.get_file_as_string("res://src/game/level_style.gd")

@@ -4,6 +4,8 @@ extends Control
 
 const MAX_LIGHTS := 32
 const MAX_CONES := 16
+const PAD_DIM := 13.0          # Schein einer Plattform, die nicht Ziel ist (Zielplattform: 38)
+const PAD_DIM_FOG := 9.0       # … bei Nebel (Zielplattform: 26)
 const PropsView := preload("res://src/game/props_view.gd")
 
 var run: Run
@@ -87,10 +89,14 @@ func _process(_d: float) -> void:
 	var spreads := PackedFloat32Array()
 	var tp := _screen(run.sim.pos)
 	lights.append(Vector3(tp.x, tp.y, (56.0 if lv.fog > 0.0 else 72.0 * light_k) + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
+	var goal := run.target_pad()                                    # Zielplattform leuchtet wie bisher (Übersicht), die übrigen nur noch schwach
 	for id in lv.pads:
 		var p: Dictionary = lv.pads[id]
 		var c := _screen(Vector2(float(p.center), float(p.row) * Tuning.TILE - 8.0))
-		lights.append(Vector3(c.x, c.y, 26.0 if lv.fog > 0.0 else 38.0))
+		if String(id) == goal:
+			lights.append(Vector3(c.x, c.y, 26.0 if lv.fog > 0.0 else 38.0))
+		else:
+			lights.append(Vector3(c.x, c.y, PAD_DIM_FOG if lv.fog > 0.0 else PAD_DIM))
 		var shl: Rect2 = p.get("shelter", Rect2())
 		if shl.size.x > 0.0:                                        # Ampellampe auf dem Dach bleibt auch im Dunkeln sichtbar
 			var lc := _screen(Vector2(shl.get_center().x, shl.position.y - 5.5))

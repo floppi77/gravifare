@@ -4,7 +4,7 @@ extends RefCounted
 ## Oberflächen. Alles bleibt flach und gedämpft, damit nichts wie ein Hindernis aussieht; Gefahren behalten ihre Warnfarben.
 
 const T := 16.0
-const PX := 1.0 / 3.0
+static var PX := 1.0 / 3.0              # ein Bildschirmpunkt (1/n Einheit), in draw() gesetzt
 
 static func _h(x: int, y: int, k: int) -> int:
 	return absi((x * 73856093) ^ (y * 19349663) ^ (k * 83492791)) >> 3
@@ -33,6 +33,7 @@ static func _depths(lv: LevelData) -> Dictionary:
 	return d
 
 static func draw(c: CanvasItem, lv: LevelData) -> void:
+	PX = PixelDraw.px_of(c)
 	var look := SectorLook.of(lv.look())
 	var dep := _depths(lv)
 	var shade: Color = look.shade
@@ -75,7 +76,10 @@ static func _fade(c: CanvasItem, x: float, y: float, w: float, h: float, top: Co
 	c.draw_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + w, y), Vector2(x + w, y + h), Vector2(x, y + h)]), PackedColorArray([top, top, bot, bot]))
 
 static func _r(c: CanvasItem, x: float, y: float, w: float, h: float, col: Color) -> void:
-	c.draw_rect(Rect2(x, y, w, h), col)
+	var nf := 1.0 / PX                                # Kanten auf ganze Bildpunkte legen, mindestens ein Bildpunkt breit
+	var x0 := roundf(x * nf)
+	var y0 := roundf(y * nf)
+	c.draw_rect(Rect2(x0 * PX, y0 * PX, maxf(roundf((x + w) * nf) - x0, 1.0) * PX, maxf(roundf((y + h) * nf) - y0, 1.0) * PX), col)
 
 ## Innenflächen: Fensterlichter, Risse, Glut.
 static func _inner(c: CanvasItem, s: int, x: int, y: int, px: float, py: float) -> void:

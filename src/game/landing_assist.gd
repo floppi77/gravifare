@@ -108,8 +108,8 @@ func _draw_gauge() -> void:
 		var ang := PI + float(i) / 24.0 * PI
 		body.append(c + Vector2(cos(ang), sin(ang)) * (r + 1.0))
 	draw_colored_polygon(body + PackedVector2Array([c + Vector2(r + 1.0, 2.0), c + Vector2(-r - 1.0, 2.0)]), Color(0.1, 0.1, 0.12, 0.96 * a))
-	draw_polyline(body, Color(0.62, 0.66, 0.8, 0.9 * a), 0.8)
-	draw_line(c + Vector2(-r - 1.0, 2.0), c + Vector2(r + 1.0, 2.0), Color(0.62, 0.66, 0.8, 0.9 * a), 0.8)
+	draw_polyline(body, Color(0.62, 0.66, 0.8, 0.9 * a), PixelDraw.wsnap(self, 0.8))
+	draw_line(c + Vector2(-r - 1.0, 2.0), c + Vector2(r + 1.0, 2.0), Color(0.62, 0.66, 0.8, 0.9 * a), PixelDraw.wsnap(self, 0.8))
 	var n := 29
 	for i in n:
 		var u := float(i) / float(n - 1)
@@ -117,7 +117,7 @@ func _draw_gauge() -> void:
 		var d := Vector2(cos(ang), sin(ang))
 		var mid := i == n / 2
 		var col := Color(0.55, 0.9, 0.6, a) if mid else (Color(1.0, 0.35, 0.3, a) if i < 3 else Color(0.88, 0.97, 0.82, 0.9 * a))
-		draw_line(c + d * (r - (4.4 if mid else 3.4)), c + d * (r - 0.8), col, 1.1 if mid else 0.55)
+		draw_line(c + d * (r - (4.4 if mid else 3.4)), c + d * (r - 0.8), col, PixelDraw.wsnap(self, 1.1 if mid else 0.55))
 	var font := Fonts.hud
 	draw_string(font, c + Vector2(-r - 4.2, 3.2), "E", HORIZONTAL_ALIGNMENT_LEFT, -1, 5, Color(0.95, 0.95, 1.0, a))
 	draw_string(font, c + Vector2(r + 0.6, 3.2), "F", HORIZONTAL_ALIGNMENT_LEFT, -1, 5, Color(0.95, 0.95, 1.0, a))
@@ -126,13 +126,13 @@ func _draw_gauge() -> void:
 	draw_rect(Rect2(c.x - 2.6, c.y - 7.4, 3.8, 5.6), ic)
 	draw_rect(Rect2(c.x - 1.9, c.y - 6.6, 2.4, 1.6), Color(0.1, 0.1, 0.12, a))
 	draw_rect(Rect2(c.x - 3.2, c.y - 2.0, 5.0, 0.8), ic)
-	draw_polyline(PackedVector2Array([Vector2(c.x + 1.4, c.y - 6.4), Vector2(c.x + 2.8, c.y - 6.0), Vector2(c.x + 3.0, c.y - 3.4), Vector2(c.x + 3.8, c.y - 3.0)]), ic, 0.5)
+	draw_polyline(PackedVector2Array([Vector2(c.x + 1.4, c.y - 6.4), Vector2(c.x + 2.8, c.y - 6.0), Vector2(c.x + 3.0, c.y - 3.4), Vector2(c.x + 3.8, c.y - 3.0)]), ic, PixelDraw.wsnap(self, 0.5))
 	# Zeiger (rot, kräftig), federt nach
 	var ang2 := lerpf(th_e, th_f, clampf(needle, 0.0, 1.0))
 	var nd := Vector2(cos(ang2), sin(ang2))
 	var ncol := Color(0.93, 0.2, 0.18, a) if not (run.sim.fuel < 25.0 and int(t * 6.0) % 2 == 0) else Color(1.0, 0.55, 0.4, a)
-	draw_line(c - nd * 1.2, c + nd * (r + 0.4), ncol, 1.5)
-	draw_circle(c, 1.1, ncol)
+	draw_line(c - nd * 1.2, c + nd * (r + 0.4), ncol, PixelDraw.wsnap(self, 1.5))
+	PixelDraw.disc(self, c, 1.1, ncol)
 
 static func tone(ratio: float) -> Color:
 	return GREEN if ratio <= Tuning.GAUGE_GREEN else (YELLOW if ratio <= 1.0 else RED)
@@ -223,13 +223,13 @@ func _draw_chip(s: TaxiSim, a: float) -> void:
 			draw_rect(Rect2(ix - 4.0 if d > 0.0 else ix + 0.5, iy - 0.5, 4.0, 1.0), col)
 		2:      # Neigung: geneigte Linie über kurzer Basis
 			var d2 := signf(s.tilt) if absf(s.tilt) > 0.005 else 1.0
-			draw_line(Vector2(ix - 3.5, iy + 2.0 * d2), Vector2(ix + 3.5, iy - 2.0 * d2), col, 1.0)
+			draw_line(Vector2(ix - 3.5, iy + 2.0 * d2), Vector2(ix + 3.5, iy - 2.0 * d2), col, PixelDraw.wsnap(self, 1.0))
 			draw_rect(Rect2(ix - 4.0, iy + 3.0, 8.0, 0.67), Color(col.r, col.g, col.b, col.a * 0.6))
 	# Zustandszeichen rechts: Haken (innerhalb der Grenze) oder Warndreieck (darüber, blinkt)
 	var sx := x0 + w - 8.0
 	var sy := y0 + 7.0
 	if r <= 1.0:
-		draw_polyline(PackedVector2Array([Vector2(sx - 3.0, sy), Vector2(sx - 1.0, sy + 2.5), Vector2(sx + 3.5, sy - 3.0)]), col, 1.2)
+		draw_polyline(PackedVector2Array([Vector2(sx - 3.0, sy), Vector2(sx - 1.0, sy + 2.5), Vector2(sx + 3.5, sy - 3.0)]), col, PixelDraw.wsnap(self, 1.2))
 	elif int(t * 8.0) % 2 == 0:
 		draw_colored_polygon(PackedVector2Array([Vector2(sx - 4.0, sy + 3.5), Vector2(sx + 4.0, sy + 3.5), Vector2(sx, sy - 4.0)]), col)
 		draw_rect(Rect2(sx - 0.4, sy - 1.8, 0.8, 3.0), Color(PANEL.r, PANEL.g, PANEL.b, a))

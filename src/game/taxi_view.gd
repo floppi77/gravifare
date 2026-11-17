@@ -157,7 +157,7 @@ func _draw() -> void:
 		var gl := Tuning.GEAR_LEN / Tuning.TAXI_SCALE * g
 		var steel := Color("#c9cfee")
 		for sx in [-1.0, 1.0]:
-			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE, 5 + gl), steel, 0.7)
+			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE, 5 + gl), steel, PixelDraw.wsnap(self, 0.7))
 			draw_rect(Rect2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE - 2, 5 + gl, 4, 0.7), steel)
 		if sim.gear_extended():
 			var ok := sim.landing_margin()
@@ -170,7 +170,7 @@ func _draw() -> void:
 	var mod := Color.WHITE
 	if flash > 0.0:
 		mod = Color(1, 0.4 + 0.6 * (1.0 - flash), 0.4 + 0.6 * (1.0 - flash))
-	var n := Cosmetics.pick_size(Cosmetics.pixel_scale(self))       # 720p … 2160p: je Bildschirmskalierung das eigens gerasterte Taxi, 1:1
+	var n := PixelScale.size_for(self)       # 720p … 2160p: je Bildschirmskalierung das eigens gerasterte Taxi, 1:1
 	if n != size_n:
 		size_n = n
 		frame = Cosmetics.taxi_frame(n)

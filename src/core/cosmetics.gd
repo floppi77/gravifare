@@ -98,6 +98,24 @@ func life_texture(id := "") -> Texture2D:
 	var t := _tex("res://assets/art/life_%s.png" % id)
 	return t if t != null else _tex("res://assets/art/life_icon.png")
 
+## Leben-Symbol je Pixelgröße (Runde 72): das neue Taxi auf 10 × 6 Einheiten, 10 Lackierungen nebeneinander, die Größen 2–6 untereinander
+## (life_sizes.png, tools/art/gen_life_icons_sizes.py). Ausschnitt in Bildpunkten: {tex, src}; fehlt das Blatt, das alte 32 × 20-Symbol.
+const LIFE_SKINS := ["std", "neon", "mint", "night", "sunset", "candy", "gold", "sky", "platinum", "wasp"]
+const LIFE_UNITS := Vector2(100, 6)
+const LIFE_ICON := Vector2(10, 6)
+
+func life_frame(n: int, id := "") -> Dictionary:
+	if id == "":
+		id = selected("paint")
+	var sheet := _tex("res://assets/art/life_sizes.png")
+	var idx := LIFE_SKINS.find(id)
+	if sheet == null:
+		var t := life_texture(id)
+		return {"tex": t, "src": Rect2(Vector2.ZERO, t.get_size())}
+	var r := PixelScale.sheet_rect(clampi(n, 2, 6), LIFE_UNITS)
+	var nn := clampi(n, 2, 6)
+	return {"tex": sheet, "src": Rect2(r.position + Vector2(float(maxi(idx, 0)) * LIFE_ICON.x * float(nn), 0.0), LIFE_ICON * float(nn))}
+
 func sticker_texture(id := "") -> Texture2D:
 	if id == "":
 		id = selected("sticker")
@@ -115,37 +133,22 @@ func sticker_small_texture(id := "") -> Texture2D:
 	return _tex(p) if ResourceLoader.exists(p) else _tex("res://assets/art/sticker_%s.png" % id)
 
 # ------------------------------------------------------------------ Taxi in der Pixelgröße des Bildschirms (Runde 71)
-## Das Spiel skaliert ganzzahlig: 720p = 2, 1080p = 3, 1440p = 4, 1800p = 5, 2160p = 6 Bildschirmpunkte je Einheit. Das Taxi und sein Aufkleber
-## liegen für jede dieser Größen eigens gerastert vor (taxi_sizes/<lack>.png, sticker_<id>_sizes.png; tools/art/gen_taxi.py, gen_art.py),
+## Die Größenwahl liegt in PixelScale (src/core/pixel_scale.gd); hier nur die Blätter des Taxis und der Aufkleber: Das Taxi und sein Aufkleber
+## liegen für jede Größe eigens gerastert vor (taxi_sizes/<lack>.png, sticker_<id>_sizes.png; tools/art/gen_taxi.py, gen_art.py),
 ## damit sie im Level immer 1:1 erscheinen statt ungleichmäßig gestreckt.
-const TAXI_SIZES := [2, 3, 4, 5, 6]
+const TAXI_SIZES := PixelScale.SIZES
 const TAXI_UNITS := Vector2(26, 16)
 const STICKER_BASE := 20            # Aufkleber bei 3 Punkten je Einheit
 
 ## Bildschirmpunkte je Welteinheit, mit denen `node` gerade gezeichnet wird (Fensterskalierung × Kamerazoom).
 func pixel_scale(node: CanvasItem) -> float:
-	if node == null or not node.is_inside_tree():
-		return 3.0
-	var vp := node.get_viewport()
-	return absf(vp.get_final_transform().get_scale().x * vp.get_canvas_transform().get_scale().x)
+	return PixelScale.of(node)
 
-## Vorhandene Größe für eine Skalierung: genau passend, sonst ein Teiler (8 → 4, 9 → 3, 10 → 5, 12 → 6: ganze Vielfache), sonst die größte.
 static func pick_size(scale: float) -> int:
-	var n := maxi(2, roundi(scale))
-	if n <= 6:
-		return n
-	for k in [6, 5, 4, 3, 2]:
-		if n % k == 0:
-			return k
-	return 6
+	return PixelScale.pick(scale)
 
 static func _sheet_y(n: int, unit: Callable) -> int:
-	var y := 0
-	for k in TAXI_SIZES:
-		if k == n:
-			break
-		y += int(unit.call(k))
-	return y
+	return PixelScale.sheet_y(n, unit)
 
 ## Ausschnitt des Taxis in der Größe `n`: {tex, src (Bildpunkte im Blatt), n}. Fehlt das Blatt, das 78×48-Bild.
 func taxi_frame(n: int, id := "") -> Dictionary:
@@ -157,7 +160,7 @@ func taxi_frame(n: int, id := "") -> Dictionary:
 	if sheet == null:
 		var t := paint_texture(id)
 		return {"tex": t, "src": Rect2(Vector2.ZERO, t.get_size()), "n": 3}
-	return {"tex": sheet, "src": Rect2(0, _sheet_y(n, func(k): return TAXI_UNITS.y * k), TAXI_UNITS.x * n, TAXI_UNITS.y * n), "n": n}
+	return {"tex": sheet, "src": PixelScale.sheet_rect(n, TAXI_UNITS), "n": n}
 
 static func sticker_px(n: int) -> int:
 	return roundi(STICKER_BASE * n / 3.0)

@@ -4,7 +4,8 @@ Aufruf: python3 tools/art/gen_art.py   -> schreibt nach assets/art/
 Alle Grafiken entstehen in 3-facher Detailauflösung (Tile = 48 px, im Spiel 16 Welteinheiten),
 damit sie bei 1080p (Skalierung 3) pixelgenau und bei 4K (6x) sauber vergrößert erscheinen.
 Eigenständig per Code gezeichnet, keine Fremdassets."""
-import os, random
+import os, random, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -49,76 +50,90 @@ P = dict(
     spike=hexc("#f0587a"), spike_d=hexc("#8f2a45"), spike_h=hexc("#ffc1d0"),
 )
 
-def plate(d, rnd, ox, variant, deep=False):
+def plate(d, rnd, variant, deep=False):
+    """Metallplatte des Sternenhafens in Entwurfspunkten (48 × 48); `d` ist eine sizekit.Sc-Fläche."""
     base = shade(P["base"], 0.72) if deep else P["base"]
-    d.rectangle([ox, 0, ox + T - 1, T - 1], fill=base)
+    d.rectangle([0, 0, T - 1, T - 1], fill=base)
     # Rauschen in drei diskreten Stufen
     for _ in range(110):
         x, y = rnd.randrange(T), rnd.randrange(T)
-        d.point((ox + x, y), fill=rnd.choice([P["dark"], P["lite"], P["dark"], base]))
+        d.point((x, y), fill=rnd.choice([P["dark"], P["lite"], P["dark"], base]))
     if deep:
         for i in (0, 24):
-            d.line([ox, i, ox + T - 1, i], fill=P["deep"]); d.line([ox + i, 0, ox + i, T - 1], fill=P["deep"])
+            d.line([0, i, T - 1, i], fill=P["deep"]); d.line([i, 0, i, T - 1], fill=P["deep"])
         return
     # Fase: oben/links hell, unten/rechts dunkel
-    d.line([ox, 0, ox + T - 1, 0], fill=P["lite2"]); d.line([ox, 1, ox + T - 1, 1], fill=P["lite"])
-    d.line([ox, 0, ox, T - 1], fill=P["lite"])
-    d.line([ox, T - 1, ox + T - 1, T - 1], fill=P["deep"]); d.line([ox + T - 1, 0, ox + T - 1, T - 1], fill=P["dark"])
-    d.line([ox + 1, T - 2, ox + T - 2, T - 2], fill=P["dark"])
+    d.line([0, 0, T - 1, 0], fill=P["lite2"]); d.line([0, 1, T - 1, 1], fill=P["lite"])
+    d.line([0, 0, 0, T - 1], fill=P["lite"])
+    d.line([0, T - 1, T - 1, T - 1], fill=P["deep"]); d.line([T - 1, 0, T - 1, T - 1], fill=P["dark"])
+    d.line([1, T - 2, T - 2, T - 2], fill=P["dark"])
     def rivet(x, y):
-        d.rectangle([ox + x, y, ox + x + 2, y + 2], fill=P["rivet"]); d.point((ox + x + 2, y + 2), fill=P["rivet_s"])
+        d.rectangle([x, y, x + 2, y + 2], fill=P["rivet"]); d.point((x + 2, y + 2), fill=P["rivet_s"])
     for (x, y) in ((4, 4), (40, 4), (4, 40), (40, 40)): rivet(x, y)
     if variant == 1:    # zwei Paneele
-        d.line([ox + 3, 24, ox + T - 4, 24], fill=P["deep"]); d.line([ox + 3, 25, ox + T - 4, 25], fill=P["lite"])
+        d.line([3, 24, T - 4, 24], fill=P["deep"]); d.line([3, 25, T - 4, 25], fill=P["lite"])
     elif variant == 2:  # Lüftungsschlitze
         for k in range(5):
             y = 12 + k * 5
-            d.rectangle([ox + 12, y, ox + 35, y + 2], fill=P["deep"]); d.line([ox + 12, y + 3, ox + 35, y + 3], fill=P["lite"])
+            d.rectangle([12, y, 35, y + 2], fill=P["deep"]); d.line([12, y + 3, 35, y + 3], fill=P["lite"])
     elif variant == 3:  # Statusleuchte + Leitung
-        d.rectangle([ox + 10, 22, ox + 37, 25], fill=P["dark"])
+        d.rectangle([10, 22, 37, 25], fill=P["dark"])
         col = rnd.choice([hexc("#35e0d2"), hexc("#ffb02e"), hexc("#ff5a7a")])
-        d.rectangle([ox + 20, 18, ox + 27, 29], fill=P["deep"]); d.rectangle([ox + 21, 19, ox + 26, 28], fill=shade(col, 0.55))
-        d.rectangle([ox + 22, 21, ox + 25, 26], fill=col)
+        d.rectangle([20, 18, 27, 29], fill=P["deep"]); d.rectangle([21, 19, 26, 28], fill=shade(col, 0.55))
+        d.rectangle([22, 21, 25, 26], fill=col)
     # Kratzer
     for _ in range(3):
         x, y = rnd.randrange(8, 36), rnd.randrange(8, 38)
-        d.line([ox + x, y, ox + x + rnd.randrange(3, 8), y + rnd.randrange(-1, 2)], fill=P["dark"])
+        d.line([x, y, x + rnd.randrange(3, 8), y + rnd.randrange(-1, 2)], fill=P["dark"])
+
+def tile_set(n):
+    """Alle Funktions- und Metallkacheln des Sternenhafens in der Pixelgröße n: {Feld: Bild (16n × 16n)}.
+    Felder wie im Atlas: 0–3 Platten, 4 Plattform, 5 Tankpad, 6 Dornen, 7–9 tiefe Paneele."""
+    from sizekit import Sc
+    tn = 16 * n
+    out = {}
+    rnd = random.Random(11)
+    def new():
+        im = Image.new("RGBA", (tn, tn), (0, 0, 0, 0)); return im, Sc(im, n)
+    for v in range(4):
+        im, d = new(); plate(d, rnd, v); out[v] = im
+    # Plattform (4)
+    im, d = new()
+    d.rectangle([0, 0, T - 1, T - 1], fill=P["pad"])
+    d.vgrad((0, 0, T - 1, 5), P["pad_l"][:3], P["pad_d"][:3])
+    d.line([0, 6, T - 1, 6], fill=OUTLINE)
+    for k in range(0, T, 12):
+        d.rectangle([k + 2, 1, k + 5, 3], fill=hexc("#d9fffb"))
+    for y in (14, 15): d.line([0, y, T - 1, y], fill=shade(P["pad"], 1.35))
+    d.rectangle([5, 22, 17, 34], fill=P["dark"]); d.rectangle([30, 22, 42, 34], fill=P["dark"])
+    for k in range(3):
+        d.line([6, 24 + k * 4, 16, 24 + k * 4], fill=P["steel"]); d.line([31, 24 + k * 4, 41, 24 + k * 4], fill=P["steel"])
+    d.line([0, T - 1, T - 1, T - 1], fill=P["deep"])
+    out[4] = im
+    # Tankpad (5)
+    im, d = new()
+    d.rectangle([0, 0, T - 1, T - 1], fill=P["fuel"])
+    d.vgrad((0, 0, T - 1, 5), P["fuel_hi"][:3], P["fuel_l"][:3])
+    d.line([0, 6, T - 1, 6], fill=OUTLINE)
+    for k in range(-T, T, 16):
+        d.polygon([(k, T - 1), (k + 8, T - 1), (k + 24, 16), (k + 16, 16)], fill=P["fuel_l"])
+    d.rectangle([0, 16, T - 1, 17], fill=OUTLINE)
+    out[5] = im
+    # Dornen (6)
+    im, d = new()
+    d.rectangle([0, 36, T - 1, T - 1], fill=P["spike_d"])
+    for x in range(0, T, 12):
+        d.polygon([(x, 36), (x + 6, 4), (x + 12, 36)], fill=P["spike"])
+        d.polygon([(x + 2, 36), (x + 6, 8), (x + 6, 36)], fill=P["spike_h"])
+        d.line([x, 36, x + 6, 4], fill=OUTLINE); d.line([x + 12, 36, x + 6, 4], fill=OUTLINE)
+    out[6] = im
+    for k in range(3):
+        im, d = new(); plate(d, rnd, 0, deep=True); out[7 + k] = im
+    return out
 
 def tiles():
-    img = Image.new("RGBA", (T * 10, T), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    rnd = random.Random(11)
-    for v in range(4): plate(d, rnd, v * T, v)
-    # Pad (4)
-    ox = 4 * T
-    d.rectangle([ox, 0, ox + T - 1, T - 1], fill=P["pad"])
-    vgrad(d, (ox, 0, ox + T - 1, 5), P["pad_l"][:3], P["pad_d"][:3])
-    d.line([ox, 6, ox + T - 1, 6], fill=OUTLINE)
-    for k in range(0, T, 12):
-        d.rectangle([ox + k + 2, 1, ox + k + 5, 3], fill=hexc("#d9fffb"))
-    for y in (14, 15): d.line([ox, y, ox + T - 1, y], fill=shade(P["pad"], 1.35))
-    d.rectangle([ox + 5, 22, ox + 17, 34], fill=P["dark"]); d.rectangle([ox + 30, 22, ox + 42, 34], fill=P["dark"])
-    for k in range(3):
-        d.line([ox + 6, 24 + k * 4, ox + 16, 24 + k * 4], fill=P["steel"]); d.line([ox + 31, 24 + k * 4, ox + 41, 24 + k * 4], fill=P["steel"])
-    d.line([ox, T - 1, ox + T - 1, T - 1], fill=P["deep"])
-    # Tankpad (5) – in eigener Ebene gezeichnet, damit nichts in Nachbar-Tiles läuft
-    ft = Image.new("RGBA", (T, T), P["fuel"]); fd = ImageDraw.Draw(ft)
-    vgrad(fd, (0, 0, T - 1, 5), P["fuel_hi"][:3], P["fuel_l"][:3])
-    fd.line([0, 6, T - 1, 6], fill=OUTLINE)
-    for k in range(-T, T, 16):
-        fd.polygon([(k, T - 1), (k + 8, T - 1), (k + 24, 16), (k + 16, 16)], fill=P["fuel_l"])
-    fd.rectangle([0, 16, T - 1, 17], fill=OUTLINE)
-    img.paste(ft, (5 * T, 0))
-    # Dornen (6)
-    ox = 6 * T
-    d.rectangle([ox, 36, ox + T - 1, T - 1], fill=P["spike_d"])
-    for x in range(0, T, 12):
-        d.polygon([(ox + x, 36), (ox + x + 6, 4), (ox + x + 12, 36)], fill=P["spike"])
-        d.polygon([(ox + x + 2, 36), (ox + x + 6, 8), (ox + x + 6, 36)], fill=P["spike_h"])
-        d.line([ox + x, 36, ox + x + 6, 4], fill=OUTLINE); d.line([ox + x + 12, 36, ox + x + 6, 4], fill=OUTLINE)
-    # Tiefe Paneele (7-9)
-    for k in range(3): plate(d, rnd, (7 + k) * T, 0, deep=True)
-    img.save(OUT + "tiles_s1.png")
+    """Die Kacheln liegen jetzt in tile_set(n); der Fels-Atlas je Sektor entsteht in gen_sector_tiles.py."""
+    print("Kacheln: siehe tools/art/gen_sector_tiles.py (nutzt gen_art.tile_set)")
 
 def tiles_normal():
     """Normal-Map zum Tile-Atlas (OpenGL-Konvention, Grün = oben), aus der Helligkeit des Diffuse-Tiles abgeleitet:
@@ -174,15 +189,17 @@ def shelter():
     img = add_outline(img)
     img.save(OUT + "shelter.png")
 
-# ------------------------------------------------------------------ Ausgangstor
-GW, GH = 192, 96          # 4x2 Tiles
-INNER = (10, 10, 181, 85)  # Öffnung im Rahmen (x0, y0, x1, y1)
-LEAF_W = 86
+# ------------------------------------------------------------------ Ausgangstor (64 × 32 Einheiten, in jeder Pixelgröße)
+GW, GH = 192, 96          # Entwurfspunkte (3 je Einheit): 4x2 Tiles
+INNER = (9, 9, 182, 86)    # Öffnung im Rahmen (x0, y0, x1, y1): 3 … 61 × 3 … 29 Einheiten (ganze Einheiten, damit jede Pixelgröße aufgeht)
+LEAF_W = 87                # ein Torflügel: 29 Einheiten
 
-def gate():
-    fr = Image.new("RGBA", (GW, GH), (0, 0, 0, 0)); d = ImageDraw.Draw(fr)
+def gate(n=3):
+    """Rahmen und linker Flügel in der Größe n: (Rahmen 64n × 32n, Flügel 29n × 26n); der rechte Flügel ist gespiegelt."""
+    from sizekit import Sc, stroke
+    fr = Image.new("RGBA", (GW * n // 3, GH * n // 3), (0, 0, 0, 0)); d = Sc(fr, n)
     d.rectangle([0, 0, GW - 1, GH - 1], fill=hexc("#6f7fa8"))
-    vgrad(d, (0, 0, GW - 1, GH - 1), hexc("#8d9be8")[:3], hexc("#2c3262")[:3])
+    d.vgrad((0, 0, GW - 1, GH - 1), hexc("#8d9be8")[:3], hexc("#2c3262")[:3])
     x0, y0, x1, y1 = INNER
     d.rectangle([x0 - 2, y0 - 2, x1 + 2, y1 + 2], fill=OUTLINE)
     # Warnstreifen oben/unten und Seitenpylone
@@ -193,26 +210,31 @@ def gate():
     for (x, y) in ((5, 7), (GW - 8, 7), (5, GH - 10), (GW - 8, GH - 10)):
         d.rectangle([x, y, x + 2, y + 2], fill=hexc("#d9e0ff"))
     # Öffnung freistanzen
-    a = np.array(fr); a[y0:y1 + 1, x0:x1 + 1, :] = 0
-    fr = Image.fromarray(a)
-    fr = add_outline(fr)
-    fr.save(OUT + "gate_frame.png")
-    # Torflügel (links); rechter Flügel gespiegelt
-    lf = Image.new("RGBA", (LEAF_W, INNER[3] - INNER[1] + 1), (0, 0, 0, 0)); d = ImageDraw.Draw(lf)
-    h = lf.size[1]
+    a = np.array(fr)
+    a[d._lo(y0):d._hi(y1) + 1, d._lo(x0):d._hi(x1) + 1, :] = 0
+    fr = add_outline(Image.fromarray(a), thick=stroke(n))
+    h3 = INNER[3] - INNER[1] + 1
+    lf = Image.new("RGBA", (LEAF_W * n // 3, h3 * n // 3), (0, 0, 0, 0)); d = Sc(lf, n)
+    h = h3
     d.rectangle([0, 0, LEAF_W - 1, h - 1], fill=hexc("#4a5596"))
-    vgrad(d, (0, 0, LEAF_W - 1, h - 1), hexc("#6a78c4")[:3], hexc("#2f3868")[:3])
+    d.vgrad((0, 0, LEAF_W - 1, h - 1), hexc("#6a78c4")[:3], hexc("#2f3868")[:3])
     for y in range(8, h, 16): d.line([0, y, LEAF_W - 1, y], fill=hexc("#232a5a")); d.line([0, y + 1, LEAF_W - 1, y + 1], fill=hexc("#8d9be8"))
     for x in range(10, LEAF_W - 12, 20): d.line([x, 0, x, h - 1], fill=hexc("#232a5a"))
-    for k in range(-h, 14, 12):
-        d.polygon([(LEAF_W - 14 + k, h), (LEAF_W - 9 + k, h), (LEAF_W - 9 + k + h, 0), (LEAF_W - 14 + k + h, 0)], fill=hexc("#ffcb3d")) if False else None
     d.rectangle([LEAF_W - 12, 0, LEAF_W - 1, h - 1], fill=hexc("#ffcb3d"))
     for y in range(0, h, 12):
         d.polygon([(LEAF_W - 12, y), (LEAF_W - 1, y - 11), (LEAF_W - 1, y - 5), (LEAF_W - 12, y + 6)], fill=OUTLINE)
     d.line([LEAF_W - 13, 0, LEAF_W - 13, h - 1], fill=OUTLINE)
-    lf = add_outline(lf)
-    lf.save(OUT + "gate_leaf_l.png")
-    lf.transpose(Image.FLIP_LEFT_RIGHT).save(OUT + "gate_leaf_r.png")
+    lf = add_outline(lf, thick=stroke(n))
+    return fr, lf
+
+def gate_files():
+    from sizekit import SIZES, stack
+    by = {n: gate(n) for n in SIZES}
+    stack({n: by[n][0] for n in SIZES}).save(OUT + "gate_frame_sizes.png")
+    stack({n: by[n][1] for n in SIZES}).save(OUT + "gate_leaf_sizes.png")      # nur der linke Flügel; der rechte ist gespiegelt
+    by[3][0].save(OUT + "gate_frame.png")
+    by[3][1].save(OUT + "gate_leaf_l.png")
+    by[3][1].transpose(Image.FLIP_LEFT_RIGHT).save(OUT + "gate_leaf_r.png")
 
 # ------------------------------------------------------------------ Hintergründe (1920x1080)
 BAYER = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0
@@ -427,14 +449,15 @@ def stickers(small_only=False):
     for fn, nm in ((star, "star"), (bolt, "bolt"), (heart, "heart"), (flame, "flame"), (boom, "boom"), (crown, "crown"), (sun, "sun"), (medal, "medal")):
         icon(fn, nm)
 
-# ------------------------------------------------------------------ Zapfsäule (16x32 Einheiten = 48x96 px; Kopf getrennt: 16x12 = 48x36 px)
-def pump():
+# ------------------------------------------------------------------ Zapfsäule (16x32 Einheiten; Kopf getrennt: 22x16), je Pixelgröße
+def pump(n=3):
+    """Säule und Kopf in der Größe n: (Säule 16n × 32n, Kopf 22n × 16n)."""
+    from sizekit import Sc, stroke
     steel, steel_d, steel_h = hexc("#6f7fa8"), hexc("#3a4575"), hexc("#b8c4f0")
     amber, amber_d = hexc("#ffa530"), hexc("#b8631a")
-    # Säulenkörper
-    base = Image.new("RGBA", (48, 96), (0, 0, 0, 0)); d = ImageDraw.Draw(base)
+    base = Image.new("RGBA", (16 * n, 32 * n), (0, 0, 0, 0)); d = Sc(base, n)
     d.rectangle([12, 30, 35, 90], fill=steel)
-    vgrad(d, (12, 30, 35, 90), steel_h[:3], steel_d[:3])
+    d.vgrad((12, 30, 35, 90), steel_h[:3], steel_d[:3])
     d.rectangle([12, 30, 14, 90], fill=steel_h)                  # Glanzkante links
     d.rectangle([33, 30, 35, 90], fill=steel_d)
     for k in range(-24, 24, 12):                                  # Warnband oben
@@ -455,17 +478,25 @@ def pump():
         d.rectangle([x, 91, x + 2, 93], fill=hexc("#8d9be8"))
     for y in (38, 76):
         d.rectangle([14, y, 16, y + 2], fill=hexc("#8d9be8")); d.rectangle([31, y, 33, y + 2], fill=hexc("#8d9be8"))
-    add_outline(base).save(OUT + "pump_base.png")
+    base = add_outline(base, thick=stroke(n))
     # Kopf mit Preisanzeige (Pivot unten Mitte)
-    head = Image.new("RGBA", (48, 36), (0, 0, 0, 0)); d = ImageDraw.Draw(head)
+    head = Image.new("RGBA", (22 * n, 16 * n), (0, 0, 0, 0)); d = Sc(head, n, 22.0 * n / 48.0, 16.0 * n / 36.0)       # im Spiel 22 × 16 Einheiten: gleich als Form so entworfen
     d.rounded_rectangle([2, 6, 45, 33], radius=5, fill=steel)
-    vgrad(d, (4, 8, 43, 31), steel_h[:3], steel_d[:3])
+    d.vgrad((4, 8, 43, 31), steel_h[:3], steel_d[:3])
     d.rounded_rectangle([7, 11, 40, 27], radius=3, fill=hexc("#06140f"))
     d.rounded_rectangle([7, 11, 40, 27], radius=3, outline=hexc("#35e0d2"), width=1)
     d.rectangle([20, 1, 27, 6], fill=hexc("#ff4d6d")); d.rectangle([21, 2, 26, 4], fill=hexc("#ffb0c0"))
     d.rectangle([4, 28, 6, 30], fill=hexc("#8d9be8")); d.rectangle([41, 28, 43, 30], fill=hexc("#8d9be8"))
     d.rectangle([17, 32, 30, 35], fill=steel_d)
-    add_outline(head).save(OUT + "pump_head.png")
+    return base, add_outline(head, thick=stroke(n))
+
+def pump_files():
+    from sizekit import SIZES, stack
+    by = {n: pump(n) for n in SIZES}
+    stack({n: by[n][0] for n in SIZES}).save(OUT + "pump_base_sizes.png")
+    stack({n: by[n][1] for n in SIZES}).save(OUT + "pump_head_sizes.png")
+    by[3][0].save(OUT + "pump_base.png")
+    by[3][1].save(OUT + "pump_head.png")
 
 # ------------------------------------------------------------------ Flaggen (120x80 = 40x26,7 Einheiten, Sprachwahl im Hauptmenü)
 def flags():
@@ -531,6 +562,6 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in ("tiles", "tiles_normal", "shelter", "gate", "taxi_skins", "stickers", "background", "space", "flags", "pump"):
+    for f in ("tiles", "shelter", "gate_files", "taxi_skins", "stickers", "background", "space", "flags", "pump_files"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

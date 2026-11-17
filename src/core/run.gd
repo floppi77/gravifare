@@ -343,7 +343,7 @@ func _fragile_break(a: PassengerActor) -> void:
 ## Zusatz-Krankenpatient verletzt: weg, Strafe in Höhe des aktuellen Preises.
 func _extra_break(ex: Dictionary) -> void:
 	var a: PassengerActor = ex.actor
-	var fee := minf(snappedf(extra_prospect(ex), 1.0), money)
+	var fee := minf(snappedf(extra_prospect(ex), 1.0), floorf(money * Tuning.MISSED_FEE_CAP))
 	money -= fee
 	missed_fees += fee
 	extras_missed += 1
@@ -377,7 +377,7 @@ func _exit_timeout() -> void:
 	if not jobs.is_empty():
 		var lj: Dictionary = jobs[jobs.size() - 1]
 		fee = snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.EXIT_TIMEOUT_FEE_FACTOR, 1.0)
-	log.append({"type": "exit_timeout", "fee": fee})
+	log.append({"type": "exit_timeout", "fee": due_share(fee)})
 	for ex in extras.duplicate():
 		extras.erase(ex)
 	var who := ""
@@ -672,17 +672,24 @@ func _miss_job() -> void:
 	actor = null
 	_lose_job(old.pname)
 
+## Anteil einer neuen Strafe `fee`, der am Levelende tatsächlich abgezogen würde: Gesamtstrafe auf 40 % des jetzigen Guthabens gedeckelt,
+## abzüglich dessen, was die bisher fälligen Strafen schon verbrauchen (Anzeige in den Meldungen; Abrechnung bleibt in _finish_level).
+func due_share(fee: float) -> float:
+	var room := floorf(maxf(money, 0.0) * Tuning.MISSED_FEE_CAP)
+	return minf(missed_due + fee, room) - minf(missed_due, room)
+
 ## Gemeinsame Buchhaltung für einen nicht beförderten Pflichtauftrag (verpasst oder rausgeworfen).
 func _lose_job(pname: String, extra_fee := 0.0) -> void:
 	var lj: Dictionary = jobs[job_index]
 	var fee := maxf(snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.missed_fee_factor(level.sector), 1.0), snappedf(extra_fee, 1.0))
 	missed += 1
+	var shown := due_share(fee)                  # Meldung: der Betrag, der tatsächlich abgezogen wird (nach dem 40-%-Deckel)
 	missed_due += fee                            # fällig am Levelende, nicht sofort
 	shift_waits = shift_waits.filter(func(w): return int(w.job) != job_index)          # Nachtschicht: ein verlorener Fahrgast zählt gar nicht
 	shift_landings = shift_landings.filter(func(l): return int(l.job) != job_index)
-	log.append({"type": "job_missed", "name": pname, "fee": fee})
+	log.append({"type": "job_missed", "name": pname, "fee": shown})
 	if bool(jobs[job_index].get("fragile", false)):
-		log.append({"type": "patient_lost", "name": pname, "fee": fee})
+		log.append({"type": "patient_lost", "name": pname, "fee": shown})
 	job_index += 1
 	job_clock = 0.0
 	respawn_keep_clock = false
@@ -811,7 +818,7 @@ func _finish_level() -> void:
 		job_index += 1
 		actor = null
 	_settle_pending()
-	var due := minf(missed_due, money)           # Strafen für verlorene Pflichtfahrgäste
+	var due := minf(missed_due, floorf(money * Tuning.MISSED_FEE_CAP))           # Strafen für verlorene Pflichtfahrgäste: höchstens 40 % des Guthabens
 	money -= due
 	missed_fees += due
 	missed_due = 0.0

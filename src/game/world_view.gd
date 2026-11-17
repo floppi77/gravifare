@@ -3,7 +3,9 @@ extends Node2D
 ## Pads mit Signalbaken, das Ausgangstor, Fahrgäste und Zielmarker.
 
 const T := Tuning.TILE
-const PX := 1.0 / 3.0                 # ein Bildschirmpixel bei 1080p in Welteinheiten
+var PX := 1.0 / 3.0                   # ein Bildschirmpunkt in Welteinheiten (1/n, in _draw gesetzt)
+var _n := 3                           # Pixelgröße, in der das Level gerade gezeichnet ist (Runde 72); ändert sie sich, wird neu gezeichnet
+var _atlas := Rect2()                 # Ausschnitt des Fels-Atlas für diese Größe (Bildpunkte im Blatt)
 
 var level: LevelData
 var run: Run
@@ -18,20 +20,22 @@ func setup(r: Run) -> void:
 	level = r.level
 	look = SectorLook.of(level.look())
 	var ct := CanvasTexture.new()
-	ct.diffuse_texture = SectorLook.tiles(level.look())
-	ct.normal_texture = SectorLook.tiles_normal(level.look())
+	ct.diffuse_texture = SectorLook.tiles_sized(level.look())
+	ct.normal_texture = SectorLook.tiles_sized_normal(level.look())
 	tiles_tex = ct
 	queue_redraw()
 
 func _process(_delta: float) -> void:
-	# Tore ändern die Kollisionsfläche nicht optisch; Tiles sind statisch und werden nur bei Bedarf neu gezeichnet
-	pass
+	# Tore ändern die Kollisionsfläche nicht optisch; Tiles sind statisch und werden nur neu gezeichnet, wenn sich die Pixelgröße ändert
+	if level != null and PixelScale.size_for(self) != _n:
+		queue_redraw()
 
 func _hash(x: int, y: int) -> int:
 	return int(absi((x * 73856093) ^ (y * 19349663))) % 4
 
 func _tile(idx: int, cx: int, cy: int, row := 0) -> void:
-	draw_texture_rect_region(tiles_tex, Rect2(cx * T, cy * T, T, T), Rect2(idx * 48, row * 48, 48, 48))
+	var tp := T * float(_n)                                          # Kachel in Bildpunkten dieser Größe
+	draw_texture_rect_region(tiles_tex, Rect2(cx * T, cy * T, T, T), Rect2(_atlas.position + Vector2(idx, row) * tp, Vector2(tp, tp)))
 
 ## Fels nach Nachbarschaft (Runde 63, Atlas aus tools/art/gen_sector_tiles.py): Randkachel je Maske der offenen Nachbarn (1 oben, 2 rechts, 4 unten,
 ## 8 links, Zeile 1), Innenecken als Auflage (Zeile 2), sonst Innenfläche mit Abwandlung (tief im Fels häufiger mit Merkmalen).
@@ -66,7 +70,8 @@ func _spike_tile(cx: int, cy: int) -> void:
 	elif _base(cx + 1, cy):
 		rot = -PI * 0.5
 	draw_set_transform(Vector2((cx + 0.5) * T, (cy + 0.5) * T), rot)
-	draw_texture_rect_region(tiles_tex, Rect2(-T * 0.5, -T * 0.5, T, T), Rect2(6 * 48, 0, 48, 48))
+	var tp := T * float(_n)
+	draw_texture_rect_region(tiles_tex, Rect2(-T * 0.5, -T * 0.5, T, T), Rect2(_atlas.position + Vector2(6.0 * tp, 0.0), Vector2(tp, tp)))
 	draw_set_transform(Vector2.ZERO, 0.0)
 
 func _base(cx: int, cy: int) -> bool:
@@ -82,6 +87,9 @@ func _deep(cx: int, cy: int) -> bool:
 func _draw() -> void:
 	if level == null:
 		return
+	_n = PixelScale.size_for(self)
+	PX = 1.0 / float(_n)
+	_atlas = PixelScale.sheet_rect(_n, SectorLook.TILES_UNITS)
 	level.doors_ignore = true        # Tore werden dynamisch in props_view gezeichnet; hier gelten sie als offen
 	_draw_world()
 	level.doors_ignore = false
@@ -91,12 +99,14 @@ func _draw_world() -> void:
 	var sh_far := Color(0.01, 0.015, 0.03, 0.14)
 	var sh_mid := Color(0.01, 0.015, 0.03, 0.22)
 	var sh := Color(0.01, 0.015, 0.03, 0.45)
+	var sn := func(v: float) -> float: return PixelDraw.snap(v, _n)       # Schattenversatz auf ganze Bildpunkte
+	var aow := float(PixelDraw.scaled_w(2, _n)) * PX                     # Breite der Kantenabdunklung (2 Punkte der Größe 3)
 	for cy in level.height:
 		for cx in level.width:
 			if level.is_solid_cell(cx, cy) and (not level.is_solid_cell(cx + 1, cy) or not level.is_solid_cell(cx, cy + 1) or not level.is_solid_cell(cx + 1, cy + 1)):
-				draw_rect(Rect2(cx * T + 7.0, cy * T + 10.0, T, T), sh_far)
-				draw_rect(Rect2(cx * T + 4.5, cy * T + 6.5, T, T), sh_mid)
-				draw_rect(Rect2(cx * T + 2.0, cy * T + 3.0, T, T), sh)
+				draw_rect(Rect2(cx * T + sn.call(7.0), cy * T + sn.call(10.0), T, T), sh_far)
+				draw_rect(Rect2(cx * T + sn.call(4.5), cy * T + sn.call(6.5), T, T), sh_mid)
+				draw_rect(Rect2(cx * T + sn.call(2.0), cy * T + sn.call(3.0), T, T), sh)
 	for cy in level.height:
 		for cx in level.width:
 			var c := level.cell(cx, cy)
@@ -107,11 +117,11 @@ func _draw_world() -> void:
 				# Ambient Occlusion: abgestufte Abdunklung an Kanten zu offenen Nachbarn (innen)
 				for k in 3:
 					var ao := Color(0.02, 0.02, 0.1, 0.22 - k * 0.07)
-					var d := PX * (3 + k * 2) + PX * 2
+					var d := PixelDraw.snap(float(3 + k * 2) / 3.0, _n) + aow
 					if not level.is_solid_cell(cx + 1, cy):
-						draw_rect(Rect2(x + T - d - PX * 2, y, PX * 2, T), ao)
+						draw_rect(Rect2(x + T - d - aow, y, aow, T), ao)
 					if not level.is_solid_cell(cx, cy + 1):
-						draw_rect(Rect2(x, y + T - d - PX * 2, T, PX * 2), ao)
+						draw_rect(Rect2(x, y + T - d - aow, T, aow), ao)
 			elif c == "^":
 				_spike_tile(cx, cy)
 			elif c == "F" or c == "L":
@@ -127,6 +137,7 @@ func _draw_world() -> void:
 const SOFT_EDGE := 5
 func _draw_soft_edge() -> void:
 	var tex_size: Vector2 = tiles_tex.get_size()
+	var tp := T * float(_n)
 	for side in [-1, 1]:
 		var edge_x: int = 0 if side < 0 else level.width - 1
 		for k in range(1, SOFT_EDGE + 1):
@@ -140,13 +151,14 @@ func _draw_soft_edge() -> void:
 				if not level.is_solid_cell(edge_x, cy):
 					continue                          # Öffnungen in der Außenwand (Verkehr) bleiben offen
 				var h := int(absi((cx * 83492791) ^ (cy * 2654435761)) >> 4)
-				var u0 := float([7, 8, 9, 10, 11][h % 5] * 48) / tex_size.x
-				var u1 := u0 + 48.0 / tex_size.x
-				var v1 := 48.0 / tex_size.y
+				var u0 := (_atlas.position.x + float([7, 8, 9, 10, 11][h % 5]) * tp) / tex_size.x
+				var u1 := u0 + tp / tex_size.x
+				var v0 := _atlas.position.y / tex_size.y
+				var v1 := v0 + tp / tex_size.y
 				var x := float(cx) * T
 				var y := float(cy) * T
 				draw_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + T, y), Vector2(x + T, y + T), Vector2(x, y + T)]), cols,
-						PackedVector2Array([Vector2(u0, 0.0), Vector2(u1, 0.0), Vector2(u1, v1), Vector2(u0, v1)]), tiles_tex)
+						PackedVector2Array([Vector2(u0, v0), Vector2(u1, v0), Vector2(u1, v1), Vector2(u0, v1)]), tiles_tex)
 
 ## Farbe des Randfelsens im Abstand `d` Kacheln von der Karte: stufenlos dunkler und durchsichtiger, außen ganz weg.
 ## (Vorher je Spalte ein fester Wert und ein dunkles Band über die volle Höhe: bei 32:9 sah man fünf Streifen.)

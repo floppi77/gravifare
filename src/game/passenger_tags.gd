@@ -3,7 +3,7 @@ extends Node2D
 ## Die Formen unterscheiden sich auch ohne Farbsehen (Krone gegen Kreuz, dazu die Zahl beim Notfall). Sitzt ein Notfall im Taxi, steht die Frist
 ## über dem Taxi. Eigener Knoten über den Requisiten (props_view.gd zeichnet Figur, Betrag und Zielblase); Lage links neben dem Betrag.
 
-const PX := 1.0 / 3.0
+var PX := 1.0 / 3.0                    # ein Bildschirmpunkt (1/n Einheit), in _draw gesetzt
 const INK := Color("#0c0f24")
 const GOLD := Color("#ffd23a")
 const RED := Color("#e8243a")
@@ -22,6 +22,7 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if run == null:
 		return
+	PX = PixelDraw.px_of(self)
 	if run.actor != null:
 		_tag(run.actor, run.current_job(), run.emergency_left())
 	for e in run.extras:
@@ -92,7 +93,7 @@ func _clock(c: Vector2, left: float, fade: float) -> void:
 	var on := not urgent or fmod(t, 0.5) < 0.32
 	var r := Rect2(c.x - w * 0.5, c.y - 3.8, w, 7.4)
 	draw_rect(r, Color(0.04, 0.05, 0.14, 0.92 * fade))
-	draw_rect(r, Color(Color.WHITE if urgent else RED, fade), false, 0.7)
+	draw_rect(r, Color(Color.WHITE if urgent else RED, fade), false, PixelDraw.wsnap(self, 0.7))
 	if on:
 		draw_string_outline(font, Vector2(r.position.x, c.y + 2.2), txt, HORIZONTAL_ALIGNMENT_CENTER, w, 7, 3, Color(0.02, 0.03, 0.1, fade))
 		draw_string(font, Vector2(r.position.x, c.y + 2.2), txt, HORIZONTAL_ALIGNMENT_CENTER, w, 7, Color(1.0, 0.9, 0.9, fade))

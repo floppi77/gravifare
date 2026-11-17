@@ -1,31 +1,60 @@
 class_name PixelDraw
 extends RefCounted
-## Zeichenhilfen im Pixelraster: Alles liegt auf einem Raster von 1/3 Einheit (= ein Bildschirmpunkt bei 1080p), ohne Kantenglättung.
+## Zeichenhilfen im Pixelraster: Alles liegt auf einem Raster von 1/n Einheit (= ein Bildschirmpunkt), ohne Kantenglättung. `n` ist die Pixelgröße
+## des Bildschirms (PixelScale: 720p = 2 … 2160p = 6), je Zeichenfläche aus ihrer Skalierung bestimmt, damit Linien, Ringe, Dornen, Wimpel und
+## Flammen in jeder Auflösung auf ganzen Bildpunkten liegen. Maße und Formen in Einheiten bleiben gleich.
 ## Linien, Ringe und Bögen werden aus lauter solchen Rechtecken gesetzt (waagerechte und senkrechte Läufe zusammengefasst, damit es wenige
 ## Zeichenaufrufe bleiben). Die Taxi- und Hintergrundgrafik nutzt dasselbe Raster.
 
-const PX := 1.0 / 3.0
+const PX := 1.0 / 3.0                       # Raster der Größe 3 (Vorgabe, wo keine Zeichenfläche bekannt ist)
 
 static var _ring_cache := {}
 
 ## Auf das Raster von 1/3 Einheit runden.
-static func snap(v: float) -> float:
-	return roundf(v * 3.0) / 3.0
+static func snap(v: float, n := 3) -> float:
+	return roundf(v * float(n)) / float(n)
 
-static func snap2(v: Vector2) -> Vector2:
-	return Vector2(snap(v.x), snap(v.y))
+static func snap2(v: Vector2, n := 3) -> Vector2:
+	return Vector2(snap(v.x, n), snap(v.y, n))
+
+## Pixelgröße der Zeichenfläche `ci` (2 … 6) und ihr Bildpunkt in Einheiten.
+static func n_of(ci: CanvasItem) -> int:
+	return PixelScale.size_for(ci)
+
+static func px_of(ci: CanvasItem) -> float:
+	return 1.0 / float(PixelScale.size_for(ci))
+
+## Auf das Raster der Zeichenfläche runden.
+static func snap_to(ci: CanvasItem, v: float) -> float:
+	return snap(v, PixelScale.size_for(ci))
+
+static func snap2_to(ci: CanvasItem, v: Vector2) -> Vector2:
+	return snap2(v, PixelScale.size_for(ci))
+
+## Linienbreite (Einheiten) auf ganze Bildpunkte der Zeichenfläche runden, mindestens ein Bildpunkt.
+static func wsnap(ci: CanvasItem, w: float) -> float:
+	var nf := float(n_of(ci))
+	return maxf(roundf(w * nf), 1.0) / nf
+
+## Strichstärke: Aufrufer geben sie in Bildpunkten der Größe 3 an (1/3 Einheit); gerechnet wird in Bildpunkten der Größe n, mindestens 1
+## (1 Punkt bleibt 1 Punkt bis 1440p, darüber 2, wie beim Taxi; 3 Punkte = 1 Einheit bleiben 1 Einheit).
+static func scaled_w(w3: int, n: int) -> int:
+	return maxi(1, roundi(float(w3) * float(n) / 3.0))
 
 ## Ein Bildpunkt-Rechteck (Zellen x, y, Breite, Höhe in Bildpunkten) zeichnen.
 static func _cells(ci: CanvasItem, x: int, y: int, w: int, h: int, col: Color) -> void:
-	ci.draw_rect(Rect2(float(x) * PX, float(y) * PX, float(w) * PX, float(h) * PX), col)
+	var p := px_of(ci)
+	ci.draw_rect(Rect2(float(x) * p, float(y) * p, float(w) * p, float(h) * p), col)
 
 ## Gerade Linie von a nach b, `w_px` Bildpunkte dick (Vielfache von 1/3 Einheit). Waagerechte und senkrechte Linien sind ein einziges Rechteck,
 ## schräge werden Lauf für Lauf gesetzt.
 static func line(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w_px := 1) -> void:
-	var x0 := roundi(a.x * 3.0)
-	var y0 := roundi(a.y * 3.0)
-	var x1 := roundi(b.x * 3.0)
-	var y1 := roundi(b.y * 3.0)
+	var nf := float(n_of(ci))
+	var x0 := roundi(a.x * nf)
+	var y0 := roundi(a.y * nf)
+	var x1 := roundi(b.x * nf)
+	var y1 := roundi(b.y * nf)
+	w_px = scaled_w(w_px, int(nf))
 	var lo := -(w_px / 2)                           # die Dicke wächst nach beiden Seiten um die Mitte
 	if y0 == y1:
 		_cells(ci, mini(x0, x1), y0 + lo, absi(x1 - x0) + 1, w_px, col)
@@ -83,10 +112,11 @@ static func polyline(ci: CanvasItem, pts: PackedVector2Array, col: Color, w_px :
 
 ## Gefülltes Rechteck, an das Raster angelegt (Kanten auf Vielfachen von 1/3 Einheit, mindestens ein Bildpunkt).
 static func rect(ci: CanvasItem, r: Rect2, col: Color) -> void:
-	var x0 := roundi(r.position.x * 3.0)
-	var y0 := roundi(r.position.y * 3.0)
-	var x1 := maxi(roundi(r.end.x * 3.0), x0 + 1)
-	var y1 := maxi(roundi(r.end.y * 3.0), y0 + 1)
+	var nf := float(n_of(ci))
+	var x0 := roundi(r.position.x * nf)
+	var y0 := roundi(r.position.y * nf)
+	var x1 := maxi(roundi(r.end.x * nf), x0 + 1)
+	var y1 := maxi(roundi(r.end.y * nf), y0 + 1)
 	_cells(ci, x0, y0, x1 - x0, y1 - y0, col)
 
 ## Bildpunkte eines Rings (Innen- und Außenradius in Bildpunkten, `r_in` = 0 ergibt eine Scheibe) als Läufe [x, y, w, h] relativ zur Mitte, in Bildpunkten:
@@ -118,26 +148,30 @@ static func ring_runs(r_in: float, r_out: float) -> Array:
 	return runs
 
 static func _runs(ci: CanvasItem, c: Vector2, runs: Array, col: Color) -> void:
-	var cx := roundi(c.x * 3.0)
-	var cy := roundi(c.y * 3.0)
+	var nf := float(n_of(ci))
+	var cx := roundi(c.x * nf)
+	var cy := roundi(c.y * nf)
 	for run in runs:
 		_cells(ci, cx + int(run[0]), cy + int(run[1]), int(run[2]), int(run[3]), col)
 
 ## Kreisring mit Radius `r` (Einheiten) um `c`, `w_px` Bildpunkte dick, gestuft.
 static func ring(ci: CanvasItem, c: Vector2, r: float, col: Color, w_px := 1) -> void:
-	var r_px := maxf(r * 3.0, 1.0)
-	var half := float(w_px) * 0.5
+	var nf := float(n_of(ci))
+	var r_px := maxf(r * nf, 1.0)
+	var half := float(scaled_w(w_px, int(nf))) * 0.5
 	_runs(ci, c, ring_runs(maxf(r_px - half, 0.0), r_px + half), col)
 
 ## Gefüllte Scheibe, gestuft.
 static func disc(ci: CanvasItem, c: Vector2, r: float, col: Color) -> void:
-	_runs(ci, c, ring_runs(0.0, maxf(r * 3.0, 1.0)), col)
+	_runs(ci, c, ring_runs(0.0, maxf(r * float(n_of(ci)), 1.0)), col)
 
 ## Kreisbogen (Winkel im Bogenmaß wie `draw_arc`, 0 = rechts, im Uhrzeigersinn positiv), `w_px` Bildpunkte dick. Für kleine Radien (Takt-Anzeige).
 static func arc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col: Color, w_px := 1) -> void:
-	var r_px := maxf(r * 3.0, 1.0)
-	var cx := roundi(c.x * 3.0)
-	var cy := roundi(c.y * 3.0)
+	var nf := float(n_of(ci))
+	var r_px := maxf(r * nf, 1.0)
+	var cx := roundi(c.x * nf)
+	var cy := roundi(c.y * nf)
+	w_px = scaled_w(w_px, int(nf))
 	var n := maxi(int(ceilf(absf(a1 - a0) * r_px * 1.5)), 2)          # ein Schritt kürzer als ein Bildpunkt
 	var lo := -(w_px / 2)
 	var last := Vector2i(1 << 30, 1 << 30)
@@ -164,10 +198,11 @@ static func arc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col:
 ## Strahl aus Pixelzeilen (Triebwerksflamme): Spitze in Richtung `dir` (achsenparallel), vom Ansatz `base` aus `length` lang und `half_w` halb breit;
 ## die Breite nimmt gestuft ab, jede Zeile ist ein Rechteck.
 static func jet(ci: CanvasItem, base: Vector2, dir: Vector2, length: float, half_w: float, col: Color) -> void:
-	var len_px := maxi(roundi(length * 3.0), 1)
-	var hw_px := maxi(roundi(half_w * 3.0), 1)
-	var bx := roundi(base.x * 3.0)
-	var by := roundi(base.y * 3.0)
+	var nf := float(n_of(ci))
+	var len_px := maxi(roundi(length * nf), 1)
+	var hw_px := maxi(roundi(half_w * nf), 1)
+	var bx := roundi(base.x * nf)
+	var by := roundi(base.y * nf)
 	for k in range(-hw_px, hw_px):                    # Zeile k (quer zur Richtung)
 		var f := 1.0 - (absf(float(k) + 0.5) / float(hw_px))
 		var ln := maxi(roundi(float(len_px) * f), 1)
@@ -180,9 +215,10 @@ static func jet(ci: CanvasItem, base: Vector2, dir: Vector2, length: float, half
 
 ## Punktreihe auf einem Kreis (`n` Punkte, je ein Bildpunkt), beginnend bei Winkel `a0`.
 static func dots(ci: CanvasItem, c: Vector2, r: float, n: int, a0: float, col: Color) -> void:
-	var cx := roundi(c.x * 3.0)
-	var cy := roundi(c.y * 3.0)
-	var r_px := r * 3.0
+	var nf := float(n_of(ci))
+	var cx := roundi(c.x * nf)
+	var cy := roundi(c.y * nf)
+	var r_px := r * nf
 	for i in n:
 		var a := a0 + TAU * float(i) / float(n)
 		_cells(ci, cx + roundi(cos(a) * r_px), cy + roundi(sin(a) * r_px), 1, 1, col)

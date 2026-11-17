@@ -233,8 +233,9 @@ const EXIT_COUNTDOWN_MIN_V4 := 22.5     # ab Regelstand 4 halbiert: mindestens 2
 const EXIT_COUNTDOWN_PAR_FACTOR_V4 := 1.1   # … bzw. 1,1 × Richtzeit des Ausgangs-Auftrags
 const EXIT_HURRY_AT := [20.0, 10.0, 5.0]  # Restsekunden, bei denen der letzte Fahrgast zur Eile drängt
 const EXIT_TIMEOUT_FEE_FACTOR := 1.2     # Strafzahlung bei Zeitablauf: 120 % des Fahrpreises des Ausgangs-Fahrgasts
-const MISSED_FEE_BASE := 4.0      # Strafe für einen verlorenen Pflichtfahrgast (verpasst, gerammt, rausgeworfen): 4-facher Fahrpreis in Sektor 1 …
-const MISSED_FEE_STEP := 1.0      # … und je Sektor ein Vielfaches mehr (Sektor 2: 5-fach, Sektor 3: 6-fach, …)
+const MISSED_FEE_BASE := 2.0      # Strafe für einen verlorenen Pflichtfahrgast (verpasst, gerammt, rausgeworfen): 2-facher Fahrpreis in allen Sektoren (Runde 74; vorher 4-fach in Sektor 1, je Sektor ein Vielfaches mehr bis 12-fach in Sektor 9) …
+const MISSED_FEE_STEP := 0.0      # … ohne Zuschlag je Sektor
+const MISSED_FEE_CAP := 0.4       # Strafen für verlorene Fahrgäste nehmen höchstens 40 % des Guthabens zur Zeit der Abrechnung (Runde 74)
 
 static func missed_fee_factor(sector: int) -> float:
 	return MISSED_FEE_BASE + MISSED_FEE_STEP * float(maxi(sector - 1, 0))

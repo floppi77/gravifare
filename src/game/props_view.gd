@@ -3,21 +3,28 @@ extends Node2D
 ## Fahrgäste mit Laufanimation und Ruf-Sprechblase. Läuft ungelit, damit Spielelemente stets lesbar bleiben.
 
 const T := Tuning.TILE
-const PX := 1.0 / 3.0
-const GATE_INNER := Rect2(10.0 / 3.0, 10.0 / 3.0, 172.0 / 3.0, 76.0 / 3.0)
-const LEAF_W := 86.0 / 3.0
+var PX := 1.0 / 3.0                    # ein Bildschirmpunkt in Einheiten (1/n, wird in _draw aus der Skalierung gesetzt)
+const GATE_INNER := Rect2(3, 3, 58, 26)            # Öffnung im Torrahmen (ganze Einheiten, Runde 72: in jeder Pixelgröße auf ganzen Bildpunkten)
+const LEAF_W := 29.0
+const GATE_UNITS := Vector2(64, 32)
+const LEAF_UNITS := Vector2(29, 26)
+const PUMP_UNITS := Vector2(16, 32)
+const PUMP_HEAD_UNITS := Vector2(22, 16)
 
 var level: LevelData
 var run: Run
-var pass_tex: Texture2D = preload("res://assets/art/passengers.png")
+var pass_tex: Texture2D = preload("res://assets/art/passengers_sizes.png")      # Fahrgastblatt je Pixelgröße 2–6 untereinander (tools/art/gen_figures_sizes.py)
+const PASS_UNITS := Vector2(70, 140)                  # ein Blatt in Einheiten: 10 Bilder × 14 Figuren zu 7 × 10 Einheiten
+const PASS_IMG := Vector2(7, 10)                      # Figur im Spiel: 7 × 10 Einheiten, 1:1 in jeder Pixelgröße
 var taxi_tex: Texture2D = Cosmetics.paint_texture()
-var shelter_tex: Texture2D = preload("res://assets/art/shelters.png")      # eine Haltestelle je Sektor, Blatt mit 76 px Abstand (tools/art/aseprite)
-var pump_base_tex: Texture2D = preload("res://assets/art/pump_base.png")
-var pump_head_tex: Texture2D = preload("res://assets/art/pump_head.png")
+var shelter_tex: Texture2D = preload("res://assets/art/shelters_sizes.png")      # eine Haltestelle je Sektor (20 × 17 Einheiten), Pixelgrößen 2–6 untereinander (tools/art/gen_shelters_vehicles_sizes.py)
+const SHELTER_UNITS := Vector2(180, 17)           # ein Blatt in Einheiten: 9 Haltestellen nebeneinander
+const SHELTER_IMG := Vector2(20, 17)              # Bild im Spiel; der Platz (Level.SHELTER_W/H = 20,4 × 17) bleibt, das Bild sitzt mittig darin
+var pump_base_tex: Texture2D = preload("res://assets/art/pump_base_sizes.png")      # Blätter mit den Pixelgrößen 2–6 untereinander (tools/art/gen_art.py)
+var pump_head_tex: Texture2D = preload("res://assets/art/pump_head_sizes.png")
 var pump_flash := 0.0                 # kurzes Aufblitzen der Preisanzeige bei Preiswechsel
-var gate_frame: Texture2D = preload("res://assets/art/gate_frame.png")
-var leaf_l: Texture2D = preload("res://assets/art/gate_leaf_l.png")
-var leaf_r: Texture2D = preload("res://assets/art/gate_leaf_r.png")
+var gate_frame: Texture2D = preload("res://assets/art/gate_frame_sizes.png")
+var gate_leaf: Texture2D = preload("res://assets/art/gate_leaf_sizes.png")          # linker Flügel; der rechte wird gespiegelt gezeichnet
 var t := 0.0
 var door := 0.0                       # 0 = zu, 1 = offen (animiert)
 var door_override := -1.0             # >= 0: Torstellung von außen vorgeben (Taxi-Anflug)
@@ -40,6 +47,7 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if level == null:
 		return
+	PX = PixelDraw.px_of(self)
 	_draw_pads()
 	_draw_reflections()
 	_draw_pumps()
@@ -51,8 +59,8 @@ func _draw() -> void:
 	_draw_taxi_shadow()
 	if OS.get_cmdline_user_args().has("--debug-hitbox"):      # Dev: Kollisionsrechtecke der Mover und des Taxis
 		for m in level.movers:
-			draw_rect(m.rect, Color(1, 0.2, 0.2, 0.9), false, 0.6)
-		draw_rect(Rect2(run.sim.pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0), Color(0.3, 1, 0.3, 0.9), false, 0.6)
+			draw_rect(m.rect, Color(1, 0.2, 0.2, 0.9), false, PixelDraw.wsnap(self, 0.6))
+		draw_rect(Rect2(run.sim.pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0), Color(0.3, 1, 0.3, 0.9), false, PixelDraw.wsnap(self, 0.6))
 
 var flags: Array = []
 var flags_level: LevelData = null
@@ -74,7 +82,11 @@ func _draw_pads() -> void:
 		# Wartebereich-Unterstand, Pfosten mit Signalbaken nur am freien Ende
 		var shelter: Rect2 = p.get("shelter", Rect2())
 		if shelter.size.x > 0.0:
-			draw_texture_rect_region(shelter_tex, shelter, Rect2((clampi(level.look(), 1, 9) - 1) * 76, 0, 72, 60))
+			var sn := PixelScale.size_for(self)
+			var ss := PixelScale.sheet_rect(sn, SHELTER_UNITS)
+			var sidx := clampi(level.look(), 1, 9) - 1
+			draw_texture_rect_region(shelter_tex, Rect2(PixelDraw.snap2_to(self, Vector2(shelter.position.x + (shelter.size.x - SHELTER_IMG.x) * 0.5, shelter.end.y - SHELTER_IMG.y)), SHELTER_IMG),
+					Rect2(ss.position + Vector2(float(sidx) * SHELTER_IMG.x * float(sn), 0.0), SHELTER_IMG * float(sn)))
 			_light_shelter(shelter, id)
 			var rx := shelter.get_center().x
 			draw_rect(Rect2(rx - 1.5, shelter.position.y - 2.0, 3, 2), col.darkened(0.3))
@@ -194,7 +206,7 @@ func _draw_glass_gate(ch: String, gate: Dictionary, gap: float) -> void:
 				var xx := leaf.position.x + u + 3.0
 				if xx + 6.0 < leaf.end.x:
 					draw_colored_polygon(PackedVector2Array([Vector2(xx, leaf.position.y + 9.0), Vector2(xx + 5.0, leaf.position.y + 2.0), Vector2(xx + 9.0, leaf.position.y + 2.0), Vector2(xx + 4.0, leaf.position.y + 9.0)]), Color(1, 1, 1, 0.22))
-		draw_rect(leaf, Color(edge.r, edge.g, edge.b, 0.75), false, 0.8)
+		draw_rect(leaf, Color(edge.r, edge.g, edge.b, 0.75), false, PixelDraw.wsnap(self, 0.8))
 		var front := 2.0
 		if vert:
 			draw_rect(Rect2(leaf.position.x, leaf.end.y - 1.0 if i == 0 else leaf.position.y, leaf.size.x, 1.0), Color(1, 1, 1, 0.95))
@@ -224,7 +236,7 @@ func _draw_slide_gate(gate: Dictionary, gap: float, lamp: Color, sweep_leaves: A
 				draw_rect(Rect2(leaf.end.x - u - w if i == 0 else leaf.position.x + u, leaf.position.y + 1.0, w, leaf.size.y - 2.0), col)
 			u += 3.0
 			n += 1
-		draw_rect(leaf, Color("#7f8fe0"), false, 0.8)
+		draw_rect(leaf, Color("#7f8fe0"), false, PixelDraw.wsnap(self, 0.8))
 		if vert:
 			draw_rect(Rect2(leaf.position.x, leaf.end.y - 1.0 if i == 0 else leaf.position.y, leaf.size.x, 1.0), Color("#e8ecff"))
 		else:
@@ -382,7 +394,7 @@ func _draw_heat(z: Dictionary, on: bool) -> void:
 			plate.append(pc + Vector2(cos(aa) * (3.5 + 1.5 * float((i + j) % 2)), sin(aa) * (2.6 + 1.2 * float((i + j) % 3))))
 		draw_colored_polygon(plate, Color(0.14, 0.05, 0.04, 0.85))
 		plate.append(plate[0])
-		draw_polyline(plate, Color(1.0, 0.5, 0.1, 0.7 * glow), 0.8)
+		draw_polyline(plate, Color(1.0, 0.5, 0.1, 0.7 * glow), PixelDraw.wsnap(self, 0.8))
 	# Blasen steigen auf und platzen
 	for i in 5:
 		var h := fmod(float(i) * 0.618 + float(seed % 11) * 0.1, 1.0)
@@ -390,11 +402,11 @@ func _draw_heat(z: Dictionary, on: bool) -> void:
 		var bp := Vector2(c.x + (h - 0.5) * rx * 1.3, c.y + ry * 0.55 - fr * ry * 1.1)
 		var rad := 1.2 + 1.6 * fr
 		if fr < 0.88:
-			draw_arc(bp, rad, 0.0, TAU, 12, Color(1.0, 0.85, 0.4, 0.8 * glow), 0.9)
+			draw_arc(bp, rad, 0.0, TAU, 12, Color(1.0, 0.85, 0.4, 0.8 * glow), PixelDraw.wsnap(self, 0.9))
 			draw_circle(bp + Vector2(-0.4, -0.4), 0.5, Color(1.0, 1.0, 0.85, 0.7 * glow))
 		else:
 			var q := (fr - 0.88) / 0.12
-			draw_arc(bp, rad + 3.0 * q, 0.0, TAU, 12, Color(1.0, 0.6, 0.2, (1.0 - q) * glow), 0.8)
+			draw_arc(bp, rad + 3.0 * q, 0.0, TAU, 12, Color(1.0, 0.6, 0.2, (1.0 - q) * glow), PixelDraw.wsnap(self, 0.8))
 	# Tropfen fallen unten ab, Funken steigen nach oben
 	for i in 4:
 		var h := fmod(float(i) * 0.37 + float(seed % 13) * 0.07, 1.0)
@@ -412,7 +424,7 @@ func _draw_heat(z: Dictionary, on: bool) -> void:
 		for i in 10:
 			var u := float(i) / 9.0
 			pts.append(Vector2(c.x - rx + u * rx * 2.0, c.y - ry * 1.15 - float(k) * 3.5 + sin(t * 4.0 + u * 8.0 + float(k)) * 1.4))
-		draw_polyline(pts, Color(1.0, 0.8, 0.5, 0.12 * glow), 1.0)
+		draw_polyline(pts, Color(1.0, 0.8, 0.5, 0.12 * glow), PixelDraw.wsnap(self, 1.0))
 	_timer_arc(c, z, minf(rx, ry) * 0.35 + 3.0)
 
 func _scaled(poly: PackedVector2Array, c: Vector2, f: float) -> PackedVector2Array:
@@ -495,15 +507,21 @@ func _draw_movers() -> void:
 ## Verkehr: eigenes Fahrzeug („Pendlergleiter“, assets/art/vehicle_<farbe>.png) statt umgefärbter Taxis, in Taxigröße gezeichnet.
 const PAINTS := ["red", "blue", "green", "purple", "silver"]
 const VEH_SIZE := Tuning.TAXI_UNITS       # wie das Taxi (26 × 16 Einheiten, 1:1)
+const VEH_UNITS := Vector2(130, 16)       # Blatt assets/art/vehicles_sizes.png in Einheiten: 5 Farben nebeneinander (Reihenfolge wie PAINTS), Pixelgrößen untereinander
 const VEH_BEAM_LEN := 12.0      # Länge des weißen Lichtkegels vor dem Fahrzeug
 const VEH_TAIL_LEN := 5.0       # Länge des roten Kegels hinter dem Fahrzeug
 var _paint_tex := {}
 
-func _vehicle_tex(i: int) -> Texture2D:
-	var id: String = PAINTS[i % PAINTS.size()]
-	if not _paint_tex.has(id):
-		_paint_tex[id] = load("res://assets/art/vehicle_%s.png" % id)
-	return _paint_tex[id]
+func _vehicle_tex(_i: int) -> Texture2D:
+	if not _paint_tex.has("sheet"):
+		_paint_tex["sheet"] = load("res://assets/art/vehicles_sizes.png")
+	return _paint_tex["sheet"]
+
+## Ausschnitt des Fahrzeugs (Farbe i) im Blatt der aktuellen Pixelgröße.
+func _vehicle_src(i: int) -> Rect2:
+	var n := PixelScale.size_for(self)
+	var r := PixelScale.sheet_rect(n, VEH_UNITS)
+	return Rect2(r.position + Vector2(float(i % PAINTS.size()) * VEH_SIZE.x * float(n), 0.0), VEH_SIZE * float(n))
 
 func _draw_vehicle_portals() -> void:
 	var seen := {}
@@ -559,51 +577,58 @@ func _draw_movers_main() -> void:
 ## Trümmer in den Größen der Level (16 × 32, 32 × 16 und 16 × 16 Einheiten) sind ganze Wrackteile aus assets/art/debris.png (tools/art/gen_debris.py):
 ## Frachtcontainer, Rumpfplatte oder Solarpaneel, je Brocken fest nach seiner Lage gewählt. Die Fläche ist genau die Trefferfläche `r`.
 ## Andere Größen (Gemeinschaftslevel) gibt es nicht als Bild: dann false, und das Kachelblatt setzt sie zusammen.
-const DEBRIS_TEX: Texture2D = preload("res://assets/art/debris.png")
-const DEBRIS_S := 48
-const DEBRIS_L := 96
+const DEBRIS_TEX: Texture2D = preload("res://assets/art/debris_sizes.png")      # Blätter der Pixelgrößen 2–6 untereinander (Runde 72)
+const DEBRIS_UNITS := Vector2(80, 48)             # ein Blatt in Einheiten: stehend 16 × 32 bei x = 0, 16, 32; liegend 32 × 16 bei x = 48, y = 0, 16, 32; Quadrat 16 × 16 bei (0, 32)
 
 func _draw_debris_piece(r: Rect2, seed: int) -> bool:
-	var w := roundi(r.size.x * 3.0)
-	var h := roundi(r.size.y * 3.0)
+	var w := roundi(r.size.x)
+	var h := roundi(r.size.y)
 	var v := posmod(seed, 3)
-	var src: Rect2
-	if w == DEBRIS_S and h == DEBRIS_L:
-		src = Rect2(v * DEBRIS_S, 0, DEBRIS_S, DEBRIS_L)
-	elif w == DEBRIS_L and h == DEBRIS_S:
-		src = Rect2(3 * DEBRIS_S, v * DEBRIS_S, DEBRIS_L, DEBRIS_S)
-	elif w == DEBRIS_S and h == DEBRIS_S:
-		src = Rect2(0, DEBRIS_L, DEBRIS_S, DEBRIS_S)
+	var u: Rect2                                      # Ausschnitt in Einheiten
+	if w == 16 and h == 32:
+		u = Rect2(v * 16, 0, 16, 32)
+	elif w == 32 and h == 16:
+		u = Rect2(48, v * 16, 32, 16)
+	elif w == 16 and h == 16:
+		u = Rect2(0, 32, 16, 16)
 	else:
 		return false
-	draw_texture_rect_region(DEBRIS_TEX, Rect2(PixelDraw.snap2(r.position), Vector2(w, h) * PixelDraw.PX), src)
+	var n := PixelScale.size_for(self)
+	var sheet := PixelScale.sheet_rect(n, DEBRIS_UNITS)
+	var src := Rect2(sheet.position + u.position * float(n), u.size * float(n))
+	draw_texture_rect_region(DEBRIS_TEX, Rect2(PixelDraw.snap2_to(self, r.position), Vector2(w, h)), src)
 	return true
 
-## Pixel-Hindernisse (Trümmer, Schieber, fahrende Plattformen) aus dem Kachelblatt assets/art/movers.png (tools/art/gen_movers.py): neun Stücke
-## (Ecken, Kanten, Füllung) in 12 × 12 Bildpunkten (4 Einheiten), 1 Bildpunkt = 1/3 Einheit. Zeile 0 Trümmer, 1 Schieber, 2 Plattform.
+## Pixel-Hindernisse (Trümmer, Schieber, fahrende Plattformen) aus dem Kachelblatt assets/art/movers_sizes.png (tools/art/gen_movers.py sizes): neun Stücke
+## (Ecken, Kanten, Füllung) in 4 Einheiten = 4·n Bildpunkten, je Pixelgröße n eigens gerastert. Zeile 0 Trümmer, 1 Schieber, 2 Plattform.
 ## Jede Größe entsteht aus denselben Stücken; die Fläche ist genau die der Trefferfläche `r`, nur auf das Raster gelegt.
-const MOVER_TEX: Texture2D = preload("res://assets/art/movers.png")
-const MV := 12
+const MOVER_TEX: Texture2D = preload("res://assets/art/movers_sizes.png")
+const MOVER_UNITS := Vector2(40, 12)              # ein Blatt in Einheiten: 10 Spalten × 3 Zeilen zu 4 Einheiten
 var _slice_cache := {}
 
 ## Aufteilung einer Länge in Bildpunkten in Stücke [Start, Länge, Art]: Art 0 Anfang, 1 Mitte, 2 Ende (das letzte Mittelstück wird gekürzt).
-func _slices(n: int) -> Array:
-	n = maxi(n, 2 * MV)
-	if _slice_cache.has(n):
-		return _slice_cache[n]
-	var out: Array = [[0, MV, 0]]
-	var pos := MV
-	while pos < n - MV:
-		out.append([pos, mini(MV, n - MV - pos), 1])
-		pos += MV
-	out.append([n - MV, MV, 2])
-	_slice_cache[n] = out
+func _slices(len_px: int, mv: int) -> Array:
+	len_px = maxi(len_px, 2 * mv)
+	var key := Vector2i(len_px, mv)
+	if _slice_cache.has(key):
+		return _slice_cache[key]
+	var out: Array = [[0, mv, 0]]
+	var pos := mv
+	while pos < len_px - mv:
+		out.append([pos, mini(mv, len_px - mv - pos), 1])
+		pos += mv
+	out.append([len_px - mv, mv, 2])
+	_slice_cache[key] = out
 	return out
 
 func _draw_mover_box(row: int, r: Rect2, seed: int) -> void:
-	var o := PixelDraw.snap2(r.position)
-	var xs := _slices(roundi(r.size.x * 3.0))
-	var ys := _slices(roundi(r.size.y * 3.0))
+	var n := PixelScale.size_for(self)
+	var mv := 4 * n
+	var o := PixelDraw.snap2_to(self, r.position)
+	var sheet := PixelScale.sheet_rect(n, MOVER_UNITS)
+	var xs := _slices(roundi(r.size.x * float(n)), mv)
+	var ys := _slices(roundi(r.size.y * float(n)), mv)
+	var px := 1.0 / float(n)
 	for j in ys.size():
 		var sy: Array = ys[j]
 		for i in xs.size():
@@ -611,8 +636,8 @@ func _draw_mover_box(row: int, r: Rect2, seed: int) -> void:
 			var cell := int(sy[2]) * 3 + int(sx[2])                   # 0–8: oben/Mitte/unten × links/Mitte/rechts
 			if cell == 4 and ((i * 7 + j * 13 + seed) % 3 + 3) % 3 == 0:
 				cell = 9                                              # zweite Füllung (Risse, schlichte Platte), damit sich nichts wiederholt
-			draw_texture_rect_region(MOVER_TEX, Rect2(o + Vector2(float(sx[0]), float(sy[0])) * PixelDraw.PX, Vector2(float(sx[1]), float(sy[1])) * PixelDraw.PX),
-					Rect2(cell * MV, row * MV, int(sx[1]), int(sy[1])))
+			draw_texture_rect_region(MOVER_TEX, Rect2(o + Vector2(float(sx[0]), float(sy[0])) * px, Vector2(float(sx[1]), float(sy[1])) * px),
+					Rect2(sheet.position + Vector2(cell * mv, row * mv), Vector2(int(sx[1]), int(sy[1]))))
 
 ## Fahrende Plattform: Schiene über den ganzen Fahrweg, Platte mit türkiser Landeleiste, optional Dornen unten (rosa, Spitzen nach unten).
 func _draw_pad_mover(m: Dictionary, r: Rect2) -> void:
@@ -636,10 +661,11 @@ func _draw_pad_mover(m: Dictionary, r: Rect2) -> void:
 
 ## Eine Dorne aus Pixelzeilen: Grundlinie oben, Spitze nach unten; linke Hälfte hell, rechte dunkler, ein heller Kiel in der Mitte.
 func _pixel_spike(base: Vector2, w: float, h: float) -> void:
-	var w_px := maxi(roundi(w * 3.0), 2)
-	var h_px := maxi(roundi(h * 3.0), 1)
-	var x0 := roundi(base.x * 3.0)
-	var y0 := roundi(base.y * 3.0)
+	var nf := float(PixelScale.size_for(self))
+	var w_px := maxi(roundi(w * nf), 2)
+	var h_px := maxi(roundi(h * nf), 1)
+	var x0 := roundi(base.x * nf)
+	var y0 := roundi(base.y * nf)
 	for k in h_px:
 		var half := maxf(float(w_px) * 0.5 * (1.0 - (float(k) + 0.5) / float(h_px)), 0.5)
 		var half_i := maxi(roundi(half), 1)
@@ -674,6 +700,8 @@ func _draw_vehicle(m: Dictionary) -> void:
 		return
 	var c: Vector2 = st.pos
 	var dir: Vector2 = st.dir
+	if absf(dir.x) < 0.01 or absf(dir.y) < 0.01:
+		c = PixelDraw.snap2_to(self, c)                                      # waagerecht oder senkrecht: Fahrzeug auf ganzen Bildpunkten, 1:1
 	var tex := _vehicle_tex(int(m.paint))
 	var ang := dir.angle() if dir.x >= 0.0 else dir.angle() + PI          # Fahrtrichtung links: Sprite gespiegelt statt auf dem Kopf
 	var flip := -1.0 if dir.x < -0.01 else 1.0
@@ -700,7 +728,7 @@ func _draw_vehicle(m: Dictionary) -> void:
 		var f := float(i + 1) / 4.0
 		draw_circle(Vector2(-fwd * (hw + 0.4 + f * 6.0), 0.7 + sin(t * 20.0 + float(i)) * 0.5), (1.0 - f) * 2.0 + 0.4, Color(1.0, 0.6 - f * 0.3, 0.2, 0.55 * (1.0 - f)))      # Düse am Heck
 	draw_set_transform(c, ang, Vector2(flip, 1.0))                                                            # Spiegeln über die Transformation (negative Rechtecke verschieben das Bild um eine Länge)
-	draw_texture_rect(tex, Rect2(-VEH_SIZE * 0.5, VEH_SIZE), false)
+	draw_texture_rect_region(tex, Rect2(-VEH_SIZE * 0.5, VEH_SIZE), _vehicle_src(int(m.paint)))
 	draw_set_transform(c, ang, Vector2.ONE)
 	draw_circle(Vector2(fwd * (hw - 1.2), 1.6), 1.1, Color(1.0, 0.98, 0.75, 0.95))                              # Scheinwerfer sitzt an der Nase
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -724,10 +752,10 @@ func _draw_beam(m: Dictionary) -> void:
 	if not active and eta <= float(m.warn):
 		var k := 1.0 - eta / float(m.warn)
 		var fl := 0.25 + 0.5 * absf(sin(t * (10.0 + 14.0 * k)))
-		draw_line(a0, a1, Color(1.0, 0.3, 0.9, fl * (0.4 + 0.6 * k)) if neon else Color(1.0, 0.45, 0.2, fl * (0.4 + 0.6 * k)), 1.0)
+		draw_line(a0, a1, Color(1.0, 0.3, 0.9, fl * (0.4 + 0.6 * k)) if neon else Color(1.0, 0.45, 0.2, fl * (0.4 + 0.6 * k)), PixelDraw.wsnap(self, 1.0))
 		return
 	if not active:
-		draw_line(a0, a1, Color(0.5, 0.45, 0.6, 0.18), 1.0)
+		draw_line(a0, a1, Color(0.5, 0.45, 0.6, 0.18), PixelDraw.wsnap(self, 1.0))
 		return
 	var thick := (lr.size.y if horiz else lr.size.x)
 	for i in 4:
@@ -744,7 +772,7 @@ func _draw_beam(m: Dictionary) -> void:
 		var p := a0.lerp(a1, u)
 		var jit := sin(t * 40.0 + float(i) * 2.3) * 1.6 * sin(u * PI)
 		pts.append(p + (Vector2(0.0, jit) if horiz else Vector2(jit, 0.0)))
-	draw_polyline(pts, Color(0.85, 1.0, 1.0, 0.95) if neon else Color(1.0, 1.0, 0.9, 0.95), 1.0)
+	draw_polyline(pts, Color(0.85, 1.0, 1.0, 0.95) if neon else Color(1.0, 1.0, 0.9, 0.95), PixelDraw.wsnap(self, 1.0))
 
 ## Meteorit: vor dem Fall blinkt seine Bahn als Warnstreifen, im Fall zieht er einen Feuerschweif hinter sich her.
 func _draw_meteor(m: Dictionary) -> void:
@@ -757,8 +785,8 @@ func _draw_meteor(m: Dictionary) -> void:
 		var lr: Rect2 = level.lane_rect(m)
 		var pulse := 0.5 + 0.5 * sin(t * (7.0 + 12.0 * k))
 		draw_rect(lr, Color(1.0, 0.2, 0.15, (0.10 + 0.22 * pulse) * (0.5 + 0.5 * k)))
-		draw_line(lr.position, Vector2(lr.position.x, lr.end.y), Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), 1.2)
-		draw_line(Vector2(lr.end.x, lr.position.y), lr.end, Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), 1.2)
+		draw_line(lr.position, Vector2(lr.position.x, lr.end.y), Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), PixelDraw.wsnap(self, 1.2))
+		draw_line(Vector2(lr.end.x, lr.position.y), lr.end, Color(1.0, 0.45, 0.3, 0.45 + 0.5 * pulse), PixelDraw.wsnap(self, 1.2))
 		var horiz := lr.size.x > lr.size.y
 		var dirw := (a1 - a0).normalized()
 		var span := a0.distance_to(a1)
@@ -766,10 +794,10 @@ func _draw_meteor(m: Dictionary) -> void:
 			var u := fposmod(t * 70.0 + float(i) * 26.0, maxf(span, 1.0))
 			var p := a0 + dirw * u
 			var nrm := Vector2(-dirw.y, dirw.x)
-			draw_polyline(PackedVector2Array([p - dirw * 3.0 + nrm * 4.0, p + dirw * 2.0, p - dirw * 3.0 - nrm * 4.0]), Color(1.0, 0.5, 0.35, 0.35 + 0.5 * pulse), 1.4)
+			draw_polyline(PackedVector2Array([p - dirw * 3.0 + nrm * 4.0, p + dirw * 2.0, p - dirw * 3.0 - nrm * 4.0]), Color(1.0, 0.5, 0.35, 0.35 + 0.5 * pulse), PixelDraw.wsnap(self, 1.4))
 		var tp := a0 - dirw * 9.0
 		draw_colored_polygon(PackedVector2Array([tp + Vector2(0, -7), tp + Vector2(7, 6), tp + Vector2(-7, 6)]), Color(1.0, 0.82, 0.15, 0.55 + 0.45 * pulse))
-		draw_polyline(PackedVector2Array([tp + Vector2(0, -7), tp + Vector2(7, 6), tp + Vector2(-7, 6), tp + Vector2(0, -7)]), Color(0.45, 0.05, 0.05, 0.95), 1.2)
+		draw_polyline(PackedVector2Array([tp + Vector2(0, -7), tp + Vector2(7, 6), tp + Vector2(-7, 6), tp + Vector2(0, -7)]), Color(0.45, 0.05, 0.05, 0.95), PixelDraw.wsnap(self, 1.2))
 		draw_rect(Rect2(tp.x - 0.7, tp.y - 3.0, 1.4, 5.0), Color(0.45, 0.05, 0.05, 0.95))
 		draw_rect(Rect2(tp.x - 0.7, tp.y + 3.0, 1.4, 1.4), Color(0.45, 0.05, 0.05, 0.95))
 		return
@@ -805,7 +833,7 @@ func _draw_meteor(m: Dictionary) -> void:
 		draw_circle(cp, 1.3 + 0.5 * float(i % 2), Color(0.18, 0.14, 0.17, 0.85))
 		draw_circle(cp + Vector2(-0.4, -0.4), 0.6, Color(0.55, 0.47, 0.5, 0.8))
 	pts.append(pts[0])
-	draw_polyline(pts, Color(1.0, 0.55, 0.2, 0.9), 1.0)
+	draw_polyline(pts, Color(1.0, 0.55, 0.2, 0.9), PixelDraw.wsnap(self, 1.0))
 
 ## Beleuchtete Wartehütte: warmes Fensterlicht, Halo und ein Lichtfleck auf der Plattform. Wartet dort ein Fahrgast, leuchtet sie heller
 ## und flackert leicht; sonst brennt ein gedämpftes Licht.
@@ -855,15 +883,21 @@ func _draw_gate() -> void:
 			var cy: float = inner.end.y - fmod(t * 14.0 + k * 9.0, 27.0)
 			var cxm: float = inner.get_center().x
 			var chev := PackedVector2Array([Vector2(cxm - 8, cy + 4), Vector2(cxm, cy - 2), Vector2(cxm + 8, cy + 4)])
-			draw_polyline(chev, Color(0.05, 0.4, 0.2, door * 0.9), 1.5)
+			draw_polyline(chev, Color(0.05, 0.4, 0.2, door * 0.9), PixelDraw.wsnap(self, 1.5))
 	# Torflügel schieben sich beim Öffnen seitlich in den Rahmen
-	var d := door * LEAF_W
-	var vis := LEAF_W - d
-	if vis > PX:
+	var gn := PixelScale.size_for(self)
+	var dpx := roundi(door * LEAF_W * float(gn))                       # Verschiebung in ganzen Bildpunkten
+	var vis_px := roundi(LEAF_W * float(gn)) - dpx
+	if vis_px > 0:
 		var lh := inner.size.y
-		draw_texture_rect_region(leaf_l, Rect2(inner.position.x, inner.position.y, vis, lh), Rect2(d * 3.0, 0, vis * 3.0, lh * 3.0))
-		draw_texture_rect_region(leaf_r, Rect2(inner.position.x + LEAF_W + d, inner.position.y, vis, lh), Rect2(0, 0, vis * 3.0, lh * 3.0))
-	draw_texture_rect(gate_frame, r, false)
+		var ls := PixelScale.sheet_rect(gn, LEAF_UNITS)
+		var vis := float(vis_px) / float(gn)
+		draw_texture_rect_region(gate_leaf, Rect2(inner.position.x, inner.position.y, vis, lh), Rect2(ls.position.x + dpx, ls.position.y, vis_px, ls.size.y))
+		var rx := inner.position.x + LEAF_W * 2.0 - vis                        # rechter Flügel: gespiegelt, von rechts nach innen geschoben
+		draw_set_transform(Vector2(rx + vis, 0.0), 0.0, Vector2(-1.0, 1.0))
+		draw_texture_rect_region(gate_leaf, Rect2(0.0, inner.position.y, vis, lh), Rect2(ls.position.x + dpx, ls.position.y, vis_px, ls.size.y))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	draw_texture_rect_region(gate_frame, r, PixelScale.sheet_rect(gn, GATE_UNITS))
 	# Statuslampen im Rahmen und Schild auf dem Deckenfels
 	var blink := int(t * 3.0) % 2 == 0
 	var lamp := Color("#5dff9a") if open else (Color("#ff4d6d") if blink else Color("#7a2438"))
@@ -883,6 +917,12 @@ func _draw_gate() -> void:
 		var spill := Color("#5dff9a")
 		spill.a = 0.10 + 0.04 * sin(t * 4.0)
 		draw_colored_polygon(PackedVector2Array([Vector2(r.position.x + 6, r.end.y), Vector2(r.end.x - 6, r.end.y), Vector2(r.end.x + 22, r.end.y + 56), Vector2(r.position.x - 22, r.end.y + 56)]), spill)
+
+## Ausschnitt eines Figurenbilds (Bild 0–9, Figur 0–13) im Blatt der aktuellen Pixelgröße.
+func _pass_src(frame: int, look: int) -> Rect2:
+	var n := PixelScale.size_for(self)
+	var r := PixelScale.sheet_rect(n, PASS_UNITS)
+	return Rect2(r.position + Vector2(frame, look) * PASS_IMG * float(n), PASS_IMG * float(n))
 
 func _actor_frame(a: PassengerActor) -> int:
 	if a.is_walking():
@@ -904,11 +944,13 @@ func _draw_actor(a: PassengerActor) -> void:
 		draw_set_transform(Vector2(pos.x, pos.y), 0.0, Vector2(1.0, 0.32))
 		draw_circle(Vector2.ZERO, 3.6, Color(0.0, 0.0, 0.05, 0.38 * a.fade))
 		draw_circle(Vector2.ZERO, 2.4, Color(0.0, 0.0, 0.05, 0.25 * a.fade))
-	draw_set_transform(Vector2(pos.x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
+	var pass_x := PixelDraw.snap_to(self, pos.x - PASS_IMG.x * 0.5) + PASS_IMG.x * 0.5            # Figur auf ganzen Bildpunkten (auch gespiegelt)
+	var pass_y := PixelDraw.snap_to(self, pos.y - PASS_IMG.y)
+	draw_set_transform(Vector2(pass_x, 0), 0.0, Vector2(a.facing if a.is_walking() else 1.0, 1.0))
 	if a.medical:
 		_draw_stretcher(a, pos.y, col.a)
 	else:
-		draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, pos.y - Tuning.PASS_H, Tuning.PASS_W, Tuning.PASS_H), Rect2(_actor_frame(a) * 24, a.look * 36, 24, 36), col)
+		draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, pass_y, PASS_IMG.x, PASS_IMG.y), _pass_src(_actor_frame(a), a.look), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	_draw_amount(a, pos)
 	var dest := run.dest_of(a)
@@ -933,16 +975,16 @@ func _draw_stretcher(a: PassengerActor, y: float, al: float) -> void:
 	for wx in [-8.0, 8.0]:
 		draw_circle(Vector2(wx, yy - 1.4), 1.5, ink)
 		draw_circle(Vector2(wx, yy - 1.4), 0.7, Color(0.7, 0.75, 0.85, al))
-		draw_line(Vector2(wx, yy - 2.6), Vector2(wx * 0.9, yy - 4.6), Color(0.55, 0.6, 0.75, al), 1.0)
+		draw_line(Vector2(wx, yy - 2.6), Vector2(wx * 0.9, yy - 4.6), Color(0.55, 0.6, 0.75, al), PixelDraw.wsnap(self, 1.0))
 	draw_rect(Rect2(-10.5, yy - 5.2, 21.0, 1.2), Color(0.6, 0.66, 0.8, al))
 	# Matratze und Kissen
 	draw_rect(Rect2(-10.5, yy - 7.8, 21.0, 2.8), Color(0.94, 0.96, 1.0, al))
-	draw_rect(Rect2(-10.5, yy - 7.8, 21.0, 2.8), ink, false, 0.6)
+	draw_rect(Rect2(-10.5, yy - 7.8, 21.0, 2.8), ink, false, PixelDraw.wsnap(self, 0.6))
 	draw_rect(Rect2(-10.0, yy - 9.6, 5.0, 2.0), Color(0.98, 0.98, 1.0, al))
 	# Körper unter der Decke (hellgrün), Kopf links
 	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 2.8), Color(0.55, 0.82, 0.78, al))
 	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 0.9), Color(0.72, 0.92, 0.88, al))
-	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 2.8), ink, false, 0.6)
+	draw_rect(Rect2(-5.0, yy - 10.6, 15.0, 2.8), ink, false, PixelDraw.wsnap(self, 0.6))
 	draw_circle(Vector2(-7.4, yy - 10.4), 2.5, Color(0.86, 0.82, 0.74, al))             # blasses Gesicht
 	draw_circle(Vector2(-7.4, yy - 10.4), 2.5, ink, false, 0.6) if false else null
 	draw_rect(Rect2(-8.6, yy - 11.0, 1.1, 0.5), ink)                                       # geschlossene Augen
@@ -952,10 +994,10 @@ func _draw_stretcher(a: PassengerActor, y: float, al: float) -> void:
 	draw_rect(Rect2(3.2, yy - 10.2, 1.0, 2.2), Color(0.9, 0.12, 0.18, al))
 	draw_rect(Rect2(2.6, yy - 9.6, 2.2, 1.0), Color(0.9, 0.12, 0.18, al))
 	# Infusionsständer mit tropfendem Beutel
-	draw_line(Vector2(11.5, yy - 3.5), Vector2(11.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), 0.8)
-	draw_line(Vector2(9.5, yy - 17.5), Vector2(13.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), 0.8)
+	draw_line(Vector2(11.5, yy - 3.5), Vector2(11.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), PixelDraw.wsnap(self, 0.8))
+	draw_line(Vector2(9.5, yy - 17.5), Vector2(13.5, yy - 17.5), Color(0.65, 0.7, 0.85, al), PixelDraw.wsnap(self, 0.8))
 	draw_rect(Rect2(9.8, yy - 17.0, 3.0, 4.2), Color(0.55, 0.85, 1.0, al * 0.9))
-	draw_line(Vector2(11.3, yy - 12.8), Vector2(5.0, yy - 9.6), Color(0.8, 0.9, 1.0, al * 0.7), 0.5)
+	draw_line(Vector2(11.3, yy - 12.8), Vector2(5.0, yy - 9.6), Color(0.8, 0.9, 1.0, al * 0.7), PixelDraw.wsnap(self, 0.5))
 	var drip := fmod(t * 1.3 + float(a.job_index) * 0.37, 1.0)
 	draw_rect(Rect2(11.0, yy - 12.4 + drip * 3.0, 0.8, 0.8), Color(0.7, 0.95, 1.0, al * (1.0 - drip)))
 
@@ -1016,7 +1058,7 @@ func _draw_falling(a: PassengerActor, pos: Vector2) -> void:
 	var col := Color(1, 1, 1, a.fade) if a.state == PassengerActor.S.FALLING else Color(0.8, 0.7, 0.7, a.fade)
 	var cy := pos.y - Tuning.PASS_H * 0.5 if a.state == PassengerActor.S.FALLING else pos.y - 2.5
 	draw_set_transform(Vector2(pos.x, cy), rot, Vector2.ONE)
-	draw_texture_rect_region(pass_tex, Rect2(-Tuning.PASS_W * 0.5, -Tuning.PASS_H * 0.5, Tuning.PASS_W, Tuning.PASS_H), Rect2(frame * 24, a.look * 36, 24, 36), col)
+	draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, -PASS_IMG.y * 0.5, PASS_IMG.x, PASS_IMG.y), _pass_src(frame, a.look), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if a.state == PassengerActor.S.FALLING:
 		var shake := sin(t * 40.0) * 0.6
@@ -1085,7 +1127,7 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 	var tw := maxf(16.0, font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x + 4.0)     # Betrag nie abschneiden
 	var mand := run.extra_of(a).is_empty() and a == run.actor
 	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(0.04, 0.05, 0.14, 0.92 * a.fade))
-	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(1.0, 0.82, 0.2, a.fade) if mand else Color(0.3, 0.85, 0.95, 0.7 * a.fade), false, 0.7)
+	draw_rect(Rect2(pos.x - tw * 0.5, pos.y - 21.0, tw, 7.2), Color(1.0, 0.82, 0.2, a.fade) if mand else Color(0.3, 0.85, 0.95, 0.7 * a.fade), false, PixelDraw.wsnap(self, 0.7))
 	if mand and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
 		_gold_star(Vector2(pos.x, pos.y - 28.0 - sin(t * 4.0) * 1.0), 3.6, a.fade)
 	draw_string_outline(font, Vector2(pos.x - tw * 0.5, pos.y - 15.2), txt, HORIZONTAL_ALIGNMENT_CENTER, tw, 7, 3, Color(0.02, 0.03, 0.1, a.fade))
@@ -1100,7 +1142,8 @@ func _draw_pumps() -> void:
 		var top := r.end.y - 32.0
 		var broken := run.pump_broken
 		var stage := mini(run.pump_touches, 3)
-		draw_texture_rect(pump_base_tex, Rect2(r.position.x, top, 16, 32), false, Color(0.32, 0.27, 0.27) if broken else Color.WHITE)
+		var pn := PixelScale.size_for(self)
+		draw_texture_rect_region(pump_base_tex, Rect2(r.position.x, top, 16, 32), PixelScale.sheet_rect(pn, PUMP_UNITS), Color(0.32, 0.27, 0.27) if broken else Color.WHITE)
 		if broken:
 			return
 		var rots := [0.0, 0.2, 0.55, 1.2]
@@ -1108,7 +1151,7 @@ func _draw_pumps() -> void:
 		var pivot: Vector2 = Vector2(r.position.x + 8.0, top + 11.3) + drops[stage]
 		var flick := 1.0 if stage < 2 else (0.55 + 0.45 * absf(sin(t * 23.0)))
 		draw_set_transform(pivot, rots[stage], Vector2.ONE)
-		draw_texture_rect(pump_head_tex, Rect2(-11, -14.5, 22, 16), false, Color(1, 1, 1, 1))          # Kopf größer: auch Preise wie 15.26 passen hinein
+		draw_texture_rect_region(pump_head_tex, Rect2(-11, -14.5, 22, 16), PixelScale.sheet_rect(pn, PUMP_HEAD_UNITS))          # Kopf größer: auch Preise wie 15.26 passen hinein
 		# Anzeige: Preis (farbig nach Preisniveau) bzw. Fehlermeldung bei Stufe 3
 		var pf := run.fuel_price()
 		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
@@ -1152,7 +1195,7 @@ func _draw_reflections() -> void:
 			if h > -1.5 and h < 46.0:
 				var a := 0.34 * (1.0 - clampf(h, 0.0, 46.0) / 46.0)
 				draw_set_transform(Vector2(s.pos.x, 2.0 * surf - s.pos.y), -s.tilt, Vector2(Tuning.TAXI_SCALE, -Tuning.TAXI_SCALE))
-				var fr := Cosmetics.taxi_frame(Cosmetics.pick_size(Cosmetics.pixel_scale(self)))      # dieselbe Größe wie das Taxi darüber
+				var fr := Cosmetics.taxi_frame(PixelScale.size_for(self))      # dieselbe Größe wie das Taxi darüber
 				var r0 := Tuning.reflect_row(int(fr.n))
 				var src := Rect2(fr.src.position.x, fr.src.position.y + r0, fr.src.size.x, fr.src.size.y - r0)
 				draw_texture_rect_region(fr.tex, Tuning.reflect_dst(int(fr.n)), src, Color(0.7, 0.92, 1.0, a))
