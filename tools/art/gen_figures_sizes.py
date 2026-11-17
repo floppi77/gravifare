@@ -28,7 +28,7 @@ def _load_fig():
     b = src.index("ORDER = ")
     b = src.index("\n", b)
     ns = {}
-    exec(src[a:b], ns)
+    exec(src[a:b], ns)  # nosec B102 - eigene Datei im Repo (FIG besteht aus dict()-Aufrufen, literal_eval geht nicht)
     return ns["FIG"], ns["ORDER"]
 
 
