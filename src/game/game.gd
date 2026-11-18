@@ -143,6 +143,7 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--autopilot") or (Flow.community and Flow.editor_autopilot):
 		run.extras_enabled = false      # Autopilot (Dev bzw. Testflug im Level-Editor) fährt nur die Auftragskette
 		autopilot = Bot.new(run, Flow.community and Flow.editor_autopilot)
+		autopilot.replan_gap = 0.25           # im Bild: nicht in jedem Tick neu planen (Runde 84)
 	for ua in OS.get_cmdline_user_args():
 		if ua.begins_with("--skip-time="):          # Dev: Spielzeit vorspulen (Taxi bleibt stehen), z. B. für Screenshots von Meteoriten
 			for i in int(float(ua.substr(12)) / Tuning.TICK):
@@ -317,6 +318,7 @@ func load_level(path: String) -> void:
 	if autopilot != null:
 		run.extras_enabled = false      # Dev-Autopilot fährt nur die Auftragskette
 		autopilot = Bot.new(run, Flow.community and Flow.editor_autopilot)
+		autopilot.replan_gap = 0.25           # im Bild: nicht in jedem Tick neu planen (Runde 84)
 	hud.paused = false
 	paused = false
 	near_z = 0.0
@@ -844,7 +846,7 @@ func _physics_process(_delta: float) -> void:
 		# Ohne eine einzige Beförderung (z. B. Leerlauf bis zum Countdown) zählt das Level nicht als geschafft.
 		var counted := run.delivered > 0 or run.extras_delivered > 0
 		var med := run.medals() if counted else {"time": false, "clean": false, "pro": false}
-		hud.result = {"counted": counted, "time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
+		hud.result = {"counted": counted, "time": run.level_time, "target": run.time_target(), "best": prev_best, "medals": med, "money_target": run.money_target(), "earned": run.earned, "repair": run.repair_cost, "taxi_fees": run.taxi_fees, "missed_fees": run.missed_fees, "fuel": run.fuel_cost, "net": run.earned - run.repair_cost - run.taxi_fees - run.missed_fees - run.fuel_cost, "delivered": run.delivered, "jobs": run.level.jobs.size(), "extras": run.extras_delivered, "balance": run.money}
 		hud.result_age = 0.0
 		hud.next_exists = Flow.next_level_id() != ""
 		var score := run.level_score() if counted else 0
@@ -1137,8 +1139,8 @@ func _debug_result(variant: String) -> void:
 	hud.result = {"counted": counted, "time": 87.4 if all else 131.2, "target": 96.0, "best": 91.0 if variant != "none" else 84.0,
 		"medals": {"time": all, "clean": all and variant != "solved", "pro": all}, "money_target": 520.0,
 		"earned": 612.0 if counted else 0.0, "repair": 0.0 if all else 46.0, "taxi_fees": 0.0 if variant != "none" else 120.0,
-		"missed_fees": 0.0 if variant != "none" else 88.0, "delivered": 4 if counted else 0, "jobs": 4, "extras": 2 if counted else 0, "balance": 2384.0}
-	hud.result["net"] = float(hud.result.earned) - float(hud.result.repair) - float(hud.result.taxi_fees) - float(hud.result.missed_fees)
+		"missed_fees": 0.0 if variant != "none" else 88.0, "fuel": 37.0 if all else 64.0, "delivered": 4 if counted else 0, "jobs": 4, "extras": 2 if counted else 0, "balance": 2384.0}
+	hud.result["net"] = float(hud.result.earned) - float(hud.result.repair) - float(hud.result.taxi_fees) - float(hud.result.missed_fees) - float(hud.result.fuel)
 	hud.result["score"] = 1089 if all else (152 if counted else 0)
 	hud.result["best_score"] = 1089 if all else 940
 	if variant == "solved":

@@ -3,6 +3,46 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.6.6
+
+### Deutsch
+
+**Neu**
+- Neue Credits: Ein Taxi zieht ein Werbebanner mit der Kategorie über den Himmel, unten halten Fahrgäste die Einträge auf Schildern und Spruchbändern hoch – jedes Mal mit anderer Lackierung und aus einer anderen Richtung, zum Schluss winken alle
+- Blender ist in den Credits mit eigener Kategorie „3D-Grafik“ genannt
+- Levelauswertung: Die Abrechnung zeigt jetzt auch die im Level bezahlten Spritkosten (auch in der Nachtschicht)
+
+**Level-Editor**
+- Eigene Aufträge springen beim Durchschalten einer Plattformzahl nicht mehr auf die automatischen Ziele zurück
+- Rechtsklick auf Start oder Ziel eines Auftrags schaltet eine Zahl zurück, Linksklick weiter
+- Das Krankenhaus lässt sich bei jedem Auftrag als Ziel wählen; der Fahrgast wird dabei zum Patienten
+
+**Leistung**
+- Level mit Magnetfeldern und anderen schrägen Linien zeichnen schneller (in 4K bis zu ein Drittel weniger Rechenzeit je Bild), bei gleichem Bild
+- Testflug mit Autopilot im Editor ruckelt vor Toren nicht mehr
+
+**Level**
+- Level 94 überarbeitet (Karte und Aufträge), neue Vorschau in der Levelauswahl
+
+### English
+
+**New**
+- New credits: a taxi tows an advertising banner with the category across the sky while passengers below hold up the entries on signs and banners – every pass with a different paint job and from a different direction, and everyone waves at the end
+- Blender is credited with its own "3D graphics" category
+- Level results: the ledger now also shows the fuel you paid for in the level (night shift too)
+
+**Level editor**
+- Custom jobs no longer jump back to automatic destinations while you cycle a platform number
+- Right-click on a job's start or destination steps one number back, left-click steps forward
+- The hospital can be picked as a destination for any job; the passenger becomes a patient
+
+**Performance**
+- Levels with magnetic fields and other diagonal lines draw faster (up to a third less time per frame in 4K), with an identical picture
+- Autopilot test flights in the editor no longer stutter in front of gates
+
+**Levels**
+- Level 94 reworked (map and jobs), new preview in level select
+
 ## 1.6.5
 
 ### Deutsch

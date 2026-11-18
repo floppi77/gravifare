@@ -16,6 +16,7 @@ var cars: Array = []
 var meteors: Array = []
 var meteor_timer := 2.0
 var hero_t := -4.0
+var hero := true                 # Taxi im Vordergrund (die Credits haben ihr eigenes)
 var rng := RandomNumberGenerator.new()
 var _wf := 1.0                    # Breitenfaktor (Ultrawide > 1): Sterne, Verkehr und Kacheln verteilen sich über die ganze Breite
 var _oy := 0.0                    # Versatz nach unten bei höheren Fenstern (Skyline bleibt unten)
@@ -144,7 +145,7 @@ func _draw_cars(front: bool) -> void:
 
 ## Großes Taxi im Vordergrund: fliegt alle ~11 s gemächlich durchs Bild, mit Funkenspur.
 func _draw_hero() -> void:
-	if hero_t < 0.0 or hero_t > 9.0:
+	if not hero or hero_t < 0.0 or hero_t > 9.0:
 		return
 	var k := hero_t / 9.0
 	var x := lerpf(-50.0, 700.0 * _wf, k)

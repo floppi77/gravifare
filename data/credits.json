@@ -79,10 +79,10 @@
   [
    "head",
    {
-    "de": "Hintergründe & Logo",
-    "en": "Backgrounds & logo",
-    "fr": "Décors et logo",
-    "es": "Fondos y logotipo"
+    "de": "Level-Hintergründe & Logo",
+    "en": "Level backgrounds & logo",
+    "fr": "Décors des niveaux et logo",
+    "es": "Fondos de los niveles y logotipo"
    }
   ],
   [
@@ -92,6 +92,37 @@
     "en": "AI-generated",
     "fr": "générés par IA",
     "es": "generados con IA"
+   }
+  ],
+  [
+   "head",
+   {
+    "de": "3D-Grafik",
+    "en": "3D graphics",
+    "fr": "Graphismes 3D",
+    "es": "Gráficos 3D"
+   }
+  ],
+  [
+   "line",
+   "Blender – blender.org"
+  ],
+  [
+   "line",
+   {
+    "de": "Licht, Glanz und Rundung des Taxis",
+    "en": "Lighting, gloss and shape of the taxi",
+    "fr": "Lumière, reflets et volume du taxi",
+    "es": "Luz, brillo y volumen del taxi"
+   }
+  ],
+  [
+   "line",
+   {
+    "de": "Hintergründe der Flüge zwischen den Leveln",
+    "en": "Backgrounds of the flights between levels",
+    "fr": "Décors des vols entre les niveaux",
+    "es": "Fondos de los vuelos entre niveles"
    }
   ],
   [
@@ -214,7 +245,7 @@
   ],
   [
    "line",
-   "Python · NumPy · SciPy · Pillow · Blender · FFmpeg · faster-whisper"
+   "Python · NumPy · SciPy · Pillow · FFmpeg · faster-whisper"
   ],
   [
    "head",

@@ -43,6 +43,12 @@ var cross_dir := 0.0           # pro: Richtung (±1) des beschlossenen Tordurchf
 var route_until := -1.0         # pro: bis zu dieser Zeit entscheidet die Bahnvorhersage (nach längerem Stillstand vor einem Hindernis)
 var pump_off_until := -1.0      # pro: bis zu dieser Zeit bleibt die Zapfsäulen-Planung aus (nach langem Stillstand: der Umweg um die Säule ist die Falle)
 var track_until := -1.0         # pro: bis zu dieser Zeit fliegt der Bot mit der Öffnung einer schnellen Sweep-Schleuse mit
+## Mindestabstand (Spielsekunden) zwischen erzwungenen Neuplanungen zum selben Ziel. 0 = in jedem Tick (Prüfflüge ohne Bild, unverändert);
+## im Spiel (Testflug im Editor, Dev-Autopilot) 0,25 s: Vor Toren wechselte der Bot sonst bis zu einer Sekunde lang in jedem Tick zwischen Warten
+## und Neuplanen, und jede Wegsuche kostet 10–20 ms (Runde 84: 20–43 ms je Bild in Level 20, 52, 82). Die Menü-Demo bleibt bei 0 (ihre Flüge unverändert).
+var replan_gap := 0.0
+var _plan_t := -1.0e9
+var _plan_key := ""
 
 func _init(r: Run, pro_mode := false) -> void:
 	run = r
@@ -107,8 +113,11 @@ func decide() -> Array:
 		landing = false
 		goal_key = ""   # neu planen
 		return [Vector2(0, -1), true]
-	if key != goal_key:
+	var throttled := replan_gap > 0.0 and goal_key == "" and key == _plan_key and level.clock - _plan_t < replan_gap
+	if key != goal_key and not throttled:
 		goal_key = key
+		_plan_key = key
+		_plan_t = level.clock
 		landing = false
 		if heading_exit:
 			var sum := Vector2.ZERO
@@ -569,12 +578,13 @@ func _sweep_track(ch: String, gate: Dictionary) -> float:
 	return clampf(vg + (c - sim.pos.y) * 4.0, -lim, lim)
 
 ## `rules`: Regelstand der Auftragslogik (Run.RULES; 2 = Tankregel und Aufträge wie bis 1.0.1, für den Nachweis der Fliegbarkeit, siehe Testläufer).
-static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false, rules := Run.RULES) -> Dictionary:
+static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false, rules := Run.RULES, replan_gap := 0.0) -> Dictionary:
 	var r := Run.new()
 	r.rules = rules
 	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional
 	r.start(lvl, fuel_in)
 	var bot := Bot.new(r, pro_mode)
+	bot.replan_gap = replan_gap
 	var rep: Replay = null
 	if record:
 		rep = Replay.new()

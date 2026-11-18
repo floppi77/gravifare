@@ -56,58 +56,65 @@ static func _cells(ci: CanvasItem, x: int, y: int, w: int, h: int, col: Color) -
 ## Gerade Linie von a nach b, `w_px` Bildpunkte dick (Vielfache von 1/3 Einheit). Waagerechte und senkrechte Linien sind ein einziges Rechteck,
 ## schräge werden Lauf für Lauf gesetzt.
 static func line(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w_px := 1) -> void:
-	var nf := float(n_of(ci))
+	var n := n_of(ci)
+	var nf := float(n)
 	var x0 := roundi(a.x * nf)
 	var y0 := roundi(a.y * nf)
 	var x1 := roundi(b.x * nf)
 	var y1 := roundi(b.y * nf)
-	w_px = scaled_w(w_px, int(nf))
+	w_px = scaled_w(w_px, n)
 	var lo := -(w_px / 2)                           # die Dicke wächst nach beiden Seiten um die Mitte
-	var p := 1.0 / nf
-	var pts := PackedVector2Array()
 	if y0 == y1:
 		_cells(ci, mini(x0, x1), y0 + lo, absi(x1 - x0) + 1, w_px, col)
 		return
 	if x0 == x1:
 		_cells(ci, x0 + lo, mini(y0, y1), w_px, absi(y1 - y0) + 1, col)
 		return
-	var dx := absi(x1 - x0)
-	var dy := absi(y1 - y0)
-	var sx := 1 if x1 > x0 else -1
-	var sy := 1 if y1 > y0 else -1
-	if dx >= dy:                                    # flacher: Läufe in x je Zeile
-		var run_start := x0
-		var cy := y0
-		var err := dx / 2
-		var x := x0
-		while true:
-			if x == x1:
-				_seg_h(pts, run_start, x, cy, lo, w_px, p)
-				break
-			err -= dy
-			x += sx
-			if err < 0:
-				_seg_h(pts, run_start, x - sx, cy, lo, w_px, p)
-				cy += sy
-				err += dx
-				run_start = x
+	_flush(ci, _diag(x0, y0, x1, y1, w_px, n), col, float(w_px) * (1.0 / nf))
+
+## Schräge Linie (Bildpunkte, Ende eingeschlossen) als Segmente in Einheiten. Die Läufe hängen nur von der Form ab (dx, dy, Dicke, Pixelgröße):
+## einmal berechnet, danach nur an den Startpunkt verschoben (Runde 84: Feldlinien und Partikel der Magnete wurden in jedem Bild Punkt für Punkt
+## neu gerastert, bis 3,4 ms je Bild in Level 44). Gleiche Bildpunkte wie zuvor, keine Winkelstufen.
+static var _line_cache := {}
+
+static func _diag(x0: int, y0: int, x1: int, y1: int, w: int, n: int) -> PackedVector2Array:
+	var key := Vector4i(x1 - x0, y1 - y0, w, n)
+	var rel: PackedVector2Array
+	if _line_cache.has(key):
+		rel = _line_cache[key]
+	else:
+		rel = _diag_runs(x1 - x0, y1 - y0, w, 1.0 / float(n))
+		if _line_cache.size() > 60000:
+			_line_cache.clear()
+		_line_cache[key] = rel
+	var p := 1.0 / float(n)
+	return Transform2D(0.0, Vector2(float(x0) * p, float(y0) * p)) * rel
+
+## Bresenham-Läufe einer schrägen Linie vom Ursprung nach (dx, dy), direkt je Lauf berechnet statt Bildpunkt für Bildpunkt:
+## Der j-te Zeilen- bzw. Spaltenwechsel liegt bei Schritt (h + j·lang) / kurz + 1 (h = lang / 2), genau wie in der schrittweisen Fassung.
+static func _diag_runs(dx: int, dy: int, w: int, p: float) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	var lo := -(w / 2)
+	var adx := absi(dx)
+	var ady := absi(dy)
+	var sx := 1 if dx > 0 else -1
+	var sy := 1 if dy > 0 else -1
+	var prev := 0
+	if adx >= ady:                                  # flacher: Läufe in x je Zeile
+		var h := adx / 2
+		for j in ady:
+			var i := (h + j * adx) / ady + 1
+			_seg_h(pts, sx * prev, sx * (i - 1), sy * j, lo, w, p)
+			prev = i
+		_seg_h(pts, sx * prev, dx, dy, lo, w, p)
 	else:                                           # steiler: Läufe in y je Spalte
-		var run_start2 := y0
-		var cx := x0
-		var err2 := dy / 2
-		var y := y0
-		while true:
-			if y == y1:
-				_seg_v(pts, cx, run_start2, y, lo, w_px, p)
-				break
-			err2 -= dx
-			y += sy
-			if err2 < 0:
-				_seg_v(pts, cx, run_start2, y - sy, lo, w_px, p)
-				cx += sx
-				err2 += dy
-				run_start2 = y
-	_flush(ci, pts, col, float(w_px) * p)
+		var h2 := ady / 2
+		for j in adx:
+			var i2 := (h2 + j * ady) / adx + 1
+			_seg_v(pts, sx * j, sy * prev, sy * (i2 - 1), lo, w, p)
+			prev = i2
+		_seg_v(pts, dx, sy * prev, dy, lo, w, p)
+	return pts
 
 ## Waagerechter Lauf (Bildpunkte xa…xb in Zeile y, Dicke w) als Segment längs der Mitte der Dicke.
 static func _seg_h(pts: PackedVector2Array, xa: int, xb: int, y: int, lo: int, w: int, p: float) -> void:
@@ -128,9 +135,22 @@ static func _run_v(ci: CanvasItem, x: int, ya: int, yb: int, lo: int, w: int, co
 	_cells(ci, x + lo, mini(ya, yb), w, absi(yb - ya) + 1, col)
 
 ## Linienzug.
+## Schräge Stücke werden gesammelt und in einem Aufruf gezeichnet (gleiche Farbe: Reihenfolge und Überlappung ändern das Bild nicht).
 static func polyline(ci: CanvasItem, pts: PackedVector2Array, col: Color, w_px := 1) -> void:
+	var n := n_of(ci)
+	var nf := float(n)
+	var w := scaled_w(w_px, n)
+	var batch := PackedVector2Array()
 	for i in range(pts.size() - 1):
-		line(ci, pts[i], pts[i + 1], col, w_px)
+		var x0 := roundi(pts[i].x * nf)
+		var y0 := roundi(pts[i].y * nf)
+		var x1 := roundi(pts[i + 1].x * nf)
+		var y1 := roundi(pts[i + 1].y * nf)
+		if x0 == x1 or y0 == y1:
+			line(ci, pts[i], pts[i + 1], col, w_px)
+		else:
+			batch.append_array(_diag(x0, y0, x1, y1, w, n))
+	_flush(ci, batch, col, float(w) * (1.0 / nf))
 
 ## Gefülltes Rechteck, an das Raster angelegt (Kanten auf Vielfachen von 1/3 Einheit, mindestens ein Bildpunkt).
 static func rect(ci: CanvasItem, r: Rect2, col: Color) -> void:

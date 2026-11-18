@@ -357,7 +357,7 @@ func _draw_result() -> void:
 	var ui := Fonts.ui
 	var counted: bool = result.get("counted", true)
 	var pw := 400.0
-	var ph := 238.0
+	var ph := 246.0                                       # Runde 84: Abrechnung mit Spritzeile (vorher 238)
 	var px := roundf(size.x * 0.5 - pw * 0.5)
 	var py := roundf(size.y * 0.5 - ph * 0.5)
 	var accent := Color("#5dff9a") if counted else Color("#ffb02e")
@@ -382,7 +382,7 @@ func _draw_result() -> void:
 		_fit_text(ui, Vector2(cx + 28.0, my + 25.0), items[i][2], cw - 32.0, 8, Color("#b4c0ff") if got else Color("#646d9e"), HORIZONTAL_ALIGNMENT_LEFT)
 	# ---- zwei Karten: Zeit | Abrechnung
 	var ky := my + 40.0
-	var kh := 88.0
+	var kh := 96.0
 	var kw := (iw - mgap) * 0.5
 	var lx := ix
 	var rx := ix + kw + mgap
@@ -424,17 +424,17 @@ func _draw_result() -> void:
 	draw_string(ui, Vector2(al, ky + 26.0), tr("RES_FARES"), HORIZONTAL_ALIGNMENT_LEFT, aw, 9, Color("#d8e0ff"))
 	draw_string(ui, Vector2(al, ky + 26.0), "+¢%d" % int(earned), HORIZONTAL_ALIGNMENT_RIGHT, aw, 9, Color("#ffe14a") if earned > 0.0 else Color("#5a628f"))
 	_fit_text(ui, Vector2(al, ky + 35.0), tr("RES_JOBS") % [int(result.get("delivered", 0)), int(result.get("jobs", 0)), int(result.get("extras", 0))], aw, 7, Color("#7c86bb"), HORIZONTAL_ALIGNMENT_LEFT)
-	var rows := [[tr("RES_REPAIR"), float(result.get("repair", 0.0))], [tr("RES_TAXIS"), float(result.get("taxi_fees", 0.0))], [tr("RES_MISSED"), float(result.get("missed_fees", 0.0))]]
+	var rows := [[tr("RES_FUEL"), float(result.get("fuel", 0.0))], [tr("RES_REPAIR"), float(result.get("repair", 0.0))], [tr("RES_TAXIS"), float(result.get("taxi_fees", 0.0))], [tr("RES_MISSED"), float(result.get("missed_fees", 0.0))]]
 	for i in rows.size():
 		var yy := ky + 47.0 + float(i) * 9.0
 		var amt: float = rows[i][1]
 		var paid := amt > 0.0
 		draw_string(ui, Vector2(al, yy), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, aw - 40.0, 8, Color("#a9b3e8") if paid else Color("#4e5788"))
 		draw_string(ui, Vector2(al, yy), "−¢%d" % int(amt) if paid else "–", HORIZONTAL_ALIGNMENT_RIGHT, aw, 8, Color("#ff9a7a") if paid else Color("#4e5788"))
-	draw_rect(Rect2(al, ky + 70.0, aw, 1.0), Color("#3a4580"))
+	draw_rect(Rect2(al, ky + 79.0, aw, 1.0), Color("#3a4580"))
 	var net := float(result.get("net", 0.0))
-	draw_string(ui, Vector2(al, ky + 82.0), tr("RES_NET_ROW"), HORIZONTAL_ALIGNMENT_LEFT, aw - 70.0, 9, Color("#d8e0ff"))
-	draw_string(font, Vector2(al, ky + 83.0), "%s¢%d" % ["+" if net >= 0.0 else "−", int(absf(net))], HORIZONTAL_ALIGNMENT_RIGHT, aw, 13, SignalColors.good() if net >= 0.0 else SignalColors.bad(Color("#ff6a4a")))
+	draw_string(ui, Vector2(al, ky + 91.0), tr("RES_NET_ROW"), HORIZONTAL_ALIGNMENT_LEFT, aw - 70.0, 9, Color("#d8e0ff"))
+	draw_string(font, Vector2(al, ky + 92.0), "%s¢%d" % ["+" if net >= 0.0 else "−", int(absf(net))], HORIZONTAL_ALIGNMENT_RIGHT, aw, 13, SignalColors.good() if net >= 0.0 else SignalColors.bad(Color("#ff6a4a")))
 	# ---- Fußband: Kontostand links, Punkte rechts
 	var by := ky + kh + 8.0
 	var bh := 28.0
@@ -818,7 +818,7 @@ func _draw_shift_result() -> void:
 	var blink := 0.65 + 0.35 * sin(result_age * 4.0)
 	draw_string(ui, Vector2(px, py + ph - 9.0), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color(0.66, 0.72, 1.0, blink))
 
-## Nachtschicht: kurze Abrechnung der Karte in einer Leiste – Fahrpreise, Reparatur, Ersatztaxi, verpasste Fahrgäste und Saldo (wie in der Karriere).
+## Nachtschicht: kurze Abrechnung der Karte in einer Leiste – Fahrpreise, Sprit, Reparatur, Ersatztaxi, verpasste Fahrgäste und Saldo (wie in der Karriere).
 func _draw_shift_ledger(x: float, y: float, w: float) -> void:
 	var ui := Fonts.ui
 	_rbox(Rect2(x, y, w, 30.0), Color(0.08, 0.11, 0.26, 0.95), 6, Color("#3a4580"), 1)
@@ -826,6 +826,7 @@ func _draw_shift_ledger(x: float, y: float, w: float) -> void:
 	var net := float(result.get("net", 0.0))
 	var cells := [
 		[tr("RES_FARES"), "+¢%d" % int(earned), Color("#ffe14a") if earned > 0.0 else Color("#5a628f")],
+		[tr("RES_FUEL"), float(result.get("fuel", 0.0))],
 		[tr("RES_REPAIR"), float(result.get("repair", 0.0))],
 		[tr("RES_TAXIS"), float(result.get("taxi_fees", 0.0))],
 		[tr("RES_MISSED"), float(result.get("missed_fees", 0.0))],

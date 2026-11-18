@@ -92,6 +92,7 @@ var pen_wrong_sum := 0.0
 var wrong_pad_last := ""          # zuletzt bemeckerte Plattform (ein Hüpfer beim Abheben ist noch dieselbe Landung)
 var taxi_damage := 0.0            # Hüllenschaden des aktuellen Taxis (wird am Levelende repariert, kostet Credits)
 var repair_cost := 0.0            # Reparaturrechnung dieses Levels
+var fuel_cost := 0.0              # in diesem Level bezahlter Sprit (Gratis-Tanken zählt nicht; nur Anzeige in der Abrechnung, Punkte unverändert)
 var taxi_fees := 0.0              # Ersatztaxis in diesem Level
 var shift_mode := false           # Nachtschicht: keine Geduldgrenze, keine Lebensstation; zählt Wartezeit, Landungen und Vorbeiflüge (siehe NightShift)
 var shift_waits: Array = []       # je abgeholtem Fahrgast {job, wait, leg}: Wartezeit bis zur Landung am Abholpad und Anflugstrecke
@@ -173,6 +174,7 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	missed_fees = 0.0
 	missed_due = 0.0
 	repair_cost = 0.0
+	fuel_cost = 0.0
 	taxi_fees = 0.0
 	shift_waits.clear()
 	shift_landings.clear()
@@ -1029,6 +1031,7 @@ func _service_pad(dt: float) -> void:
 			refuel_tick = true
 		elif money >= cost:
 			money -= cost
+			fuel_cost += cost
 			sim.refuel(want)
 			refuel_tick = true
 	var job := current_job()

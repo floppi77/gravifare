@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -129,12 +129,13 @@ const BOT_FUEL_OVERRIDE := {"s4_05": 38.0, "s8_08": 38.0, "s9_05": 40.0, "s5_11"
 ## ein Pflichtfahrgast mehr darf verloren gehen (Geduld) bzw. die Hülle bis 75 % sinken. Für Menschen bleiben die Level lösbar, der Bot ist hier nur langsamer.
 ## Runde 65: Lava trifft schon am Rumpf (9 je 0,25 s); in Level 50 und 51 streift der Autopilot die pulsierende Lava über Pad 6 bzw. am Engpass,
 ## liefert aber alle Fahrgäste ab. Dort genügt eine Resthülle über 45 %.
+## Level 94 (s9_06) am 2026-11-18 vom Entwickler mit neuen Aufträgen umgebaut (Autopilot scheitert, Handlösung).
 ## Level 52 (s5_08) hat der Entwickler am 2026-11-13 von Hand umgebaut (Lava und Plattform versetzt): seitdem in BOT_HAND_LEVELS; ebenso Level 69, 75, 76 (2026-11-14, Balance Sektor 7).
 const BOT_LENIENT := {"s9_11": [2, 90.0], "s8_03": [1, 75.0], "s5_06": [1, 45.0], "s5_07": [1, 45.0]}
 
 ## Von Hand gebaute Level (Stand 2026-11), die der Autopilot ab 35 % Sprit nicht oder nicht sauber schafft (lange Wartezeiten an Wandertoren, Strahlen und Fahrzeugbahnen,
 ## Zapfsäule weit weg). Der Entwickler hat sie alle selbst gelöst; für sie wird nur die statische Lösbarkeit geprüft. Alle anderen Level muss der Autopilot weiter lösen.
-const BOT_HAND_LEVELS := ["s7_03", "s7_09", "s7_10", "s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04"]
+const BOT_HAND_LEVELS := ["s7_03", "s7_09", "s7_10", "s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04", "s9_06"]
 ## Runde 60: Level, die der Autopilot mit der strengen Tankregel (unter 35 % gratis nur ohne Geld) ab Mindest-Sprit nicht mehr löst. Er tankt erst, wenn
 ## Credits da sind, zahlt dann auch unter 35 % und fliegt mit zu wenig Sprit los. Der Auftraggeber verlangt hier keine Autopilot-Lösung (2026-11-10);
 ## geprüft wird die Fliegbarkeit mit Regelstand 2 (Tankregel und Aufträge wie bis 1.0.1) und die statische Lösbarkeit; das Ergebnis mit den neuen Regeln wird nur ausgegeben.
@@ -534,6 +535,206 @@ func _test_languages_fr_es() -> void:
 	var o_fr: Array = PH.lang_order()
 	TranslationServer.set_locale(prev)
 	check(o_fr == ["fr", "en"], "Controller-Hinweis auf Französisch: Französisch und Englisch")
+
+## Referenz für Runde 84: Bresenham Bildpunkt für Bildpunkt (die Fassung vor Runde 84), Läufe als Segmente in Einheiten.
+func _ref_diag(x0: int, y0: int, x1: int, y1: int, w: int, p: float) -> PackedVector2Array:
+	var lo := -(w / 2)
+	var pts := PackedVector2Array()
+	var dx := absi(x1 - x0)
+	var dy := absi(y1 - y0)
+	var sx := 1 if x1 > x0 else -1
+	var sy := 1 if y1 > y0 else -1
+	var seg_h := func(xa: int, xb: int, y: int) -> void:
+		var yc := (float(y + lo) + float(w) * 0.5) * p
+		pts.append(Vector2(float(mini(xa, xb)) * p, yc))
+		pts.append(Vector2(float(maxi(xa, xb) + 1) * p, yc))
+	var seg_v := func(x: int, ya: int, yb: int) -> void:
+		var xc := (float(x + lo) + float(w) * 0.5) * p
+		pts.append(Vector2(xc, float(mini(ya, yb)) * p))
+		pts.append(Vector2(xc, float(maxi(ya, yb) + 1) * p))
+	if dx >= dy:
+		var run_start := x0
+		var cy := y0
+		var err := dx / 2
+		var x := x0
+		while true:
+			if x == x1:
+				seg_h.call(run_start, x, cy)
+				break
+			err -= dy
+			x += sx
+			if err < 0:
+				seg_h.call(run_start, x - sx, cy)
+				cy += sy
+				err += dx
+				run_start = x
+	else:
+		var run_start2 := y0
+		var cx := x0
+		var err2 := dy / 2
+		var y := y0
+		while true:
+			if y == y1:
+				seg_v.call(cx, run_start2, y)
+				break
+			err2 -= dx
+			y += sy
+			if err2 < 0:
+				seg_v.call(cx, run_start2, y - sy)
+				cx += sx
+				err2 += dy
+				run_start2 = y
+	return pts
+
+func _test_round84() -> void:
+	## Runde 84: schräge Linien aus dem Zwischenspeicher (gleiche Bildpunkte), Autopilot plant im Bild gedrosselt, Credits als Szene.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 84
+	var bad := 0
+	var cases := 0
+	for i in 4000:
+		var n: int = [2, 3, 4, 5, 6][i % 5]
+		var w: int = [1, 2, 3, 4, 6][(i / 5) % 5]
+		var dx := rng.randi_range(-70, 70)
+		var dy := rng.randi_range(-70, 70)
+		if dx == 0 or dy == 0:
+			continue
+		var x0 := rng.randi_range(-2500, 2500)
+		var y0 := rng.randi_range(-2500, 2500)
+		var a := _ref_diag(x0, y0, x0 + dx, y0 + dy, w, 1.0 / float(n))
+		var b := PixelDraw._diag(x0, y0, x0 + dx, y0 + dy, w, n)
+		cases += 1
+		var same := a.size() == b.size()
+		if same:
+			for k in a.size():
+				if (a[k] - b[k]).length() * float(n) > 0.001:
+					same = false
+					break
+		if not same:
+			bad += 1
+	check(cases > 3000 and bad == 0, "Schräge Linien: Zwischenspeicher und Lauf-Formel ergeben dieselben Bildpunkte wie Bresenham Punkt für Punkt (%d Fälle, %d Abweichungen)" % [cases, bad])
+	var pd := FileAccess.get_file_as_string("res://src/game/pixel_draw.gd")
+	check(pd.contains("batch.append_array(_diag(x0, y0, x1, y1, w, n))") and pd.contains("_flush(ci, batch, col"), "Linienzug: schräge Stücke in einem Zeichenaufruf (Quelltextprüfung)")
+	var r := Run.new()
+	r.start(_lvl())
+	var bot := Bot.new(r)
+	var game_src := FileAccess.get_file_as_string("res://src/game/game.gd")
+	var demo_src := FileAccess.get_file_as_string("res://src/game/intro_demo.gd")
+	check(bot.replan_gap == 0.0 and game_src.count("autopilot.replan_gap = 0.25") == 2 and not demo_src.contains("replan_gap"),
+		"Autopilot: Prüfflüge planen weiter in jedem Tick (replan_gap 0), Testflug und Dev-Autopilot gedrosselt, Menü-Demo unverändert")
+	var fl := Bot.fly_level(_lvl(), 120.0, -1.0, false, false, Run.RULES, 0.25)
+	check(bool(fl.complete), "Autopilot mit Drosselung schafft Level 1 (%s)" % String(fl.reason))
+	# Credits als Szene
+	var cj = JSON.parse_string(FileAccess.get_file_as_string("res://data/credits.json"))
+	var CSH = load("res://src/ui/credits_show.gd")
+	var all_text := JSON.stringify(cj)
+	check(all_text.contains("Blender – blender.org") and not all_text.contains("Pillow · Blender"), "Credits: Blender hat eine eigene Zeile (3D-Grafik), nicht mehr nur in der Werkzeugliste")
+	var paints: Array = get_root().get_node("Cosmetics").LIFE_SKINS
+	var fnode: Node = get_root().get_node("Fonts")
+	if fnode.hud == null:
+		fnode._ready()
+	var font: Font = fnode.hud
+	var large_k: float = get_root().get_node("Settings").TEXT_LARGE_K
+	for lg in ["de", "en", "fr", "es"]:
+		for big in [false, true]:
+			var fs := roundi(10.0 * (large_k if big else 1.0))
+			var cfs := roundi(11.0 * (large_k if big else 1.0))
+			for width in [640.0, 853.0]:
+				var plan: Dictionary = CSH.build(cj.lines, lg, width, 360.0, font, fs, cfs, paints)
+				var shown := {}
+				var fits := true
+				var differ := true
+				var prev := {}
+				var passes: Array = plan.passes
+				for ps in passes:
+					for sg in ps.signs:
+						shown[String(sg.text)] = true
+						if float(sg.sw) > width - 40.0 or float(sg.cx) - float(sg.foot) * 0.5 < 0.0 or float(sg.cx) + float(sg.foot) * 0.5 > width:
+							fits = false
+					if not prev.is_empty() and (String(prev.paint) == String(ps.paint) or float(prev.dir) == float(ps.dir)):
+						differ = false
+					prev = ps
+				var missing := []
+				var sec: Dictionary = CSH.sections(cj.lines, lg)
+				for c in sec.cats:
+					for it in c.items:
+						if not shown.has(String(it)):
+							missing.append(it)
+				var tag := "%s%s %d" % [lg, " groß" if big else "", int(width)]
+				check(missing.is_empty(), "Credits (%s): jeder Eintrag wird hochgehalten (fehlt: %s)" % [tag, str(missing)])
+				check(fits, "Credits (%s): jedes Schild passt mit seinen Haltern ins Bild" % tag)
+				check(differ, "Credits (%s): aufeinanderfolgende Durchflüge mit anderer Lackierung und aus der anderen Richtung" % tag)
+				check(bool(passes[-1].get("outro", false)) and String(passes[-1].cat) == String(sec.outro) and float(plan.end) > float(passes[-1].start), "Credits (%s): zum Schluss das Dankeschön-Banner" % tag)
+	var rr := RandomNumberGenerator.new()
+	rr.seed = 1
+	var shallow := true
+	for kind in ["level", "dive", "climb", "wave"]:
+		for left in [true, false]:
+			var pts: Array = CSH.route(kind, left, 640.0, 360.0, rr)
+			var prev_p: Vector2 = CSH.bezier(pts, 0.25)
+			for k in range(26, 76):
+				var q: Vector2 = CSH.bezier(pts, float(k) / 100.0)
+				if absf(q.y - prev_p.y) > absf(q.x - prev_p.x) * 0.6 or signf(q.x - prev_p.x) != (1.0 if left else -1.0):
+					shallow = false
+				prev_p = q
+	check(shallow, "Credits: in der Bildmitte fliegt das Taxi flach (Banner lesbar) und immer in Flugrichtung, nie rückwärts")
+	# Spritkosten in der Abrechnung (Runde 84, Nachtrag)
+	var rf := Run.new()
+	rf.start(_lvl(), 80.0, 100.0, 11)
+	_land_on(rf, "F")
+	rf.sim.fuel = 60.0
+	var mb := rf.money
+	for i in 240:
+		rf._service_pad(Tuning.TICK)
+	check(rf.fuel_cost > 1.0 and absf(rf.fuel_cost - (mb - rf.money)) < 0.01, "Abrechnung: bezahlter Sprit wird je Level gezählt (¢%.2f)" % rf.fuel_cost)
+	var rg := Run.new()
+	rg.start(_lvl(), 80.0, 0.0, 11)
+	_land_on(rg, "F")
+	rg.sim.fuel = Tuning.EMERGENCY_FUEL - 5.0
+	for i in 120:
+		rg._service_pad(Tuning.TICK)
+	check(rg.sim.fuel > Tuning.EMERGENCY_FUEL - 5.0 and rg.fuel_cost == 0.0, "Abrechnung: Gratis-Tanken (kein Geld, Tank fast leer) kostet nichts und zählt nicht")
+	var hud_src := FileAccess.get_file_as_string("res://src/game/hud.gd")
+	check(game_src.contains("\"fuel\": run.fuel_cost") and game_src.contains("- run.missed_fees - run.fuel_cost,") and hud_src.count("[tr(\"RES_FUEL\"), float(result.get(\"fuel\", 0.0))]") == 2,
+		"Abrechnung: Spritzeile in der Levelauswertung und in der Nachtschicht, Ergebnis abzüglich Sprit (Quelltextprüfung)")
+	# Level-Editor: eigene Aufträge bleiben beim Durchschalten einer Plattformzahl (Zwischenstand verletzt kurz die Regeln)
+	var me = LE.blank()
+	me.jobs_make_explicit(me.validate().level.jobs)
+	var to0 := String(me.jobs[0].to)
+	var guard := 0
+	while String(me.jobs[0].from) != to0 and guard < 12:
+		me.job_cycle(0, "from", 1)
+		guard += 1
+	var ve: Dictionary = me.validate()
+	check(String(me.jobs[0].from) == to0 and not ve.ok and not me.jobs.is_empty() and not me.jobs_reset and ve.errors.any(func(e): return String(e.code) == "JOB_PADS"),
+		"Editor: Start gleich Ziel ist ein Fehler, die eigenen Aufträge bleiben stehen (kein Sprung auf automatisch)")
+	me.job_cycle(0, "from", 1)
+	check(not me.jobs.is_empty() and String(me.jobs[0].from) != to0, "Editor: weiterschalten löst den Zwischenstand auf, die Liste bleibt eigen")
+	var gone := "3"                                          # höchste Plattform löschen (die Nummerierung bleibt lückenlos)
+	var uses3 := false
+	for jj in me.jobs:
+		uses3 = uses3 or String(jj.from) == gone or String(jj.to) == gone
+	check(uses3, "Editor: Testaufbau – ein eigener Auftrag nutzt Plattform 3")
+	for y in me.h:
+		for x in me.w:
+			if me.cell(x, y) == gone:
+				me.rect(Vector2i(x, y), Vector2i(x, y), "#")
+	me.validate()
+	check(me.jobs.is_empty() and me.jobs_reset, "Editor: verweist ein Auftrag auf eine gelöschte Plattform, gelten wieder die automatischen Aufträge")
+	# Level-Editor: Krankenhaus als Ziel wählbar, macht den Fahrgast zum Patienten
+	var mh = LE.blank()
+	mh.rect(Vector2i(20, 6), Vector2i(23, 6), "H")
+	mh.jobs_make_explicit(mh.validate().level.jobs)
+	check(mh.jobs[0].get("fragile", false) != true and mh.job_options(0, "to").has("H"), "Editor: Krankenhaus steht auch ohne „Z“ als Ziel zur Wahl")
+	var g2 := 0
+	while String(mh.jobs[0].to) != "H" and g2 < 12:
+		mh.job_cycle(0, "to", 1)
+		g2 += 1
+	var vh: Dictionary = mh.validate()
+	check(String(mh.jobs[0].to) == "H" and mh.jobs[0].get("fragile", false) == true and not mh.jobs.is_empty() and not vh.errors.any(func(e): return String(e.code) == "JOB_PADS"),
+		"Editor: Ziel Krankenhaus macht den Fahrgast zum Patienten, der Auftrag ist gültig (%s)" % str(vh.errors))
+	var cr := FileAccess.get_file_as_string("res://src/ui/credits.gd")
+	check(cr.contains("credits_show.gd") and cr.contains("backdrop.hero = false") and cr.contains("Flow.KOFI_URL") and cr.contains("ui_cancel"), "Credits: Szene eingebunden, Ko-fi (X/K) und Zurück (B/Esc) bleiben")
 
 func _test_round83() -> void:
 	## Runde 83: Im Dunkeln leuchtet die nächste Abholplattform erst, wenn der Fahrgast dort erscheint (nicht schon nach dem Absetzen).
@@ -5557,6 +5758,22 @@ func _test_level_editor_screen() -> void:
 	check(ed.model.jobs.size() == jn + 1, "Editor-Bildschirm: Auftrag einfügen")
 	ed._job_remove(0)
 	check(ed.model.jobs.size() == jn, "Editor-Bildschirm: Auftrag entfernen")
+	# Runde 84: Linksklick auf Start/Ziel schaltet weiter, Rechtsklick eine Stelle zurück
+	var to_btn: Button = null
+	for c in ed.job_box.get_children():
+		if c is Button and String(c.get_meta("key", "")) == "j:0:to":
+			to_btn = c
+	var opts: Array = ed.model.job_options(0, "to")
+	var before := String(ed.model.jobs[0].to)
+	var rc := InputEventMouseButton.new()
+	rc.button_index = MOUSE_BUTTON_RIGHT
+	rc.pressed = true
+	if to_btn != null:
+		to_btn.gui_input.emit(rc)
+	var back_ok := String(ed.model.jobs[0].to) == String(opts[wrapi(opts.find(before) - 1, 0, opts.size())])
+	ed._job_cycle(0, "to")
+	check(to_btn != null and back_ok and String(ed.model.jobs[0].to) == before and not ed.model.jobs.is_empty(),
+		"Editor-Bildschirm: Rechtsklick auf das Ziel schaltet eine Stelle zurück, Linksklick wieder vor (Liste bleibt eigen)")
 	ed._job_mode()
 	check(ed.model.jobs.is_empty(), "Editor-Bildschirm: zurück zu automatischen Aufträgen")
 	ed._set_page(0)
@@ -6092,9 +6309,9 @@ func _test_round46_fixes() -> void:
 	# 6b. Sweep-Schleuse auch ohne Glas sichtbar wandernd
 	var pv := FileAccess.get_file_as_string("res://src/game/props_view.gd")
 	check(pv.contains("level.door_leaf_rects(ch, gate, level.clock) if level.is_sweep(ch) else []") and pv.contains("sweep_leaves: Array = []"), "Tore: eine Sweep-Schleuse zeigt die wandernde Öffnung auch ohne Glas (Quelltextprüfung)")
-	# 7. Credits mit Logo
-	var cv: Control = load("res://src/ui/credits_view.gd").new()
-	check(cv.logo != null and cv._row_h("title") > 64.0, "Credits: die Titelzeile ist das GraviFare-Logo (höher als die Schriftzeile)")
+	# 7. Credits mit Logo (seit Runde 84 als Szene: das Logo erscheint vor dem ersten Durchflug)
+	var cv: Control = load("res://src/ui/credits_show.gd").new()
+	check(cv.logo != null, "Credits: das GraviFare-Logo ist geladen (erscheint zu Beginn)")
 	cv.free()
 	TranslationServer.set_locale(old_locale)
 	TranslationServer.remove_translation(tr_de)

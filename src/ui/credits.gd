@@ -1,5 +1,5 @@
 extends Control
-## Credits-Abspann: scrollender Text über dem animierten Menühintergrund. A/Enter beschleunigt, B/Esc beendet.
+## Credits: Szene mit Taxi, Werbebanner und Schildern (credits_show.gd) über dem animierten Menühintergrund. A/Enter beschleunigt, B/Esc beendet.
 
 var lines: Array = []
 var scroll_y := 380.0
@@ -18,14 +18,15 @@ func _ready() -> void:
 		lines = d.get("lines", [])
 	var backdrop := Control.new()
 	backdrop.set_script(load("res://src/ui/menu_backdrop.gd"))
+	backdrop.hero = false                                      # das Taxi der Credits fliegt selbst
 	add_child(backdrop)
 	var dim := ColorRect.new()
-	dim.color = Color(0.02, 0.03, 0.1, 0.55)
+	dim.color = Color(0.02, 0.03, 0.1, 0.28)                   # Bühne: Himmel und Skyline bleiben sichtbar
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
 	var view := Control.new()
-	view.set_script(load("res://src/ui/credits_view.gd"))
+	view.set_script(load("res://src/ui/credits_show.gd"))
 	view.lines = lines
 	view.lang = lang
 	view.owner_scene = self

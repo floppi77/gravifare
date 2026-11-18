@@ -1035,6 +1035,13 @@ func _job_cycle(i: int, key: String) -> void:
 	model.job_cycle(i, key, 1)
 	_job_changed("j:%d:%s" % [i, key])
 
+## Rechtsklick auf Start oder Ziel eines Auftrags: eine Stelle zurück (Linksklick schaltet weiter).
+func _job_btn_input(ev: InputEvent, i: int, key: String) -> void:
+	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_RIGHT:
+		accept_event()
+		model.job_cycle(i, key, -1)
+		_job_changed("j:%d:%s" % [i, key])
+
 func _job_fragile(i: int) -> void:
 	model.job_toggle_fragile(i)
 	_job_changed("j:%d:f" % i)
@@ -1113,6 +1120,8 @@ func _rebuild_jobs(force := false) -> void:
 		bd.tooltip_text = tr("ED_J_TIP_DELETE")
 		bf.set_meta("key", "j:%d:from" % i)
 		bt.set_meta("key", "j:%d:to" % i)
+		bf.gui_input.connect(_job_btn_input.bind(i, "from"))      # Rechtsklick: eine Zahl zurück (Linksklick weiter)
+		bt.gui_input.connect(_job_btn_input.bind(i, "to"))
 		bz.set_meta("key", "j:%d:f" % i)
 		bi.set_meta("key", "j:%d:i" % i)
 		bd.set_meta("key", "j:%d:d" % i)

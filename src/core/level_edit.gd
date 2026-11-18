@@ -130,20 +130,37 @@ func to_wrapper() -> Dictionary:
 		doc["derived_from"] = derived_from
 	return doc
 
-## Prüfung wie beim Einlesen, ohne Zugriff auf das Modell (darf in einem Arbeitsfaden laufen). Passen die Aufträge nicht mehr zur Karte (nur `JOB_*`-Fehler),
-## werden sie verworfen und neu erzeugt: Ergebnis mit `jobs_reset = true`.
+## Prüfung wie beim Einlesen, ohne Zugriff auf das Modell (darf in einem Arbeitsfaden laufen). Verweisen eigene Aufträge auf Plattformen, die es in der Karte
+## nicht mehr gibt (nur `JOB_*`-Fehler), werden sie verworfen und neu erzeugt: Ergebnis mit `jobs_reset = true`. Regelfehler zwischen vorhandenen Plattformen
+## (Start = Ziel, Kette, Ausgang) bleiben als Fehler stehen: Beim Durchschalten einer Plattformzahl entsteht zwangsläufig kurz ein solcher Zwischenstand,
+## und früher sprang die Liste dabei auf die automatischen Ziele zurück (Runde 84).
 static func validate_wrapper(doc: Dictionary) -> Dictionary:
 	var res := CL.clean(doc)
 	if not res.ok and not (doc.level.get("jobs", []) as Array).is_empty():
 		var only_jobs: bool = not res.errors.is_empty()
 		for e in res.errors:
 			only_jobs = only_jobs and String(e.code).begins_with("JOB_")
-		if only_jobs:
+		if only_jobs and jobs_reference_missing(doc.level):
 			var d2: Dictionary = doc.duplicate(true)
 			d2.level["jobs"] = []
 			res = CL.clean(d2)
 			res["jobs_reset"] = true
 	return res
+
+## Verweist ein eigener Auftrag auf eine Plattform, die in der Karte (Ziffern, fahrende Plattformen, Krankenhaus „H“) nicht vorkommt?
+static func jobs_reference_missing(lv: Dictionary) -> bool:
+	var have := {"exit": true}
+	for row in lv.get("map", []):
+		for ch in String(row):
+			if PAD_CHARS.contains(ch) or ch == "H":
+				have[ch] = true
+	for m in lv.get("movers", []):
+		if String(m.get("kind", "")) == "pad" and String(m.get("pad", "")) != "":
+			have[String(m.pad)] = true
+	for j in lv.get("jobs", []):
+		if not have.has(String(j.get("from", ""))) or not have.has(String(j.get("to", ""))):
+			return true
+	return false
 
 ## Prüfung des Modells (gleichzeitig): verworfene Aufträge werden auch im Modell gelöscht.
 func validate() -> Dictionary:
@@ -751,11 +768,12 @@ func jobs_make_auto() -> void:
 		jobs = []
 		_mark_changed())
 
-## Wahlmöglichkeiten für Start ("from") bzw. Ziel ("to") des Auftrags i.
+## Wahlmöglichkeiten für Start ("from") bzw. Ziel ("to") des Auftrags i. Das Krankenhaus „H“ steht bei jedem Auftrag zur Wahl, sobald die Karte eines hat
+## (Runde 84: vorher nur nach „Z“, das war nicht zu erkennen); wer es wählt, macht den Fahrgast zum Patienten (zerbrechlich, siehe job_cycle).
 func job_options(i: int, key: String) -> Array:
 	var opts: Array = pad_digits()
 	if key == "to":
-		if i < jobs.size() and jobs[i].get("fragile", false) == true and pad_used_char("H"):
+		if i < jobs.size() and pad_used_char("H"):
 			opts.append("H")
 		if i == jobs.size() - 1:
 			opts.append("exit")
@@ -776,6 +794,8 @@ func job_cycle(i: int, key: String, direction: int) -> void:
 	var cur: int = opts.find(String(jobs[i].get(key, "")))
 	_edit(func():
 		jobs[i][key] = opts[wrapi(cur + direction, 0, opts.size())]
+		if key == "to" and String(jobs[i][key]) == "H":
+			jobs[i]["fragile"] = true              # ins Krankenhaus fahren nur Patienten (die Prüfung verlangt es)
 		_mark_changed())
 
 func job_toggle_fragile(i: int) -> void:
