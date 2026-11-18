@@ -1,0 +1,3 @@
+# Geprüfte Fehlalarme (Fingerabdruck = Commit:Datei:Regel:Zeile). Nur ganz bestimmte Funde, keine Dateien oder Regeln pauschal.
+# Französische Hilfezeile des Level-Editors („Gauche/Droite modifie (maintenir : plus vite) …“), kein Schlüssel – generic-api-key schlägt auf den Text an.
+76cef86d2c3e984c19428806141b302539b75951:data/i18n/fr.json:generic-api-key:709
