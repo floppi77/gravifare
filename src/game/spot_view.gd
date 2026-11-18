@@ -86,20 +86,21 @@ func _draw() -> void:
 		return
 	var f := Fonts.ui
 	var w := 540.0
-	var fs := 9
+	var fs := Settings.fs(9)                       # Option „Große Schrift“
+	var lh := 11.0 * Settings.text_k()
 	var lines := _wrap(f, sub_text, w - 16.0, fs)
-	var h := 6.0 + float(lines.size()) * 11.0 + 8.0
+	var h := 6.0 + float(lines.size()) * lh + 8.0
 	var x := size.x * 0.5 - w * 0.5
 	var y := size.y * 0.5 + 154.0 - h          # 334 px auf der zentrierten 640×360-Fläche
 	draw_rect(Rect2(x - 1.0, y - 1.0, w + 2.0, h + 2.0), Color(0.02, 0.03, 0.09, 0.55 * sub_a))
 	draw_rect(Rect2(x, y, w, h), Color(0.04, 0.06, 0.16, 0.88 * sub_a))
 	draw_rect(Rect2(x, y, w, 1.0), Color(1.0, 0.88, 0.58, 0.55 * sub_a))
-	draw_string(Fonts.hud, Vector2(x + 8.0, y + 7.5), sub_speaker.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 6, Color(1.0, 0.88, 0.58, sub_a))
+	draw_string(Fonts.hud, Vector2(x + 8.0, y + 7.5), sub_speaker.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, Settings.fs(6), Color(1.0, 0.88, 0.58, sub_a))
 	if hint:
-		var key := "U" if Controls.last_device == "keyboard" else "B"
-		draw_string(Fonts.hud, Vector2(x + w - 148.0, y + 7.5), tr("TUT_SKIP") % key, HORIZONTAL_ALIGNMENT_RIGHT, 140, 6, Color(0.75, 0.8, 1.0, 0.85 * sub_a))
+		var key := "U" if Controls.last_device == "keyboard" else Controls.pad_name("B")
+		draw_string(Fonts.hud, Vector2(x + w - 148.0, y + 7.5), tr("TUT_SKIP") % key, HORIZONTAL_ALIGNMENT_RIGHT, 140, Settings.fs(6), Color(0.75, 0.8, 1.0, 0.85 * sub_a))
 	for i in lines.size():
-		draw_string(f, Vector2(x + 8.0, y + 17.0 + float(i) * 11.0), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.95, 0.97, 1.0, sub_a))
+		draw_string(f, Vector2(x + 8.0, y + 6.0 + lh * float(i + 1)), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.95, 0.97, 1.0, sub_a))
 
 ## Einfacher Zeilenumbruch nach Pixelbreite.
 func _wrap(f: Font, text: String, width: float, fs: int) -> Array:

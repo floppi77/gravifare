@@ -18,15 +18,26 @@ def norm(t, lang="en"):
         words.append(DIG[lang][int(w)] if w.isdigit() and int(w) < 10 else w)
     return " ".join(words)
 
-ap = argparse.ArgumentParser(); ap.add_argument("--model", default="small"); a = ap.parse_args()
+ap = argparse.ArgumentParser(); ap.add_argument("--model", default="small"); ap.add_argument("--lang", nargs="*", default=[]); a = ap.parse_args()
+sys.path.insert(0, "tools/audio")
+import voice_lang
 manifest = json.load(open("assets/audio/voice/manifest.json"))["clips"]
 model = WhisperModel(a.model, device=os.environ.get("WHISPER_DEVICE", "cpu"), compute_type="int8" if os.environ.get("WHISPER_DEVICE", "cpu") == "cpu" else "float16", local_files_only=True)
 bad = 0; total = 0
 accent = {}   # Hinweis auf englisch gefärbtes Deutsch: "bitte" wird als bitter/better/bitta erkannt
 for key, meta in sorted(manifest.items()):
     lang = key.split("/")[0]
-    segs, _ = model.transcribe(f"assets/audio/voice/{key}.ogg", language=lang, beam_size=5)
-    got = norm(" ".join(s.text for s in segs), lang); want = norm(meta["text"], lang)
+    if a.lang and lang not in a.lang:
+        continue
+    if not os.path.exists(f"assets/audio/voice/{key}.ogg"):
+        continue
+    import librosa                                         # selbst einlesen: neuere PyAV-Fassungen vertragen faster-whispers Dateizugriff nicht
+    audio, _ = librosa.load(f"assets/audio/voice/{key}.ogg", sr=16000, mono=True)
+    segs, _ = model.transcribe(audio, language=lang, beam_size=5)
+    if lang in ("fr", "es"):
+        got = " ".join(voice_lang.norm(" ".join(s.text for s in segs), lang)); want = " ".join(voice_lang.norm(meta["text"], lang))
+    else:
+        got = norm(" ".join(s.text for s in segs), lang); want = norm(meta["text"], lang)
     sim = difflib.SequenceMatcher(None, got.replace(" ", ""), want.replace(" ", "")).ratio()
     # Alternativschreibweisen
     ok = sim >= 0.88   # kleine Schreibabweichungen der Erkennung (bitter/bitte) erlaubt

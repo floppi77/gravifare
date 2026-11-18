@@ -13,7 +13,7 @@ import numpy as np
 
 SRC = "tools/audio/drama_tutorial.json"
 OUT = "assets/audio/voice"
-TARGET_DB = {"de": -17.4, "en": -16.3}      # mittlerer Pegel der aktiven Sprache, wie die bisherigen Clips
+TARGET_DB = {"de": -17.4, "en": -16.3, "fr": -16.8, "es": -16.8}      # mittlerer Pegel der aktiven Sprache, wie die bisherigen Clips
 NUM_DE = {"null": "0", "zwei": "2", "drei": "3", "vier": "4", "fünf": "5", "sechs": "6", "sieben": "7", "acht": "8", "neun": "9", "zehn": "10",
           "tausend": "1000", "fünfhundert": "500", "fünfunddreißig": "35"}
 NUM_EN = {"zero": "0", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
@@ -80,9 +80,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lang", default="both"); ap.add_argument("--only", nargs="*", default=[]); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--server", default="http://127.0.0.1:18732/v1/speak"); ap.add_argument("--keep-wav", default="")
+    ap.add_argument("--validate", action="store_true", help="jeden Clip mit faster-whisper prüfen und bei Abweichung mit neuem Seed wiederholen")
+    ap.add_argument("--tries", type=int, default=5); ap.add_argument("--skip-existing", action="store_true")
+    ap.add_argument("--threshold", type=float, default=0.85, help="Mindestähnlichkeit der Spracherkennung")
     a = ap.parse_args()
     src = json.load(open(SRC, encoding="utf-8"))
-    langs = ["de", "en"] if a.lang == "both" else [a.lang]
+    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es"]}.get(a.lang, [a.lang])
+    import sys
+    sys.path.insert(0, "tools/audio")
+    import voice_lang
+    weak = []
     mp = OUT + "/manifest.json"
     manifest = json.load(open(mp, encoding="utf-8"))
     lines = json.load(open("data/voice_lines.json", encoding="utf-8"))
@@ -90,19 +97,39 @@ def main():
         for key, e in src.items():
             if a.only and key not in a.only:
                 continue
-            y, sr = render(a.server, lang, e[lang], a.seed)
+            if lang not in e:
+                continue
+            dest = f"{OUT}/{lang}/i0_{key}.ogg"
+            if a.skip_existing and os.path.exists(dest):
+                continue
+            sub_want = e[lang].get("subtitle") or subtitle(e[lang]["spoken"], lang)
+            best = None
+            for attempt in range(a.tries if a.validate else 1):
+                y, sr = render(a.server, lang, e[lang], a.seed + attempt * 13)
+                if not a.validate:
+                    best = (1.0, y, sr)
+                    break
+                ok, got, sim = voice_lang.check(y, sr, sub_want, lang, threshold=a.threshold)
+                print(f"   {lang}/{key} Versuch {attempt + 1}: {'ok' if ok else 'verworfen'} ({sim:.2f}) {got[:70]!r}", flush=True)
+                if best is None or sim > best[0]:
+                    best = (sim, y, sr)
+                if ok:
+                    break
+            if best[0] < a.threshold:
+                weak.append(f"{lang}/i0_{key} ({best[0]:.2f})")
+            _, y, sr = best
             if a.keep_wav:
                 os.makedirs(a.keep_wav, exist_ok=True)
                 with wave.open(f"{a.keep_wav}/{lang}_{key}.wav", "wb") as w:
                     w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes((np.clip(y, -1, 1) * 32767).astype(np.int16).tobytes())
-            dest = f"{OUT}/{lang}/i0_{key}.ogg"
             dur = finish(y, sr, lang, dest)
-            sub = subtitle(e[lang]["spoken"], lang)
+            sub = sub_want
             lines["i0"][lang][key] = sub
             manifest["clips"][f"{lang}/i0_{key}"] = {"text": sub, "seconds": round(dur, 2), "engine": "drama3-fp8", "spoken": e[lang]["spoken"]}
             print(lang, key, f"{dur:.1f}s", flush=True)
             json.dump(manifest, open(mp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
             json.dump(lines, open("data/voice_lines.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print("\nSchwache Clips: " + ", ".join(weak) if weak else "\nAlle Clips ok.")
 
 if __name__ == "__main__":
     main()

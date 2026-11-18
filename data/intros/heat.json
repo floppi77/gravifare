@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Hitzezonen",
-  "en": "Heat zones"
+  "en": "Heat zones",
+  "fr": "Zones de chaleur",
+  "es": "Zonas de calor"
  },
  "map": [
   "########################################",
@@ -73,7 +75,9 @@
   ],
   "title": {
    "de": "Hitzezonen",
-   "en": "Heat zones"
+   "en": "Heat zones",
+   "fr": "Zones de chaleur",
+   "es": "Zonas de calor"
   }
  }
 }

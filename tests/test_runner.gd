@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -478,6 +478,476 @@ func _test_round74() -> void:
 	check(shown == 40.0 and rn.missed_due >= 1000.0, "Meldung „verpasst“ nennt ¢40 (Deckel), nicht die volle Strafe")
 
 ## Runde 76: keine wiederholten Aufträge (Nacht-/Tagschicht und Tagesflug, Karriere-Level)
+func _test_languages_fr_es() -> void:
+	## Runde 78: Französisch und Spanisch – gleiche Schlüssel, gleiche Platzhalter, Knopfnamen wie im Englischen, Levelnamen, Sprechzeilen, Flaggen.
+	var en := _read_json("res://data/i18n/en.json")
+	var ph := RegEx.create_from_string("%[-+0-9.]*[dsf%]")
+	var loc: Node = get_root().get_node("Loc")
+	if loc.tables.is_empty():
+		loc._ready()
+	check(loc.LOCALES == ["de", "en", "fr", "es"], "Sprachen: Deutsch, Englisch, Französisch, Spanisch")
+	var tok := RegEx.create_from_string("(?<![\\w+])(LB|RB|LT|RT|Back(?! to)|Start|A|B|X|Y)(?!\\w)")
+	for lang in ["fr", "es"]:
+		var d := _read_json("res://data/i18n/%s.json" % lang)
+		var bad: Array = []
+		for k in en:
+			if not d.has(k) or String(d[k]).strip_edges() == "":
+				bad.append(k)
+				continue
+			var a: Array = ph.search_all(String(en[k])).map(func(m): return m.get_string())
+			var b: Array = ph.search_all(String(d[k])).map(func(m): return m.get_string())
+			a.sort()
+			b.sort()
+			if a != b or String(en[k]).count("\n") != String(d[k]).count("\n") or String(en[k]).count("|") != String(d[k]).count("|"):
+				bad.append(k)
+		check(bad.is_empty() and d.size() == en.size(), "%s: alle %d Texte vorhanden, Platzhalter und Zeilen wie im Englischen %s" % [lang, en.size(), str(bad.slice(0, 8))])
+		var pad_bad: Array = []
+		for k in loc.PAD_KEYS:
+			if tok.search_all(String(en[k])).size() != tok.search_all(String(d.get(k, ""))).size():
+				pad_bad.append(k)
+		check(pad_bad.is_empty(), "%s: Knopfnamen in Hinweisen wie im Englischen (für das PlayStation-Layout) %s" % [lang, str(pad_bad)])
+		check(ResourceLoader.exists("res://assets/art/flag_%s.png" % lang), "%s: Flagge vorhanden" % lang)
+	var names := _read_json("res://data/i18n/level_names.json")
+	var miss: Array = []
+	for f in DirAccess.open("res://data/levels").get_files():
+		if f.ends_with(".json"):
+			var lvl := LevelData.load_file("res://data/levels/" + f)
+			if lvl.display_name("fr") == lvl.names.get("en", "x") and lvl.names.get("fr", "") == "":
+				miss.append(lvl.id)
+			elif String(lvl.names.get("fr", "")) == "" or String(lvl.names.get("es", "")) == "":
+				miss.append(lvl.id)
+	check(miss.is_empty() and names.has("TUT"), "Levelnamen auf Französisch und Spanisch (ohne Änderung der Level-Dateien) %s" % str(miss))
+	var vl := _read_json("res://data/voice_lines.json")
+	var vbad: Array = []
+	for g in vl:
+		for k in vl[g].en:
+			for lang in ["fr", "es"]:
+				if String(vl[g].get(lang, {}).get(k, "")) == "":
+					vbad.append("%s/%s/%s" % [g, lang, k])
+	check(vbad.is_empty(), "Untertitel der Sprechzeilen auf Französisch und Spanisch %s" % str(vbad.slice(0, 6)))
+	check(loc.pick({"de": "a", "en": "b"}, "fr") == "b" and loc.pick({"de": "a"}, "es") == "a" and loc.pick(null, "fr", "x") == "x", "Fehlt eine Sprache, gilt Englisch, dann Deutsch")
+	var sfx := FileAccess.get_file_as_string("res://src/core/sfx.gd")
+	check(sfx.contains("voice/en/%s_%s.ogg"), "Fehlt eine Aufnahme, spricht die englische Stimme (Untertitel in der Sprache)")
+	var PH = load("res://src/ui/pad_hint.gd")
+	var prev := TranslationServer.get_locale()
+	TranslationServer.set_locale("fr")
+	var o_fr: Array = PH.lang_order()
+	TranslationServer.set_locale(prev)
+	check(o_fr == ["fr", "en"], "Controller-Hinweis auf Französisch: Französisch und Englisch")
+
+func _test_round83() -> void:
+	## Runde 83: Im Dunkeln leuchtet die nächste Abholplattform erst, wenn der Fahrgast dort erscheint (nicht schon nach dem Absetzen).
+	var dv := FileAccess.get_file_as_string("res://src/game/dark_view.gd")
+	check(dv.contains("var goal := run.marker_pad()") and not dv.contains("run.target_pad()"), "Dunkelheit: Leuchten der Plattform folgt marker_pad (wie Pfeil und Leuchtfeuer)")
+	var r := Run.new()
+	r.extras_enabled = false
+	r.start(_lvl())
+	var j := r.current_job()
+	var pending_ok := true
+	if not j.is_empty():
+		r.phase = Run.Phase.WAITING
+		var keep_actor = r.actor
+		r.actor = null
+		pending_ok = r.marker_pad() == "" and r.target_pad() == String(j.from)
+		r.actor = keep_actor
+	check(not j.is_empty() and pending_ok, "Dunkelheit: zwischen zwei Aufträgen (Fahrgast noch nicht da) kein Leuchten auf der nächsten Abholplattform")
+	var hd := FileAccess.get_file_as_string("res://src/game/hud.gd")
+	check(hd.contains("func _draw_shift_ledger") and hd.contains("_draw_shift_ledger(px + 14.0, by + 58.0, pw - 28.0)") and hd.contains("tr(\"RES_MISSED\"), float(result.get(\"missed_fees\", 0.0))]"),
+		"Nachtschicht: Ergebnis jeder Karte mit Abrechnung (Fahrpreise, Reparatur, Ersatztaxi, Verpasst, Saldo)")
+
+func _test_round82() -> void:
+	## Runde 82: Flugschule (Tanken, Absturz schon bei der Erklärung, gekauftes Taxi bleibt), Debug-Zeile per Controller.
+	var gs := GDScript.new()
+	gs.source_code = "extends Node\nvar spoken: Array = []\nfunc tutorial_voice_stop() -> void:\n\tpass\nfunc tutorial_speak(k: String) -> Dictionary:\n\tspoken.append(k)\n\treturn {\"len\": 2.0, \"text\": k}\n"
+	gs.reload()
+	var ss := GDScript.new()
+	ss.source_code = "extends Control\nvar hint := false\nfunc say(_a, _b) -> void:\n\tpass\n"
+	ss.reload()
+	var g: Node = gs.new()
+	var sp: Node = ss.new()
+	var tu: Node = load("res://src/game/tutorial.gd").new()
+	tu.game = g
+	tu.spot = sp
+	var full := [false]
+	var flying := [false]
+	var st := {"key": "tut_refuel", "wait": func(): return full[0], "fast_if": func(): return flying[0]}
+	tu.t = 1.0
+	tu._check_fast(st)
+	full[0] = true
+	tu._check_fast(st)
+	var still: bool = not st.has("_fast")
+	flying[0] = true
+	tu._check_fast(st)
+	check(still and st.get("_fast", false) and g.spoken.size() == 1, "Flugschule: Tanken schaltet weiter, wenn der Tank voll genug ist und man schon wieder abhebt (nicht schon im Stand)")
+	tu.free()
+	g.free()
+	sp.free()
+	var src := FileAccess.get_file_as_string("res://src/game/tutorial.gd")
+	check(src.contains("\"early\": func(): return _landed_on(\"F\")") and src.contains("flags[\"crash_early\"] = true") and src.contains("_fast_line(st)                            # Aufgabe schon"),
+		"Flugschule: schon während der vorigen Erklärung gelandet bzw. zerstört → Spruch statt Erklärung")
+	# gekauftes Taxi: Schritt „Taxistation“ mit 5 Taxis nach dem Kauf – die Flugschule darf nicht wieder auf 4 setzen
+	var gl := GDScript.new()
+	gl.source_code = "extends Node\nvar lives_set: Array = []\nfunc tutorial_set_lives(n: int) -> void:\n\tlives_set.append(n)\nfunc tutorial_narrating() -> bool:\n\treturn false\n"
+	gl.reload()
+	var g2: Node = gl.new()
+	var tu2: Node = load("res://src/game/tutorial.gd").new()
+	var r := Run.new()
+	r.start(_lvl())
+	tu2.game = g2
+	tu2.run = r
+	tu2.steps = [{"key": "tut_life"}]
+	tu2.idx = 0
+	r.lives = 4
+	tu2._watch(0.1)
+	var before_ok: bool = r.lives == 4
+	r.lives = 5
+	tu2.flags["life_bought"] = true
+	tu2._watch(0.1)
+	check(before_ok and r.lives == 5 and not g2.lives_set.has(4) and src.contains("if run.lives >= Tuning.MAX_LIVES and not flags.get(\"life_bought\", false):"),
+		"Flugschule: gekauftes Taxi bleibt (vorher setzte die Übung es sofort wieder auf 4 zurück)")
+	tu2.free()
+	g2.free()
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm.contains("func _link_debug_row") and mm.contains("quit_btn.focus_neighbor_bottom = quit_btn.get_path_to(lb)"), "Debug-Zeile: per Controller erreichbar (unter „Beenden“ fest verdrahtet)")
+	var gd := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(gd.contains("event.physical_keycode == KEY_F6 and (Save.debug or not Cosmetics.taxi_3d)") and gd.contains("Cosmetics.taxi_3d = not Cosmetics.taxi_3d"), "Taxi: F6 schaltet im Spiel direkt zwischen Mischform und 2D (Vergleich, nur Debug)")
+
+func _test_round81() -> void:
+	## Runde 81–83: Mischform des Taxis (2D-Taxi mit Licht und Drehung aus Blender) als Standard für alle Lackierungen; 2D zum Vergleich im Debug-Menü.
+	var cos: Node = get_root().get_node("Cosmetics")
+	var missing: Array = []
+	for skin in cos.LIFE_SKINS:
+		var img := Image.load_from_file(ProjectSettings.globalize_path("res://assets/art/taxi_hybrid/%s.png" % skin))
+		if img == null or img.get_size() != Vector2i(26 * 6 * 7, 320):
+			missing.append(skin)
+	check(missing.is_empty(), "Mischform: Blatt je Lackierung mit 7 Drehstufen in den Größen 2–6 %s" % str(missing))
+	var f: Dictionary = cos.taxi3d_frame(4, 6, "neon")
+	check(not f.is_empty() and f.src == Rect2(Vector2(26 * 6 * 6, 32 + 48), Vector2(104, 64)), "Mischform: Ausschnitt je Größe, Drehstufe und Lackierung")
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm.contains("DEBUG_TAXI3D") and mm.contains("Cosmetics.taxi_3d = not Cosmetics.taxi_3d") and bool(cos.taxi_3d), "Mischform ist Standard; 2D nur zum Vergleich im Debug-Menü")
+
+func _test_round80() -> void:
+	## Runde 80: Farbsehschwäche, große Schrift, Bug melden, Bestflug ansehen, Steam-Vorbereitung.
+	# Farbtafel: normal unverändert, mit Option blau/gelb/purpurrot (HudGauges per load: kennt den Autoload Settings)
+	var HudGauges = load("res://src/game/hud_gauges.gd")
+	SignalColors.safe = false
+	var normal_ok: bool = SignalColors.good() == Color("#5dff9a") and SignalColors.bad() == Color("#ff4d6d") and SignalColors.bad(Color("#ff6a4a")) == Color("#ff6a4a") \
+		and HudGauges.fuel_color(1.0) == HudGauges.FUEL_FULL_C and HudGauges.fuel_color(0.05) == HudGauges.FUEL_CRIT_C
+	SignalColors.safe = true
+	var safe_ok: bool = SignalColors.good() == SignalColors.SAFE_GOOD and SignalColors.bad(Color("#ff6a4a")) == SignalColors.SAFE_BAD \
+		and SignalColors.by_level(0.5, 0.6, 1.0) == SignalColors.SAFE_GOOD and SignalColors.by_level(0.8, 0.6, 1.0) == SignalColors.SAFE_MID and SignalColors.by_level(1.5, 0.6, 1.0) == SignalColors.SAFE_BAD \
+		and HudGauges.fuel_color(0.05) == SignalColors.SAFE_FUEL[3] and HudGauges.hull_color(0.2) == SignalColors.SAFE_BAD
+	SignalColors.safe = false
+	check(normal_ok and safe_ok, "Farbsehschwäche: Signalfarben normal unverändert, mit Option blau/gelb/purpurrot (Ampel, Tank, Hülle)")
+	var sources_ok := true
+	for f in ["res://src/game/hud.gd", "res://src/game/landing_assist.gd", "res://src/game/props_view.gd", "res://src/game/taxi_view.gd", "res://src/game/fx.gd"]:
+		sources_ok = sources_ok and FileAccess.get_file_as_string(f).contains("SignalColors.")
+	check(sources_ok and not FileAccess.get_file_as_string("res://src/game/hud.gd").contains('Color("#5dff9a") if ratio'), "Farbsehschwäche: HUD, Landeassistent, Lampen, Zapfsäule und Tor nutzen die Farbtafel (Quelltextprüfung)")
+	# Einstellungen
+	var sv: Node = get_root().get_node("Settings")
+	var defaults_ok: bool = sv.values.has("color_safe") and sv.values.has("text_large")
+	var k_before: bool = sv.values.text_large
+	sv.values.text_large = true
+	var big: int = sv.fs(9)
+	sv.values.text_large = false
+	var small: int = sv.fs(9)
+	sv.values.text_large = k_before
+	check(defaults_ok and big == 12 and small == 9, "Große Schrift: Einstellung vorhanden, Schriftgröße 9 → %d (normal %d)" % [big, small])
+	var op := FileAccess.get_file_as_string("res://src/ui/options_panel.gd")
+	check(op.contains("func show_access") and op.contains('"color_safe"') and op.contains('"text_large"'), "Optionen: eigene Seite „Bedienhilfen“ mit beiden Schaltern (aus voreingestellt)")
+	# Bug melden
+	var url := BugReport.mailto(BugReport.subject("1.6.1", "Linux"), BugReport.body(["Was?"], [["Version", "1.6.1"]]))
+	check(url.begins_with("mailto:gravifare@jpfa.eu?subject=%5BGraviFare-Bug%5D%20v1.6.1") and url.contains("%0D%0A") and not url.contains(" "), "Bug melden: mailto mit Betreff „[GraviFare-Bug] v…“ (filterbar), CRLF, alles kodiert")
+	var bug := BugIcon.image(3)
+	var sym := true
+	for y in bug.get_height():
+		for x in 18:
+			var a := bug.get_pixel(x, y)
+			var b := bug.get_pixel(bug.get_width() - 1 - x, y)
+			if (a.a > 0.0) != (b.a > 0.0):
+				sym = false
+	check(bug.get_width() == 39 and bug.get_height() == 39 and sym and bug.get_pixel(19, 21).a > 0.0, "Bug melden: Käfer 13×13 Pixel (×3), spiegelsymmetrisch")
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm.contains("func show_bug") and mm.contains("BugIcon.texture()") and mm.contains("shell_show_in_file_manager"), "Bug melden: Eintrag mit Käfer im Hauptmenü, Seite mit E-Mail, Protokollordner und Adresse")
+	# Bestflug ansehen
+	var lvl := LevelData.load_file("res://data/levels/s1_04.json")
+	var rep := Replay.new()
+	rep.begin(lvl.id, 5, -1.0, 0.0, {}, true)
+	rep.lives = 3
+	rep.add(Vector2.ZERO, true)
+	rep.sig = "falsch"
+	rep.finish({"complete": true, "time": 1.0})
+	var d := rep.to_dict()
+	check(int(d.get("lives", -1)) == 3, "Bestflug: Läufe speichern die Leben beim Start (Lebens-Station)")
+	var gd := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(gd.contains("func _watch_input") and gd.contains("autopilot != null or watching or not"), "Bestflug: Spiel fliegt Eingaben der Aufzeichnung nach, ohne Geist (Quelltextprüfung)")
+	var fl := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	check(fl.contains("func start_watch") and fl.contains('("levels" if not watch.is_empty() else "")'), "Bestflug: Start aus der Levelauswahl, danach zurück dorthin")
+	# Deterministisch: Aufzeichnung (mit Absturz und Rauswerfen) über die Spiellogik nachgerechnet
+	var lv := LevelData.load_file("res://data/levels/s1_04.json")
+	var res := Bot.fly_level(lv, 400.0, Tuning.MIN_START_FUEL, true)
+	var dd: Dictionary = JSON.parse_string(JSON.stringify(res.replay))
+	dd.erase("sig")
+	var pl := Replay.play(LevelData.load_file("res://data/levels/s1_04.json"), dd)
+	check(res.complete and absf(pl.time - float(dd.result.time)) < 0.001, "Bestflug: Aufzeichnung reproduzierbar (%.2f s)" % pl.time)
+	# Steam
+	check(SteamBridge.api_name("first_fare") == "ACH_FIRST_FARE" and (Engine.has_singleton("Steam") or SteamBridge.push(["first_fare"]) == 0), "Steam: Brücke ohne GodotSteam wirkungslos, Namen ACH_<ID>")
+	check(FileAccess.file_exists("res://docs/steam_achievements.md") and FileAccess.get_file_as_string("res://docs/steam_achievements.md").contains("ACH_HOURS_10"), "Steam: Liste der Erfolge für Steamworks (docs/steam_achievements.md)")
+	# Texte in allen Sprachen
+	var missing: Array = []
+	for lang in ["de", "en", "fr", "es"]:
+		var tj := _read_json("res://data/i18n/%s.json" % lang)
+		for key in ["OPT_COLOR_SAFE", "OPT_TEXT_LARGE", "OPT_CAT_ACCESS", "OPT_ACCESS_NOTE", "MENU_BUG", "HELP_BUG", "BUG_TITLE", "BUG_TEXT", "BUG_MAIL", "BUG_MAIL_OPENED", "BUG_MAIL_FAILED",
+				"BUG_LOGS", "BUG_LOGS_OPENED", "BUG_COPY", "BUG_COPIED", "BUG_MAIL_Q1", "BUG_MAIL_Q2", "LVL_WATCH", "WATCH_TAG", "WATCH_HINT", "WATCH_DONE"]:
+			if String(tj.get(key, "")) == "":
+				missing.append(lang + ":" + key)
+	check(missing.is_empty(), "Runde 80: neue Texte in allen vier Sprachen %s" % str(missing))
+
+func _test_round79() -> void:
+	## Runde 79: Flugschule schaltet weiter, wenn die Aufgabe schon während der Erklärung erfüllt ist (drei Sprüche reihum, alle Sprachen).
+	var vl := _read_json("res://data/voice_lines.json")
+	var lines_ok := true
+	for lang in ["de", "en", "fr", "es"]:
+		for n in [1, 2, 3]:
+			lines_ok = lines_ok and String(vl.i0[lang].get("tut_fast_%d" % n, "")) != ""
+	var clips_ok := true
+	for lang in ["de", "en", "fr", "es"]:
+		for n in [1, 2, 3]:
+			clips_ok = clips_ok and ResourceLoader.exists("res://assets/audio/voice/%s/i0_tut_fast_%d.ogg" % [lang, n])
+	check(lines_ok and clips_ok, "Flugschule: drei „Schneller als erklärt“-Sprüche in allen vier Sprachen, gesprochen und als Untertitel")
+	var gs := GDScript.new()
+	gs.source_code = "extends Node\nvar spoken: Array = []\nvar stopped := 0\nfunc tutorial_voice_stop() -> void:\n\tstopped += 1\nfunc tutorial_speak(k: String) -> Dictionary:\n\tspoken.append(k)\n\treturn {\"len\": 2.0, \"text\": k}\n"
+	gs.reload()
+	var ss := GDScript.new()
+	ss.source_code = "extends Control\nvar hint := false\nfunc say(_a, _b) -> void:\n\tpass\n"
+	ss.reload()
+	var g: Node = gs.new()
+	var sp: Node = ss.new()
+	var tu: Node = load("res://src/game/tutorial.gd").new()
+	tu.game = g
+	tu.spot = sp
+	var cond := [false]
+	var st := {"key": "tut_soft", "wait": func(): return cond[0]}
+	tu.t = 1.0
+	tu._check_fast(st)
+	var open_ok: bool = st.get("_open", false) and g.spoken.is_empty()
+	cond[0] = true
+	tu.t = 2.0
+	tu._check_fast(st)
+	check(open_ok and st.get("_fast", false) and g.spoken == ["tut_fast_1"] and g.stopped == 1 and tu.t == 0.0, "Flugschule: Aufgabe während der Erklärung erfüllt → Erklärung bricht ab, Spruch 1")
+	var st2 := {"key": "tut_gear", "wait": func(): return true}
+	tu.t = 1.0
+	tu._check_fast(st2)
+	var st3 := {"key": "tut_refuel", "no_fast": true, "wait": func(): return cond[0]}
+	st3["_open"] = true
+	tu._check_fast(st3)
+	check(g.spoken.size() == 1 and not st2.has("_fast") and not st3.has("_fast"), "Flugschule: schon vorher erfüllt oder Tanken im Stand → kein Spruch")
+	for k in 3:
+		var c2 := [false]
+		var stn := {"key": "tut_hard", "wait": func(): return c2[0]}
+		tu.t = 1.0
+		tu._check_fast(stn)
+		c2[0] = true
+		tu._check_fast(stn)
+	check(g.spoken == ["tut_fast_1", "tut_fast_2", "tut_fast_3", "tut_fast_1"], "Flugschule: die drei Sprüche wechseln sich ab %s" % str(g.spoken))
+	var src := FileAccess.get_file_as_string("res://src/game/tutorial.gd")
+	check(src.contains("\"wait\": func(): return run.sim.fuel >= 35.0, \"timeout\": 25.0, \"fast_if\": _lifted_off") and src.contains("st.get(\"_fast\", false) or (st.wait as Callable).call()"), "Flugschule: Tanken erst nach dem Abheben, nach dem Spruch geht es ohne erneutes Warten weiter")
+	tu.free()
+	g.free()
+	sp.free()
+
+func _test_round78() -> void:
+	## Runde 78: Ampel mit Haken/X, PlayStation-Symbole, Erfolge.
+	var pv := FileAccess.get_file_as_string("res://src/game/props_view.gd")
+	check(pv.contains("# Haken") and pv.contains("# X") and pv.contains("LAMP_R"), "Ampel: grün mit Haken, rot mit X")
+	# PlayStation-Erkennung und Texte
+	var C = load("res://src/core/controls.gd")
+	check(C.style_for_name("PS5 Controller") == "ps" and C.style_for_name("DualSense Wireless Controller") == "ps" and C.style_for_name("Wireless Controller") == "ps"
+		and C.style_for_name("Sony Interactive Entertainment Wireless Controller") == "ps", "PlayStation-Controller werden erkannt")
+	check(C.style_for_name("Xbox Series Controller") == "xbox" and C.style_for_name("Steam Deck") == "xbox" and C.style_for_name("") == "xbox", "Andere Controller behalten das Xbox-Layout")
+	var loc: Node = get_root().get_node("Loc")
+	if loc.tables.is_empty():
+		loc._ready()
+	check(loc.ps_text("A / Enter: weiter · LB/RB Seite · Back halten · Start Pause · Y Modus") == "✕ / Enter: weiter · L1/R1 Seite · Share halten · Options Pause · △ Modus", "Knopfnamen werden ins PlayStation-Layout übertragen")
+	check(loc.ps_text("B|Back to the map") == "○|Back to the map" and loc.ps_text("Strg+Y") == "Strg+Y" and loc.ps_text("Wind X") == "Wind □", "Englisches „Back to“ und Tastenkürzel bleiben (nur PAD_KEYS werden ersetzt)")
+	var en := _read_json("res://data/i18n/en.json")
+	var all_keys := true
+	for k in loc.PAD_KEYS:
+		all_keys = all_keys and en.has(k)
+	check(all_keys, "Alle Schlüssel mit Knopfnamen existieren")
+	var ctl: Node = get_root().get_node("Controls")
+	var prev_dev: String = ctl.dev_style
+	ctl.dev_style = "ps"
+	ctl._detect(-1)
+	var jb := InputEventJoypadButton.new()
+	jb.button_index = JOY_BUTTON_A
+	var seen := [ctl.pad_style(), ctl.pad_name("A"), ctl.pad_name("RB"), C.glyph_id("△"), ctl.event_label(jb), String(loc.translations.de.get_message("TRANS_SKIP"))]
+	ctl.dev_style = "xbox"
+	ctl._detect(-1)
+	seen.append_array([ctl.event_label(jb), String(loc.translations.de.get_message("TRANS_SKIP"))])
+	ctl.dev_style = prev_dev
+	ctl._detect(-1)
+	var ps_ok: bool = seen[0] == "ps" and seen[1] == "✕" and seen[2] == "R1" and seen[3] == "Y" and seen[4] == "✕" and String(seen[5]).begins_with("✕") and seen[6] == "A" and String(seen[7]).begins_with("A")
+	check(ps_ok, "Symbolsatz wechselt Knopfnamen, Tastennamen und Hinweistexte (und zurück) %s" % str(seen))
+	var fn: Node = get_root().get_node("Fonts")
+	if fn.title == null:
+		fn._ready()
+	var sym_ok := true
+	for f in [fn.hud, fn.ui, fn.title]:
+		for ch in ["✕", "○", "□", "△"]:
+			sym_ok = sym_ok and f.has_char(ch.unicode_at(0))
+	check(sym_ok, "Alle drei Schriften zeigen ✕ ○ □ △ (Ersatzschrift Noto Sans Symbols 2)")
+	var lic := FileAccess.get_file_as_string("res://THIRD_PARTY_LICENSES.md")
+	check(lic.contains("Noto Sans Symbols 2") and FileAccess.file_exists("res://assets/fonts/noto_symbols2/OFL.txt"), "Ersatzschrift mit Herkunft und Lizenz im Inventar")
+	# Erfolge
+	var A = load("res://src/core/achievements.gd")
+	var names_ok := true
+	var de := _read_json("res://data/i18n/de.json")
+	for id in A.ids():
+		var k := "ACH_" + String(id).to_upper()
+		names_ok = names_ok and de.has(k) and en.has(k) and de.has(k + "_D") and en.has(k + "_D")
+		if A.goal(id) > 1:
+			names_ok = names_ok and String(de[k + "_D"]).contains("%d") and String(en[k + "_D"]).contains("%d")
+	check(names_ok and A.ids().size() >= 20, "Erfolge: %d, jeder mit Name und Beschreibung in beiden Sprachen" % A.ids().size())
+	var empty := {"completed": {}, "stats": {}}
+	check(A.reached(empty).is_empty(), "Erfolge: leerer Spielstand erreicht nichts")
+	var old := {"completed": {"s1_01": {"medals": {"time": true, "clean": true, "pro": true}}}, "stats": {"deliveries": 120, "perfect_landings": 30}}
+	var r1: Dictionary = A.update(old, "2026-11-17")
+	check(r1.retro and r1.new.has("first_fare") and r1.new.has("fares_100") and r1.new.has("triple") and r1.new.has("perfect_25") and not r1.new.has("fares_500"), "Erfolge: älterer Spielstand zählt rückwirkend, als Sammelhinweis")
+	old.stats.deliveries = 600
+	var r2: Dictionary = A.update(old, "2026-11-18")
+	check(not r2.retro and r2.new == ["fares_500"] and String(old.achievements.first_fare) == "2026-11-17", "Erfolge: danach einzeln, Datum des ersten Erreichens bleibt")
+	var ever := {}
+	for i in range(1, 12):
+		ever["s1_%02d" % i] = true
+	var lost := {"completed": {}, "ever": ever, "stats": {}, "achievements": {"triple": "2026-11-01"}}
+	var r3: Dictionary = A.update(lost, "2026-11-17")
+	check(r3.new == ["sector_1"] and lost.achievements.has("triple"), "Erfolge: Sektor zählt nach Game Over (ever), erreichte Erfolge gehen nie verloren")
+	var sv: Node = get_root().get_node("Save")
+	var keep := [sv.data, sv.slot, sv.debug, sv.community_mode, sv.dev_session, sv.ach_pending.duplicate(), sv.ach_retro]
+	sv.data = {"completed": {}, "stats": {"deliveries": 5}, "achievements": {}}
+	sv.slot = 1
+	sv.dev_session = false
+	sv.ach_pending = []
+	sv.debug = true
+	sv.sync_achievements()
+	var dbg_none: bool = sv.data.achievements.is_empty()
+	sv.debug = false
+	sv.community_mode = true
+	sv.sync_achievements()
+	var com_none: bool = sv.data.achievements.is_empty()
+	sv.community_mode = false
+	sv.sync_achievements()
+	var counted: bool = sv.data.achievements.has("first_fare") and sv.ach_pending == ["first_fare"]
+	sv.data = keep[0]
+	sv.slot = keep[1]
+	sv.debug = keep[2]
+	sv.community_mode = keep[3]
+	sv.dev_session = keep[4]
+	sv.ach_pending = keep[5]
+	sv.ach_retro = keep[6]
+	check(dbg_none and com_none and counted, "Erfolge: nicht im Debug-Modus und nicht in Community-Leveln, sonst mit Banner")
+	var V = load("res://src/ui/achievements_view.gd")
+	var dd: Dictionary = V.demo_data()
+	check(not A.stored(dd).is_empty() and A.stored(dd).size() < A.ids().size(), "Erfolge: Beispielstand der Übersicht hat erreichte und offene")
+	check(ResourceLoader.exists("res://src/ui/achievements_view.tscn") and FileAccess.get_file_as_string("res://src/ui/stats.gd").contains("achievements_view.tscn"), "Erfolge: Übersicht aus der Statistik erreichbar")
+	var gm := FileAccess.get_file_as_string("res://src/game/game.gd")
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(gm.contains("AchToast.flush(get_tree())") and mm.contains("ach_toast.gd\").flush(get_tree())"), "Erfolge: Banner an Ruhepunkten (Ergebnis, Hauptmenü)")
+
+func _test_round77() -> void:
+	## Runde 77: Controller-Hinweis nach dem Startbildschirm (Controller im Xbox-Layout, Text gleichzeitig auf Deutsch und Englisch).
+	var sp_src := FileAccess.get_file_as_string("res://src/ui/splash.gd")
+	check(sp_src.contains("change_scene_to_file(PAD_HINT)") and sp_src.contains("res://src/ui/pad_hint.tscn"), "Controller-Hinweis: Startbildschirm führt zu ihm")
+	var PH = load("res://src/ui/pad_hint.gd")
+	var scene: PackedScene = load("res://src/ui/pad_hint.tscn")
+	check(scene != null, "Controller-Hinweis: Szene lädt")
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var keys_ok := true
+	for k in ["PAD_HINT_TITLE", "PAD_HINT_BODY", "PAD_HINT_ON", "PAD_HINT_OFF", "PAD_HINT_GO"]:
+		keys_ok = keys_ok and de.has(k) and en.has(k) and de[k] != en[k] and not String(de[k]).to_lower().contains("xbox") and not String(en[k]).to_lower().contains("xbox")
+	check(keys_ok, "Controller-Hinweis: Texte in beiden Sprachen, verschieden, ohne Markennamen")
+	var loc: Node = get_root().get_node("Loc")
+	if loc.tables.is_empty():
+		loc._ready()
+	check(loc.text_in("de", "PAD_HINT_TITLE") == de.PAD_HINT_TITLE and loc.text_in("en", "PAD_HINT_TITLE") == en.PAD_HINT_TITLE and loc.text_in("en", "NO_SUCH_KEY") == "NO_SUCH_KEY", "Controller-Hinweis: Loc.text_in liefert jede Sprache unabhängig von der eingestellten")
+	var prev_loc := TranslationServer.get_locale()
+	TranslationServer.set_locale("en")
+	var o_en: Array = PH.lang_order()
+	TranslationServer.set_locale("de")
+	var o_de: Array = PH.lang_order()
+	TranslationServer.set_locale(prev_loc)
+	check(o_en == ["en", "de"] and o_de == ["de", "en"], "Controller-Hinweis: eingestellte Sprache zuerst, die andere darunter")
+	# Umriss: geschlossen, symmetrisch, passt mit Schultertasten über den Titel und in die Fläche
+	var pts: PackedVector2Array = PH._body_outline()
+	var r := Rect2(pts[0], Vector2.ZERO)
+	for v in pts:
+		r = r.expand(v)
+	check(absf(r.position.x + r.end.x) < 0.5 and r.size.x / r.size.y > 1.4 and r.size.x / r.size.y < 1.9, "Controller-Hinweis: Umriss symmetrisch, Seitenverhältnis eines Controllers (%.2f)" % (r.size.x / r.size.y))
+	var top: float = PH.PAD_C.y + (-72.0) * PH.PAD_K
+	var bottom: float = PH.PAD_C.y + r.end.y * PH.PAD_K
+	check(top > 20.0 and bottom < PH.TITLE_Y - 30.0 and PH.PAD_C.x + r.end.x * PH.PAD_K < 600.0, "Controller-Hinweis: Controller liegt über dem Titel in der Fläche (%.0f … %.0f)" % [top, bottom])
+	var fn: Node = get_root().get_node("Fonts")
+	if fn.title == null:
+		fn._ready()
+	var wide := 0.0
+	for lang in [de, en]:
+		wide = maxf(wide, fn.ui.get_string_size(lang.PAD_HINT_BODY, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x)
+		wide = maxf(wide, fn.title.get_string_size(lang.PAD_HINT_TITLE, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x)
+	var st: float = fn.hud.get_string_size("%s  ·  %s" % [de.PAD_HINT_OFF, en.PAD_HINT_OFF], HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+	check(wide < 600.0 and st < 560.0, "Controller-Hinweis: Texte passen auf die 640er-Fläche (%.0f / %.0f)" % [wide, st])
+	var sv: Node = get_root().get_node("Settings")
+	var prev_rm: bool = sv.values.reduce_motion
+	sv.values.reduce_motion = false
+	var h: Control = scene.instantiate()
+	h._ready()
+	check(h.fade.color.a > 0.99, "Controller-Hinweis: beginnt schwarz")
+	h.fake_pad = "on"
+	var on: bool = h.pad_connected()
+	h.fake_pad = "off"
+	check(on and not h.pad_connected(), "Controller-Hinweis: Status verbunden/nicht verbunden")
+	h.t = 0.1
+	var early := InputEventKey.new()
+	early.pressed = true
+	early.keycode = KEY_ENTER
+	h._input(early)
+	check(not h.leaving, "Controller-Hinweis: Tastendruck direkt nach dem Startbildschirm überspringt ihn nicht gleich mit")
+	h.t = 1.0
+	var echo := InputEventKey.new()
+	echo.pressed = true
+	echo.echo = true
+	echo.keycode = KEY_ENTER
+	h._input(echo)
+	h._input(InputEventMouseMotion.new())
+	var axis := InputEventJoypadMotion.new()
+	axis.axis_value = 1.0
+	h._input(axis)
+	check(not h.leaving, "Controller-Hinweis: Wiederholung, Mausbewegung und Stick gehen nicht weiter")
+	var pad := InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_A
+	pad.pressed = true
+	h._input(pad)
+	check(h.leaving and absf(h.out_dur - PH.SKIP_FADE) < 0.001, "Controller-Hinweis: Controllerknopf geht weiter")
+	h.free()
+	var h2: Control = scene.instantiate()
+	h2._ready()
+	h2.t = PH.T_END - 0.01
+	h2._process(0.02)
+	check(h2.leaving, "Controller-Hinweis: wechselt nach %.1f s von selbst" % PH.T_END)
+	h2.free()
+	sv.values.reduce_motion = true
+	var h3: Control = scene.instantiate()
+	h3._ready()
+	var lit := 0.0
+	for tt in [0.8, 1.0, 1.2, 3.0]:
+		h3.t = tt
+		for i in 4:
+			lit = maxf(lit, h3._lit(i))
+	check(h3.still and lit == 0.0, "Controller-Hinweis: „Weniger Bewegung“ ohne Aufleuchten und Wackeln")
+	h3.free()
+	sv.values.reduce_motion = prev_rm
+
 func _test_round76() -> void:
 	var repeat_bad := []
 	var consec_bad := []
@@ -3104,7 +3574,8 @@ func _test_voice_lines_complete() -> void:
 				var voices: Array = PassengerActor.VOICES_F + PassengerActor.VOICES_M if group == "passenger_extra" else [group]
 				for v in voices:
 					total += 1
-					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, key]):
+					var clip_lang: String = lang                                          # seit Runde 79 hat jede Sprache eigene Aufnahmen
+					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [clip_lang, v, key]):
 						missing.append("%s/%s_%s" % [lang, v, key])
 	check(missing.is_empty() and total > 50, "Alle %d Sondersprachzeilen (Tankwart, Zentrale, Passagier-Reaktionen) haben Text und Clip %s" % [total, str(missing.slice(0, 4))])
 
@@ -3114,12 +3585,12 @@ func _test_passenger_voices() -> void:
 	for n in range(1, 10):
 		lines.append("dest_%d" % n)
 	var missing: Array = []
-	for lang in ["de", "en"]:
+	for lang in ["de", "en", "fr", "es"]:
 		for v in PassengerActor.VOICES_F + PassengerActor.VOICES_M:
 			for l in lines:
 				if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, l]):
 					missing.append("%s/%s_%s" % [lang, v, l])
-	check(missing.is_empty(), "Alle 14 Fahrgaststimmen haben in Deutsch und Englisch die Grundzeilen %s" % str(missing.slice(0, 4)))
+	check(missing.is_empty(), "Alle 14 Fahrgaststimmen haben in allen vier Sprachen die Grundzeilen %s" % str(missing.slice(0, 4)))
 	var seen := {}
 	var stable := true
 	var right_gender := true
@@ -3182,7 +3653,7 @@ func _test_round54_visuals() -> void:
 	check(names.size() >= 5, "Erster Fahrgast heißt nicht in jedem Sektor gleich (%d Namen)" % names.size())
 	var dv := FileAccess.get_file_as_string("res://src/game/dark_view.gd")
 	check(dv.contains("uniform vec4 cones[16]") and dv.contains("kein runder Schein"), "Dunkelheit: Fahrzeuge leuchten mit Kegeln statt rundum")
-	check(not dv.contains("PAD_DIM") and dv.contains("run.target_pad()") and dv.contains("if String(id) == goal:"), "Dunkelheit: nur die Zielplattform leuchtet (Radius 38), die übrigen Plattformen gar nicht (Ampellampe bleibt)")
+	check(not dv.contains("PAD_DIM") and dv.contains("run.marker_pad()") and dv.contains("if String(id) == goal:"), "Dunkelheit: nur die Zielplattform leuchtet (Radius 38), die übrigen Plattformen gar nicht (Ampellampe bleibt)")
 
 ## Runde 57: Pixelgrafik für Hindernisse, Linien im Pixelraster, Leben im Hintergrund, Menüs.
 func _src(path: String) -> String:
@@ -3676,10 +4147,10 @@ func _test_night_shift() -> void:
 	# Finale der Nachtschicht: Ansage je Note (gesprochen und als Untertitel), eigene Musik, Fahrer-Ablauf
 	var voice_ok := true
 	for g in ["S", "A", "B", "C", "D", "E"]:
-		for lang in ["de", "en"]:
+		for lang in ["de", "en", "fr", "es"]:
 			voice_ok = voice_ok and ResourceLoader.exists("res://assets/audio/voice/%s/d0_shift_%s.ogg" % [lang, g])
 		voice_ok = voice_ok and String(get_root().get_node("Sfx").line_text("d0", "shift_" + g)) != ""
-	check(voice_ok, "Nachtschicht-Finale: Ansage der Zentrale zu jeder Note (S–E) in Deutsch und Englisch")
+	check(voice_ok, "Nachtschicht-Finale: Ansage der Zentrale zu jeder Note (S–E) in allen vier Sprachen")
 	check(ResourceLoader.exists("res://assets/audio/music/night_A.ogg") and ResourceLoader.exists("res://assets/audio/music/night_B.ogg") and ResourceLoader.exists("res://assets/audio/music/night_C.ogg"), "Nachtschicht-Finale: eigenes Musikstück „night“ (drei Schichten)")
 	var night_len := (load("res://assets/audio/music/night_A.ogg") as AudioStream).get_length()
 	check(night_len > 50.0 and night_len < 70.0, "Nachtschicht-Finale: Musikstück dauert etwa eine Minute (%.0f s)" % night_len)
@@ -4958,7 +5429,7 @@ func _test_editor_labels_fit() -> void:
 	var old_locale := TranslationServer.get_locale()
 	var bad: Array = []
 	var rows := 0
-	for lang in ["de", "en"]:
+	for lang in ["de", "en", "fr", "es"]:
 		var tl := Translation.new()
 		tl.locale = lang
 		var texts := _read_json("res://data/i18n/%s.json" % lang)
@@ -5003,6 +5474,7 @@ func _test_editor_labels_fit() -> void:
 							bad.append("%s: Text liegt unter Knopf '%s'" % [tag, sib.text])
 		# Werte der Wirkung und der Ausrichtung sind mittig im Feld
 		ed.free()
+		TranslationServer.remove_translation(tl)
 	TranslationServer.set_locale(old_locale)
 	check(rows > 100 and bad.is_empty(), "Editor: alle Werte und Beschriftungen mittig, ganz sichtbar, nie unter einem Knopf (%d Felder; %s)" % [rows, "; ".join(bad.slice(0, 4))])
 

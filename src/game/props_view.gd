@@ -44,23 +44,48 @@ func _process(delta: float) -> void:
 		door = move_toward(door, 1.0 if run.exit_open else 0.0, delta * 0.9)
 	queue_redraw()
 
+var _prof := {}                    # Dev (--profile-draw): Zeichenzeit je Teil in µs, alle 2 s gemittelt ausgegeben
+var _prof_n := 0
+var _prof_t := 0
+
 func _draw() -> void:
 	if level == null:
 		return
 	PX = PixelDraw.px_of(self)
-	_draw_pads()
-	_draw_reflections()
-	_draw_pumps()
-	_draw_gate()
-	_draw_doors()
-	_draw_zones()
-	_draw_movers()
-	_draw_actors()
-	_draw_taxi_shadow()
+	if not _prof_on():
+		_draw_pads()
+		_draw_reflections()
+		_draw_pumps()
+		_draw_gate()
+		_draw_doors()
+		_draw_zones()
+		_draw_movers()
+		_draw_actors()
+		_draw_taxi_shadow()
+	else:
+		for part in ["_draw_pads", "_draw_reflections", "_draw_pumps", "_draw_gate", "_draw_doors", "_draw_zones", "_draw_movers", "_draw_actors", "_draw_taxi_shadow"]:
+			var t0 := Time.get_ticks_usec()
+			call(part)
+			_prof[part] = int(_prof.get(part, 0)) + Time.get_ticks_usec() - t0
+		_prof_n += 1
+		if Time.get_ticks_msec() - _prof_t > 2000:
+			_prof_t = Time.get_ticks_msec()
+			var line := "draw n=%d:" % PixelDraw.n_of(self)
+			for k in _prof:
+				line += " %s=%dus" % [String(k).substr(6), int(_prof[k]) / maxi(_prof_n, 1)]
+			print(line)
+			_prof = {}
+			_prof_n = 0
 	if OS.get_cmdline_user_args().has("--debug-hitbox"):      # Dev: Kollisionsrechtecke der Mover und des Taxis
 		for m in level.movers:
 			draw_rect(m.rect, Color(1, 0.2, 0.2, 0.9), false, PixelDraw.wsnap(self, 0.6))
 		draw_rect(Rect2(run.sim.pos - Tuning.HULL_HALF, Tuning.HULL_HALF * 2.0), Color(0.3, 1, 0.3, 0.9), false, PixelDraw.wsnap(self, 0.6))
+
+var _prof_flag := -1
+func _prof_on() -> bool:
+	if _prof_flag < 0:
+		_prof_flag = 1 if OS.get_cmdline_user_args().has("--profile-draw") else 0
+	return _prof_flag == 1
 
 var flags: Array = []
 var flags_level: LevelData = null
@@ -167,7 +192,7 @@ func _draw_doors() -> void:
 		var gap := level.door_gap(ch, level.clock)
 		var ttc := level.door_time_to_close(ch, level.clock)
 		var warn := gap >= 1.0 and ttc > 0.0 and ttc < 1.3 and int(t * 8.0) % 2 == 0
-		var lamp := Color("#ffd24a") if warn else (Color(0.36, 1.0, 0.6, 0.8) if gap >= 1.0 else Color("#ff4d6d"))
+		var lamp := Color("#ffd24a") if warn else (SignalColors.good(Color(0.36, 1.0, 0.6, 0.8)) if gap >= 1.0 else SignalColors.bad())
 		for gate in d.gates:
 			if bool(d.get("glass", false)):
 				_draw_glass_gate(ch, gate, gap)
@@ -837,18 +862,29 @@ func _draw_meteor(m: Dictionary) -> void:
 
 ## Beleuchtete Wartehütte: warmes Fensterlicht, Halo und ein Lichtfleck auf der Plattform. Wartet dort ein Fahrgast, leuchtet sie heller
 ## und flackert leicht; sonst brennt ein gedämpftes Licht.
-## Ampellampe auf dem Dach des Wartehäuschens: rot = niemand wartet, grün (pulsierend) = Fahrgast wartet.
+## Ampellampe auf dem Dach des Wartehäuschens: rot mit X = niemand wartet, grün mit Haken (pulsierend) = Fahrgast wartet.
+## Das Zeichen macht den Zustand auch ohne Farbunterscheidung erkennbar (Farbsehschwäche).
+const LAMP_UP := 7.0                     # Mitte der Lampe über dem Dach
+const LAMP_R := 3.3                      # Radius der Lampe
+
 func _light_shelter(sh: Rect2, id: String) -> void:
 	var waiting := run.passenger_waiting_at(id)
-	var c := Vector2(sh.get_center().x, sh.position.y - 5.5)
-	var col := Color(0.3, 1.0, 0.45) if waiting else Color(1.0, 0.22, 0.2)
+	var c := Vector2(sh.get_center().x, sh.position.y - LAMP_UP)
+	var col := SignalColors.good(Color(0.3, 1.0, 0.45)) if waiting else SignalColors.bad(Color(1.0, 0.22, 0.2))
 	var pulse := 0.85 + 0.15 * sin(t * 8.0) if waiting else 0.7 + 0.1 * sin(t * 2.0)
-	draw_rect(Rect2(c.x - 1.0, c.y + 1.0, 2.0, 2.5), Color("#0c0f24"))              # Mast
-	draw_rect(Rect2(c.x - 2.2, c.y - 2.2, 4.4, 4.4), Color("#0c0f24"))              # Gehäuse
-	draw_circle(c, 6.5, Color(col.r, col.g, col.b, 0.10 * pulse))                    # Schein
-	draw_circle(c, 4.0, Color(col.r, col.g, col.b, 0.16 * pulse))
-	draw_circle(c, 1.8, Color(col.r, col.g, col.b, pulse))                           # Lampe
-	draw_circle(c + Vector2(-0.5, -0.5), 0.6, Color(1.0, 1.0, 1.0, 0.8 * pulse))     # Glanzpunkt
+	var dark := Color("#0c0f24")
+	draw_rect(Rect2(c.x - 1.0, c.y + LAMP_R, 2.0, LAMP_UP - LAMP_R), dark)          # Mast
+	draw_circle(c, LAMP_R + 1.0, dark)                                               # Gehäuse
+	draw_circle(c, 9.0, Color(col.r, col.g, col.b, 0.09 * pulse))                    # Schein
+	draw_circle(c, 5.5, Color(col.r, col.g, col.b, 0.15 * pulse))
+	draw_circle(c, LAMP_R, Color(col.r, col.g, col.b, maxf(pulse, 0.8)))            # Lampe
+	var w := PixelDraw.wsnap(self, 0.67)
+	var ink := Color(0.03, 0.05, 0.1, 0.95)
+	if waiting:                                                                      # Haken
+		draw_polyline(PackedVector2Array([c + Vector2(-1.7, 0.1), c + Vector2(-0.5, 1.4), c + Vector2(1.8, -1.4)]), ink, w)
+	else:                                                                            # X
+		draw_line(c + Vector2(-1.3, -1.3), c + Vector2(1.3, 1.3), ink, w)
+		draw_line(c + Vector2(-1.3, 1.3), c + Vector2(1.3, -1.3), ink, w)
 
 ## Krankenhaus-Plattform: weißes Schild mit rotem Kreuz über dem Unterstand und ein rot blinkendes Rundumlicht.
 func _draw_hospital_sign(p: Dictionary, y: float) -> void:
@@ -875,7 +911,7 @@ func _draw_gate() -> void:
 		var bands := 6
 		for i in bands:
 			var f := float(i) / bands
-			var c := Color("#5dff9a").lerp(Color("#eafff2"), f)
+			var c := SignalColors.good().lerp(Color("#eafff2"), f)
 			c.a = door * (0.55 - f * 0.4)
 			draw_rect(Rect2(inner.position.x, inner.position.y + inner.size.y * f, inner.size.x, inner.size.y / bands), c)
 		# Leitchevrons nach oben
@@ -900,7 +936,7 @@ func _draw_gate() -> void:
 	draw_texture_rect_region(gate_frame, r, PixelScale.sheet_rect(gn, GATE_UNITS))
 	# Statuslampen im Rahmen und Schild auf dem Deckenfels
 	var blink := int(t * 3.0) % 2 == 0
-	var lamp := Color("#5dff9a") if open else (Color("#ff4d6d") if blink else Color("#7a2438"))
+	var lamp := SignalColors.good() if open else (SignalColors.bad() if blink else SignalColors.bad().darkened(0.55))
 	for x in [r.position.x + 2.0, r.end.x - 4.0]:
 		draw_rect(Rect2(x, r.position.y + r.size.y * 0.5 - 2, 2, 4), lamp)
 	var font := Fonts.hud
@@ -914,7 +950,7 @@ func _draw_gate() -> void:
 	draw_string(font, Vector2(cxm - 22, sy + 7.8), tr("EXIT_SIGN") if open else tr("EXIT_LOCKED"), HORIZONTAL_ALIGNMENT_CENTER, 44, 8, tc)
 	if open:
 		# Lichtkegel unter dem Tor
-		var spill := Color("#5dff9a")
+		var spill := SignalColors.good()
 		spill.a = 0.10 + 0.04 * sin(t * 4.0)
 		draw_colored_polygon(PackedVector2Array([Vector2(r.position.x + 6, r.end.y), Vector2(r.end.x - 6, r.end.y), Vector2(r.end.x + 22, r.end.y + 56), Vector2(r.position.x - 22, r.end.y + 56)]), spill)
 
@@ -1114,13 +1150,13 @@ func _draw_amount(a: PassengerActor, pos: Vector2) -> void:
 		if int(ex.state) == Run.ES.WAIT:                     # Geduld: schrumpfender Balken unter dem Betrag
 			var frac := clampf(float(ex.patience) / float(ex.patience_max), 0.0, 1.0)
 			draw_rect(Rect2(pos.x - 8.0, pos.y - 13.6, 16.0, 1.4), Color(0.04, 0.05, 0.14, 0.8 * a.fade))
-			draw_rect(Rect2(pos.x - 8.0, pos.y - 13.6, 16.0 * frac, 1.4), Color("#5dff9a").lerp(Color("#ff4d6d"), 1.0 - frac))
+			draw_rect(Rect2(pos.x - 8.0, pos.y - 13.6, 16.0 * frac, 1.4), SignalColors.good().lerp(SignalColors.bad(), 1.0 - frac))
 	elif a.state == PassengerActor.S.EXITING and not a.pay_info.is_empty():
 		value = a.pay_for(0.0)
 		factor = a.factor_for(0.0)
 	if value < 0.0:
 		return
-	var col := Color("#5dff9a") if factor > 1.05 else (Color("#ffe14a") if factor > 0.8 else Color("#ff8a5a"))
+	var col := SignalColors.by_level(-factor, -1.05, -0.8, Color("#ff8a5a"))
 	col.a = a.fade
 	var txt := "¢%d" % int(round(value))
 	var font := Fonts.hud
@@ -1156,11 +1192,11 @@ func _draw_pumps() -> void:
 		var pf := run.fuel_price()
 		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
 		var lvl_n := (pf - run.level.fuel_price_min) / span
-		var col := Color("#5dff9a") if lvl_n < 0.34 else (Color("#ffe14a") if lvl_n < 0.67 else Color("#ff6a4a"))
+		var col := SignalColors.by_level(lvl_n, 0.34, 0.67, Color("#ff6a4a"))
 		var txt := "%.2f" % pf
 		if stage >= 3:
 			txt = "ERR"
-			col = Color("#ff4d6d")
+			col = SignalColors.bad()
 		col.a = flick
 		draw_string(font, Vector2(-11, -4.3), txt, HORIZONTAL_ALIGNMENT_RIGHT, 17.6, 5, col)          # rechtsbündig im Display (kleiner Rand zum rechten Rahmen)
 		if pump_flash > 0.0:

@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Böen",
-  "en": "Gusts"
+  "en": "Gusts",
+  "fr": "Rafales",
+  "es": "Ráfagas"
  },
  "map": [
   "########################################",
@@ -79,7 +81,9 @@
   ],
   "title": {
    "de": "Böen",
-   "en": "Gusts"
+   "en": "Gusts",
+   "fr": "Rafales",
+   "es": "Ráfagas"
   }
  }
 }

@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Schieber",
-  "en": "Sliders"
+  "en": "Sliders",
+  "fr": "Glissières",
+  "es": "Correderas"
  },
  "map": [
   "########################################",
@@ -78,7 +80,9 @@
   ],
   "title": {
    "de": "Schieber",
-   "en": "Sliders"
+   "en": "Sliders",
+   "fr": "Glissières",
+   "es": "Correderas"
   }
  }
 }

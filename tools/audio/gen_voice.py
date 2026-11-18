@@ -27,6 +27,28 @@ VOICES = {  # Sprache -> Stimme -> (Beschreibung in der Sprache der Zeile, Seed)
         "m1": ("A middle-aged man with a deep, warm, slightly gravelly voice, easygoing and good-humored delivery. Native English speaker with a neutral accent.", 404),
     },
 }
+_FR = " Locutrice native française, accent standard de France."
+_FR_M = " Locuteur natif français, accent standard de France."
+_ES = " Hablante nativa de español de España, acento castellano neutro."
+_ES_M = " Hablante nativo de español de España, acento castellano neutro."
+VOICES["fr"] = {
+    "f0": ("Une jeune femme à la voix claire, chaleureuse et joyeuse, tessiture moyenne, détendue et aimable." + _FR, 101),
+    "f1": ("Une femme d’environ trente-cinq ans à la voix un peu plus grave, calme et assurée, avec un humour pince-sans-rire." + _FR, 202),
+    "m0": ("Un homme d’environ trente-cinq ans à la voix de baryton grave, calme et chaleureuse, détendu et aimable." + _FR_M, 303),
+    "m1": ("Un homme âgé à la voix grave, chaleureuse et légèrement rauque, posé et bienveillant." + _FR_M, 404),
+    "t0": ("Un vieux pompiste à la voix grave et rauque, bougon mais bon enfant, qui parle avec beaucoup d’insistance." + _FR_M, 505),
+    "d0": ("Une régulatrice d’une quarantaine d’années à la voix calme, maîtrisée, légèrement ironique, à la diction claire, comme à la radio." + _FR, 606),
+}
+VOICES["es"] = {
+    "f0": ("Una mujer joven con voz clara, cálida y alegre, tono medio, desenfadada y amable." + _ES, 101),
+    "f1": ("Una mujer de unos treinta y cinco años con voz algo más grave, tranquila y segura, con un humor seco." + _ES, 202),
+    "m0": ("Un hombre de unos treinta y cinco años con voz de barítono grave, tranquila y cálida, relajado y amable." + _ES_M, 303),
+    "m1": ("Un hombre mayor con voz grave, cálida y algo ronca, sereno y bondadoso." + _ES_M, 404),
+    "t0": ("Un gasolinero mayor con voz grave y ronca, gruñón pero bonachón, que habla con mucho énfasis." + _ES_M, 505),
+    "d0": ("Una operadora de radio de unos cuarenta años con voz tranquila, serena, algo irónica y dicción clara, como por radio." + _ES, 606),
+}
+VOICES["fr"]["i0"] = VOICES["fr"]["m0"]
+VOICES["es"]["i0"] = VOICES["es"]["m0"]
 SPECIAL = json.load(open("data/voice_lines.json"))          # gemeinsame Quelle für Generator und Spiel-Untertitel
 PASSENGER_VOICES = ["f0", "f1", "m0", "m1"]
 VOICES["de"]["t0"] = ("Ein älterer Tankwart mit tiefer, rauer, gutmütig-grantiger Stimme, spricht mit kräftiger Betonung. Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache.", 505)
@@ -37,11 +59,17 @@ VOICES["de"]["i0"] = VOICES["de"]["m0"]          # Fluglehrer im Tutorial: gleic
 VOICES["en"]["i0"] = VOICES["en"]["m0"]
 NUM_DE = ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun"]
 NUM_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+NUM_FR = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"]
+NUM_ES = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"]
 LINES = {
     "de": {"language": "German", "lines": {
         "call": "Hey Taxi!", "thanks": "Danke!", "angry": "Hey, Idiot!", "dest_exit": "Zum Ausgang, bitte!", "dest_H": "Zum Krankenhaus, bitte!", **{f"dest_{n}": f"Plattform {NUM_DE[n]}, bitte!" for n in range(1, 10)}}},
     "en": {"language": "English", "lines": {
         "call": "Hey Taxi!", "thanks": "Thanks!", "angry": "Hey, idiot!", "dest_exit": "To the exit, please!", "dest_H": "To the hospital, please!", **{f"dest_{n}": f"Platform {NUM_EN[n]}, please!" for n in range(1, 10)}}},
+    "fr": {"language": "French", "lines": {
+        "call": "Hé, taxi !", "thanks": "Merci !", "angry": "Hé, espèce d’idiot !", "dest_exit": "À la sortie, s’il vous plaît !", "dest_H": "À l’hôpital, s’il vous plaît !", **{f"dest_{n}": f"Plateforme {NUM_FR[n]}, s’il vous plaît !" for n in range(1, 10)}}},
+    "es": {"language": "Spanish", "lines": {
+        "call": "¡Eh, taxi!", "thanks": "¡Gracias!", "angry": "¡Oye, idiota!", "dest_exit": "¡A la salida, por favor!", "dest_H": "¡Al hospital, por favor!", **{f"dest_{n}": f"¡A la plataforma {NUM_ES[n]}, por favor!" for n in range(1, 10)}}},
 }
 
 def trim(x, sr):
@@ -71,6 +99,10 @@ def norm(t, lang):
 
 _asr = None
 def clip_ok(x, sr, text, lang):
+    if lang in ("fr", "es"):                         # Französisch/Spanisch: gemeinsame Prüfung mit Zahlwörtern (tools/audio/voice_lang.py)
+        sys.path.insert(0, "tools/audio")
+        import voice_lang
+        return voice_lang.check(x, sr, text, lang)
     """Automatische Qualitätsprüfung: lokale Spracherkennung (faster-whisper medium, nur lokale Modelle).
     Akzeptiert nur Clips ohne Zusatzwörter (Lacher, Stottern) und mit Ähnlichkeit >= 0,88."""
     import difflib, librosa
@@ -123,7 +155,12 @@ def main():
                 x = None
                 for attempt in range(a.tries if a.validate else 1):
                     torch.manual_seed(seed + a.bump + attempt * 13)  # identischer Seed je Stimme, Versatz bei Wiederholung
-                    wavs, sr = model.generate_voice_design(text=text, instruct=instruct, language=cfg["language"], do_sample=True, temperature=0.7)
+                    say = text
+                    if lang in ("fr", "es"):                 # Ziffern im Untertitel („plateforme 2“) für die Sprachausgabe ausschreiben
+                        sys.path.insert(0, "tools/audio")
+                        import voice_lang
+                        say = voice_lang.spoken(text, lang)
+                    wavs, sr = model.generate_voice_design(text=say, instruct=instruct, language=cfg["language"], do_sample=True, temperature=0.7)
                     x = trim(np.asarray(wavs[0], dtype=np.float32), sr)
                     if not a.validate:
                         break

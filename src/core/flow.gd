@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "1.6.1"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "1.6.5"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
@@ -36,6 +36,9 @@ var community := false:                 # Community-Level (user://community/, si
 		Save.community_mode = v
 var editor_autopilot := false            # Testflug aus dem Level-Editor: der Autopilot fliegt, man sieht ihm zu (zählt nichts)
 var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
+var watch := {}                         # Bestflug ansehen: gespeicherter Lauf (Replay), den das Spiel nachfliegt; zählt nichts
+var watch_level := ""                   # zuletzt angesehenes Level: die Levelauswahl kehrt dorthin zurück
+var came_from_achievements := false     # Statistik: nach der Erfolgsübersicht steht der Fokus wieder auf ihrem Knopf
 var editor_skip_solve := false          # Debug: Speichern im Editor ohne Handlösung (nur wirksam bei Save.debug; bleibt über Testflüge erhalten)
 var editor_session := ""                # Die in dieser Editorsitzung gespeicherte Fassung bleibt über den Testflug hinweg die, die das nächste Speichern ersetzt
 var editor_original := ""               # Debug: Id des mitgelieferten Levels, das der Editor gerade bearbeitet (bleibt über den Testflug erhalten)
@@ -91,6 +94,7 @@ func in_tutorial() -> bool:
 
 ## Tutorial starten (eigener Mini-Lauf mit vollen Leben/Tank, ohne Speicherstand-Eingriff). `next_id`: Level danach, "" = Menü.
 func start_tutorial(next_id := "") -> void:
+	watch = {}
 	lives = Tuning.START_LIVES
 	entry_fuel = Tuning.FUEL_MAX
 	entry_credits = 0.0
@@ -104,6 +108,7 @@ func start_tutorial(next_id := "") -> void:
 
 ## Neuer Lauf: volle Leben, voller Tank, keine Credits – ab dem gewählten Level.
 func start_campaign(id: String) -> void:
+	watch = {}
 	lives = Tuning.START_LIVES
 	entry_fuel = Tuning.FUEL_MAX
 	entry_credits = 0.0
@@ -118,6 +123,7 @@ func start_campaign(id: String) -> void:
 
 ## Start aus der Levelauswahl: Läuft eine Karriere, wird es ein Übungsflug (die Karriere bleibt unberührt), sonst beginnt ab hier eine neue Karriere.
 func start_selected(id: String) -> void:
+	watch = {}
 	if Save.campaign().is_empty():
 		start_campaign(id)
 		return
@@ -146,6 +152,7 @@ func dev_fake_map_stats(drng: RandomNumberGenerator, q: float) -> Dictionary:
 
 ## Nachtschicht: 9 Karten, je eine pro Sektor (1 → 9), mit festem Tages-Seed. Ein Versuch pro Tag (im Debug-Modus unbegrenzt), 5 Taxis, volle Tanks.
 func start_shift() -> void:
+	watch = {}
 	var date := Daily.today()
 	if Save.shift_used_today(date):
 		return
@@ -182,6 +189,7 @@ func start_shift() -> void:
 
 ## Tagschicht: Karte, Regel, Ziel, Aufträge und Preise hängen nur vom Datum ab (siehe daily.gd, day_shift.gd). Volle Leben, keine Credits, Tank je nach Regel.
 func start_daily() -> void:
+	watch = {}
 	daily_date = Daily.today()
 	daily_rule = dev_day_rule if dev_day_rule != "" else DayShift.rule_of(daily_date)
 	daily_goal = dev_day_goal if dev_day_goal != "" else DayShift.goal_of(daily_date)
@@ -236,6 +244,7 @@ func finish_shift() -> Dictionary:
 
 ## Gespeicherte Karriere fortsetzen (Leben, Credits, Sprit, Seed, Fahrgast); false, wenn keine vorhanden ist.
 func resume_campaign() -> bool:
+	watch = {}
 	var c := Save.campaign()
 	if c.is_empty() or not level_ids().has(String(c.level)):
 		return false
@@ -252,6 +261,7 @@ func resume_campaign() -> bool:
 
 ## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; die Karriere bleibt unberührt (wie der Übungsflug).
 func start_community(id: String, autopilot := false) -> void:
+	watch = {}
 	if not community_store().playable(id):         # gespeichert oder Entwurf eines Testflugs
 		return
 	editor_autopilot = autopilot and return_to_editor != ""        # nur aus dem Editor heraus
@@ -260,6 +270,19 @@ func start_community(id: String, autopilot := false) -> void:
 	entry_credits = 0.0
 	carry_passenger = {}
 	run_seed = randi() % 1000000
+	practice = true
+	shift = false
+	daily = false
+	start_level(id)
+
+## Bestflug eines Levels ansehen (Levelauswahl): Startwerte aus der Aufzeichnung, kein Eintrag in Karriere oder Statistik.
+func start_watch(id: String, d: Dictionary) -> void:
+	watch = d
+	watch_level = id
+	lives = int(d.get("lives", Tuning.START_LIVES))
+	entry_fuel = float(d.get("fuel", -1.0))
+	entry_credits = float(d.get("credits", 0.0))
+	carry_passenger = (d.get("carry", {}) as Dictionary).duplicate(true)
 	practice = true
 	shift = false
 	daily = false
@@ -287,7 +310,8 @@ func next_level_id() -> String:
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
-	menu_screen = ("editor:" + return_to_editor if return_to_editor != "" else "community") if community else ""
+	menu_screen = ("editor:" + return_to_editor if return_to_editor != "" else "community") if community else ("levels" if not watch.is_empty() else "")
+	watch = {}
 	return_to_editor = ""
 	editor_autopilot = false
 	var g := get_tree().current_scene

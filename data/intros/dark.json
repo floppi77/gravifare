@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Dunkelheit",
-  "en": "Darkness"
+  "en": "Darkness",
+  "fr": "Obscurité",
+  "es": "Oscuridad"
  },
  "map": [
   "########################################",
@@ -82,7 +84,9 @@
   ],
   "title": {
    "de": "Dunkelheit",
-   "en": "Darkness"
+   "en": "Darkness",
+   "fr": "Obscurité",
+   "es": "Oscuridad"
   }
  }
 }

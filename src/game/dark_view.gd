@@ -87,7 +87,7 @@ func _process(_d: float) -> void:
 	var spreads := PackedFloat32Array()
 	var tp := _screen(run.sim.pos)
 	lights.append(Vector3(tp.x, tp.y, (56.0 if lv.fog > 0.0 else 72.0 * light_k) + 3.0 * sin(Time.get_ticks_msec() * 0.011)))
-	var goal := run.target_pad()                                    # nur die Zielplattform leuchtet (Übersicht); die übrigen bleiben dunkel, es genügt die Ampellampe
+	var goal := run.marker_pad()                                    # nur die Zielplattform leuchtet (Übersicht), und erst, wenn der Fahrgast dort erscheint (Runde 83: vorher leuchtete die nächste Abholplattform schon nach dem Absetzen)
 	for id in lv.pads:
 		var p: Dictionary = lv.pads[id]
 		var c := _screen(Vector2(float(p.center), float(p.row) * Tuning.TILE - 8.0))
@@ -95,7 +95,7 @@ func _process(_d: float) -> void:
 			lights.append(Vector3(c.x, c.y, 26.0 if lv.fog > 0.0 else 38.0))
 		var shl: Rect2 = p.get("shelter", Rect2())
 		if shl.size.x > 0.0:                                        # Ampellampe auf dem Dach bleibt auch im Dunkeln sichtbar
-			var lc := _screen(Vector2(shl.get_center().x, shl.position.y - 5.5))
+			var lc := _screen(Vector2(shl.get_center().x, shl.position.y - 7.0))
 			lights.append(Vector3(lc.x, lc.y, 16.0))
 	var ex := _screen(lv.exit_rect().get_center())
 	lights.append(Vector3(ex.x, ex.y, 54.0 if run.exit_open else 30.0))

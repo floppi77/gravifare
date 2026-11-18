@@ -545,6 +545,14 @@ def flags():
     en = Image.fromarray(np.where(upper_left[:, :, None], np.array(us), np.array(uk)).astype(np.uint8))          # USA oben links (aufrecht), Union Jack unten rechts
     d = ImageDraw.Draw(en); d.line([W, 0, 0, H], fill=hexc("#0c0f24"), width=2)
     finish(en, "flag_en.png")
+    # Frankreich
+    fr = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(fr)
+    d.rectangle([0, 0, 39, H], fill=hexc("#0055a4")); d.rectangle([40, 0, 79, H], fill=hexc("#ffffff")); d.rectangle([80, 0, W, H], fill=hexc("#ef4135"))
+    finish(fr, "flag_fr.png")
+    # Spanien (vereinfacht ohne Wappen, wie in Sprachwahlen üblich): Rot, Gelb doppelt breit, Rot
+    es = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(es)
+    d.rectangle([0, 0, W, 19], fill=hexc("#c60b1e")); d.rectangle([0, 20, W, 59], fill=hexc("#ffc400")); d.rectangle([0, 60, W, H], fill=hexc("#c60b1e"))
+    finish(es, "flag_es.png")
 
 # ------------------------------------------------------------------ Weltraum-Zwischensequenz (Ersatzhintergrund; je Sektor siehe tools/art/transit/)
 def space():

@@ -23,6 +23,7 @@ var result: Dictionary = {}
 var trace: Array = []         # flach: x, y, Neigung je Abtastung
 var mods: Dictionary = {}     # Werkstatt-Einbauten des Laufs
 var rules := Run.RULES       # Regelstand, mit dem der Lauf geflogen wurde
+var lives := -1               # Leben beim Start (für „Bestflug ansehen“: die Lebens-Station hängt davon ab); -1 = unbekannt (ältere Läufe)
 var sig := ""                 # Kennung des Leveldateiinhalts: Wurde das Level danach geändert, wird der Geist nicht mehr gezeigt (er flöge durch die alte Karte)
 
 ## Kennung des Levelinhalts (für `sig`).
@@ -81,13 +82,25 @@ func finish(res: Dictionary) -> void:
 
 func to_dict() -> Dictionary:
 	return {"v": VERSION, "level": level_id, "seed": seed, "fuel": fuel, "credits": credits, "carry": carry, "extras": extras,
-		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods, "sig": sig, "rules": rules}
+		"ticks": ticks, "runs": runs, "events": events, "result": result, "trace": trace, "mods": mods, "sig": sig, "rules": rules, "lives": lives}
+
+## Bestflug zum Ansehen: der gespeicherte Lauf eines Levels, wenn er zum aktuellen Levelinhalt passt (sonst flöge er durch eine alte Karte).
+static func watchable(lvl: LevelData, slot: int) -> Dictionary:
+	if lvl == null:
+		return {}
+	var d := load_best(lvl.id, slot)
+	if d.is_empty() or (d.get("runs", []) as Array).is_empty() or not bool(d.get("result", {}).get("complete", false)):
+		return {}
+	if d.has("sig") and String(d.sig) != sig_of(lvl):
+		return {}
+	return d
 
 ## Rechnet einen Lauf nach. Rückgabe: {complete, time, money, earned, delivered, ticks}.
 static func play(lvl: LevelData, d: Dictionary) -> Dictionary:
 	var r := Run.new()
 	r.rules = int(d.get("rules", LEGACY_RULES))
 	r.extras_enabled = bool(d.get("extras", true))
+	r.lives = int(d.get("lives", Tuning.START_LIVES))
 	r.start(lvl, float(d.get("fuel", -1.0)), float(d.get("credits", 0.0)), int(d.get("seed", -1)))
 	r.sim.apply_mods(d.get("mods", {}))
 	var carry_d: Dictionary = d.get("carry", {})

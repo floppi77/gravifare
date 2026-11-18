@@ -285,7 +285,12 @@ def render(n, driver=True):
     ring = grow(c.on, t) & ~c.on
     c.col[ring] = OL
     alpha = c.on | ring
+    global LAST_PART
+    LAST_PART = c.part.copy()                    # Teile-Karte (1 Rumpf, 2 Kuppel, 3 Kapsel, 4 Düse, 5 Flosse) für die Mischform (tools/art/taxi3d)
     return c.col.copy(), alpha, c.paint & c.on
+
+
+LAST_PART = None
 
 
 def _driver(c, glass):

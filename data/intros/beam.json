@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Plasmastrahlen",
-  "en": "Plasma beams"
+  "en": "Plasma beams",
+  "fr": "Rayons plasma",
+  "es": "Rayos de plasma"
  },
  "map": [
   "########################################",
@@ -77,7 +79,9 @@
   ],
   "title": {
    "de": "Plasmastrahlen",
-   "en": "Plasma beams"
+   "en": "Plasma beams",
+   "fr": "Rayons plasma",
+   "es": "Rayos de plasma"
   }
  }
 }

@@ -135,7 +135,7 @@ func _draw_gauge() -> void:
 	PixelDraw.disc(self, c, 1.1, ncol)
 
 static func tone(ratio: float) -> Color:
-	return GREEN if ratio <= Tuning.GAUGE_GREEN else (YELLOW if ratio <= 1.0 else RED)
+	return SignalColors.by_level(ratio, Tuning.GAUGE_GREEN, 1.0)
 
 ## Plattform unter dem Taxi (Fahrwerk-Fußpunkt), nächste zuerst; leer, wenn keine in Reichweite liegt.
 func _pad_below(s: TaxiSim) -> Dictionary:
@@ -178,7 +178,7 @@ func _draw_window(s: TaxiSim, pad: Dictionary, a: float) -> void:
 		return
 	var y := float(pad.row) * Tuning.TILE - s.pos.y            # lokale Koordinate der Plattformoberkante
 	var inside := s.pos.x >= lo and s.pos.x <= hi
-	var col := GREEN if inside else YELLOW
+	var col := SignalColors.good() if inside else SignalColors.mid()
 	col.a = a
 	var x0 := lo - s.pos.x
 	var x1 := hi - s.pos.x
@@ -191,7 +191,7 @@ func _draw_window(s: TaxiSim, pad: Dictionary, a: float) -> void:
 	draw_rect(Rect2(x0, y - 5.0, 2.0, 0.67), col)
 	draw_rect(Rect2(x1 - 2.0, y - 5.0, 2.0, 0.67), col)
 	# Lotmarke: Dreieck auf der Plattform unter dem Taxi (Spitze nach oben)
-	var mcol := GREEN if inside else (YELLOW if s.pos.x >= float(pad.x0) + Tuning.FOOT_X and s.pos.x <= float(pad.x1) - Tuning.FOOT_X else RED)
+	var mcol := SignalColors.good() if inside else (SignalColors.mid() if s.pos.x >= float(pad.x0) + Tuning.FOOT_X and s.pos.x <= float(pad.x1) - Tuning.FOOT_X else SignalColors.bad())
 	mcol.a = a
 	draw_colored_polygon(PackedVector2Array([Vector2(-2.0, y + 2.0), Vector2(2.0, y + 2.0), Vector2(0.0, y - 0.7)]), mcol)
 

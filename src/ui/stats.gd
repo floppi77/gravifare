@@ -79,10 +79,18 @@ func _ready() -> void:
 		h.add_child(a)
 		h.add_child(b)
 		box.add_child(h)
+	var AchV := preload("res://src/core/achievements.gd")
+	var ach := MenuKit.button(tr("STAT_ACH_BTN") % [AchV.stored(Save.data).size(), AchV.LIST.size()], func(): get_tree().change_scene_to_file("res://src/ui/achievements_view.tscn"))
 	var back := MenuKit.button(tr("MENU_BACK"), func(): Flow.to_menu())
-	box.add_child(back)
+	var foot := HBoxContainer.new()                   # Erfolge und Zurück nebeneinander: so passt die Seite samt Titel auf 360 Zeilen
+	foot.alignment = BoxContainer.ALIGNMENT_CENTER
+	foot.add_theme_constant_override("separation", 8)
+	foot.add_child(ach)
+	foot.add_child(back)
+	box.add_child(foot)
 	await get_tree().process_frame
-	back.grab_focus()
+	(ach if Flow.came_from_achievements else back).grab_focus()
+	Flow.came_from_achievements = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

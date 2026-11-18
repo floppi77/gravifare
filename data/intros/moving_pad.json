@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Fahrende Plattformen",
-  "en": "Moving pads"
+  "en": "Moving pads",
+  "fr": "Pads mobiles",
+  "es": "Plataformas móviles"
  },
  "map": [
   "########################################",
@@ -72,7 +74,9 @@
   ],
   "title": {
    "de": "Fahrende Plattformen",
-   "en": "Moving pads"
+   "en": "Moving pads",
+   "fr": "Pads mobiles",
+   "es": "Plataformas móviles"
   }
  }
 }

@@ -62,13 +62,15 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
 - **Karriere mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
   (Düsen, Hülle, Fahrwerk, Scheinwerfer). Game Over setzt den Sektor zurück, jeder Einbau verliert eine Stufe. Fahrgäste mit Sonderwünschen: **VIP** (zahlt fast doppelt, wenig Geduld) und **Notfall** (doppelter Preis, Frist in Sekunden).
-- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
+- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist und **Bestflug ansehen** in der Levelauswahl, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
   **Garage** mit Lackierungen und Aufklebern.
 - **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
-- **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch und Englisch** mit Untertiteln.
+- **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch, Englisch, Französisch und Spanisch** mit Untertiteln.
 - **Soundtrack** mit 23 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
 - **Anzeige:** 16:9, 1440p/2160p und Ultrawide, drei Speicherplätze.
+- **Bedienhilfen:** Farbtafel für Farbsehschwäche (Ampel, Tank, Preise und Lampen in Blau, Gelb und Purpurrot), große Schrift für HUD und Untertitel, weniger Bewegung, Landehilfe.
+- **Bug melden** direkt aus dem Hauptmenü: öffnet eine E-Mail mit Betreff und Systemangaben, dazu der Protokollordner.
 
 ## Herunterladen und spielen
 
@@ -150,7 +152,7 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (a brightly lit map every day with a daily rule – windy day, fog, mirror world, thin tank, glass roof, rush hour, tailwind – and a daily goal with bronze, silver and gold, a streak with rewards and a ghost),
   and a **garage** with paint jobs and stickers.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
-- **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German and English** with subtitles.
+- **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German, English, French and Spanish** with subtitles.
 - **Soundtrack** of 23 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).
 - **Display:** 16:9, 1440p/2160p and ultrawide, three save slots.

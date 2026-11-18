@@ -48,6 +48,7 @@ func _ready() -> void:
 	res = Flow.shift_last_result
 	if res.is_empty():                               # Dev-Aufruf ohne Schicht: Beispielwerte
 		res = {"grade": "B", "score": 71.0, "maps": 9, "taxis": 4, "credits": 4200.0}
+	preload("res://src/ui/ach_toast.gd").flush(get_tree())          # anstehende Erfolge (z. B. rückwirkend beim ersten Start)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 11
 	for i in 90:

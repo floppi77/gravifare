@@ -21,6 +21,13 @@ var path := "user://controls.cfg"
 var deadzone := 0.2
 var gear_toggle := true
 var last_device := "keyboard"   # "keyboard" | "gamepad" – steuert die Hinweisanzeige
+var dev_style := ""             # Dev-Schalter --pad-style=
+var detected_style := "xbox"    # erkannter Controller: "xbox" (auch alle übrigen) | "ps" (PlayStation) – siehe pad_style()
+
+## Knopfnamen im PlayStation-Layout (gleiche Reihenfolge wie PAD_NAMES) und die Zuordnung der Xbox-Namen dazu.
+const PS_NAMES := ["✕", "○", "□", "△", "Share", "PS", "Options", "L3", "R3", "L1", "R1", "D↑", "D↓", "D←", "D→", "Misc"]
+const PS_OF := {"A": "✕", "B": "○", "X": "□", "Y": "△", "LB": "L1", "RB": "R1", "LT": "L2", "RT": "R2", "Back": "Share", "Start": "Options",
+	"LB/RB": "L1/R1", "START": "Options"}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -31,6 +38,61 @@ func _ready() -> void:
 		jb.button_index = pair[1]
 		InputMap.action_add_event(pair[0], jb)
 	load_bindings()
+	Input.joy_connection_changed.connect(func(_d: int, _c: bool): _detect(-1))
+	_detect.call_deferred(-1)                           # erst wenn Settings und Loc bereit sind
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--pad-style="):               # Dev: Controller vortäuschen (xbox | ps), Hinweise wie mit Controller
+			dev_style = a.substr(12)
+			last_device = "gamepad"
+
+## Ist das ein PlayStation-Controller? (Namen aus der SDL-Controllerdatenbank bzw. dem Treiber)
+static func style_for_name(joy_name: String) -> String:
+	var n := joy_name.to_lower()
+	for w in ["ps3", "ps4", "ps5", "dualshock", "dualsense", "playstation", "sony"]:
+		if n.contains(w):
+			return "ps"
+	if n.strip_edges() == "wireless controller":       # so meldet sich ein DualShock 4 ohne Zuordnung
+		return "ps"
+	return "xbox"
+
+## Symbolsatz, der gerade gilt: Einstellung „Controllersymbole“ (auto | xbox | ps), bei „auto“ der zuletzt benutzte Controller.
+func pad_style() -> String:
+	var st: Node = _autoload("Settings")
+	var v: String = String(st.values.get("pad_glyphs", "auto")) if st != null else "auto"
+	return v if v in ["xbox", "ps"] else detected_style
+
+## Anderer Autoload über die Wurzel der Hauptschleife (auch wenn dieser Knoten noch nicht im Baum hängt, z. B. im Testlauf).
+static func _autoload(n: String) -> Node:
+	var ml := Engine.get_main_loop()
+	return (ml as SceneTree).root.get_node_or_null(n) if ml is SceneTree else null
+
+## Erkennung aus dem zuletzt benutzten (device ≥ 0) oder dem ersten verbundenen Controller; meldet einen Wechsel an Loc (Hinweistexte).
+func _detect(device: int) -> void:
+	var pads := Input.get_connected_joypads()
+	if device < 0:
+		device = pads[0] if not pads.is_empty() else -1
+	var st := style_for_name(Input.get_joy_name(device)) if device >= 0 else detected_style
+	if dev_style != "":
+		st = dev_style
+	detected_style = st
+	refresh_style()
+
+## Hinweistexte an den aktuellen Symbolsatz anpassen (nach Erkennung oder geänderter Einstellung).
+func refresh_style() -> void:
+	var loc: Node = _autoload("Loc")
+	if loc != null:
+		loc.set_pad_style(pad_style())
+
+## Knopfname im aktuellen Symbolsatz („A“ → „✕“ bei PlayStation).
+func pad_name(xbox_name: String) -> String:
+	return String(PS_OF.get(xbox_name, xbox_name)) if pad_style() == "ps" else xbox_name
+
+## Umkehrung von pad_name für gezeichnete Symbole: „✕“ → „A“ (unbekannte Namen bleiben).
+static func glyph_id(label: String) -> String:
+	for k in PS_OF:
+		if PS_OF[k] == label:
+			return k
+	return label
 
 ## Standardbelegung setzen (alle Spielaktionen, überschreibt vorhandene Ereignisse).
 func apply_defaults() -> void:
@@ -56,6 +118,8 @@ func apply_defaults() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and event.axis <= JOY_AXIS_RIGHT_Y and absf(event.axis_value) > 0.5):
 		last_device = "gamepad"
+		if event is InputEventJoypadButton:
+			_detect(event.device)
 	elif event is InputEventKey and event.pressed:
 		last_device = "keyboard"
 
@@ -95,7 +159,8 @@ func event_label(ev: InputEvent) -> String:
 		return loc if loc != k else t           # Tastennamen lokalisiert, falls übersetzt (Leertaste, Pfeile …)
 	if ev is InputEventJoypadButton:
 		var i: int = ev.button_index
-		return PAD_NAMES[i] if i >= 0 and i < PAD_NAMES.size() else "B%d" % i
+		var names: Array = PS_NAMES if pad_style() == "ps" else PAD_NAMES
+		return names[i] if i >= 0 and i < names.size() else "B%d" % i
 	if ev is InputEventJoypadMotion:
 		var m := ev as InputEventJoypadMotion
 		match m.axis:
@@ -103,8 +168,8 @@ func event_label(ev: InputEvent) -> String:
 			JOY_AXIS_LEFT_Y: return "Stick " + ("↓" if m.axis_value > 0 else "↑")
 			JOY_AXIS_RIGHT_X: return "R-Stick " + ("→" if m.axis_value > 0 else "←")
 			JOY_AXIS_RIGHT_Y: return "R-Stick " + ("↓" if m.axis_value > 0 else "↑")
-			JOY_AXIS_TRIGGER_LEFT: return "LT"
-			JOY_AXIS_TRIGGER_RIGHT: return "RT"
+			JOY_AXIS_TRIGGER_LEFT: return pad_name("LT")
+			JOY_AXIS_TRIGGER_RIGHT: return pad_name("RT")
 		return "Achse %d" % m.axis
 	return "?"
 

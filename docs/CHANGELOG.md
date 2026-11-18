@@ -3,6 +3,64 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.6.5
+
+### Deutsch
+
+**Neu**
+- Französisch und Spanisch: alle Texte und die komplette Sprachausgabe (Fahrgäste, Tankwart, Zentrale, Fluglehrer, Einspieler); Sprache über die Flaggen im Hauptmenü oder in den Optionen
+- 26 Erfolge mit eigener Übersicht in der Statistik; Fortschritt von früher zählt rückwirkend
+- Bestflug ansehen: In der Levelauswahl spielt Y bzw. V die eigene Bestzeit als Wiedergabe im Spiel ab
+- Bedienhilfen (Optionen): Farbsehschwäche (Ampel, Tank, Spritpreis und Lampen in Blau, Gelb und Purpurrot) und große Schrift für HUD, Untertitel, Flugschule und Einspieler
+- Bug melden im Hauptmenü: öffnet eine E-Mail mit Betreff und Systemangaben, dazu der Protokollordner
+- Beim Spielstart ein Hinweis, dass ein Controller empfohlen wird (Deutsch und Englisch zugleich)
+- PlayStation-Controller werden erkannt und zeigen ✕ ○ □ △ statt A B X Y (einstellbar)
+
+**Grafik**
+- Neues Taxi: Das gezeichnete Taxi bekommt in Blender Licht, Glanz und Rundung und dreht sich beim Seitenflug leicht ein – in allen Lackierungen und Pixelgrößen
+- Ampel am Wartehäuschen mit Haken (grün) und X (rot)
+- Levelauswahl: Titel und Hinweise werden nicht mehr von Knöpfen überdeckt
+
+**Flugschule**
+- Wer eine Aufgabe schon während der Erklärung erledigt, wird mit einem von drei Sprüchen gelobt, und es geht gleich weiter – auch beim Tanken (nach dem Abheben) und bei einem Absturz schon während der Erklärung zur Landung
+- Ein an der Taxistation gekauftes Taxi bleibt jetzt erhalten
+
+**Nachtschicht**
+- Das Ergebnis jeder Karte zeigt jetzt auch die Abrechnung: Fahrpreise, Reparatur, Ersatztaxis, verpasste Fahrgäste und das Ergebnis
+
+**Korrekturen**
+- Dunkle Level: Die nächste Abholplattform leuchtet erst, wenn der Fahrgast dort erscheint, nicht schon nach dem Absetzen des vorigen (Karriere und Nachtschicht)
+- Level 49 überarbeitet
+- Level mit Magnetfeldern (z. B. Level 41) laufen deutlich flüssiger: Die Felder kosten nur noch ein Viertel der Zeichenzeit
+
+### English
+
+**New**
+- French and Spanish: all texts and full voice-over (passengers, attendant, dispatch, flight instructor, clips); pick the language with the flags in the main menu or in the options
+- 26 achievements with their own overview in the statistics; earlier progress counts retroactively
+- Watch best run: in level select, Y or V replays your best time inside the game
+- Accessibility (options): colour-blind mode (lights, fuel, fuel price and lamps in blue, yellow and crimson) and large text for HUD, subtitles, flight school and clips
+- Report a bug from the main menu: opens an e-mail with subject and system details, plus the log folder
+- At startup a note recommends a controller (German and English at once)
+- PlayStation controllers are detected and show ✕ ○ □ △ instead of A B X Y (configurable)
+
+**Graphics**
+- New taxi: the hand-drawn taxi gets lighting, gloss and roundness from Blender and turns slightly when flying sideways – in all paints and pixel sizes
+- Shelter lamps with a check mark (green) and an X (red)
+- Level select: title and hints are no longer covered by buttons
+
+**Flight school**
+- Finish a task while the instructor is still explaining and he praises you with one of three lines and moves on – also when refuelling (after taking off again) and when crashing during the landing explanation
+- A taxi bought at the taxi station is now kept
+
+**Night shift**
+- Each map result now also shows the ledger: fares, repair, replacement taxis, missed passengers and the balance
+
+**Fixes**
+- Dark levels: the next pickup platform only lights up once the passenger appears there, not right after dropping off the previous one (career and night shift)
+- Level 49 reworked
+- Levels with magnet fields (e.g. level 41) run much smoother: the fields take only a quarter of the drawing time
+
 ## 1.6.1
 
 ### Deutsch

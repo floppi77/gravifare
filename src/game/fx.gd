@@ -195,10 +195,10 @@ func _process(delta: float) -> void:
 			l.energy = 2.0
 	if gate_light != null:
 		if run.exit_open:
-			gate_light.color = Color("#5dff9a")
+			gate_light.color = SignalColors.good()
 			gate_light.energy = 3.0 + 0.4 * sin(_t * 4.0)
 		else:
-			gate_light.color = Color("#ff4d6d")
+			gate_light.color = SignalColors.bad()
 			gate_light.energy = 0.8 + (0.5 if int(_t * 3.0) % 2 == 0 else 0.0)
 	if gate_occluder != null:
 		gate_occluder.visible = not run.exit_open

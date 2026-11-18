@@ -206,6 +206,8 @@ static func format_stamp(date: String, hour: int, minute: int, lang: String) -> 
 		if h12 == 0:
 			h12 = 12
 		return "%s/%s/%s, %d:%02d %s" % [p[1], p[2], p[0], h12, minute, "AM" if hour < 12 else "PM"]
+	if lang == "fr" or lang == "es":
+		return "%s/%s/%s, %02d:%02d" % [p[2], p[1], p[0], hour, minute]
 	return "%s.%s.%s, %02d:%02d Uhr" % [p[2], p[1], p[0], hour, minute]
 
 static func grade(score: float) -> String:

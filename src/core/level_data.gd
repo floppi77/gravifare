@@ -11,6 +11,20 @@ var look_sector := 0            # nur Darstellung: Fels, Hintergrund und Haltest
 var index := 1
 var number := 1                # Levelnummer 1..99
 var names := {}
+
+const LocScript := preload("res://src/core/loc.gd")    # statische Hilfen; der Autoload-Name „Loc“ fehlt beim frühen Kompilieren (Tests)
+static var _extra_names := {}
+## Weitere Sprachen der Levelnamen (fr, es …) aus data/i18n/level_names.json, damit die Level-Dateien und ihre Prüfsummen unverändert bleiben.
+static func extra_names() -> Dictionary:
+	if _extra_names.is_empty():
+		var f := FileAccess.open("res://data/i18n/level_names.json", FileAccess.READ)
+		var d = JSON.parse_string(f.get_as_text()) if f != null else null
+		_extra_names = d if d is Dictionary else {"_": {}}
+	return _extra_names
+
+## Name in der aktuellen Sprache (sonst Englisch, Deutsch, ID).
+func display_name(lang := "") -> String:
+	return LocScript.pick(names, lang if lang != "" else TranslationServer.get_locale().substr(0, 2), id)
 var rows: Array = []
 var width := 0
 var height := 0
@@ -73,7 +87,11 @@ static func from_dict(d: Dictionary) -> LevelData:
 	l.sector = int(d.get("sector", 1))
 	l.index = int(d.get("index", 1))
 	l.number = (l.sector - 1) * 11 + l.index
-	l.names = d.get("name", {})
+	l.names = (d.get("name", {}) as Dictionary).duplicate() if d.get("name", {}) is Dictionary else {}
+	var extra: Dictionary = extra_names().get(l.id, {})
+	for k in extra:
+		if not l.names.has(k):
+			l.names[k] = extra[k]
 	l.rows = d.get("map", [])
 	l.height = l.rows.size()
 	for r in l.rows:

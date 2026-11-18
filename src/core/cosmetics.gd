@@ -8,7 +8,15 @@ const STAR_STATS := {"stars_time": "time", "stars_clean": "clean", "stars_pro": 
 var items: Array = []
 var _tex_cache := {}
 
+# Mischform (Runde 83, Standard): das gezeichnete 2D-Taxi auf einem Relief in Blender mit Licht und Drehstufen (tools/art/taxi3d/make_hybrid.py),
+# je Lackierung ein Blatt. Gilt für das Taxi im Level; Garage, Menüs und Leben-Symbole zeigen weiter das 2D-Bild (feste Vorderansicht).
+# Zum Vergleich im Debug-Modus: Debug-Menü oder F6 im Level zeigen das bisherige 2D-Taxi; Dev: --taxi2d.
+const TAXI3D_SHEET := "res://assets/art/taxi_hybrid/%s.png"
+const TAXI3D_FRAMES := 7               # Drehstufen −12° … +12° um die Hochachse
+var taxi_3d := true
+
 func _ready() -> void:
+	taxi_3d = not OS.get_cmdline_user_args().has("--taxi2d")
 	var f := FileAccess.open("res://data/cosmetics.json", FileAccess.READ)
 	var d = JSON.parse_string(f.get_as_text()) if f != null else null
 	if typeof(d) == TYPE_DICTIONARY:
@@ -161,6 +169,21 @@ func taxi_frame(n: int, id := "") -> Dictionary:
 		var t := paint_texture(id)
 		return {"tex": t, "src": Rect2(Vector2.ZERO, t.get_size()), "n": 3}
 	return {"tex": sheet, "src": PixelScale.sheet_rect(n, TAXI_UNITS), "n": n}
+
+## Mischform: Ausschnitt der Drehstufe `k` (0 … TAXI3D_FRAMES−1, Mitte = geradeaus) in der Größe `n` für die Lackierung `id`; {} ohne Blatt.
+func taxi3d_frame(n: int, k: int, id := "") -> Dictionary:
+	if id == "":
+		id = selected("paint")
+	if not TAXI_SIZES.has(n):
+		n = 3
+	var p := TAXI3D_SHEET % id
+	if not ResourceLoader.exists(p):
+		return {}
+	var sheet := _tex(p)
+	if sheet == null:
+		return {}
+	var r := PixelScale.sheet_rect(n, TAXI_UNITS)
+	return {"tex": sheet, "src": Rect2(r.position + Vector2(float(clampi(k, 0, TAXI3D_FRAMES - 1)) * TAXI_UNITS.x * 6.0, 0.0), r.size), "n": n}
 
 static func sticker_px(n: int) -> int:
 	return roundi(STICKER_BASE * n / 3.0)

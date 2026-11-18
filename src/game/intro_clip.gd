@@ -42,7 +42,7 @@ func start(g: Node, k: String) -> bool:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	var tt: Dictionary = demo.data.get("title", {})
-	title = String(tt.get(lang, tt.get("de", k)))
+	title = Loc.pick(tt, lang, k)
 	_build_view()
 	var info: Dictionary = game.call("tutorial_speak", "vid_" + k)
 	speak_len = float(info.len)
@@ -194,14 +194,16 @@ func _draw() -> void:
 		draw_rect(Rect2(r.position.x, r.position.y + float(i) * 3.0, r.size.x, 1.0), Color(0, 0, 0, 0.07 * f))
 	# Untertitel
 	if Settings.values.subtitles and text != "":
-		var lines := _wrap(Fonts.ui, text, r.size.x - 18.0, 9)
-		var h := 8.0 + float(lines.size()) * 11.0
-		var y := r.end.y + 12.0
+		var sfs := Settings.fs(9)                           # Option „Große Schrift“
+		var lh := 11.0 * Settings.text_k()
+		var lines := _wrap(Fonts.ui, text, r.size.x - 18.0, sfs)
+		var h := 8.0 + float(lines.size()) * lh
+		var y := minf(r.end.y + 12.0, VIEW.y - 3.0 - h)         # viele Zeilen (große Schrift): Kasten rückt ins Bild, statt unten abgeschnitten zu werden
 		draw_rect(Rect2(-mg.x, y - 4.0, get_viewport_rect().size.x, VIEW.y + mg.y - y + 4.0), Color(0.01, 0.01, 0.05, f))      # Auftragszeile des HUD ganz abdecken statt halb durchscheinen
 		draw_rect(Rect2(r.position.x, y, r.size.x, h), Color(0.04, 0.06, 0.16, 0.9 * f))
 		draw_rect(Rect2(r.position.x, y, r.size.x, 1.0), Color(1.0, 0.88, 0.58, 0.55 * f))
 		for i in lines.size():
-			draw_string(Fonts.ui, Vector2(r.position.x + 9.0, y + 12.0 + float(i) * 11.0), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.95, 0.97, 1.0, f))
+			draw_string(Fonts.ui, Vector2(r.position.x + 9.0, y + 1.0 + lh * float(i + 1)), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, sfs, Color(0.95, 0.97, 1.0, f))
 	draw_string(hud, Vector2(r.end.x - 120.0, r.position.y - 13.0), tr("CLIP_SKIP"), HORIZONTAL_ALIGNMENT_RIGHT, 120.0, 7, Color(0.7, 0.75, 1.0, 0.8 * f))
 
 func _wrap(f: Font, txt: String, width: float, fs: int) -> Array:

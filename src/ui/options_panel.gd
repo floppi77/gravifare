@@ -1,6 +1,6 @@
 class_name OptionsPanel
 extends VBoxContainer
-## Optionen als Kategorien (Audio, Steuerung, Anzeige, Spiel) mit Seiten im selben Container. Die Belegungsseite
+## Optionen als Kategorien (Audio, Steuerung, Anzeige, Spiel, Bedienhilfen) mit Seiten im selben Container. Die Belegungsseite
 ## erlaubt freies Umbelegen: Knopf wählen, dann gewünschte Taste/Gamepad-Eingabe drücken (Esc/Start = Abbruch).
 
 var back: Callable
@@ -69,6 +69,7 @@ func show_root() -> void:
 	add_child(MenuKit.button(tr("OPT_CAT_CONTROLS"), show_controls))
 	add_child(MenuKit.button(tr("OPT_CAT_DISPLAY"), show_display))
 	add_child(MenuKit.button(tr("OPT_CAT_GAME"), show_game))
+	add_child(MenuKit.button(tr("OPT_CAT_ACCESS"), show_access))
 	add_child(MenuKit.button(tr("MENU_BACK"), func(): if back.is_valid(): back.call()))
 	_focus()
 
@@ -100,6 +101,15 @@ func show_controls() -> void:
 		Settings.set_value("gear_toggle", not Settings.values.gear_toggle)
 		gr.call())
 	add_child(gear)
+	var glyphs := MenuKit.button("", func(): pass)
+	var names := {"auto": "OPT_PAD_AUTO", "xbox": "OPT_PAD_XBOX", "ps": "OPT_PAD_PS"}
+	var glr := func(): glyphs.text = tr("OPT_PAD_GLYPHS") + ": " + tr(names.get(Settings.values.pad_glyphs, "OPT_PAD_AUTO"))
+	glr.call()
+	glyphs.pressed.connect(func():
+		var order := ["auto", "xbox", "ps"]
+		Settings.set_value("pad_glyphs", order[(order.find(Settings.values.pad_glyphs) + 1) % order.size()])
+		glr.call())
+	add_child(glyphs)
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
 
@@ -125,6 +135,24 @@ func show_display() -> void:
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
 
+## Bedienhilfen: Farbtafel für Farbsehschwäche (SignalColors) und große Schrift (HUD, Untertitel, Flugschule, Einspieler).
+func show_access() -> void:
+	page = "access"
+	_clear()
+	add_child(MenuKit.screen_title(tr("OPT_CAT_ACCESS"), 20))
+	add_child(_toggle("OPT_COLOR_SAFE", "color_safe"))
+	add_child(_toggle("OPT_TEXT_LARGE", "text_large"))
+	var note := Label.new()
+	note.text = tr("OPT_ACCESS_NOTE")
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(240, 0)
+	note.add_theme_font_size_override("font_size", 8)
+	note.add_theme_color_override("font_color", Color("#a9b8ff"))
+	add_child(note)
+	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
+	_focus()
+
 func show_game() -> void:
 	page = "game"
 	_clear()
@@ -132,11 +160,11 @@ func show_game() -> void:
 	var lang := MenuKit.button("", func(): pass)
 	var lr := func():
 		var code: String = TranslationServer.get_locale().substr(0, 2)
-		lang.text = tr("OPT_LANG") + ": " + ("Deutsch" if code == "de" else "English")
+		lang.text = tr("OPT_LANG") + ": " + String(Loc.NAMES.get(code, code))
 	lr.call()
 	lang.pressed.connect(func():
 		var cur: String = TranslationServer.get_locale().substr(0, 2)
-		Settings.set_value("language", "en" if cur == "de" else "de")
+		Settings.set_value("language", Loc.LOCALES[(Loc.LOCALES.find(cur) + 1) % Loc.LOCALES.size()])
 		if rebuild.is_valid():
 			rebuild.call()
 		else:

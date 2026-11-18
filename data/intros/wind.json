@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Strömungen",
-  "en": "Currents"
+  "en": "Currents",
+  "fr": "Courants",
+  "es": "Corrientes"
  },
  "map": [
   "########################################",
@@ -84,7 +86,9 @@
   ],
   "title": {
    "de": "Strömungen",
-   "en": "Currents"
+   "en": "Currents",
+   "fr": "Courants",
+   "es": "Corrientes"
   }
  }
 }

@@ -4,6 +4,7 @@ extends Node
 ## Bis ein Platz gewählt ist (slot == 0), wird nichts geladen oder geschrieben.
 
 const SLOTS := 3
+const Achievements := preload("res://src/core/achievements.gd")
 var legacy_path := "user://save.json"      # Speicherstand vor den Plätzen: wird einmalig nach Platz 1 übernommen
 var slot := 0
 var path := ""
@@ -12,7 +13,7 @@ var dev_session := false
 var data := _default_data()
 
 static func _default_data() -> Dictionary:
-	return {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none"}, "campaign": {}}
+	return {"version": 1, "completed": {}, "stats": {"flights": 0, "crashes": 0, "deliveries": 0, "perfect_landings": 0, "best_streak": 0, "pump_hits": 0, "pump_explosions": 0, "squashes": 0, "credits_total": 0}, "unlocked": [], "cosmetics": {"paint": "std", "sticker": "none"}, "campaign": {}, "achievements": {}}
 
 ## Gesetzt von Flow.community: Während eines Community-Levels werden Statistik und Freischaltungen nicht verändert.
 var community_mode := false
@@ -24,7 +25,7 @@ func slot_path(n: int) -> String:
 func _ready() -> void:
 	var want := 0
 	for a in OS.get_cmdline_user_args():
-		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light=") or a.begins_with("--debug-result"):
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a == "--bug" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--debug-destroy-at=") or a.begins_with("--inputs=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light=") or a.begins_with("--debug-result"):
 			dev_session = true
 		if a.begins_with("--level=") or a.begins_with("--scene=") or a == "--levels" or a.begins_with("--shot="):
 			want = maxi(want, 1)                 # Dev-Aufrufe überspringen die Platzwahl (Platz 1)
@@ -44,6 +45,9 @@ func select_slot(n: int) -> void:
 	path = slot_path(n)
 	data = _default_data()
 	load_save()
+	ach_pending = []
+	ach_retro = 0
+	sync_achievements()                          # älterer Spielstand: bisheriger Fortschritt zählt rückwirkend (ein Sammelbanner)
 
 ## Name des gewählten Spielstands ("" = keiner vergeben).
 func slot_name() -> String:
@@ -149,9 +153,26 @@ func load_save() -> void:
 		DirAccess.rename_absolute(path, bad)
 		push_warning("Speicherstand defekt – gesichert als " + bad.get_file())
 
+## Erfolge, die seit dem letzten Banner neu erreicht wurden (AchToast.flush zeigt sie an Ruhepunkten), und die Zahl der rückwirkend
+## erreichten beim ersten Abgleich eines älteren Spielstands (ein Sammelbanner statt vieler).
+var ach_pending: Array = []
+var ach_retro := 0
+
+## Erfolge abgleichen (nicht im Debug-Modus, bei Entwicklerschaltern, in Community-Leveln oder ohne gewählten Platz).
+func sync_achievements() -> void:
+	if dev_session or slot == 0 or debug or community_mode:
+		return
+	var r: Dictionary = Achievements.update(data, Daily.today())
+	SteamBridge.push((data.get("achievements", {}) as Dictionary).keys())          # nur mit GodotSteam und laufendem Steam, sonst ohne Wirkung
+	if r.retro:
+		ach_retro += r.new.size()
+	else:
+		ach_pending.append_array(r.new)
+
 func write() -> void:
 	if dev_session or slot == 0:
 		return
+	sync_achievements()
 	var tmp := path + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:

@@ -37,6 +37,11 @@ func _ready() -> void:
 		Flow.start_daily.call_deferred()
 		return
 	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--watch-file="):      # Dev: gespeicherten Lauf (Replay-JSON) als „Bestflug ansehen“ abspielen
+			var wd = JSON.parse_string(FileAccess.get_file_as_string(a.substr(13)))
+			if typeof(wd) == TYPE_DICTIONARY:
+				Flow.start_watch.call_deferred(Flow.resolve_level(String(wd.get("level", ""))), wd)     # Läufe tragen die Anzeige-Id (S1-04)
+				return
 		if a.begins_with("--scene="):           # Dev: garage | credits | finale | menu direkt öffnen
 			get_tree().change_scene_to_file.call_deferred("res://src/ui/%s.tscn" % a.substr(8).replace("menu", "main_menu"))
 			return

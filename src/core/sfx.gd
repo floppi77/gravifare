@@ -116,6 +116,8 @@ func play_voice(voice: String, line: String) -> bool:
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	var path := "res://assets/audio/voice/%s/%s_%s.ogg" % [lang, voice, line]
 	if not ResourceLoader.exists(path):
+		path = "res://assets/audio/voice/en/%s_%s.ogg" % [voice, line]      # fehlt eine Aufnahme: englische Stimme, Untertitel in der Sprache
+	if not ResourceLoader.exists(path):
 		return false
 	var stream: AudioStream = load(path)
 	voice_player.stream = stream
@@ -181,4 +183,5 @@ func line_text(group: String, key: String) -> String:
 		var d = JSON.parse_string(f.get_as_text()) if f != null else null
 		_lines = d if typeof(d) == TYPE_DICTIONARY else {"_": 1}
 	var lang := TranslationServer.get_locale().substr(0, 2)
-	return String(_lines.get(group, {}).get(lang, {}).get(key, ""))
+	var g: Dictionary = _lines.get(group, {})
+	return String(g.get(lang, g.get("en", {})).get(key, ""))

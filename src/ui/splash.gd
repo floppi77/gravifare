@@ -1,5 +1,5 @@
 extends Control
-## Startbildschirm vor dem Hauptmenü: GraviFare-Logo mit wanderndem Glanzstreifen in den oberen zwei Dritteln, darunter links das
+## Startbildschirm vor dem Hauptmenü (danach kommt der Controller-Hinweis pad_hint.gd): GraviFare-Logo mit wanderndem Glanzstreifen in den oberen zwei Dritteln, darunter links das
 ## Studio (Quantum Abacus Games, Neon-Abakus: Perlen gleiten auf ihre Plätze, die Quantenperle flackert zwischen zwei Zuständen,
 ## ein Elektron kreist) und rechts „Made with Godot“ (offizielles Logo, unverzerrt). Jede Taste, jeder Controllerknopf und jeder
 ## Mausklick überspringt. „Weniger Bewegung“: nur Überblendungen. Inhalt auf der zentrierten 640×360-Fläche, der Hintergrund füllt
@@ -10,6 +10,7 @@ const SHINE := preload("res://src/ui/logo_shine.gdshader")
 const LOGO := preload("res://assets/art/logo.png")
 const HALO := preload("res://assets/art/splash/logo_halo.png")
 const GODOT_LOGO := preload("res://assets/art/splash/godot_logo.png")
+const PAD_HINT := "res://src/ui/pad_hint.tscn"
 
 const LOGO_CROP := Rect2(13, 210, 1749, 426)    # sichtbarer Bereich von logo.png (wie tools/art/splash/gen_splash.py)
 const HALO_PAD := 160.0                         # Rand des Scheins um LOGO_CROP (in Pixeln von logo.png)
@@ -170,15 +171,10 @@ func _leave(dur: float) -> void:
 	out_t = 0.0
 	out_dur = dur
 
+## Weiter zum Controller-Hinweis (pad_hint.gd), der dann das hier vorgeladene Hauptmenü übernimmt.
 func _to_menu() -> void:
 	set_process(false)
-	var ps: PackedScene = null
-	if ResourceLoader.load_threaded_get_status(Flow.MENU) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-		ps = ResourceLoader.load_threaded_get(Flow.MENU) as PackedScene
-	if ps != null:
-		get_tree().change_scene_to_packed(ps)
-	else:
-		get_tree().change_scene_to_file(Flow.MENU)
+	get_tree().change_scene_to_file(PAD_HINT)
 
 static func _ease_out(x: float) -> float:
 	x = clampf(x, 0.0, 1.0)

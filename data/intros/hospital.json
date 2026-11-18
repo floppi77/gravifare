@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Krankentransport",
-  "en": "Medical transport"
+  "en": "Medical transport",
+  "fr": "Transport médical",
+  "es": "Transporte médico"
  },
  "map": [
   "########################################",
@@ -57,7 +59,9 @@
   ],
   "title": {
    "de": "Krankentransport",
-   "en": "Medical transport"
+   "en": "Medical transport",
+   "fr": "Transport médical",
+   "es": "Transporte médico"
   }
  }
 }

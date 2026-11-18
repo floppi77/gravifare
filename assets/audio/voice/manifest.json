@@ -4827,6 +4827,4522 @@
   "en/i0_vid_emergency": {
    "text": "Emergency: the red cross and the number show the deadline in seconds. Get the passenger to the destination in time and you earn double the fare. If time runs out, the passenger is lost.",
    "seconds": 11.04
+  },
+  "fr/f0_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.5
+  },
+  "fr/f0_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.82
+  },
+  "fr/f0_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.82
+  },
+  "fr/f0_thanks": {
+   "text": "Merci !",
+   "seconds": 0.78
+  },
+  "fr/f0_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.74
+  },
+  "fr/f0_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/f0_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 2.29
+  },
+  "fr/f0_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/f0_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.98
+  },
+  "fr/f0_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.5
+  },
+  "fr/f0_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 2.46
+  },
+  "fr/f0_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.66
+  },
+  "fr/f0_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.9
+  },
+  "fr/f0_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.5
+  },
+  "fr/f0_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.82
+  },
+  "fr/f0_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.9
+  },
+  "fr/f0_hard": {
+   "text": "Aïe !",
+   "seconds": 0.54
+  },
+  "fr/f0_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.58
+  },
+  "fr/f0_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.5
+  },
+  "fr/f0_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.5
+  },
+  "fr/f0_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.94
+  },
+  "fr/f0_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.1
+  },
+  "fr/f1_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.26
+  },
+  "fr/f1_thanks": {
+   "text": "Merci !",
+   "seconds": 1.74
+  },
+  "fr/f1_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.82
+  },
+  "fr/f1_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 2.2
+  },
+  "fr/f1_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 2.54
+  },
+  "fr/f1_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 2.3
+  },
+  "fr/f1_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 2.22
+  },
+  "fr/f1_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.66
+  },
+  "fr/f1_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 2.14
+  },
+  "fr/f1_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 2.62
+  },
+  "fr/f1_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.91
+  },
+  "fr/f1_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 2.3
+  },
+  "fr/f1_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 2.41
+  },
+  "fr/f1_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 2.78
+  },
+  "fr/f1_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 3.26
+  },
+  "fr/f1_hard": {
+   "text": "Aïe !",
+   "seconds": 1.26
+  },
+  "fr/f1_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.58
+  },
+  "fr/f1_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 2.03
+  },
+  "fr/f1_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/f1_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 1.18
+  },
+  "fr/f1_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.66
+  },
+  "fr/f1_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.74
+  },
+  "fr/m0_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.1
+  },
+  "fr/m0_thanks": {
+   "text": "Merci !",
+   "seconds": 1.26
+  },
+  "fr/m0_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.89
+  },
+  "fr/m0_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.34
+  },
+  "fr/m0_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.58
+  },
+  "fr/m0_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.64
+  },
+  "fr/m0_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.58
+  },
+  "fr/m0_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.66
+  },
+  "fr/m0_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.82
+  },
+  "fr/m0_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/m0_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/m0_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 2.62
+  },
+  "fr/m0_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.74
+  },
+  "fr/m0_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.66
+  },
+  "fr/m0_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.9
+  },
+  "fr/m0_hard": {
+   "text": "Aïe !",
+   "seconds": 0.7
+  },
+  "fr/m0_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.1
+  },
+  "fr/m0_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.74
+  },
+  "fr/m0_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 2.14
+  },
+  "fr/m0_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.78
+  },
+  "fr/m0_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.18
+  },
+  "fr/m0_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.95
+  },
+  "fr/m1_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.6
+  },
+  "fr/m1_thanks": {
+   "text": "Merci !",
+   "seconds": 2.15
+  },
+  "fr/m1_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.66
+  },
+  "fr/m1_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.87
+  },
+  "fr/m1_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 4.51
+  },
+  "fr/m1_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.65
+  },
+  "fr/m1_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 2.22
+  },
+  "fr/m1_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 2.2
+  },
+  "fr/m1_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 2.21
+  },
+  "fr/m1_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 2.19
+  },
+  "fr/m1_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 2.66
+  },
+  "fr/m1_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 2.41
+  },
+  "fr/m1_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 2.09
+  },
+  "fr/m1_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 2.02
+  },
+  "fr/m1_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.45
+  },
+  "fr/m1_hard": {
+   "text": "Aïe !",
+   "seconds": 1.06
+  },
+  "fr/m1_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.89
+  },
+  "fr/m1_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 2.27
+  },
+  "fr/m1_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 4.03
+  },
+  "fr/m1_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 1.29
+  },
+  "fr/m1_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.46
+  },
+  "fr/m1_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 3.36
+  },
+  "fr/t0_pump_hit_1": {
+   "text": "Attention à ma pompe !",
+   "seconds": 1.9
+  },
+  "fr/t0_pump_hit_2": {
+   "text": "Hé ! Arrêtez ça !",
+   "seconds": 2.94
+  },
+  "fr/t0_pump_hit_3": {
+   "text": "Non ! Ma station !",
+   "seconds": 2.06
+  },
+  "fr/t0_price_up": {
+   "text": "Les prix montent !",
+   "seconds": 3.54
+  },
+  "fr/t0_price_down": {
+   "text": "Les prix baissent ! Venez faire le plein !",
+   "seconds": 2.65
+  },
+  "fr/d0_r2": {
+   "text": "Arrêt carburant en vue : posez-vous, faites le plein, payez. Les prix varient.",
+   "seconds": 7.28
+  },
+  "fr/d0_r3": {
+   "text": "Un puits étroit. Heureusement, vous avez la main légère.",
+   "seconds": 4.95
+  },
+  "fr/d0_r4": {
+   "text": "Atterrissage en terrasse. Le gardien demande des plateformes propres.",
+   "seconds": 4.55
+  },
+  "fr/d0_r5": {
+   "text": "Nouveau : des stations de vie pour mille crédits. Et les passagers vous hèlent maintenant à l’improviste.",
+   "seconds": 5.64
+  },
+  "fr/d0_r6": {
+   "text": "Le pompiste est grognon aujourd’hui. Ne touchez pas à sa pompe.",
+   "seconds": 4.12
+  },
+  "fr/d0_r7": {
+   "text": "Circuit en boucle. Tourner en rond montre mieux la ville.",
+   "seconds": 5.24
+  },
+  "fr/d0_r8": {
+   "text": "Attention, des pics ! Chaque contact abîme votre taxi.",
+   "seconds": 4.68
+  },
+  "fr/d0_r9": {
+   "text": "Pointes d’aiguille. Ne vous pressez pas, mais ne traînez pas non plus.",
+   "seconds": 6.6
+  },
+  "fr/d0_r10": {
+   "text": "Urgence carburant signalée. La station est tout en haut.",
+   "seconds": 3.67
+  },
+  "fr/d0_r11": {
+   "text": "Examen final. Après, vous aurez mérité un café.",
+   "seconds": 4.28
+  },
+  "fr/d0_r12": {
+   "text": "Les Canyons néon arrivent. Étroits, lumineux et animés.",
+   "seconds": 4.77
+  },
+  "fr/d0_r13": {
+   "text": "L’Avenue néon. Les lumières sont jolies, la distance au mur compte plus.",
+   "seconds": 6.84
+  },
+  "fr/d0_r14": {
+   "text": "Nouveau : des portes coulissantes. Elles se ferment en rythme, ne vous faites pas coincer.",
+   "seconds": 6.68
+  },
+  "fr/d0_r15": {
+   "text": "Deux écluses à la suite. Comptez le rythme.",
+   "seconds": 3.88
+  },
+  "fr/d0_r16": {
+   "text": "Heure de pointe dans les canyons. Tout le monde veut partir en même temps.",
+   "seconds": 4.58
+  },
+  "fr/d0_r17": {
+   "text": "Façade de verre. Évitez de foncer dedans, le gardien va râler.",
+   "seconds": 4.73
+  },
+  "fr/d0_r18": {
+   "text": "La herse ! Passez vite, mais pas trop.",
+   "seconds": 3.24
+  },
+  "fr/d0_r19": {
+   "text": "Le labyrinthe néon. Pas de fil d’Ariane, mais un bon sens de l’orientation.",
+   "seconds": 6.6
+  },
+  "fr/d0_r20": {
+   "text": "Le sas. Au fait, le café y est infect.",
+   "seconds": 4.28
+  },
+  "fr/d0_r21": {
+   "text": "Double écluse, double patience.",
+   "seconds": 2.92
+  },
+  "fr/d0_r22": {
+   "text": "Final néon. Vous avez presque traversé les canyons.",
+   "seconds": 4.66
+  },
+  "fr/d0_r23": {
+   "text": "Ceinture de ferraille. Des débris dérivent dans le champ, chaque contact abîme votre taxi.",
+   "seconds": 6.78
+  },
+  "fr/d0_r24": {
+   "text": "Le rail de grue est chargé aujourd’hui. Gardez vos distances avec les blocs.",
+   "seconds": 5.24
+  },
+  "fr/d0_r25": {
+   "text": "Nouveau : des pads mobiles sur rails. Posez-vous à la vitesse du pad.",
+   "seconds": 5.64
+  },
+  "fr/d0_r26": {
+   "text": "Le champ de débris signale un trafic dense. Volez devant les blocs.",
+   "seconds": 4.36
+  },
+  "fr/d0_r27": {
+   "text": "Nouveau : les transports médicaux. Patient à l’hôpital, tout dégât est dangereux.",
+   "seconds": 6.12
+  },
+  "fr/d0_r28": {
+   "text": "Double navette. Deux plateformes bougent, choisissez la plus sympa.",
+   "seconds": 5.16
+  },
+  "fr/d0_r29": {
+   "text": "Pluie de météores ! Les couloirs clignotent juste avant l’impact.",
+   "seconds": 4.44
+  },
+  "fr/d0_r30": {
+   "text": "Ferraille. Le ferrailleur vous salue et demande une remise.",
+   "seconds": 4.61
+  },
+  "fr/d0_r31": {
+   "text": "Ceinture médicale. Vol sanitaire, en douceur et sans hâte, s’il vous plaît.",
+   "seconds": 5.56
+  },
+  "fr/d0_r32": {
+   "text": "Presse à ferraille. Un patient attend, et des météores arrivent aussi.",
+   "seconds": 4.9
+  },
+  "fr/d0_r33": {
+   "text": "Gardien de la ceinture. Nouveau : les glissières, de gros blocs qui écrasent. Attention !",
+   "seconds": 6.84
+  },
+  "fr/d0_r34": {
+   "text": "Champ magnétique détecté. Nouveau : les aimants attirent votre taxi. Contrez !",
+   "seconds": 7.2
+  },
+  "fr/d0_r35": {
+   "text": "Nouveau : des aimants répulsifs. Ils vous repoussent, servez-vous-en.",
+   "seconds": 5.8
+  },
+  "fr/d0_r36": {
+   "text": "Pôles jumeaux. L’un attire, l’autre repousse, votre café déborde.",
+   "seconds": 8.2
+  },
+  "fr/d0_r37": {
+   "text": "Nouveau : des aimants qui s’allument et s’éteignent en rythme. Surveillez l’anneau autour du noyau.",
+   "seconds": 6.28
+  },
+  "fr/d0_r38": {
+   "text": "Puits magnétique. Deux champs, un puits, beaucoup de patience.",
+   "seconds": 5.4
+  },
+  "fr/d0_r39": {
+   "text": "Lignes de champ. Trois aimants, et l’un d’eux est de mauvaise humeur.",
+   "seconds": 5.0
+  },
+  "fr/d0_r40": {
+   "text": "Inversion des pôles. Les champs échangent leurs pôles. Il y a aussi une station de vie.",
+   "seconds": 6.04
+  },
+  "fr/d0_r41": {
+   "text": "Dynamo. Tout pulse, restez dans le rythme.",
+   "seconds": 4.52
+  },
+  "fr/d0_r42": {
+   "text": "Champ de secours. Un patient dans le champ magnétique, volez tout en douceur.",
+   "seconds": 6.57
+  },
+  "fr/d0_r43": {
+   "text": "Porteurs magnétiques. Les plateformes bougent, les champs aussi.",
+   "seconds": 4.44
+  },
+  "fr/d0_r44": {
+   "text": "Maître des aimants. Dernier niveau du champ magnétique, ensuite ça chauffe.",
+   "seconds": 5.72
+  },
+  "fr/d0_r45": {
+   "text": "Forge solaire. Nouveau : les zones de chaleur. Qui y vole rougeoie, et le taxi prend des dégâts.",
+   "seconds": 7.69
+  },
+  "fr/d0_r46": {
+   "text": "Nouveau : les rayons plasma. Ils se chargent un instant, puis brûlent. Attendez le rythme.",
+   "seconds": 6.36
+  },
+  "fr/d0_r47": {
+   "text": "Vague de chaleur. Nouveau : des bulles de lave qui refroidissent et rougeoient en rythme.",
+   "seconds": 5.81
+  },
+  "fr/d0_r48": {
+   "text": "Stimulateur. Chaud, minuté, avec une station de vie pour souffler.",
+   "seconds": 5.56
+  },
+  "fr/d0_r49": {
+   "text": "Haut fourneau. Les maîtres de forge prétendent qu’on y est bien.",
+   "seconds": 4.66
+  },
+  "fr/d0_r50": {
+   "text": "Forge solaire. Deux rayons, même règle : d’abord attendre, puis voler.",
+   "seconds": 6.51
+  },
+  "fr/d0_r51": {
+   "text": "Maître forgeron. Gardez votre calme, Taxi sept, la forge vous observe.",
+   "seconds": 7.0
+  },
+  "fr/d0_r52": {
+   "text": "Moule de fonte. Météores au-dessus de la forge, rayons en dessous. Tout à la fois.",
+   "seconds": 7.4
+  },
+  "fr/d0_r53": {
+   "text": "Forge à plasma. Un patient attend, et les rayons aussi. En douceur et en rythme.",
+   "seconds": 7.15
+  },
+  "fr/d0_r54": {
+   "text": "Solstice. La forge est presque finie. Gardez votre calme, Taxi sept.",
+   "seconds": 5.64
+  },
+  "fr/d0_r55": {
+   "text": "Zénith solaire. Dernier niveau de la forge, ensuite les marées.",
+   "seconds": 4.62
+  },
+  "fr/d0_r56": {
+   "text": "Orbite des marées. Nouveau : les courants. Des marées invisibles poussent votre taxi.",
+   "seconds": 8.11
+  },
+  "fr/d0_r57": {
+   "text": "Nouveau : les zones de gravité. Tantôt tout s’allège, tantôt tout s’alourdit.",
+   "seconds": 6.2
+  },
+  "fr/d0_r58": {
+   "text": "Grande marée. Nouveau : les rafales, des courants qui vont et viennent en rythme. Et un patient attend.",
+   "seconds": 9.15
+  },
+  "fr/d0_r59": {
+   "text": "Reflux. Deux courants et une zone de gravité. Pourvu que le café reste dans la tasse.",
+   "seconds": 7.17
+  },
+  "fr/d0_r60": {
+   "text": "Soixante niveaux. La centrale est fière de vous.",
+   "seconds": 4.27
+  },
+  "fr/d0_r61": {
+   "text": "Tourbillon. Un patient dans le remous, volez doux et gardez le cap.",
+   "seconds": 6.5
+  },
+  "fr/d0_r62": {
+   "text": "Onde de tempête. Trois courants, deux zones de gravité et une station de vie pour souffler.",
+   "seconds": 6.11
+  },
+  "fr/d0_r63": {
+   "text": "Maître des marées. Les marées exigent tout ce que vous avez appris.",
+   "seconds": 4.76
+  },
+  "fr/d0_r64": {
+   "text": "Attraction orbitale. La station de vie est à portée, profitez-en.",
+   "seconds": 4.96
+  },
+  "fr/d0_r65": {
+   "text": "Maelström. Un patient attend au milieu des marées.",
+   "seconds": 3.88
+  },
+  "fr/d0_r66": {
+   "text": "Dernier niveau des marées. Prochain arrêt : le nœud.",
+   "seconds": 4.12
+  },
+  "fr/d0_r67": {
+   "text": "Nœud de transit. Nouveau : la circulation. Des véhicules entrent et sortent par des tunnels dans les murs.",
+   "seconds": 8.68
+  },
+  "fr/d0_r68": {
+   "text": "Plaque tournante. Les véhicules bifurquent, choisissez votre moment. Et un patient attend.",
+   "seconds": 9.24
+  },
+  "fr/d0_r69": {
+   "text": "Relève. La circulation change de voie, la station de vie vous aide.",
+   "seconds": 5.79
+  },
+  "fr/d0_r70": {
+   "text": "Centre de contrôle. Circulation, vent et un aimant. La centrale vous regarde.",
+   "seconds": 6.6
+  },
+  "fr/d0_r71": {
+   "text": "Ligne de fret. Un patient attend entre les cargos, volez en douceur.",
+   "seconds": 5.32
+  },
+  "fr/d0_r72": {
+   "text": "Ligne express. Les véhicules sont particulièrement pressés aujourd’hui.",
+   "seconds": 4.84
+  },
+  "fr/d0_r73": {
+   "text": "Anneau de transit. Encore un patient, encore un rythme, vous y arriverez.",
+   "seconds": 5.48
+  },
+  "fr/d0_r74": {
+   "text": "Gare centrale. Plus que deux nœuds, gardez votre voie.",
+   "seconds": 3.48
+  },
+  "fr/d0_r75": {
+   "text": "La station regrette votre sourire. Et la facture.",
+   "seconds": 3.88
+  },
+  "fr/d0_r76": {
+   "text": "Presque sorti du nœud. Gardez votre voie.",
+   "seconds": 3.48
+  },
+  "fr/d0_r77": {
+   "text": "Dernier niveau du nœud. Ensuite, il fera sombre.",
+   "seconds": 3.96
+  },
+  "fr/d0_r78": {
+   "text": "Anneau d’ombre. Nouveau : l’obscurité. Seuls taxi, plateformes et porte sont éclairés, le reste se devine.",
+   "seconds": 10.95
+  },
+  "fr/d0_r79": {
+   "text": "Équipe de nuit. Mémorisez le chemin avant d’entrer.",
+   "seconds": 3.79
+  },
+  "fr/d0_r80": {
+   "text": "Relèvement. Circulation dans le noir, les véhicules luisent, et un patient attend.",
+   "seconds": 6.53
+  },
+  "fr/d0_r81": {
+   "text": "Zone d’ombre radio. Un aimant se cache dans le noir, vous le sentez avant de le voir.",
+   "seconds": 6.48
+  },
+  "fr/d0_r82": {
+   "text": "Champ de capteurs. Vent, aimant et circulation dans le noir. Une station de vie vous aide.",
+   "seconds": 6.88
+  },
+  "fr/d0_r83": {
+   "text": "Sans lumière. Les rayons plasma ne brillent qu’en tirant. Et un patient attend.",
+   "seconds": 5.32
+  },
+  "fr/d0_r84": {
+   "text": "Anneau d’ombre. Deux routes de circulation dans le noir, seuls les phares les trahissent.",
+   "seconds": 7.4
+  },
+  "fr/d0_r85": {
+   "text": "Obscurité. Presque plus de lumière. Fiez-vous à votre instinct, Taxi sept.",
+   "seconds": 5.95
+  },
+  "fr/d0_r86": {
+   "text": "Vous volez comme en dormant. Restez éveillé, s’il vous plaît.",
+   "seconds": 3.88
+  },
+  "fr/d0_r87": {
+   "text": "Bientôt vous reverrez des étoiles. Des vraies.",
+   "seconds": 3.64
+  },
+  "fr/d0_r88": {
+   "text": "Dernier niveau dans l’ombre. Ensuite, le final.",
+   "seconds": 4.76
+  },
+  "fr/d0_r89": {
+   "text": "Bord de la singularité. Tous les systèmes à la fois. Chaque seconde compte.",
+   "seconds": 6.36
+  },
+  "fr/d0_r90": {
+   "text": "Le temps s’écoule plus lentement ici. Pas votre facture.",
+   "seconds": 4.2
+  },
+  "fr/d0_r91": {
+   "text": "La lumière se courbe ici. Gardez quand même le cap.",
+   "seconds": 4.33
+  },
+  "fr/d0_r92": {
+   "text": "La centrale retient son souffle.",
+   "seconds": 2.26
+  },
+  "fr/d0_r93": {
+   "text": "Un passager demande si c’est un trou de ver. Par pitié, non.",
+   "seconds": 4.93
+  },
+  "fr/d0_r94": {
+   "text": "Vous êtes le meilleur pilote que la centrale ait jamais eu. Ne le dites à personne.",
+   "seconds": 5.24
+  },
+  "fr/d0_r95": {
+   "text": "Tous les instruments tremblent, pourvu que vos mains non.",
+   "seconds": 4.18
+  },
+  "fr/d0_r96": {
+   "text": "Plus que quelques niveaux, Taxi sept.",
+   "seconds": 3.56
+  },
+  "fr/d0_r97": {
+   "text": "Le bord se resserre. Pas votre talent.",
+   "seconds": 3.16
+  },
+  "fr/d0_r98": {
+   "text": "L’avant-dernier niveau. Respirez profondément.",
+   "seconds": 3.56
+  },
+  "fr/d0_r99": {
+   "text": "Dernier niveau. Montrez-leur ce que vous valez, Taxi sept.",
+   "seconds": 4.52
+  },
+  "fr/d0_patient_lost": {
+   "text": "Patient perdu. Ça va coûter cher.",
+   "seconds": 2.84
+  },
+  "fr/d0_exit_start": {
+   "text": "Dernier passager du niveau. Le chrono tourne, Taxi sept.",
+   "seconds": 5.48
+  },
+  "fr/d0_exit_hurry": {
+   "text": "Taxi sept, le temps presse !",
+   "seconds": 2.12
+  },
+  "fr/d0_finale_1": {
+   "text": "Taxi sept, ici la centrale. C’était la dernière course. Les quatre-vingt-dix-neuf niveaux, et le gardien vous reparle.",
+   "seconds": 8.36
+  },
+  "fr/d0_finale_2": {
+   "text": "Garez le taxi. Fin de service. Le café est offert par la centrale aujourd’hui.",
+   "seconds": 5.46
+  },
+  "fr/d0_shift_S": {
+   "text": "Taxi sept, ici la centrale. Sans faute ! La nuit est à vous. Fin de service !",
+   "seconds": 7.48
+  },
+  "fr/d0_shift_A": {
+   "text": "Taxi sept, ici la centrale. Belle équipe, à peine une égratignure. Bonne nuit !",
+   "seconds": 6.84
+  },
+  "fr/d0_shift_B": {
+   "text": "Taxi sept, ici la centrale. Du bon travail ce soir. Retour au dépôt.",
+   "seconds": 6.28
+  },
+  "fr/d0_shift_C": {
+   "text": "Taxi sept, ici la centrale. Équipe terminée. Essayez d’atterrir plus doucement la prochaine fois.",
+   "seconds": 6.76
+  },
+  "fr/d0_shift_D": {
+   "text": "Taxi sept, ici la centrale. Les passagers ont connu des trajets plus agréables. Allez dormir.",
+   "seconds": 6.84
+  },
+  "fr/d0_shift_E": {
+   "text": "Taxi sept, ici la centrale. L’essentiel, c’est que vous soyez rentré. Demain est une nouvelle nuit.",
+   "seconds": 7.72
+  },
+  "es/f0_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.58
+  },
+  "es/f0_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.94
+  },
+  "es/f0_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.26
+  },
+  "es/f0_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.82
+  },
+  "es/f0_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 2.06
+  },
+  "es/f0_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 2.61
+  },
+  "es/f0_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 2.03
+  },
+  "es/f0_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 2.38
+  },
+  "es/f0_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.06
+  },
+  "es/f0_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 2.46
+  },
+  "es/f0_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 2.29
+  },
+  "es/f0_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 2.29
+  },
+  "es/f0_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 2.29
+  },
+  "es/f0_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.3
+  },
+  "es/f0_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.58
+  },
+  "es/f0_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.94
+  },
+  "es/f0_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.54
+  },
+  "es/f0_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.66
+  },
+  "es/f0_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 2.06
+  },
+  "es/f0_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.94
+  },
+  "es/f0_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 2.06
+  },
+  "es/f0_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.68
+  },
+  "es/f1_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 2.23
+  },
+  "es/f1_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.86
+  },
+  "es/f1_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.98
+  },
+  "es/f1_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 2.13
+  },
+  "es/f1_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 2.94
+  },
+  "es/f1_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 2.94
+  },
+  "es/f1_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 2.86
+  },
+  "es/f1_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 3.5
+  },
+  "es/f1_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.3
+  },
+  "es/f1_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 4.38
+  },
+  "es/f1_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 4.14
+  },
+  "es/f1_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 3.74
+  },
+  "es/f1_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 4.06
+  },
+  "es/f1_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 3.9
+  },
+  "es/f1_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 2.42
+  },
+  "es/f1_hard": {
+   "text": "¡Ay!",
+   "seconds": 1.1
+  },
+  "es/f1_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 2.37
+  },
+  "es/f1_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 2.09
+  },
+  "es/f1_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.74
+  },
+  "es/f1_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 1.02
+  },
+  "es/f1_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 2.94
+  },
+  "es/f1_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 2.3
+  },
+  "es/m0_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.1
+  },
+  "es/m0_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.78
+  },
+  "es/m0_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.32
+  },
+  "es/m0_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 2.06
+  },
+  "es/m0_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.9
+  },
+  "es/m0_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 2.06
+  },
+  "es/m0_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 2.06
+  },
+  "es/m0_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 2.46
+  },
+  "es/m0_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.3
+  },
+  "es/m0_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 2.54
+  },
+  "es/m0_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 2.22
+  },
+  "es/m0_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 2.06
+  },
+  "es/m0_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.96
+  },
+  "es/m0_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.3
+  },
+  "es/m0_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.5
+  },
+  "es/m0_hard": {
+   "text": "¡Ay!",
+   "seconds": 1.65
+  },
+  "es/m0_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.98
+  },
+  "es/m0_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 2.46
+  },
+  "es/m0_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 2.06
+  },
+  "es/m0_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.94
+  },
+  "es/m0_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.58
+  },
+  "es/m0_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.65
+  },
+  "es/m1_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.88
+  },
+  "es/m1_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 1.32
+  },
+  "es/m1_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.56
+  },
+  "es/m1_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 2.34
+  },
+  "es/m1_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 2.5
+  },
+  "es/m1_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 5.27
+  },
+  "es/m1_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 2.52
+  },
+  "es/m1_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 2.87
+  },
+  "es/m1_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.88
+  },
+  "es/m1_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 3.6
+  },
+  "es/m1_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 2.32
+  },
+  "es/m1_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 2.57
+  },
+  "es/m1_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 2.57
+  },
+  "es/m1_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.62
+  },
+  "es/m1_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.79
+  },
+  "es/m1_hard": {
+   "text": "¡Ay!",
+   "seconds": 1.4
+  },
+  "es/m1_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.61
+  },
+  "es/m1_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 2.0
+  },
+  "es/m1_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 2.22
+  },
+  "es/m1_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 1.05
+  },
+  "es/m1_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 3.13
+  },
+  "es/m1_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.66
+  },
+  "es/t0_pump_hit_1": {
+   "text": "¡Cuidado con mi surtidor!",
+   "seconds": 2.14
+  },
+  "es/t0_pump_hit_2": {
+   "text": "¡Eh! ¡Basta ya!",
+   "seconds": 1.89
+  },
+  "es/t0_pump_hit_3": {
+   "text": "¡No! ¡Mi gasolinera!",
+   "seconds": 1.82
+  },
+  "es/t0_price_up": {
+   "text": "¡Los precios suben!",
+   "seconds": 1.82
+  },
+  "es/t0_price_down": {
+   "text": "¡Bajan los precios! ¡Ven a repostar!",
+   "seconds": 3.18
+  },
+  "es/d0_r2": {
+   "text": "Parada de repostaje: aterriza, reposta, paga. Los precios varían.",
+   "seconds": 5.88
+  },
+  "es/d0_r3": {
+   "text": "Un pozo estrecho. Menos mal que tienes buen pulso.",
+   "seconds": 3.82
+  },
+  "es/d0_r4": {
+   "text": "Aterrizaje en terrazas. El conserje pide plataformas limpias.",
+   "seconds": 5.81
+  },
+  "es/d0_r5": {
+   "text": "Novedad: estaciones de vidas por mil créditos. Y ahora los pasajeros te llaman sin avisar.",
+   "seconds": 8.16
+  },
+  "es/d0_r6": {
+   "text": "El gasolinero está de mal humor hoy. No le golpees el surtidor.",
+   "seconds": 4.92
+  },
+  "es/d0_r7": {
+   "text": "Ruta circular. Dar vueltas enseña más de la ciudad.",
+   "seconds": 5.01
+  },
+  "es/d0_r8": {
+   "text": "¡Cuidado, pinchos! Cada roce daña tu taxi.",
+   "seconds": 4.29
+  },
+  "es/d0_r9": {
+   "text": "Puntas de aguja. Sin prisa, pero sin pausa.",
+   "seconds": 3.47
+  },
+  "es/d0_r10": {
+   "text": "Emergencia de combustible. La estación está muy arriba.",
+   "seconds": 4.04
+  },
+  "es/d0_r11": {
+   "text": "Examen final. Después te habrás ganado un café.",
+   "seconds": 4.6
+  },
+  "es/d0_r12": {
+   "text": "Llegan los Cañones de Neón. Estrechos, brillantes y concurridos.",
+   "seconds": 6.12
+  },
+  "es/d0_r13": {
+   "text": "Avenida de neón. Las luces son bonitas, pero importa más la distancia a la pared.",
+   "seconds": 6.23
+  },
+  "es/d0_r14": {
+   "text": "Novedad: puertas correderas. Se cierran a ritmo, que no te atrapen.",
+   "seconds": 4.6
+  },
+  "es/d0_r15": {
+   "text": "Dos esclusas seguidas. Cuenta el ritmo.",
+   "seconds": 3.72
+  },
+  "es/d0_r16": {
+   "text": "Hora punta en los cañones. Todos quieren ir a la vez a algún sitio.",
+   "seconds": 4.62
+  },
+  "es/d0_r17": {
+   "text": "Fachada de cristal. Por favor, no te estrelles, el conserje se quejará.",
+   "seconds": 6.82
+  },
+  "es/d0_r18": {
+   "text": "¡El rastrillo! Pasa rápido, pero no demasiado.",
+   "seconds": 4.52
+  },
+  "es/d0_r19": {
+   "text": "El laberinto de neón. Sin hilo, pero con buen sentido de la orientación.",
+   "seconds": 6.2
+  },
+  "es/d0_r20": {
+   "text": "La cámara de esclusa. Por cierto, el café ahí es horrible.",
+   "seconds": 5.0
+  },
+  "es/d0_r21": {
+   "text": "Doble esclusa, doble paciencia.",
+   "seconds": 3.16
+  },
+  "es/d0_r22": {
+   "text": "Final de neón. Ya casi has cruzado los cañones.",
+   "seconds": 4.44
+  },
+  "es/d0_r23": {
+   "text": "Cinturón de Chatarra. Los escombros flotan por el campo, cada roce daña tu taxi.",
+   "seconds": 7.6
+  },
+  "es/d0_r24": {
+   "text": "La vía de la grúa está concurrida hoy. Mantén la distancia con los bloques.",
+   "seconds": 5.16
+  },
+  "es/d0_r25": {
+   "text": "Novedad: plataformas móviles sobre raíles. Aterriza a la velocidad de la plataforma.",
+   "seconds": 8.2
+  },
+  "es/d0_r26": {
+   "text": "El campo de escombros informa de mucho tráfico. Vuela por delante de los bloques.",
+   "seconds": 5.16
+  },
+  "es/d0_r27": {
+   "text": "Novedad: transportes médicos. Paciente al hospital, cualquier daño es peligroso.",
+   "seconds": 6.84
+  },
+  "es/d0_r28": {
+   "text": "Transbordador doble. Dos plataformas se mueven, elige la más amable.",
+   "seconds": 5.64
+  },
+  "es/d0_r29": {
+   "text": "¡Lluvia de meteoritos! Los carriles parpadean justo antes del impacto.",
+   "seconds": 4.76
+  },
+  "es/d0_r30": {
+   "text": "Chatarra. El chatarrero te saluda y pide un descuento.",
+   "seconds": 3.96
+  },
+  "es/d0_r31": {
+   "text": "Cinturón médico. Vuelo sanitario, suave y sin prisas, por favor.",
+   "seconds": 6.04
+  },
+  "es/d0_r32": {
+   "text": "Prensa de chatarra. Un paciente espera, y también vienen meteoritos.",
+   "seconds": 4.76
+  },
+  "es/d0_r33": {
+   "text": "Guardián del cinturón. Novedad: correderas, grandes bloques que aplastan. ¡Cuidado!",
+   "seconds": 6.63
+  },
+  "es/d0_r34": {
+   "text": "Campo magnético detectado. Novedad: los imanes atraen tu taxi. ¡Contrarresta!",
+   "seconds": 6.92
+  },
+  "es/d0_r35": {
+   "text": "Novedad: imanes que repelen. Te empujan lejos, aprovéchalo.",
+   "seconds": 6.28
+  },
+  "es/d0_r36": {
+   "text": "Polos gemelos. Uno atrae, otro repele, tu café se derrama.",
+   "seconds": 4.68
+  },
+  "es/d0_r37": {
+   "text": "Novedad: imanes que se encienden y apagan a ritmo. Fíjate en el anillo alrededor del núcleo.",
+   "seconds": 8.6
+  },
+  "es/d0_r38": {
+   "text": "Pozo magnético. Dos campos, un pozo, mucha paciencia.",
+   "seconds": 5.4
+  },
+  "es/d0_r39": {
+   "text": "Líneas de campo. Tres imanes, y uno está de mal humor.",
+   "seconds": 5.16
+  },
+  "es/d0_r40": {
+   "text": "Cambio de polos. Los campos intercambian sus polos. También hay una estación de vidas.",
+   "seconds": 6.12
+  },
+  "es/d0_r41": {
+   "text": "Dinamo. Todo late, mantén el ritmo.",
+   "seconds": 2.92
+  },
+  "es/d0_r42": {
+   "text": "Campo de rescate. Un paciente dentro del campo magnético, vuela con especial suavidad.",
+   "seconds": 8.1
+  },
+  "es/d0_r43": {
+   "text": "Portadores magnéticos. Las plataformas se mueven, y los campos también.",
+   "seconds": 5.48
+  },
+  "es/d0_r44": {
+   "text": "Maestro de imanes. Último nivel del campo magnético, luego hará calor.",
+   "seconds": 6.84
+  },
+  "es/d0_r45": {
+   "text": "Forja solar. Novedad: zonas de calor. Quien vuela dentro se pone al rojo, y el taxi sufre daños.",
+   "seconds": 10.04
+  },
+  "es/d0_r46": {
+   "text": "Novedad: rayos de plasma. Se cargan un momento y luego queman. Espera el ritmo.",
+   "seconds": 6.52
+  },
+  "es/d0_r47": {
+   "text": "Ola de calor. Novedad: burbujas de lava que se enfrían y vuelven a brillar a ritmo.",
+   "seconds": 6.83
+  },
+  "es/d0_r48": {
+   "text": "Marcapasos. Calor, ritmo y una estación de vidas para respirar.",
+   "seconds": 6.12
+  },
+  "es/d0_r49": {
+   "text": "Alto horno. Los maestros forjadores dicen que es acogedor.",
+   "seconds": 4.93
+  },
+  "es/d0_r50": {
+   "text": "Forja solar. Dos rayos, misma regla: primero esperar, luego volar.",
+   "seconds": 7.32
+  },
+  "es/d0_r51": {
+   "text": "Maestro forjador. Mantén la calma, Taxi siete, la forja te observa.",
+   "seconds": 6.07
+  },
+  "es/d0_r52": {
+   "text": "Molde de fundición. Meteoritos sobre la forja, rayos debajo. Todo a la vez.",
+   "seconds": 7.32
+  },
+  "es/d0_r53": {
+   "text": "Forja de plasma. Un paciente espera, y los rayos también. Suave y a ritmo.",
+   "seconds": 8.12
+  },
+  "es/d0_r54": {
+   "text": "Solsticio. La forja casi está. Mantén la calma, Taxi siete.",
+   "seconds": 7.08
+  },
+  "es/d0_r55": {
+   "text": "Cénit solar. Último nivel de la forja, luego llegan las mareas.",
+   "seconds": 5.16
+  },
+  "es/d0_r56": {
+   "text": "Órbita de Mareas. Novedad: corrientes. Mareas invisibles empujan tu taxi.",
+   "seconds": 7.34
+  },
+  "es/d0_r57": {
+   "text": "Novedad: zonas de gravedad. A veces todo pesa menos, a veces más.",
+   "seconds": 7.4
+  },
+  "es/d0_r58": {
+   "text": "Marea viva. Novedad: ráfagas, corrientes que se encienden y apagan a ritmo. Y un paciente espera.",
+   "seconds": 8.48
+  },
+  "es/d0_r59": {
+   "text": "Bajamar. Dos corrientes y una zona de gravedad. Ojalá el café se quede en la taza.",
+   "seconds": 6.86
+  },
+  "es/d0_r60": {
+   "text": "Sesenta niveles. La central está orgullosa de ti.",
+   "seconds": 5.52
+  },
+  "es/d0_r61": {
+   "text": "Remolino. Un paciente en la resaca, vuela suave y mantén el rumbo.",
+   "seconds": 5.4
+  },
+  "es/d0_r62": {
+   "text": "Marejada. Tres corrientes, dos zonas de gravedad y una estación de vidas para respirar.",
+   "seconds": 6.36
+  },
+  "es/d0_r63": {
+   "text": "Maestro de mareas. Las mareas exigen todo lo que has aprendido.",
+   "seconds": 5.16
+  },
+  "es/d0_r64": {
+   "text": "Atracción orbital. La estación de vidas está al alcance, aprovéchala.",
+   "seconds": 5.72
+  },
+  "es/d0_r65": {
+   "text": "Maelstrom. Un paciente espera en medio de las mareas.",
+   "seconds": 4.84
+  },
+  "es/d0_r66": {
+   "text": "Último nivel de mareas. Próxima parada: el nudo.",
+   "seconds": 5.87
+  },
+  "es/d0_r67": {
+   "text": "Nudo de Tránsito. Novedad: tráfico. Los vehículos entran y salen por túneles en las paredes.",
+   "seconds": 7.4
+  },
+  "es/d0_r68": {
+   "text": "Intercambiador. Los vehículos giran, elige tu momento. Y un paciente espera.",
+   "seconds": 5.88
+  },
+  "es/d0_r69": {
+   "text": "Cambio de turno. El tráfico cambia de carril, la estación de vidas te ayuda.",
+   "seconds": 6.2
+  },
+  "es/d0_r70": {
+   "text": "Centro de control. Tráfico, viento y un imán. La central te observa.",
+   "seconds": 6.72
+  },
+  "es/d0_r71": {
+   "text": "Línea de carga. Un paciente espera entre los cargueros, vuela con suavidad.",
+   "seconds": 6.2
+  },
+  "es/d0_r72": {
+   "text": "Línea exprés. Hoy los vehículos van con mucha prisa.",
+   "seconds": 4.28
+  },
+  "es/d0_r73": {
+   "text": "Anillo de tránsito. Otro paciente, otro ritmo, tú puedes.",
+   "seconds": 5.57
+  },
+  "es/d0_r74": {
+   "text": "Nudo central. Quedan dos nudos más, mantén tu carril.",
+   "seconds": 4.52
+  },
+  "es/d0_r75": {
+   "text": "La estación echa de menos tu sonrisa. Y la factura.",
+   "seconds": 4.36
+  },
+  "es/d0_r76": {
+   "text": "Casi fuera del nudo. Mantén tu carril.",
+   "seconds": 3.4
+  },
+  "es/d0_r77": {
+   "text": "Último nivel del nudo. Después oscurece.",
+   "seconds": 4.14
+  },
+  "es/d0_r78": {
+   "text": "Anillo de Sombra. Novedad: oscuridad. Solo el taxi, las plataformas y la puerta están iluminados, el resto lo intuyes.",
+   "seconds": 11.8
+  },
+  "es/d0_r79": {
+   "text": "Turno de noche. Memoriza el camino antes de entrar.",
+   "seconds": 3.88
+  },
+  "es/d0_r80": {
+   "text": "Rumbo. Tráfico a oscuras, los vehículos brillan, y un paciente espera.",
+   "seconds": 6.86
+  },
+  "es/d0_r81": {
+   "text": "Sombra de radio. Un imán se esconde en la oscuridad, lo notas antes de verlo.",
+   "seconds": 6.8
+  },
+  "es/d0_r82": {
+   "text": "Campo de sensores. Viento, imán y tráfico a oscuras. Una estación de vidas te ayuda.",
+   "seconds": 7.56
+  },
+  "es/d0_r83": {
+   "text": "Sin luz. Los rayos de plasma solo brillan al disparar. Y un paciente espera.",
+   "seconds": 7.8
+  },
+  "es/d0_r84": {
+   "text": "Anillo de sombra. Dos rutas de tráfico a oscuras, solo los faros las delatan.",
+   "seconds": 7.33
+  },
+  "es/d0_r85": {
+   "text": "Oscuridad. Casi no queda luz. Confía en tu instinto, Taxi siete.",
+   "seconds": 6.53
+  },
+  "es/d0_r86": {
+   "text": "Vuelas como si durmieras. Por favor, sigue despierto.",
+   "seconds": 4.2
+  },
+  "es/d0_r87": {
+   "text": "Pronto volverás a ver estrellas. De verdad.",
+   "seconds": 3.79
+  },
+  "es/d0_r88": {
+   "text": "Último nivel en la sombra. Después, el final.",
+   "seconds": 4.28
+  },
+  "es/d0_r89": {
+   "text": "Borde de la Singularidad. Todos los sistemas a la vez. Ahora cuenta cada segundo.",
+   "seconds": 7.32
+  },
+  "es/d0_r90": {
+   "text": "Aquí el tiempo pasa más despacio. Tu factura no.",
+   "seconds": 3.81
+  },
+  "es/d0_r91": {
+   "text": "Aquí la luz se curva. Aun así, mantén el rumbo.",
+   "seconds": 4.61
+  },
+  "es/d0_r92": {
+   "text": "La central contiene la respiración.",
+   "seconds": 2.2
+  },
+  "es/d0_r93": {
+   "text": "Un pasajero pregunta si eso es un agujero de gusano. Por favor, no.",
+   "seconds": 5.87
+  },
+  "es/d0_r94": {
+   "text": "Eres el mejor piloto que ha tenido la central. No se lo digas a nadie.",
+   "seconds": 4.92
+  },
+  "es/d0_r95": {
+   "text": "Todos los instrumentos tiemblan, ojalá tus manos no.",
+   "seconds": 4.84
+  },
+  "es/d0_r96": {
+   "text": "Solo quedan unos niveles, Taxi siete.",
+   "seconds": 3.24
+  },
+  "es/d0_r97": {
+   "text": "El borde se estrecha. Tu destreza no.",
+   "seconds": 4.2
+  },
+  "es/d0_r98": {
+   "text": "El penúltimo nivel. Respira hondo.",
+   "seconds": 3.56
+  },
+  "es/d0_r99": {
+   "text": "Último nivel. Demuéstrales lo que vales, Taxi siete.",
+   "seconds": 4.75
+  },
+  "es/d0_patient_lost": {
+   "text": "Paciente perdido. Eso saldrá caro.",
+   "seconds": 3.08
+  },
+  "es/d0_exit_start": {
+   "text": "Último pasajero del nivel. Corre el reloj, Taxi siete.",
+   "seconds": 5.7
+  },
+  "es/d0_exit_hurry": {
+   "text": "¡Taxi siete, se acaba el tiempo!",
+   "seconds": 3.88
+  },
+  "es/d0_finale_1": {
+   "text": "Taxi siete, aquí la central. Ese fue el último viaje. Los noventa y nueve niveles, y el conserje vuelve a hablarte.",
+   "seconds": 11.56
+  },
+  "es/d0_finale_2": {
+   "text": "Aparca el taxi. Fin del turno. Hoy el café lo paga la central.",
+   "seconds": 5.06
+  },
+  "es/d0_shift_S": {
+   "text": "Taxi siete, aquí la central. ¡Impecable! La noche es tuya. ¡A casa!",
+   "seconds": 8.12
+  },
+  "es/d0_shift_A": {
+   "text": "Taxi siete, aquí la central. Gran turno, apenas un rasguño. ¡Buenas noches!",
+   "seconds": 6.52
+  },
+  "es/d0_shift_B": {
+   "text": "Taxi siete, aquí la central. Buen trabajo esta noche. Vuelve al depósito.",
+   "seconds": 5.88
+  },
+  "es/d0_shift_C": {
+   "text": "Taxi siete, aquí la central. Turno terminado. La próxima vez aterriza algo más suave.",
+   "seconds": 7.64
+  },
+  "es/d0_shift_D": {
+   "text": "Taxi siete, aquí la central. Los pasajeros han tenido viajes mejores. Ve a dormir.",
+   "seconds": 6.2
+  },
+  "es/d0_shift_E": {
+   "text": "Taxi siete, aquí la central. Lo importante es que has vuelto. Mañana es otra noche.",
+   "seconds": 6.68
+  },
+  "fr/i0_vid_spikes": {
+   "text": "Les pics. Ils sont sur les rochers et les plateformes. Chaque contact abîme votre taxi, même lentement. Gardez vos distances.",
+   "seconds": 8.44
+  },
+  "fr/i0_vid_doors": {
+   "text": "Les portes coulissantes se ferment des deux côtés à un rythme fixe, restent closes un instant puis se rouvrent. Attendez qu’elle soit ouverte et passez vite. Si elle vous attrape, vous êtes éjecté et votre taxi s’abîme.",
+   "seconds": 11.75
+  },
+  "fr/i0_vid_debris": {
+   "text": "Les débris suivent des trajets fixes. Observez leur rythme et passez quand la voie est libre. Un contact abîme votre taxi.",
+   "seconds": 7.05
+  },
+  "fr/i0_vid_moving_pad": {
+   "text": "Les pads mobiles glissent sur des rails. Survolez-en un, calez-vous sur sa vitesse et posez-vous à son rythme. Le taxi l’accompagne.",
+   "seconds": 8.41
+  },
+  "fr/i0_vid_hospital": {
+   "text": "Transport médical : le patient est sur une civière et doit aller à l’hôpital. Tout dégât est dangereux. Si le patient est perdu, la course actuelle est perdue. Volez tout en douceur.",
+   "seconds": 11.79
+  },
+  "fr/i0_vid_meteors": {
+   "text": "Les météores tombent dans des couloirs fixes. Le couloir clignote avant la chute. Restez à l’écart jusqu’au passage du rocher. Un impact abîme votre taxi.",
+   "seconds": 9.71
+  },
+  "fr/i0_vid_slider": {
+   "text": "Les glissières sont de gros blocs lourds. Elles écrasent tout ce qui est coincé contre un mur et abîment gravement votre taxi. Passez quand elles sont assez loin.",
+   "seconds": 8.82
+  },
+  "fr/i0_vid_magnet_pull": {
+   "text": "Les champs magnétiques attirent votre taxi vers le noyau. Plus près, plus fort. Contrez à temps, sinon vous finirez au centre.",
+   "seconds": 8.61
+  },
+  "fr/i0_vid_magnet_push": {
+   "text": "Les aimants répulsifs vous repoussent. Vous approchez à peine du noyau. Servez-vous de la poussée pour être emporté.",
+   "seconds": 6.69
+  },
+  "fr/i0_vid_magnet_pulse": {
+   "text": "Certains aimants s’allument et s’éteignent en rythme. L’anneau autour du noyau montre quand ils sont actifs. Passez pendant leur pause.",
+   "seconds": 7.97
+  },
+  "fr/i0_vid_heat": {
+   "text": "Les zones de chaleur rougeoient. Tant que vous y volez, votre taxi s’abîme. Traversez vite ou, mieux, contournez-les.",
+   "seconds": 7.56
+  },
+  "fr/i0_vid_beam": {
+   "text": "Les rayons plasma se chargent un instant, puis brûlent. Le clignotement vous prévient. Dans le rayon, votre taxi s’abîme. Attendez qu’il s’éteigne, puis passez.",
+   "seconds": 10.12
+  },
+  "fr/i0_vid_heat_pulse": {
+   "text": "Les bulles de lave refroidissent en rythme puis rougeoient de nouveau. Sombres, on peut passer sans risque. Surveillez le rythme.",
+   "seconds": 6.65
+  },
+  "fr/i0_vid_wind": {
+   "text": "Les courants poussent votre taxi dans une direction. Les traînées montrent laquelle. Compensez par une contre-poussée.",
+   "seconds": 6.34
+  },
+  "fr/i0_vid_gravity": {
+   "text": "Les zones de gravité changent votre poids. Dans la zone légère, vous montez tout seul ; dans la lourde, vous descendez. Ajustez votre poussée.",
+   "seconds": 8.51
+  },
+  "fr/i0_vid_wind_gust": {
+   "text": "Les rafales sont des courants qui vont et viennent en rythme. Attendez la pause ou anticipez la poussée.",
+   "seconds": 5.27
+  },
+  "fr/i0_vid_traffic": {
+   "text": "Circulation : d’autres véhicules suivent des routes fixes par des tunnels dans les murs. Une collision abîme votre taxi. Attendez un trou et traversez la voie.",
+   "seconds": 9.17
+  },
+  "fr/i0_vid_dark": {
+   "text": "L’obscurité. Seuls votre taxi, les plateformes et la porte sont éclairés. Véhicules, météores et rayons se trahissent par leur lumière. Retenez le chemin.",
+   "seconds": 12.53
+  },
+  "fr/i0_vid_vip": {
+   "text": "On reconnaît les passagers VIP à la couronne dorée. Ils paient presque le double, mais n’attendent que moitié moins. Atterrissages brutaux et chocs coûtent double avec eux. Volez vite et en douceur.",
+   "seconds": 12.45
+  },
+  "fr/i0_vid_emergency": {
+   "text": "Urgence : la croix rouge et le nombre indiquent le délai en secondes. Amenez le passager à temps et vous gagnez le double. Si le temps s’écoule, le passager est perdu.",
+   "seconds": 10.09
+  },
+  "es/i0_vid_spikes": {
+   "text": "Pinchos. Están en rocas y plataformas. Cada roce daña tu taxi, por despacio que vueles. Mantén la distancia.",
+   "seconds": 7.26
+  },
+  "es/i0_vid_doors": {
+   "text": "Las puertas correderas se cierran por ambos lados a un ritmo fijo, quedan cerradas un momento y se abren de nuevo. Espera a que esté abierta y cruza rápido. Si te atrapa, sales despedido y tu taxi se daña.",
+   "seconds": 12.3
+  },
+  "es/i0_vid_debris": {
+   "text": "Los escombros siguen rutas fijas. Observa su ritmo y pasa cuando el camino esté libre. Un roce daña tu taxi.",
+   "seconds": 6.94
+  },
+  "es/i0_vid_moving_pad": {
+   "text": "Las plataformas móviles se deslizan sobre raíles. Vuela sobre una, iguala su velocidad y aterriza a su ritmo. El taxi viaja con ella.",
+   "seconds": 9.1
+  },
+  "es/i0_vid_hospital": {
+   "text": "Transporte médico: el paciente va en camilla y debe llegar al hospital. Cualquier daño es peligroso. Si se pierde, te cuesta la tarifa actual. Vuela con especial suavidad.",
+   "seconds": 11.1
+  },
+  "es/i0_vid_meteors": {
+   "text": "Los meteoritos caen por carriles fijos. El carril parpadea antes de la caída. Apártate hasta que pase la roca. Un impacto daña tu taxi.",
+   "seconds": 8.62
+  },
+  "es/i0_vid_slider": {
+   "text": "Las correderas son bloques grandes y pesados. Aplastan todo lo que queda entre ellas y una pared y dañan mucho tu taxi. Pasa cuando estén lo bastante lejos.",
+   "seconds": 10.06
+  },
+  "es/i0_vid_magnet_pull": {
+   "text": "Los campos magnéticos atraen tu taxi hacia el núcleo. Cuanto más cerca, más fuerte. Contrarresta a tiempo o acabarás en el centro.",
+   "seconds": 8.42
+  },
+  "es/i0_vid_magnet_push": {
+   "text": "Los imanes que repelen te empujan lejos. Apenas te acercas al núcleo. Aprovecha el empujón para dejarte llevar.",
+   "seconds": 7.38
+  },
+  "es/i0_vid_magnet_pulse": {
+   "text": "Algunos imanes se encienden y apagan a ritmo. El anillo alrededor del núcleo muestra cuándo están activos. Pasa mientras descansan.",
+   "seconds": 8.38
+  },
+  "es/i0_vid_heat": {
+   "text": "Las zonas de calor brillan. Mientras vueles dentro, tu taxi se sigue dañando. Crúzalas rápido o, mejor, rodéalas.",
+   "seconds": 8.54
+  },
+  "es/i0_vid_beam": {
+   "text": "Los rayos de plasma se cargan un momento y luego queman. El parpadeo te avisa. Dentro del rayo tu taxi se daña. Espera a que se apague y pasa.",
+   "seconds": 9.26
+  },
+  "es/i0_vid_heat_pulse": {
+   "text": "Las burbujas de lava se enfrían a ritmo y vuelven a brillar. Cuando están oscuras, puedes pasar sin peligro. Atento al ritmo.",
+   "seconds": 7.5
+  },
+  "es/i0_vid_wind": {
+   "text": "Las corrientes empujan tu taxi en una dirección. Las estelas te muestran cuál. Compensa con empuje contrario.",
+   "seconds": 7.26
+  },
+  "es/i0_vid_gravity": {
+   "text": "Las zonas de gravedad cambian tu peso. En la ligera subes solo, en la pesada te hundes. Ajusta el empuje.",
+   "seconds": 7.5
+  },
+  "es/i0_vid_wind_gust": {
+   "text": "Las ráfagas son corrientes que se encienden y apagan a ritmo. Espera la pausa o prevé el empujón.",
+   "seconds": 6.06
+  },
+  "es/i0_vid_traffic": {
+   "text": "Tráfico: otros vehículos siguen rutas fijas por túneles en las paredes. Una colisión daña tu taxi. Espera un hueco y cruza el carril.",
+   "seconds": 9.02
+  },
+  "es/i0_vid_dark": {
+   "text": "Oscuridad. Solo tu taxi, las plataformas y la puerta están iluminados. Vehículos, meteoritos y rayos se delatan por su luz. Recuerda el camino.",
+   "seconds": 9.74
+  },
+  "es/i0_vid_vip": {
+   "text": "Los pasajeros VIP se reconocen por la corona dorada. Pagan casi el doble, pero esperan la mitad. Con ellos, los aterrizajes bruscos y los golpes cuestan el doble. Vuela rápido y suave.",
+   "seconds": 12.06
+  },
+  "es/i0_vid_emergency": {
+   "text": "Urgencia: la cruz roja y el número indican el plazo en segundos. Lleva al pasajero a tiempo y ganas el doble. Si se acaba el tiempo, el pasajero se pierde.",
+   "seconds": 10.54
+  },
+  "fr/i0_tut_welcome": {
+   "text": "Bienvenue à l’école de pilotage, Taxi 7 ! Je vais vous expliquer tout ce qu’il faut savoir pour prendre vos passagers et les mener à bon port.",
+   "seconds": 8.31,
+   "engine": "drama3-fp8",
+   "spoken": "Bienvenue à l’école de pilotage, Taxi sept ! Je vais vous expliquer tout ce qu’il faut savoir pour prendre vos passagers et les mener à bon port."
+  },
+  "fr/i0_tut_hud_fuel": {
+   "text": "En haut à gauche, votre niveau de carburant. Chaque manœuvre consomme. Réservoir vide : vous perdez un taxi.",
+   "seconds": 6.59,
+   "engine": "drama3-fp8",
+   "spoken": "En haut à gauche, votre niveau de carburant. Chaque manœuvre consomme. Réservoir vide : vous perdez un taxi."
+  },
+  "fr/i0_tut_hud_hull": {
+   "text": "À côté, votre coque. Si vous heurtez quelque chose, elle s’abîme. À 0, votre taxi est détruit.",
+   "seconds": 7.66,
+   "engine": "drama3-fp8",
+   "spoken": "À côté, votre coque. Si vous heurtez quelque chose, elle s’abîme. À zéro, votre taxi est détruit."
+  },
+  "fr/i0_tut_hud_money": {
+   "text": "Ensuite, vos crédits et vos taxis. Vous ne pouvez jamais avoir plus de 5 taxis.",
+   "seconds": 5.53,
+   "engine": "drama3-fp8",
+   "spoken": "Ensuite, vos crédits et vos taxis. Vous ne pouvez jamais avoir plus de cinq taxis."
+  },
+  "fr/i0_tut_hud_level": {
+   "text": "À droite de la porte, le niveau en cours. À côté, les passagers obligatoires livrés et leur total.",
+   "seconds": 7.24,
+   "engine": "drama3-fp8",
+   "spoken": "À droite de la porte, le niveau en cours. À côté, les passagers obligatoires livrés et leur total."
+  },
+  "fr/i0_tut_hud_price": {
+   "text": "Les prix du carburant varient, vous le savez sûrement. Faites le plein quand le prix est bas.",
+   "seconds": 5.11,
+   "engine": "drama3-fp8",
+   "spoken": "Les prix du carburant varient, vous le savez sûrement. Faites le plein quand le prix est bas."
+  },
+  "fr/i0_tut_hud_gauge": {
+   "text": "Tout à droite, votre indicateur d’atterrissage : vitesse de descente, vitesse latérale et inclinaison. Si toutes les barres restent sous la marque blanche, l’atterrissage est sûr.",
+   "seconds": 11.66,
+   "engine": "drama3-fp8",
+   "spoken": "Tout à droite, votre indicateur d’atterrissage : vitesse de descente, vitesse latérale et inclinaison. Si toutes les barres restent sous la marque blanche, l’atterrissage est sûr."
+  },
+  "fr/i0_tut_gear_in": {
+   "text": "Pour rentrer le train, appuyez sur le bouton A de la manette ou sur la barre d’espace. Rentré, votre taxi vole vite ; sorti, lentement et avec précision.",
+   "seconds": 11.52,
+   "engine": "drama3-fp8",
+   "spoken": "Pour rentrer le train, appuyez sur le bouton A de la manette ou sur la barre d’espace. Rentré, votre taxi vole vite ; sorti, lentement et avec précision."
+  },
+  "fr/i0_tut_fly": {
+   "text": "C’est parti ! Dirigez avec le stick gauche ou avec W, A, S et D. Traversez les cercles verts dans le sens des aiguilles d’une montre.",
+   "seconds": 8.82,
+   "engine": "drama3-fp8",
+   "spoken": "C’est parti ! Dirigez avec le stick gauche ou avec W, A, S et D. Traversez les cercles verts dans le sens des aiguilles d’une montre."
+  },
+  "fr/i0_tut_fly_ok": {
+   "text": "Bravo ! La gravité vous tire sans cesse vers le bas, et la poussée coûte du carburant. Essayez de planer.",
+   "seconds": 7.29,
+   "engine": "drama3-fp8",
+   "spoken": "Bravo ! La gravité vous tire sans cesse vers le bas, et la poussée coûte du carburant. Essayez de planer."
+  },
+  "fr/i0_tut_gear": {
+   "text": "Avant chaque atterrissage, ressortez le train : votre taxi vole alors lentement et avec précision. Essayez !",
+   "seconds": 6.92,
+   "engine": "drama3-fp8",
+   "spoken": "Avant chaque atterrissage, ressortez le train : votre taxi vole alors lentement et avec précision. Essayez !"
+  },
+  "fr/i0_tut_fuel_low": {
+   "text": "Oh non ! Votre réservoir est presque vide ! Allez à la station, la plateforme orange avec la pompe, et posez-vous.",
+   "seconds": 6.55,
+   "engine": "drama3-fp8",
+   "spoken": "Oh non ! Votre réservoir est presque vide ! Allez à la station, la plateforme orange avec la pompe, et posez-vous."
+  },
+  "fr/i0_tut_refuel": {
+   "text": "Tant que vous restez ici, vous faites le plein. Le carburant coûte des crédits. Seulement si vous ne pouvez pas payer, c’est gratuit jusqu’à 35 pour cent, et là, vous êtes fauché. Attention à la pompe : si vous la percutez, le pompiste se fâche et augmente les prix. Évitez ça, croyez-moi !",
+   "seconds": 19.23,
+   "engine": "drama3-fp8",
+   "spoken": "Tant que vous restez ici, vous faites le plein. Le carburant coûte des crédits. Seulement si vous ne pouvez pas payer, c’est gratuit jusqu’à trente-cinq pour cent, et là, vous êtes fauché. Attention à la pompe : si vous la percutez, le pompiste se fâche et augmente les prix. Évitez ça, croyez-moi !"
+  },
+  "fr/i0_tut_pump_fix": {
+   "text": "La pompe est en miettes ! Je la fais réparer tout de suite, mais n’y touchez plus, s’il vous plaît.",
+   "seconds": 3.81,
+   "engine": "drama3-fp8",
+   "spoken": "La pompe est en miettes ! Je la fais réparer tout de suite, mais n’y touchez plus, s’il vous plaît."
+  },
+  "fr/i0_tut_credit": {
+   "text": "À partir de maintenant, vous payez. Si vous avez des crédits, vous payez chaque goutte, même sous 35 pour cent. Je vous crédite 500 crédits, allez-y, faites le plein.",
+   "seconds": 10.68,
+   "engine": "drama3-fp8",
+   "spoken": "À partir de maintenant, vous payez. Si vous avez des crédits, vous payez chaque goutte, même sous trente-cinq pour cent. Je vous crédite cinq cents crédits, allez-y, faites le plein."
+  },
+  "fr/i0_tut_price": {
+   "text": "Le prix du carburant change régulièrement, comme dans la vraie vie. Regardez l’affichage en haut, ou la pompe. Pendant la formation, il reste fixe désormais.",
+   "seconds": 8.41,
+   "engine": "drama3-fp8",
+   "spoken": "Le prix du carburant change régulièrement, comme dans la vraie vie. Regardez l’affichage en haut, ou la pompe. Pendant la formation, il reste fixe désormais."
+  },
+  "fr/i0_tut_landing": {
+   "text": "Passons à l’atterrissage. Lent et à plat, tout va bien. Plus vite, votre taxi s’abîme, et trop vite, il est détruit d’un coup. Les dégâts vous coûtent des réparations en fin de niveau.",
+   "seconds": 11.61,
+   "engine": "drama3-fp8",
+   "spoken": "Passons à l’atterrissage. Lent et à plat, tout va bien. Plus vite, votre taxi s’abîme, et trop vite, il est détruit d’un coup. Les dégâts vous coûtent des réparations en fin de niveau."
+  },
+  "fr/i0_tut_hard": {
+   "text": "Essayez : plongez à pleine puissance et posez-vous si fort que le taxi soit détruit.",
+   "seconds": 4.83,
+   "engine": "drama3-fp8",
+   "spoken": "Essayez : plongez à pleine puissance et posez-vous si fort que le taxi soit détruit."
+  },
+  "fr/i0_tut_crash": {
+   "text": "Aïe, mais pas d’inquiétude. Vous aurez bientôt un nouveau taxi.",
+   "seconds": 3.25,
+   "engine": "drama3-fp8",
+   "spoken": "Aïe, mais pas d’inquiétude. Vous aurez bientôt un nouveau taxi."
+  },
+  "fr/i0_tut_crash_ok": {
+   "text": "Détruit ! Un taxi de moins. Si vous aviez eu un passager à bord, il serait perdu maintenant.",
+   "seconds": 6.59,
+   "engine": "drama3-fp8",
+   "spoken": "Détruit ! Un taxi de moins. Si vous aviez eu un passager à bord, il serait perdu maintenant."
+  },
+  "fr/i0_tut_soft": {
+   "text": "Maintenant, posez-vous en douceur sur la plateforme 3. Les deux patins doivent être sur la plaque claire.",
+   "seconds": 6.18,
+   "engine": "drama3-fp8",
+   "spoken": "Maintenant, posez-vous en douceur sur la plateforme trois. Les deux patins doivent être sur la plaque claire."
+  },
+  "fr/i0_tut_soft_ok": {
+   "text": "Merveilleusement doux ! Des atterrissages doux et à plat à la suite vous rapportent un bonus sur la course.",
+   "seconds": 6.92,
+   "engine": "drama3-fp8",
+   "spoken": "Merveilleusement doux ! Des atterrissages doux et à plat à la suite vous rapportent un bonus sur la course."
+  },
+  "fr/i0_tut_soft_meh": {
+   "text": "Ça a marché, mais ce n’était pas encore doux. Plus vous touchez lentement, mieux c’est. Des atterrissages doux et à plat à la suite rapportent un bonus.",
+   "seconds": 8.73,
+   "engine": "drama3-fp8",
+   "spoken": "Ça a marché, mais ce n’était pas encore doux. Plus vous touchez lentement, mieux c’est. Des atterrissages doux et à plat à la suite rapportent un bonus."
+  },
+  "fr/i0_tut_job": {
+   "text": "Au travail ! Mika attend à la plateforme 2. L’étoile au-dessus d’elle indique une passagère obligatoire. Une fois tous les passagers obligatoires livrés, la porte en haut au centre s’ouvre. Posez-vous près de Mika et attendez qu’elle monte.",
+   "seconds": 15.88,
+   "engine": "drama3-fp8",
+   "spoken": "Au travail ! Mika attend à la plateforme deux. L’étoile au-dessus d’elle indique une passagère obligatoire. Une fois tous les passagers obligatoires livrés, la porte en haut au centre s’ouvre. Posez-vous près de Mika et attendez qu’elle monte."
+  },
+  "fr/i0_tut_main_again": {
+   "text": "Mika n’est pas arrivée. Elle attend de nouveau à la plateforme 2. Prenez-la et amenez-la à bon port cette fois.",
+   "seconds": 6.64,
+   "engine": "drama3-fp8",
+   "spoken": "Mika n’est pas arrivée. Elle attend de nouveau à la plateforme deux. Prenez-la et amenez-la à bon port cette fois."
+  },
+  "fr/i0_tut_pay": {
+   "text": "Conduisez-la à la plateforme 3. Plus vous êtes rapide, plus elle paie. Le montant en bas à droite diminue. Des atterrissages doux à la suite donnent un bonus.",
+   "seconds": 10.91,
+   "engine": "drama3-fp8",
+   "spoken": "Conduisez-la à la plateforme trois. Plus vous êtes rapide, plus elle paie. Le montant en bas à droite diminue. Des atterrissages doux à la suite donnent un bonus."
+  },
+  "fr/i0_tut_delivered": {
+   "text": "Votre premier gain. Bravo !",
+   "seconds": 2.18,
+   "engine": "drama3-fp8",
+   "spoken": "Votre premier gain. Bravo !"
+  },
+  "fr/i0_tut_extra": {
+   "text": "En plus des passagers obligatoires, des passagers facultatifs appellent aussi. Les transporter est libre, mais ça rapporte ! Votre taxi n’a qu’une place, et les clients n’attendent pas éternellement. Allez-y et prenez le client.",
+   "seconds": 14.72,
+   "engine": "drama3-fp8",
+   "spoken": "En plus des passagers obligatoires, des passagers facultatifs appellent aussi. Les transporter est libre, mais ça rapporte ! Votre taxi n’a qu’une place, et les clients n’attendent pas éternellement. Allez-y et prenez le client."
+  },
+  "fr/i0_tut_extra_dest": {
+   "text": "La destination du client est maintenant éclairée. Conduisez-le là-bas.",
+   "seconds": 4.13,
+   "engine": "drama3-fp8",
+   "spoken": "La destination du client est maintenant éclairée. Conduisez-le là-bas."
+  },
+  "fr/i0_tut_extra2": {
+   "text": "Encore un appel radio ! Cet enquiquineur de la plateforme 3 râle depuis le début et sait évidemment tout mieux. Allez le chercher.",
+   "seconds": 7.38,
+   "engine": "drama3-fp8",
+   "spoken": "Encore un appel radio ! Cet enquiquineur de la plateforme trois râle depuis le début et sait évidemment tout mieux. Allez le chercher."
+  },
+  "fr/i0_tut_extra2_again": {
+   "text": "Le client est parti. Un nouveau attend à la plateforme 3.",
+   "seconds": 3.53,
+   "engine": "drama3-fp8",
+   "spoken": "Le client est parti. Un nouveau attend à la plateforme trois."
+  },
+  "fr/i0_tut_eject": {
+   "text": "Et les plaintes commencent déjà : trop vite, trop secoué, trop cher. C’est à ça que sert la touche d’éjection : E au clavier, Y à la manette. Si le taxi est au sol, le client atterrit en douceur et ronchonne. De très haut, il n’y survivra pas. Pour les passagers obligatoires, cela coûte aussi une pénalité. Pour fêter ça : éjectez-le maintenant !",
+   "seconds": 22.94,
+   "engine": "drama3-fp8",
+   "spoken": "Et les plaintes commencent déjà : trop vite, trop secoué, trop cher. C’est à ça que sert la touche d’éjection : E au clavier, Y à la manette. Si le taxi est au sol, le client atterrit en douceur et ronchonne. De très haut, il n’y survivra pas. Pour les passagers obligatoires, cela coûte aussi une pénalité. Pour fêter ça : éjectez-le maintenant !"
+  },
+  "fr/i0_tut_eject_again": {
+   "text": "Stop, ce client, il ne faut pas le livrer mais l’éjecter ! Voici le suivant. Prenez-le et éjectez-le avec E, ou Y à la manette.",
+   "seconds": 9.01,
+   "engine": "drama3-fp8",
+   "spoken": "Stop, ce client, il ne faut pas le livrer mais l’éjecter ! Voici le suivant. Prenez-le et éjectez-le avec E, ou Y à la manette."
+  },
+  "fr/i0_tut_eject_ok": {
+   "text": "Le calme à bord, et la note n’en souffre qu’un peu. Retenez : éjecter ne rapporte rien, mais c’est parfois plus rentable.",
+   "seconds": 8.22,
+   "engine": "drama3-fp8",
+   "spoken": "Le calme à bord, et la note n’en souffre qu’un peu. Retenez : éjecter ne rapporte rien, mais c’est parfois plus rentable."
+  },
+  "fr/i0_tut_life": {
+   "text": "La plateforme rose est une station de taxis. Tous les niveaux n’en ont pas ! Posé ici, vous pouvez acheter un taxi pour 1000 crédits, 5 au maximum. Je vous donne des crédits, achetez maintenant un taxi.",
+   "seconds": 13.42,
+   "engine": "drama3-fp8",
+   "spoken": "La plateforme rose est une station de taxis. Tous les niveaux n’en ont pas ! Posé ici, vous pouvez acheter un taxi pour mille crédits, cinq au maximum. Je vous donne des crédits, achetez maintenant un taxi."
+  },
+  "fr/i0_tut_exit": {
+   "text": "Enfin, Odo attend à la plateforme un. Il veut aller à la sortie. Avec le dernier passager obligatoire à bord, passez la porte en haut avec lui.",
+   "seconds": 8.96,
+   "engine": "drama3-fp8",
+   "spoken": "Enfin, Odo attend à la plateforme un. Il veut aller à la sortie. Avec le dernier passager obligatoire à bord, passez la porte en haut avec lui."
+  },
+  "fr/i0_tut_countdown": {
+   "text": "Surveillez le chrono sous la porte ! Dès que le dernier passager obligatoire apparaît, le compte à rebours démarre. À zéro, vous quittez le niveau automatiquement, le passager est perdu et vous payez une pénalité. Ici, à l’école, rien ne se passe, mais quand votre passager s’impatiente, dépêchez-vous.",
+   "seconds": 19.04,
+   "engine": "drama3-fp8",
+   "spoken": "Surveillez le chrono sous la porte ! Dès que le dernier passager obligatoire apparaît, le compte à rebours démarre. À zéro, vous quittez le niveau automatiquement, le passager est perdu et vous payez une pénalité. Ici, à l’école, rien ne se passe, mais quand votre passager s’impatiente, dépêchez-vous."
+  },
+  "fr/i0_tut_gate": {
+   "text": "La porte est ouverte. Passez-la !",
+   "seconds": 2.18,
+   "engine": "drama3-fp8",
+   "spoken": "La porte est ouverte. Passez-la !"
+  },
+  "fr/i0_tut_done": {
+   "text": "Terminé ! Vous êtes prêt pour le service. Bonne chance là-dehors, Taxi 7.",
+   "seconds": 5.15,
+   "engine": "drama3-fp8",
+   "spoken": "Terminé ! Vous êtes prêt pour le service. Bonne chance là-dehors, Taxi sept."
+  },
+  "fr/i0_tut_fast_1": {
+   "text": "Ah, vous apprenez plus vite que je n’explique. Très bien. On continue.",
+   "seconds": 4.55,
+   "engine": "drama3-fp8",
+   "spoken": "Ah, vous apprenez plus vite que je n’explique. Très bien. On continue."
+  },
+  "fr/i0_tut_fast_2": {
+   "text": "Attendez, c’est déjà fait ? Bravo ! Alors on enchaîne.",
+   "seconds": 4.1,
+   "engine": "drama3-fp8",
+   "spoken": "Attendez, c’est déjà fait ? Bravo ! Alors on enchaîne."
+  },
+  "fr/i0_tut_fast_3": {
+   "text": "Oh, déjà réussi ! Je parle sans doute trop. On continue.",
+   "seconds": 4.55,
+   "engine": "drama3-fp8",
+   "spoken": "Oh, déjà réussi ! Je parle sans doute trop. On continue."
+  },
+  "es/i0_tut_welcome": {
+   "text": "¡Bienvenido a la escuela de vuelo, Taxi 7! Te explicaré todo lo necesario para recoger a tus pasajeros y llevarlos sanos y salvos a su destino.",
+   "seconds": 10.22,
+   "engine": "drama3-fp8",
+   "spoken": "¡Bienvenido a la escuela de vuelo, Taxi siete! Te explicaré todo lo necesario para recoger a tus pasajeros y llevarlos sanos y salvos a su destino."
+  },
+  "es/i0_tut_hud_fuel": {
+   "text": "Arriba a la izquierda ves el combustible. Cada maniobra gasta. Si se vacía, pierdes un taxi.",
+   "seconds": 7.01,
+   "engine": "drama3-fp8",
+   "spoken": "Arriba a la izquierda ves el combustible. Cada maniobra gasta. Si se vacía, pierdes un taxi."
+  },
+  "es/i0_tut_hud_hull": {
+   "text": "Al lado está el casco. Si chocas, se daña. Con 0, tu taxi queda destruido.",
+   "seconds": 5.99,
+   "engine": "drama3-fp8",
+   "spoken": "Al lado está el casco. Si chocas, se daña. Con cero, tu taxi queda destruido."
+  },
+  "es/i0_tut_hud_money": {
+   "text": "Después vienen tus créditos y tus taxis. Nunca puedes tener más de 5 taxis.",
+   "seconds": 5.39,
+   "engine": "drama3-fp8",
+   "spoken": "Después vienen tus créditos y tus taxis. Nunca puedes tener más de cinco taxis."
+  },
+  "es/i0_tut_hud_level": {
+   "text": "A la derecha de la puerta ves el nivel actual. Al lado, los pasajeros obligatorios entregados y el total.",
+   "seconds": 7.2,
+   "engine": "drama3-fp8",
+   "spoken": "A la derecha de la puerta ves el nivel actual. Al lado, los pasajeros obligatorios entregados y el total."
+  },
+  "es/i0_tut_hud_price": {
+   "text": "Los precios del combustible varían, seguro que lo sabes. Reposta cuando el precio esté bajo.",
+   "seconds": 5.48,
+   "engine": "drama3-fp8",
+   "spoken": "Los precios del combustible varían, seguro que lo sabes. Reposta cuando el precio esté bajo."
+  },
+  "es/i0_tut_hud_gauge": {
+   "text": "A la derecha del todo está el indicador de aterrizaje: descenso, velocidad lateral e inclinación. Si todas las barras quedan bajo la marca blanca, aterrizas seguro.",
+   "seconds": 11.02,
+   "engine": "drama3-fp8",
+   "spoken": "A la derecha del todo está el indicador de aterrizaje: descenso, velocidad lateral e inclinación. Si todas las barras quedan bajo la marca blanca, aterrizas seguro."
+  },
+  "es/i0_tut_gear_in": {
+   "text": "Para recoger el tren, pulsa el botón A del mando o la barra espaciadora. Recogido, tu taxi vuela rápido; fuera, lento y preciso.",
+   "seconds": 10.31,
+   "engine": "drama3-fp8",
+   "spoken": "Para recoger el tren, pulsa el botón A del mando o la barra espaciadora. Recogido, tu taxi vuela rápido; fuera, lento y preciso."
+  },
+  "es/i0_tut_fly": {
+   "text": "¡Vamos! Dirige con el stick izquierdo o con W, A, S y D. Atraviesa los círculos verdes en el sentido de las agujas del reloj.",
+   "seconds": 8.78,
+   "engine": "drama3-fp8",
+   "spoken": "¡Vamos! Dirige con el stick izquierdo o con W, A, S y D. Atraviesa los círculos verdes en el sentido de las agujas del reloj."
+  },
+  "es/i0_tut_fly_ok": {
+   "text": "¡Muy bien! La gravedad tira de ti hacia abajo sin parar, y el empuje gasta combustible. Intenta planear.",
+   "seconds": 7.99,
+   "engine": "drama3-fp8",
+   "spoken": "¡Muy bien! La gravedad tira de ti hacia abajo sin parar, y el empuje gasta combustible. Intenta planear."
+  },
+  "es/i0_tut_gear": {
+   "text": "Antes de cada aterrizaje, vuelve a sacar el tren: así el taxi vuela lento y preciso. ¡Pruébalo!",
+   "seconds": 7.48,
+   "engine": "drama3-fp8",
+   "spoken": "Antes de cada aterrizaje, vuelve a sacar el tren: así el taxi vuela lento y preciso. ¡Pruébalo!"
+  },
+  "es/i0_tut_fuel_low": {
+   "text": "¡Oh, no! ¡El depósito está casi vacío! Vuela a la gasolinera, la plataforma naranja con el surtidor, y aterriza.",
+   "seconds": 8.36,
+   "engine": "drama3-fp8",
+   "spoken": "¡Oh, no! ¡El depósito está casi vacío! Vuela a la gasolinera, la plataforma naranja con el surtidor, y aterriza."
+  },
+  "es/i0_tut_refuel": {
+   "text": "Mientras estés aquí, repostas. El combustible cuesta créditos. Solo si no puedes pagar, es gratis hasta el 35 por ciento, y ahora mismo estás sin blanca. Cuidado con el surtidor: si lo embistes, el gasolinero se enfada y sube los precios. ¡Evítalo, hazme caso!",
+   "seconds": 18.62,
+   "engine": "drama3-fp8",
+   "spoken": "Mientras estés aquí, repostas. El combustible cuesta créditos. Solo si no puedes pagar, es gratis hasta el treinta y cinco por ciento, y ahora mismo estás sin blanca. Cuidado con el surtidor: si lo embistes, el gasolinero se enfada y sube los precios. ¡Evítalo, hazme caso!"
+  },
+  "es/i0_tut_pump_fix": {
+   "text": "¡El surtidor está destrozado! Lo mando reparar ahora mismo, pero por favor no lo vuelvas a tocar.",
+   "seconds": 5.62,
+   "engine": "drama3-fp8",
+   "spoken": "¡El surtidor está destrozado! Lo mando reparar ahora mismo, pero por favor no lo vuelvas a tocar."
+  },
+  "es/i0_tut_credit": {
+   "text": "A partir de ahora pagas tú. Si tienes créditos, pagas cada gota, incluso por debajo del 35 por ciento. Te ingreso 500 créditos, adelante, reposta.",
+   "seconds": 12.17,
+   "engine": "drama3-fp8",
+   "spoken": "A partir de ahora pagas tú. Si tienes créditos, pagas cada gota, incluso por debajo del treinta y cinco por ciento. Te ingreso quinientos créditos, adelante, reposta."
+  },
+  "es/i0_tut_price": {
+   "text": "El precio del combustible cambia a menudo, como en la vida real. Mira el indicador de arriba, o el surtidor. Durante la formación ahora se queda fijo.",
+   "seconds": 8.87,
+   "engine": "drama3-fp8",
+   "spoken": "El precio del combustible cambia a menudo, como en la vida real. Mira el indicador de arriba, o el surtidor. Durante la formación ahora se queda fijo."
+  },
+  "es/i0_tut_landing": {
+   "text": "Ahora, el aterrizaje. Si aterrizas lento y nivelado, todo bien. Más rápido, tu taxi se daña, y a demasiada velocidad queda destruido al instante. Los daños te cuestan reparaciones al final del nivel.",
+   "seconds": 14.54,
+   "engine": "drama3-fp8",
+   "spoken": "Ahora, el aterrizaje. Si aterrizas lento y nivelado, todo bien. Más rápido, tu taxi se daña, y a demasiada velocidad queda destruido al instante. Los daños te cuestan reparaciones al final del nivel."
+  },
+  "es/i0_tut_hard": {
+   "text": "Pruébalo: lánzate a toda potencia y aterriza tan fuerte que el taxi quede destruido.",
+   "seconds": 6.78,
+   "engine": "drama3-fp8",
+   "spoken": "Pruébalo: lánzate a toda potencia y aterriza tan fuerte que el taxi quede destruido."
+  },
+  "es/i0_tut_crash": {
+   "text": "Ay, pero tranquilo. Pronto tendrás un taxi nuevo.",
+   "seconds": 3.34,
+   "engine": "drama3-fp8",
+   "spoken": "Ay, pero tranquilo. Pronto tendrás un taxi nuevo."
+  },
+  "es/i0_tut_crash_ok": {
+   "text": "¡Destruido! Un taxi menos. Si hubieras llevado un pasajero, ahora estaría perdido.",
+   "seconds": 6.22,
+   "engine": "drama3-fp8",
+   "spoken": "¡Destruido! Un taxi menos. Si hubieras llevado un pasajero, ahora estaría perdido."
+  },
+  "es/i0_tut_soft": {
+   "text": "Ahora aterriza suavemente en la plataforma 3. Los dos patines deben quedar sobre la placa clara.",
+   "seconds": 6.73,
+   "engine": "drama3-fp8",
+   "spoken": "Ahora aterriza suavemente en la plataforma tres. Los dos patines deben quedar sobre la placa clara."
+  },
+  "es/i0_tut_soft_ok": {
+   "text": "¡Maravillosamente suave! Aterrizajes suaves y nivelados seguidos te dan un bonus en la tarifa.",
+   "seconds": 6.78,
+   "engine": "drama3-fp8",
+   "spoken": "¡Maravillosamente suave! Aterrizajes suaves y nivelados seguidos te dan un bonus en la tarifa."
+  },
+  "es/i0_tut_soft_meh": {
+   "text": "Funcionó, pero aún no fue suave. Cuanto más despacio toques, mejor. Aterrizajes suaves y nivelados seguidos dan un bonus.",
+   "seconds": 8.54,
+   "engine": "drama3-fp8",
+   "spoken": "Funcionó, pero aún no fue suave. Cuanto más despacio toques, mejor. Aterrizajes suaves y nivelados seguidos dan un bonus."
+  },
+  "es/i0_tut_job": {
+   "text": "¡Al trabajo! Mika espera en la plataforma 2. La estrella sobre ella indica que es pasajera obligatoria. Cuando entregues a todos los obligatorios de un nivel, se abre la puerta de arriba en el centro. Aterriza junto a Mika y espera a que suba.",
+   "seconds": 17.65,
+   "engine": "drama3-fp8",
+   "spoken": "¡Al trabajo! Mika espera en la plataforma dos. La estrella sobre ella indica que es pasajera obligatoria. Cuando entregues a todos los obligatorios de un nivel, se abre la puerta de arriba en el centro. Aterriza junto a Mika y espera a que suba."
+  },
+  "es/i0_tut_main_again": {
+   "text": "Mika no llegó. Vuelve a esperar en la plataforma 2. Recógela y llévala sana y salva esta vez.",
+   "seconds": 6.97,
+   "engine": "drama3-fp8",
+   "spoken": "Mika no llegó. Vuelve a esperar en la plataforma dos. Recógela y llévala sana y salva esta vez."
+  },
+  "es/i0_tut_pay": {
+   "text": "Llévala a la plataforma 3. Cuanto más rápido, más paga. La cifra de abajo a la derecha va bajando. Aterrizajes suaves seguidos dan un bonus.",
+   "seconds": 10.36,
+   "engine": "drama3-fp8",
+   "spoken": "Llévala a la plataforma tres. Cuanto más rápido, más paga. La cifra de abajo a la derecha va bajando. Aterrizajes suaves seguidos dan un bonus."
+  },
+  "es/i0_tut_delivered": {
+   "text": "Tus primeros ingresos. ¡Bien hecho!",
+   "seconds": 2.93,
+   "engine": "drama3-fp8",
+   "spoken": "Tus primeros ingresos. ¡Bien hecho!"
+  },
+  "es/i0_tut_extra": {
+   "text": "Además de los obligatorios, también llaman pasajeros opcionales. Llevarlos es voluntario, ¡pero da dinero! Tu taxi solo tiene un asiento, y los clientes no esperan para siempre. Vuela hasta allí y recoge al cliente.",
+   "seconds": 13.56,
+   "engine": "drama3-fp8",
+   "spoken": "Además de los obligatorios, también llaman pasajeros opcionales. Llevarlos es voluntario, ¡pero da dinero! Tu taxi solo tiene un asiento, y los clientes no esperan para siempre. Vuela hasta allí y recoge al cliente."
+  },
+  "es/i0_tut_extra_dest": {
+   "text": "El destino del cliente ya está iluminado. Llévalo allí.",
+   "seconds": 3.67,
+   "engine": "drama3-fp8",
+   "spoken": "El destino del cliente ya está iluminado. Llévalo allí."
+  },
+  "es/i0_tut_extra2": {
+   "text": "¡Otra llamada por radio! Ese pesado de la plataforma 3 lleva todo el rato quejándose y, claro, lo sabe todo mejor. Ve a recogerlo.",
+   "seconds": 8.87,
+   "engine": "drama3-fp8",
+   "spoken": "¡Otra llamada por radio! Ese pesado de la plataforma tres lleva todo el rato quejándose y, claro, lo sabe todo mejor. Ve a recogerlo."
+  },
+  "es/i0_tut_extra2_again": {
+   "text": "El cliente se ha ido. Uno nuevo espera en la plataforma 3.",
+   "seconds": 3.67,
+   "engine": "drama3-fp8",
+   "spoken": "El cliente se ha ido. Uno nuevo espera en la plataforma tres."
+  },
+  "es/i0_tut_eject": {
+   "text": "Y ya empiezan las quejas: demasiado rápido, demasiado movido, demasiado caro. Para eso está la tecla de expulsar: E en el teclado, Y en el mando. Si el taxi está en el suelo, el cliente cae suave y solo refunfuña. Desde muy alto, no sobrevivirá. Con pasajeros obligatorios, además cuesta una multa. Para celebrar el día: ¡échalo ahora!",
+   "seconds": 25.4,
+   "engine": "drama3-fp8",
+   "spoken": "Y ya empiezan las quejas: demasiado rápido, demasiado movido, demasiado caro. Para eso está la tecla de expulsar: E en el teclado, Y en el mando. Si el taxi está en el suelo, el cliente cae suave y solo refunfuña. Desde muy alto, no sobrevivirá. Con pasajeros obligatorios, además cuesta una multa. Para celebrar el día: ¡échalo ahora!"
+  },
+  "es/i0_tut_eject_again": {
+   "text": "¡Alto, a este cliente no hay que entregarlo, hay que echarlo! Aquí viene el siguiente. Recógelo y échalo con E, o Y en el mando.",
+   "seconds": 9.57,
+   "engine": "drama3-fp8",
+   "spoken": "¡Alto, a este cliente no hay que entregarlo, hay que echarlo! Aquí viene el siguiente. Recógelo y échalo con E, o Y en el mando."
+  },
+  "es/i0_tut_eject_ok": {
+   "text": "Paz a bordo, y la valoración apenas se resiente. Recuerda: echar a alguien no da dinero, pero a veces compensa más.",
+   "seconds": 7.8,
+   "engine": "drama3-fp8",
+   "spoken": "Paz a bordo, y la valoración apenas se resiente. Recuerda: echar a alguien no da dinero, pero a veces compensa más."
+  },
+  "es/i0_tut_life": {
+   "text": "La plataforma rosa es una estación de taxis. ¡No todos los niveles la tienen! Si aterrizas aquí, puedes comprar un taxi por 1000 créditos, 5 como máximo. Te doy créditos, compra ahora otro taxi.",
+   "seconds": 13.42,
+   "engine": "drama3-fp8",
+   "spoken": "La plataforma rosa es una estación de taxis. ¡No todos los niveles la tienen! Si aterrizas aquí, puedes comprar un taxi por mil créditos, cinco como máximo. Te doy créditos, compra ahora otro taxi."
+  },
+  "es/i0_tut_exit": {
+   "text": "Por último, Odo espera en la plataforma uno. Quiere ir a la salida. Con el último pasajero obligatorio a bordo, cruza con él la puerta de arriba.",
+   "seconds": 9.94,
+   "engine": "drama3-fp8",
+   "spoken": "Por último, Odo espera en la plataforma uno. Quiere ir a la salida. Con el último pasajero obligatorio a bordo, cruza con él la puerta de arriba."
+  },
+  "es/i0_tut_countdown": {
+   "text": "¡Atento al reloj bajo la puerta! En cuanto aparece el último pasajero obligatorio, empieza la cuenta atrás. Si llega a cero, sales del nivel automáticamente, pierdes al pasajero y pagas una multa. En la escuela no pasa nada, pero cuando tu pasajero se impaciente, date prisa.",
+   "seconds": 16.44,
+   "engine": "drama3-fp8",
+   "spoken": "¡Atento al reloj bajo la puerta! En cuanto aparece el último pasajero obligatorio, empieza la cuenta atrás. Si llega a cero, sales del nivel automáticamente, pierdes al pasajero y pagas una multa. En la escuela no pasa nada, pero cuando tu pasajero se impaciente, date prisa."
+  },
+  "es/i0_tut_gate": {
+   "text": "La puerta está abierta. ¡Crúzala!",
+   "seconds": 2.69,
+   "engine": "drama3-fp8",
+   "spoken": "La puerta está abierta. ¡Crúzala!"
+  },
+  "es/i0_tut_done": {
+   "text": "¡Listo! Estás preparado para el servicio. Buena suerte ahí fuera, Taxi 7.",
+   "seconds": 4.92,
+   "engine": "drama3-fp8",
+   "spoken": "¡Listo! Estás preparado para el servicio. Buena suerte ahí fuera, Taxi siete."
+  },
+  "es/i0_tut_fast_1": {
+   "text": "Ah, aprendes más rápido de lo que puedo explicar. Muy bien. Sigamos.",
+   "seconds": 5.67,
+   "engine": "drama3-fp8",
+   "spoken": "Ah, aprendes más rápido de lo que puedo explicar. Muy bien. Sigamos."
+  },
+  "es/i0_tut_fast_2": {
+   "text": "Un momento, ¿ya lo has hecho? ¡Impresionante! Pues seguimos.",
+   "seconds": 4.92,
+   "engine": "drama3-fp8",
+   "spoken": "Un momento, ¿ya lo has hecho? ¡Impresionante! Pues seguimos."
+  },
+  "es/i0_tut_fast_3": {
+   "text": "¡Oh, ya está! Creo que hablo demasiado. Adelante.",
+   "seconds": 4.13,
+   "engine": "drama3-fp8",
+   "spoken": "¡Oh, ya está! Creo que hablo demasiado. Adelante."
+  },
+  "de/i0_tut_fast_1": {
+   "text": "Ah, du lernst schneller, als ich erklären kann. Sehr gut. Dann weiter.",
+   "seconds": 6.55,
+   "engine": "drama3-fp8",
+   "spoken": "Ah, du lernst schneller, als ich erklären kann. Sehr gut. Dann weiter."
+  },
+  "de/i0_tut_fast_2": {
+   "text": "Moment, das hast du schon erledigt? Respekt! Dann machen wir gleich weiter.",
+   "seconds": 6.01,
+   "engine": "drama3-fp8",
+   "spoken": "Moment, das hast du schon erledigt? Respekt! Dann machen wir gleich weiter."
+  },
+  "de/i0_tut_fast_3": {
+   "text": "Oh, schon geschafft! Ich rede wohl zu viel. Weiter geht's.",
+   "seconds": 4.41,
+   "engine": "drama3-fp8",
+   "spoken": "Oh, schon geschafft! Ich rede wohl zu viel. Weiter geht's."
+  },
+  "en/i0_tut_fast_1": {
+   "text": "Ah, you learn faster than I can explain. Very good. Let's move on.",
+   "seconds": 5.11,
+   "engine": "drama3-fp8",
+   "spoken": "Ah, you learn faster than I can explain. Very good. Let's move on."
+  },
+  "en/i0_tut_fast_2": {
+   "text": "Wait, you already did that? Impressive! Then let's keep going.",
+   "seconds": 6.18,
+   "engine": "drama3-fp8",
+   "spoken": "Wait, you already did that? Impressive! Then let's keep going."
+  },
+  "en/i0_tut_fast_3": {
+   "text": "Oh, done already! I guess I talk too much. Moving on.",
+   "seconds": 4.46,
+   "engine": "drama3-fp8",
+   "spoken": "Oh, done already! I guess I talk too much. Moving on."
+  },
+  "fr/f2_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_thanks": {
+   "text": "Merci !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_hard": {
+   "text": "Aïe !",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/f2_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_thanks": {
+   "text": "Merci !",
+   "seconds": 0.71,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.51,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_hard": {
+   "text": "Aïe !",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/f3_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_thanks": {
+   "text": "Merci !",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_hard": {
+   "text": "Aïe !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "fr/f4_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_thanks": {
+   "text": "Merci !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.41,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_hard": {
+   "text": "Aïe !",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "fr/f5_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_thanks": {
+   "text": "Merci !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_hard": {
+   "text": "Aïe !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/f6_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_call": {
+   "text": "Hé, taxi !",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_thanks": {
+   "text": "Merci !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.51,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_hard": {
+   "text": "Aïe !",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 3.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "fr/m2_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_thanks": {
+   "text": "Merci !",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.56,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.38,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.87,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.59,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.51,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_hard": {
+   "text": "Aïe !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 1.23,
+   "engine": "drama3-fp8"
+  },
+  "fr/m3_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_thanks": {
+   "text": "Merci !",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.7,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.33,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.33,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.34,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_hard": {
+   "text": "Aïe !",
+   "seconds": 0.65,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "fr/m4_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.42,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_thanks": {
+   "text": "Merci !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_hard": {
+   "text": "Aïe !",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "fr/m5_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_call": {
+   "text": "Hé, taxi !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_7": {
+   "text": "Plateforme sept, s’il vous plaît !",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_hurry_3": {
+   "text": "On n’a presque plus de temps !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_thanks": {
+   "text": "Merci !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_angry": {
+   "text": "Hé, espèce d’idiot !",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_exit": {
+   "text": "À la sortie, s’il vous plaît !",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_H": {
+   "text": "À l’hôpital, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_1": {
+   "text": "Plateforme un, s’il vous plaît !",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_2": {
+   "text": "Plateforme deux, s’il vous plaît !",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_3": {
+   "text": "Plateforme trois, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_4": {
+   "text": "Plateforme quatre, s’il vous plaît !",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_5": {
+   "text": "Plateforme cinq, s’il vous plaît !",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_6": {
+   "text": "Plateforme six, s’il vous plaît !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_8": {
+   "text": "Plateforme huit, s’il vous plaît !",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_dest_9": {
+   "text": "Plateforme neuf, s’il vous plaît !",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_soft": {
+   "text": "Waouh, en douceur !",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_hard": {
+   "text": "Aïe !",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_bored": {
+   "text": "Trop lent, je m’en vais !",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_wrong_pad": {
+   "text": "Ce n’est pas la bonne plateforme !",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_bumpy": {
+   "text": "Doucement, s’il vous plaît !",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_hurry_1": {
+   "text": "Dépêchez-vous !",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "fr/m6_hurry_2": {
+   "text": "Plus vite, s’il vous plaît !",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 2.23,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "es/f2_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 1.02,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/f3_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 2.23,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 2.28,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "es/f4_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.79,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f5_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.93,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.84,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.48,
+   "engine": "drama3-fp8"
+  },
+  "es/f6_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.66,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 2.04,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.68,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "es/m2_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 0.98,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 2.09,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_hard": {
+   "text": "¡Ay!",
+   "seconds": 1.38,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m3_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.21,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.38,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 2.14,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.74,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.53,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.44,
+   "engine": "drama3-fp8"
+  },
+  "es/m4_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.16,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 0.7,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.25,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 2.0,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.67,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.3,
+   "engine": "drama3-fp8"
+  },
+  "es/m5_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.11,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_call": {
+   "text": "¡Eh, taxi!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_thanks": {
+   "text": "¡Gracias!",
+   "seconds": 1.07,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_angry": {
+   "text": "¡Oye, idiota!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_exit": {
+   "text": "¡A la salida, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_H": {
+   "text": "¡Al hospital, por favor!",
+   "seconds": 1.35,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_1": {
+   "text": "¡A la plataforma uno, por favor!",
+   "seconds": 1.81,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_2": {
+   "text": "¡A la plataforma dos, por favor!",
+   "seconds": 1.63,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_3": {
+   "text": "¡A la plataforma tres, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_4": {
+   "text": "¡A la plataforma cuatro, por favor!",
+   "seconds": 2.18,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_5": {
+   "text": "¡A la plataforma cinco, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_6": {
+   "text": "¡A la plataforma seis, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_7": {
+   "text": "¡A la plataforma siete, por favor!",
+   "seconds": 1.86,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_8": {
+   "text": "¡A la plataforma ocho, por favor!",
+   "seconds": 1.76,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_dest_9": {
+   "text": "¡A la plataforma nueve, por favor!",
+   "seconds": 1.95,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_soft": {
+   "text": "¡Guau, qué suave!",
+   "seconds": 1.72,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_hard": {
+   "text": "¡Ay!",
+   "seconds": 0.6,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_bored": {
+   "text": "¡Qué lento, me largo!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_wrong_pad": {
+   "text": "¡Esa no es la plataforma!",
+   "seconds": 1.9,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_bumpy": {
+   "text": "¡Con cuidado, por favor!",
+   "seconds": 1.49,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_hurry_1": {
+   "text": "¡Date prisa!",
+   "seconds": 0.88,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_hurry_2": {
+   "text": "¡Más rápido, por favor!",
+   "seconds": 1.58,
+   "engine": "drama3-fp8"
+  },
+  "es/m6_hurry_3": {
+   "text": "¡Se nos acaba el tiempo!",
+   "seconds": 1.39,
+   "engine": "drama3-fp8"
   }
  },
  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
@@ -4886,6 +9402,62 @@
   },
   "en/i0": {
    "instruct": "A man in his mid-thirties with a deep, calm, warm baritone voice, relaxed and friendly, casual delivery. Native English speaker with a neutral accent.",
+   "seed": 303
+  },
+  "fr/f0": {
+   "instruct": "Une jeune femme à la voix claire, chaleureuse et joyeuse, tessiture moyenne, détendue et aimable. Locutrice native française, accent standard de France.",
+   "seed": 101
+  },
+  "fr/f1": {
+   "instruct": "Une femme d’environ trente-cinq ans à la voix un peu plus grave, calme et assurée, avec un humour pince-sans-rire. Locutrice native française, accent standard de France.",
+   "seed": 202
+  },
+  "fr/m0": {
+   "instruct": "Un homme d’environ trente-cinq ans à la voix de baryton grave, calme et chaleureuse, détendu et aimable. Locuteur natif français, accent standard de France.",
+   "seed": 303
+  },
+  "fr/m1": {
+   "instruct": "Un homme âgé à la voix grave, chaleureuse et légèrement rauque, posé et bienveillant. Locuteur natif français, accent standard de France.",
+   "seed": 404
+  },
+  "fr/t0": {
+   "instruct": "Un vieux pompiste à la voix grave et rauque, bougon mais bon enfant, qui parle avec beaucoup d’insistance. Locuteur natif français, accent standard de France.",
+   "seed": 505
+  },
+  "fr/d0": {
+   "instruct": "Une régulatrice d’une quarantaine d’années à la voix calme, maîtrisée, légèrement ironique, à la diction claire, comme à la radio. Locutrice native française, accent standard de France.",
+   "seed": 606
+  },
+  "fr/i0": {
+   "instruct": "Un homme d’environ trente-cinq ans à la voix de baryton grave, calme et chaleureuse, détendu et aimable. Locuteur natif français, accent standard de France.",
+   "seed": 303
+  },
+  "es/f0": {
+   "instruct": "Una mujer joven con voz clara, cálida y alegre, tono medio, desenfadada y amable. Hablante nativa de español de España, acento castellano neutro.",
+   "seed": 101
+  },
+  "es/f1": {
+   "instruct": "Una mujer de unos treinta y cinco años con voz algo más grave, tranquila y segura, con un humor seco. Hablante nativa de español de España, acento castellano neutro.",
+   "seed": 202
+  },
+  "es/m0": {
+   "instruct": "Un hombre de unos treinta y cinco años con voz de barítono grave, tranquila y cálida, relajado y amable. Hablante nativo de español de España, acento castellano neutro.",
+   "seed": 303
+  },
+  "es/m1": {
+   "instruct": "Un hombre mayor con voz grave, cálida y algo ronca, sereno y bondadoso. Hablante nativo de español de España, acento castellano neutro.",
+   "seed": 404
+  },
+  "es/t0": {
+   "instruct": "Un gasolinero mayor con voz grave y ronca, gruñón pero bonachón, que habla con mucho énfasis. Hablante nativo de español de España, acento castellano neutro.",
+   "seed": 505
+  },
+  "es/d0": {
+   "instruct": "Una operadora de radio de unos cuarenta años con voz tranquila, serena, algo irónica y dicción clara, como por radio. Hablante nativa de español de España, acento castellano neutro.",
+   "seed": 606
+  },
+  "es/i0": {
+   "instruct": "Un hombre de unos treinta y cinco años con voz de barítono grave, tranquila y cálida, relajado y amable. Hablante nativo de español de España, acento castellano neutro.",
    "seed": 303
   }
  },

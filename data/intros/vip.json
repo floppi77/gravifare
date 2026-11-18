@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "VIP-Fahrgast",
-  "en": "VIP passenger"
+  "en": "VIP passenger",
+  "fr": "Passager VIP",
+  "es": "Pasajero VIP"
  },
  "map": [
   "########################################",
@@ -56,7 +58,9 @@
   ],
   "title": {
    "de": "VIP-Fahrgast",
-   "en": "VIP passenger"
+   "en": "VIP passenger",
+   "fr": "Passager VIP",
+   "es": "Pasajero VIP"
   }
  }
 }

@@ -8,6 +8,7 @@ var paused := false
 var gear_on := false
 var restart_timer := 0.0
 var assist: Node2D
+const AchToast := preload("res://src/ui/ach_toast.gd")
 const RESTART_CONFIRM_MS := 2000
 var restart_armed_until := 0           # Zeitpunkt (ms), bis zu dem ein zweiter Neustart-Druck gilt
 var cam_off := Vector2.ZERO
@@ -49,6 +50,14 @@ var ambient: Node2D = null
 var level_style: Node2D = null         # Optik einzelner Level (Neon, Glas), siehe level_style.gd
 var entry_carry := {}                  # Ausgangs-Fahrgast, der in diesem Level ausgestiegen ist (für den Neustart)
 var autopilot: Bot = null
+# Bestflug ansehen (Flow.watch): der gespeicherte Lauf fliegt im echten Spiel nach. Run/TaxiSim sind deterministisch, also genügen die
+# Eingaben je Tick; ein Absturz wird wie im Original nach der Absturzpause neu gestartet, Rauswerfen kommt aus den Ereignissen. Zählt nichts.
+var watching := false
+var watch_ri := 0                  # Eintrag in den lauflängenkodierten Eingaben
+var watch_rk := 0                  # Tick innerhalb dieses Eintrags
+var watch_ev := 0                  # nächstes Ereignis (Rauswerfen/Neustart)
+var watch_tick := 0                # Ticks im laufenden Zustand, wie Replay.ticks bei der Aufnahme
+var watch_done_t := -1.0           # nach dem Ende: Sekunden bis zur Rückkehr in die Levelauswahl
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
 
 func _ready() -> void:
@@ -115,6 +124,19 @@ func _ready() -> void:
 		if ag.begins_with("--debug-hit="):          # Dev: nach einer halben Sekunde N Hülle abziehen (Nachlauf der Hüllenanzeige ansehen)
 			var hit_amount := float(ag.substr(12))
 			get_tree().create_timer(0.5).timeout.connect(func(): run.sim.hull = maxf(1.0, run.sim.hull - hit_amount))
+	for ua4 in OS.get_cmdline_user_args():
+		if ua4.begins_with("--inputs="):                # Dev: Eingabefolge „x,y,fahrwerk,ticks;…“ (z. B. Flugschule: echter Absturz, Landung)
+			for part in ua4.substr(9).split(";"):
+				var q := part.split(",")
+				if q.size() == 4:
+					for i in int(q[3]):
+						script_inputs.append({"v": Vector2(float(q[0]), float(q[1])), "g": q[2] == "1"})
+	for ua3 in OS.get_cmdline_user_args():
+		if ua3.begins_with("--debug-destroy-at="):      # Dev: Taxi nach N Sekunden zerstören (z. B. Flugschule: Absturz mitten in der Erklärung)
+			get_tree().create_timer(float(ua3.substr(19))).timeout.connect(func():
+				run.sim.hull = 0.0
+				run.sim.state = TaxiSim.State.DESTROYED
+				run.pending_log.append({"type": "destroyed"}))
 	if OS.get_cmdline_user_args().has("--debug-destroy"):     # Dev: Taxi sofort zerstören (Leben-/Game-Over-Anzeige)
 		run.sim.hull = 0.0
 		run.sim.state = TaxiSim.State.DESTROYED
@@ -222,14 +244,33 @@ func load_level(path: String) -> void:
 		lvl.jobs = Daily.jobs_for(lvl, Flow.daily_date)
 		run.patience_k = DayShift.patience_k(Flow.daily_rule)
 		run.fuel_cap = DayShift.fuel_cap(Flow.daily_rule)
-	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, Flow.run_seed + lvl.number * 7919)
+	watching = not Flow.watch.is_empty()
+	var run_seed := Flow.run_seed + lvl.number * 7919
+	run.rules = Run.RULES
+	if watching:                                   # Bestflug: Startwerte, Regelstand und Taxi des aufgezeichneten Laufs
+		var wd: Dictionary = Flow.watch
+		run.rules = int(wd.get("rules", Replay.LEGACY_RULES))
+		run.extras_enabled = bool(wd.get("extras", true))
+		run_seed = int(wd.get("seed", run_seed))
+		Flow.lives = int(wd.get("lives", Tuning.START_LIVES))
+		Flow.entry_fuel = float(wd.get("fuel", -1.0))
+		Flow.entry_credits = float(wd.get("credits", 0.0))
+		watch_ri = 0
+		watch_rk = 0
+		watch_ev = 0
+		watch_tick = 0
+		watch_done_t = -1.0
+	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, run_seed)
 	run.lives = Flow.lives
 	var mods := Workshop.mods_for({}) if Flow.daily or Flow.community else Workshop.mods(Save.data)      # Tagschicht und Community-Level: Serientaxi, damit Ergebnisse vergleichbar sind
 	if Flow.daily:
 		mods = DayShift.mods(Flow.daily_rule, mods)
+	if watching:
+		mods = Flow.watch.get("mods", {})
 	run.sim.apply_mods(mods)
 	replay = Replay.new()
-	replay.begin(lvl.id, Flow.run_seed + lvl.number * 7919, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
+	replay.begin(lvl.id, run_seed, Flow.entry_fuel, Flow.entry_credits, Flow.carry_passenger, run.extras_enabled)
+	replay.lives = Flow.lives
 	replay.mods = mods
 	replay.sig = Replay.sig_of(lvl)
 	Music.play_theme(Music.theme_for_level(lvl.number))
@@ -292,7 +333,7 @@ func _setup_ghost(lvl: LevelData) -> void:
 		ghost.set_script(load("res://src/game/ghost_view.gd"))
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
-	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
+	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or watching or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	if best.has("sig") and String(best.sig) != Replay.sig_of(lvl):
 		best = {}                        # das Level wurde nach diesem Lauf geändert
 	var trace: Array = best.get("trace", [])
@@ -453,7 +494,7 @@ func _focus_tick(_delta: float) -> void:
 		return
 	if focus_on:
 		var acted := run.sim.state != TaxiSim.State.LANDED or run.sim.gear_cmd != focus_gear or Controls.thrust_vector().length() > 0.1 \
-			or debug_input != Vector2.INF or autopilot != null or run.result != Run.Result.RUNNING or trans_t >= 0.0
+			or debug_input != Vector2.INF or autopilot != null or watching or run.result != Run.Result.RUNNING or trans_t >= 0.0
 		if acted:
 			focus_on = false
 			spot.set_spots([])
@@ -605,9 +646,9 @@ func _open_briefing() -> void:
 		hud.flash_message(tr("MSG_DAILY") % [Flow.daily_date, tr("DAY_RULE_" + Flow.daily_rule), tr("DAY_GOAL_" + Flow.daily_goal)], 6.0)
 		return
 	var lang := TranslationServer.get_locale().substr(0, 2)
-	var lname: String = run.level.names.get(lang, run.level.id)
+	var lname: String = run.level.display_name(lang)
 	var stats: Dictionary = Save.data.stats
-	hud.brief = {"rule": Flow.daily_rule, "goal": Flow.daily_goal, "sub": "Level %d · %s · %s" % [run.level.number, lname, NightShift.format_stamp(Flow.daily_date, 12, 0, lang).split(",")[0]],
+	hud.brief = {"rule": Flow.daily_rule, "goal": Flow.daily_goal, "sub": (tr("LVL_NUM") + " · %s · %s") % [run.level.number, lname, NightShift.format_stamp(Flow.daily_date, 12, 0, lang).split(",")[0]],
 		"target": run.time_target(), "streak": Daily.current_streak(stats, Flow.daily_date), "reward": DayShift.next_reward(stats, Save.data.get("unlocked", [])),
 		"ghost": not Replay.load_day(Save.slot, Flow.daily_date).is_empty() and Settings.values.ghost}
 	hud.briefing = true
@@ -621,7 +662,19 @@ func _start_after_briefing() -> void:
 	hud.flash_message(tr("MSG_DAILY") % [Flow.daily_date, tr("DAY_RULE_" + Flow.daily_rule), tr("DAY_GOAL_" + Flow.daily_goal)], 6.0)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F6 and (Save.debug or not Cosmetics.taxi_3d):
+		get_viewport().set_input_as_handled()       # Debug (Vergleich): F6 schaltet das Taxi direkt zwischen Mischform und bisherigem 2D um
+		Cosmetics.taxi_3d = not Cosmetics.taxi_3d
+		hud.flash_message(tr("DEBUG_TAXI3D") % ("3D" if Cosmetics.taxi_3d else "2D") + "  [F6]", 1.6)
+		return
 	if bay != null:
+		return
+	if watching:                                  # Bestflug: keine Steuerung; B/Esc/Start (nach dem Ende auch A/Enter) zurück zur Levelauswahl
+		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel") or (completion_saved and event.is_action_pressed("ui_accept")):
+			get_viewport().set_input_as_handled()
+			Flow.to_menu()
+		elif event is InputEventKey or event is InputEventJoypadButton:
+			get_viewport().set_input_as_handled()
 		return
 	if briefing:
 		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and hud.brief_btn.has_point(hud.event_pos(event))):
@@ -724,6 +777,10 @@ func _physics_process(_delta: float) -> void:
 	if tutorial != null and tutorial.locked:
 		v = Vector2.ZERO                       # Tutorial: erst erklären, dann fliegen
 		gear_on = run.sim.gear_cmd             # … und das Fahrwerk bleibt, wie es ist
+	if watching:
+		var wc := _watch_input()
+		v = wc[0]
+		gear_on = wc[1]
 	if not script_inputs.is_empty():
 		var cmd: Dictionary = script_inputs.pop_front()
 		v = cmd.v
@@ -754,7 +811,8 @@ func _physics_process(_delta: float) -> void:
 	taxi.sync_state()
 	assist.sync_state()
 	if run.result == Run.Result.RUNNING:
-		Haptics.thrust(_thrust_rumble())
+		if not watching:
+			Haptics.thrust(_thrust_rumble())
 		_check_near_miss()
 		_music_tick()
 		_hint_tick()
@@ -771,6 +829,14 @@ func _physics_process(_delta: float) -> void:
 		completion_saved = true
 		Sfx.set_thrust(0.0, 0.0)
 		tutorial.complete()
+	if run.result == Run.Result.COMPLETE and not completion_saved and watching:
+		completion_saved = true                   # Bestflug angesehen: nichts zählt, kurz die Zeit zeigen, dann zurück in die Levelauswahl
+		Sfx.set_thrust(0.0, 0.0)
+		hud.flash_message(tr("WATCH_DONE") % run.level_time, 4.0)
+		if Array(OS.get_cmdline_user_args()).any(func(x): return String(x).begins_with("--watch-file=")):
+			print("watch done: %.3f s, ¢%.2f, %d befördert (Aufzeichnung: %.3f s, ¢%.2f, %d)" % [run.level_time, run.money, run.delivered,
+				float(Flow.watch.result.get("time", -1.0)), float(Flow.watch.result.get("money", -1.0)), int(Flow.watch.result.get("delivered", -1))])
+		watch_done_t = 3.5
 	if run.result == Run.Result.COMPLETE and not completion_saved:
 		completion_saved = true
 		Save.note_max("best_streak", run.best_streak)
@@ -829,9 +895,10 @@ func _physics_process(_delta: float) -> void:
 		if counted and not Save.dev_session:
 			Replay.save_if_best(replay.to_dict(), Save.slot)
 		var fresh := _check_unlocks()
+		AchToast.flush(get_tree())                  # neu erreichte Erfolge: Banner über der Ergebnisansicht
 		if hud.result.has("day"):
 			var dd: Dictionary = hud.result["day"]
-			dd["fresh"] = fresh.map(func(it): return String(it.name.get(TranslationServer.get_locale().substr(0, 2), it.id)))
+			dd["fresh"] = fresh.map(func(it): return Loc.pick(it.name, TranslationServer.get_locale().substr(0, 2), it.id))
 			dd["reward"] = DayShift.next_reward(Save.data.stats, Save.data.get("unlocked", []))
 		Sfx.set_thrust(0.0, 0.0)
 		if Flow.next_level_id() == "":
@@ -897,6 +964,27 @@ func _field_feedback() -> void:
 			elif z.kind == "gravity":
 				key = "MSG_FIELD_HEAVY" if float(z.g) > 1.0 else "MSG_FIELD_LIGHT"
 		hud.flash_message(tr(key), 1.6)
+
+## Bestflug: Eingabe dieses Ticks aus der Aufzeichnung ([Schub, Fahrwerk]). Nur im laufenden Zustand rückt sie weiter – genau wie
+## Replay.add bei der Aufnahme; davor fallen die Ereignisse dieses Ticks (Rauswerfen; Neustarts nach Absturz macht das Spiel selbst).
+func _watch_input() -> Array:
+	if run.result != Run.Result.RUNNING:
+		return [Vector2.ZERO, gear_on]
+	var evs: Array = Flow.watch.get("events", [])
+	while watch_ev < evs.size() and int(evs[watch_ev][0]) <= watch_tick:
+		if int(evs[watch_ev][0]) == watch_tick and String(evs[watch_ev][1]) == "eject":
+			run.eject()
+		watch_ev += 1
+	var runs: Array = Flow.watch.get("runs", [])
+	if watch_ri >= runs.size():
+		return [Vector2.ZERO, gear_on]
+	var e: Array = runs[watch_ri]
+	watch_rk += 1
+	if watch_rk >= int(e[0]):
+		watch_ri += 1
+		watch_rk = 0
+	watch_tick += 1
+	return [Vector2(float(e[1]) / 127.0, float(e[2]) / 127.0), int(e[3]) == 1]
 
 func _lose_life() -> void:
 	## Taxi zerstört: ein Leben weniger; keins mehr = Game Over. Sonst läuft das Level weiter (nichts wird neu gestartet):
@@ -968,7 +1056,7 @@ func _music_tick() -> void:
 var _hint_ticks := 0
 func _hint_tick() -> void:
 	_hint_ticks += 1
-	if _hint_ticks % 30 != 0 or not Settings.values.hints or paused or trans_t >= 0.0 or run.level.tutorial:
+	if _hint_ticks % 30 != 0 or not Settings.values.hints or watching or paused or trans_t >= 0.0 or run.level.tutorial:
 		return
 	var s := run.sim
 	var dev := Controls.last_device
@@ -1068,7 +1156,7 @@ func _check_unlocks() -> Array:
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	var fresh: Array = Cosmetics.check_unlocks()
 	for it in fresh:
-		hud.flash_message(tr("MSG_UNLOCK") % it.name.get(lang, it.id), 4.0)
+		hud.flash_message(tr("MSG_UNLOCK") % Loc.pick(it.name, lang, it.id), 4.0)
 		Sfx.play("exit", -4.0)
 	return fresh
 
@@ -1334,6 +1422,11 @@ func _on_event(e: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Levelwechsel
 func _process(delta: float) -> void:
+	if watch_done_t >= 0.0:
+		watch_done_t -= delta
+		if watch_done_t < 0.0:
+			Flow.to_menu()
+			return
 	_clip_tick(delta)
 	_focus_tick(delta)
 	if run.result == Run.Result.RUNNING and not paused and not briefing and trans_t < 0.0:
@@ -1419,7 +1512,7 @@ func _begin_transition() -> void:
 	var lang := TranslationServer.get_locale().substr(0, 2)
 	trans.sector = nl.sector                    # Hintergrund des Zielsektors
 	trans.title_sector = tr("TRANS_SECTOR") % [nl.sector, tr("SECTOR_%d" % nl.sector)]
-	trans.title_level = tr("TRANS_LEVEL") % [(nl.sector - 1) * 11 + nl.index, nl.names.get(lang, nl.id)]
+	trans.title_level = tr("TRANS_LEVEL") % [(nl.sector - 1) * 11 + nl.index, nl.display_name(lang)]
 	trans.info = tr("TRANS_FARES") % int(run.money)
 	if nl.gravity != Tuning.GRAVITY:
 		trans.info += "  ·  " + tr("TRANS_GRAVITY") % (nl.gravity / Tuning.GRAVITY)

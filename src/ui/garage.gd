@@ -101,7 +101,7 @@ func _column(kind: String, x: float, head: String) -> void:
 		if it.kind != kind:
 			continue
 		var unlocked := Cosmetics.is_unlocked(it.id)
-		var nm: String = it.name.get(lang, it.id)
+		var nm: String = Loc.pick(it.name, lang, it.id)
 		var b := Button.new()
 		b.focus_mode = Control.FOCUS_ALL
 		b.custom_minimum_size = Vector2(170, 18)

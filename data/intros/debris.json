@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Trümmer",
-  "en": "Debris"
+  "en": "Debris",
+  "fr": "Débris",
+  "es": "Escombros"
  },
  "map": [
   "########################################",
@@ -78,7 +80,9 @@
   ],
   "title": {
    "de": "Trümmer",
-   "en": "Debris"
+   "en": "Debris",
+   "fr": "Débris",
+   "es": "Escombros"
   }
  }
 }

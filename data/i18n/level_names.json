@@ -1,0 +1,402 @@
+{
+ "S1-01": {
+  "fr": "Premier vol",
+  "es": "Primer vuelo"
+ },
+ "S1-02": {
+  "fr": "Plein d’essence",
+  "es": "Parada para repostar"
+ },
+ "S1-03": {
+  "fr": "La cheminée",
+  "es": "La chimenea"
+ },
+ "S1-04": {
+  "fr": "Terrasses",
+  "es": "Terrazas"
+ },
+ "S1-05": {
+  "fr": "Puits jumeaux",
+  "es": "Pozos gemelos"
+ },
+ "S1-06": {
+  "fr": "As du plein",
+  "es": "As del repostaje"
+ },
+ "S1-07": {
+  "fr": "Périphérique",
+  "es": "Circunvalación"
+ },
+ "S1-08": {
+  "fr": "Sentier d’épines",
+  "es": "Senda de espinas"
+ },
+ "S1-09": {
+  "fr": "Pointes d’aiguille",
+  "es": "Puntas de aguja"
+ },
+ "S1-10": {
+  "fr": "À sec",
+  "es": "Sin gota"
+ },
+ "S1-11": {
+  "fr": "Examen final",
+  "es": "Examen final"
+ },
+ "S2-01": {
+  "fr": "Entrée du canyon",
+  "es": "Boca del cañón"
+ },
+ "S2-02": {
+  "fr": "Avenue néon",
+  "es": "Avenida de neón"
+ },
+ "S2-03": {
+  "fr": "Première écluse",
+  "es": "Primera esclusa"
+ },
+ "S2-04": {
+  "fr": "Portes jumelles",
+  "es": "Puertas gemelas"
+ },
+ "S2-05": {
+  "fr": "Heure de pointe",
+  "es": "Hora punta"
+ },
+ "S2-06": {
+  "fr": "Façade de verre",
+  "es": "Fachada de cristal"
+ },
+ "S2-07": {
+  "fr": "Herse",
+  "es": "Rastrillo"
+ },
+ "S2-08": {
+  "fr": "Labyrinthe néon",
+  "es": "Laberinto de neón"
+ },
+ "S2-09": {
+  "fr": "Sas",
+  "es": "Cámara de esclusa"
+ },
+ "S2-10": {
+  "fr": "Écluses jumelles",
+  "es": "Esclusas gemelas"
+ },
+ "S2-11": {
+  "fr": "Final néon",
+  "es": "Final de neón"
+ },
+ "S3-01": {
+  "fr": "Casse",
+  "es": "Desguace"
+ },
+ "S3-02": {
+  "fr": "Rail de grue",
+  "es": "Vía de la grúa"
+ },
+ "S3-03": {
+  "fr": "Convoyeur",
+  "es": "Cinta transportadora"
+ },
+ "S3-04": {
+  "fr": "Champ de débris",
+  "es": "Campo de escombros"
+ },
+ "S3-05": {
+  "fr": "Course d’urgence",
+  "es": "Carrera de urgencia"
+ },
+ "S3-06": {
+  "fr": "Double navette",
+  "es": "Transbordador doble"
+ },
+ "S3-07": {
+  "fr": "Pluie de météores",
+  "es": "Lluvia de meteoritos"
+ },
+ "S3-08": {
+  "fr": "Ferraille",
+  "es": "Chatarra"
+ },
+ "S3-09": {
+  "fr": "Ceinture médicale",
+  "es": "Cinturón médico"
+ },
+ "S3-10": {
+  "fr": "Presse à ferraille",
+  "es": "Prensa de chatarra"
+ },
+ "S3-11": {
+  "fr": "Gardien de la ceinture",
+  "es": "Guardián del cinturón"
+ },
+ "S4-01": {
+  "fr": "Première bobine",
+  "es": "Primera bobina"
+ },
+ "S4-02": {
+  "fr": "Répulsion",
+  "es": "Repulsión"
+ },
+ "S4-03": {
+  "fr": "Pôles jumeaux",
+  "es": "Polos gemelos"
+ },
+ "S4-04": {
+  "fr": "Battement de cœur",
+  "es": "Latido"
+ },
+ "S4-05": {
+  "fr": "Puits magnétique",
+  "es": "Pozo magnético"
+ },
+ "S4-06": {
+  "fr": "Lignes de champ",
+  "es": "Líneas de campo"
+ },
+ "S4-07": {
+  "fr": "Inversion des pôles",
+  "es": "Cambio de polos"
+ },
+ "S4-08": {
+  "fr": "Dynamo",
+  "es": "Dinamo"
+ },
+ "S4-09": {
+  "fr": "Champ de secours",
+  "es": "Campo de rescate"
+ },
+ "S4-10": {
+  "fr": "Porteurs magnétiques",
+  "es": "Portadores magnéticos"
+ },
+ "S4-11": {
+  "fr": "Maître des aimants",
+  "es": "Maestro de imanes"
+ },
+ "S5-01": {
+  "fr": "Puits de braises",
+  "es": "Pozo de brasas"
+ },
+ "S5-02": {
+  "fr": "Rayon plasma",
+  "es": "Rayo de plasma"
+ },
+ "S5-03": {
+  "fr": "Vague de chaleur",
+  "es": "Ola de calor"
+ },
+ "S5-04": {
+  "fr": "Stimulateur",
+  "es": "Marcapasos"
+ },
+ "S5-05": {
+  "fr": "Haut fourneau",
+  "es": "Alto horno"
+ },
+ "S5-06": {
+  "fr": "Forge solaire",
+  "es": "Forja solar"
+ },
+ "S5-07": {
+  "fr": "Maître forgeron",
+  "es": "Maestro forjador"
+ },
+ "S5-08": {
+  "fr": "Moule de fonte",
+  "es": "Molde de fundición"
+ },
+ "S5-09": {
+  "fr": "Forge à plasma",
+  "es": "Forja de plasma"
+ },
+ "S5-10": {
+  "fr": "Solstice",
+  "es": "Solsticio"
+ },
+ "S5-11": {
+  "fr": "Zénith solaire",
+  "es": "Cénit solar"
+ },
+ "S6-01": {
+  "fr": "Courant de marée",
+  "es": "Corriente de marea"
+ },
+ "S6-02": {
+  "fr": "Apesanteur",
+  "es": "Ingravidez"
+ },
+ "S6-03": {
+  "fr": "Grande marée",
+  "es": "Marea viva"
+ },
+ "S6-04": {
+  "fr": "Reflux",
+  "es": "Bajamar"
+ },
+ "S6-05": {
+  "fr": "Orbite lunaire",
+  "es": "Órbita lunar"
+ },
+ "S6-06": {
+  "fr": "Tourbillon",
+  "es": "Remolino"
+ },
+ "S6-07": {
+  "fr": "Onde de tempête",
+  "es": "Marejada ciclónica"
+ },
+ "S6-08": {
+  "fr": "Maître des marées",
+  "es": "Maestro de mareas"
+ },
+ "S6-09": {
+  "fr": "Attraction orbitale",
+  "es": "Atracción orbital"
+ },
+ "S6-10": {
+  "fr": "Maelström",
+  "es": "Maelstrom"
+ },
+ "S6-11": {
+  "fr": "Monde aquatique",
+  "es": "Mundo acuático"
+ },
+ "S7-01": {
+  "fr": "Navette",
+  "es": "Lanzadera"
+ },
+ "S7-02": {
+  "fr": "Plaque tournante",
+  "es": "Intercambiador"
+ },
+ "S7-03": {
+  "fr": "Relève",
+  "es": "Cambio de turno"
+ },
+ "S7-04": {
+  "fr": "Centre de contrôle",
+  "es": "Centro de control"
+ },
+ "S7-05": {
+  "fr": "Ligne de fret",
+  "es": "Línea de carga"
+ },
+ "S7-06": {
+  "fr": "Ligne express",
+  "es": "Línea exprés"
+ },
+ "S7-07": {
+  "fr": "Anneau de transit",
+  "es": "Anillo de tránsito"
+ },
+ "S7-08": {
+  "fr": "Gare centrale",
+  "es": "Nudo central"
+ },
+ "S7-09": {
+  "fr": "Plaque tournante",
+  "es": "Intercambiador"
+ },
+ "S7-10": {
+  "fr": "Gare de correspondance",
+  "es": "Estación de transbordo"
+ },
+ "S7-11": {
+  "fr": "Plaque tournante",
+  "es": "Intercambiador"
+ },
+ "S8-01": {
+  "fr": "Crépuscule",
+  "es": "Anochecer"
+ },
+ "S8-02": {
+  "fr": "Équipe de nuit",
+  "es": "Turno de noche"
+ },
+ "S8-03": {
+  "fr": "Relèvement",
+  "es": "Rumbo"
+ },
+ "S8-04": {
+  "fr": "Zone d’ombre radio",
+  "es": "Sombra de radio"
+ },
+ "S8-05": {
+  "fr": "Champ de capteurs",
+  "es": "Campo de sensores"
+ },
+ "S8-06": {
+  "fr": "Sans lumière",
+  "es": "Sin luz"
+ },
+ "S8-07": {
+  "fr": "Anneau d’ombre",
+  "es": "Anillo de sombra"
+ },
+ "S8-08": {
+  "fr": "Obscurité",
+  "es": "Oscuridad"
+ },
+ "S8-09": {
+  "fr": "Sondeur",
+  "es": "Ecosonda"
+ },
+ "S8-10": {
+  "fr": "Anneau d’ombre",
+  "es": "Anillo de sombra"
+ },
+ "S8-11": {
+  "fr": "Sondeur",
+  "es": "Ecosonda"
+ },
+ "S9-01": {
+  "fr": "Horizon des événements",
+  "es": "Horizonte de sucesos"
+ },
+ "S9-02": {
+  "fr": "Disque d’accrétion",
+  "es": "Disco de acreción"
+ },
+ "S9-03": {
+  "fr": "Lentille gravitationnelle",
+  "es": "Lente gravitacional"
+ },
+ "S9-04": {
+  "fr": "Dilatation du temps",
+  "es": "Dilatación temporal"
+ },
+ "S9-05": {
+  "fr": "Singularité",
+  "es": "Singularidad"
+ },
+ "S9-06": {
+  "fr": "Anneau de photons",
+  "es": "Anillo de fotones"
+ },
+ "S9-07": {
+  "fr": "Force de marée",
+  "es": "Fuerza de marea"
+ },
+ "S9-08": {
+  "fr": "Onde gravitationnelle",
+  "es": "Onda gravitacional"
+ },
+ "S9-09": {
+  "fr": "Mousse quantique",
+  "es": "Espuma cuántica"
+ },
+ "S9-10": {
+  "fr": "Trou de ver",
+  "es": "Agujero de gusano"
+ },
+ "S9-11": {
+  "fr": "Terminus",
+  "es": "Última parada"
+ },
+ "TUT": {
+  "fr": "École de pilotage",
+  "es": "Escuela de vuelo"
+ }
+}

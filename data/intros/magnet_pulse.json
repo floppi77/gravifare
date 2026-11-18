@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Magnete im Takt",
-  "en": "Pulsing magnets"
+  "en": "Pulsing magnets",
+  "fr": "Aimants pulsés",
+  "es": "Imanes pulsantes"
  },
  "map": [
   "########################################",
@@ -63,7 +65,9 @@
   ],
   "title": {
    "de": "Magnete im Takt",
-   "en": "Pulsing magnets"
+   "en": "Pulsing magnets",
+   "fr": "Aimants pulsés",
+   "es": "Imanes pulsantes"
   }
  }
 }

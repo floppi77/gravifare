@@ -3,7 +3,10 @@ extends Node
 ##   title  Jersey 10   – Pixel-Schrift für Titel und große Überschriften
 ##   hud    Oxanium     – technische Schrift für HUD, Menüs, Schilder
 ##   ui     Nunito      – gut lesbare Schrift für Untertitel und Fließtext
+## Dazu als Ersatzschrift für alle drei: Noto Sans Symbols 2, nur ✕ ○ □ △ (Knopfnamen im PlayStation-Layout).
 ## Fehlt eine Datei, fällt jede Schrift auf die Godot-Standardschrift zurück (Spiel läuft weiter).
+
+const SYMBOLS := "res://assets/fonts/noto_symbols2/NotoSansSymbols2-PadSubset.ttf"   # Teilmenge von Noto Sans Symbols 2 (SIL OFL 1.1)
 
 var title: Font
 var hud: Font
@@ -24,6 +27,10 @@ func _load(path: String, weight: int) -> Font:
 	var base: Font = load(path)
 	if base == null:
 		return ThemeDB.fallback_font
+	if ResourceLoader.exists(SYMBOLS):                  # ✕ ○ □ △ für Knopfnamen im PlayStation-Layout (fehlen in allen drei Schriften)
+		var sym: Font = load(SYMBOLS)
+		if sym != null and not base.fallbacks.has(sym):
+			base.fallbacks = base.fallbacks + [sym]
 	if weight <= 0:
 		return base
 	var fv := FontVariation.new()

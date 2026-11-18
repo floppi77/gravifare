@@ -5,7 +5,9 @@
    "kind": "paint",
    "name": {
 	"de": "Taxi-Gelb",
-	"en": "Taxi Yellow"
+	"en": "Taxi Yellow",
+	"fr": "Jaune taxi",
+	"es": "Amarillo taxi"
    },
    "unlock": null
   },
@@ -14,7 +16,9 @@
    "kind": "paint",
    "name": {
 	"de": "Neon-Magenta",
-	"en": "Neon Magenta"
+	"en": "Neon Magenta",
+	"fr": "Magenta néon",
+	"es": "Magenta neón"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -26,7 +30,9 @@
    "kind": "paint",
    "name": {
 	"de": "Minze",
-	"en": "Mint"
+	"en": "Mint",
+	"fr": "Menthe",
+	"es": "Menta"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -38,7 +44,9 @@
    "kind": "paint",
    "name": {
 	"de": "Nachtblau",
-	"en": "Midnight"
+	"en": "Midnight",
+	"fr": "Bleu nuit",
+	"es": "Azul noche"
    },
    "unlock": {
 	"stat": "perfect_landings",
@@ -50,7 +58,9 @@
    "kind": "paint",
    "name": {
 	"de": "Abendrot",
-	"en": "Sunset"
+	"en": "Sunset",
+	"fr": "Coucher de soleil",
+	"es": "Atardecer"
    },
    "unlock": {
 	"stat": "deliveries",
@@ -62,7 +72,9 @@
    "kind": "paint",
    "name": {
 	"de": "Zuckerguss",
-	"en": "Candy"
+	"en": "Candy",
+	"fr": "Bonbon",
+	"es": "Caramelo"
    },
    "unlock": {
 	"stat": "best_streak",
@@ -74,7 +86,9 @@
    "kind": "paint",
    "name": {
 	"de": "Wespe",
-	"en": "Wasp"
+	"en": "Wasp",
+	"fr": "Guêpe",
+	"es": "Avispa"
    },
    "unlock": {
 	"stat": "crashes",
@@ -86,7 +100,9 @@
    "kind": "paint",
    "name": {
 	"de": "Gold",
-	"en": "Gold"
+	"en": "Gold",
+	"fr": "Or",
+	"es": "Oro"
    },
    "unlock": {
 	"stat": "stars_all",
@@ -98,7 +114,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Kein Aufkleber",
-	"en": "No sticker"
+	"en": "No sticker",
+	"fr": "Sans autocollant",
+	"es": "Sin pegatina"
    },
    "unlock": null
   },
@@ -107,7 +125,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Flamme",
-	"en": "Flame"
+	"en": "Flame",
+	"fr": "Flamme",
+	"es": "Llama"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -119,7 +139,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Stern",
-	"en": "Star"
+	"en": "Star",
+	"fr": "Étoile",
+	"es": "Estrella"
    },
    "unlock": {
 	"stat": "stars_time",
@@ -131,7 +153,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Blitz",
-	"en": "Bolt"
+	"en": "Bolt",
+	"fr": "Éclair",
+	"es": "Rayo"
    },
    "unlock": {
 	"stat": "stars_clean",
@@ -143,7 +167,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Herz",
-	"en": "Heart"
+	"en": "Heart",
+	"fr": "Cœur",
+	"es": "Corazón"
    },
    "unlock": {
 	"stat": "deliveries",
@@ -155,7 +181,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Tankstellenschreck",
-	"en": "Pump Terror"
+	"en": "Pump Terror",
+	"fr": "Terreur des pompes",
+	"es": "Terror de surtidores"
    },
    "unlock": {
 	"stat": "pump_explosions",
@@ -167,7 +195,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Krone",
-	"en": "Crown"
+	"en": "Crown",
+	"fr": "Couronne",
+	"es": "Corona"
    },
    "unlock": {
 	"stat": "stars_pro",
@@ -179,7 +209,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Sonne",
-	"en": "Sun"
+	"en": "Sun",
+	"fr": "Soleil",
+	"es": "Sol"
    },
    "unlock": {
 	"stat": "daily_best_streak",
@@ -191,7 +223,9 @@
    "kind": "paint",
    "name": {
 	"de": "Himmelblau",
-	"en": "Sky Blue"
+	"en": "Sky Blue",
+	"fr": "Bleu ciel",
+	"es": "Azul cielo"
    },
    "unlock": {
 	"stat": "daily_best_streak",
@@ -203,7 +237,9 @@
    "kind": "sticker",
    "name": {
 	"de": "Medaille",
-	"en": "Medal"
+	"en": "Medal",
+	"fr": "Médaille",
+	"es": "Medalla"
    },
    "unlock": {
 	"stat": "day_golds",
@@ -215,7 +251,9 @@
    "kind": "paint",
    "name": {
 	"de": "Platin",
-	"en": "Platinum"
+	"en": "Platinum",
+	"fr": "Platine",
+	"es": "Platino"
    },
    "unlock": {
 	"stat": "daily_best_streak",

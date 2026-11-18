@@ -106,29 +106,31 @@ func _draw() -> void:
 	draw_line(Vector2(344, 16), Vector2(fr.end.x, 16), Color("#3a4580"), 0.67)
 	gauges.draw_fuel(self, GAUGE_FUEL, s.fuel / Tuning.FUEL_MAX, s.fuel_cap / Tuning.FUEL_MAX, run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING)
 	gauges.draw_hull(self, GAUGE_HULL, s.hull / Tuning.HULL_MAX)
-	draw_string(font, Vector2(147, 12), "¢%d" % int(run.money), HORIZONTAL_ALIGNMENT_LEFT, 56, 9, Color("#ffe14a"))
+	_fit_text(font, Vector2(147, 12), "¢%d" % int(run.money), 56.0, Settings.fs(9), Color("#ffe14a"), HORIZONTAL_ALIGNMENT_LEFT)       # Settings.fs: Option „Große Schrift“
 	var life_fr: Dictionary = Cosmetics.life_frame(PixelScale.size_for(self))                          # Runde 72: neues Taxi, 10 × 6 Einheiten in der Pixelgröße des Bildschirms
 	for i in Flow.lives:
 		draw_texture_rect_region(life_fr.tex, Rect2(204 + i * 11, 5, 10, 6), life_fr.src)
 	if run.streak >= 1:
 		var stars := mini(run.streak, Tuning.COMBO_MAX)
-		draw_string(font, Vector2(262, 12), "★%d +%d%%" % [run.streak, int(round(Tuning.COMBO_STEP * stars * 100.0))], HORIZONTAL_ALIGNMENT_LEFT, 34, 8, Color("#ffe14a"))
+		_fit_text(font, Vector2(262, 12), "★%d +%d%%" % [run.streak, int(round(Tuning.COMBO_STEP * stars * 100.0))], 34.0, Settings.fs(8), Color("#ffe14a"), HORIZONTAL_ALIGNMENT_LEFT)
 	if run.level.pads.has("F"):
 		# Spritpreis (springt in zufälligen Abständen, steigt bei Berührung der Zapfsäule)
 		var pf := run.fuel_price()
 		var span := maxf(run.level.fuel_price_max - run.level.fuel_price_min, 0.01)
 		var n := (pf - run.level.fuel_price_min) / span
-		var pcol := Color("#5dff9a") if n < 0.34 else (Color("#ffe14a") if n < 0.67 else Color("#ff6a4a"))
+		var pcol := SignalColors.by_level(n, 0.34, 0.67, Color("#ff6a4a"))
 		var ptxt := tr("HUD_PRICE") % pf
 		if run.station_down():
 			ptxt = tr("HUD_PUMP_DEAD")
-			pcol = Color("#ff4d6d")
+			pcol = SignalColors.bad()
 		if price_flash > 0.0:
 			pcol = pcol.lerp(Color.WHITE, price_flash)
-		draw_string(font, Vector2(494, 12), ptxt, HORIZONTAL_ALIGNMENT_LEFT, 82, 8, pcol)
-	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial else (tr("SHIFT_TAG") + "  " + lname if Flow.shift or result.has("shift") else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname]))), 84.0, 8, Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
-	draw_string(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], HORIZONTAL_ALIGNMENT_RIGHT, 28, 9, Color.WHITE)
+		_fit_text(font, Vector2(494, 12), ptxt, 82.0, Settings.fs(8), pcol, HORIZONTAL_ALIGNMENT_LEFT)
+	var lname: String = run.level.display_name()
+	if not Flow.watch.is_empty():
+		lname = tr("WATCH_TAG") + "  " + lname                  # Bestflug ansehen
+	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial or not Flow.watch.is_empty() else (tr("SHIFT_TAG") + "  " + lname if Flow.shift or result.has("shift") else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname]))), 84.0, Settings.fs(8), Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	_fit_text(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], 28.0, Settings.fs(9), Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei Balken mit gezeichneten Symbolen (weiße Marke = Grenze der sicheren Landung;
 	# darüber gestreift, damit der Zustand auch ohne Farbsehen erkennbar ist)
 	var rows := [s.vel.y / run.sim.land_vy, absf(s.vel.x) / Tuning.LAND_VX, absf(s.tilt) / Tuning.LAND_TILT]
@@ -137,7 +139,7 @@ func _draw() -> void:
 		if gauge_override.size() == rows.size():
 			r = float(gauge_override[i])
 		var ratio: float = clampf(r, 0.0, 2.0)
-		var col := Color("#5dff9a") if ratio <= Tuning.GAUGE_GREEN else (Color("#ffe14a") if ratio <= 1.0 else Color("#ff4d6d"))
+		var col := SignalColors.by_level(ratio, Tuning.GAUGE_GREEN, 1.0)
 		_gauge_row(i, ratio, col)
 	# Countdown des letzten Pflichtfahrgasts: unter dem Tor, ab 10 s rot blinkend
 	if run.exit_countdown > 0.0 and run.result == Run.Result.RUNNING:
@@ -146,7 +148,7 @@ func _draw() -> void:
 		var ccol := Color("#ff4d6d") if (urgent and blink) else (Color("#ffb02e") if urgent else Color("#ffe14a"))
 		draw_rect(Rect2(266, 51, 108, 13), Color(0.05, 0.06, 0.15, 0.85))
 		draw_rect(Rect2(266, 51, 108, 13), ccol, false, 0.8)
-		draw_string(font, Vector2(266, 61), tr("HUD_EXIT_TIMER") % int(ceilf(cd)), HORIZONTAL_ALIGNMENT_CENTER, 108, 9, ccol)
+		_fit_text(font, Vector2(266, 61), tr("HUD_EXIT_TIMER") % int(ceilf(cd)), 108.0, mini(Settings.fs(9), 11), ccol, HORIZONTAL_ALIGNMENT_CENTER)
 	# ---------------- unterer Streifen: Auftrag (oben) und Hinweise/Untertitel (unten)
 	var job := run.current_job()
 	var txt := ""
@@ -170,30 +172,38 @@ func _draw() -> void:
 	if txt != "":
 		draw_rect(Rect2(2, BOT_Y, 636, 13), Color(0.05, 0.06, 0.15, 0.9))
 		draw_rect(Rect2(2, BOT_Y, 636, 13), Color("#3a4580"), false, 0.67)
-		draw_string(font, Vector2(8, BOT_Y + 10), txt, HORIZONTAL_ALIGNMENT_LEFT, 440, 10, Color("#6fe8f0") if not ex_aboard.is_empty() else Color("#ffe14a"))
+		_fit_text(font, Vector2(8, BOT_Y + 10), txt, 440.0, mini(Settings.fs(10), 12), Color("#6fe8f0") if not ex_aboard.is_empty() else Color("#ffe14a"), HORIZONTAL_ALIGNMENT_LEFT)
 		if not ex_aboard.is_empty() and run.result == Run.Result.RUNNING:
 			var fe := run.extra_factor(ex_aboard)
-			var fce := Color("#5dff9a") if fe > 1.05 else (Color("#ffe14a") if fe > 0.8 else Color("#ff8a5a"))
-			draw_string(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % fe) + "  ¢%d" % int(round(run.extra_prospect(ex_aboard))), HORIZONTAL_ALIGNMENT_RIGHT, 182, 10, fce)
+			var fce := SignalColors.by_level(-fe, -1.05, -0.8, Color("#ff8a5a"))
+			_fit_text(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % fe) + "  ¢%d" % int(round(run.extra_prospect(ex_aboard))), 182.0, mini(Settings.fs(10), 12), fce, HORIZONTAL_ALIGNMENT_RIGHT)
 		elif run.actor != null and run.result == Run.Result.RUNNING:
 			var f := run.live_factor()
-			var fc := Color("#5dff9a") if f > 1.05 else (Color("#ffe14a") if f > 0.8 else Color("#ff8a5a"))
-			draw_string(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), HORIZONTAL_ALIGNMENT_RIGHT, 182, 10, fc)
+			var fc := SignalColors.by_level(-f, -1.05, -0.8, Color("#ff8a5a"))
+			_fit_text(font, Vector2(450, BOT_Y + 10), (tr("HUD_FACTOR") % f) + "  ¢%d" % int(round(run.prospect())), 182.0, mini(Settings.fs(10), 12), fc, HORIZONTAL_ALIGNMENT_RIGHT)
 	var row_b := BOT_Y + 21.0
 	draw_rect(Rect2(2, BOT_Y + 14.0, 636, 9.0), Color(0.05, 0.06, 0.15, 0.78))      # Unterlage: die Zeile bleibt auf jedem Hintergrund lesbar
 	# Untere Zeile: links Steuerungshinweis (bzw. gesprochener Untertitel/Hinweis), rechts alle Meldungen des Spiels
-	if sub_t > 0.0:
+	var large: bool = Settings.values.text_large
+	if sub_t > 0.0 and large:
+		_big_caption("%s: %s" % [sub_speaker, sub_text], Color(1, 1, 1, clampf(sub_t / 0.4, 0.0, 1.0)))
+	elif hint_t > 0.0 and hint_text != "" and large:
+		_big_caption(hint_text, Color(0.8, 1.0, 0.95, clampf(hint_t / 0.5, 0.0, 1.0)))
+	if sub_t > 0.0 and not large:
 		var line := "%s: %s" % [sub_speaker, sub_text]
 		var a := clampf(sub_t / 0.4, 0.0, 1.0)
 		_fit_text(Fonts.ui, Vector2(8, row_b), line, 330.0, 8, Color(1, 1, 1, a), HORIZONTAL_ALIGNMENT_LEFT)
-	elif hint_t > 0.0 and hint_text != "":
+	elif hint_t > 0.0 and hint_text != "" and not large:
 		var ha := clampf(hint_t / 0.5, 0.0, 1.0)
 		_fit_text(Fonts.ui, Vector2(8, row_b), hint_text, 330.0, 8, Color(0.8, 1.0, 0.95, ha), HORIZONTAL_ALIGNMENT_LEFT)
+	elif not Flow.watch.is_empty():
+		var wk := Controls.pad_name("B") if Controls.last_device == "gamepad" else "Esc"
+		_fit_text(font, Vector2(8, row_b), tr("WATCH_HINT") % wk, 330.0, Settings.fs(8), Color("#9fe6ff"), HORIZONTAL_ALIGNMENT_LEFT)
 	else:
-		draw_string(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), HORIZONTAL_ALIGNMENT_LEFT, 330, 7, Color("#b4bcea"))
+		_fit_text(font, Vector2(8, row_b), Controls.hint_text(Controls.last_device), 330.0, Settings.fs(7), Color("#b4bcea"), HORIZONTAL_ALIGNMENT_LEFT)
 	if message_t > 0.0:
 		var ma := clampf(message_t / 0.4, 0.0, 1.0)
-		_fit_text(font, Vector2(340, row_b), message, 296.0, 9, Color(1.0, 0.95, 0.7, ma), HORIZONTAL_ALIGNMENT_RIGHT)
+		_fit_text(font, Vector2(340, row_b), message, 296.0, mini(Settings.fs(9), 11), Color(1.0, 0.95, 0.7, ma), HORIZONTAL_ALIGNMENT_RIGHT)
 	elif not ex_aboard.is_empty() and not job.is_empty():     # Erinnerung an die Pflicht, solange ein Zusatzfahrgast mitfährt
 		var rem := tr("HUD_MAIN_WAITING") % [job.get("passenger", "?"), job.get("to", "") if run.phase == Run.Phase.CARRYING else job.get("from", "")]
 		_fit_text(font, Vector2(340, row_b), rem, 296.0, 8, Color("#ffd24a"), HORIZONTAL_ALIGNMENT_RIGHT)
@@ -255,6 +265,42 @@ func _gauge_row(i: int, ratio: float, col: Color) -> void:
 		x += 1.34
 		k += 1
 	draw_rect(Rect2(gx + half - 0.67, gy - 0.67, 1.34, h + 1.34), Color.WHITE)
+
+## Option „Große Schrift“: Untertitel und Hinweise stehen nicht in der schmalen unteren Zeile, sondern in einem Kasten mit großer Schrift
+## knapp über dem unteren HUD-Streifen (bis zu drei Zeilen, mittig).
+func _big_caption(text: String, col: Color) -> void:
+	var f := Fonts.ui
+	var sz := Settings.fs(9)
+	var w := 560.0
+	var lines := _wrap_lines(f, text, w - 16.0, sz)
+	while lines.size() > 3 and sz > 9:
+		sz -= 1
+		lines = _wrap_lines(f, text, w - 16.0, sz)
+	var lh := float(sz) + 3.0
+	var h := 6.0 + lh * float(lines.size())
+	var x := (size.x - w) * 0.5
+	var y := BOT_Y - 3.0 - h
+	if run.sim.pos.y > run.level.pixel_size().y * 0.55:
+		y = 19.0                                   # Taxi in der unteren Hälfte: Kasten oben, damit er Plattformen unten nicht verdeckt
+	draw_rect(Rect2(x, y, w, h), Color(0.04, 0.06, 0.16, 0.82 * col.a))
+	draw_rect(Rect2(x, y, w, 1.0), Color(1.0, 0.88, 0.58, 0.55 * col.a))
+	for i in lines.size():
+		draw_string(f, Vector2(x + 8.0, y + 2.0 + lh * float(i + 1) - 2.0), lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 16.0, sz, col)
+
+## Zeilenumbruch nach Pixelbreite.
+func _wrap_lines(f: Font, text: String, width: float, sz: int) -> Array:
+	var out: Array = []
+	var line := ""
+	for word in text.split(" "):
+		var cand := word if line == "" else line + " " + word
+		if f.get_string_size(cand, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width and line != "":
+			out.append(line)
+			line = word
+		else:
+			line = cand
+	if line != "":
+		out.append(line)
+	return out
 
 ## Text, der in `width` passen muss: Schriftgröße schrumpft bis 6 px, damit nichts abgeschnitten wird oder überläuft.
 func _fit_text(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color, align: int) -> void:
@@ -318,8 +364,8 @@ func _draw_result() -> void:
 	draw_rect(_full_rect(), Color(0.0, 0.0, 0.03, 0.6))                        # Spielbild abdunkeln (bis zum Fensterrand, auch Ultrawide)
 	_shift_panel(px, py, pw, ph, 38.0, Color(0.08, 0.2, 0.19, 1.0) if counted else Color(0.26, 0.14, 0.08, 1.0), accent)
 	draw_string(font, Vector2(px, py + 20.0), tr("HUD_COMPLETE") if counted else tr("RES_NOT_COUNTED"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, accent)
-	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	_fit_text(ui, Vector2(px + 12.0, py + 33.0), (tr("COMMUNITY_TAG") + " · " + lname if Flow.community else "Level %d · %s" % [run.level.number, lname]), pw - 24.0, 10, Color("#c9cfee"), HORIZONTAL_ALIGNMENT_CENTER)
+	var lname: String = run.level.display_name()
+	_fit_text(ui, Vector2(px + 12.0, py + 33.0), (tr("COMMUNITY_TAG") + " · " + lname if Flow.community else (tr("LVL_NUM") + " · %s") % [run.level.number, lname]), pw - 24.0, 10, Color("#c9cfee"), HORIZONTAL_ALIGNMENT_CENTER)
 	var ix := px + 12.0                                                          # Innenrand
 	var iw := pw - 24.0
 	# ---- Medaillen: drei gleich breite Karten
@@ -350,7 +396,7 @@ func _draw_result() -> void:
 	var tw := kw - 20.0
 	draw_string(ui, Vector2(tl, ky + 13.0), tr("RES_H_TIME"), HORIZONTAL_ALIGNMENT_LEFT, tw, 8, head_col)
 	var t_ok := Run.time_ok(float(result.time), float(result.target))      # wie die Medaille: ganze Sekunden, wie angezeigt
-	var tcol := Color("#5dff9a") if t_ok else Color("#ff9a7a")
+	var tcol := SignalColors.good() if t_ok else SignalColors.bad(Color("#ff9a7a"))
 	draw_string(font, Vector2(tl, ky + 37.0), "%d s" % int(result.time), HORIZONTAL_ALIGNMENT_LEFT, tw, 20, tcol)
 	draw_string(ui, Vector2(tl, ky + 36.0), tr("RES_TARGET") % int(result.target), HORIZONTAL_ALIGNMENT_RIGHT, tw, 9, Color("#a9b8ff"))      # Zeitziel neben der Zeit
 	var bar_y := ky + 46.0
@@ -388,7 +434,7 @@ func _draw_result() -> void:
 	draw_rect(Rect2(al, ky + 70.0, aw, 1.0), Color("#3a4580"))
 	var net := float(result.get("net", 0.0))
 	draw_string(ui, Vector2(al, ky + 82.0), tr("RES_NET_ROW"), HORIZONTAL_ALIGNMENT_LEFT, aw - 70.0, 9, Color("#d8e0ff"))
-	draw_string(font, Vector2(al, ky + 83.0), "%s¢%d" % ["+" if net >= 0.0 else "−", int(absf(net))], HORIZONTAL_ALIGNMENT_RIGHT, aw, 13, Color("#5dff9a") if net >= 0.0 else Color("#ff6a4a"))
+	draw_string(font, Vector2(al, ky + 83.0), "%s¢%d" % ["+" if net >= 0.0 else "−", int(absf(net))], HORIZONTAL_ALIGNMENT_RIGHT, aw, 13, SignalColors.good() if net >= 0.0 else SignalColors.bad(Color("#ff6a4a")))
 	# ---- Fußband: Kontostand links, Punkte rechts
 	var by := ky + kh + 8.0
 	var bh := 28.0
@@ -487,9 +533,9 @@ func _draw_shift_summary(fin: Dictionary, aborted: bool) -> void:
 			draw_string(ui, Vector2(px + 18.0, yy), "%d   –" % (i + 1), HORIZONTAL_ALIGNMENT_LEFT, 230.0, 9, Color("#4a5280"))
 			continue
 		var r: Dictionary = results[i]
-		var nm := String((r.get("names", {}) as Dictionary).get(lang, r.get("id", "")))
+		var nm := Loc.pick(r.get("names", {}), lang, String(r.get("id", "")))
 		draw_string(ui, Vector2(px + 18.0, yy), "%d" % (i + 1), HORIZONTAL_ALIGNMENT_LEFT, 14.0, 9, Color("#7c86bb"))
-		draw_string(ui, Vector2(px + 34.0, yy), "Level %d · %s" % [int(r.get("number", 0)), nm], HORIZONTAL_ALIGNMENT_LEFT, 200.0, 9, Color("#d8e0ff"))
+		draw_string(ui, Vector2(px + 34.0, yy), (tr("LVL_NUM") + " · %s") % [int(r.get("number", 0)), nm], HORIZONTAL_ALIGNMENT_LEFT, 200.0, 9, Color("#d8e0ff"))
 		draw_string(ui, Vector2(tx - 50.0, yy), NightShift.format_time(float(r.get("time", 0.0))), HORIZONTAL_ALIGNMENT_RIGHT, 50.0, 9, Color("#9aa6dd"))
 		var cells := [float(r.wait) * NightShift.W_WAIT, float(r.landing) * NightShift.W_LANDING, float(r.hull) * NightShift.W_HULL, float(r.bonus), float(r.score)]
 		for k in cells.size():
@@ -545,13 +591,14 @@ func _draw_shot_button(px: float, py: float, pw: float, ph: float, blink: float,
 	var kind := "kb" if Controls.last_device == "keyboard" else "pad"
 	var key := Controls.slot_label("eject", kind, 0)
 	var label := tr("SHIFT_SHOT")
-	var glyph := kind == "pad" and key in ["A", "B", "X", "Y"]          # Controller: das Symbol des Knopfs statt eines Textes
+	var gid := Controls.glyph_id(key)
+	var glyph := kind == "pad" and gid in ["A", "B", "X", "Y"]          # Controller: das Symbol des Knopfs statt eines Textes
 	var lw := ui.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
 	var kw := 12.0 if glyph else ui.get_string_size("[%s]" % key, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
 	var x0 := shot_btn.position.x + (shot_btn.size.x - (lw + 6.0 + kw)) * 0.5
 	draw_string(ui, Vector2(x0, shot_btn.position.y + 15.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#e6ebff"))
 	if glyph:
-		PadGlyph.draw(self, key, Rect2(x0 + lw + 6.0, shot_btn.position.y + 5.0, 12.0, 12.0))
+		PadGlyph.draw(self, gid, Rect2(x0 + lw + 6.0, shot_btn.position.y + 5.0, 12.0, 12.0))
 	else:
 		draw_string(ui, Vector2(x0 + lw + 6.0, shot_btn.position.y + 15.0), "[%s]" % key, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#ffe14a"))
 	if shot_note_t > 0.0:
@@ -573,9 +620,9 @@ func _draw_day_result() -> void:
 	var py := size.y * 0.5 - ph * 0.5
 	_shift_panel(px, py, pw, ph, 38.0, Color(0.1, 0.2, 0.3, 1.0), Color("#5dd0ff"))
 	draw_string(font, Vector2(px, py + 20.0), tr("DAY_DONE"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#8fe0ff"))
-	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
+	var lname: String = run.level.display_name()
 	var stamp := NightShift.format_stamp(String(d.get("date", Daily.today())), 12, 0, TranslationServer.get_locale().substr(0, 2)).split(",")[0]
-	draw_string(ui, Vector2(px, py + 33.0), "Level %d · %s · %s" % [run.level.number, lname, stamp], HORIZONTAL_ALIGNMENT_CENTER, pw, 9, Color("#c9cfff"))
+	draw_string(ui, Vector2(px, py + 33.0), (tr("LVL_NUM") + " · %s · %s") % [run.level.number, lname, stamp], HORIZONTAL_ALIGNMENT_CENTER, pw, 9, Color("#c9cfff"))
 	var rule := String(d.rule)
 	var goal := String(d.goal)
 	_draw_day_cards(px, py + 48.0, pw, rule, goal)
@@ -732,13 +779,13 @@ func _draw_shift_result() -> void:
 		return
 	var ui := Fonts.ui
 	var pw := 400.0
-	var ph := 250.0
+	var ph := 280.0                       # Runde 83: mit Abrechnung (Fahrpreise, Reparatur, Ersatztaxi, Verpasst, Saldo)
 	var px := size.x * 0.5 - pw * 0.5
 	var py := size.y * 0.5 - ph * 0.5
 	_shift_panel(px, py, pw, ph, 40.0, Color(0.09, 0.13, 0.32, 1.0), Color("#6fa8ff"))
 	draw_string(font, Vector2(px, py + 20.0), tr("SHIFT_MAP_DONE") % [int(result.get("shift_index", 1)), NightShift.MAPS], HORIZONTAL_ALIGNMENT_CENTER, pw, 16, Color("#8fc0ff"))
-	var lname: String = run.level.names.get(TranslationServer.get_locale().substr(0, 2), run.level.id)
-	draw_string(ui, Vector2(px, py + 34.0), "Level %d · %s" % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfff"))
+	var lname: String = run.level.display_name()
+	draw_string(ui, Vector2(px, py + 34.0), (tr("LVL_NUM") + " · %s") % [run.level.number, lname], HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color("#c9cfff"))
 	var rows := [
 		[tr("SHIFT_R_WAIT"), float(m.wait), int(round(float(m.wait) * NightShift.W_WAIT)), int(NightShift.W_WAIT), tr("SHIFT_D_WAIT") % int(round(float(m.avg_wait)))],
 		[tr("SHIFT_R_LANDING"), float(m.landing), int(round(float(m.landing) * NightShift.W_LANDING)), int(NightShift.W_LANDING), tr("SHIFT_D_LANDING") % [int(m.soft), int(m.medium), int(m.hard)]],
@@ -767,8 +814,38 @@ func _draw_shift_result() -> void:
 	draw_string(font, Vector2(px + 140.0, by + 44.0), mg, HORIZONTAL_ALIGNMENT_CENTER, 50.0, 30, grade_color(mg))
 	draw_string(ui, Vector2(px + 200.0, by + 22.0), tr("SHIFT_MAP_TIME") % NightShift.format_time(float(m.get("time", 0.0))), HORIZONTAL_ALIGNMENT_LEFT, 180.0, 9, Color("#9aa6dd"))
 	draw_string(ui, Vector2(px + 200.0, by + 38.0), tr("SHIFT_NEXT") % [int(result.get("shift_index", 1)) + 1, NightShift.MAPS], HORIZONTAL_ALIGNMENT_LEFT, 180.0, 9, Color("#a9b8ff"))
+	_draw_shift_ledger(px + 14.0, by + 58.0, pw - 28.0)
 	var blink := 0.65 + 0.35 * sin(result_age * 4.0)
 	draw_string(ui, Vector2(px, py + ph - 9.0), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color(0.66, 0.72, 1.0, blink))
+
+## Nachtschicht: kurze Abrechnung der Karte in einer Leiste – Fahrpreise, Reparatur, Ersatztaxi, verpasste Fahrgäste und Saldo (wie in der Karriere).
+func _draw_shift_ledger(x: float, y: float, w: float) -> void:
+	var ui := Fonts.ui
+	_rbox(Rect2(x, y, w, 30.0), Color(0.08, 0.11, 0.26, 0.95), 6, Color("#3a4580"), 1)
+	var earned := float(result.get("earned", 0.0))
+	var net := float(result.get("net", 0.0))
+	var cells := [
+		[tr("RES_FARES"), "+¢%d" % int(earned), Color("#ffe14a") if earned > 0.0 else Color("#5a628f")],
+		[tr("RES_REPAIR"), float(result.get("repair", 0.0))],
+		[tr("RES_TAXIS"), float(result.get("taxi_fees", 0.0))],
+		[tr("RES_MISSED"), float(result.get("missed_fees", 0.0))],
+		[tr("RES_NET_ROW"), "%s¢%d" % ["+" if net >= 0.0 else "−", int(absf(net))], SignalColors.good() if net >= 0.0 else SignalColors.bad(Color("#ff6a4a"))],
+	]
+	var cw := (w - 12.0) / float(cells.size())
+	for i in cells.size():
+		var cx := x + 6.0 + float(i) * cw
+		var c: Array = cells[i]
+		var txt: String
+		var col: Color
+		if c.size() == 2:
+			var amt: float = c[1]
+			txt = "−¢%d" % int(amt) if amt > 0.0 else "–"
+			col = Color("#ff9a7a") if amt > 0.0 else Color("#4e5788")
+		else:
+			txt = c[1]
+			col = c[2]
+		_fit_text(ui, Vector2(cx, y + 11.0), String(c[0]), cw - 4.0, 7, Color("#8a93c9"), HORIZONTAL_ALIGNMENT_CENTER)
+		_fit_text(font, Vector2(cx, y + 24.0), txt, cw - 4.0, 10, col, HORIZONTAL_ALIGNMENT_CENTER)
 
 ## Fünfzackiger Stern (Level-Abschluss-Medaille): gefüllt in Gold, wenn erreicht, sonst nur als dunkle Silhouette.
 func _star(c: Vector2, r: float, col: Color, filled: bool) -> void:

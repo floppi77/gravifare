@@ -1,0 +1,50 @@
+# Steam-Erfolge (Vorbereitung)
+
+Stand: Runde 80 (2026-11-18). Ein Steam-Auftritt ist **nicht** geplant; dies ist nur die Vorbereitung, damit er später ohne Umbau möglich ist.
+
+## Wie es funktioniert
+
+- Quelle der Erfolge bleibt das Spiel selbst (`src/core/achievements.gd`, abgeleitet aus dem Spielstand). Sie funktionieren ohne Steam unverändert.
+- `src/core/steam_bridge.gd` meldet bei jedem Abgleich (`Save.sync_achievements`) alle erreichten Erfolge zusätzlich an Steam – **nur**, wenn GodotSteam
+  (GDExtension, Engine-Singleton `Steam`) eingebunden ist und `steamInitEx()` erfolgreich war. Ohne GodotSteam tut die Brücke nichts.
+- Weil alle erreichten Erfolge gemeldet werden, kommen auch früher (ohne Steam) erreichte bei der ersten Steam-Sitzung nach; jede Id höchstens einmal je Sitzung.
+- Nicht gewertet (wie im Spiel): Debug-Modus, Entwicklerschalter, Community-Level.
+
+## Für einen späteren Steam-Release
+
+1. GodotSteam (GDExtension, passend zu Godot 4.7) als Addon einbinden; Lizenz MIT – in THIRD_PARTY_LICENSES.md aufnehmen.
+2. In Steamworks die 26 Erfolge mit den API-Namen unten anlegen (Name/Beschreibung DE und EN; FR/ES stehen in `data/i18n/fr.json`/`es.json`).
+3. Symbole hochladen: `docs/steam/icons/` (64×64 PNG, erreicht und gesperrt). Neu erzeugen mit
+   `godot --path . -- --scene=achievements_view --export-ach-icons=<Ordner>` (braucht ein Fenster bzw. `gamescope --backend headless`).
+4. `steam_appid.txt` nur für lokale Tests neben die ausführbare Datei legen (nicht ausliefern).
+
+## Liste
+
+| API-Name | Deutsch | Englisch | Beschreibung (EN) | Symbole |
+|---|---|---|---|---|
+| `ACH_FIRST_FARE` | Erste Fahrt | First fare | Deliver your first passenger | `icons/ACH_FIRST_FARE.png`, `icons/ACH_FIRST_FARE_locked.png` |
+| `ACH_FARES_100` | Stammkundschaft | Regulars | Deliver 100 passengers | `icons/ACH_FARES_100.png`, `icons/ACH_FARES_100_locked.png` |
+| `ACH_FARES_500` | Taxi-Legende | Taxi legend | Deliver 500 passengers | `icons/ACH_FARES_500.png`, `icons/ACH_FARES_500_locked.png` |
+| `ACH_SECTOR_1` | Erster Sektor | First sector | Complete every level of sector 1 | `icons/ACH_SECTOR_1.png`, `icons/ACH_SECTOR_1_locked.png` |
+| `ACH_SECTOR_5` | Halbzeit | Halfway there | Complete sectors 1 to 5 | `icons/ACH_SECTOR_5.png`, `icons/ACH_SECTOR_5_locked.png` |
+| `ACH_ALL_LEVELS` | Alles gesehen | Seen it all | Complete all 99 levels | `icons/ACH_ALL_LEVELS.png`, `icons/ACH_ALL_LEVELS_locked.png` |
+| `ACH_CAREER_DONE` | Feierabend | Clocking off | Fly the career all the way to the finale | `icons/ACH_CAREER_DONE.png`, `icons/ACH_CAREER_DONE_locked.png` |
+| `ACH_TRIPLE` | Dreifach | Triple | All three medals in one level | `icons/ACH_TRIPLE.png`, `icons/ACH_TRIPLE_locked.png` |
+| `ACH_MEDALS_50` | Medaillensammler | Medal collector | Win 50 medals | `icons/ACH_MEDALS_50.png`, `icons/ACH_MEDALS_50_locked.png` |
+| `ACH_SECTOR_GOLD` | Vergoldeter Sektor | Golden sector | Every medal of an entire sector | `icons/ACH_SECTOR_GOLD.png`, `icons/ACH_SECTOR_GOLD_locked.png` |
+| `ACH_MEDALS_ALL` | Makellos | Flawless | Win all 297 medals | `icons/ACH_MEDALS_ALL.png`, `icons/ACH_MEDALS_ALL_locked.png` |
+| `ACH_PERFECT_25` | Sanft aufgesetzt | Soft touch | 25 perfect landings | `icons/ACH_PERFECT_25.png`, `icons/ACH_PERFECT_25_locked.png` |
+| `ACH_PERFECT_250` | Federleicht | Light as a feather | 250 perfect landings | `icons/ACH_PERFECT_250.png`, `icons/ACH_PERFECT_250_locked.png` |
+| `ACH_STREAK_10` | In Serie | On a roll | 10 perfect landings in a row | `icons/ACH_STREAK_10.png`, `icons/ACH_STREAK_10_locked.png` |
+| `ACH_CREDITS_10K` | Gutes Trinkgeld | Good tips | Earn ¢10.000 in fares | `icons/ACH_CREDITS_10K.png`, `icons/ACH_CREDITS_10K_locked.png` |
+| `ACH_CREDITS_100K` | Großverdiener | Big earner | Earn ¢100.000 in fares | `icons/ACH_CREDITS_100K.png`, `icons/ACH_CREDITS_100K_locked.png` |
+| `ACH_SHIFT_DONE` | Nachtschwärmer | Night owl | Fly a night shift to the end | `icons/ACH_SHIFT_DONE.png`, `icons/ACH_SHIFT_DONE_locked.png` |
+| `ACH_SHIFT_S` | Bestnote | Top grade | Finish a night shift with grade S | `icons/ACH_SHIFT_S.png`, `icons/ACH_SHIFT_S_locked.png` |
+| `ACH_DAY_GOLD` | Tagesgold | Daily gold | Gold in the day shift goal | `icons/ACH_DAY_GOLD.png`, `icons/ACH_DAY_GOLD_locked.png` |
+| `ACH_DAY_STREAK_7` | Eine Woche am Steuer | A week at the wheel | Fly the day shift 7 days in a row | `icons/ACH_DAY_STREAK_7.png`, `icons/ACH_DAY_STREAK_7_locked.png` |
+| `ACH_WORKSHOP_MAX` | Voll ausgebaut | Fully upgraded | Bring one workshop upgrade to its top level | `icons/ACH_WORKSHOP_MAX.png`, `icons/ACH_WORKSHOP_MAX_locked.png` |
+| `ACH_NEW_LOOK` | Neuer Anstrich | Fresh coat | Change paint or sticker in the garage | `icons/ACH_NEW_LOOK.png`, `icons/ACH_NEW_LOOK_locked.png` |
+| `ACH_PUMP_BOOM` | Funkenflug | Sparks fly | Blow up a fuel pump | `icons/ACH_PUMP_BOOM.png`, `icons/ACH_PUMP_BOOM_locked.png` |
+| `ACH_CRASHES_50` | Stehaufmännchen | Bounce back | Survive 50 crashes | `icons/ACH_CRASHES_50.png`, `icons/ACH_CRASHES_50_locked.png` |
+| `ACH_COMMUNITY` | Gemeinschaftsgeist | Community spirit | Complete a community level | `icons/ACH_COMMUNITY.png`, `icons/ACH_COMMUNITY_locked.png` |
+| `ACH_HOURS_10` | Dauerschicht | Long haul | Play for 10 hours | `icons/ACH_HOURS_10.png`, `icons/ACH_HOURS_10_locked.png` |

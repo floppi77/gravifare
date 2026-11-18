@@ -16,6 +16,9 @@ var info_stats: Label
 var prog_sector: Label
 var prog_total: Label
 var frame: Panel                 # Rahmen der Vorschau in der Sektorfarbe
+var watch_btn: Button            # „Bestflug ansehen“ (Y / V), nur bei geschafften Leveln mit passender Aufzeichnung
+var watch_id := ""
+var watch_data := {}
 
 const TAB_W := 64.0
 const TAB_GAP := 4.0
@@ -25,7 +28,7 @@ func _ready() -> void:
 	add_child(MenuKit.dim_rect(0.62))
 	ids = Flow.level_ids()
 	sector = _start_sector()
-	add_child(_at(MenuKit.screen_title(tr("MENU_LEVELS")), Vector2(0, 3), Vector2(640, 26)))
+	add_child(_at(MenuKit.screen_title(tr("MENU_LEVELS"), 21), Vector2(0, 2), Vector2(640, 24)))     # kleiner als sonst: darunter liegen gleich die Sektor-Reiter (sonst überdecken sie den Titel)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", int(TAB_GAP))
@@ -68,7 +71,16 @@ func _ready() -> void:
 	add_child(info_name)
 	info_stats = Label.new()
 	info_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(_at(info_stats, Vector2(322, 253), Vector2(302, 40)))
+	add_child(_at(info_stats, Vector2(322, 253), Vector2(302, 30)))
+	watch_btn = Button.new()
+	watch_btn.flat = true
+	watch_btn.focus_mode = Control.FOCUS_NONE                   # per Y/V oder Maus; der Fokus bleibt auf den Levelkarten
+	watch_btn.add_theme_font_size_override("font_size", 8)
+	watch_btn.add_theme_color_override("font_color", Color("#9fe6ff"))
+	watch_btn.add_theme_color_override("font_hover_color", Color("#ffffff"))
+	watch_btn.pressed.connect(_watch)
+	watch_btn.visible = false
+	add_child(_at(watch_btn, Vector2(372, 282), Vector2(202, 14)))
 	prog_total = Label.new()                                    # Gesamtfortschritt unter den Levelkarten
 	prog_total.add_theme_font_size_override("font_size", 8)
 	prog_total.add_theme_color_override("font_color", Color("#a9b8ff"))
@@ -76,10 +88,12 @@ func _ready() -> void:
 	var all := Progress.of(ids, Save.data.completed)
 	prog_total.text = tr("LVL_PROGRESS_ALL") % [all.done, all.total, all.stars, all.stars_max]
 	var hint := Label.new()
-	hint.text = tr("LVL_SWITCH") + "\n" + tr("LVL_PRACTICE")
+	hint.text = tr("LVL_SWITCH") + "   ·   " + tr("LVL_PRACTICE")         # eine Zeile: zwei Zeilen reichten in den Zurück-Knopf hinein
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hint.clip_text = true                                          # Mindestbreite 0: sonst wächst das Feld über 640 hinaus und der Text sitzt rechts der Mitte
 	hint.add_theme_font_size_override("font_size", 8)
-	add_child(_at(hint, Vector2(0, 300), Vector2(640, 22)))
+	add_child(_at(hint, Vector2(0, 306), Vector2(640, 16)))
 	var bb := MenuKit.button(tr("MENU_BACK"), func(): back.call())
 	add_child(_at(bb, Vector2(256, 327), Vector2(128, 19)))
 	_open(sector)
@@ -99,6 +113,8 @@ func _at(c: Control, pos: Vector2, sz: Vector2) -> Control:
 ## Laufende Karriere: deren Sektor; sonst der Sektor des nächsten offenen Levels.
 func _start_sector() -> int:
 	var id: String = String(Save.campaign().get("level", ""))
+	if Flow.watch_level != "" and ids.has(Flow.watch_level):
+		id = Flow.watch_level                                 # zurück vom angesehenen Bestflug: dessen Sektor
 	if id == "":
 		for x in ids:
 			if not Save.is_completed(x):
@@ -153,7 +169,7 @@ func _show(lvl: LevelData, id: String, i: int) -> void:
 		return
 	preview.show_level(id, Save.is_completed(id) or Save.debug)      # Debug: alle Vorschaubilder scharf
 	var lang := TranslationServer.get_locale().substr(0, 2)
-	info_name.text = "%d · %s" % [lvl.number, lvl.names.get(lang, lvl.id)]
+	info_name.text = "%d · %s" % [lvl.number, lvl.display_name(lang)]
 	var line := tr("LVL_JOBS") % lvl.jobs.size()
 	if not Save.is_unlocked(ids, i):
 		line = tr("LVL_LOCKED")
@@ -162,16 +178,38 @@ func _show(lvl: LevelData, id: String, i: int) -> void:
 	else:
 		line += "\n" + tr("LVL_NEW")
 	info_stats.text = line
+	watch_data = Replay.watchable(lvl, Save.slot) if Save.is_completed(id) else {}
+	watch_id = id if not watch_data.is_empty() else ""
+	watch_btn.visible = watch_id != ""
+	if watch_btn.visible:
+		var key := Controls.pad_name("Y") if Controls.last_device == "gamepad" else "V"
+		watch_btn.text = tr("LVL_WATCH") % [key, int(float(watch_data.get("result", {}).get("time", 0.0)))]
+
+## Bestflug des gewählten Levels ansehen.
+func _watch() -> void:
+	if watch_id == "" or watch_data.is_empty():
+		return
+	Sfx.play("ui_ok")
+	Flow.start_watch(watch_id, watch_data)
 
 func _focus_first_level() -> void:
 	await get_tree().process_frame
 	if grid.get_child_count() > 0:
-		grid.get_child(0).grab_focus()
+		var k := 0
+		if Flow.watch_level != "":                           # zurück vom angesehenen Bestflug: Fokus auf dessen Karte
+			k = clampi(ids.find(Flow.watch_level) - (sector - 1) * 11, 0, grid.get_child_count() - 1)
+			Flow.watch_level = ""
+		grid.get_child(k).grab_focus()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		back.call()
+		return
+	if (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_Y) or (event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_V):
+		if watch_id != "":
+			get_viewport().set_input_as_handled()
+			_watch()
 		return
 	var step := 0
 	if event is InputEventJoypadButton and event.pressed:

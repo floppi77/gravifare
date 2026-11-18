@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Anziehende Magnete",
-  "en": "Attracting magnets"
+  "en": "Attracting magnets",
+  "fr": "Aimants attractifs",
+  "es": "Imanes que atraen"
  },
  "map": [
   "########################################",
@@ -86,7 +88,9 @@
   ],
   "title": {
    "de": "Anziehende Magnete",
-   "en": "Attracting magnets"
+   "en": "Attracting magnets",
+   "fr": "Aimants attractifs",
+   "es": "Imanes que atraen"
   }
  }
 }

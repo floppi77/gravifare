@@ -23,6 +23,8 @@ var flags := {}
 var finished := false
 var _spoke_crash := false
 var locked := true              # Steuerung und Fahrwerk gesperrt, bis das Starten erklärt wird (das Taxi bleibt auf dem Startpad)
+var fast_n := 0                 # zuletzt gesprochener „Schneller als erklärt“-Spruch (1–3, reihum)
+const FAST_LINES := 3
 
 # HUD-Bereiche (logische Pixel)
 const R_FUEL := Rect2(2, 2, 70, 12)
@@ -89,15 +91,15 @@ func _build() -> void:
 		{"key": "tut_fly_ok"},
 		{"key": "tut_gear", "wait": func(): return run.sim.gear_cmd, "timeout": 40.0},
 		{"key": "tut_fuel_low", "enter": func(): run.sim.fuel = minf(run.sim.fuel, 22.0),
-			"spots": func(): return [_fuel_rect()],
+			"spots": func(): return [_fuel_rect()], "early": func(): return _landed_on("F"),
 			"wait": func(): return _landed_on("F"), "timeout": 120.0},
 		{"key": "tut_refuel", "spots": func(): return [_fuel_rect(), R_FUEL],
-			"wait": func(): return run.sim.fuel >= 35.0, "timeout": 25.0},
+			"wait": func(): return run.sim.fuel >= 35.0, "timeout": 25.0, "fast_if": _lifted_off},          # tankt von selbst, solange man steht: weiter erst, wenn man danach schon wieder abhebt
 		{"key": "tut_credit", "enter": _enter_credit, "spots": func(): return [R_MONEY, R_FUEL],
-			"wait": func(): return run.sim.fuel >= 92.0 or run.money < 1.0, "timeout": 30.0},          # Guthaben aufgebraucht: weiter
+			"wait": func(): return run.sim.fuel >= 92.0 or run.money < 1.0, "timeout": 30.0, "fast_if": _lifted_off},          # Guthaben aufgebraucht: weiter
 		{"key": "tut_price", "enter": _enter_price, "spots": func(): return [R_PRICE, _fuel_rect()]},
 		{"key": "tut_landing", "spots": func(): return [R_GAUGE, R_HULL], "gauge": true},
-		{"key": "tut_hard", "enter": func(): flags["crashed"] = false,
+		{"key": "tut_hard", "enter": func(): flags["crashed"] = flags.get("crash_early", false), "early": func(): return flags.get("crash_early", false),
 			"wait": func(): return flags.get("crashed", false), "timeout": 240.0},
 		{"key": "tut_crash_ok", "spots": func(): return [R_LIVES, _taxi_rect()]},
 		{"key": "tut_soft", "enter": func(): flags["land3"] = false,
@@ -211,12 +213,18 @@ func _next() -> void:
 		_next()
 		return
 	st.erase("_speech_done")
+	st.erase("_open")
+	st.erase("_fast")
 	var key := String(st.key)
 	if key == "tut_soft_react":
 		key = "tut_soft_ok" if flags.get("soft_ok", false) else "tut_soft_meh"
 		st["key"] = key
 	if st.has("enter"):
 		(st.enter as Callable).call()
+	if st.has("early") and (st.early as Callable).call() and not flags.has("retry_key"):
+		flags.erase("crash_early")
+		_fast_line(st)                            # Aufgabe schon während der vorigen Erklärung erledigt: gleich der Spruch statt der Erklärung
+		return
 	_speak(String(flags.get("retry_key", key)))
 	flags.erase("retry_key")
 
@@ -274,8 +282,11 @@ func _watch(delta: float) -> void:
 			if run.extras.is_empty() and run.ejected <= int(flags.get("ejected0", 0)) and not flags.get("ejected", false):
 				_retry("tut_extra2", "tut_eject_again" if flags.get("guest_dropped", false) else "tut_extra2_again")
 		"tut_life":
-			run.money = maxf(run.money, Tuning.LIFE_PRICE)       # Tanken oder ein Ersatztaxi dürfen die Übung nicht verhindern
-			if run.lives >= Tuning.MAX_LIVES:
+			if flags.get("life_bought", false):
+				pass                                  # gekauft: das neue Taxi bleibt (vorher setzte die Sperre unten es sofort wieder zurück)
+			else:
+				run.money = maxf(run.money, Tuning.LIFE_PRICE)       # Tanken oder ein Ersatztaxi dürfen die Übung nicht verhindern
+			if run.lives >= Tuning.MAX_LIVES and not flags.get("life_bought", false):
 				run.lives = Tuning.MAX_LIVES - 1
 				game.call("tutorial_set_lives", run.lives)
 
@@ -315,13 +326,14 @@ func _process(delta: float) -> void:
 	t += delta
 	_tick_gates()
 	if OS.get_cmdline_user_args().has("--tut-debug") and Engine.get_process_frames() % 120 == 0:
-		print("tut idx=%d key=%s t=%.1f speak=%.1f waiting=%s" % [idx, st.key, t, speak_len, waiting])
+		print("tut idx=%d key=%s t=%.1f speak=%.1f waiting=%s pos=%s state=%d lives=%d" % [idx, st.key, t, speak_len, waiting, str(run.sim.pos.round()), run.sim.state, run.lives])
 	if st.has("spots"):
 		spot.set_spots(_to_screen((st.spots as Callable).call()))
 	else:
 		spot.set_spots([])
 	_gauge(bool(st.get("gauge", false)))
 	if t < speak_len + 0.15:
+		_check_fast(st)
 		return
 	if st.has("after_speech") and not st.get("_speech_done", false):
 		st["_speech_done"] = true
@@ -330,7 +342,7 @@ func _process(delta: float) -> void:
 		waiting = true
 	if waiting:
 		wait_t += delta
-		var done: bool = (st.wait as Callable).call()
+		var done: bool = st.get("_fast", false) or (st.wait as Callable).call()
 		if not done:
 			if wait_t >= float(st.get("timeout", 60.0)):
 				wait_t = 0.0
@@ -343,6 +355,40 @@ func _process(delta: float) -> void:
 		if st.has("after"):
 			(st.after as Callable).call()
 		_next()
+
+## Schneller als erklärt: Erfüllt der Spieler die Aufgabe des Schritts, während der Fluglehrer sie noch erklärt (sie war zu Beginn noch
+## offen), bricht die Erklärung ab, ein Spruch (tut_fast_1…3, reihum) lobt das, danach geht es mit dem nächsten Schritt weiter.
+## Nicht bei Schritten, die sich von selbst erfüllen („no_fast“: Tanken im Stand) oder deren Aufgabe erst nach der Erklärung möglich ist.
+## Tankschritte füllen sich im Stand von selbst: Dort zählt es erst, wenn der Tank das Ziel erreicht hat und man schon wieder abhebt („fast_if“).
+## Erledigt der Spieler die Aufgabe schon während der vorigen Erklärung („early“, z. B. Absturz bei der Erklärung zur Landung), kommt der
+## Spruch sofort statt der Erklärung (_next).
+func _check_fast(st: Dictionary) -> void:
+	if not st.has("wait") or st.get("no_fast", false) or st.get("_fast", false) or t < 0.5:
+		return
+	if not (st.wait as Callable).call():
+		st["_open"] = true
+		return
+	if not st.get("_open", false):
+		return                                    # schon vor dem Schritt erfüllt: normal weiter
+	if st.has("fast_if") and not (st.fast_if as Callable).call():
+		return
+	_fast_line(st)
+
+## Taxi steht nicht mehr (nach dem Tanken wieder abgehoben).
+func _lifted_off() -> bool:
+	return run.sim.state == TaxiSim.State.FLYING
+
+func _fast_line(st: Dictionary) -> void:
+	st["_fast"] = true
+	game.call("tutorial_voice_stop")
+	fast_n = fast_n % FAST_LINES + 1
+	if OS.get_cmdline_user_args().has("--tut-debug"):
+		print("tut fast: %s -> tut_fast_%d" % [st.key, fast_n])
+	_speak("tut_fast_%d" % fast_n)
+	t = 0.0
+	if st.has("after_speech") and not st.get("_speech_done", false):
+		st["_speech_done"] = true
+		(st.after_speech as Callable).call()
 
 ## Landeanzeige im Tutorial: erst Ausschläge in allen drei Balken, dann alle sicher unter der weißen Marke.
 func _gauge(on: bool) -> void:
@@ -432,6 +478,8 @@ func on_event(e: Dictionary) -> void:
 		"life_bought":
 			flags["life_bought"] = true
 		"destroyed":
+			if _key() == "tut_landing":
+				flags["crash_early"] = true          # schon bei der Erklärung zur Landung zerstört: „Probier es aus“ ist dann erledigt
 			if _key() == "tut_hard":
 				flags["crashed"] = true
 			elif not _spoke_crash and not bool(game.call("tutorial_narrating")):

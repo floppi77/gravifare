@@ -13,12 +13,14 @@ var code := CodeEntry.new("marvin")
 var notice: Label
 var help: Label                    # Hilfetext zum gewählten oder überfahrenen Menüpunkt (unten unter dem Menü)
 var flags_col: Control = null      # Sprachflaggen, untereinander links neben dem Menü
+var bug_btn: Button = null          # „Bug melden“ unten rechts (nur im Hauptmenü)
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
 const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_COMMUNITY",
-	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN"]
+	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN"]
 
 func _ready() -> void:
+	preload("res://src/ui/ach_toast.gd").flush(get_tree())          # anstehende Erfolge (z. B. rückwirkend beim ersten Start)
 	Music.play_theme("menu")
 	Music.set_layers(true, false)
 	Music.duck(0.0)
@@ -65,6 +67,9 @@ func _ready() -> void:
 		var eid := Flow.menu_screen.substr(7)
 		Flow.menu_screen = ""
 		show_editor(eid, Flow.editor_session)
+	elif Flow.menu_screen == "levels":                  # zurück vom angesehenen Bestflug: wieder die Levelauswahl
+		Flow.menu_screen = ""
+		show_levels()
 	elif Flow.menu_screen == "community":               # zurück aus einem Community-Level: wieder die Liste zeigen
 		Flow.menu_screen = ""
 		show_community()
@@ -79,6 +84,8 @@ func _ready() -> void:
 		var pg := _options_page()
 		if pg != "":
 			options.call_deferred("show_" + pg)
+	elif OS.get_cmdline_user_args().has("--bug"):       # Dev: die Seite „Bug melden“ zeigen
+		show_bug()
 	elif OS.get_cmdline_user_args().has("--confirm"):   # Dev: die Nachfrage „Neues Spiel“ zeigen
 		show_new_confirm(func(): pass)
 	else:
@@ -97,6 +104,9 @@ func _clear() -> void:
 	if flags_col != null and is_instance_valid(flags_col):
 		flags_col.queue_free()
 	flags_col = null
+	if bug_btn != null and is_instance_valid(bug_btn):
+		bug_btn.queue_free()
+	bug_btn = null
 	help.text = ""
 
 ## Fokus setzen: auf die Flagge der gewählten Sprache (nach einem Sprachwechsel), auf den zuletzt geöffneten Menüpunkt (`restore`, nach „Zurück“),
@@ -109,6 +119,8 @@ func _focus_first(lang := "", restore := false) -> void:
 				c.grab_focus()
 				return
 	var buttons := box.find_children("*", "Button", true, false)
+	if bug_btn != null and is_instance_valid(bug_btn):
+		buttons.append(bug_btn)                     # „Bug melden“ liegt außerhalb der Spalte (Rückkehr von seiner Seite)
 	if restore and _return_focus != "":
 		for c in buttons:
 			if c.get_meta("key", "") == _return_focus and not (c as Button).disabled:
@@ -230,11 +242,32 @@ func show_main(focus_lang := "") -> void:
 	var quit_btn := _menu_button(tr("MENU_QUIT"), "quit", func(): get_tree().quit(), true)
 	quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(quit_btn)
-	_equalize_grid.call_deferred(grid, quit_btn)
+	_equalize_grid.call_deferred(grid, [quit_btn])
+	# „Bug melden“ (mit Käfer) unten rechts über der Versionsangabe: In der Spalte ist kein Platz mehr (das Logo würde oben abgeschnitten).
+	# Erreichbar mit Rechts von „Beenden“ bzw. „Ko-fi“, zurück mit Links/Hoch.
+	bug_btn = _menu_button(tr("MENU_BUG"), "bug", show_bug, true)
+	bug_btn.icon = BugIcon.texture()
+	bug_btn.add_theme_constant_override("icon_max_width", 11)
+	bug_btn.add_theme_constant_override("h_separation", 4)
+	stage.add_child(bug_btn)
+	_place_bug_button.call_deferred(grid, quit_btn)
 	if Save.debug:
-		box.add_child(_menu_button(tr("DEBUG_LEAVE"), "debug", func():
+		var drow := HBoxContainer.new()                  # Debug: verlassen und Taxi-Grafik 2D/Mischform (Vergleich) in einer Zeile
+		drow.alignment = BoxContainer.ALIGNMENT_CENTER
+		drow.add_theme_constant_override("separation", 4)
+		var leave := func():
+			Cosmetics.taxi_3d = true                    # Vergleich beendet: wieder die Mischform (Standard)
 			Flow.set_debug(false)
-			show_main()))
+			show_main()
+		var flip := func():
+			Cosmetics.taxi_3d = not Cosmetics.taxi_3d
+			show_main()
+		var lb := _menu_button(tr("DEBUG_LEAVE"), "debug", leave, true)
+		var fb := _menu_button(tr("DEBUG_TAXI3D") % ("3D" if Cosmetics.taxi_3d else "2D"), "debug3d", flip, true)
+		drow.add_child(lb)
+		drow.add_child(fb)
+		_link_debug_row.call_deferred(quit_btn, lb, fb)
+		box.add_child(drow)
 	# Sprachwahl: zwei Flaggen ohne Text untereinander links neben dem Menü (Auf/Ab wechselt, Rechts führt ins Menü, Links aus dem Menü zu den Flaggen)
 	flags_col = MenuKit.flag_column(func(code): show_main(code))
 	flags_col.position = Vector2(14, 138)
@@ -257,7 +290,7 @@ func _link_grid(grid: GridContainer) -> void:
 
 ## Alle Knöpfe des Nebenmenüs so breit wie der breiteste (z. B. „Ko-fi: Unterstützen“), damit beide Spalten gleich aussehen.
 ## Erst im Baum gemessen, weil die Schrift aus dem Theme kommt.
-func _equalize_grid(grid: GridContainer, extra: Control = null) -> void:
+func _equalize_grid(grid: GridContainer, extras: Array = []) -> void:
 	if not is_instance_valid(grid):
 		return
 	var w := 0.0
@@ -265,8 +298,38 @@ func _equalize_grid(grid: GridContainer, extra: Control = null) -> void:
 		w = maxf(w, (c as Control).get_combined_minimum_size().x)
 	for c in grid.get_children():
 		(c as Control).custom_minimum_size.x = w
-	if is_instance_valid(extra):
-		extra.custom_minimum_size.x = w            # so breit wie eine Spalte, mittig unter dem Gitter
+	for extra in extras:
+		if is_instance_valid(extra):
+			(extra as Control).custom_minimum_size.x = w            # so breit wie eine Spalte, mittig unter dem Gitter
+
+## Debug-Zeile unter „Beenden“ fest verdrahten: Die automatische Suche fand sie mit Controller/Pfeiltasten nicht (Runde 82).
+func _link_debug_row(quit_btn: Control, lb: Control, fb: Control) -> void:
+	if not (is_instance_valid(quit_btn) and is_instance_valid(lb) and is_instance_valid(fb)):
+		return
+	quit_btn.focus_neighbor_bottom = quit_btn.get_path_to(lb)
+	for b in [lb, fb]:
+		b.focus_neighbor_top = b.get_path_to(quit_btn)
+		b.focus_neighbor_bottom = b.get_path_to(b)
+	lb.focus_neighbor_right = lb.get_path_to(fb)
+	fb.focus_neighbor_left = fb.get_path_to(lb)
+	lb.focus_neighbor_left = lb.get_path_to(lb)
+	if bug_btn != null and is_instance_valid(bug_btn):
+		fb.focus_neighbor_right = fb.get_path_to(bug_btn)
+
+## „Bug melden“ rechtsbündig über der Versionsangabe; Fokuswege von „Beenden“ und „Ko-fi“ (Rechts) und zurück (Links/Hoch).
+func _place_bug_button(grid: GridContainer, quit_btn: Control) -> void:
+	if bug_btn == null or not is_instance_valid(bug_btn) or not is_instance_valid(quit_btn):
+		return
+	var sz := bug_btn.get_combined_minimum_size()
+	bug_btn.size = sz
+	bug_btn.position = Vector2(640.0 - 6.0 - sz.x, 340.0 - sz.y)
+	var kofi := grid.get_child(grid.get_child_count() - 1) as Control
+	quit_btn.focus_neighbor_right = quit_btn.get_path_to(bug_btn)
+	kofi.focus_neighbor_right = kofi.get_path_to(bug_btn)
+	bug_btn.focus_neighbor_left = bug_btn.get_path_to(quit_btn)
+	bug_btn.focus_neighbor_top = bug_btn.get_path_to(kofi)
+	bug_btn.focus_neighbor_bottom = bug_btn.get_path_to(bug_btn)
+	bug_btn.focus_neighbor_right = bug_btn.get_path_to(bug_btn)
 
 ## Dunkle Tafel hinter den Menüknöpfen (nicht hinter Logo und Untertitel): die Knöpfe liegen sonst direkt auf dem detailreichen Stadtbild.
 func _add_button_panel() -> void:
@@ -389,6 +452,7 @@ func show_slots() -> void:
 	ss.chosen = func(n: int):
 		Save.select_slot(n)
 		show_main()
+		preload("res://src/ui/ach_toast.gd").flush(get_tree())
 	ss.back = show_main if Save.slot != 0 else Callable()
 	_show_screen(ss)
 
@@ -407,6 +471,63 @@ func show_new_confirm(start: Callable) -> void:
 	box.add_child(MenuKit.button(tr("SLOT_NO"), show_main))
 	box.add_child(MenuKit.button(tr("MENU_NEW_YES"), start))
 	_focus_first()
+
+## „Bug melden“: Erklärung, E-Mail mit vorausgefülltem Betreff und Systemangaben, Protokollordner, Adresse kopieren.
+func show_bug() -> void:
+	_clear()
+	_pin_top(true)
+	_header()
+	box.add_child(MenuKit.title(tr("BUG_TITLE")))
+	var sub := Label.new()
+	sub.text = tr("BUG_TEXT") % BugReport.ADDRESS
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.custom_minimum_size = Vector2(250, 0)
+	sub.add_theme_font_size_override("font_size", 8)
+	box.add_child(sub)
+	var note := Label.new()
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(250, 11)
+	note.add_theme_font_size_override("font_size", 8)
+	note.add_theme_color_override("font_color", Color("#ffe14a"))
+	var mail := MenuKit.button(tr("BUG_MAIL"), func():
+		var err := OS.shell_open(bug_mailto())
+		note.text = tr("BUG_MAIL_OPENED") if err == OK else tr("BUG_MAIL_FAILED") % BugReport.ADDRESS)
+	mail.icon = BugIcon.texture()
+	mail.add_theme_constant_override("icon_max_width", 11)
+	box.add_child(mail)
+	box.add_child(MenuKit.button(tr("BUG_LOGS"), func():
+		var dir := ProjectSettings.globalize_path("user://logs")
+		DirAccess.make_dir_recursive_absolute(dir)
+		var logf := dir.path_join("godot.log")
+		var err := OS.shell_show_in_file_manager(logf if FileAccess.file_exists(logf) else dir)
+		note.text = tr("BUG_LOGS_OPENED") if err == OK else dir))
+	box.add_child(MenuKit.button(tr("BUG_COPY"), func():
+		DisplayServer.clipboard_set(BugReport.ADDRESS)
+		note.text = tr("BUG_COPIED") % BugReport.ADDRESS))
+	box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
+	box.add_child(note)
+	_focus_first()
+
+## mailto:-Adresse mit Betreff „[GraviFare-Bug] v<Version> · <System>“ und den Systemangaben (Version, System, Grafik, Fenster, Sprache, Eingabe, Protokoll).
+func bug_mailto() -> String:
+	var win := DisplayServer.window_get_size()
+	var mode := DisplayServer.window_get_mode()
+	var fs := mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+	var pads := Input.get_connected_joypads()
+	var pad_names: Array = pads.map(func(d): return Input.get_joy_name(d))
+	var info := [
+		["Version", Flow.VERSION],
+		["System", "%s %s (%s)" % [OS.get_name(), OS.get_version(), Engine.get_architecture_name()]],
+		["Grafik", RenderingServer.get_video_adapter_name()],
+		["Fenster", "%d×%d%s" % [win.x, win.y, " Vollbild" if fs else ""]],
+		["Sprache", TranslationServer.get_locale().substr(0, 2)],
+		["Eingabe", (", ".join(pad_names) if not pad_names.is_empty() else "-") + " / zuletzt " + Controls.last_device],
+		["Spielstand", "Platz %d" % Save.slot],
+		["Protokoll", ProjectSettings.globalize_path("user://logs/godot.log")],
+	]
+	return BugReport.mailto(BugReport.subject(Flow.VERSION, OS.get_name()), BugReport.body([tr("BUG_MAIL_Q1"), tr("BUG_MAIL_Q2")], info))
 
 func show_options() -> void:
 	_clear()

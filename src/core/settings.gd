@@ -7,12 +7,21 @@ var values := {
 	"language": "",
 	"gear_toggle": true, "deadzone": 0.2,
 	"fullscreen": false, "vsync": true, "reduce_motion": false, "subtitles": true, "vibration": 1.0, "fps_cap": 0, "show_fps": false, "hints": true, "landing_assist": true, "ghost": true, "debug": false,
+	"pad_glyphs": "auto",                  # Controllersymbole: auto (erkannt) | xbox | ps
+	"color_safe": false,                   # Farbsehschwäche: Signalfarben blau/gelb/purpurrot statt grün/gelb/rot (siehe signal_colors.gd)
+	"text_large": false,                   # Große Schrift für HUD, Untertitel, Flugschule und Einspieler
 }
+const TEXT_LARGE_K := 1.3                  # Faktor der großen Schrift
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var first_start := not FileAccess.file_exists(path)
 	load_settings()
+	for a in OS.get_cmdline_user_args():          # Dev (Bildschirmfotos): Farbtafel/große Schrift setzen, ohne die Einstellungen zu speichern
+		if a == "--color-safe":
+			values.color_safe = true
+		elif a == "--text-large":
+			values.text_large = true
 	apply()
 	apply_display()
 	if not values.fullscreen:
@@ -54,10 +63,14 @@ func apply() -> void:
 	Sfx.set_volume("Voice", values.voice)
 	var lang: String = values.language
 	if lang == "":
-		lang = "de" if OS.get_locale_language() == "de" else "en"
+		lang = Loc.system_language()
 	Loc.set_language(lang)
 	Controls.gear_toggle = values.gear_toggle
 	Controls.deadzone = values.deadzone
+	if not (values.pad_glyphs in ["auto", "xbox", "ps"]):
+		values.pad_glyphs = "auto"
+	Controls.refresh_style()
+	SignalColors.safe = values.color_safe
 	for a in ["thrust_left", "thrust_right", "thrust_up", "thrust_down"]:
 		InputMap.action_set_deadzone(a, values.deadzone)
 	Engine.max_fps = int(values.fps_cap)
@@ -110,6 +123,14 @@ func _size_from_cmdline() -> bool:
 	return false
 
 var _fps_label: Label
+
+## Schriftfaktor (1.0 normal, TEXT_LARGE_K bei großer Schrift).
+func text_k() -> float:
+	return TEXT_LARGE_K if values.text_large else 1.0
+
+## Schriftgröße mit dem Faktor der großen Schrift.
+func fs(size: int) -> int:
+	return int(round(float(size) * text_k()))
 
 ## Kleine FPS-Anzeige oben rechts (Option „FPS anzeigen“).
 func _update_fps_overlay() -> void:

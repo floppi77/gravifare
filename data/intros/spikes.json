@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Dornen",
-  "en": "Spikes"
+  "en": "Spikes",
+  "fr": "Pics",
+  "es": "Pinchos"
  },
  "map": [
   "########################################",
@@ -73,7 +75,9 @@
   ],
   "title": {
    "de": "Dornen",
-   "en": "Spikes"
+   "en": "Spikes",
+   "fr": "Pics",
+   "es": "Pinchos"
   }
  }
 }

@@ -746,7 +746,8 @@ func _toggle_grid() -> void:
 
 func _sync_fields() -> void:
 	var lang := TranslationServer.get_locale().substr(0, 2)
-	name_edit.text = String(model.names.get(lang, model.names.get("de", "")))
+	var nk := lang if lang == "de" else "en"                          # Level-Dateien kennen nur de/en; Französisch/Spanisch bearbeiten den englischen Namen
+	name_edit.text = String(model.names.get(nk, model.names.get("de", "")))
 	author_edit.text = model.author
 	look_label.text = tr("ED_LOOK") % model.sector
 	dark_label.text = tr("ED_DARK") % int(round(model.dark * 100.0))
@@ -830,7 +831,8 @@ func _name_changed(t: String) -> void:
 	var s := CommunityLevel.clean_text(t, CommunityLevel.MAX_TEXT)
 	if orig_id != "":
 		var lang := TranslationServer.get_locale().substr(0, 2)       # Originale haben zwei verschiedene Namen: nur den der gezeigten Sprache ändern
-		model.names[lang if model.names.has(lang) else "de"] = s if s != "" else String(model.names.get("de", ""))
+		var nk := lang if lang == "de" else "en"                      # fr/es: englischer Name (Level-Dateien kennen nur de/en)
+		model.names[nk if model.names.has(nk) else "de"] = s if s != "" else String(model.names.get("de", ""))
 	else:
 		model.names = {"de": s, "en": s} if s != "" else {"de": "Mein Level", "en": "My level"}
 	model.dirty = true

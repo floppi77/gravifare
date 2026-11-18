@@ -12,6 +12,7 @@ import numpy as np
 sys.path.insert(0, "tools/audio")
 from passenger_voices import VOICES, REF_TEXT, direction
 from gen_voice_drama import speak, finish, OUT
+import voice_lang
 import io
 
 REFS = "tools/audio/passenger_refs"
@@ -64,7 +65,7 @@ def main():
     if a.print_serve:
         print_serve(a.print_serve)
         return
-    langs = ["de", "en"] if a.lang == "both" else [a.lang]
+    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es"]}.get(a.lang, [a.lang])
     mp = OUT + "/manifest.json"
     manifest = json.load(open(mp, encoding="utf-8"))
     weak = []
@@ -83,7 +84,7 @@ def main():
                 best = None
                 for attempt in range(TRIES):
                     y, sr = decode(speak(a.server, f"{vk}_{lang}", (direction(key, lang) + " " + text).strip(), SEED + attempt * 13 + len(key)))
-                    ok, got, sim = check(y, sr, text, lang)
+                    ok, got, sim = voice_lang.check(y, sr, text, lang) if lang in ("fr", "es") else check(y, sr, text, lang)
                     if best is None or sim > best[0]:
                         best = (sim, y, sr, got)
                     print(f"  {lang}/{vk}_{key} Versuch {attempt + 1}: {'ok' if ok else 'verworfen'} ({got!r}, {sim:.2f})", flush=True)

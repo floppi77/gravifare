@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Verkehr",
-  "en": "Traffic"
+  "en": "Traffic",
+  "fr": "Circulation",
+  "es": "Tráfico"
  },
  "map": [
   "########################################",
@@ -101,7 +103,9 @@
   ],
   "title": {
    "de": "Verkehr",
-   "en": "Traffic"
+   "en": "Traffic",
+   "fr": "Circulation",
+   "es": "Tráfico"
   }
  }
 }

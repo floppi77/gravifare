@@ -12,11 +12,15 @@ from gen_voice import trim, VOICES, OUT
 REF_TEXT = {
     "de": "Willkommen in der Flugschule. Ich bin dein Fluglehrer und erkläre dir alles, was du für den Dienst als Taxipilot wissen musst. Hör gut zu, und halte die Düsen ruhig.",
     "en": "Welcome to flight school. I am your flight instructor, and I will explain everything you need to know to serve as a taxi pilot. Listen carefully, and keep your thrusters steady.",
+    "fr": "Bienvenue à l’école de pilotage. Je suis votre instructeur de vol et je vais vous expliquer tout ce qu’il faut savoir pour piloter un taxi. Écoutez bien, et gardez les réacteurs bien stables.",
+    "es": "Bienvenido a la escuela de vuelo. Soy tu instructor de vuelo y te explicaré todo lo que necesitas saber para pilotar un taxi. Escucha con atención y mantén los propulsores estables.",
 }
-LANGNAME = {"de": "German", "en": "English"}
+LANGNAME = {"de": "German", "en": "English", "fr": "French", "es": "Spanish"}
 REF_DIR = OUT + "/ref"
 INSTRUCT_EXTRA = {"de": " Er spricht wie ein erfahrener Fluglehrer: ruhig, klar, freundlich und mit natürlichem Sprachfluss.",
-                  "en": " He speaks like an experienced flight instructor: calm, clear, friendly and with a natural flow."}
+                  "en": " He speaks like an experienced flight instructor: calm, clear, friendly and with a natural flow.",
+                  "fr": " Il parle comme un instructeur de vol expérimenté : calme, clair, aimable, avec un débit naturel.",
+                  "es": " Habla como un instructor de vuelo experimentado: tranquilo, claro, amable y con un ritmo natural."}
 
 
 def make_refs(langs, force):
@@ -43,6 +47,9 @@ def main():
     ap.add_argument("--only", default="", help="nur Schlüssel mit diesem Präfix, z. B. tut_ oder vid_")
     ap.add_argument("--new-ref", action="store_true")
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--validate", action="store_true", help="jeden Clip per Spracherkennung prüfen, bei Abweichung mit neuem Seed wiederholen")
+    ap.add_argument("--tries", type=int, default=6)
+    ap.add_argument("--skip-existing", action="store_true")
     a = ap.parse_args()
     langs = [a.lang] if a.lang else ["de", "en"]
     make_refs(langs, a.new_ref)
@@ -57,16 +64,35 @@ def main():
         for key, text in lines[l].items():
             if a.only and not key.startswith(a.only):
                 continue
-            torch.manual_seed(a.seed + len(key))
-            wavs, sr = base.generate_voice_clone(text=text, language=LANGNAME[l], voice_clone_prompt=prompt, do_sample=True, temperature=0.6)
-            x = trim(np.asarray(wavs[0], dtype=np.float32), sr)
-            x = x / max(1e-6, np.abs(x).max()) * 0.85
             dst = "%s/%s/i0_%s.ogg" % (OUT, l, key)
+            if a.skip_existing and os.path.exists(dst):
+                continue
+            import voice_lang
+            say = voice_lang.spoken(text, l)
+            best = None
+            for attempt in range(a.tries if a.validate else 1):
+                torch.manual_seed(a.seed + len(key) + attempt * 13)
+                wavs, sr = base.generate_voice_clone(text=say, language=LANGNAME[l], voice_clone_prompt=prompt, do_sample=True, temperature=0.6)
+                x = trim(np.asarray(wavs[0], dtype=np.float32), sr)
+                if not a.validate:
+                    best = (1.0, x)
+                    break
+                ok, got, sim = voice_lang.check(x, sr, text, l, threshold=0.85)
+                print("   Versuch %d: %s (%.2f) %r" % (attempt + 1, "ok" if ok else "verworfen", sim, got[:80]), flush=True)
+                if best is None or sim > best[0]:
+                    best = (sim, x)
+                if ok:
+                    break
+            if best[0] < 0.85:
+                print("SCHWACH %s/i0_%s (%.2f)" % (l, key, best[0]), flush=True)
+            x = best[1]
+            x = x / max(1e-6, np.abs(x).max()) * 0.85
             tmp = dst[:-4] + ".wav"
             sf.write(tmp, x, sr)
             subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-c:a", "libvorbis", "-q:a", "5", dst], check=True)
             os.remove(tmp)
             man["clips"]["%s/i0_%s" % (l, key)] = {"text": text, "seconds": round(len(x) / sr, 2)}
+            json.dump(man, open(mp, "w"), indent=1, ensure_ascii=False)
             print("%s/i0_%s: %.1fs (%d Zeichen)" % (l, key, len(x) / sr, len(text)), flush=True)
     man["clone"] = {"model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base", "reference": "VoiceDesign m0 + Fluglehrer", "license": "Apache-2.0"}
     json.dump(man, open(mp, "w"), indent=1, ensure_ascii=False)

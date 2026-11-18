@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Schwerkraftzonen",
-  "en": "Gravity zones"
+  "en": "Gravity zones",
+  "fr": "Zones de gravité",
+  "es": "Zonas de gravedad"
  },
  "map": [
   "########################################",
@@ -105,7 +107,9 @@
   ],
   "title": {
    "de": "Schwerkraftzonen",
-   "en": "Gravity zones"
+   "en": "Gravity zones",
+   "fr": "Zones de gravité",
+   "es": "Zonas de gravedad"
   }
  }
 }

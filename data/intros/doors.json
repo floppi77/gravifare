@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Schiebetore",
-  "en": "Sliding gates"
+  "en": "Sliding gates",
+  "fr": "Portes coulissantes",
+  "es": "Puertas correderas"
  },
  "map": [
   "########################################",
@@ -70,7 +72,9 @@
   ],
   "title": {
    "de": "Schiebetore",
-   "en": "Sliding gates"
+   "en": "Sliding gates",
+   "fr": "Portes coulissantes",
+   "es": "Puertas correderas"
   }
  }
 }

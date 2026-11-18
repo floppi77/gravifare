@@ -50,29 +50,34 @@ var trail_hold := 0.0
 var hit_t := 0.0                          # 1 beim Treffer, klingt ab
 
 ## Farbe der Tankfüllung für den Anteil `frac` (0–1) des vollen Tanks.
+## Option „Farbsehschwäche“: dieselben Stufen in der Tafel von SignalColors (blau, weiß, gelb-orange, purpurrot).
 static func fuel_color(frac: float) -> Color:
+	var cs: Array = SignalColors.SAFE_FUEL if SignalColors.safe else [FUEL_FULL_C, FUEL_MID_C, FUEL_LOW_C, FUEL_CRIT_C]
 	if frac <= FUEL_RESERVE:
-		return FUEL_CRIT_C
+		return cs[3]
 	if frac <= FUEL_LOW:
-		return FUEL_LOW_C
+		return cs[2]
 	if frac >= FUEL_FADE:
-		return FUEL_FULL_C
+		return cs[0]
 	var t := (FUEL_FADE - frac) / (FUEL_FADE - FUEL_LOW)
-	return FUEL_FULL_C.lerp(FUEL_MID_C, t * 2.0) if t < 0.5 else FUEL_MID_C.lerp(FUEL_LOW_C, t * 2.0 - 1.0)
+	return (cs[0] as Color).lerp(cs[1], t * 2.0) if t < 0.5 else (cs[1] as Color).lerp(cs[2], t * 2.0 - 1.0)
 
 ## Zustand des Tanks: 0 gut, 1 wird knapp (orange), 2 Reserve (rot).
 static func fuel_state(frac: float) -> int:
 	return 2 if frac <= FUEL_RESERVE else (1 if frac <= FUEL_LOW else 0)
 
 ## Farbe der Hüllenfüllung für den Anteil `frac` (0–1) der vollen Hülle.
+## Option „Farbsehschwäche“: blau / gelb / purpurrot (die normale Tafel blau/violett/magenta ist bei Rot-Grün-Schwäche zu ähnlich).
 static func hull_color(frac: float) -> Color:
+	var ok_c := SignalColors.SAFE_GOOD if SignalColors.safe else HULL_OK_C
+	var worn_c := SignalColors.SAFE_MID if SignalColors.safe else HULL_WORN_C
 	if frac <= HULL_CRIT:
-		return HULL_CRIT_C
+		return SignalColors.SAFE_BAD if SignalColors.safe else HULL_CRIT_C
 	if frac >= HULL_OK:
-		return HULL_OK_C
+		return ok_c
 	if frac <= HULL_WORN:
-		return HULL_WORN_C
-	return HULL_OK_C.lerp(HULL_WORN_C, (HULL_OK - frac) / (HULL_OK - HULL_WORN))
+		return worn_c
+	return ok_c.lerp(worn_c, (HULL_OK - frac) / (HULL_OK - HULL_WORN))
 
 ## Zustand der Hülle: 0 heil, 1 angeschlagen (violett), 2 kritisch (magenta).
 static func hull_state(frac: float) -> int:

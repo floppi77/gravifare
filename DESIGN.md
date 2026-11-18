@@ -761,3 +761,140 @@ Jede Warte-Bedingung muss erreichbar bleiben, egal was der Spieler tut (`Tutoria
 - **Bilder der Projektseite** (`docs/media/de|en`: Hauptmenü, Garage, Werkstatt, Flugschule, Sektor 1/3/5/6, Neon, Notfall, Nachtschicht) mit neuem HUD und Taxi neu aufgenommen (1080p, auf 1280 × 720 verkleinert, frischer Spielstand); Level-Editor und Credits unverändert.
 - Test `_test_round76`.
 - **Version 1.6.1.**
+
+## Runde 77: Controller-Hinweis beim Spielstart
+
+- **Wunsch:** Beim Spielstart zeigen, dass ein Controller empfohlen wird. Dazu ein nachgezeichneter Controller im Xbox-Layout und der Hinweis gleichzeitig auf Deutsch und Englisch.
+- **Ablauf:** Startbildschirm (`splash.gd`) → **Controller-Hinweis** (`src/ui/pad_hint.gd`/`.tscn`) → Hauptmenü.
+  - Der Startbildschirm lädt das Hauptmenü schon vor; der Hinweis übernimmt es.
+  - Nach 4,8 s geht es von selbst weiter. Jede Taste, jeder Controllerknopf und jeder Mausklick geht sofort weiter, frühestens nach 0,3 s: Wer den Startbildschirm mit einem Druck überspringt, verpasst den Hinweis nicht gleich mit.
+  - Eine gehaltene Taste wird nicht ins Menü mitgenommen, wie beim Startbildschirm.
+  - Der Hinweis erscheint nur zusammen mit dem Startbildschirm, also nicht bei Entwicklerschaltern.
+- **Bild:** Der Controller ist ganz aus Formen gezeichnet, ohne Bilddatei, ohne Herstellerlogo und ohne Markennamen. Er hat:
+  - einen geglätteten, gespiegelten Umriss (Catmull-Rom) mit Farbverlauf und Neonrand in Cyan;
+  - Bumper und Trigger, linken Stick oben, Steuerkreuz und rechten Stick unten, A/B/X/Y in den Xbox-Farben (`PadGlyph.COLORS`);
+  - die Knöpfe Ansicht, Teilen und Menü;
+  - einen Leuchtknopf mit eigenem Zeichen: gelber Punkt im Neonring.
+- **Animation:**
+  - Der Controller schwebt herein.
+  - A, B, X und Y leuchten nacheinander auf und wiederholen das ruhig.
+  - Der linke Stick kreist leicht, der Leuchtknopf pulsiert.
+  - Mit „Weniger Bewegung“ gibt es nur Überblendungen.
+- **Text:** Titel, Satz, Status und Weiter-Hinweis stehen in beiden Sprachen.
+  - Die eingestellte Sprache steht zuerst (gelb bzw. weiß), die andere darunter (lavendel bzw. gedämpft).
+  - Neue Schlüssel: `PAD_HINT_TITLE`, `PAD_HINT_BODY`, `PAD_HINT_ON`, `PAD_HINT_OFF`, `PAD_HINT_GO`.
+  - `Loc.text_in(sprache, schlüssel)` liefert jede Sprache unabhängig von der eingestellten.
+- **Status (live):** grüner Punkt „Controller verbunden · Controller connected“ oder orange „Kein Controller verbunden · No controller connected“.
+- **Bildschirm:** Der Inhalt liegt auf der 640×360-Fläche, Hintergrund und Sternenhimmel füllen das ganze Fenster (Ultrawide).
+- **Dev:** `--scene=pad_hint` öffnet den Hinweis direkt, `--pad-hint-t=<s>` friert die Zeit ein, `--pad-hint-pad=on|off` täuscht den Status vor.
+- Test `_test_round77`.
+
+## Runde 78: Ampel mit Zeichen, PlayStation-Symbole, Steam Deck, Erfolge, Französisch und Spanisch
+
+- **Ampellampe am Wartehäuschen** (`props_view._light_shelter`): Die Lampe ist größer (Radius 3,3), grün mit Haken (Fahrgast wartet), rot mit X (niemand wartet). Damit ist der Zustand auch ohne Farbunterscheidung erkennbar. Der Lichtpunkt im Dunkeln (`dark_view`) sitzt an der neuen Stelle.
+- **PlayStation-Symbole:**
+  - `Controls.style_for_name` erkennt PS3/4/5, DualShock, DualSense, Sony und „Wireless Controller“; alle übrigen Controller behalten das Xbox-Layout.
+  - Erkannt wird am zuletzt benutzten Controller und beim Anschließen. Einstellung „Controllersymbole: automatisch / Xbox / PlayStation“ (`Settings.pad_glyphs`) unter Steuerung.
+  - Wirkt auf drei Stellen:
+    - gezeichnete Knöpfe: `PadGlyph`, ✕ ○ □ △ auf dunklen Knöpfen, L1/R1;
+    - Knopfnamen der Belegung: `Controls.event_label`, `pad_name`;
+    - Hinweistexte: `Loc.PAD_KEYS` werden per `Loc.ps_text` umgeschrieben: A→✕, B→○, X→□, Y→△, LB/RB→L1/R1, LT/RT→L2/R2, Back→Share, Start→Options. Englisches „Back to …“ bleibt, Tastenkürzel wie „Strg+Y“ bleiben.
+  - ✕ ○ □ △ fehlen in allen drei Spielschriften. Dafür gibt es eine Ersatzschrift: eine Teilmenge von Noto Sans Symbols 2 (OFL 1.1, aus dem Systempaket noto-fonts 1:2026.11.01-1, Version 2.008), `assets/fonts/noto_symbols2/`, eingetragen in THIRD_PARTY_LICENSES.md.
+  - Dev: `--pad-style=ps|xbox` täuscht einen Controller vor.
+  - Der Controller-Hinweis (Runde 77) zeigt bewusst weiter den Xbox-Controller.
+- **Steam Deck (1280×800) geprüft:** Das Spiel skaliert ganzzahlig auf 1280×720. Die 40 px oben und unten füllt jeder Bildschirm mit seinem Hintergrund (Menü, Level, Ergebnis, Controller-Hinweis). Kein Inhalt ist abgeschnitten. Die kleinste HUD-Schrift ist dort 12–14 px hoch: lesbar, aber klein.
+- **Erfolge** (`src/core/achievements.gd`, 26 Stück in zehn Kategorien):
+  - Sie werden rein aus dem Spielstand abgeleitet, also auch rückwirkend.
+  - Gespeichert wird nur `data.achievements = {id: Datum}`; einmal erreicht, bleibt ein Erfolg.
+  - Sektor-Erfolge lesen `ever` (überstehen ein Game Over). Medaillen-Erfolge zählen nur Medaillen, die noch im Spielstand stehen.
+  - Abgleich in `Save.write` und beim Laden eines Platzes, nicht im Debug-Modus, bei Entwicklerschaltern oder in Community-Leveln.
+  - Banner (`ach_toast.gd`) nur an Ruhepunkten: Ergebnisansicht, Hauptmenü, Ende der Nachtschicht. Ein älterer Spielstand bekommt ein Sammelbanner („12 Erfolge schon erreicht“).
+  - Übersicht (`achievements_view.gd`) über „Erfolge (x / 26)“ in der Statistik: zwei Spalten, zwei Seiten, Datum oder Fortschritt mit Balken, blättern mit LB/RB, Links/Rechts, Bild auf/ab, Mausrad oder Pfeilen.
+  - Dev: `--scene=achievements_view --ach-demo`, `--ach-toast=<id>|retro`.
+- **Französisch und Spanisch:**
+  - `data/i18n/fr.json` und `es.json` mit allen Texten. Levelnamen stehen in `data/i18n/level_names.json`, damit Level-Dateien und Prüfsummen unverändert bleiben.
+  - Ebenfalls übersetzt: Untertitel aller Sprechzeilen (`voice_lines.json`), Einspieler-Titel, Lackierungen, Credits.
+  - Gesprochen wird in FR/ES die englische Stimme, die Untertitel erscheinen in der Sprache.
+  - Bedienung: Flaggen FR/ES (`tools/art/gen_art.py`, Spanien vereinfacht ohne Wappen) im Hauptmenü und Pausenmenü; die Sprachwahl in den Optionen schaltet reihum.
+  - Fehlt ein Text in einer Sprache, gilt Englisch, dann Deutsch (`Loc.pick`). Die Systemsprache wird erkannt.
+  - „Level %d“ ist jetzt der Text `LVL_NUM` (Niveau/Nivel).
+  - Kurze Beschriftungen mit fester Breite gekürzt (z. B. CARB./COMB. in der Tankanzeige).
+  - Controller-Hinweis in FR/ES: eingestellte Sprache und Englisch.
+- Tests `_test_round78`, `_test_languages_fr_es`.
+
+## Runde 79: Sprachausgabe auf Französisch und Spanisch, Flugschule schaltet bei schnellen Schülern weiter
+
+- **Flugschule** (`tutorial.gd`, `_check_fast`): Erfüllt der Spieler die Aufgabe eines Schritts, während der Fluglehrer sie noch erklärt, bricht die Erklärung ab. Beispiel: Er landet, während die Landung noch erklärt wird.
+  - Bedingung: Die Aufgabe war zu Beginn des Schritts noch offen. Sie wird ab 0,5 s nach Beginn der Erklärung geprüft.
+  - Der Fluglehrer sagt dann einen von drei Sprüchen (`tut_fast_1…3`, reihum, z. B. „Ah, du lernst schneller, als ich erklären kann. Sehr gut. Dann weiter.“). Danach folgt sofort der nächste Schritt, ohne erneut auf die Aufgabe zu warten.
+  - Ausgenommen sind Schritte, die sich von selbst erfüllen (`no_fast`: Tanken im Stand, Volltanken mit Guthaben). Schritte, deren Aufgabe erst nach der Erklärung möglich ist (Einsteigen, Ausgang), lösen ihn ohnehin nicht aus.
+  - Dev: `--tut-step=N --tut-debug` gibt „tut fast: …“ aus.
+- **Stimmen FR/ES:** Alle Sprechzeilen gibt es jetzt auch auf Französisch und Spanisch, mit denselben Figuren und Werkzeugen wie DE/EN, alles offline:
+  - Qwen3-TTS VoiceDesign: Fahrgäste f0/f1/m0/m1, Tankwart, Zentrale.
+  - Qwen3-TTS Klon der Fluglehrer-Referenz: Einspieler `vid_*`.
+  - Fish Audio Drama 3 (FP8): Flugschule `tut_*`, die drei neuen Sprüche in allen vier Sprachen, Fahrgäste f2–f6/m2–m6 mit neuen Referenzstimmen.
+  - Ziffern im Untertitel werden für die Sprachausgabe ausgeschrieben (`tools/audio/voice_lang.py`).
+  - Jeder Clip wird mit faster-whisper (medium, lokal) gegen den Untertitel geprüft und bei Abweichung mit neuem Seed wiederholt.
+  - Danach gleicht `level_voice.py` die Lautheit an, `verify_voice.py --lang fr es` prüft am Ende alle Clips.
+  - Die englische Ersatzstimme aus Runde 78 bleibt nur als Rückfall für fehlende Clips.
+- **Skripte** (`tools/audio`):
+  - `gen_voice.py`, `gen_voice_clone.py` (`--validate`, `--skip-existing`), `gen_voice_drama.py` (`--lang all`, `--validate`, Untertitel aus `subtitle`), `gen_voice_drama_passengers.py`, `passenger_voices.py`, `verify_voice.py` (`--lang`) und `level_voice.py` kennen fr/es.
+  - `drama_tutorial.json` enthält die FR/ES-Sprechtexte mit übersetzten Regieanweisungen.
+- Test `_test_round79`.
+
+## Runde 80: Bedienhilfen (Farbsehschwäche, große Schrift), Bug melden, Bestflug ansehen, Steam-Vorbereitung
+
+- **Farbsehschwäche** (Optionen → Bedienhilfen, aus voreingestellt; `Settings.color_safe`, `signal_colors.gd`):
+  - Signalfarben für Zustände laufen über `SignalColors` (gut / Achtung / schlecht). Normal bleiben sie grün/gelb/rot wie bisher, mit der Option blau `#4fb0ff` / gelb `#ffe14a` / purpurrot `#d83c64`; der Tank hat vier Stufen (blau, weiß, gelb-orange, purpurrot), die Hülle nutzt dieselbe Tafel.
+  - Betroffen: Tank- und Hüllenanzeige, Landeampel, Landeassistent, Lampe am Taxi, Spritpreis (HUD und Zapfsäule), Fahrpreisfaktor, Geduldsbalken, Lampen an Wartehäuschen, Türen und Ausgang samt Torlicht, Zeit und Saldo in der Ergebnisansicht.
+  - Gewählt per Rechnung (`tools/art/cvd_check.py`, Simulation Machado 2009): kleinster Abstand der Stufen bei Deuteranopie/Protanopie/Tritanopie für die Ampel ≥ 51 (vorher 23), Tank ≥ 38 (vorher 6), Hülle ≥ 51 (vorher 14).
+  - Verworfen: ein Bildfilter über alles (Daltonisierung). Er verbesserte Rot-Grün kaum und machte bei Tritanopie Gelb und Rot ununterscheidbar.
+- **Große Schrift** (`Settings.text_large`, Faktor 1,3, `Settings.fs()`):
+  - HUD oben und unten (Werte wachsen, `_fit_text` verkleinert nur, wenn der Platz nicht reicht), Steuerungshinweis, Meldungen.
+  - Untertitel und Hinweise stehen in einem eigenen Kasten mit großer Schrift (bis drei Zeilen) über dem unteren HUD-Streifen; ist das Taxi in der unteren Bildhälfte, steht er oben, damit er keine Plattform verdeckt.
+  - Flugschule (`spot_view.gd`) und Einspieler (`intro_clip.gd`) mit größerer Schrift und Zeilenhöhe; der Kasten der Einspieler rückt bei vielen Zeilen ins Bild.
+  - Menüs bleiben unverändert.
+- **Bug melden** (Hauptmenü unten rechts, mit gezeichnetem Käfer `bug_icon.gd`; in der Menüspalte war kein Platz, ohne das Logo abzuschneiden oder „Beenden“ zu verschieben):
+  - Seite mit Erklärung und den Knöpfen „E-Mail schreiben“, „Protokollordner öffnen“ (wählt `godot.log` im Dateimanager aus) und „Adresse kopieren“.
+  - Die Mail geht an `gravifare@jpfa.eu`, Betreff `[GraviFare-Bug] v<Version> · <System>` (filterbar), Text mit zwei Fragen in der Spielsprache und Systemangaben (Version, System, Grafik, Fenster, Sprache, Eingabegeräte, Speicherplatz, Pfad des Protokolls) (`bug_report.gd`).
+  - Rechts von „Beenden“ bzw. „Ko-fi“ erreichbar; Dev: `--bug`.
+- **Bestflug ansehen** (Levelauswahl, Y bzw. V oder Klick auf den Hinweis unter den Bestwerten):
+  - Den Geist der Bestzeit gab es schon (fliegt beim Spielen mit). Neu: Der gespeicherte Bestlauf wird im echten Spiel nachgeflogen (`Flow.start_watch`, `game.gd` `_watch_input`). Run/TaxiSim sind deterministisch; Startwerte, Regelstand, Werkstatt-Einbauten, Seed und Leben kommen aus der Aufzeichnung, die Eingaben je Tick aus den Läufen, Rauswerfen aus den Ereignissen; Abstürze startet das Spiel wie im Original nach der Absturzpause neu.
+  - Neue Läufe speichern die Leben beim Start (`lives`, für die Lebens-Station); ältere nehmen 5 an.
+  - Nichts zählt (kein Spielstand, keine Statistik, kein Geist, keine Hinweise, kein Brummen). B/Esc beendet, nach dem Ende geht es nach 3,5 s zurück in die Levelauswahl auf dieselbe Karte. HUD: Kennung „BESTFLUG“ und Hinweiszeile.
+  - Geprüft im Spiel (headless, `--fixed-fps 120`): fünf Bot-Läufe und zwei Läufe mit Absturz und Rauswerfen enden mit genau der aufgezeichneten Zeit, demselben Guthaben und denselben Fahrgästen. Dev: `--watch-file=<replay.json>`.
+- **Steam-Vorbereitung** (`steam_bridge.gd`, `docs/steam_achievements.md`, `docs/steam/icons/`): Mit GodotSteam meldet die Brücke alle erreichten Erfolge zusätzlich an Steam (`ACH_<ID>`); ohne GodotSteam tut sie nichts. Symbole 64×64 aus `--export-ach-icons=<Ordner>`. Kein Steam-Auftritt geplant.
+- **Levelauswahl:** Der Titel ist etwas kleiner, damit die Sektor-Reiter ihn nicht mehr überdecken; die beiden Hinweise stehen in einer Zeile über „Zurück“ (vorher ragte die zweite Zeile in den Knopf).
+- Test `_test_round80`.
+
+## Runde 81 (Test, verworfen): Taxi als eigenes 3D-Modell aus Blender
+
+- Ein eigenes 3D-Modell (Rumpf als abgeflachte Kugel, Glaskuppel, Fahrer, Kapseln), vorgerendert und zu Pixelgrafik umgerechnet, mit Drehstufen. Vom Nutzer abgelehnt: flacher, „vorgerendert“, der Fahrer schlechter erkennbar. Skripte und Blatt sind entfernt.
+
+## Runde 82: Mischform des Taxis (Test), Flugschule, Debug-Zeile per Controller
+
+- **Mischform** (`tools/art/taxi3d/make_hybrid.py`; nur im Debug-Menü „Taxi: 2D/3D (Test)“, Dev `--taxi3d`):
+  - Das gezeichnete 2D-Taxi bleibt Form und Bild: Je Pixelgröße 2–6 kommen Vorlage und Teile-Karte aus `gen_taxi.render(n)` (`hybrid_prep.py`). Daraus entsteht ein Höhenrelief: Rumpf als Ellipsoid, Kuppel als Kugelkappe davor, Kapseln und Flossen dahinter, Düse als Wulst.
+  - Blender (`build_hybrid.py`) legt das Bild Pixel für Pixel auf das Relief (ein Feld je Bildpunkt, Farbe „Closest“). Gerendert wird mit Licht von oben links und Kantenlicht in 7 Drehstufen (−12° … +12°), dazu ein unbeleuchteter Durchgang.
+  - Zurück auf ganze Bildpunkte: Deckung nach Mehrheit; Kontur, Augen, Mund und Fugen aus dem unbeleuchteten Durchgang (das Licht darf sie nicht aufhellen); alle Farben auf die Farbtafel des 2D-Taxis derselben Größe.
+  - Geradeaus ist die Mischform bildpunktgenau das 2D-Taxi mit Licht und Glanz; die Drehstufen verschieben Kuppel (vorn) und Kapseln (hinten). Rest: an steilen Kanten etwas dunkler Saum in den äußeren Drehstufen.
+  - Blatt `assets/art/taxi_hybrid_test/std.png` (Drehstufen nebeneinander, Größen untereinander). `gen_taxi.py` merkt sich dafür die Teile-Karte (`LAST_PART`), die Ausgabe bleibt bitgleich.
+- **Flugschule:**
+  - Gekauftes Taxi blieb nicht: Die Sperre „schon 5 Taxis“ setzte nach dem Kauf sofort wieder auf 4 zurück; sie greift jetzt nur vor dem Kauf.
+  - Tanken: Die beiden Tankschritte schalten weiter, sobald das Tankziel erreicht ist und man schon wieder abhebt (`fast_if`). Nur „Ziel erreicht“ hätte die Erklärung immer nach einer halben Sekunde abgebrochen, weil sich der Tank im Stand von selbst füllt.
+  - Erledigt schon während der vorigen Erklärung (`early`): Landet man bei „Sprit knapp“ schon auf der Tankstelle oder zerstört das Taxi schon bei der Erklärung zur Landung, kommt der Spruch sofort statt der Erklärung von „Probier es aus“.
+  - Dev: `--debug-destroy-at=<s>` (Absturz mit Ereignis), `--inputs=x,y,fahrwerk,ticks;…` (Eingabefolge).
+- **F6 im Spiel** (Debug): schaltet das Taxi direkt zwischen 2D und Mischform um, mit kurzer Meldung – für den direkten Vergleich im Flug.
+- **Level 49** (s5_05) vom Nutzer im Editor geändert: Vorschaubild `assets/art/levels/s5_05.jpg` neu aus dem Spiel (wie `tools/make_level_shots.sh`, nur dieses Level).
+- **Debug-Zeile per Controller:** „Debug-Modus verlassen“ und „Taxi 2D/3D“ sind fest verdrahtet (unter „Beenden“, Links/Rechts, Hoch zurück); die automatische Suche fand sie nicht.
+- Test `_test_round82`.
+
+## Runde 83: Mischform als Standard, Leuchten der nächsten Plattform, Version 1.6.5
+
+- **Mischform als Standard** (`Cosmetics.taxi_3d = true`): Blätter für alle 10 Lackierungen (`assets/art/taxi_hybrid/<lack>.png`, `make_hybrid.py <arbeitsordner> assets/art/taxi_hybrid`; das Relief ist für alle gleich, Blender wechselt je Größe nur die Vorlage, die Farbtafel kommt aus `taxi_sizes/<lack>.png`). Aufkleber werden wieder gezeichnet (Lage wie bisher; bei ±12° verschiebt sich die Rumpfkante nur um etwa einen Bildpunkt). Garage, Menüs, Leben-Symbole und Zwischenflug zeigen weiter das 2D-Bild (feste Vorderansicht). Vergleich: Debug-Menü „Taxi: 3D/2D“ und F6 im Level schalten auf das bisherige 2D-Taxi; Dev `--taxi2d`. Das Testblatt `taxi_hybrid_test` ist entfernt.
+- **Dunkle Level:** `DarkView` ließ die nächste Abholplattform schon nach dem Absetzen des vorigen Fahrgasts leuchten (`target_pad`). Jetzt `marker_pad` wie Pfeil und Leuchtfeuer: erst, wenn der Fahrgast erscheint. Gilt für Karriere und Nachtschicht (die Tagschicht ist immer hell).
+- **Nachtschicht:** Das Ergebnis jeder Karte hat unten eine Abrechnungsleiste (`_draw_shift_ledger`: Fahrpreise, Reparatur, Ersatztaxis, Verpasst, Saldo – dieselben Werte wie die Ergebnisansicht der Karriere); die Tafel ist dafür 30 Einheiten höher.
+- **Ruckler auf Level 41 („Dynamo“, heute Karte 4 der Nachtschicht):** Die drei Magnetfelder kosteten 6 ms (1440p) bis 9 ms (4K) Zeichenzeit je Bild, weil `PixelDraw` jede Zeile eines Rings und jeden Lauf einer schrägen Linie als eigenes Rechteck zeichnete. Jetzt werden die Läufe als Segmente gesammelt und mit einem `draw_multiline` je Ring/Linie/Bogen gezeichnet (Ringe und Scheiben als fertige Segmentlisten im Zwischenspeicher, verschoben per `Transform2D`). Gemessen: 1,8 ms bzw. 2,2 ms; das Bild bleibt gleich (Vergleich alt/neu im Rauschen zweier Läufe). Dazu lief beim Spielen Blender auf der Grafikkarte, das verstärkte die Ruckler. Dev: `--profile-draw` gibt die Zeichenzeit je Teil von `props_view` aus.
+- **Version 1.6.5** mit den Runden 77–83, Änderungsliste in `docs/CHANGELOG.md`.
+- Test `_test_round83`.
+

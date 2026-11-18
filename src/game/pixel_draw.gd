@@ -9,6 +9,13 @@ extends RefCounted
 const PX := 1.0 / 3.0                       # Raster der Größe 3 (Vorgabe, wo keine Zeichenfläche bekannt ist)
 
 static var _ring_cache := {}
+static var _seg_cache := {}              # Ringe/Scheiben als fertige Liniensegmente je (Radien, Pixelgröße): ein Zeichenaufruf statt eines je Zeile
+
+## Läufe einer Zeile als Liniensegmente sammeln und in einem einzigen Aufruf zeichnen (Runde 83: Magnetfelder in Level 41 kosteten
+## sonst bis zu 9 ms je Bild, weil jede Zeile eines Rings ein eigenes Rechteck war). Breite = Dicke des Laufs in Einheiten.
+static func _flush(ci: CanvasItem, pts: PackedVector2Array, col: Color, width: float) -> void:
+	if pts.size() >= 2:
+		ci.draw_multiline(pts, col, width)
 
 ## Auf das Raster von 1/3 Einheit runden.
 static func snap(v: float, n := 3) -> float:
@@ -56,6 +63,8 @@ static func line(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w_px := 1) 
 	var y1 := roundi(b.y * nf)
 	w_px = scaled_w(w_px, int(nf))
 	var lo := -(w_px / 2)                           # die Dicke wächst nach beiden Seiten um die Mitte
+	var p := 1.0 / nf
+	var pts := PackedVector2Array()
 	if y0 == y1:
 		_cells(ci, mini(x0, x1), y0 + lo, absi(x1 - x0) + 1, w_px, col)
 		return
@@ -73,12 +82,12 @@ static func line(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w_px := 1) 
 		var x := x0
 		while true:
 			if x == x1:
-				_run_h(ci, run_start, x, cy, lo, w_px, col)
+				_seg_h(pts, run_start, x, cy, lo, w_px, p)
 				break
 			err -= dy
 			x += sx
 			if err < 0:
-				_run_h(ci, run_start, x - sx, cy, lo, w_px, col)
+				_seg_h(pts, run_start, x - sx, cy, lo, w_px, p)
 				cy += sy
 				err += dx
 				run_start = x
@@ -89,15 +98,28 @@ static func line(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, w_px := 1) 
 		var y := y0
 		while true:
 			if y == y1:
-				_run_v(ci, cx, run_start2, y, lo, w_px, col)
+				_seg_v(pts, cx, run_start2, y, lo, w_px, p)
 				break
 			err2 -= dx
 			y += sy
 			if err2 < 0:
-				_run_v(ci, cx, run_start2, y - sy, lo, w_px, col)
+				_seg_v(pts, cx, run_start2, y - sy, lo, w_px, p)
 				cx += sx
 				err2 += dy
 				run_start2 = y
+	_flush(ci, pts, col, float(w_px) * p)
+
+## Waagerechter Lauf (Bildpunkte xa…xb in Zeile y, Dicke w) als Segment längs der Mitte der Dicke.
+static func _seg_h(pts: PackedVector2Array, xa: int, xb: int, y: int, lo: int, w: int, p: float) -> void:
+	var yc := (float(y + lo) + float(w) * 0.5) * p
+	pts.append(Vector2(float(mini(xa, xb)) * p, yc))
+	pts.append(Vector2(float(maxi(xa, xb) + 1) * p, yc))
+
+## Senkrechter Lauf (Bildpunkte ya…yb in Spalte x, Dicke w).
+static func _seg_v(pts: PackedVector2Array, x: int, ya: int, yb: int, lo: int, w: int, p: float) -> void:
+	var xc := (float(x + lo) + float(w) * 0.5) * p
+	pts.append(Vector2(xc, float(mini(ya, yb)) * p))
+	pts.append(Vector2(xc, float(maxi(ya, yb) + 1) * p))
 
 static func _run_h(ci: CanvasItem, xa: int, xb: int, y: int, lo: int, w: int, col: Color) -> void:
 	_cells(ci, mini(xa, xb), y + lo, absi(xb - xa) + 1, w, col)
@@ -159,11 +181,31 @@ static func ring(ci: CanvasItem, c: Vector2, r: float, col: Color, w_px := 1) ->
 	var nf := float(n_of(ci))
 	var r_px := maxf(r * nf, 1.0)
 	var half := float(scaled_w(w_px, int(nf))) * 0.5
-	_runs(ci, c, ring_runs(maxf(r_px - half, 0.0), r_px + half), col)
+	_ring_draw(ci, c, maxf(r_px - half, 0.0), r_px + half, col)
+
+## Ring/Scheibe aus dem Zwischenspeicher: Zeilenläufe als Segmente relativ zur Mitte, verschoben in einem Aufruf gezeichnet.
+static func _ring_draw(ci: CanvasItem, c: Vector2, r_in: float, r_out: float, col: Color) -> void:
+	var n := n_of(ci)
+	var nf := float(n)
+	var key := Vector3i(roundi(r_in * 2.0), roundi(r_out * 2.0), n)
+	var pts: PackedVector2Array
+	if _seg_cache.has(key):
+		pts = _seg_cache[key]
+	else:
+		var p := 1.0 / nf
+		for run in ring_runs(r_in, r_out):
+			var yc := (float(run[1]) + 0.5) * p
+			pts.append(Vector2(float(run[0]) * p, yc))
+			pts.append(Vector2(float(int(run[0]) + int(run[2])) * p, yc))
+		if _seg_cache.size() > 4000:
+			_seg_cache.clear()
+		_seg_cache[key] = pts
+	var off := Vector2(float(roundi(c.x * nf)), float(roundi(c.y * nf))) / nf
+	_flush(ci, Transform2D(0.0, off) * pts, col, 1.0 / nf)
 
 ## Gefüllte Scheibe, gestuft.
 static func disc(ci: CanvasItem, c: Vector2, r: float, col: Color) -> void:
-	_runs(ci, c, ring_runs(0.0, maxf(r * float(n_of(ci)), 1.0)), col)
+	_ring_draw(ci, c, 0.0, maxf(r * float(n_of(ci)), 1.0), col)
 
 ## Kreisbogen (Winkel im Bogenmaß wie `draw_arc`, 0 = rechts, im Uhrzeigersinn positiv), `w_px` Bildpunkte dick. Für kleine Radien (Takt-Anzeige).
 static func arc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col: Color, w_px := 1) -> void:
@@ -174,6 +216,8 @@ static func arc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col:
 	w_px = scaled_w(w_px, int(nf))
 	var n := maxi(int(ceilf(absf(a1 - a0) * r_px * 1.5)), 2)          # ein Schritt kürzer als ein Bildpunkt
 	var lo := -(w_px / 2)
+	var pp := 1.0 / nf
+	var pts := PackedVector2Array()
 	var last := Vector2i(1 << 30, 1 << 30)
 	var run_x := 0
 	var run_w := 0
@@ -188,12 +232,13 @@ static func arc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col:
 			run_w += 1
 			continue
 		if run_w > 0:
-			_cells(ci, run_x, run_y + lo, run_w, w_px, col)
+			_seg_h(pts, run_x, run_x + run_w - 1, run_y, lo, w_px, pp)
 		run_x = p.x
 		run_y = p.y
 		run_w = 1
 	if run_w > 0:
-		_cells(ci, run_x, run_y + lo, run_w, w_px, col)
+		_seg_h(pts, run_x, run_x + run_w - 1, run_y, lo, w_px, pp)
+	_flush(ci, pts, col, float(w_px) * pp)
 
 ## Strahl aus Pixelzeilen (Triebwerksflamme): Spitze in Richtung `dir` (achsenparallel), vom Ansatz `base` aus `length` lang und `half_w` halb breit;
 ## die Breite nimmt gestuft ab, jede Zeile ist ein Rechteck.

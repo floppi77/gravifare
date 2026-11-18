@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Meteoriten",
-  "en": "Meteors"
+  "en": "Meteors",
+  "fr": "Météores",
+  "es": "Meteoritos"
  },
  "map": [
   "########################################",
@@ -78,7 +80,9 @@
   ],
   "title": {
    "de": "Meteoriten",
-   "en": "Meteors"
+   "en": "Meteors",
+   "fr": "Météores",
+   "es": "Meteoritos"
   }
  }
 }

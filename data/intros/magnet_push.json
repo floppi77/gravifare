@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Abstoßende Magnete",
-  "en": "Repelling magnets"
+  "en": "Repelling magnets",
+  "fr": "Aimants répulsifs",
+  "es": "Imanes que repelen"
  },
  "map": [
   "########################################",
@@ -85,7 +87,9 @@
   ],
   "title": {
    "de": "Abstoßende Magnete",
-   "en": "Repelling magnets"
+   "en": "Repelling magnets",
+   "fr": "Aimants répulsifs",
+   "es": "Imanes que repelen"
   }
  }
 }

@@ -4,7 +4,9 @@
  "index": 1,
  "name": {
   "de": "Lavablasen im Takt",
-  "en": "Pulsing lava"
+  "en": "Pulsing lava",
+  "fr": "Lave pulsée",
+  "es": "Lava pulsante"
  },
  "map": [
   "########################################",
@@ -76,7 +78,9 @@
   ],
   "title": {
    "de": "Lavablasen im Takt",
-   "en": "Pulsing lava"
+   "en": "Pulsing lava",
+   "fr": "Lave pulsée",
+   "es": "Lava pulsante"
   }
  }
 }

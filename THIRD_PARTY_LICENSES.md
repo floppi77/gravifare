@@ -10,6 +10,7 @@
 | Jersey 10 (Titel) | github.com/google/fonts (ofl/jersey10), © 2023 The Soft Type Project Authors | SIL OFL 1.1 (`assets/fonts/jersey10/OFL.txt`) | – | ja | in Benutzung |
 | Oxanium (HUD, Menüs) | github.com/google/fonts (ofl/oxanium), © 2019 The Oxanium Project Authors | SIL OFL 1.1 (`assets/fonts/oxanium/OFL.txt`) | variabel, Gewicht 600 | ja | in Benutzung |
 | Nunito (Untertitel, Funk-/Fließtext) | github.com/google/fonts (ofl/nunito), © 2014 The Nunito Project Authors | SIL OFL 1.1 (`assets/fonts/nunito/OFL.txt`) | variabel, Gewicht 600 | ja | in Benutzung |
+| Noto Sans Symbols 2 (Teilmenge: nur ✕ ○ □ △, Ersatzschrift für Knopfnamen im PlayStation-Layout) | Systempaket noto-fonts 1:2026.11.01-1 (Arch Linux), Schriftversion 2.008, © 2022 The Noto Project Authors (github.com/notofonts/symbols); Teilmenge mit pyftsubset erzeugt | SIL OFL 1.1 (`assets/fonts/noto_symbols2/OFL.txt`, laut Namenstabelle der Schrift) | `NotoSansSymbols2-PadSubset.ttf`, 4 Zeichen | ja | in Benutzung |
 | Silkscreen, Pixelify Sans | Google Fonts | OFL 1.1 | – | nein | **bewertet, nicht eingebunden** (Silkscreen: sehr klein und nur Versalien; Pixelify: breit) |
 | Raumklang `amb_s1–s9` | eigene Synthese `tools/audio/gen_ambience.py` | eigene Arbeit | – | ja | in Benutzung |
 | Musik (22 Themen × 3 Schichten, OGG, Klang von C64-SID und Amiga-Paula) | eigene Synthese und Komposition `tools/audio/gen_music.py`, `music_score.py`; alle Instrumente selbst erzeugt, keine Fremdsamples | eigene Arbeit | – | ja | in Benutzung |

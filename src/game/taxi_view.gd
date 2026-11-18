@@ -12,6 +12,7 @@ var flame_main := 0.0
 var flame_down := 0.0
 var flame_side := 0.0
 var flash := 0.0
+var yaw := 0.0                    # Mischform: geglättete Drehung −1 … 1 nach der Seitengeschwindigkeit
 
 var light: PointLight2D
 var exhaust: CPUParticles2D
@@ -145,6 +146,8 @@ func sync_state() -> void:
 func _process(delta: float) -> void:
 	t += delta
 	flash = maxf(0.0, flash - delta * 4.0)
+	if sim != null and Cosmetics.taxi_3d:
+		yaw = move_toward(yaw, clampf(sim.vel.x / 60.0, -1.0, 1.0), delta * 2.5)
 	queue_redraw()
 
 func _draw() -> void:
@@ -161,7 +164,7 @@ func _draw() -> void:
 			draw_rect(Rect2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE - 2, 5 + gl, 4, 0.7), steel)
 		if sim.gear_extended():
 			var ok := sim.landing_margin()
-			var lamp := Color("#5dff9a") if ok > 0.0 else Color("#ff4d6d")
+			var lamp := SignalColors.good() if ok > 0.0 else SignalColors.bad()
 			draw_rect(Rect2(-1, 7, 2, 1), lamp)
 	# Flammen: aus Pixelzeilen (heißer Kern, flackernder Rand, Spitzen in Rot), Lenkdüsen blau
 	var flick := 0.6 + 0.4 * sin(t * 60.0)
@@ -175,7 +178,11 @@ func _draw() -> void:
 		size_n = n
 		frame = Cosmetics.taxi_frame(n)
 		sticker_frame = Cosmetics.sticker_frame(n)
-	draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src, mod)
+	var f3 := Cosmetics.taxi3d_frame(n, roundi((yaw + 1.0) * 0.5 * float(Cosmetics.TAXI3D_FRAMES - 1))) if Cosmetics.taxi_3d else {}
+	if not f3.is_empty():
+		draw_texture_rect_region(f3.tex, Tuning.TAXI_RECT, f3.src, mod)       # Mischform: Drehstufe nach der Seitengeschwindigkeit
+	else:
+		draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src, mod)
 	if not sticker_frame.is_empty():
 		draw_texture_rect_region(sticker_frame.tex, Tuning.sticker_rect(int(sticker_frame.n), int(sticker_frame.src.size.x)), sticker_frame.src, mod)
 	# Schadenanzeige: Funken/Rauch
