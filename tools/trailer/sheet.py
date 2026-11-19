@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Kontaktbogen roher Aufnahmen: sheet.py <clip> <out.png> t1 t2 ... (Sekunden); markiert die Taxi-Position aus der Spur."""
 import sys, os, subprocess
+from fractions import Fraction
 from PIL import Image, ImageDraw
 C = os.path.expanduser(os.environ.get("GF_TRAILER_CLIPS", "~/.cache/gravifare-trailer/clips_v5"))
 clip, out = sys.argv[1], sys.argv[2]
 ts = [float(a) for a in sys.argv[3:]]
 tr = [l.split() for l in open(f"{C}/{clip}.trace")] if os.path.exists(f"{C}/{clip}.trace") else []
 pr = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height,r_frame_rate", "-of", "csv=p=0", f"{C}/{clip}.avi"], capture_output=True, text=True).stdout.strip().split(",")
-SW, SH, FR = int(pr[0]), int(pr[1]), eval(pr[2])
+SW, SH, FR = int(pr[0]), int(pr[1]), float(Fraction(pr[2]))       # Bildrate „60/1“ als Bruch
 ims = []
 for t in ts:
     raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.3f}", "-i", f"{C}/{clip}.avi", "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
