@@ -696,7 +696,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if trans_t >= 0.0:
 		# Levelwechsel: A/Enter/B/Esc überspringen die Sequenz bis zum Einblenden; sonst keine Eingabe
-		if (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")) and trans_t < TV.T_IN - 0.01:
+		if (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") or _is_click(event)) and trans_t < TV.T_IN - 0.01:
 			trans_t = TV.T_IN - 0.001
 			radio_played = true
 			radio_age = 1.0e6                  # die Warte-Bedingung in _process darf nicht greifen
@@ -717,7 +717,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif hud.shot_available() and (event.is_action_pressed("eject") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and hud.shot_btn.has_point(hud.event_pos(event)))):
 		get_viewport().set_input_as_handled()
 		_take_shift_shot()
-	elif event.is_action_pressed("ui_accept") and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
+	elif (event.is_action_pressed("ui_accept") or _is_click(event)) and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
 		get_viewport().set_input_as_handled()     # vor einem Szenenwechsel: danach hat der Knoten keinen Viewport mehr
 		if Flow.next_level_id() != "":
 			if Workshop.due(run.level.number) and not Flow.shift:
@@ -731,7 +731,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			Flow.to_menu()
 	elif hud.game_over:
-		if event.is_action_pressed("ui_accept"):
+		if event.is_action_pressed("ui_accept") or _is_click(event):
+			get_viewport().set_input_as_handled()
 			Flow.to_menu()
 	elif event.is_action_pressed("horn"):
 		get_viewport().set_input_as_handled()
@@ -761,6 +762,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("gear") and not paused and Controls.gear_toggle:
 		if tutorial == null or not tutorial.locked:
 			gear_on = not gear_on
+
+## Linker Mausklick (Maus-Bedienung): gilt in Ergebnisansicht, Game Over und Levelwechsel wie A/Enter.
+static func _is_click(event: InputEvent) -> bool:
+	return event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 
 ## Stärke 0..1 des Schubbrummens: nur im Flug und nur für Schub über dem, was das Taxi zum Schweben braucht.
 ## Schweben, kleine Korrekturen und ein Stick, der im Stand leicht ausschlägt, brummen nicht.

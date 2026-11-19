@@ -302,6 +302,29 @@ func _link_grid(grid: GridContainer) -> void:
 		elif i % 2 == 1:
 			b.focus_neighbor_left = b.get_path_to(grid.get_child(i - 1))
 
+## Gitter fest in allen vier Richtungen verdrahten (Gamepad/Pfeiltasten): Links/Rechts in der Zeile, Hoch/Runter in der Spalte, aus der letzten Zeile
+## nach unten auf `below` (z. B. „Zurück“) und von dort wieder hoch in die linke Spalte. Ränder bleiben stehen statt quer zu springen.
+func _link_grid_full(grid: GridContainer, below: Control = null) -> void:
+	var n := grid.get_child_count()
+	var cols := maxi(grid.columns, 1)
+	for i in n:
+		var b := grid.get_child(i) as Control
+		var col := i % cols
+		b.focus_neighbor_left = b.get_path_to(grid.get_child(i - 1) if col > 0 else b)
+		b.focus_neighbor_right = b.get_path_to(grid.get_child(i + 1) if col < cols - 1 and i + 1 < n else b)
+		b.focus_neighbor_top = b.get_path_to(grid.get_child(i - cols) if i - cols >= 0 else b)
+		var down: Control = grid.get_child(i + cols) if i + cols < n else (below if below != null else b)
+		b.focus_neighbor_bottom = b.get_path_to(down)
+		b.focus_next = b.get_path_to(grid.get_child(i + 1) if i + 1 < n else (below if below != null else b))
+		b.focus_previous = b.get_path_to(grid.get_child(i - 1) if i > 0 else b)
+	if below != null and n > 0:
+		var last_left := grid.get_child(((n - 1) / cols) * cols) as Control
+		below.focus_neighbor_top = below.get_path_to(last_left)
+		below.focus_neighbor_bottom = below.get_path_to(below)
+		below.focus_neighbor_left = below.get_path_to(below)
+		below.focus_neighbor_right = below.get_path_to(below)
+		below.focus_previous = below.get_path_to(grid.get_child(n - 1))
+
 ## Alle Knöpfe des Nebenmenüs so breit wie der breiteste (z. B. „Ko-fi: Unterstützen“), damit beide Spalten gleich aussehen.
 ## Erst im Baum gemessen, weil die Schrift aus dem Theme kommt.
 func _equalize_grid(grid: GridContainer, extras: Array = []) -> void:
@@ -386,7 +409,10 @@ func show_debug_eggs() -> void:
 		var id: String = entry[1]
 		grid.add_child(MenuKit.button(tr(entry[0]), func(): Flow.start_selected(id)))
 	grid.add_child(MenuKit.button(tr("DEBUG_EGG_DAILY"), func(): Flow.start_daily()))
-	box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
+	var back := MenuKit.button(tr("MENU_BACK"), show_main)
+	box.add_child(back)
+	_equalize_grid.call_deferred(grid)
+	_link_grid_full(grid, back)
 	_focus_first()
 
 ## „Bug melden“ rechtsbündig über der Versionsangabe; Fokuswege von „Beenden“ und „Ko-fi“ (Rechts) und zurück (Links/Hoch).

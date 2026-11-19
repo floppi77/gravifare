@@ -285,7 +285,7 @@ static func _smooth(x: float) -> float:
 	return x * x * (3.0 - 2.0 * x)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if state == S.IN and event.is_action_pressed("ui_accept"):
+	if state == S.IN and (event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)):
 		t = FLY_IN + LIFT_UP
 		get_viewport().set_input_as_handled()
 	elif state == S.SHOP and (event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")):
@@ -464,3 +464,9 @@ func _draw_roof(m: Vector2) -> void:
 		draw_rect(Rect2(leaf.position.x, ROOF_Y - 5.0, leaf.size.x, 5.0), Color("#ffc23a"))
 		draw_rect(leaf, look.edge, false, 1.0)
 	draw_rect(Rect2(-m.x, ROOF_Y, 640.0 + 2.0 * m.x, 1.0), look.edge)
+
+## Maus: Klick überspringt den Einflug (die Halle ist selbst ein Control und bekommt Klicks als Oberflächen-Ereignis).
+func _gui_input(event: InputEvent) -> void:
+	if state == S.IN and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		accept_event()
+		t = FLY_IN + LIFT_UP

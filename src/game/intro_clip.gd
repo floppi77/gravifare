@@ -132,7 +132,8 @@ func _build_view() -> void:
 func _input(event: InputEvent) -> void:
 	if closing:
 		return
-	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") \
+			or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		_close()
 		get_viewport().set_input_as_handled()
 

@@ -10,7 +10,7 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Runde 86, 2026-11-19):** 4101 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Runde 86, 2026-11-19):** 4103 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
 
 - **Runde 86:** Eastereggs (`_test_round86`; Einzelheiten absichtlich nicht dokumentiert). Die Stimmtests verlangen jetzt in allen sieben Sprachen eigene Aufnahmen (native Sprachausgabe it/pt/pl aus Runde 85).
 

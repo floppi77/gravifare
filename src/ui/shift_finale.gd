@@ -79,7 +79,7 @@ func _announce() -> void:
 	radio_until = t + length + 0.5
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel"):
+	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or _click(event):
 		get_viewport().set_input_as_handled()
 		Sfx.voice_player.stop()
 		Music.duck(0.0)
@@ -340,3 +340,12 @@ func _box(bg: Color, border: Color) -> StyleBoxFlat:
 		sb.anti_aliasing = true
 		_boxes[key] = sb
 	return _boxes[key]
+
+## Maus: Linksklick wie A/Enter. Die Szene ist selbst ein Control und nimmt Klicks als Oberflächen-Ereignis an – darum hier weiterreichen.
+static func _click(event: InputEvent) -> bool:
+	return event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+
+func _gui_input(event: InputEvent) -> void:
+	if _click(event):
+		accept_event()
+		_unhandled_input(event)

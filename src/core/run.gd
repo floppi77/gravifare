@@ -773,14 +773,18 @@ func eject() -> bool:
 	var ground := _ground_below(sim.pos.x, foot_y)
 	var height := ground - foot_y
 	var lethal := height >= Tuning.EJECT_LETHAL_HEIGHT and sim.state != TaxiSim.State.LANDED
+	# Wohin der Fahrgast läuft: auf die Plattform, auf der das Taxi steht oder dicht über der es schwebt – nie zurück zu seiner
+	# Herkunftsplattform durch die Luft (Fehler bis 1.7.0). Liegt unter dem Taxi keine Plattform, stürzt er ab, auch aus geringer Höhe.
+	var under: Dictionary = sim.landed_pad if sim.state == TaxiSim.State.LANDED and not sim.landed_pad.is_empty() else level.pad_at_foot(Vector2(sim.pos.x, ground + 1.0))
+	if not lethal and under.is_empty():
+		lethal = true
 	a.pay_info = {}
 	ejected += 1
 	log.append({"type": "ejected", "voice": a.voice_key(), "name": a.pname, "lethal": lethal})
 	if lethal:
 		a.start_fall(sim.pos.x, sim.pos.y + 4.0, sim.vel, ground)
 	else:
-		var pad: Dictionary = sim.landed_pad if not sim.landed_pad.is_empty() else a.pad
-		a.kicked_out(sim.pos.x, pad)
+		a.kicked_out(sim.pos.x, under)
 	leavers.append(a)
 	if not ex.is_empty():
 		extras.erase(ex)

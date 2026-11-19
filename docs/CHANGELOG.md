@@ -3,6 +3,26 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.7.1
+
+### Deutsch
+
+**Fehlerbehebungen**
+- Rausgeworfene Fahrgäste liefen manchmal durch die Luft zu ihrer Herkunftsplattform. Jetzt gilt: Steht oder schwebt das Taxi dicht über einer Plattform, läuft der Fahrgast nur zum Häuschen dieser Plattform; ist darunter keine Plattform, stürzt er ab – auch aus geringer Höhe
+- Fahrgäste, die nach einer perfekten Landung am Häuschen winken, fahren auf einer beweglichen Plattform jetzt mit, statt in der Luft zu hängen
+- Erfolge: Mit der Maus lässt sich wieder blättern (Pfeile und Mausrad) und zurückgehen
+- Maus: Ein Klick führt jetzt auch in der Levelauswertung, bei Game Over, beim Levelwechsel, im Finale, in Einspielern und beim Einflug in die Werkstatt weiter; die Credits haben einen „Zurück“-Knopf
+- Controller und Pfeiltasten: Menüs mit zwei Spalten springen beim Wechsel zwischen links/rechts und oben/unten nicht mehr quer
+
+### English
+
+**Bug fixes**
+- Ejected passengers sometimes walked through the air back to the platform they came from. Now: if the taxi stands on or hovers close above a platform, the passenger only walks to that platform's shelter; with no platform below, they fall – even from a low height
+- Passengers waving at the shelter after a perfect landing now ride along on a moving platform instead of hanging in mid-air
+- Achievements: paging (arrows and mouse wheel) and going back work with the mouse again
+- Mouse: a click now also continues on the level results, game over, level transitions, the finale, intro clips and the workshop fly-in; the credits have a "Back" button
+- Controller and arrow keys: two-column menus no longer jump diagonally when moving left/right and up/down
+
 ## 1.7.0
 
 ### Deutsch

@@ -1,5 +1,5 @@
 extends Control
-## Credits: Szene mit Taxi, Werbebanner und Schildern (credits_show.gd) über dem animierten Menühintergrund. A/Enter beschleunigt, B/Esc beendet.
+## Credits: Szene mit Taxi, Werbebanner und Schildern (credits_show.gd) über dem animierten Menühintergrund. A/Enter beschleunigt, B/Esc oder „Zurück“ (Maus) beendet.
 
 var lines: Array = []
 var scroll_y := 380.0
@@ -44,6 +44,18 @@ func _ready() -> void:
 	kofi.theme = MenuKit.make_theme()
 	kofi.pressed.connect(func(): OS.shell_open(Flow.KOFI_URL))
 	add_child(kofi)
+	var back := Button.new()                                   # Maus; per Gamepad B oder Esc
+	back.text = tr("MENU_BACK")
+	back.focus_mode = Control.FOCUS_NONE
+	back.add_theme_font_size_override("font_size", 8)
+	back.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	back.offset_left = 8.0
+	back.offset_top = -24.0
+	back.offset_right = 90.0
+	back.offset_bottom = -6.0
+	back.theme = MenuKit.make_theme()
+	back.pressed.connect(func(): Flow.to_menu())
+	add_child(back)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_X) or (event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_K):

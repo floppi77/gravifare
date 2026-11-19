@@ -3056,6 +3056,41 @@ func _test_eject() -> void:
 	check(r2.eject(), "Rauswerfen am Boden")
 	var surv: PassengerActor = r2.leavers[r2.leavers.size() - 1]
 	check(surv.state == PassengerActor.S.EXITING and surv.angry and surv.pay_info.is_empty(), "Am Boden überlebt er, schimpft und läuft weg – ohne Geld")
+	# dicht über einer anderen Plattform: läuft nur zu deren Häuschen (nicht durch die Luft zur Herkunftsplattform); über Fels: stürzt immer ab
+	var r4 := Run.new()
+	r4.extras_enabled = false
+	r4.start(lvl)
+	var job4 := _board_main(r4, lvl)
+	var origin_id := String(job4.get("from", ""))
+	var other: Dictionary = {}
+	for id in lvl.pads:
+		if lvl.is_passenger_pad(id) and id != origin_id:
+			other = lvl.pads[id]
+			break
+	r4.sim.state = TaxiSim.State.FLYING
+	r4.sim.landed_pad = {}
+	r4.sim.gear = 0.0
+	r4.sim.pos = Vector2(float(other.center), float(other.row) * Tuning.TILE - Tuning.HULL_HALF.y - 8.0)
+	r4.eject()
+	var near: PassengerActor = r4.leavers[r4.leavers.size() - 1]
+	check(not other.is_empty() and near.state == PassengerActor.S.EXITING and String(near.pad.id) == String(other.id) and is_equal_approx(near.surface_y, float(other.row) * Tuning.TILE),
+		"Dicht über fremder Plattform rausgeworfen: läuft zu deren Häuschen, auf deren Höhe (Pad %s statt %s)" % [str(other.get("id", "")), origin_id])
+	var r5 := Run.new()
+	r5.extras_enabled = false
+	r5.start(lvl)
+	_board_main(r5, lvl)
+	var rock := Vector2.ZERO
+	for cy in range(2, lvl.height):
+		for cx in range(1, lvl.width - 1):
+			if rock == Vector2.ZERO and lvl.cell(cx, cy) == LevelData.SOLID and lvl.cell(cx, cy - 1) == "." and lvl.cell(cx, cy - 2) == "." and lvl.cell(cx - 1, cy - 1) == "." and lvl.cell(cx + 1, cy - 1) == ".":
+				rock = Vector2(cx * Tuning.TILE + Tuning.TILE * 0.5, cy * Tuning.TILE)
+	r5.sim.state = TaxiSim.State.FLYING
+	r5.sim.landed_pad = {}
+	r5.sim.gear = 0.0
+	r5.sim.pos = rock - Vector2(0, Tuning.HULL_HALF.y + 6.0)
+	r5.eject()
+	var low: PassengerActor = r5.leavers[r5.leavers.size() - 1]
+	check(rock != Vector2.ZERO and low.state == PassengerActor.S.FALLING, "Dicht über Fels (keine Plattform) rausgeworfen: stürzt ab")
 	# Zusatzfahrgast
 	var l5 := LevelData.load_file("res://data/levels/s1_05.json")
 	var r3 := Run.new()

@@ -93,24 +93,32 @@ func _unhandled_input(e: InputEvent) -> void:
 		turn(1)
 	elif e.is_action_pressed("ui_accept") and not (e is InputEventMouseButton):
 		_back()
-	elif e is InputEventMouseButton and e.pressed:
-		var p := canvas.get_local_mouse_position()
-		match e.button_index:
-			MOUSE_BUTTON_WHEEL_UP: turn(-1)
-			MOUSE_BUTTON_WHEEL_DOWN: turn(1)
-			MOUSE_BUTTON_LEFT:
-				if arrow_l.has_point(p):
-					turn(-1)
-				elif arrow_r.has_point(p):
-					turn(1)
-				elif back_r.has_point(p):
-					_back()
-				else:
-					used = false
-			_: used = false
 	else:
 		used = false
 	if used and is_inside_tree():
+		get_viewport().set_input_as_handled()
+
+## Maus: Pfeile, „Zurück“ und Mausrad. Über _input, weil die Seite selbst (Control) Klicks sonst als Oberflächen-Ereignis schluckt
+## und _unhandled_input sie nie sähe (Fehler bis 1.7.0: Blättern ging nur mit LB/RB und Tastatur).
+func _input(e: InputEvent) -> void:
+	if not (e is InputEventMouseButton and e.pressed) or not is_inside_tree():
+		return
+	var p: Vector2 = canvas.make_input_local(e).position
+	var used := true
+	match e.button_index:
+		MOUSE_BUTTON_WHEEL_UP: turn(-1)
+		MOUSE_BUTTON_WHEEL_DOWN: turn(1)
+		MOUSE_BUTTON_LEFT:
+			if arrow_l.grow(3.0).has_point(p):
+				turn(-1)
+			elif arrow_r.grow(3.0).has_point(p):
+				turn(1)
+			elif back_r.grow(2.0).has_point(p):
+				_back()
+			else:
+				used = false
+		_: used = false
+	if used:
 		get_viewport().set_input_as_handled()
 
 func _draw_page() -> void:

@@ -987,8 +987,8 @@ func _draw_actor(a: PassengerActor) -> void:
 			return
 	if a.state == PassengerActor.S.EXITING and a.farewell == "perfect" and not a.medical and absf(a.target_x - a.x) < 1.0:
 		_note_waver(a, pos)
-	if valentine and a.state == PassengerActor.S.EXITING and a.farewell != "hard" and not a.medical and not a.has_meta("kiss") \
-			and absf(a.x - a.exit_from_x) > 3.0:
+	if valentine and a.state == PassengerActor.S.EXITING and a.farewell != "hard" and not a.medical and not a.angry and not a.has_meta("kiss") \
+			and absf(a.x - a.exit_from_x) > 3.0:                          # nur nach dem Abliefern (nicht nach Rauswurf oder Anfahren: dort ist exit_from_x alt)
 		a.set_meta("kiss", true)
 		kisses.append({"from": Vector2(pos.x, pos.y - 8.0), "t0": t})
 	if a.has_meta("waved"):
@@ -1163,8 +1163,9 @@ func _note_waver(a: PassengerActor, pos: Vector2) -> void:
 	if a.has_meta("waved"):
 		return
 	a.set_meta("waved", true)
+	var pd: Dictionary = a.dest if not a.dest.is_empty() else a.pad
 	wavers.append({"x": pos.x, "y": pos.y, "look": a.look, "t0": t, "facing": signf(run.sim.pos.x - pos.x) if absf(run.sim.pos.x - pos.x) > 1.0 else 1.0,
-		"extra": not run.extra_of(a).is_empty()})
+		"extra": not run.extra_of(a).is_empty(), "pad": pd, "dx0": float(pd.get("dx", 0.0))})      # fahrende Plattform: winkt mit ihr mit
 
 func _draw_wavers() -> void:
 	var keep: Array = []
@@ -1175,7 +1176,11 @@ func _draw_wavers() -> void:
 		keep.append(w)
 		var al := minf(1.0, (WAVE_TIME - age) / 0.3)
 		var col := Color(0.72, 0.88, 1.0, al * 0.8) if bool(w.extra) else Color(1, 1, 1, al)
-		var px := PixelDraw.snap_to(self, float(w.x) - PASS_IMG.x * 0.5) + PASS_IMG.x * 0.5
+		var wx := float(w.x)
+		var wpd: Dictionary = w.get("pad", {})
+		if bool(wpd.get("moving", false)):
+			wx += float(wpd.get("dx", 0.0)) - float(w.dx0)
+		var px := PixelDraw.snap_to(self, wx - PASS_IMG.x * 0.5) + PASS_IMG.x * 0.5
 		var py := PixelDraw.snap_to(self, float(w.y) - PASS_IMG.y)
 		draw_set_transform(Vector2(px, 0), 0.0, Vector2(float(w.facing), 1.0))
 		draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, py, PASS_IMG.x, PASS_IMG.y), _pass_src(2 + int(age * 6.0) % 2, int(w.look)), col)

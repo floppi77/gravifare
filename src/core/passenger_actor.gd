@@ -120,6 +120,7 @@ func can_be_hit() -> bool:
 ## Taxi kommt ihm auf den Kopf: schimpft und flüchtet in den Unterstand (wird dort unsichtbar).
 func squash() -> void:
 	angry = true
+	exit_from_x = x
 	state = S.EXITING
 	target_x = pad.door_x
 	speed_mul = 1.9
@@ -184,6 +185,7 @@ func kicked_out(taxi_x: float, pad_d: Dictionary) -> void:
 	pad = pad_d
 	surface_y = pad_d.row * Tuning.TILE
 	x = taxi_x
+	exit_from_x = taxi_x
 	angry = true
 	state = S.EXITING
 	target_x = float(pad_d.get("door_x", pad_d.center))
