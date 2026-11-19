@@ -9,7 +9,7 @@ def measure(f):
     p = re.findall(r"Peak:\s+(-?[\d.]+) dBFS", r)
     return f, float(i[-1]) if i else -70.0, float(p[-1]) if p else 0.0
 
-files = sorted(f for l in ("de", "en", "fr", "es") for f in glob.glob("assets/audio/voice/%s/*.ogg" % l))
+files = sorted(f for l in ("de", "en", "fr", "es", "it", "pt", "pl") for f in glob.glob("assets/audio/voice/%s/*.ogg" % l))
 with ThreadPoolExecutor(os.cpu_count()) as ex:
     res = list(ex.map(measure, files))
 done = 0

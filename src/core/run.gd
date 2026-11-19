@@ -32,6 +32,7 @@ var job_times: Array = []   # Dauer je zugestelltem Auftrag
 var pen_pick := 0.0         # Abzug durch harte Landung beim Abholen
 var pen_drop := 0.0         # Abzug durch harte Landung am Ziel
 var last_vy := 0.0
+var last_landing_perfect := false     # Runde 86: letzte Landung perfekt (nur für den Abschied des Fahrgasts, ändert nichts am Ablauf)
 var streak := 0               # perfekte Landungen in Folge
 var damage_taken := 0.0       # Hüllenschaden im Level (für die Medaille „Sauber“)
 var respawns := 0             # verlorene Leben im Level
@@ -249,13 +250,42 @@ static func chain_jobs(lvl: LevelData, n: int, rng: RandomNumberGenerator) -> Ar
 		prev_to = to_id
 	return out
 
+## Runde 86: Abschied nach dem Aussteigen – nur Darstellung und Ton (Weg, Zeit und Bezahlung bleiben gleich).
+## Harte Landung (Landeabzug) → rennt schimpfend weg; perfekte Landung → winkt am Häuschen; sonst wie bisher.
+func _note_farewell(a: PassengerActor) -> void:
+	if a == null:
+		return
+	a.farewell = "hard" if _land_pen(last_vy) > 0.005 else ("perfect" if last_landing_perfect else "")
+	if a.farewell == "hard":
+		log.append({"type": "farewell_hard", "voice": a.voice_key(), "name": a.pname})
+
+## Runde 86: Besondere Fahrgäste (nur Name, Aussehen und Stimme; der Ablauf bleibt gleich). Level 42: der erste Fahrgast sagt beim Einsteigen nur „42“.
+## Selten (1 %, fest je Level, Auftrag und Lauf): „floppi“ fährt mit und bedankt sich besonders herzlich.
+const FLOPPI_CHANCE := 100
+static var debug_floppi := false          # Debug-Menü „Eastereggs“: der seltene Gast kommt immer
+func _special_passenger(job: Dictionary) -> String:
+	if level.tutorial or job.is_empty() or bool(job.get("fragile", false)):
+		return ""
+	if level.number == 42 and job_index == 0 and level.id.begins_with("S4-"):
+		job["look"] = 0 if String(job.get("gender", "f")) == "f" else 1          # Stimme f0 bzw. m0 (sprechen die „42“)
+		return "42"
+	if debug_floppi or absi(("floppi|%s|%d|%d" % [level.id, job_index, level.meteor_seed]).hash()) % FLOPPI_CHANCE == 7:
+		job["passenger"] = "floppi"
+		job["gender"] = "m"
+		job["look"] = 1                                                          # Stimme m0
+		return "floppi"
+	return ""
+
 func _spawn_actor(instant: bool) -> void:
 	var job := current_job()
 	if job.is_empty():
 		actor = null
 		return
+	var special := _special_passenger(job) if not job.has("special") else String(job.special)
+	job["special"] = special
 	actor = PassengerActor.new()
 	actor.setup(job, level.pads[String(job.from)], job_index, instant)
+	actor.special = special
 	main_wait = 0.0
 	main_patience = maxf(flow_rng.randf_range(Tuning.MAIN_PATIENCE_MIN, Tuning.MAIN_PATIENCE_MAX), Tuning.MAIN_PATIENCE_FLOOR) * patience_k      # unabhängig von der Richtzeit (sonst ändern neue Richtzeiten den Ablauf)
 	if kind_of(job) == "vip":
@@ -808,6 +838,7 @@ func _evaluate_landing(e: Dictionary) -> void:
 	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
 	landing_count += 1
+	last_landing_perfect = perfect_landing(e)
 	if perfect_landing(e):
 		streak += 1
 		perfect_count += 1
@@ -1058,6 +1089,7 @@ func _service_pad(dt: float) -> void:
 				dropoff_clock = job_clock
 				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
 				actor.step_out(sim.pos.x, level.pads[String(job.to)])
+				_note_farewell(actor)
 		Phase.DROPOFF:
 			phase_timer += dt
 			if phase_timer >= STEP_OUT_TIME:
@@ -1125,7 +1157,7 @@ func _finish_boarding(job: Dictionary) -> void:
 	phase = Phase.CARRYING
 	near_tips = 0                     # neue Fahrt: wieder bis zu drei Trinkgelder
 	var dest := "exit" if is_exit_job(job) else String(job.to)
-	log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest})
+	log.append({"type": "boarded", "job": job_index, "voice": actor.voice_key(), "name": actor.pname, "dest": dest, "special": actor.special})
 	if is_exit_job(job):
 		exit_open = true
 		level.exit_open = true
@@ -1168,7 +1200,7 @@ func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
 	elif not bool(l.pay_info.get("carry", false)):
 		delivered += 1
 		job_times.append(total_time)
-	log.append({"type": "delivered", "extra": is_extra, "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "pen_land": float(l.pay_info.get("pen_land", pen)), "pen_hit": float(l.pay_info.get("pen_hit", 0.0)), "pen_wrong": float(l.pay_info.get("pen_wrong", 0.0)), "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname})
+	log.append({"type": "delivered", "extra": is_extra, "job": int(l.pay_info.job), "fare": l.pay_info.fare, "factor": factor, "penalty": pen, "pen_land": float(l.pay_info.get("pen_land", pen)), "pen_hit": float(l.pay_info.get("pen_hit", 0.0)), "pen_wrong": float(l.pay_info.get("pen_wrong", 0.0)), "combo": int(l.pay_info.get("combo", 0)), "pay": pay, "voice": l.voice_key(), "name": l.pname, "special": l.special})
 	l.pay_info = {}
 
 ## Beim Levelende noch laufende Fahrgäste gelten als angekommen (Rest-Gehzeit wird eingerechnet).
@@ -1368,6 +1400,25 @@ func _extra_at(pad_id: String) -> Variant:
 			return e
 	return null
 
+## Runde 86: Fahrgäste, die gerade warten (Hupe: winken zurück).
+func waiting_actors() -> Array:
+	var out: Array = []
+	if actor != null and actor.state == PassengerActor.S.WAITING:
+		out.append(actor)
+	for e in extras:
+		if e.actor != null and (e.actor as PassengerActor).state == PassengerActor.S.WAITING:
+			out.append(e.actor)
+	return out
+
+## Runde 86: Wie viel Geduld hat ein wartender Fahrgast noch (1 voll, 0 gleich weg)? Nur für die Anzeige der Ungeduld.
+func patience_left(a: PassengerActor) -> float:
+	if a == actor:
+		return 1.0 - clampf(main_wait / maxf(main_patience, 0.001), 0.0, 1.0)
+	for e in extras:
+		if e.actor == a:
+			return clampf(float(e.patience) / maxf(float(e.patience_max), 0.001), 0.0, 1.0)
+	return 1.0
+
 func extra_of(a: PassengerActor) -> Dictionary:
 	for e in extras:
 		if e.actor == a:
@@ -1539,6 +1590,7 @@ func _service_extras() -> void:
 			info["job"] = -1
 			aboard.actor.pay_info = info
 			aboard.actor.step_out(sim.pos.x, level.pads[String(aboard.job.to)])
+			_note_farewell(aboard.actor)
 		return
 	if phase != Phase.WAITING or exit_open:
 		return

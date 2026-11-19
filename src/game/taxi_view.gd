@@ -14,6 +14,23 @@ var flame_side := 0.0
 var flash := 0.0
 var yaw := 0.0                    # Mischform: geglättete Drehung −1 … 1 nach der Seitengeschwindigkeit
 
+# Runde 86 – kleine Details (nur Darstellung): Nickerchen, Kaffeetasse, Sektor-Zubehör, Hut nach Kalender, Trinkgeld-Münze
+const Calendar := preload("res://src/core/calendar.gd")
+static var nap_after := 9.0       # so lange gelandet ohne Eingabe, dann schläft der Fahrer ein (Debug-Menü „Eastereggs“: 2 s)
+var idle_t := 0.0
+var startle_t := 0.0
+var slosh_t := 9.0
+var slosh_k := 1.0
+var coin_t := 9.0
+const COIN_TIME := 0.8
+var hat := Calendar.hat()
+var valentine := Calendar.valentine()   # 14. Februar: Herz-Duftbaum in der Kuppel, Erröten bei Kusshänden (props_view.gd)
+var blush_t := 9.0
+const BLUSH_TIME := 2.4
+## Waagerechte Verschiebung des Fahrerkopfs je Drehstufe der Mischform (Bildpunkte in der Größe 6, gemessen an den Augen; Mitte = 2D-Taxi).
+const FACE_SHIFT_PX6 := [-5.0, -3.0, -2.0, 0.0, 2.0, 3.0, 5.0]
+var face_dx := 0.0                # aktuelle Verschiebung in Bildeinheiten
+
 var light: PointLight2D
 var exhaust: CPUParticles2D
 var side_l: CPUParticles2D
@@ -146,6 +163,21 @@ func sync_state() -> void:
 func _process(delta: float) -> void:
 	t += delta
 	flash = maxf(0.0, flash - delta * 4.0)
+	if sim != null:
+		var quiet := sim.state == TaxiSim.State.LANDED and sim.thrust_in.length() < 0.05
+		if quiet:
+			idle_t += delta
+		else:
+			if idle_t > nap_after:
+				startle_t = 0.8                 # aus dem Nickerchen hochgeschreckt
+			idle_t = 0.0
+	startle_t = maxf(0.0, startle_t - delta)
+	slosh_t += delta
+	blush_t += delta
+	var was := coin_t
+	coin_t += delta
+	if was < COIN_TIME and coin_t >= COIN_TIME:
+		Sfx.play("coin", -9.0)                  # Münze landet klimpernd im Taxi
 	if sim != null and Cosmetics.taxi_3d:
 		yaw = move_toward(yaw, clampf(sim.vel.x / 60.0, -1.0, 1.0), delta * 2.5)
 	queue_redraw()
@@ -181,10 +213,14 @@ func _draw() -> void:
 	var f3 := Cosmetics.taxi3d_frame(n, roundi((yaw + 1.0) * 0.5 * float(Cosmetics.TAXI3D_FRAMES - 1))) if Cosmetics.taxi_3d else {}
 	if not f3.is_empty():
 		draw_texture_rect_region(f3.tex, Tuning.TAXI_RECT, f3.src, mod)       # Mischform: Drehstufe nach der Seitengeschwindigkeit
+		face_dx = float(FACE_SHIFT_PX6[clampi(roundi((yaw + 1.0) * 0.5 * float(Cosmetics.TAXI3D_FRAMES - 1)), 0, FACE_SHIFT_PX6.size() - 1)]) / 6.0
 	else:
 		draw_texture_rect_region(frame.tex, Tuning.TAXI_RECT, frame.src, mod)
+		face_dx = 0.0
 	if not sticker_frame.is_empty():
 		draw_texture_rect_region(sticker_frame.tex, Tuning.sticker_rect(int(sticker_frame.n), int(sticker_frame.src.size.x)), sticker_frame.src, mod)
+	if sim.state != TaxiSim.State.DESTROYED:
+		_draw_details(n)
 	# Schadenanzeige: Funken/Rauch
 	if hurt > 0.45 and int(t * 8.0) % 2 == 0:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))
@@ -224,3 +260,130 @@ func _pixel_flames(flick: float) -> void:
 	if absf(flame_side) > 0.05:
 		var sd := -signf(flame_side)
 		_flame_rows(Vector2(sd * 16.0, 0), Vector2(sd, 0), 3.0 + 6.0 * absf(flame_side) * flick, 2.8, ICE, 5.0)
+
+
+
+# ---------------------------------------------------------------- Runde 86: kleine Details
+## Trinkgeld: Münze springt aus der Kuppel hoch und fällt zurück (Klang beim Aufkommen).
+## Valentinstag: eine Kusshand ist angekommen – der Fahrer errötet, kleine Herzen steigen auf.
+func blush() -> void:
+	blush_t = 0.0
+
+func tip_coin() -> void:
+	coin_t = 0.0
+
+## Harte Landung: Kaffee schwappt aus der Tasse (k = Stärke 0–1).
+func slosh(k: float) -> void:
+	slosh_t = 0.0
+	slosh_k = k
+
+## Punkt im Taxibild in Bildeinheiten (26 × 16) → Zeichenkoordinaten; verschiebt mit dem Kopf in der Drehstufe der Mischform (face_dx).
+func _u(u: float, v: float) -> Vector2:
+	return Vector2(Tuning.TAXI_RECT.position.x + (u + face_dx) * Tuning.TAXI_RECT.size.x / Tuning.TAXI_UNITS.x,
+		Tuning.TAXI_RECT.position.y + v * Tuning.TAXI_RECT.size.y / Tuning.TAXI_UNITS.y)
+
+func _box(u: float, v: float, w: float, h: float, c: Color) -> void:
+	var a := _u(u, v)
+	var b := _u(u + w, v + h)
+	draw_rect(Rect2(a, b - a), c)
+
+func _draw_details(n: int) -> void:
+	var sector := sim.level.sector if sim.level != null else 1
+	# Sektor-Zubehör des Fahrers: Sonnenbrille in der Solarschmiede, Stirnlampe im Schattenring
+	if sector == 5:
+		var frame_c := Color("#0b0b14")
+		var lens := Color("#2a3570")
+		for lx in [11.5, 13.17]:                                              # zwei Gläser über den Augen (Augen: Zeilen 26–27, Spalten 72–73 und 82–83 in Größe 6)
+			_box(lx, 4.17, 1.33, 0.83, frame_c)
+			_box(lx + 0.17, 4.33, 1.0, 0.5, lens)
+			_box(lx + 0.17, 4.33, 0.33, 0.17, Color(0.8, 0.9, 1.0, 0.9))
+		_box(12.83, 4.33, 0.33, 0.17, frame_c)                                # Steg
+	elif sector == 8:
+		_box(12.67, 3.0, 0.83, 0.67, Color("#3a3f58"))
+		_box(12.83, 3.17, 0.5, 0.33, Color("#fff6c8"))
+		var c := _u(13.08, 3.33)
+		draw_circle(c, 1.6, Color(1.0, 0.96, 0.75, 0.22 + 0.06 * sin(t * 3.0)))
+	# Kaffeetasse am Armaturenbrett, rechts in der Kuppel
+	_box(15.5, 5.5, 1.17, 1.17, Color("#f2f2f6"))
+	_box(15.5, 5.5, 1.17, 0.17, Color("#6b3a1e"))
+	_box(16.67, 5.83, 0.33, 0.5, Color("#f2f2f6"))
+	_box(15.5, 6.5, 1.17, 0.17, Color("#b9bccc"))
+	if not Settings.values.reduce_motion and idle_t > 1.0:                  # Dampf, solange das Taxi ruht
+		for k in 2:
+			var ph := fmod(t * 0.7 + k * 0.5, 1.0)
+			_box(15.8 + k * 0.5 + sin(t * 2.0 + k) * 0.17, 5.2 - ph * 1.6, 0.17, 0.17, Color(1, 1, 1, 0.45 * (1.0 - ph)))
+	if slosh_t < 0.7 and not Settings.values.reduce_motion:
+		for k in 4:
+			var dir := -1.0 if k % 2 == 0 else 1.0
+			var sp := 0.6 + 0.35 * float(k)
+			var tt := slosh_t
+			_box(16.0 + dir * sp * tt * 3.0 * slosh_k, 5.4 - (2.4 * slosh_k) * tt + 6.0 * tt * tt, 0.17, 0.17, Color("#7a4524"))
+	if valentine:
+		_draw_valentine()
+	# Hut nach Kalender auf der Kuppel
+	if hat != "":
+		_draw_hat()
+	# Nickerchen und Hochschrecken
+	if idle_t > nap_after:
+		var f := Fonts.hud
+		for k in 3:
+			var ph := fmod((idle_t - nap_after) * 0.45 + k / 3.0, 1.0) if not Settings.values.reduce_motion else 0.3 + k * 0.25
+			var p := _u(15.5 + ph * 4.0, 2.5 - ph * 4.0)
+			draw_string(f, p, "z" if k < 2 else "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, int(4 + 3 * ph), Color(0.85, 0.9, 1.0, 0.9 * (1.0 - ph * 0.7)))
+	elif startle_t > 0.0:
+		var p := _u(14.6, 0.2 - (0.8 - startle_t) * 2.0)
+		draw_string(Fonts.hud, p, "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(1.0, 0.88, 0.3, minf(1.0, startle_t * 2.0)))
+	# Trinkgeld-Münze
+	if coin_t < COIN_TIME:
+		var k := coin_t / COIN_TIME
+		var cp := _u(13.6 + k * 1.2, 2.0 - 9.0 * k + 10.5 * k * k)
+		var w := absf(cos(coin_t * 18.0))                        # dreht sich
+		draw_set_transform(cp, 0.0, Vector2(maxf(0.25, w), 1.0))
+		draw_circle(Vector2.ZERO, 1.25, Color("#ffcf3a"))
+		draw_circle(Vector2.ZERO, 0.8, Color("#ffe98a"))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+func _heart(c: Vector2, s: float, col: Color) -> void:
+	draw_circle(c + Vector2(-s * 0.5, 0), s * 0.55, col)
+	draw_circle(c + Vector2(s * 0.5, 0), s * 0.55, col)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-s * 1.02, s * 0.15), c + Vector2(s * 1.02, s * 0.15), c + Vector2(0, s * 1.25)]), col)
+
+func _draw_valentine() -> void:
+	# Herz-Duftbaum unter dem Kuppeldach: pendelt mit der Seitengeschwindigkeit
+	var top := _u(15.9, 1.1)
+	var swing := clampf(-sim.vel.x * 0.012, -0.7, 0.7) + (0.0 if Settings.values.reduce_motion else sin(t * 2.6) * 0.12)
+	var hang := Vector2(0, 2.3).rotated(swing)
+	draw_line(top, top + hang, Color(0.9, 0.9, 0.95, 0.8), 0.3)
+	var hc := top + hang + Vector2(0, 0.6).rotated(swing)
+	_heart(hc, 0.85, Color("#7a0f2c"))
+	_heart(hc + Vector2(0, -0.1), 0.65, Color("#ff3d73"))
+	if blush_t < BLUSH_TIME:
+		var a := clampf(minf(blush_t * 6.0, (BLUSH_TIME - blush_t) * 2.0), 0.0, 1.0)
+		var cheek := Color(1.0, 0.35, 0.55, 0.85 * a)
+		_box(11.33, 5.0, 0.67, 0.33, cheek)                                  # Wangen unter den Augen
+		_box(13.83, 5.0, 0.67, 0.33, cheek)
+		if not Settings.values.reduce_motion:
+			for k in 3:
+				var ph := fmod(blush_t * 0.9 + k / 3.0, 1.0)
+				var p := _u(12.5 + (k - 1) * 1.6 + sin(blush_t * 4.0 + k) * 0.4, 0.5 - ph * 5.0)
+				_heart(p, 0.45 + 0.35 * ph, Color(1.0, 0.4, 0.6, a * (1.0 - ph)))
+
+func _draw_hat() -> void:
+	var base_l := _u(11.6, 0.6)
+	var base_r := _u(14.6, 0.6)
+	if hat == "party":
+		var tip := _u(13.1, -3.6)
+		draw_colored_polygon(PackedVector2Array([base_l, base_r, tip]), Color("#4fc3ff"))
+		for k in 3:                                                   # Streifen
+			var a := base_l.lerp(tip, 0.2 + k * 0.25)
+			var b := base_r.lerp(tip, 0.2 + k * 0.25)
+			draw_line(a, b, Color("#ff4fc8"), 0.8)
+		draw_circle(tip, 0.9, Color("#ffe14a"))
+	else:
+		var peak := _u(13.6, -2.2)
+		var tip := _u(15.8, -1.6 + 0.25 * sin(t * 2.0))                   # Zipfel hängt nach rechts und wippt
+		draw_colored_polygon(PackedVector2Array([base_l, base_r, peak]), Color("#d6283c"))
+		draw_colored_polygon(PackedVector2Array([_u(12.9, -1.4), _u(14.0, -1.0), tip]), Color("#b81f32"))
+		draw_rect(Rect2(_u(11.3, 0.1), _u(14.9, 0.9) - _u(11.3, 0.1)), Color("#f4f4f8"))
+		draw_circle(tip, 0.9, Color("#f4f4f8"))
+

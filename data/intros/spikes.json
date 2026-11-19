@@ -6,7 +6,10 @@
   "de": "Dornen",
   "en": "Spikes",
   "fr": "Pics",
-  "es": "Pinchos"
+  "es": "Pinchos",
+  "it": "Spine",
+  "pt": "Espinhos",
+  "pl": "Kolce"
  },
  "map": [
   "########################################",
@@ -77,7 +80,10 @@
    "de": "Dornen",
    "en": "Spikes",
    "fr": "Pics",
-   "es": "Pinchos"
+   "es": "Pinchos",
+   "it": "Spine",
+   "pt": "Espinhos",
+   "pl": "Kolce"
   }
  }
 }

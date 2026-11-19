@@ -70,7 +70,7 @@ func setup(level: LevelData) -> void:
 
 func _build_signs() -> void:
 	_sign_n = PixelScale.size_for(self)
-	signs = NeonSigns.plan(lv, style, _sign_n)
+	signs = NeonSigns.plan(lv, style, _sign_n, preload("res://src/core/calendar.gd").late_night())
 	var Fx := load("res://src/game/fx.gd")
 	for s in signs:
 		for it in s.items:

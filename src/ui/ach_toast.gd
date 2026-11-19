@@ -9,7 +9,7 @@ const Achievements := preload("res://src/core/achievements.gd")
 
 const CAT_COLORS := {"fare": Color("#35e0d2"), "sector": Color("#8c9cff"), "medal": Color("#ffd24a"), "landing": Color("#5dff9a"),
 	"money": Color("#b6f06a"), "shift": Color("#b07cff"), "day": Color("#ffa04a"), "garage": Color("#ff7ac8"), "fun": Color("#ff6464"),
-	"time": Color("#7fd3ff")}
+	"time": Color("#7fd3ff"), "egg": Color("#ff9ae6"), "holiday": Color("#ff5a7a"), "crown": Color("#ffe680")}
 const T_IN := 0.3
 const T_STAY := 2.8
 const T_OUT := 0.3
@@ -114,6 +114,11 @@ static func draw_badge(ci: CanvasItem, id: String, c: Vector2, r: float, unlocke
 	var s := Color(col, (1.0 if unlocked else 0.45) * a)
 	var w := maxf(r * 0.12, 0.8)
 	var u := r * 0.5
+	if not unlocked and Achievements.is_hidden(id):            # verdeckter Erfolg: nur ein Fragezeichen
+		ci.draw_arc(c + Vector2(0, -u * 0.35), u * 0.42, PI * 1.05, PI * 2.45, 12, s, w * 1.2, true)
+		ci.draw_line(c + Vector2(u * 0.05, u * 0.05), c + Vector2(0, u * 0.4), s, w * 1.2, true)
+		ci.draw_circle(c + Vector2(0, u * 0.78), w * 0.75, s, true, -1.0, true)
+		return
 	match cat:
 		"fare":
 			ci.draw_circle(c + Vector2(0, -u * 0.55), u * 0.38, s, true, -1.0, true)
@@ -156,3 +161,43 @@ static func draw_badge(ci: CanvasItem, id: String, c: Vector2, r: float, unlocke
 			ci.draw_arc(c, u * 0.85, 0.0, TAU, 24, s, w, true)
 			ci.draw_line(c, c + Vector2(0, -u * 0.6), s, w, true)
 			ci.draw_line(c, c + Vector2(u * 0.45, 0), s, w, true)
+		"egg":
+			var egg := PackedVector2Array()
+			for i in 20:
+				var ang := TAU * float(i) / 20.0
+				var up := cos(ang)
+				egg.append(c + Vector2(sin(ang) * u * 0.7 * (1.0 - 0.18 * maxf(0.0, up)), -up * u * (1.05 if up > 0.0 else 0.8)))
+			ci.draw_colored_polygon(egg, s)
+			var bg := Color(0.07, 0.08, 0.2, a)
+			ci.draw_polyline(PackedVector2Array([c + Vector2(-u * 0.6, 0), c + Vector2(-u * 0.3, -u * 0.25), c + Vector2(0, 0), c + Vector2(u * 0.3, -u * 0.25), c + Vector2(u * 0.6, 0)]), bg, w * 0.8, true)
+		"holiday":
+			_holiday_symbol(ci, id, c, u, s, w)
+		"crown":
+			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-u * 0.9, u * 0.55), c + Vector2(-u * 0.9, -u * 0.45), c + Vector2(-u * 0.45, 0),
+				c + Vector2(0, -u * 0.75), c + Vector2(u * 0.45, 0), c + Vector2(u * 0.9, -u * 0.45), c + Vector2(u * 0.9, u * 0.55)]), s)
+			for x in [-0.9, 0.0, 0.9]:
+				ci.draw_circle(c + Vector2(u * x, -u * (0.75 if x == 0.0 else 0.45) - u * 0.15), u * 0.14, s, true, -1.0, true)
+
+## Zeichen der Feiertags-Erfolge: Stiefel (Nikolaus), Tannenbaum (Weihnachten), Feuerwerk (Silvester), Herz (Valentinstag).
+static func _holiday_symbol(ci: CanvasItem, id: String, c: Vector2, u: float, s: Color, w: float) -> void:
+	match id:
+		"day_nikolaus":
+			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-u * 0.35, -u * 0.85), c + Vector2(u * 0.25, -u * 0.85), c + Vector2(u * 0.25, u * 0.2),
+				c + Vector2(u * 0.85, u * 0.35), c + Vector2(u * 0.85, u * 0.8), c + Vector2(-u * 0.35, u * 0.8)]), s)
+			ci.draw_rect(Rect2(c + Vector2(-u * 0.5, -u * 1.0), Vector2(u * 0.9, u * 0.3)), Color(1, 1, 1, s.a))
+		"day_xmas":
+			for k in 3:
+				var y := -u * 0.95 + u * 0.5 * k
+				var hw := u * (0.45 + 0.25 * k)
+				ci.draw_colored_polygon(PackedVector2Array([c + Vector2(0, y), c + Vector2(hw, y + u * 0.75), c + Vector2(-hw, y + u * 0.75)]), s)
+			ci.draw_rect(Rect2(c + Vector2(-u * 0.15, u * 0.8), Vector2(u * 0.3, u * 0.3)), s)
+		"day_silvester":
+			for i in 8:
+				var d := Vector2.from_angle(TAU * float(i) / 8.0 + 0.2)
+				ci.draw_line(c + d * u * 0.3, c + d * u * 0.95, s, w * 0.8, true)
+				ci.draw_circle(c + d * u * 1.0, u * 0.1, s, true, -1.0, true)
+			ci.draw_circle(c, u * 0.18, s, true, -1.0, true)
+		_:
+			ci.draw_circle(c + Vector2(-u * 0.42, -u * 0.25), u * 0.47, s, true, -1.0, true)
+			ci.draw_circle(c + Vector2(u * 0.42, -u * 0.25), u * 0.47, s, true, -1.0, true)
+			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-u * 0.86, -u * 0.08), c + Vector2(u * 0.86, -u * 0.08), c + Vector2(0, u * 0.9)]), s)

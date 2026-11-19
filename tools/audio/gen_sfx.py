@@ -277,7 +277,27 @@ def land_perfect():
         x[m] += np.sin(2 * np.pi * f * (tt[m] - 0.07)) * np.exp(-(tt[m] - 0.07) * 7) * a * np.minimum((tt[m] - 0.07) / 0.01, 1.0)
     save("land_perfect", np.tanh(x * 1.2) * 0.8)
 
+def horn():
+    """Runde 86: Hupe des Schwebetaxis – zwei kurze, freundliche Stöße (Terz, leicht verstimmte Rechteckklänge durch einen Tiefpass, kleiner Hall)."""
+    d = 0.16
+    x = np.zeros(int(SR * 0.52))
+    for k, start in enumerate((0.0, 0.22)):
+        tt = t(d)
+        f = (392.0, 494.0)                      # g' und h': Terz
+        s = sum(np.sign(np.sin(2 * np.pi * ff * tt * (1.0 + 0.004 * k))) + 0.6 * np.sign(np.sin(2 * np.pi * ff * 1.004 * tt)) for ff in f)
+        s = lp(s * 0.18, 0.18) * env(len(tt), 0.008, 0.05)
+        i = int(start * SR)
+        x[i:i + len(s)] += s
+    x = lp(x, 0.5)
+    tail = np.convolve(x, np.exp(-np.arange(int(0.08 * SR)) / (0.025 * SR)) * 0.04, mode="full")[:len(x)]
+    save("horn", np.tanh((x + tail) * 1.4) * 0.7)
+
+if __name__ == "__main__" and os.environ.get("GF_SFX_ONLY"):
+    os.makedirs(OUT, exist_ok=True)
+    for name in os.environ["GF_SFX_ONLY"].split(","):
+        globals()[name]()
+    raise SystemExit
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter, land_perfect): f()
+    for f in (thrust_loop, side_loop, land, clunk, crash, hit, warn, coin, board, exit_open, transit, ui_move, ui_ok, pump_hit, pump_boom, price_tick, near_miss, perfect, scream_f, scream_m, splat, flatline, shatter, land_perfect, horn): f()
     print(sorted(os.listdir(OUT)))

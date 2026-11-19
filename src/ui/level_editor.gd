@@ -192,6 +192,7 @@ func _attach_original(id: String) -> bool:
 	return true
 
 func _ready() -> void:
+	add_to_group("full_fps")                    # Runde 85: Menü-Sparstufe gilt hier nicht (Zeichnen mit der Maus braucht volle Bildrate)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(MenuKit.dim_rect(0.86))
 	if model == null:

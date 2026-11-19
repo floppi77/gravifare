@@ -54,6 +54,7 @@ func _draw() -> void:
 	PX = PixelDraw.px_of(self)
 	if not _prof_on():
 		_draw_pads()
+		_draw_egg()
 		_draw_reflections()
 		_draw_pumps()
 		_draw_gate()
@@ -63,7 +64,7 @@ func _draw() -> void:
 		_draw_actors()
 		_draw_taxi_shadow()
 	else:
-		for part in ["_draw_pads", "_draw_reflections", "_draw_pumps", "_draw_gate", "_draw_doors", "_draw_zones", "_draw_movers", "_draw_actors", "_draw_taxi_shadow"]:
+		for part in ["_draw_pads", "_draw_egg", "_draw_reflections", "_draw_pumps", "_draw_gate", "_draw_doors", "_draw_zones", "_draw_movers", "_draw_actors", "_draw_taxi_shadow"]:
 			var t0 := Time.get_ticks_usec()
 			call(part)
 			_prof[part] = int(_prof.get(part, 0)) + Time.get_ticks_usec() - t0
@@ -602,6 +603,8 @@ func _draw_movers_main() -> void:
 ## Trümmer in den Größen der Level (16 × 32, 32 × 16 und 16 × 16 Einheiten) sind ganze Wrackteile aus assets/art/debris.png (tools/art/gen_debris.py):
 ## Frachtcontainer, Rumpfplatte oder Solarpaneel, je Brocken fest nach seiner Lage gewählt. Die Fläche ist genau die Trefferfläche `r`.
 ## Andere Größen (Gemeinschaftslevel) gibt es nicht als Bild: dann false, und das Kachelblatt setzt sie zusammen.
+const EasterEggS := preload("res://src/game/easter_egg.gd")
+const Calendar := preload("res://src/core/calendar.gd")
 const DEBRIS_TEX: Texture2D = preload("res://assets/art/debris_sizes.png")      # Blätter der Pixelgrößen 2–6 untereinander (Runde 72)
 const DEBRIS_UNITS := Vector2(80, 48)             # ein Blatt in Einheiten: stehend 16 × 32 bei x = 0, 16, 32; liegend 32 × 16 bei x = 48, y = 0, 16, 32; Quadrat 16 × 16 bei (0, 32)
 
@@ -974,8 +977,24 @@ func _draw_actor(a: PassengerActor) -> void:
 	if a.state == PassengerActor.S.FALLING or a.state == PassengerActor.S.DEAD:
 		_draw_falling(a, pos)
 		return
+	var hard_run := a.state == PassengerActor.S.EXITING and a.farewell == "hard" and not a.medical
+	var vis_alpha := 1.0
+	if hard_run:
+		var hv := _hard_view(a)
+		pos.x = float(hv.x)
+		vis_alpha = float(hv.alpha)
+		if vis_alpha <= 0.0:
+			return
+	if a.state == PassengerActor.S.EXITING and a.farewell == "perfect" and not a.medical and absf(a.target_x - a.x) < 1.0:
+		_note_waver(a, pos)
+	if valentine and a.state == PassengerActor.S.EXITING and a.farewell != "hard" and not a.medical and not a.has_meta("kiss") \
+			and absf(a.x - a.exit_from_x) > 3.0:
+		a.set_meta("kiss", true)
+		kisses.append({"from": Vector2(pos.x, pos.y - 8.0), "t0": t})
+	if a.has_meta("waved"):
+		return
 	var is_extra := not run.extra_of(a).is_empty()
-	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8) if is_extra else Color(1, 1, 1, a.fade)       # Zusatzfahrgäste wirken blasser/bläulich
+	var col := Color(0.72, 0.88, 1.0, a.fade * 0.8 * vis_alpha) if is_extra else Color(1, 1, 1, a.fade * vis_alpha)       # Zusatzfahrgäste wirken blasser/bläulich
 	if not a.medical:          # flacher Bodenschatten unter den Füßen
 		draw_set_transform(Vector2(pos.x, pos.y), 0.0, Vector2(1.0, 0.32))
 		draw_circle(Vector2.ZERO, 3.6, Color(0.0, 0.0, 0.05, 0.38 * a.fade))
@@ -986,12 +1005,26 @@ func _draw_actor(a: PassengerActor) -> void:
 	if a.medical:
 		_draw_stretcher(a, pos.y, col.a)
 	else:
-		draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, pass_y, PASS_IMG.x, PASS_IMG.y), _pass_src(_actor_frame(a), a.look), col)
+		var fr := _actor_frame(a)
+		if hard_run:
+			fr = 4 + int(a.walked * HARD_RUN / 2.2) % 6                  # rennt: schnellerer Schrittwechsel
+		elif a.state == PassengerActor.S.WAITING and run.patience_left(a) < 0.35 and a.wave_t <= 0.0:
+			fr = int(t * 4.0) % 2                                          # tritt ungeduldig von einem Bein aufs andere
+		draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, pass_y, PASS_IMG.x, PASS_IMG.y), _pass_src(fr, a.look), col)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_draw_impatience(a, pos)
 	_draw_amount(a, pos)
 	var dest := run.dest_of(a)
 	if a.wave_t <= 0.0 and not a.angry and dest != "" and (a.state == PassengerActor.S.WAITING or a.state == PassengerActor.S.EMERGING):
 		_draw_dest_bubble(pos, dest, a.fade, run.extra_of(a).is_empty())
+	if hard_run:                                                       # schimpft beim Wegrennen
+		var hb := Vector2(pos.x + 4.0, pos.y - 18.0 - sin(t * 14.0))
+		draw_rect(Rect2(hb.x - 4, hb.y - 3, 8, 8), Color(0.05, 0.06, 0.14, vis_alpha))
+		draw_rect(Rect2(hb.x - 4 + PX * 2, hb.y - 3 + PX * 2, 8 - PX * 4, 8 - PX * 4), Color(1.0, 0.3, 0.43, vis_alpha))
+		draw_string(Fonts.hud, Vector2(hb.x - 4, hb.y + 4), "#!", HORIZONTAL_ALIGNMENT_CENTER, 8, 8, Color(1, 1, 1, vis_alpha))
+		if valentine:                                                  # Valentinstag: dazu ein gebrochenes Herz, das auseinanderfällt
+			var gap := 0.6 + 0.6 * sin(t * 6.0)
+			draw_heart(Vector2(pos.x - 6.0, pos.y - 21.0 - sin(t * 9.0)), 2.6, Color(1.0, 0.25, 0.4, vis_alpha), -1, gap)
 	if a.wave_t > 0.0 or a.angry:
 		var bx := pos.x + (4.0 if a.angry else 17.0)          # Winken: am Platz der Zielblase, rechts neben dem Betrag (lag vorher auf dem Preisschild)
 		var by := pos.y - 18.0 - sin(t * (14.0 if a.angry else 8.0))
@@ -1110,6 +1143,57 @@ func _draw_actors() -> void:
 		_draw_actor(ex.actor)
 	if run.actor != null:
 		_draw_actor(run.actor)
+	_draw_wavers()
+	_draw_kisses()
+
+# ---------------------------------------------------------------- Runde 86: Abschied und Ungeduld (nur Darstellung)
+const WAVE_TIME := 1.5
+const HARD_RUN := 1.9                 # so viel schneller rennt der Fahrgast nach einer harten Landung (sichtbar; Weg und Bezahlung wie beim Gehen)
+var wavers: Array = []                # nach perfekter Landung: {x, y, look, t0, facing, extra}
+
+## Fortschritt des Wegs zum Häuschen (0–1) und sichtbare Position nach einer harten Landung (rennt voraus und ist eher drinnen).
+func _hard_view(a: PassengerActor) -> Dictionary:
+	var span := a.target_x - a.exit_from_x
+	if absf(span) < 0.5:
+		return {"x": a.x, "alpha": 1.0}
+	var p := clampf((a.x - a.exit_from_x) / span, 0.0, 1.0) * HARD_RUN
+	return {"x": a.exit_from_x + span * minf(p, 1.0), "alpha": 1.0 - clampf((p - 1.0) / 0.12, 0.0, 1.0)}
+
+func _note_waver(a: PassengerActor, pos: Vector2) -> void:
+	if a.has_meta("waved"):
+		return
+	a.set_meta("waved", true)
+	wavers.append({"x": pos.x, "y": pos.y, "look": a.look, "t0": t, "facing": signf(run.sim.pos.x - pos.x) if absf(run.sim.pos.x - pos.x) > 1.0 else 1.0,
+		"extra": not run.extra_of(a).is_empty()})
+
+func _draw_wavers() -> void:
+	var keep: Array = []
+	for w in wavers:
+		var age: float = t - float(w.t0)
+		if age > WAVE_TIME:
+			continue
+		keep.append(w)
+		var al := minf(1.0, (WAVE_TIME - age) / 0.3)
+		var col := Color(0.72, 0.88, 1.0, al * 0.8) if bool(w.extra) else Color(1, 1, 1, al)
+		var px := PixelDraw.snap_to(self, float(w.x) - PASS_IMG.x * 0.5) + PASS_IMG.x * 0.5
+		var py := PixelDraw.snap_to(self, float(w.y) - PASS_IMG.y)
+		draw_set_transform(Vector2(px, 0), 0.0, Vector2(float(w.facing), 1.0))
+		draw_texture_rect_region(pass_tex, Rect2(-PASS_IMG.x * 0.5, py, PASS_IMG.x, PASS_IMG.y), _pass_src(2 + int(age * 6.0) % 2, int(w.look)), col)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	wavers = keep
+
+## Kleine Uhr neben einem wartenden Fahrgast, dessen Geduld zur Neige geht (Zeiger tickt; schneller, je knapper).
+func _draw_impatience(a: PassengerActor, pos: Vector2) -> void:
+	var left := run.patience_left(a)
+	if left > 0.35 or a.state != PassengerActor.S.WAITING:
+		return
+	var c := Vector2(pos.x - 9.0, pos.y - 21.0)
+	var urgent := left < 0.15
+	draw_circle(c, 3.4, Color("#0c0f24"))
+	draw_circle(c, 2.6, Color("#ff9a8a") if urgent else Color("#f4f4f8"))
+	var ang := -PI * 0.5 + floorf(t * (4.0 if urgent else 2.0)) * PI / 4.0
+	draw_line(c, c + Vector2(cos(ang), sin(ang)) * 2.0, Color("#0c0f24"), PixelDraw.wsnap(self, 0.6))
+	draw_rect(Rect2(c.x - 0.6, c.y - 4.4, 1.2, 1.0), Color("#0c0f24"))
 
 ## Weicher Kontaktschatten des Taxis auf der Fläche darunter: wird mit der Höhe kleiner und blasser.
 func _draw_taxi_shadow() -> void:
@@ -1236,3 +1320,159 @@ func _draw_reflections() -> void:
 				var src := Rect2(fr.src.position.x, fr.src.position.y + r0, fr.src.size.x, fr.src.size.y - r0)
 				draw_texture_rect_region(fr.tex, Tuning.reflect_dst(int(fr.n)), src, Color(0.7, 0.92, 1.0, a))
 				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+# ---------------------------------------------------------------- Runde 86: Osterei (nur Darstellung; Treffer prüft game.gd)
+var egg := {}                         # EasterEgg.spot(); leer = kein Ei in diesem Level
+var egg_broken := -1.0                # Zeitpunkt des Zerplatzens (t), < 0 = heil
+var _egg_cache := {}                  # vorgerechnete Flächen {"key", "body", "bands": [[Polygon, Farbe]], "dots": [[Mitte, Farbe]]}
+
+func egg_alive() -> bool:
+	return not egg.is_empty() and egg_broken < 0.0
+
+func break_egg() -> void:
+	egg_broken = t
+
+func set_egg(e: Dictionary) -> void:
+	egg = e
+	egg_broken = -1.0
+	_egg_cache = {}
+
+## Flächen relativ zur Mitte unten des Eis (Ursprung = egg.pos).
+func _egg_shapes() -> Dictionary:
+	if not _egg_cache.is_empty():
+		return _egg_cache
+	var body := EasterEggS.outline(Vector2.ZERO)
+	var cols: Array = egg.colors
+	var bands: Array = []
+	var dots: Array = []
+	var pat := int(egg.pattern)
+	var h := EasterEggS.SIZE.y
+	var w := EasterEggS.SIZE.x
+	if pat == 0 or pat == 2:                                        # Zickzackband in der Mitte
+		var zz := PackedVector2Array()
+		var y0 := -h * 0.5
+		for i in 7:
+			zz.append(Vector2(-w * 0.6 + w * 1.2 * float(i) / 6.0, y0 - (0.8 if i % 2 == 0 else -0.2)))
+		for i in 7:
+			zz.append(Vector2(w * 0.6 - w * 1.2 * float(i) / 6.0, y0 + 1.4 - (0.8 if (6 - i) % 2 == 0 else -0.2)))
+		for poly in Geometry2D.intersect_polygons(body, zz):
+			bands.append([poly, cols[1]])
+	if pat == 1 or pat == 2:                                        # Punkte
+		var spots := [Vector2(-1.4, -2.3), Vector2(1.3, -2.6), Vector2(-0.2, -6.0)] if pat == 2 else [Vector2(-1.3, -3.4), Vector2(1.2, -4.0), Vector2(-0.3, -5.6), Vector2(0.5, -2.0)]
+		for d in spots:
+			dots.append([d, cols[1] if pat == 1 else Color(1, 1, 1, 0.95)])
+	if pat == 1:                                                    # schmale Streifen oben und unten
+		for yy in [-h * 0.16, -h * 0.82]:
+			var r := PackedVector2Array([Vector2(-w, yy - 0.4), Vector2(w, yy - 0.4), Vector2(w, yy + 0.4), Vector2(-w, yy + 0.4)])
+			for poly in Geometry2D.intersect_polygons(body, r):
+				bands.append([poly, Color(cols[1]).lerp(Color.WHITE, 0.4)])
+	var cup := PackedVector2Array()                                 # untere Schale nach dem Zerplatzen, oben gezackt
+	for p in body:
+		if p.y > -h * 0.4:
+			cup.append(p)
+	_egg_cache = {"body": body, "outline": EasterEggS.outline(Vector2(0, 0.5), EasterEggS.SIZE + Vector2(1.0, 1.0)), "bands": bands, "dots": dots, "cup": cup}
+	return _egg_cache
+
+func _draw_egg() -> void:
+	if egg.is_empty():
+		return
+	var sh := _egg_shapes()
+	var base: Vector2 = egg.pos
+	var cols: Array = egg.colors
+	var dim := 1.0 - level.dark * 0.45                          # im Dunkeln (Sektor 8) etwas gedämpft, aber zu finden
+	var tint := Color(dim, dim, dim)
+	var shell := Color(cols[0]) * tint
+	if egg_broken < 0.0:
+		var rock := 0.0                                         # wackelt ab und zu leicht – ein kleiner Hinweis
+		if not Settings.values.reduce_motion:
+			var ph := fmod(t + float(int(egg.cell.x) % 5), 5.0)
+			if ph < 0.8:
+				rock = sin(ph * 18.0) * 0.18 * (1.0 - ph / 0.8)
+		draw_rect(Rect2(base + Vector2(-EasterEggS.SIZE.x * 0.6, -0.9), Vector2(EasterEggS.SIZE.x * 1.2, 0.9)), Color(0.0, 0.0, 0.05, 0.4))      # Schatten
+		draw_set_transform(base, rock, Vector2.ONE)
+		draw_colored_polygon(sh.outline, Color(0.05, 0.04, 0.12))
+		draw_colored_polygon(sh.body, shell)
+		for b in sh.bands:
+			draw_colored_polygon(b[0], Color(b[1]) * tint)
+		for d in sh.dots:
+			draw_circle(d[0], 0.65, Color(d[1]) * tint)
+		draw_rect(Rect2(-1.9, -6.2, 0.8, 1.6), Color(1, 1, 1, 0.55 * dim))      # Glanzpunkt
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		return
+	# zerplatzt: untere Schale bleibt liegen, Splitter und Konfetti fliegen
+	draw_set_transform(base, 0.0, Vector2.ONE)
+	if (sh.cup as PackedVector2Array).size() >= 3:
+		draw_colored_polygon(sh.cup, shell)
+		for i in 4:
+			var x := -2.6 + 1.3 * float(i)
+			draw_colored_polygon(PackedVector2Array([Vector2(x, -3.1), Vector2(x + 1.3, -3.1), Vector2(x + 0.65, -4.2)]), shell)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	var age := t - egg_broken
+	if age > 1.6 or (Settings.values.reduce_motion and age > 0.4):
+		return
+	var g := 70.0
+	var a := clampf(1.0 - age / 1.6, 0.0, 1.0)
+	for i in 14:
+		var ang := -PI * 0.5 + (float(i) / 13.0 - 0.5) * 2.4
+		var sp := 28.0 + float((i * 37) % 17)
+		var v := Vector2(cos(ang), sin(ang)) * sp
+		var p := base + Vector2(0, -4.0) + v * age + Vector2(0, 0.5 * g * age * age)
+		if i % 2 == 0:                                          # Schalensplitter
+			var rot := age * (6.0 + i)
+			var tri := PackedVector2Array([Vector2(-1.5, -1.1), Vector2(1.6, -0.7), Vector2(0.0, 1.4)])
+			for k in tri.size():
+				tri[k] = p + tri[k].rotated(rot)
+			draw_colored_polygon(tri, Color(shell, a))
+		else:                                                   # Konfetti
+			var cc: Color = [cols[1], Color("#ff7ac8"), Color("#6ad8ff"), Color("#ffe14a")][i % 4]
+			draw_rect(Rect2(p - Vector2(0.75, 0.75), Vector2(1.5, 1.5)), Color(cc, a))
+
+# ---------------------------------------------------------------- Runde 86: Valentinstag (nur Darstellung)
+## Am 14. Februar wirft jeder aussteigende Fahrgast dem Taxi eine Kusshand zu (ein Herz fliegt zum Taxi, das Taxi errötet);
+## nach einer harten Landung fällt beim Wegrennen ein gebrochenes Herz auseinander.
+const KISS_TIME := 0.9
+var valentine := Calendar.valentine()
+var kisses: Array = []
+var on_kiss := Callable()             # setzt game.gd: Taxi errötet, sobald das Herz ankommt
+
+func _draw_kisses() -> void:
+	if kisses.is_empty():
+		return
+	var keep: Array = []
+	for k in kisses:
+		var age := t - float(k.t0)
+		if age >= KISS_TIME:
+			if on_kiss.is_valid():
+				on_kiss.call()
+			continue
+		keep.append(k)
+		var u := age / KISS_TIME
+		var to := run.sim.pos + Vector2(0, -6.0)
+		var p := Vector2(k.from).lerp(to, u) + Vector2(0, -14.0 * sin(u * PI))
+		var s := 2.0 + 1.2 * sin(u * PI) + 0.3 * sin(t * 20.0)
+		draw_heart(p, s, Color(1.0, 0.35, 0.55, minf(1.0, (1.0 - u) * 4.0)))
+	kisses = keep
+
+## Herz um `c` (Breite ≈ 2 × s). `broken` < 0: in zwei Hälften mit Abstand `gap` geteilt (gebrochenes Herz).
+func draw_heart(c: Vector2, s: float, col: Color, broken := 0, gap := 0.0) -> void:
+	for side in [-1.0, 1.0]:
+		var dx: float = side * gap * 0.5 if broken < 0 else 0.0
+		var rot: float = side * gap * 0.12 if broken < 0 else 0.0
+		var poly := PackedVector2Array()
+		poly.append(Vector2(0, -s * 0.2))
+		for i in 9:                                             # Bogen oben, von innen nach außen
+			var a := PI * float(i) / 8.0
+			poly.append(Vector2(side * s * 0.5, -s * 0.2) + Vector2(-side * cos(a), -sin(a)) * s * 0.5)
+		poly.append(Vector2(side * s * 0.8, s * 0.3))
+		poly.append(Vector2(0, s * 0.95))
+		if broken < 0:                                          # Bruchkante im Zickzack
+			poly.append(Vector2(side * s * 0.12, s * 0.55))
+			poly.append(Vector2(-side * s * 0.1, s * 0.3))
+			poly.append(Vector2(side * s * 0.1, s * 0.05))
+		for i in poly.size():
+			poly[i] = c + Vector2(dx, 0) + poly[i].rotated(rot)
+		if Geometry2D.triangulate_polygon(poly).is_empty():
+			poly.reverse()
+		if not Geometry2D.triangulate_polygon(poly).is_empty():
+			draw_colored_polygon(poly, col)
+	draw_rect(Rect2(c + Vector2(-s * 0.7, -s * 0.5), Vector2(maxf(s * 0.22, 0.5), maxf(s * 0.22, 0.5))), Color(1, 1, 1, col.a * 0.7))

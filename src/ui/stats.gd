@@ -19,7 +19,7 @@ func _ready() -> void:
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
-	box.add_theme_constant_override("separation", 3)
+	box.add_theme_constant_override("separation", 0)          # Runde 86: 16 Zeilen – enger, damit Titel und Knöpfe in 360 Zeilen passen
 	add_child(box)
 	box.add_child(MenuKit.screen_title(tr("MENU_STATS")))
 	var st: Dictionary = Save.data.stats
@@ -43,6 +43,8 @@ func _ready() -> void:
 		["STAT_SHIFT_TODAY", _shift_today()],
 		["STAT_DAILY", "%d · %d" % [int(st.get("day_golds", 0)), Daily.current_streak(st, Daily.today())]],
 		["STAT_TIME", "%d:%02d:%02d" % [secs / 3600, (secs / 60) % 60, secs % 60]],
+		["STAT_DISTANCE", Loc.decimal_text(Save.distance_km(st), 1) + " km"],
+		["STAT_COFFEE", "≈ %d" % Save.coffee_cups(st)],
 	]
 	var panel := Panel.new()
 	panel.add_theme_stylebox_override("panel", MenuKit.panel_style(0.82))
@@ -70,11 +72,13 @@ func _ready() -> void:
 		ri += 1
 		var a := Label.new()
 		a.text = tr(r[0])
+		a.add_theme_font_size_override("font_size", 9)
 		a.custom_minimum_size = Vector2(150, 0)
 		var b := Label.new()
 		b.text = r[1]
 		b.custom_minimum_size = Vector2(90, 0)
 		b.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		b.add_theme_font_size_override("font_size", 9)
 		b.add_theme_color_override("font_color", Color("#ffe14a"))
 		h.add_child(a)
 		h.add_child(b)

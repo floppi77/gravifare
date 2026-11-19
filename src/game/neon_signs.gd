@@ -91,9 +91,11 @@ const CONTENT := {
 
 ## Legt die Schilder fest. Ergebnis: Liste von Schildern {kind, cells: Rect2i, board: Rect2 (Einheiten), col, col2, mode, phase, items}.
 ## items: [{strokes (Einheiten, absolut), w_px, col, glyph: Index für Flackern}] – die Röhren eines Zeichens bilden ein Element.
-static func plan(lv: LevelData, style: Dictionary, n := 3) -> Array:
+static func plan(lv: LevelData, style: Dictionary, n := 3, late := false) -> Array:
 	_n = n
 	var content: Dictionary = CONTENT.get(lv.id, CONTENT["S2-02"])
+	if late:
+		content = late_content(content)
 	var pal: Array = style.get("pal", ["#ff4fd8", "#4fd8ff"])
 	var max_signs: int = int(style.get("max", 9))
 	var taken := {}
@@ -123,6 +125,18 @@ static func plan(lv: LevelData, style: Dictionary, n := 3) -> Array:
 			out.append(sign)
 			_take(taken, sign.cells, 1)
 	return out
+
+## Runde 86: Spät in der Nacht (2–5 Uhr Ortszeit) rät die Leuchtreklame zum Schlafen – nur Englisch: „SLEEP“ auf Bannern statt „24H“, „ZZZ“ auf den kleinen Tafeln.
+static func late_content(content: Dictionary) -> Dictionary:
+	var c := content.duplicate(true)
+	for key in ["words", "small", "main"]:
+		if not c.has(key):
+			continue
+		var list: Array = c[key]
+		for i in list.size():
+			if String(list[i]) == "24H":
+				list[i] = "ZZZ" if key == "small" else "SLEEP"
+	return c
 
 ## Gefahren in der Nähe (Einheiten): Dornen (rosa) und Neon-Strahlen. Dort keine Magenta-Röhren, an Strahlen kein Flackern.
 static func _hazard_zones(lv: LevelData) -> Dictionary:

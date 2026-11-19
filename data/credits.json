@@ -10,7 +10,10 @@
     "de": "Ein schwereloses Taxi-Abenteuer",
     "en": "A weightless taxi adventure",
     "fr": "Une aventure de taxi en apesanteur",
-    "es": "Una aventura de taxi sin gravedad"
+    "es": "Una aventura de taxi sin gravedad",
+    "it": "Un'avventura in taxi senza peso",
+    "pt": "Uma aventura de táxi sem peso",
+    "pl": "Nieważka przygoda taksówkarza"
    }
   ],
   [
@@ -19,7 +22,10 @@
     "de": "Spielidee",
     "en": "Concept",
     "fr": "Concept",
-    "es": "Concepto"
+    "es": "Concepto",
+    "it": "Idea",
+    "pt": "Conceito",
+    "pl": "Pomysł"
    }
   ],
   [
@@ -28,7 +34,10 @@
     "de": "floppi – Ideen, Tests",
     "en": "floppi – ideas, playtests",
     "fr": "floppi – idées, tests",
-    "es": "floppi – ideas, pruebas"
+    "es": "floppi – ideas, pruebas",
+    "it": "floppi – idee, playtest",
+    "pt": "floppi – ideias, testes de jogo",
+    "pl": "floppi – pomysły, testy"
    }
   ],
   [
@@ -37,7 +46,10 @@
     "de": "Level",
     "en": "Levels",
     "fr": "Niveaux",
-    "es": "Niveles"
+    "es": "Niveles",
+    "it": "Livelli",
+    "pt": "Níveis",
+    "pl": "Poziomy"
    }
   ],
   [
@@ -46,7 +58,10 @@
     "de": "floppi – alle 99 Level von Hand gebaut und selbst durchgeflogen",
     "en": "floppi – all 99 levels built and flown by hand",
     "fr": "floppi – les 99 niveaux construits et volés à la main",
-    "es": "floppi – los 99 niveles construidos y volados a mano"
+    "es": "floppi – los 99 niveles construidos y volados a mano",
+    "it": "floppi – tutti i 99 livelli costruiti e volati a mano",
+    "pt": "floppi – todos os 99 níveis feitos e voados à mão",
+    "pl": "floppi – wszystkie 99 poziomów zbudowane i przelatane ręcznie"
    }
   ],
   [
@@ -55,7 +70,10 @@
     "de": "Entwicklung",
     "en": "Development",
     "fr": "Développement",
-    "es": "Desarrollo"
+    "es": "Desarrollo",
+    "it": "Sviluppo",
+    "pt": "Desenvolvimento",
+    "pl": "Produkcja"
    }
   ],
   [
@@ -64,7 +82,10 @@
     "de": "Programmierung, Pixel-Art, Sounddesign",
     "en": "Programming, pixel art, sound design",
     "fr": "Programmation, pixel art, conception sonore",
-    "es": "Programación, pixel art, diseño de sonido"
+    "es": "Programación, pixel art, diseño de sonido",
+    "it": "Programmazione, pixel art, sound design",
+    "pt": "Programação, pixel art, design de som",
+    "pl": "Programowanie, pixel art, dźwięk"
    }
   ],
   [
@@ -73,7 +94,10 @@
     "de": "erzeugt mit Claude Code (Anthropic)",
     "en": "created with Claude Code (Anthropic)",
     "fr": "créés avec Claude Code (Anthropic)",
-    "es": "creados con Claude Code (Anthropic)"
+    "es": "creados con Claude Code (Anthropic)",
+    "it": "creato con Claude Code (Anthropic)",
+    "pt": "criado com Claude Code (Anthropic)",
+    "pl": "stworzone z Claude Code (Anthropic)"
    }
   ],
   [
@@ -82,7 +106,10 @@
     "de": "Level-Hintergründe & Logo",
     "en": "Level backgrounds & logo",
     "fr": "Décors des niveaux et logo",
-    "es": "Fondos de los niveles y logotipo"
+    "es": "Fondos de los niveles y logotipo",
+    "it": "Sfondi dei livelli e logo",
+    "pt": "Fundos dos níveis e logo",
+    "pl": "Tła poziomów i logo"
    }
   ],
   [
@@ -91,7 +118,10 @@
     "de": "KI-generiert",
     "en": "AI-generated",
     "fr": "générés par IA",
-    "es": "generados con IA"
+    "es": "generados con IA",
+    "it": "Generati con IA",
+    "pt": "Gerados por IA",
+    "pl": "Wygenerowane przez AI"
    }
   ],
   [
@@ -100,7 +130,10 @@
     "de": "3D-Grafik",
     "en": "3D graphics",
     "fr": "Graphismes 3D",
-    "es": "Gráficos 3D"
+    "es": "Gráficos 3D",
+    "it": "Grafica 3D",
+    "pt": "Gráficos 3D",
+    "pl": "Grafika 3D"
    }
   ],
   [
@@ -113,7 +146,10 @@
     "de": "Licht, Glanz und Rundung des Taxis",
     "en": "Lighting, gloss and shape of the taxi",
     "fr": "Lumière, reflets et volume du taxi",
-    "es": "Luz, brillo y volumen del taxi"
+    "es": "Luz, brillo y volumen del taxi",
+    "it": "Luce, lucentezza e forme del taxi",
+    "pt": "Luz, brilho e formas do táxi",
+    "pl": "Światło, połysk i kształt taksówki"
    }
   ],
   [
@@ -122,7 +158,10 @@
     "de": "Hintergründe der Flüge zwischen den Leveln",
     "en": "Backgrounds of the flights between levels",
     "fr": "Décors des vols entre les niveaux",
-    "es": "Fondos de los vuelos entre niveles"
+    "es": "Fondos de los vuelos entre niveles",
+    "it": "Sfondi dei voli tra i livelli",
+    "pt": "Fundos dos voos entre os níveis",
+    "pl": "Tła lotów między poziomami"
    }
   ],
   [
@@ -131,7 +170,10 @@
     "de": "Engine",
     "en": "Engine",
     "fr": "Moteur",
-    "es": "Motor"
+    "es": "Motor",
+    "it": "Motore",
+    "pt": "Motor",
+    "pl": "Silnik"
    }
   ],
   [
@@ -144,7 +186,10 @@
     "de": "Godot-Logo © 2017 Andrea Calabró – CC BY 4.0",
     "en": "Godot logo © 2017 Andrea Calabró – CC BY 4.0",
     "fr": "Logo Godot © 2017 Andrea Calabró – CC BY 4.0",
-    "es": "Logotipo de Godot © 2017 Andrea Calabró – CC BY 4.0"
+    "es": "Logotipo de Godot © 2017 Andrea Calabró – CC BY 4.0",
+    "it": "Logo di Godot © 2017 Andrea Calabró – CC BY 4.0",
+    "pt": "Logo do Godot © 2017 Andrea Calabró – CC BY 4.0",
+    "pl": "Logo Godot © 2017 Andrea Calabró – CC BY 4.0"
    }
   ],
   [
@@ -153,7 +198,10 @@
     "de": "Schriften",
     "en": "Fonts",
     "fr": "Polices",
-    "es": "Fuentes"
+    "es": "Fuentes",
+    "it": "Caratteri",
+    "pt": "Fontes",
+    "pl": "Czcionki"
    }
   ],
   [
@@ -178,7 +226,10 @@
     "de": "alle unter der SIL Open Font License 1.1",
     "en": "all under the SIL Open Font License 1.1",
     "fr": "toutes sous SIL Open Font License 1.1",
-    "es": "todas bajo SIL Open Font License 1.1"
+    "es": "todas bajo SIL Open Font License 1.1",
+    "it": "tutti con SIL Open Font License 1.1",
+    "pt": "todas sob a SIL Open Font License 1.1",
+    "pl": "wszystkie na licencji SIL Open Font License 1.1"
    }
   ],
   [
@@ -187,7 +238,10 @@
     "de": "Stimmen",
     "en": "Voices",
     "fr": "Voix",
-    "es": "Voces"
+    "es": "Voces",
+    "it": "Voci",
+    "pt": "Vozes",
+    "pl": "Głosy"
    }
   ],
   [
@@ -196,7 +250,10 @@
     "de": "Fiktive Stimmen, offline synthetisiert mit Qwen3-TTS",
     "en": "Fictional voices, synthesized offline with Qwen3-TTS",
     "fr": "Voix fictives, synthétisées hors ligne avec Qwen3-TTS",
-    "es": "Voces ficticias, sintetizadas sin conexión con Qwen3-TTS"
+    "es": "Voces ficticias, sintetizadas sin conexión con Qwen3-TTS",
+    "it": "Voci immaginarie, sintetizzate offline con Qwen3-TTS",
+    "pt": "Vozes fictícias, sintetizadas offline com Qwen3-TTS",
+    "pl": "Fikcyjne głosy, syntetyzowane offline w Qwen3-TTS"
    }
   ],
   [
@@ -209,7 +266,10 @@
     "de": "Fluglehrer und zehn weitere Fahrgaststimmen: Built with Fish Audio (Drama 3)",
     "en": "Flight instructor and ten more passenger voices: Built with Fish Audio (Drama 3)",
     "fr": "Instructrice de vol et dix autres voix de passagers : Built with Fish Audio (Drama 3)",
-    "es": "Instructora de vuelo y diez voces de pasajeros más: Built with Fish Audio (Drama 3)"
+    "es": "Instructora de vuelo y diez voces de pasajeros más: Built with Fish Audio (Drama 3)",
+    "it": "Istruttore di volo e altre dieci voci di passeggeri: Built with Fish Audio (Drama 3)",
+    "pt": "Instrutor de voo e mais dez vozes de passageiros: Built with Fish Audio (Drama 3)",
+    "pl": "Instruktor lotu i dziesięć kolejnych głosów pasażerów: Built with Fish Audio (Drama 3)"
    }
   ],
   [
@@ -222,7 +282,10 @@
     "de": "Musik & Klänge",
     "en": "Music & sound",
     "fr": "Musique et son",
-    "es": "Música y sonido"
+    "es": "Música y sonido",
+    "it": "Musica e suoni",
+    "pt": "Música e som",
+    "pl": "Muzyka i dźwięk"
    }
   ],
   [
@@ -231,7 +294,10 @@
     "de": "Komplett synthetisch erzeugt, eigene Kompositionen",
     "en": "Entirely synthesized, original compositions",
     "fr": "Entièrement synthétisées, compositions originales",
-    "es": "Totalmente sintetizada, composiciones originales"
+    "es": "Totalmente sintetizada, composiciones originales",
+    "it": "Interamente sintetizzate, composizioni originali",
+    "pt": "Totalmente sintetizadas, composições originais",
+    "pl": "W pełni syntetyczne, oryginalne kompozycje"
    }
   ],
   [
@@ -240,7 +306,10 @@
     "de": "Werkzeuge",
     "en": "Tools",
     "fr": "Outils",
-    "es": "Herramientas"
+    "es": "Herramientas",
+    "it": "Strumenti",
+    "pt": "Ferramentas",
+    "pl": "Narzędzia"
    }
   ],
   [
@@ -253,7 +322,10 @@
     "de": "Unterstützen",
     "en": "Support",
     "fr": "Soutien",
-    "es": "Apoyo"
+    "es": "Apoyo",
+    "it": "Supporto",
+    "pt": "Apoio",
+    "pl": "Wsparcie"
    }
   ],
   [
@@ -266,7 +338,10 @@
     "de": "Dank",
     "en": "Thanks",
     "fr": "Merci",
-    "es": "Gracias"
+    "es": "Gracias",
+    "it": "Grazie",
+    "pt": "Obrigado",
+    "pl": "Podziękowania"
    }
   ],
   [
@@ -275,7 +350,10 @@
     "de": "allen Fahrgästen, die sich nicht auf den Kopf landen ließen",
     "en": "to all passengers who survived being landed on",
     "fr": "à tous les passagers qui ont survécu à nos atterrissages",
-    "es": "a todos los pasajeros que sobrevivieron a nuestros aterrizajes"
+    "es": "a todos los pasajeros que sobrevivieron a nuestros aterrizajes",
+    "it": "a tutti i passeggeri sopravvissuti agli atterraggi",
+    "pt": "a todos os passageiros que sobreviveram aos pousos",
+    "pl": "dla wszystkich pasażerów, którzy przeżyli lądowania"
    }
   ],
   [
@@ -284,7 +362,10 @@
     "de": "Danke fürs Spielen!",
     "en": "Thanks for playing!",
     "fr": "Merci d’avoir joué !",
-    "es": "¡Gracias por jugar!"
+    "es": "¡Gracias por jugar!",
+    "it": "Grazie per aver giocato!",
+    "pt": "Obrigado por jogar!",
+    "pl": "Dzięki za grę!"
    }
   ]
  ]

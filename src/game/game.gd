@@ -18,6 +18,8 @@ var slowmo_left := 0.0
 var completion_saved := false
 const TV := preload("res://src/game/transition_view.gd")
 const Stage := preload("res://src/core/stage.gd")
+const Calendar := preload("res://src/core/calendar.gd")
+const EasterEgg := preload("res://src/game/easter_egg.gd")
 var replay: Replay = null              # Aufzeichnung des laufenden Levels (Replay-Fundament)
 var arrive_path := PackedVector2Array()   # hindernisfreier Einflug-Pfad (Pathing.arrival_path)
 var trans_t := -1.0              # Zeitachse des Levelwechsels (siehe transition_view.gd), < 0 = inaktiv
@@ -170,6 +172,10 @@ func _ready() -> void:
 	for ua4 in OS.get_cmdline_user_args():
 		if ua4 == "--debug-result" or ua4.begins_with("--debug-result="):      # Dev: Ergebnisansicht sofort mit Beispielwerten (all/none/uncounted/solved/last)
 			_debug_result(ua4.substr(15) if ua4.length() > 15 else "all")
+		if ua4 == "--debug-split":                 # Dev (Runde 85): Zwischenzeit der Karriere-Uhr mit Beispielwerten zeigen
+			Flow.career_clock = 2471.3
+			hud.show_split({"sector": 3, "time": 2471.3, "best": 2486.5, "total_best": -1.0})
+			hud.split_t = 600.0
 	_queue_clip(0.9)                          # Szenenstart (Menü): Einspieler nach kurzer Pause; bei Übergangsflügen in _end_transition
 	for ua3 in OS.get_cmdline_user_args():
 		if ua3.begins_with("--clip="):           # Dev: Einspieler sofort zeigen
@@ -288,6 +294,8 @@ func load_level(path: String) -> void:
 	dark.setup(run, cam)
 	world_tiles.setup(run)
 	props.setup(run)
+	props.on_kiss = taxi.blush
+	_setup_egg()
 	if tags == null:
 		tags = Node2D.new()
 		tags.set_script(load("res://src/game/passenger_tags.gd"))
@@ -725,6 +733,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept"):
 			Flow.to_menu()
+	elif event.is_action_pressed("horn"):
+		get_viewport().set_input_as_handled()
+		if run.result == Run.Result.RUNNING and trans_t < 0.0:
+			_honk()
 	elif event.is_action_pressed("eject"):
 		if run.result == Run.Result.RUNNING and trans_t < 0.0:
 			replay.mark_eject()
@@ -793,6 +805,7 @@ func _physics_process(_delta: float) -> void:
 		replay.add(v, gear_on)
 	run.step(v, gear_on)
 	replay.sample(run.sim.pos, run.sim.tilt)
+	_calendar_tick()
 	if run.sim.gear_cmd != gear_before:
 		Sfx.play("gear")
 	if bay == null:                          # in der Werkstatt steuert sie den Triebwerksklang selbst
@@ -891,6 +904,8 @@ func _physics_process(_delta: float) -> void:
 			counted = false
 		if counted:
 			Save.complete_level(Flow.current_level, run.level_time, run.money, run.earned, med, score)
+			if Flow.is_career() and run.level.number % 11 == 0:
+				hud.show_split(Flow.note_career_split(run.level.sector, run.level.number >= 99))
 		replay.finish({"complete": true, "time": run.level_time, "money": run.money, "earned": run.earned, "delivered": run.delivered})
 		if Flow.daily and day_ghost_score >= 0 and not Save.dev_session:
 			Replay.save_day(replay.to_dict(), Save.slot, Flow.daily_date, day_ghost_score)
@@ -1015,6 +1030,7 @@ func _lose_life() -> void:
 			hud.over_level = Flow.lose_sector(run.level.sector).number
 		return
 	if not Flow.practice:
+		Flow.store_clock()                 # Karriere-Uhr mit dem verlorenen Leben sichern
 		Save.note_campaign_lives(Flow.lives)
 	replay.mark_respawn()
 	run.respawn_after_crash()
@@ -1164,6 +1180,75 @@ func _check_unlocks() -> Array:
 
 var voice_cd := 0.0
 var attendant_cd := 0.0
+var horn_cd := 0.0
+var horn_scold := 0
+# ---------------------------------------------------------------- Runde 86: Osterei und Feiertage (nur Darstellung und Statistik)
+var egg_key := ""                     # "JJJJ-MM-TT:Modus:Level" – jedes Ei zählt je Tag, Schicht und Karte einmal
+var holiday_noted := false
+
+## Echte Flüge zählen (nicht Zuschauen, Einspieler, Autopilot des Editors).
+func _counts() -> bool:
+	return not watching and Flow.watch.is_empty() and not Flow.editor_autopilot and autopilot == null and script_inputs.is_empty()
+
+func _setup_egg() -> void:
+	props.set_egg({})
+	if not Calendar.easter() or not (Flow.shift or Flow.daily) or run.level.tutorial or run.level.id == "":
+		return                                   # nur in Tag- und Nachtschicht, nicht in der Karriere
+	var d := Calendar.now()
+	egg_key = "%04d-%02d-%02d:%s:%s" % [int(d.year), int(d.month), int(d.day), "night" if Flow.shift else "day", run.level.id]
+	if Save.has_egg(egg_key) and not Save.debug:
+		return                                   # heute in dieser Schicht schon gefunden
+	props.set_egg(EasterEgg.spot(run.level, egg_key))
+
+
+var _egg_near_done := false
+
+func _calendar_tick() -> void:
+	if run.result != Run.Result.RUNNING:
+		return
+	if not _egg_near_done and not props.egg.is_empty():
+		_egg_near_done = true
+		for arg in OS.get_cmdline_user_args():
+			if arg.begins_with("--egg-near="):           # Dev (Bildschirmfotos): Taxi neben das Ei setzen, Versatz x,y
+				var xy := arg.substr(11).split(",")
+				run.sim.pos = Vector2(props.egg.pos) + Vector2(float(xy[0]), float(xy[1]) if xy.size() > 1 else -20.0)
+				run.sim.vel = Vector2.ZERO
+				run.sim.state = TaxiSim.State.FLYING
+	if not holiday_noted and run.sim.state == TaxiSim.State.FLYING and _counts():
+		holiday_noted = true
+		var h := Calendar.holiday()
+		if h != "":
+			Save.note_holiday(h, int(Calendar.now().year))
+	if props.egg_alive() and run.sim.state != TaxiSim.State.DESTROYED and EasterEgg.touches(props.egg, run.sim.pos):
+		props.break_egg()
+		Sfx.play("shatter", -7.0)
+		Sfx.play("land_perfect", -6.0)
+		Haptics.pulse(0.12, 0.25, 0.1)
+		if _counts() and Save.note_egg(egg_key):
+			hud.flash_message(tr("MSG_EGG") % Save.egg_count(), 2.6)
+
+const HORN_PUMP_DIST := 70.0           # so nah an einer Zapfsäule schimpft der Tankwart über die Hupe
+
+## Runde 86: Hupe (H / X) – ohne Spielwirkung: wartende Fahrgäste in der Nähe winken zurück, an der Zapfsäule schimpft der Tankwart.
+## Läuft nicht über die Simulation (keine Aufzeichnung, gleicher Ablauf).
+func _honk() -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	if now < horn_cd:
+		return
+	horn_cd = now + 0.45
+	Sfx.play("horn", -4.0)
+	Haptics.pulse(0.1, 0.25, 0.08)
+	var p := run.sim.pos
+	for a in run.waiting_actors():
+		if a.world_pos().distance_to(p) < 220.0:
+			a.wave()
+	for pump in run.level.pumps:
+		if (pump.rect as Rect2).get_center().distance_to(p) < HORN_PUMP_DIST and now >= attendant_cd and not run.station_down():
+			attendant_cd = now + 6.0
+			horn_scold = horn_scold % 3 + 1
+			Sfx.play_voice("t0", "horn_%d" % horn_scold)
+			hud.subtitle(tr("SPK_ATTENDANT"), Sfx.line_text("t0", "horn_%d" % horn_scold), 2.4)
+			break
 var pending_call := {}
 ## Fahrgast an Bord kommentiert die Landung: weich = „Wow, sanft!“, hart = „Aua!“ (höchstens alle 8 s).
 func _passenger_reaction(e: Dictionary) -> void:
@@ -1219,6 +1304,7 @@ func _on_event(e: Dictionary) -> void:
 		"near_miss":
 			if float(e.get("tip", 0.0)) > 0.0:
 				hud.flash_message(tr("MSG_NEAR_TIP") % int(e.tip), 1.2)
+				taxi.tip_coin()                       # Runde 86: Trinkgeld springt als Münze hoch und fällt klimpernd ins Taxi
 			if not Settings.values.reduce_motion:
 				_near_miss_fx(float(e.get("tip", 0.0)) <= 0.0)
 			else:
@@ -1239,6 +1325,8 @@ func _on_event(e: Dictionary) -> void:
 			else:
 				Sfx.play("land", -4.0)
 			taxi.burst_puff(0.6)
+			if float(e.vy) > 30.0:
+				taxi.slosh(clampf((float(e.vy) - 30.0) / 25.0, 0.3, 1.0))     # Runde 86: Kaffee schwappt über
 			Haptics.pulse(0.15, clampf(float(e.vy) / 48.0, 0.0, 1.0) * 0.8, 0.12)
 			if float(e.vy) > 35.0:
 				_add_shake(1.2)
@@ -1251,8 +1339,12 @@ func _on_event(e: Dictionary) -> void:
 			hud.subtitle(e.name, tr("VOICE_CALL"))
 		"boarded":
 			Sfx.play("board", -6.0)
-			Sfx.play_voice(e.voice, "dest_" + e.dest)
-			hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else (tr("VOICE_DEST_H") if e.dest == "H" else tr("VOICE_DEST") % e.dest), 2.8)
+			if String(e.get("special", "")) == "42":          # Runde 86: Level 42 – der erste Fahrgast sagt nur „42“
+				Sfx.play_voice(e.voice, "answer_42")
+				hud.subtitle(e.name, Sfx.line_text(e.voice, "answer_42"), 2.4)
+			else:
+				Sfx.play_voice(e.voice, "dest_" + e.dest)
+				hud.subtitle(e.name, tr("VOICE_EXIT") if e.dest == "exit" else (tr("VOICE_DEST_H") if e.dest == "H" else tr("VOICE_DEST") % e.dest), 2.8)
 			if int(e.job) >= 0 and bool(run.jobs[e.job].get("fragile", false)):
 				hud.flash_message(tr("MSG_MEDICAL"), 3.2)
 		"delivered":
@@ -1273,8 +1365,15 @@ func _on_event(e: Dictionary) -> void:
 				msg += "  " + tr("MSG_PEN_WRONG") % int(round(pw * 100.0))
 			hud.flash_message(msg, 3.0)
 			Sfx.play("coin")
-			Sfx.play_voice(e.voice, "thanks")
-			hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+			if String(e.get("special", "")) == "floppi":      # Runde 86: seltener Gast bedankt sich besonders herzlich
+				Sfx.play_voice("m0", "floppi_thanks")
+				hud.subtitle(e.name, Sfx.line_text("m0", "floppi_thanks"), 4.0)
+			else:
+				Sfx.play_voice(e.voice, "thanks")
+				hud.subtitle(e.name, tr("VOICE_THANKS"), 1.8)
+		"farewell_hard":                                  # Runde 86: nach harter Landung rennt der Fahrgast schimpfend weg
+			Sfx.play_voice(e.voice, "angry")
+			hud.subtitle(e.name, tr("VOICE_ANGRY"), 2.0)
 		"squashed":
 			Haptics.pulse(0.3, 0.1, 0.15)
 			Save.count_event("squashes")
@@ -1433,6 +1532,10 @@ func _process(delta: float) -> void:
 	_focus_tick(delta)
 	if run.result == Run.Result.RUNNING and not paused and not briefing and trans_t < 0.0:
 		Save.add_playtime(delta / maxf(Engine.time_scale, 0.05))
+		if run.sim.state == TaxiSim.State.FLYING and Flow.watch.is_empty() and not Flow.editor_autopilot:
+			Save.add_distance(run.sim.vel.length() * delta)        # Runde 86: geflogene Strecke für die Statistik
+		if Flow.is_career():
+			Flow.career_clock += delta / maxf(Engine.time_scale, 0.05)       # Karriere-Uhr: echte Zeit, Zeitlupe dehnt sie nicht
 	if slowmo_left > 0.0:
 		slowmo_left -= delta / maxf(Engine.time_scale, 0.05)
 		if slowmo_left <= 0.0:
@@ -1484,7 +1587,7 @@ func _store_progress() -> void:
 	Flow.carry_passenger = run.carried
 	entry_carry = {}
 	if not Flow.practice:
-		Save.set_campaign({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried})
+		Save.set_campaign(Flow.career_fields({"level": next_id, "lives": Flow.lives, "fuel": Flow.entry_fuel, "credits": Flow.entry_credits, "seed": Flow.run_seed, "carry": run.carried}))
 
 ## Werkstatt nach dem Sektor: liegt über allem; verlässt das Taxi sie, beginnt der Levelwechsel direkt im Weltraum.
 func _open_bay() -> void:

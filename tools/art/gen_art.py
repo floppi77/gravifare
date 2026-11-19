@@ -553,6 +553,38 @@ def flags():
     es = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(es)
     d.rectangle([0, 0, W, 19], fill=hexc("#c60b1e")); d.rectangle([0, 20, W, 59], fill=hexc("#ffc400")); d.rectangle([0, 60, W, H], fill=hexc("#c60b1e"))
     finish(es, "flag_es.png")
+    # Italien (Runde 85)
+    it = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(it)
+    d.rectangle([0, 0, 39, H], fill=hexc("#009246")); d.rectangle([40, 0, 79, H], fill=hexc("#ffffff")); d.rectangle([80, 0, W, H], fill=hexc("#ce2b37"))
+    finish(it, "flag_it.png")
+    # Polen (Runde 85): Weiß über Rot
+    pl = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(pl)
+    d.rectangle([0, 0, W, 39], fill=hexc("#ffffff")); d.rectangle([0, 40, W, H], fill=hexc("#dc143c"))
+    finish(pl, "flag_pl.png")
+    # Portugiesisch (Runde 85) wie Englisch geteilt: Brasilien oben links (vereinfacht: Raute und Himmelskugel mit Band), Portugal unten rechts
+    # (Grün/Rot, das Wappen als gelber Ring mit Schild)
+    def brazil():
+        im = Image.new("RGBA", (W, H), hexc("#009c3b")); d = ImageDraw.Draw(im)
+        cx, cy = 40, 28
+        d.polygon([(cx - 34, cy), (cx, cy - 22), (cx + 34, cy), (cx, cy + 22)], fill=hexc("#ffdf00"))
+        d.ellipse([cx - 13, cy - 13, cx + 13, cy + 13], fill=hexc("#002776"))
+        d.arc([cx - 22, cy - 6, cx + 22, cy + 30], 215, 325, fill=hexc("#ffffff"), width=3)
+        for sx, sy in ((cx - 5, cy + 5), (cx + 4, cy + 7), (cx + 1, cy + 2), (cx - 2, cy + 9), (cx + 7, cy + 2)):
+            d.rectangle([sx, sy, sx + 1, sy + 1], fill=hexc("#ffffff"))
+        return im
+    def portugal():
+        im = Image.new("RGBA", (W, H), hexc("#da291c")); d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, 47, H], fill=hexc("#046a38"))
+        ex, ey = 72, 54
+        d.ellipse([ex - 13, ey - 13, ex + 13, ey + 13], outline=hexc("#ffe900"), width=4)
+        d.rectangle([ex - 7, ey - 8, ex + 7, ey + 6], fill=hexc("#ffffff"), outline=hexc("#da291c"), width=2)
+        d.pieslice([ex - 7, ey - 2, ex + 7, ey + 12], 0, 180, fill=hexc("#ffffff"))
+        d.rectangle([ex - 3, ey - 4, ex + 3, ey + 4], fill=hexc("#003399"))
+        return im
+    br, ptg = brazil(), portugal()
+    pt = Image.fromarray(np.where(upper_left[:, :, None], np.array(br), np.array(ptg)).astype(np.uint8))
+    d = ImageDraw.Draw(pt); d.line([W, 0, 0, H], fill=hexc("#0c0f24"), width=2)
+    finish(pt, "flag_pt.png")
 
 # ------------------------------------------------------------------ Weltraum-Zwischensequenz (Ersatzhintergrund; je Sektor siehe tools/art/transit/)
 def space():
@@ -570,6 +602,10 @@ def space():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    if len(sys.argv) > 1:                       # einzelne Teile, z. B. `python3 tools/art/gen_art.py flags`
+        for f in sys.argv[1:]:
+            globals()[f]()
+        sys.exit(0)
     for f in ("tiles", "shelter", "gate_files", "taxi_skins", "stickers", "background", "space", "flags", "pump_files"):
         globals()[f]()
     print("Assets geschrieben nach", OUT)

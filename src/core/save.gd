@@ -25,7 +25,7 @@ func slot_path(n: int) -> String:
 func _ready() -> void:
 	var want := 0
 	for a in OS.get_cmdline_user_args():
-		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a == "--bug" or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--debug-destroy-at=") or a.begins_with("--inputs=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light=") or a.begins_with("--debug-result"):
+		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a == "--update-ask" or a == "--debug-split" or a == "--bug" or a.begins_with("--date=") or a.begins_with("--hour=") or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--debug-destroy-at=") or a.begins_with("--inputs=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light=") or a.begins_with("--debug-result"):
 			dev_session = true
 		if a.begins_with("--level=") or a.begins_with("--scene=") or a == "--levels" or a.begins_with("--shot="):
 			want = maxi(want, 1)                 # Dev-Aufrufe überspringen die Platzwahl (Platz 1)
@@ -225,6 +225,50 @@ func total_score() -> int:
 	for id in data.completed:
 		t += int(data.completed[id].get("score", 0))
 	return t
+
+## Runde 86: geflogene Strecke (Welteinheiten). Anzeige in km: das Taxi ist 26 Einheiten breit ≈ 4 m.
+const METERS_PER_UNIT := 4.0 / 26.0
+func add_distance(units: float) -> void:
+	if not community_mode:
+		data.stats["distance"] = float(data.stats.get("distance", 0.0)) + units
+
+## Runde 86: Ostereier in Tag- und Nachtschicht ("JJJJ-MM-TT:Modus:Level" → true; je Tag, Schicht und Karte einmal). Rückgabe: neu gefunden.
+func note_egg(key: String) -> bool:
+	if community_mode or debug:
+		return false
+	var e = data.stats.get("eggs")
+	if not (e is Dictionary):
+		e = {}
+	if e.has(key):
+		return false
+	e[key] = true
+	data.stats["eggs"] = e
+	return true
+
+func has_egg(key: String) -> bool:
+	var e = data.stats.get("eggs")
+	return e is Dictionary and e.has(key)
+
+func egg_count() -> int:
+	var e = data.stats.get("eggs")
+	return e.size() if e is Dictionary else 0
+
+## Runde 86: an einem Feiertag gespielt (Calendar.holiday) – merkt das Jahr.
+func note_holiday(h: String, year: int) -> void:
+	if community_mode or debug or h == "":
+		return
+	var d = data.stats.get("holidays")
+	if not (d is Dictionary):
+		d = {}
+	d[h] = year
+	data.stats["holidays"] = d
+
+static func distance_km(stats: Dictionary) -> float:
+	return float(stats.get("distance", 0.0)) * METERS_PER_UNIT / 1000.0
+
+## Runde 86: „Getrunkener Kaffee der Zentrale“ – geschätzt eine Tasse je zehn Minuten Spielzeit.
+static func coffee_cups(stats: Dictionary) -> int:
+	return int(float(stats.get("play_seconds", 0.0)) / 600.0)
 
 func add_playtime(seconds: float) -> void:
 	data.stats["play_seconds"] = float(data.stats.get("play_seconds", 0.0)) + seconds

@@ -1,402 +1,702 @@
 {
  "S1-01": {
   "fr": "Premier vol",
-  "es": "Primer vuelo"
+  "es": "Primer vuelo",
+  "it": "Primo volo",
+  "pt": "Primeiro voo",
+  "pl": "Pierwszy lot"
  },
  "S1-02": {
   "fr": "Plein d’essence",
-  "es": "Parada para repostar"
+  "es": "Parada para repostar",
+  "it": "Pausa rifornimento",
+  "pt": "Parada para abastecer",
+  "pl": "Postój na tankowanie"
  },
  "S1-03": {
   "fr": "La cheminée",
-  "es": "La chimenea"
+  "es": "La chimenea",
+  "it": "Il camino",
+  "pt": "A chaminé",
+  "pl": "Komin"
  },
  "S1-04": {
   "fr": "Terrasses",
-  "es": "Terrazas"
+  "es": "Terrazas",
+  "it": "Terrazze",
+  "pt": "Terraços",
+  "pl": "Tarasy"
  },
  "S1-05": {
   "fr": "Puits jumeaux",
-  "es": "Pozos gemelos"
+  "es": "Pozos gemelos",
+  "it": "Pozzi gemelli",
+  "pt": "Poços gêmeos",
+  "pl": "Bliźniacze szyby"
  },
  "S1-06": {
   "fr": "As du plein",
-  "es": "As del repostaje"
+  "es": "As del repostaje",
+  "it": "Asso del pieno",
+  "pt": "Mestre do tanque",
+  "pl": "Mistrz tankowania"
  },
  "S1-07": {
   "fr": "Périphérique",
-  "es": "Circunvalación"
+  "es": "Circunvalación",
+  "it": "Circonvallazione",
+  "pt": "Anel viário",
+  "pl": "Obwodnica"
  },
  "S1-08": {
   "fr": "Sentier d’épines",
-  "es": "Senda de espinas"
+  "es": "Senda de espinas",
+  "it": "Sentiero di spine",
+  "pt": "Trilha de espinhos",
+  "pl": "Ścieżka cierni"
  },
  "S1-09": {
   "fr": "Pointes d’aiguille",
-  "es": "Puntas de aguja"
+  "es": "Puntas de aguja",
+  "it": "Punte d'ago",
+  "pt": "Pontas de agulha",
+  "pl": "Szpilki"
  },
  "S1-10": {
   "fr": "À sec",
-  "es": "Sin gota"
+  "es": "Sin gota",
+  "it": "A secco",
+  "pt": "No osso",
+  "pl": "Na oparach"
  },
  "S1-11": {
   "fr": "Examen final",
-  "es": "Examen final"
+  "es": "Examen final",
+  "it": "Esame da maestro",
+  "pt": "Exame de mestre",
+  "pl": "Egzamin mistrzowski"
  },
  "S2-01": {
   "fr": "Entrée du canyon",
-  "es": "Boca del cañón"
+  "es": "Boca del cañón",
+  "it": "Bocca del canyon",
+  "pt": "Boca do cânion",
+  "pl": "Wylot kanionu"
  },
  "S2-02": {
   "fr": "Avenue néon",
-  "es": "Avenida de neón"
+  "es": "Avenida de neón",
+  "it": "Viale al neon",
+  "pt": "Avenida Neon",
+  "pl": "Neonowa aleja"
  },
  "S2-03": {
   "fr": "Première écluse",
-  "es": "Primera esclusa"
+  "es": "Primera esclusa",
+  "it": "Prima chiusa",
+  "pt": "Primeira eclusa",
+  "pl": "Pierwsza śluza"
  },
  "S2-04": {
   "fr": "Portes jumelles",
-  "es": "Puertas gemelas"
+  "es": "Puertas gemelas",
+  "it": "Cancelli gemelli",
+  "pt": "Portões gêmeos",
+  "pl": "Bliźniacze bramy"
  },
  "S2-05": {
   "fr": "Heure de pointe",
-  "es": "Hora punta"
+  "es": "Hora punta",
+  "it": "Ora di punta",
+  "pt": "Hora do rush",
+  "pl": "Godzina szczytu"
  },
  "S2-06": {
   "fr": "Façade de verre",
-  "es": "Fachada de cristal"
+  "es": "Fachada de cristal",
+  "it": "Facciata di vetro",
+  "pt": "Fachada de vidro",
+  "pl": "Szklana fasada"
  },
  "S2-07": {
   "fr": "Herse",
-  "es": "Rastrillo"
+  "es": "Rastrillo",
+  "it": "Saracinesca",
+  "pt": "Grade levadiça",
+  "pl": "Brona"
  },
  "S2-08": {
   "fr": "Labyrinthe néon",
-  "es": "Laberinto de neón"
+  "es": "Laberinto de neón",
+  "it": "Labirinto al neon",
+  "pt": "Labirinto de neon",
+  "pl": "Neonowy labirynt"
  },
  "S2-09": {
   "fr": "Sas",
-  "es": "Cámara de esclusa"
+  "es": "Cámara de esclusa",
+  "it": "Camera di chiusa",
+  "pt": "Câmara da eclusa",
+  "pl": "Komora śluzy"
  },
  "S2-10": {
   "fr": "Écluses jumelles",
-  "es": "Esclusas gemelas"
+  "es": "Esclusas gemelas",
+  "it": "Chiuse gemelle",
+  "pt": "Eclusas gêmeas",
+  "pl": "Bliźniacze śluzy"
  },
  "S2-11": {
   "fr": "Final néon",
-  "es": "Final de neón"
+  "es": "Final de neón",
+  "it": "Finale al neon",
+  "pt": "Final neon",
+  "pl": "Neonowy finał"
  },
  "S3-01": {
   "fr": "Casse",
-  "es": "Desguace"
+  "es": "Desguace",
+  "it": "Sfasciacarrozze",
+  "pt": "Ferro-velho",
+  "pl": "Złomowisko"
  },
  "S3-02": {
   "fr": "Rail de grue",
-  "es": "Vía de la grúa"
+  "es": "Vía de la grúa",
+  "it": "Binario della gru",
+  "pt": "Trilho do guindaste",
+  "pl": "Tor dźwigu"
  },
  "S3-03": {
   "fr": "Convoyeur",
-  "es": "Cinta transportadora"
+  "es": "Cinta transportadora",
+  "it": "Nastro trasportatore",
+  "pt": "Esteira",
+  "pl": "Przenośnik"
  },
  "S3-04": {
   "fr": "Champ de débris",
-  "es": "Campo de escombros"
+  "es": "Campo de escombros",
+  "it": "Campo di detriti",
+  "pt": "Campo de destroços",
+  "pl": "Pole szczątków"
  },
  "S3-05": {
   "fr": "Course d’urgence",
-  "es": "Carrera de urgencia"
+  "es": "Carrera de urgencia",
+  "it": "Corsa d'emergenza",
+  "pt": "Corrida de emergência",
+  "pl": "Kurs ratunkowy"
  },
  "S3-06": {
   "fr": "Double navette",
-  "es": "Transbordador doble"
+  "es": "Transbordador doble",
+  "it": "Traghetto doppio",
+  "pt": "Balsa dupla",
+  "pl": "Podwójny prom"
  },
  "S3-07": {
   "fr": "Pluie de météores",
-  "es": "Lluvia de meteoritos"
+  "es": "Lluvia de meteoritos",
+  "it": "Pioggia di meteore",
+  "pt": "Chuva de meteoros",
+  "pl": "Deszcz meteorów"
  },
  "S3-08": {
   "fr": "Ferraille",
-  "es": "Chatarra"
+  "es": "Chatarra",
+  "it": "Rottame",
+  "pt": "Sucata",
+  "pl": "Złom"
  },
  "S3-09": {
   "fr": "Ceinture médicale",
-  "es": "Cinturón médico"
+  "es": "Cinturón médico",
+  "it": "Cintura medica",
+  "pt": "Cinturão médico",
+  "pl": "Pas medyczny"
  },
  "S3-10": {
   "fr": "Presse à ferraille",
-  "es": "Prensa de chatarra"
+  "es": "Prensa de chatarra",
+  "it": "Pressa per rottami",
+  "pt": "Prensa de sucata",
+  "pl": "Prasa do złomu"
  },
  "S3-11": {
   "fr": "Gardien de la ceinture",
-  "es": "Guardián del cinturón"
+  "es": "Guardián del cinturón",
+  "it": "Guardiano della cintura",
+  "pt": "Guardião do cinturão",
+  "pl": "Strażnik pasa"
  },
  "S4-01": {
   "fr": "Première bobine",
-  "es": "Primera bobina"
+  "es": "Primera bobina",
+  "it": "Prima bobina",
+  "pt": "Primeira bobina",
+  "pl": "Pierwsza cewka"
  },
  "S4-02": {
   "fr": "Répulsion",
-  "es": "Repulsión"
+  "es": "Repulsión",
+  "it": "Repulsione",
+  "pt": "Repulsão",
+  "pl": "Odpychanie"
  },
  "S4-03": {
   "fr": "Pôles jumeaux",
-  "es": "Polos gemelos"
+  "es": "Polos gemelos",
+  "it": "Poli gemelli",
+  "pt": "Polos gêmeos",
+  "pl": "Bliźniacze bieguny"
  },
  "S4-04": {
   "fr": "Battement de cœur",
-  "es": "Latido"
+  "es": "Latido",
+  "it": "Battito",
+  "pt": "Batimento",
+  "pl": "Bicie serca"
  },
  "S4-05": {
   "fr": "Puits magnétique",
-  "es": "Pozo magnético"
+  "es": "Pozo magnético",
+  "it": "Pozzo magnetico",
+  "pt": "Poço magnético",
+  "pl": "Szyb magnetyczny"
  },
  "S4-06": {
   "fr": "Lignes de champ",
-  "es": "Líneas de campo"
+  "es": "Líneas de campo",
+  "it": "Linee di campo",
+  "pt": "Linhas de campo",
+  "pl": "Linie pola"
  },
  "S4-07": {
   "fr": "Inversion des pôles",
-  "es": "Cambio de polos"
+  "es": "Cambio de polos",
+  "it": "Cambio di polo",
+  "pt": "Troca de polos",
+  "pl": "Zmiana biegunów"
  },
  "S4-08": {
   "fr": "Dynamo",
-  "es": "Dinamo"
+  "es": "Dinamo",
+  "it": "Dinamo",
+  "pt": "Dínamo",
+  "pl": "Dynamo"
  },
  "S4-09": {
   "fr": "Champ de secours",
-  "es": "Campo de rescate"
+  "es": "Campo de rescate",
+  "it": "Campo di soccorso",
+  "pt": "Campo de resgate",
+  "pl": "Pole ratunkowe"
  },
  "S4-10": {
   "fr": "Porteurs magnétiques",
-  "es": "Portadores magnéticos"
+  "es": "Portadores magnéticos",
+  "it": "Portamagneti",
+  "pt": "Porta-ímãs",
+  "pl": "Nośniki magnesów"
  },
  "S4-11": {
   "fr": "Maître des aimants",
-  "es": "Maestro de imanes"
+  "es": "Maestro de imanes",
+  "it": "Maestro dei magneti",
+  "pt": "Mestre dos ímãs",
+  "pl": "Mistrz magnesów"
  },
  "S5-01": {
   "fr": "Puits de braises",
-  "es": "Pozo de brasas"
+  "es": "Pozo de brasas",
+  "it": "Pozzo di brace",
+  "pt": "Poço de brasas",
+  "pl": "Szyb żaru"
  },
  "S5-02": {
   "fr": "Rayon plasma",
-  "es": "Rayo de plasma"
+  "es": "Rayo de plasma",
+  "it": "Raggio al plasma",
+  "pt": "Raio de plasma",
+  "pl": "Wiązka plazmy"
  },
  "S5-03": {
   "fr": "Vague de chaleur",
-  "es": "Ola de calor"
+  "es": "Ola de calor",
+  "it": "Ondata di calore",
+  "pt": "Onda de calor",
+  "pl": "Fala upałów"
  },
  "S5-04": {
   "fr": "Stimulateur",
-  "es": "Marcapasos"
+  "es": "Marcapasos",
+  "it": "Pacemaker",
+  "pt": "Marca-passo",
+  "pl": "Rozrusznik"
  },
  "S5-05": {
   "fr": "Haut fourneau",
-  "es": "Alto horno"
+  "es": "Alto horno",
+  "it": "Altoforno",
+  "pt": "Alto-forno",
+  "pl": "Wielki piec"
  },
  "S5-06": {
   "fr": "Forge solaire",
-  "es": "Forja solar"
+  "es": "Forja solar",
+  "it": "Forgia solare",
+  "pt": "Forja solar",
+  "pl": "Słoneczna kuźnia"
  },
  "S5-07": {
   "fr": "Maître forgeron",
-  "es": "Maestro forjador"
+  "es": "Maestro forjador",
+  "it": "Maestro della forgia",
+  "pt": "Mestre da forja",
+  "pl": "Mistrz kuźni"
  },
  "S5-08": {
   "fr": "Moule de fonte",
-  "es": "Molde de fundición"
+  "es": "Molde de fundición",
+  "it": "Stampo di fusione",
+  "pt": "Molde de fundição",
+  "pl": "Forma odlewnicza"
  },
  "S5-09": {
   "fr": "Forge à plasma",
-  "es": "Forja de plasma"
+  "es": "Forja de plasma",
+  "it": "Forgia al plasma",
+  "pt": "Forja de plasma",
+  "pl": "Kuźnia plazmy"
  },
  "S5-10": {
   "fr": "Solstice",
-  "es": "Solsticio"
+  "es": "Solsticio",
+  "it": "Solstizio",
+  "pt": "Solstício",
+  "pl": "Przesilenie"
  },
  "S5-11": {
   "fr": "Zénith solaire",
-  "es": "Cénit solar"
+  "es": "Cénit solar",
+  "it": "Zenit solare",
+  "pt": "Zênite solar",
+  "pl": "Słoneczny zenit"
  },
  "S6-01": {
   "fr": "Courant de marée",
-  "es": "Corriente de marea"
+  "es": "Corriente de marea",
+  "it": "Corrente di marea",
+  "pt": "Corrente de maré",
+  "pl": "Prąd pływowy"
  },
  "S6-02": {
   "fr": "Apesanteur",
-  "es": "Ingravidez"
+  "es": "Ingravidez",
+  "it": "Senza peso",
+  "pt": "Sem peso",
+  "pl": "Nieważkość"
  },
  "S6-03": {
   "fr": "Grande marée",
-  "es": "Marea viva"
+  "es": "Marea viva",
+  "it": "Marea viva",
+  "pt": "Maré viva",
+  "pl": "Pływ syzygijny"
  },
  "S6-04": {
   "fr": "Reflux",
-  "es": "Bajamar"
+  "es": "Bajamar",
+  "it": "Bassa marea",
+  "pt": "Maré baixa",
+  "pl": "Odpływ"
  },
  "S6-05": {
   "fr": "Orbite lunaire",
-  "es": "Órbita lunar"
+  "es": "Órbita lunar",
+  "it": "Orbita lunare",
+  "pt": "Órbita lunar",
+  "pl": "Orbita Księżyca"
  },
  "S6-06": {
   "fr": "Tourbillon",
-  "es": "Remolino"
+  "es": "Remolino",
+  "it": "Mulinello",
+  "pt": "Redemoinho",
+  "pl": "Wir"
  },
  "S6-07": {
   "fr": "Onde de tempête",
-  "es": "Marejada ciclónica"
+  "es": "Marejada ciclónica",
+  "it": "Mareggiata",
+  "pt": "Ressaca",
+  "pl": "Sztormowy przypływ"
  },
  "S6-08": {
   "fr": "Maître des marées",
-  "es": "Maestro de mareas"
+  "es": "Maestro de mareas",
+  "it": "Maestro delle maree",
+  "pt": "Mestre das marés",
+  "pl": "Mistrz pływów"
  },
  "S6-09": {
   "fr": "Attraction orbitale",
-  "es": "Atracción orbital"
+  "es": "Atracción orbital",
+  "it": "Attrazione orbitale",
+  "pt": "Atração orbital",
+  "pl": "Przyciąganie orbitalne"
  },
  "S6-10": {
   "fr": "Maelström",
-  "es": "Maelstrom"
+  "es": "Maelstrom",
+  "it": "Maelstrom",
+  "pt": "Voragem",
+  "pl": "Malstrom"
  },
  "S6-11": {
   "fr": "Monde aquatique",
-  "es": "Mundo acuático"
+  "es": "Mundo acuático",
+  "it": "Mondo d'acqua",
+  "pt": "Mundo de água",
+  "pl": "Wodny świat"
  },
  "S7-01": {
   "fr": "Navette",
-  "es": "Lanzadera"
+  "es": "Lanzadera",
+  "it": "Linea di raccordo",
+  "pt": "Linha alimentadora",
+  "pl": "Linia dowozowa"
  },
  "S7-02": {
   "fr": "Plaque tournante",
-  "es": "Intercambiador"
+  "es": "Intercambiador",
+  "it": "Snodo",
+  "pt": "Terminal",
+  "pl": "Węzeł"
  },
  "S7-03": {
   "fr": "Relève",
-  "es": "Cambio de turno"
+  "es": "Cambio de turno",
+  "it": "Cambio turno",
+  "pt": "Troca de turno",
+  "pl": "Zmiana zmiany"
  },
  "S7-04": {
   "fr": "Centre de contrôle",
-  "es": "Centro de control"
+  "es": "Centro de control",
+  "it": "Centro di controllo",
+  "pt": "Centro de controle",
+  "pl": "Centrum sterowania"
  },
  "S7-05": {
   "fr": "Ligne de fret",
-  "es": "Línea de carga"
+  "es": "Línea de carga",
+  "it": "Linea merci",
+  "pt": "Linha de carga",
+  "pl": "Linia towarowa"
  },
  "S7-06": {
   "fr": "Ligne express",
-  "es": "Línea exprés"
+  "es": "Línea exprés",
+  "it": "Linea express",
+  "pt": "Linha expressa",
+  "pl": "Linia ekspresowa"
  },
  "S7-07": {
   "fr": "Anneau de transit",
-  "es": "Anillo de tránsito"
+  "es": "Anillo de tránsito",
+  "it": "Anello di transito",
+  "pt": "Anel de trânsito",
+  "pl": "Pierścień tranzytowy"
  },
  "S7-08": {
   "fr": "Gare centrale",
-  "es": "Nudo central"
+  "es": "Nudo central",
+  "it": "Snodo centrale",
+  "pt": "Terminal central",
+  "pl": "Węzeł centralny"
  },
  "S7-09": {
   "fr": "Plaque tournante",
-  "es": "Intercambiador"
+  "es": "Intercambiador",
+  "it": "Snodo",
+  "pt": "Terminal",
+  "pl": "Węzeł"
  },
  "S7-10": {
   "fr": "Gare de correspondance",
-  "es": "Estación de transbordo"
+  "es": "Estación de transbordo",
+  "it": "Stazione di scambio",
+  "pt": "Estação de baldeação",
+  "pl": "Stacja przesiadkowa"
  },
  "S7-11": {
   "fr": "Plaque tournante",
-  "es": "Intercambiador"
+  "es": "Intercambiador",
+  "it": "Snodo",
+  "pt": "Terminal",
+  "pl": "Węzeł"
  },
  "S8-01": {
   "fr": "Crépuscule",
-  "es": "Anochecer"
+  "es": "Anochecer",
+  "it": "Crepuscolo",
+  "pt": "Crepúsculo",
+  "pl": "Zmierzch"
  },
  "S8-02": {
   "fr": "Équipe de nuit",
-  "es": "Turno de noche"
+  "es": "Turno de noche",
+  "it": "Turno di notte",
+  "pt": "Turno da noite",
+  "pl": "Nocna zmiana"
  },
  "S8-03": {
   "fr": "Relèvement",
-  "es": "Rumbo"
+  "es": "Rumbo",
+  "it": "Rilevamento",
+  "pt": "Rumo",
+  "pl": "Namiar"
  },
  "S8-04": {
   "fr": "Zone d’ombre radio",
-  "es": "Sombra de radio"
+  "es": "Sombra de radio",
+  "it": "Ombra radio",
+  "pt": "Sombra de rádio",
+  "pl": "Cień radiowy"
  },
  "S8-05": {
   "fr": "Champ de capteurs",
-  "es": "Campo de sensores"
+  "es": "Campo de sensores",
+  "it": "Campo di sensori",
+  "pt": "Campo de sensores",
+  "pl": "Pole czujników"
  },
  "S8-06": {
   "fr": "Sans lumière",
-  "es": "Sin luz"
+  "es": "Sin luz",
+  "it": "Senza luce",
+  "pt": "Sem luz",
+  "pl": "Bez światła"
  },
  "S8-07": {
   "fr": "Anneau d’ombre",
-  "es": "Anillo de sombra"
+  "es": "Anillo de sombra",
+  "it": "Anello d'ombra",
+  "pt": "Anel das sombras",
+  "pl": "Pierścień cienia"
  },
  "S8-08": {
   "fr": "Obscurité",
-  "es": "Oscuridad"
+  "es": "Oscuridad",
+  "it": "Oscurità",
+  "pt": "Escuridão",
+  "pl": "Ciemność"
  },
  "S8-09": {
   "fr": "Sondeur",
-  "es": "Ecosonda"
+  "es": "Ecosonda",
+  "it": "Ecoscandaglio",
+  "pt": "Ecobatímetro",
+  "pl": "Echosonda"
  },
  "S8-10": {
   "fr": "Anneau d’ombre",
-  "es": "Anillo de sombra"
+  "es": "Anillo de sombra",
+  "it": "Anello d'ombra",
+  "pt": "Anel das sombras",
+  "pl": "Pierścień cienia"
  },
  "S8-11": {
   "fr": "Sondeur",
-  "es": "Ecosonda"
+  "es": "Ecosonda",
+  "it": "Ecoscandaglio",
+  "pt": "Ecobatímetro",
+  "pl": "Echosonda"
  },
  "S9-01": {
   "fr": "Horizon des événements",
-  "es": "Horizonte de sucesos"
+  "es": "Horizonte de sucesos",
+  "it": "Orizzonte degli eventi",
+  "pt": "Horizonte de eventos",
+  "pl": "Horyzont zdarzeń"
  },
  "S9-02": {
   "fr": "Disque d’accrétion",
-  "es": "Disco de acreción"
+  "es": "Disco de acreción",
+  "it": "Disco di accrescimento",
+  "pt": "Disco de acreção",
+  "pl": "Dysk akrecyjny"
  },
  "S9-03": {
   "fr": "Lentille gravitationnelle",
-  "es": "Lente gravitacional"
+  "es": "Lente gravitacional",
+  "it": "Lente gravitazionale",
+  "pt": "Lente gravitacional",
+  "pl": "Soczewka grawitacyjna"
  },
  "S9-04": {
   "fr": "Dilatation du temps",
-  "es": "Dilatación temporal"
+  "es": "Dilatación temporal",
+  "it": "Dilatazione del tempo",
+  "pt": "Dilatação do tempo",
+  "pl": "Dylatacja czasu"
  },
  "S9-05": {
   "fr": "Singularité",
-  "es": "Singularidad"
+  "es": "Singularidad",
+  "it": "Singolarità",
+  "pt": "Singularidade",
+  "pl": "Osobliwość"
  },
  "S9-06": {
   "fr": "Anneau de photons",
-  "es": "Anillo de fotones"
+  "es": "Anillo de fotones",
+  "it": "Anello di fotoni",
+  "pt": "Anel de fótons",
+  "pl": "Pierścień fotonowy"
  },
  "S9-07": {
   "fr": "Force de marée",
-  "es": "Fuerza de marea"
+  "es": "Fuerza de marea",
+  "it": "Forza di marea",
+  "pt": "Força de maré",
+  "pl": "Siła pływowa"
  },
  "S9-08": {
   "fr": "Onde gravitationnelle",
-  "es": "Onda gravitacional"
+  "es": "Onda gravitacional",
+  "it": "Onda gravitazionale",
+  "pt": "Onda gravitacional",
+  "pl": "Fala grawitacyjna"
  },
  "S9-09": {
   "fr": "Mousse quantique",
-  "es": "Espuma cuántica"
+  "es": "Espuma cuántica",
+  "it": "Schiuma quantistica",
+  "pt": "Espuma quântica",
+  "pl": "Piana kwantowa"
  },
  "S9-10": {
   "fr": "Trou de ver",
-  "es": "Agujero de gusano"
+  "es": "Agujero de gusano",
+  "it": "Cunicolo spaziotemporale",
+  "pt": "Buraco de minhoca",
+  "pl": "Tunel czasoprzestrzenny"
  },
  "S9-11": {
   "fr": "Terminus",
-  "es": "Última parada"
+  "es": "Última parada",
+  "it": "Ultima fermata",
+  "pt": "Última parada",
+  "pl": "Ostatni przystanek"
  },
  "TUT": {
   "fr": "École de pilotage",
-  "es": "Escuela de vuelo"
+  "es": "Escuela de vuelo",
+  "it": "Scuola di volo",
+  "pt": "Escola de voo",
+  "pl": "Szkoła lotnicza"
  }
 }

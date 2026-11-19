@@ -3,6 +3,42 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.7.0
+
+### Deutsch
+
+**Neu**
+- Drei neue Sprachen: Italienisch, Portugiesisch (Brasilien) und Polnisch – alle Texte, Untertitel und eine eigene Sprachausgabe für jede Figur. Damit spricht GraviFare sieben Sprachen
+- Hupe (Tastatur H, Controller X, frei belegbar)
+- Schwerkraftanzeige im Level: unauffällig mit Symbol, zeigt die Schwerkraft am Ort des Taxis (auch in Schwerkraftzonen)
+- Speedrun-Uhr für die Karriere (Optionen › Spiel, Standard aus): Flugzeit samt verlorener Versuche, Zwischenzeit am Ende jedes Sektors mit Abstand zur Bestzeit
+- Hinweis auf neue Versionen: Das Spiel fragt einmal, ob es nachsehen darf; mit Zustimmung höchstens einmal am Tag, ohne persönliche Daten
+- Statistik: geflogene Strecke
+- Neuer Erfolg „Taxi-Ikone“ für alle anderen Erfolge, dazu verborgene Erfolge, die sich erst beim Erreichen zeigen
+- Eastereggs hinzugefügt
+- Neuer Trailer, aufgenommen in 4K
+
+**Optionen und Bedienhilfen**
+- Strom sparen: eigene Bildrate im Hintergrund und in Menüs (15 / 30 / 60 / wie im Spiel, Standard 30); das Spiel selbst läuft unverändert
+- Tonausgabe Mono (Bedienhilfen, Standard Stereo)
+
+### English
+
+**New**
+- Three new languages: Italian, Portuguese (Brazil) and Polish – all texts, subtitles and a voice of their own for every character. GraviFare now speaks seven languages
+- Horn (keyboard H, controller X, rebindable)
+- Gravity indicator in levels: unobtrusive with an icon, shows the gravity where the taxi is (gravity zones included)
+- Speedrun clock for the career (Options › Game, off by default): flight time including lost attempts, split at the end of every sector with the gap to your best
+- New version notice: the game asks once whether it may check; with your consent at most once a day, without personal data
+- Statistics: distance flown
+- New achievement "Taxi icon" for all other achievements, plus hidden achievements that only reveal themselves once unlocked
+- Easter eggs added
+- New trailer, recorded in 4K
+
+**Options and accessibility**
+- Power saving: separate frame rate in the background and in menus (15 / 30 / 60 / same as in game, default 30); the game itself runs as before
+- Mono audio output (Accessibility, default stereo)
+
 ## 1.6.6
 
 ### Deutsch

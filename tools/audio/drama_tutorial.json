@@ -18,6 +18,21 @@
    "spoken": "¡Bienvenido a la escuela de vuelo, Taxi siete! Te explicaré todo lo necesario para recoger a tus pasajeros y llevarlos sanos y salvos a su destino.",
    "direction": "[cálido y alentador, como un instructor de vuelo experimentado]",
    "subtitle": "¡Bienvenido a la escuela de vuelo, Taxi 7! Te explicaré todo lo necesario para recoger a tus pasajeros y llevarlos sanos y salvos a su destino."
+  },
+  "it": {
+   "spoken": "Benvenuto alla scuola di volo, Taxi sette! Ti spiego tutto quello che ti serve per prendere i passeggeri e portarli sani e salvi a destinazione.",
+   "direction": "[caloroso e incoraggiante, come un istruttore di volo esperto]",
+   "subtitle": "Benvenuto alla scuola di volo, Taxi 7! Ti spiego tutto quello che ti serve per prendere i passeggeri e portarli sani e salvi a destinazione."
+  },
+  "pt": {
+   "spoken": "Bem-vindo à escola de voo, Táxi sete! Vou explicar tudo o que você precisa para pegar seus passageiros e levá-los em segurança ao destino.",
+   "direction": "[caloroso e encorajador, como um instrutor de voo experiente]",
+   "subtitle": "Bem-vindo à escola de voo, Táxi 7! Vou explicar tudo o que você precisa para pegar seus passageiros e levá-los em segurança ao destino."
+  },
+  "pl": {
+   "spoken": "Witaj w szkole lotniczej, Taxi siedem! Wyjaśnię ci wszystko, co musisz wiedzieć, żeby odbierać pasażerów i bezpiecznie dowozić ich do celu.",
+   "direction": "[ciepło i zachęcająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Witaj w szkole lotniczej, Taxi 7! Wyjaśnię ci wszystko, co musisz wiedzieć, żeby odbierać pasażerów i bezpiecznie dowozić ich do celu."
   }
  },
  "tut_hud_fuel": {
@@ -39,6 +54,21 @@
    "spoken": "Arriba a la izquierda ves el combustible. Cada maniobra gasta. Si se vacía, pierdes un taxi.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Arriba a la izquierda ves el combustible. Cada maniobra gasta. Si se vacía, pierdes un taxi."
+  },
+  "it": {
+   "spoken": "In alto a sinistra vedi il livello del serbatoio. Ogni manovra consuma carburante. Quando è vuoto, perdi un taxi.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "In alto a sinistra vedi il livello del serbatoio. Ogni manovra consuma carburante. Quando è vuoto, perdi un taxi."
+  },
+  "pt": {
+   "spoken": "No canto superior esquerdo você vê o nível do tanque. Cada manobra gasta combustível. Quando ele acaba, você perde um táxi.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "No canto superior esquerdo você vê o nível do tanque. Cada manobra gasta combustível. Quando ele acaba, você perde um táxi."
+  },
+  "pl": {
+   "spoken": "W lewym górnym rogu widzisz poziom paliwa. Każdy manewr zużywa paliwo. Gdy bak się opróżni, tracisz taksówkę.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "W lewym górnym rogu widzisz poziom paliwa. Każdy manewr zużywa paliwo. Gdy bak się opróżni, tracisz taksówkę."
   }
  },
  "tut_hud_hull": {
@@ -60,6 +90,21 @@
    "spoken": "Al lado está el casco. Si chocas, se daña. Con cero, tu taxi queda destruido.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Al lado está el casco. Si chocas, se daña. Con 0, tu taxi queda destruido."
+  },
+  "it": {
+   "spoken": "Accanto c'è lo scafo. Se urti qualcosa, subisce danni. A zero il taxi è distrutto.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Accanto c'è lo scafo. Se urti qualcosa, subisce danni. A 0 il taxi è distrutto."
+  },
+  "pt": {
+   "spoken": "Ao lado está o casco. Se você bater em algo, ele sofre dano. Em zero, seu táxi é destruído.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Ao lado está o casco. Se você bater em algo, ele sofre dano. Em 0, seu táxi é destruído."
+  },
+  "pl": {
+   "spoken": "Obok jest kadłub. Gdy w coś uderzysz, ulega uszkodzeniu. Przy zero taksówka jest zniszczona.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Obok jest kadłub. Gdy w coś uderzysz, ulega uszkodzeniu. Przy 0 taksówka jest zniszczona."
   }
  },
  "tut_hud_money": {
@@ -81,6 +126,21 @@
    "spoken": "Después vienen tus créditos y tus taxis. Nunca puedes tener más de cinco taxis.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Después vienen tus créditos y tus taxis. Nunca puedes tener más de 5 taxis."
+  },
+  "it": {
+   "spoken": "Accanto ancora ci sono i tuoi crediti e i tuoi taxi. Non puoi mai avere più di cinque taxi.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Accanto ancora ci sono i tuoi crediti e i tuoi taxi. Non puoi mai avere più di 5 taxi."
+  },
+  "pt": {
+   "spoken": "Ao lado ficam seus créditos e seus táxis. Você nunca pode ter mais de cinco táxis.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Ao lado ficam seus créditos e seus táxis. Você nunca pode ter mais de 5 táxis."
+  },
+  "pl": {
+   "spoken": "Dalej są twoje kredyty i taksówki. Nigdy nie możesz mieć więcej niż pięć taksówek.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Dalej są twoje kredyty i taksówki. Nigdy nie możesz mieć więcej niż 5 taksówek."
   }
  },
  "tut_hud_level": {
@@ -102,6 +162,21 @@
    "spoken": "A la derecha de la puerta ves el nivel actual. Al lado, los pasajeros obligatorios entregados y el total.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "A la derecha de la puerta ves el nivel actual. Al lado, los pasajeros obligatorios entregados y el total."
+  },
+  "it": {
+   "spoken": "A destra del cancello vedi il livello attuale. Accanto, quanti passeggeri obbligatori hai consegnato e il totale.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "A destra del cancello vedi il livello attuale. Accanto, quanti passeggeri obbligatori hai consegnato e il totale."
+  },
+  "pt": {
+   "spoken": "À direita do portão você vê o nível atual. Ao lado, quantos passageiros obrigatórios foram entregues e o total.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "À direita do portão você vê o nível atual. Ao lado, quantos passageiros obrigatórios foram entregues e o total."
+  },
+  "pl": {
+   "spoken": "Na prawo od bramy widzisz bieżący poziom. Obok liczbę dowiezionych obowiązkowych pasażerów i ich łączną liczbę.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Na prawo od bramy widzisz bieżący poziom. Obok liczbę dowiezionych obowiązkowych pasażerów i ich łączną liczbę."
   }
  },
  "tut_hud_price": {
@@ -123,6 +198,21 @@
    "spoken": "Los precios del combustible varían, seguro que lo sabes. Reposta cuando el precio esté bajo.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Los precios del combustible varían, seguro que lo sabes. Reposta cuando el precio esté bajo."
+  },
+  "it": {
+   "spoken": "I prezzi del carburante oscillano, lo sai di sicuro. Fai rifornimento quando il prezzo è basso.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "I prezzi del carburante oscillano, lo sai di sicuro. Fai rifornimento quando il prezzo è basso."
+  },
+  "pt": {
+   "spoken": "O preço do combustível oscila, você com certeza sabe. Abasteça quando o preço estiver baixo.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "O preço do combustível oscila, você com certeza sabe. Abasteça quando o preço estiver baixo."
+  },
+  "pl": {
+   "spoken": "Ceny paliwa się wahają, na pewno to wiesz. Tankuj, gdy cena jest niska.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Ceny paliwa się wahają, na pewno to wiesz. Tankuj, gdy cena jest niska."
   }
  },
  "tut_hud_gauge": {
@@ -144,6 +234,21 @@
    "spoken": "A la derecha del todo está el indicador de aterrizaje: descenso, velocidad lateral e inclinación. Si todas las barras quedan bajo la marca blanca, aterrizas seguro.",
    "direction": "[lento y claro, explicativo, como un instructor de vuelo experimentado]",
    "subtitle": "A la derecha del todo está el indicador de aterrizaje: descenso, velocidad lateral e inclinación. Si todas las barras quedan bajo la marca blanca, aterrizas seguro."
+  },
+  "it": {
+   "spoken": "All'estrema destra c'è l'indicatore di atterraggio. Velocità di discesa, velocità laterale e inclinazione. Se tutte le barre restano sotto il segno bianco, atterri in sicurezza.",
+   "direction": "[lento e chiaro, didattico, come un istruttore di volo esperto]",
+   "subtitle": "All'estrema destra c'è l'indicatore di atterraggio. Velocità di discesa, velocità laterale e inclinazione. Se tutte le barre restano sotto il segno bianco, atterri in sicurezza."
+  },
+  "pt": {
+   "spoken": "Na extrema direita fica o indicador de pouso. Taxa de descida, velocidade lateral e inclinação. Se todas as barras ficarem abaixo da marca branca, você pousa com segurança.",
+   "direction": "[devagar e claro, explicativo, como um instrutor de voo experiente]",
+   "subtitle": "Na extrema direita fica o indicador de pouso. Taxa de descida, velocidade lateral e inclinação. Se todas as barras ficarem abaixo da marca branca, você pousa com segurança."
+  },
+  "pl": {
+   "spoken": "Najdalej po prawej jest wskaźnik lądowania. Prędkość opadania, prędkość boczna i przechył. Jeśli wszystkie paski zostaną poniżej białego znacznika, wylądujesz bezpiecznie.",
+   "direction": "[powoli i wyraźnie, objaśniająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Najdalej po prawej jest wskaźnik lądowania. Prędkość opadania, prędkość boczna i przechył. Jeśli wszystkie paski zostaną poniżej białego znacznika, wylądujesz bezpiecznie."
   }
  },
  "tut_gear_in": {
@@ -165,6 +270,21 @@
    "spoken": "Para recoger el tren, pulsa el botón A del mando o la barra espaciadora. Recogido, tu taxi vuela rápido; fuera, lento y preciso.",
    "direction": "[lento y claro, explicativo, como un instructor de vuelo experimentado]",
    "subtitle": "Para recoger el tren, pulsa el botón A del mando o la barra espaciadora. Recogido, tu taxi vuela rápido; fuera, lento y preciso."
+  },
+  "it": {
+   "spoken": "Per alzare il carrello premi il tasto A sul controller o la barra spaziatrice. Alzato, il taxi vola veloce; abbassato, lento e preciso.",
+   "direction": "[lento e chiaro, didattico, come un istruttore di volo esperto]",
+   "subtitle": "Per alzare il carrello premi il tasto A sul controller o la barra spaziatrice. Alzato, il taxi vola veloce; abbassato, lento e preciso."
+  },
+  "pt": {
+   "spoken": "Para recolher o trem de pouso, aperte o botão A no controle ou a barra de espaço. Recolhido, o táxi voa rápido; baixado, devagar e com precisão.",
+   "direction": "[devagar e claro, explicativo, como um instrutor de voo experiente]",
+   "subtitle": "Para recolher o trem de pouso, aperte o botão A no controle ou a barra de espaço. Recolhido, o táxi voa rápido; baixado, devagar e com precisão."
+  },
+  "pl": {
+   "spoken": "Aby schować podwozie, naciśnij przycisk A na kontrolerze albo spację. Schowane – taksówka leci szybko; wysunięte – wolno i precyzyjnie.",
+   "direction": "[powoli i wyraźnie, objaśniająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Aby schować podwozie, naciśnij przycisk A na kontrolerze albo spację. Schowane – taksówka leci szybko; wysunięte – wolno i precyzyjnie."
   }
  },
  "tut_fly": {
@@ -186,6 +306,21 @@
    "spoken": "¡Vamos! Dirige con el stick izquierdo o con W, A, S y D. Atraviesa los círculos verdes en el sentido de las agujas del reloj.",
    "direction": "[animado y enérgico, como un instructor de vuelo experimentado]",
    "subtitle": "¡Vamos! Dirige con el stick izquierdo o con W, A, S y D. Atraviesa los círculos verdes en el sentido de las agujas del reloj."
+  },
+  "it": {
+   "spoken": "Si parte! Guida con lo stick sinistro o con W, A, S e D. Vola in senso orario attraverso i cerchi verdi.",
+   "direction": "[vivace e brioso, come un istruttore di volo esperto]",
+   "subtitle": "Si parte! Guida con lo stick sinistro o con W, A, S e D. Vola in senso orario attraverso i cerchi verdi."
+  },
+  "pt": {
+   "spoken": "Vamos lá! Pilote com o analógico esquerdo ou com W, A, S e D. Voe no sentido horário pelos círculos verdes.",
+   "direction": "[animado e enérgico, como um instrutor de voo experiente]",
+   "subtitle": "Vamos lá! Pilote com o analógico esquerdo ou com W, A, S e D. Voe no sentido horário pelos círculos verdes."
+  },
+  "pl": {
+   "spoken": "Startujemy! Steruj lewą gałką albo klawiszami W, A, S i D. Przeleć zgodnie z ruchem wskazówek zegara przez zielone okręgi.",
+   "direction": "[żywo i energicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Startujemy! Steruj lewą gałką albo klawiszami W, A, S i D. Przeleć zgodnie z ruchem wskazówek zegara przez zielone okręgi."
   }
  },
  "tut_fly_ok": {
@@ -207,6 +342,21 @@
    "spoken": "¡Muy bien! La gravedad tira de ti hacia abajo sin parar, y el empuje gasta combustible. Intenta planear.",
    "direction": "[entusiasta, elogioso, como un instructor de vuelo experimentado]",
    "subtitle": "¡Muy bien! La gravedad tira de ti hacia abajo sin parar, y el empuje gasta combustible. Intenta planear."
+  },
+  "it": {
+   "spoken": "Ben fatto! La gravità ti tira sempre giù, e la spinta costa carburante. Prova a planare.",
+   "direction": "[entusiasta, pieno di elogi, come un istruttore di volo esperto]",
+   "subtitle": "Ben fatto! La gravità ti tira sempre giù, e la spinta costa carburante. Prova a planare."
+  },
+  "pt": {
+   "spoken": "Muito bem! A gravidade puxa você para baixo o tempo todo, e o impulso gasta combustível. Tente planar.",
+   "direction": "[entusiasmado, elogioso, como um instrutor de voo experiente]",
+   "subtitle": "Muito bem! A gravidade puxa você para baixo o tempo todo, e o impulso gasta combustível. Tente planar."
+  },
+  "pl": {
+   "spoken": "Świetnie! Grawitacja ciągle ściąga cię w dół, a ciąg kosztuje paliwo. Spróbuj szybować.",
+   "direction": "[entuzjastycznie, z uznaniem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Świetnie! Grawitacja ciągle ściąga cię w dół, a ciąg kosztuje paliwo. Spróbuj szybować."
   }
  },
  "tut_gear": {
@@ -228,6 +378,21 @@
    "spoken": "Antes de cada aterrizaje, vuelve a sacar el tren: así el taxi vuela lento y preciso. ¡Pruébalo!",
    "direction": "[lento y claro, explicativo, como un instructor de vuelo experimentado]",
    "subtitle": "Antes de cada aterrizaje, vuelve a sacar el tren: así el taxi vuela lento y preciso. ¡Pruébalo!"
+  },
+  "it": {
+   "spoken": "Prima di ogni atterraggio abbassa di nuovo il carrello, così il taxi vola lento e preciso. Provalo!",
+   "direction": "[lento e chiaro, didattico, come un istruttore di volo esperto]",
+   "subtitle": "Prima di ogni atterraggio abbassa di nuovo il carrello, così il taxi vola lento e preciso. Provalo!"
+  },
+  "pt": {
+   "spoken": "Antes de cada pouso, baixe o trem de pouso de novo, assim o táxi voa devagar e com precisão. Experimente!",
+   "direction": "[devagar e claro, explicativo, como um instrutor de voo experiente]",
+   "subtitle": "Antes de cada pouso, baixe o trem de pouso de novo, assim o táxi voa devagar e com precisão. Experimente!"
+  },
+  "pl": {
+   "spoken": "Przed każdym lądowaniem znów wysuń podwozie, wtedy taksówka leci wolno i precyzyjnie. Spróbuj!",
+   "direction": "[powoli i wyraźnie, objaśniająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Przed każdym lądowaniem znów wysuń podwozie, wtedy taksówka leci wolno i precyzyjnie. Spróbuj!"
   }
  },
  "tut_fuel_low": {
@@ -249,6 +414,21 @@
    "spoken": "¡Oh, no! ¡El depósito está casi vacío! Vuela a la gasolinera, la plataforma naranja con el surtidor, y aterriza.",
    "direction": "[urgente, tenso, como un instructor de vuelo experimentado]",
    "subtitle": "¡Oh, no! ¡El depósito está casi vacío! Vuela a la gasolinera, la plataforma naranja con el surtidor, y aterriza."
+  },
+  "it": {
+   "spoken": "Oh no! Il serbatoio è quasi vuoto! Vola alla stazione di servizio, la piattaforma arancione con la pompa, e atterra.",
+   "direction": "[urgente, teso, come un istruttore di volo esperto]",
+   "subtitle": "Oh no! Il serbatoio è quasi vuoto! Vola alla stazione di servizio, la piattaforma arancione con la pompa, e atterra."
+  },
+  "pt": {
+   "spoken": "Ah, não! Seu tanque está quase vazio! Voe até o posto, a plataforma laranja com a bomba, e pouse.",
+   "direction": "[urgente, tenso, como um instrutor de voo experiente]",
+   "subtitle": "Ah, não! Seu tanque está quase vazio! Voe até o posto, a plataforma laranja com a bomba, e pouse."
+  },
+  "pl": {
+   "spoken": "O nie! Bak jest prawie pusty! Leć na stację paliw, pomarańczowe lądowisko z dystrybutorem, i wyląduj.",
+   "direction": "[pilnie, z napięciem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "O nie! Bak jest prawie pusty! Leć na stację paliw, pomarańczowe lądowisko z dystrybutorem, i wyląduj."
   }
  },
  "tut_refuel": {
@@ -270,6 +450,21 @@
    "spoken": "Mientras estés aquí, repostas. El combustible cuesta créditos. Solo si no puedes pagar, es gratis hasta el treinta y cinco por ciento, y ahora mismo estás sin blanca. Cuidado con el surtidor: si lo embistes, el gasolinero se enfada y sube los precios. ¡Evítalo, hazme caso!",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "Mientras estés aquí, repostas. El combustible cuesta créditos. Solo si no puedes pagar, es gratis hasta el 35 por ciento, y ahora mismo estás sin blanca. Cuidado con el surtidor: si lo embistes, el gasolinero se enfada y sube los precios. ¡Evítalo, hazme caso!"
+  },
+  "it": {
+   "spoken": "Finché resti qui, fai rifornimento. Il carburante costa crediti. Solo se non puoi pagare lo ricevi gratis fino al trentacinque per cento, e adesso sei al verde. Attento alla pompa: se la urti, il benzinaio non è contento e alza i prezzi. Evitalo, fidati!",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Finché resti qui, fai rifornimento. Il carburante costa crediti. Solo se non puoi pagare lo ricevi gratis fino al 35 per cento, e adesso sei al verde. Attento alla pompa: se la urti, il benzinaio non è contento e alza i prezzi. Evitalo, fidati!"
+  },
+  "pt": {
+   "spoken": "Enquanto ficar aqui, você abastece. Combustível custa créditos. Só quando não pode pagar você ganha de graça até trinta e cinco por cento, e agora você está sem dinheiro. Cuidado com a bomba: se bater nela, o frentista fica bravo e aumenta os preços. Evite isso, confie em mim!",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "Enquanto ficar aqui, você abastece. Combustível custa créditos. Só quando não pode pagar você ganha de graça até 35 por cento, e agora você está sem dinheiro. Cuidado com a bomba: se bater nela, o frentista fica bravo e aumenta os preços. Evite isso, confie em mim!"
+  },
+  "pl": {
+   "spoken": "Dopóki tu stoisz, tankujesz. Paliwo kosztuje kredyty. Tylko gdy nie możesz zapłacić, dostajesz je za darmo do trzydziestu pięciu procent, a teraz jesteś spłukany. Uważaj na dystrybutor: jeśli w niego uderzysz, pracownik stacji się wkurzy i podniesie ceny. Unikaj tego, uwierz mi!",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Dopóki tu stoisz, tankujesz. Paliwo kosztuje kredyty. Tylko gdy nie możesz zapłacić, dostajesz je za darmo do 35 procent, a teraz jesteś spłukany. Uważaj na dystrybutor: jeśli w niego uderzysz, pracownik stacji się wkurzy i podniesie ceny. Unikaj tego, uwierz mi!"
   }
  },
  "tut_pump_fix": {
@@ -291,6 +486,21 @@
    "spoken": "¡El surtidor está destrozado! Lo mando reparar ahora mismo, pero por favor no lo vuelvas a tocar.",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "¡El surtidor está destrozado! Lo mando reparar ahora mismo, pero por favor no lo vuelvas a tocar."
+  },
+  "it": {
+   "spoken": "La pompa è distrutta! La faccio riparare subito, ma per favore non toccarla più.",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "La pompa è distrutta! La faccio riparare subito, ma per favore non toccarla più."
+  },
+  "pt": {
+   "spoken": "A bomba está destruída! Vou mandar consertar agora, mas por favor não encoste mais nela.",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "A bomba está destruída! Vou mandar consertar agora, mas por favor não encoste mais nela."
+  },
+  "pl": {
+   "spoken": "Dystrybutor rozwalony! Zaraz go naprawię, ale proszę, nie dotykaj go więcej.",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Dystrybutor rozwalony! Zaraz go naprawię, ale proszę, nie dotykaj go więcej."
   }
  },
  "tut_credit": {
@@ -312,6 +522,21 @@
    "spoken": "A partir de ahora pagas tú. Si tienes créditos, pagas cada gota, incluso por debajo del treinta y cinco por ciento. Te ingreso quinientos créditos, adelante, reposta.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "A partir de ahora pagas tú. Si tienes créditos, pagas cada gota, incluso por debajo del 35 por ciento. Te ingreso 500 créditos, adelante, reposta."
+  },
+  "it": {
+   "spoken": "D'ora in poi paghi tu. Se hai crediti, paghi ogni goccia, anche sotto il trentacinque per cento. Ti accredito cinquecento crediti, quindi fai pure il pieno.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "D'ora in poi paghi tu. Se hai crediti, paghi ogni goccia, anche sotto il 35 per cento. Ti accredito 500 crediti, quindi fai pure il pieno."
+  },
+  "pt": {
+   "spoken": "A partir de agora você paga. Se tiver créditos, paga cada gota, mesmo abaixo de trinta e cinco por cento. Vou creditar quinhentos créditos, então pode abastecer.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "A partir de agora você paga. Se tiver créditos, paga cada gota, mesmo abaixo de 35 por cento. Vou creditar 500 créditos, então pode abastecer."
+  },
+  "pl": {
+   "spoken": "Od teraz płacisz ty. Jeśli masz kredyty, płacisz za każdą kroplę, nawet poniżej trzydziestu pięciu procent. Dopisuję ci pięćset kredytów, więc śmiało tankuj.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Od teraz płacisz ty. Jeśli masz kredyty, płacisz za każdą kroplę, nawet poniżej 35 procent. Dopisuję ci 500 kredytów, więc śmiało tankuj."
   }
  },
  "tut_price": {
@@ -333,6 +558,21 @@
    "spoken": "El precio del combustible cambia a menudo, como en la vida real. Mira el indicador de arriba, o el surtidor. Durante la formación ahora se queda fijo.",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "El precio del combustible cambia a menudo, como en la vida real. Mira el indicador de arriba, o el surtidor. Durante la formación ahora se queda fijo."
+  },
+  "it": {
+   "spoken": "Il prezzo del carburante cambia di continuo, proprio come nella realtà. Guarda l'indicatore in alto, o la pompa. Durante l'addestramento ora resta fisso.",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Il prezzo del carburante cambia di continuo, proprio come nella realtà. Guarda l'indicatore in alto, o la pompa. Durante l'addestramento ora resta fisso."
+  },
+  "pt": {
+   "spoken": "O preço do combustível muda regularmente, igualzinho à vida real. Olhe o mostrador lá em cima, ou a bomba. Durante o treinamento ele fica fixo agora.",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "O preço do combustível muda regularmente, igualzinho à vida real. Olhe o mostrador lá em cima, ou a bomba. Durante o treinamento ele fica fixo agora."
+  },
+  "pl": {
+   "spoken": "Cena paliwa regularnie się zmienia, zupełnie jak w życiu. Patrz na wyświetlacz u góry albo na dystrybutor. Podczas szkolenia będzie teraz stała.",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Cena paliwa regularnie się zmienia, zupełnie jak w życiu. Patrz na wyświetlacz u góry albo na dystrybutor. Podczas szkolenia będzie teraz stała."
   }
  },
  "tut_landing": {
@@ -354,6 +594,21 @@
    "spoken": "Ahora, el aterrizaje. Si aterrizas lento y nivelado, todo bien. Más rápido, tu taxi se daña, y a demasiada velocidad queda destruido al instante. Los daños te cuestan reparaciones al final del nivel.",
    "direction": "[serio e insistente, como un instructor de vuelo experimentado]",
    "subtitle": "Ahora, el aterrizaje. Si aterrizas lento y nivelado, todo bien. Más rápido, tu taxi se daña, y a demasiada velocidad queda destruido al instante. Los daños te cuestan reparaciones al final del nivel."
+  },
+  "it": {
+   "spoken": "Ora l'atterraggio. Se atterri lento e in piano, va tutto bene. Se sei più veloce, il taxi subisce danni, e a velocità troppo alta viene distrutto subito. I danni ti costano soldi di riparazione alla fine del livello.",
+   "direction": "[serio e insistente, come un istruttore di volo esperto]",
+   "subtitle": "Ora l'atterraggio. Se atterri lento e in piano, va tutto bene. Se sei più veloce, il taxi subisce danni, e a velocità troppo alta viene distrutto subito. I danni ti costano soldi di riparazione alla fine del livello."
+  },
+  "pt": {
+   "spoken": "Agora o pouso. Se pousar devagar e nivelado, tudo certo. Se for mais rápido, o táxi sofre dano, e em velocidade alta demais ele é destruído na hora. Os danos custam dinheiro de reparo no fim do nível.",
+   "direction": "[sério e insistente, como um instrutor de voo experiente]",
+   "subtitle": "Agora o pouso. Se pousar devagar e nivelado, tudo certo. Se for mais rápido, o táxi sofre dano, e em velocidade alta demais ele é destruído na hora. Os danos custam dinheiro de reparo no fim do nível."
+  },
+  "pl": {
+   "spoken": "Teraz lądowanie. Jeśli lądujesz wolno i poziomo, wszystko gra. Gdy lecisz szybciej, taksówka się uszkadza, a przy zbyt dużej prędkości od razu się rozbija. Uszkodzenia kosztują cię na końcu poziomu pieniądze za naprawę.",
+   "direction": "[poważnie i stanowczo, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Teraz lądowanie. Jeśli lądujesz wolno i poziomo, wszystko gra. Gdy lecisz szybciej, taksówka się uszkadza, a przy zbyt dużej prędkości od razu się rozbija. Uszkodzenia kosztują cię na końcu poziomu pieniądze za naprawę."
   }
  },
  "tut_hard": {
@@ -375,6 +630,21 @@
    "spoken": "Pruébalo: lánzate a toda potencia y aterriza tan fuerte que el taxi quede destruido.",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "Pruébalo: lánzate a toda potencia y aterriza tan fuerte que el taxi quede destruido."
+  },
+  "it": {
+   "spoken": "Prova: picchiata a tutta potenza e atterra così forte che il taxi si distrugga.",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Prova: picchiata a tutta potenza e atterra così forte che il taxi si distrugga."
+  },
+  "pt": {
+   "spoken": "Experimente: mergulhe com potência total e pouse tão forte que o táxi seja destruído.",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "Experimente: mergulhe com potência total e pouse tão forte que o táxi seja destruído."
+  },
+  "pl": {
+   "spoken": "Spróbuj: zanurkuj z pełną mocą i wyląduj tak mocno, żeby taksówka się rozbiła.",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Spróbuj: zanurkuj z pełną mocą i wyląduj tak mocno, żeby taksówka się rozbiła."
   }
  },
  "tut_crash": {
@@ -396,6 +666,21 @@
    "spoken": "Ay, pero tranquilo. Pronto tendrás un taxi nuevo.",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "Ay, pero tranquilo. Pronto tendrás un taxi nuevo."
+  },
+  "it": {
+   "spoken": "Ahi, ma non preoccuparti. Avrai presto un nuovo taxi.",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Ahi, ma non preoccuparti. Avrai presto un nuovo taxi."
+  },
+  "pt": {
+   "spoken": "Ai, mas não se preocupe. Você vai ganhar um táxi novo logo.",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "Ai, mas não se preocupe. Você vai ganhar um táxi novo logo."
+  },
+  "pl": {
+   "spoken": "Auć, ale nie martw się. Zaraz dostaniesz nową taksówkę.",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Auć, ale nie martw się. Zaraz dostaniesz nową taksówkę."
   }
  },
  "tut_crash_ok": {
@@ -417,6 +702,21 @@
    "spoken": "¡Destruido! Un taxi menos. Si hubieras llevado un pasajero, ahora estaría perdido.",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "¡Destruido! Un taxi menos. Si hubieras llevado un pasajero, ahora estaría perdido."
+  },
+  "it": {
+   "spoken": "Distrutto! Un taxi in meno. Se avessi avuto un passeggero a bordo, ora sarebbe perso.",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Distrutto! Un taxi in meno. Se avessi avuto un passeggero a bordo, ora sarebbe perso."
+  },
+  "pt": {
+   "spoken": "Destruído! Um táxi a menos. Se você tivesse um passageiro a bordo, ele estaria perdido agora.",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "Destruído! Um táxi a menos. Se você tivesse um passageiro a bordo, ele estaria perdido agora."
+  },
+  "pl": {
+   "spoken": "Zniszczona! O jedną taksówkę mniej. Gdybyś miał pasażera na pokładzie, właśnie byś go stracił.",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Zniszczona! O jedną taksówkę mniej. Gdybyś miał pasażera na pokładzie, właśnie byś go stracił."
   }
  },
  "tut_soft": {
@@ -438,6 +738,21 @@
    "spoken": "Ahora aterriza suavemente en la plataforma tres. Los dos patines deben quedar sobre la placa clara.",
    "direction": "[lento y claro, explicativo, como un instructor de vuelo experimentado]",
    "subtitle": "Ahora aterriza suavemente en la plataforma 3. Los dos patines deben quedar sobre la placa clara."
+  },
+  "it": {
+   "spoken": "Ora atterra dolcemente sulla piattaforma tre. Entrambi i pattini devono stare sulla piastra d'atterraggio chiara.",
+   "direction": "[lento e chiaro, didattico, come un istruttore di volo esperto]",
+   "subtitle": "Ora atterra dolcemente sulla piattaforma 3. Entrambi i pattini devono stare sulla piastra d'atterraggio chiara."
+  },
+  "pt": {
+   "spoken": "Agora pouse com suavidade na plataforma três. Os dois esquis precisam ficar sobre a placa de pouso clara.",
+   "direction": "[devagar e claro, explicativo, como um instrutor de voo experiente]",
+   "subtitle": "Agora pouse com suavidade na plataforma 3. Os dois esquis precisam ficar sobre a placa de pouso clara."
+  },
+  "pl": {
+   "spoken": "Teraz wyląduj łagodnie na lądowisku trzy. Obie płozy muszą stać na jasnej płycie lądowiska.",
+   "direction": "[powoli i wyraźnie, objaśniająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Teraz wyląduj łagodnie na lądowisku 3. Obie płozy muszą stać na jasnej płycie lądowiska."
   }
  },
  "tut_soft_ok": {
@@ -459,6 +774,21 @@
    "spoken": "¡Maravillosamente suave! Aterrizajes suaves y nivelados seguidos te dan un bonus en la tarifa.",
    "direction": "[entusiasta, elogioso, como un instructor de vuelo experimentado]",
    "subtitle": "¡Maravillosamente suave! Aterrizajes suaves y nivelados seguidos te dan un bonus en la tarifa."
+  },
+  "it": {
+   "spoken": "Meravigliosamente dolce! Atterraggi morbidi e in piano di fila ti fanno guadagnare un bonus sulla tariffa.",
+   "direction": "[entusiasta, pieno di elogi, come un istruttore di volo esperto]",
+   "subtitle": "Meravigliosamente dolce! Atterraggi morbidi e in piano di fila ti fanno guadagnare un bonus sulla tariffa."
+  },
+  "pt": {
+   "spoken": "Maravilhosamente suave! Pousos suaves e nivelados em sequência dão um bônus na tarifa.",
+   "direction": "[entusiasmado, elogioso, como um instrutor de voo experiente]",
+   "subtitle": "Maravilhosamente suave! Pousos suaves e nivelados em sequência dão um bônus na tarifa."
+  },
+  "pl": {
+   "spoken": "Cudownie łagodnie! Miękkie, poziome lądowania z rzędu dają premię do opłaty.",
+   "direction": "[entuzjastycznie, z uznaniem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Cudownie łagodnie! Miękkie, poziome lądowania z rzędu dają premię do opłaty."
   }
  },
  "tut_soft_meh": {
@@ -480,6 +810,21 @@
    "spoken": "Funcionó, pero aún no fue suave. Cuanto más despacio toques, mejor. Aterrizajes suaves y nivelados seguidos dan un bonus.",
    "direction": "[cálido y alentador, como un instructor de vuelo experimentado]",
    "subtitle": "Funcionó, pero aún no fue suave. Cuanto más despacio toques, mejor. Aterrizajes suaves y nivelados seguidos dan un bonus."
+  },
+  "it": {
+   "spoken": "È andata, ma non era ancora morbido. Più lento tocchi terra, meglio è. Atterraggi morbidi e in piano di fila ti danno un bonus.",
+   "direction": "[caloroso e incoraggiante, come un istruttore di volo esperto]",
+   "subtitle": "È andata, ma non era ancora morbido. Più lento tocchi terra, meglio è. Atterraggi morbidi e in piano di fila ti danno un bonus."
+  },
+  "pt": {
+   "spoken": "Deu certo, mas ainda não foi suave. Quanto mais devagar tocar o solo, melhor. Pousos suaves e nivelados em sequência dão um bônus.",
+   "direction": "[caloroso e encorajador, como um instrutor de voo experiente]",
+   "subtitle": "Deu certo, mas ainda não foi suave. Quanto mais devagar tocar o solo, melhor. Pousos suaves e nivelados em sequência dão um bônus."
+  },
+  "pl": {
+   "spoken": "Udało się, ale jeszcze nie miękko. Im wolniej przyziemisz, tym lepiej. Miękkie, poziome lądowania z rzędu dają premię.",
+   "direction": "[ciepło i zachęcająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Udało się, ale jeszcze nie miękko. Im wolniej przyziemisz, tym lepiej. Miękkie, poziome lądowania z rzędu dają premię."
   }
  },
  "tut_job": {
@@ -501,6 +846,21 @@
    "spoken": "¡Al trabajo! Mika espera en la plataforma dos. La estrella sobre ella indica que es pasajera obligatoria. Cuando entregues a todos los obligatorios de un nivel, se abre la puerta de arriba en el centro. Aterriza junto a Mika y espera a que suba.",
    "direction": "[lento y claro, explicativo, como un instructor de vuelo experimentado]",
    "subtitle": "¡Al trabajo! Mika espera en la plataforma 2. La estrella sobre ella indica que es pasajera obligatoria. Cuando entregues a todos los obligatorios de un nivel, se abre la puerta de arriba en el centro. Aterriza junto a Mika y espera a que suba."
+  },
+  "it": {
+   "spoken": "Ora al lavoro! Mika aspetta alla piattaforma due. La stella sopra di lei indica che Mika è una passeggera obbligatoria. Quando hai consegnato tutti i passeggeri obbligatori di un livello, si apre il cancello in alto al centro. Atterra accanto a Mika e aspetta che salga.",
+   "direction": "[lento e chiaro, didattico, come un istruttore di volo esperto]",
+   "subtitle": "Ora al lavoro! Mika aspetta alla piattaforma 2. La stella sopra di lei indica che Mika è una passeggera obbligatoria. Quando hai consegnato tutti i passeggeri obbligatori di un livello, si apre il cancello in alto al centro. Atterra accanto a Mika e aspetta che salga."
+  },
+  "pt": {
+   "spoken": "Agora, ao trabalho! Mika espera na plataforma dois. A estrela acima dela mostra que Mika é uma passageira obrigatória. Quando você entregar todos os passageiros obrigatórios de um nível, o portão no alto, no centro, se abre. Pouse ao lado da Mika e espere ela entrar.",
+   "direction": "[devagar e claro, explicativo, como um instrutor de voo experiente]",
+   "subtitle": "Agora, ao trabalho! Mika espera na plataforma 2. A estrela acima dela mostra que Mika é uma passageira obrigatória. Quando você entregar todos os passageiros obrigatórios de um nível, o portão no alto, no centro, se abre. Pouse ao lado da Mika e espere ela entrar."
+  },
+  "pl": {
+   "spoken": "Do roboty! Mika czeka na lądowisku dwa. Gwiazdka nad nią oznacza, że Mika jest obowiązkową pasażerką. Gdy dowieziesz wszystkich obowiązkowych pasażerów poziomu, otworzy się brama u góry pośrodku. Wyląduj obok Miki i poczekaj, aż wsiądzie.",
+   "direction": "[powoli i wyraźnie, objaśniająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Do roboty! Mika czeka na lądowisku 2. Gwiazdka nad nią oznacza, że Mika jest obowiązkową pasażerką. Gdy dowieziesz wszystkich obowiązkowych pasażerów poziomu, otworzy się brama u góry pośrodku. Wyląduj obok Miki i poczekaj, aż wsiądzie."
   }
  },
  "tut_main_again": {
@@ -522,6 +882,21 @@
    "spoken": "Mika no llegó. Vuelve a esperar en la plataforma dos. Recógela y llévala sana y salva esta vez.",
    "direction": "[cálido y alentador, como un instructor de vuelo experimentado]",
    "subtitle": "Mika no llegó. Vuelve a esperar en la plataforma 2. Recógela y llévala sana y salva esta vez."
+  },
+  "it": {
+   "spoken": "Mika non ce l'ha fatta. Aspetta di nuovo alla piattaforma due. Prendila e stavolta portala sana e salva.",
+   "direction": "[caloroso e incoraggiante, come un istruttore di volo esperto]",
+   "subtitle": "Mika non ce l'ha fatta. Aspetta di nuovo alla piattaforma 2. Prendila e stavolta portala sana e salva."
+  },
+  "pt": {
+   "spoken": "A Mika não conseguiu. Ela espera de novo na plataforma dois. Pegue-a e desta vez leve-a em segurança.",
+   "direction": "[caloroso e encorajador, como um instrutor de voo experiente]",
+   "subtitle": "A Mika não conseguiu. Ela espera de novo na plataforma 2. Pegue-a e desta vez leve-a em segurança."
+  },
+  "pl": {
+   "spoken": "Mice się nie udało. Znów czeka na lądowisku dwa. Odbierz ją i tym razem dowieź bezpiecznie.",
+   "direction": "[ciepło i zachęcająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Mice się nie udało. Znów czeka na lądowisku 2. Odbierz ją i tym razem dowieź bezpiecznie."
   }
  },
  "tut_pay": {
@@ -543,6 +918,21 @@
    "spoken": "Llévala a la plataforma tres. Cuanto más rápido, más paga. La cifra de abajo a la derecha va bajando. Aterrizajes suaves seguidos dan un bonus.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Llévala a la plataforma 3. Cuanto más rápido, más paga. La cifra de abajo a la derecha va bajando. Aterrizajes suaves seguidos dan un bonus."
+  },
+  "it": {
+   "spoken": "Portala alla piattaforma tre. Più sei veloce, più paga. L'importo in basso a destra scende. Atterraggi morbidi di fila ti danno un bonus.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Portala alla piattaforma 3. Più sei veloce, più paga. L'importo in basso a destra scende. Atterraggi morbidi di fila ti danno un bonus."
+  },
+  "pt": {
+   "spoken": "Leve-a à plataforma três. Quanto mais rápido, mais ela paga. O valor no canto inferior direito vai caindo. Pousos suaves em sequência dão um bônus.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Leve-a à plataforma 3. Quanto mais rápido, mais ela paga. O valor no canto inferior direito vai caindo. Pousos suaves em sequência dão um bônus."
+  },
+  "pl": {
+   "spoken": "Zawieź ją na lądowisko trzy. Im szybciej, tym więcej zapłaci. Kwota w prawym dolnym rogu spada. Miękkie lądowania z rzędu dają premię.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Zawieź ją na lądowisko 3. Im szybciej, tym więcej zapłaci. Kwota w prawym dolnym rogu spada. Miękkie lądowania z rzędu dają premię."
   }
  },
  "tut_delivered": {
@@ -564,6 +954,21 @@
    "spoken": "Tus primeros ingresos. ¡Bien hecho!",
    "direction": "[entusiasta, elogioso, como un instructor de vuelo experimentado]",
    "subtitle": "Tus primeros ingresos. ¡Bien hecho!"
+  },
+  "it": {
+   "spoken": "Ecco il tuo primo guadagno. Ben fatto!",
+   "direction": "[entusiasta, pieno di elogi, come un istruttore di volo esperto]",
+   "subtitle": "Ecco il tuo primo guadagno. Ben fatto!"
+  },
+  "pt": {
+   "spoken": "Esse foi seu primeiro ganho. Muito bem!",
+   "direction": "[entusiasmado, elogioso, como um instrutor de voo experiente]",
+   "subtitle": "Esse foi seu primeiro ganho. Muito bem!"
+  },
+  "pl": {
+   "spoken": "To był twój pierwszy zarobek. Brawo!",
+   "direction": "[entuzjastycznie, z uznaniem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "To był twój pierwszy zarobek. Brawo!"
   }
  },
  "tut_extra": {
@@ -585,6 +990,21 @@
    "spoken": "Además de los obligatorios, también llaman pasajeros opcionales. Llevarlos es voluntario, ¡pero da dinero! Tu taxi solo tiene un asiento, y los clientes no esperan para siempre. Vuela hasta allí y recoge al cliente.",
    "direction": "[animado y enérgico, como un instructor de vuelo experimentado]",
    "subtitle": "Además de los obligatorios, también llaman pasajeros opcionales. Llevarlos es voluntario, ¡pero da dinero! Tu taxi solo tiene un asiento, y los clientes no esperan para siempre. Vuela hasta allí y recoge al cliente."
+  },
+  "it": {
+   "spoken": "Oltre ai passeggeri obbligatori chiamano anche passeggeri facoltativi. Trasportarli è volontario, ma porta guadagni! Però il taxi ha un solo posto, e gli ospiti non aspettano in eterno. Vola lì e porta l'ospite con te.",
+   "direction": "[vivace e brioso, come un istruttore di volo esperto]",
+   "subtitle": "Oltre ai passeggeri obbligatori chiamano anche passeggeri facoltativi. Trasportarli è volontario, ma porta guadagni! Però il taxi ha un solo posto, e gli ospiti non aspettano in eterno. Vola lì e porta l'ospite con te."
+  },
+  "pt": {
+   "spoken": "Além dos passageiros obrigatórios, passageiros opcionais também chamam. Levá-los é opcional, mas dá dinheiro! Só que seu táxi tem um único lugar, e os clientes não esperam para sempre. Voe até lá e leve o cliente.",
+   "direction": "[animado e enérgico, como um instrutor de voo experiente]",
+   "subtitle": "Além dos passageiros obrigatórios, passageiros opcionais também chamam. Levá-los é opcional, mas dá dinheiro! Só que seu táxi tem um único lugar, e os clientes não esperam para sempre. Voe até lá e leve o cliente."
+  },
+  "pl": {
+   "spoken": "Oprócz obowiązkowych pasażerów zgłaszają się też dodatkowi. Ich przewóz jest dobrowolny, ale przynosi zarobek! Tyle że taksówka ma tylko jedno miejsce, a goście nie będą czekać wiecznie. Leć tam i zabierz gościa.",
+   "direction": "[żywo i energicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Oprócz obowiązkowych pasażerów zgłaszają się też dodatkowi. Ich przewóz jest dobrowolny, ale przynosi zarobek! Tyle że taksówka ma tylko jedno miejsce, a goście nie będą czekać wiecznie. Leć tam i zabierz gościa."
   }
  },
  "tut_extra_dest": {
@@ -606,6 +1026,21 @@
    "spoken": "El destino del cliente ya está iluminado. Llévalo allí.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "El destino del cliente ya está iluminado. Llévalo allí."
+  },
+  "it": {
+   "spoken": "Ora la destinazione dell'ospite è illuminata. Portalo lì.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Ora la destinazione dell'ospite è illuminata. Portalo lì."
+  },
+  "pt": {
+   "spoken": "Agora o destino do cliente está aceso. Leve-o até lá.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Agora o destino do cliente está aceso. Leve-o até lá."
+  },
+  "pl": {
+   "spoken": "Cel gościa jest teraz podświetlony. Zawieź go tam.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Cel gościa jest teraz podświetlony. Zawieź go tam."
   }
  },
  "tut_extra2": {
@@ -627,6 +1062,21 @@
    "spoken": "¡Otra llamada por radio! Ese pesado de la plataforma tres lleva todo el rato quejándose y, claro, lo sabe todo mejor. Ve a recogerlo.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "¡Otra llamada por radio! Ese pesado de la plataforma 3 lleva todo el rato quejándose y, claro, lo sabe todo mejor. Ve a recogerlo."
+  },
+  "it": {
+   "spoken": "Un'altra chiamata radio! Questo rompiscatole alla piattaforma tre si lamenta da tutto il tempo e ovviamente ne sa di più. Vola lì e prendilo.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Un'altra chiamata radio! Questo rompiscatole alla piattaforma 3 si lamenta da tutto il tempo e ovviamente ne sa di più. Vola lì e prendilo."
+  },
+  "pt": {
+   "spoken": "Outro chamado no rádio! Esse chato na plataforma três está reclamando o tempo todo e, claro, sabe mais que todo mundo. Voe até lá e pegue-o.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Outro chamado no rádio! Esse chato na plataforma 3 está reclamando o tempo todo e, claro, sabe mais que todo mundo. Voe até lá e pegue-o."
+  },
+  "pl": {
+   "spoken": "Kolejne wezwanie radiowe! Ten marudny typ z lądowiska trzy narzeka cały czas i oczywiście wie lepiej. Leć tam i go zabierz.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Kolejne wezwanie radiowe! Ten marudny typ z lądowiska 3 narzeka cały czas i oczywiście wie lepiej. Leć tam i go zabierz."
   }
  },
  "tut_extra2_again": {
@@ -648,6 +1098,21 @@
    "spoken": "El cliente se ha ido. Uno nuevo espera en la plataforma tres.",
    "direction": "[cálido y alentador, como un instructor de vuelo experimentado]",
    "subtitle": "El cliente se ha ido. Uno nuevo espera en la plataforma 3."
+  },
+  "it": {
+   "spoken": "L'ospite se n'è andato. Uno nuovo aspetta alla piattaforma tre.",
+   "direction": "[caloroso e incoraggiante, come un istruttore di volo esperto]",
+   "subtitle": "L'ospite se n'è andato. Uno nuovo aspetta alla piattaforma 3."
+  },
+  "pt": {
+   "spoken": "O cliente foi embora. Um novo espera na plataforma três.",
+   "direction": "[caloroso e encorajador, como um instrutor de voo experiente]",
+   "subtitle": "O cliente foi embora. Um novo espera na plataforma 3."
+  },
+  "pl": {
+   "spoken": "Gość odszedł. Nowy czeka na lądowisku trzy.",
+   "direction": "[ciepło i zachęcająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Gość odszedł. Nowy czeka na lądowisku 3."
   }
  },
  "tut_eject": {
@@ -669,6 +1134,21 @@
    "spoken": "Y ya empiezan las quejas: demasiado rápido, demasiado movido, demasiado caro. Para eso está la tecla de expulsar: E en el teclado, Y en el mando. Si el taxi está en el suelo, el cliente cae suave y solo refunfuña. Desde muy alto, no sobrevivirá. Con pasajeros obligatorios, además cuesta una multa. Para celebrar el día: ¡échalo ahora!",
    "direction": "[seco, algo irónico, como un instructor de vuelo experimentado]",
    "subtitle": "Y ya empiezan las quejas: demasiado rápido, demasiado movido, demasiado caro. Para eso está la tecla de expulsar: E en el teclado, Y en el mando. Si el taxi está en el suelo, el cliente cae suave y solo refunfuña. Desde muy alto, no sobrevivirá. Con pasajeros obligatorios, además cuesta una multa. Para celebrar el día: ¡échalo ahora!"
+  },
+  "it": {
+   "spoken": "Ed ecco che iniziano le lamentele: troppo veloce, troppo scossoni, troppo caro. Per questo c'è il tasto espulsione: E sulla tastiera, Y sul controller. Se il taxi è a terra, l'ospite atterra morbido e brontola soltanto. Da grande altezza non sopravvive. Per i passeggeri obbligatori costa anche una penale. Per festeggiare la giornata: buttalo fuori adesso!",
+   "direction": "[asciutto, un po' ironico, come un istruttore di volo esperto]",
+   "subtitle": "Ed ecco che iniziano le lamentele: troppo veloce, troppo scossoni, troppo caro. Per questo c'è il tasto espulsione: E sulla tastiera, Y sul controller. Se il taxi è a terra, l'ospite atterra morbido e brontola soltanto. Da grande altezza non sopravvive. Per i passeggeri obbligatori costa anche una penale. Per festeggiare la giornata: buttalo fuori adesso!"
+  },
+  "pt": {
+   "spoken": "E já começam as reclamações: rápido demais, sacudindo demais, caro demais. É para isso que serve o botão de expulsar: E no teclado, Y no controle. Se o táxi estiver no chão, o cliente cai de leve e só resmunga. De grande altura, ele não sobrevive. Para passageiros obrigatórios, também custa uma multa. Para comemorar o dia: expulse-o agora!",
+   "direction": "[seco, um pouco irônico, como um instrutor de voo experiente]",
+   "subtitle": "E já começam as reclamações: rápido demais, sacudindo demais, caro demais. É para isso que serve o botão de expulsar: E no teclado, Y no controle. Se o táxi estiver no chão, o cliente cai de leve e só resmunga. De grande altura, ele não sobrevive. Para passageiros obrigatórios, também custa uma multa. Para comemorar o dia: expulse-o agora!"
+  },
+  "pl": {
+   "spoken": "I już zaczyna się narzekanie: za szybko, za trzęsie, za drogo. Do tego służy przycisk wyrzucania: E na klawiaturze, Y na kontrolerze. Gdy taksówka stoi na ziemi, gość ląduje miękko i tylko burczy. Z dużej wysokości tego nie przeżyje. Przy obowiązkowych pasażerach kosztuje to też karę. Z okazji dnia: wyrzuć go teraz!",
+   "direction": "[sucho, lekko ironicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "I już zaczyna się narzekanie: za szybko, za trzęsie, za drogo. Do tego służy przycisk wyrzucania: E na klawiaturze, Y na kontrolerze. Gdy taksówka stoi na ziemi, gość ląduje miękko i tylko burczy. Z dużej wysokości tego nie przeżyje. Przy obowiązkowych pasażerach kosztuje to też karę. Z okazji dnia: wyrzuć go teraz!"
   }
  },
  "tut_eject_again": {
@@ -690,6 +1170,21 @@
    "spoken": "¡Alto, a este cliente no hay que entregarlo, hay que echarlo! Aquí viene el siguiente. Recógelo y échalo con E, o Y en el mando.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "¡Alto, a este cliente no hay que entregarlo, hay que echarlo! Aquí viene el siguiente. Recógelo y échalo con E, o Y en el mando."
+  },
+  "it": {
+   "spoken": "Alt, questo ospite non devi consegnarlo, devi buttarlo fuori! Ecco il prossimo. Prendilo e buttalo fuori con E, o Y sul controller.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Alt, questo ospite non devi consegnarlo, devi buttarlo fuori! Ecco il prossimo. Prendilo e buttalo fuori con E, o Y sul controller."
+  },
+  "pt": {
+   "spoken": "Pare, você não deve entregar esse cliente, deve expulsá-lo! Lá vem o próximo. Leve-o e expulse com E, ou Y no controle.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Pare, você não deve entregar esse cliente, deve expulsá-lo! Lá vem o próximo. Leve-o e expulse com E, ou Y no controle."
+  },
+  "pl": {
+   "spoken": "Stop, tego gościa masz nie dowozić, tylko wyrzucić! Nadchodzi następny. Zabierz go i wyrzuć klawiszem E albo Y na kontrolerze.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Stop, tego gościa masz nie dowozić, tylko wyrzucić! Nadchodzi następny. Zabierz go i wyrzuć klawiszem E albo Y na kontrolerze."
   }
  },
  "tut_eject_ok": {
@@ -711,6 +1206,21 @@
    "spoken": "Paz a bordo, y la valoración apenas se resiente. Recuerda: echar a alguien no da dinero, pero a veces compensa más.",
    "direction": "[entusiasta, elogioso, como un instructor de vuelo experimentado]",
    "subtitle": "Paz a bordo, y la valoración apenas se resiente. Recuerda: echar a alguien no da dinero, pero a veces compensa más."
+  },
+  "it": {
+   "spoken": "Pace a bordo, e la valutazione ne soffre solo un po'. Ricorda: buttare fuori non fa guadagnare, ma a volte conviene lo stesso.",
+   "direction": "[entusiasta, pieno di elogi, come un istruttore di volo esperto]",
+   "subtitle": "Pace a bordo, e la valutazione ne soffre solo un po'. Ricorda: buttare fuori non fa guadagnare, ma a volte conviene lo stesso."
+  },
+  "pt": {
+   "spoken": "Paz a bordo, e a avaliação só cai um pouquinho. Lembre-se: expulsar não dá dinheiro, mas às vezes ainda compensa.",
+   "direction": "[entusiasmado, elogioso, como um instrutor de voo experiente]",
+   "subtitle": "Paz a bordo, e a avaliação só cai um pouquinho. Lembre-se: expulsar não dá dinheiro, mas às vezes ainda compensa."
+  },
+  "pl": {
+   "spoken": "Spokój na pokładzie, a ocena spada tylko trochę. Pamiętaj: wyrzucanie nie przynosi pieniędzy, ale czasem i tak się opłaca.",
+   "direction": "[entuzjastycznie, z uznaniem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Spokój na pokładzie, a ocena spada tylko trochę. Pamiętaj: wyrzucanie nie przynosi pieniędzy, ale czasem i tak się opłaca."
   }
  },
  "tut_life": {
@@ -732,6 +1242,21 @@
    "spoken": "La plataforma rosa es una estación de taxis. ¡No todos los niveles la tienen! Si aterrizas aquí, puedes comprar un taxi por mil créditos, cinco como máximo. Te doy créditos, compra ahora otro taxi.",
    "direction": "[cálido y alentador, como un instructor de vuelo experimentado]",
    "subtitle": "La plataforma rosa es una estación de taxis. ¡No todos los niveles la tienen! Si aterrizas aquí, puedes comprar un taxi por 1000 créditos, 5 como máximo. Te doy créditos, compra ahora otro taxi."
+  },
+  "it": {
+   "spoken": "La piattaforma rosa è una stazione taxi. Ma non tutti i livelli ne hanno una! Se atterri lì, puoi comprare taxi a mille crediti l'uno, al massimo cinque. Ti do dei crediti, ora compra un altro taxi.",
+   "direction": "[caloroso e incoraggiante, come un istruttore di volo esperto]",
+   "subtitle": "La piattaforma rosa è una stazione taxi. Ma non tutti i livelli ne hanno una! Se atterri lì, puoi comprare taxi a 1000 crediti l'uno, al massimo 5. Ti do dei crediti, ora compra un altro taxi."
+  },
+  "pt": {
+   "spoken": "A plataforma rosa é uma estação de táxi. Mas nem todo nível tem uma! Se pousar lá, você pode comprar táxis por mil créditos cada, no máximo cinco. Vou te dar créditos, agora compre mais um táxi.",
+   "direction": "[caloroso e encorajador, como um instrutor de voo experiente]",
+   "subtitle": "A plataforma rosa é uma estação de táxi. Mas nem todo nível tem uma! Se pousar lá, você pode comprar táxis por 1000 créditos cada, no máximo 5. Vou te dar créditos, agora compre mais um táxi."
+  },
+  "pl": {
+   "spoken": "Różowe lądowisko to stacja taksówek. Ale nie każdy poziom ją ma! Gdy tam wylądujesz, możesz kupić taksówkę za tysiąc kredytów, najwyżej pięć. Dam ci kredyty, kup teraz jeszcze jedną taksówkę.",
+   "direction": "[ciepło i zachęcająco, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Różowe lądowisko to stacja taksówek. Ale nie każdy poziom ją ma! Gdy tam wylądujesz, możesz kupić taksówkę za 1000 kredytów, najwyżej 5. Dam ci kredyty, kup teraz jeszcze jedną taksówkę."
   }
  },
  "tut_exit": {
@@ -753,6 +1278,21 @@
    "spoken": "Por último, Odo espera en la plataforma uno. Quiere ir a la salida. Con el último pasajero obligatorio a bordo, cruza con él la puerta de arriba.",
    "direction": "[tranquilo, amable, como un instructor de vuelo experimentado]",
    "subtitle": "Por último, Odo espera en la plataforma uno. Quiere ir a la salida. Con el último pasajero obligatorio a bordo, cruza con él la puerta de arriba."
+  },
+  "it": {
+   "spoken": "Infine, Odo aspetta alla piattaforma uno. Vuole andare all'uscita. Con l'ultimo passeggero obbligatorio a bordo, attraversa con lui il cancello in alto.",
+   "direction": "[calmo, cordiale, come un istruttore di volo esperto]",
+   "subtitle": "Infine, Odo aspetta alla piattaforma uno. Vuole andare all'uscita. Con l'ultimo passeggero obbligatorio a bordo, attraversa con lui il cancello in alto."
+  },
+  "pt": {
+   "spoken": "Por fim, Odo espera na plataforma um. Ele quer ir para a saída. Com o último passageiro obrigatório a bordo, passe com ele pelo portão lá em cima.",
+   "direction": "[calmo, simpático, como um instrutor de voo experiente]",
+   "subtitle": "Por fim, Odo espera na plataforma um. Ele quer ir para a saída. Com o último passageiro obrigatório a bordo, passe com ele pelo portão lá em cima."
+  },
+  "pl": {
+   "spoken": "Na koniec Odo czeka na lądowisku jeden. Chce do wyjścia. Z ostatnim obowiązkowym pasażerem na pokładzie przeleć z nim przez bramę na górze.",
+   "direction": "[spokojnie, przyjaźnie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Na koniec Odo czeka na lądowisku jeden. Chce do wyjścia. Z ostatnim obowiązkowym pasażerem na pokładzie przeleć z nim przez bramę na górze."
   }
  },
  "tut_countdown": {
@@ -774,6 +1314,21 @@
    "spoken": "¡Atento al reloj bajo la puerta! En cuanto aparece el último pasajero obligatorio, empieza la cuenta atrás. Si llega a cero, sales del nivel automáticamente, pierdes al pasajero y pagas una multa. En la escuela no pasa nada, pero cuando tu pasajero se impaciente, date prisa.",
    "direction": "[urgente, tenso, como un instructor de vuelo experimentado]",
    "subtitle": "¡Atento al reloj bajo la puerta! En cuanto aparece el último pasajero obligatorio, empieza la cuenta atrás. Si llega a cero, sales del nivel automáticamente, pierdes al pasajero y pagas una multa. En la escuela no pasa nada, pero cuando tu pasajero se impaciente, date prisa."
+  },
+  "it": {
+   "spoken": "Guarda l'orologio sotto il cancello! Appena compare l'ultimo passeggero obbligatorio, parte il conto alla rovescia. Quando scade, lasci automaticamente il livello, il passeggero è perso e paghi una penale. Qui alla scuola di volo non succede nulla, ma quando il passeggero ti mette fretta, sbrigati.",
+   "direction": "[urgente, teso, come un istruttore di volo esperto]",
+   "subtitle": "Guarda l'orologio sotto il cancello! Appena compare l'ultimo passeggero obbligatorio, parte il conto alla rovescia. Quando scade, lasci automaticamente il livello, il passeggero è perso e paghi una penale. Qui alla scuola di volo non succede nulla, ma quando il passeggero ti mette fretta, sbrigati."
+  },
+  "pt": {
+   "spoken": "Fique de olho no relógio abaixo do portão! Assim que o último passageiro obrigatório aparece, começa a contagem regressiva. Quando ela acaba, você sai do nível automaticamente, o passageiro se perde e você paga uma multa. Aqui na escola de voo nada acontece, mas quando o passageiro começar a apressar você, corra.",
+   "direction": "[urgente, tenso, como um instrutor de voo experiente]",
+   "subtitle": "Fique de olho no relógio abaixo do portão! Assim que o último passageiro obrigatório aparece, começa a contagem regressiva. Quando ela acaba, você sai do nível automaticamente, o passageiro se perde e você paga uma multa. Aqui na escola de voo nada acontece, mas quando o passageiro começar a apressar você, corra."
+  },
+  "pl": {
+   "spoken": "Patrz na zegar pod bramą! Gdy tylko pojawi się ostatni obowiązkowy pasażer, rusza odliczanie. Gdy się skończy, automatycznie opuszczasz poziom, pasażer przepada, a ty płacisz karę. Tu w szkole nic się nie stanie, ale gdy pasażer zaczyna poganiać, pospiesz się.",
+   "direction": "[pilnie, z napięciem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Patrz na zegar pod bramą! Gdy tylko pojawi się ostatni obowiązkowy pasażer, rusza odliczanie. Gdy się skończy, automatycznie opuszczasz poziom, pasażer przepada, a ty płacisz karę. Tu w szkole nic się nie stanie, ale gdy pasażer zaczyna poganiać, pospiesz się."
   }
  },
  "tut_gate": {
@@ -795,6 +1350,21 @@
    "spoken": "La puerta está abierta. ¡Crúzala!",
    "direction": "[animado y enérgico, como un instructor de vuelo experimentado]",
    "subtitle": "La puerta está abierta. ¡Crúzala!"
+  },
+  "it": {
+   "spoken": "Il cancello è aperto. Attraversalo!",
+   "direction": "[vivace e brioso, come un istruttore di volo esperto]",
+   "subtitle": "Il cancello è aperto. Attraversalo!"
+  },
+  "pt": {
+   "spoken": "O portão está aberto. Passe por ele!",
+   "direction": "[animado e enérgico, como um instrutor de voo experiente]",
+   "subtitle": "O portão está aberto. Passe por ele!"
+  },
+  "pl": {
+   "spoken": "Brama otwarta. Przeleć przez nią!",
+   "direction": "[żywo i energicznie, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Brama otwarta. Przeleć przez nią!"
   }
  },
  "tut_done": {
@@ -816,6 +1386,21 @@
    "spoken": "¡Listo! Estás preparado para el servicio. Buena suerte ahí fuera, Taxi siete.",
    "direction": "[entusiasta, elogioso, como un instructor de vuelo experimentado]",
    "subtitle": "¡Listo! Estás preparado para el servicio. Buena suerte ahí fuera, Taxi 7."
+  },
+  "it": {
+   "spoken": "Fatto! Sei pronto per il servizio. Buona fortuna là fuori, Taxi sette.",
+   "direction": "[entusiasta, pieno di elogi, come un istruttore di volo esperto]",
+   "subtitle": "Fatto! Sei pronto per il servizio. Buona fortuna là fuori, Taxi 7."
+  },
+  "pt": {
+   "spoken": "Pronto! Você está pronto para o serviço. Boa sorte lá fora, Táxi sete.",
+   "direction": "[entusiasmado, elogioso, como um instrutor de voo experiente]",
+   "subtitle": "Pronto! Você está pronto para o serviço. Boa sorte lá fora, Táxi 7."
+  },
+  "pl": {
+   "spoken": "Gotowe! Jesteś gotów do służby. Powodzenia, Taxi siedem.",
+   "direction": "[entuzjastycznie, z uznaniem, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Gotowe! Jesteś gotów do służby. Powodzenia, Taxi 7."
   }
  },
  "tut_fast_1": {
@@ -839,6 +1424,21 @@
    "spoken": "Ah, aprendes más rápido de lo que puedo explicar. Muy bien. Sigamos.",
    "direction": "[sorprendido y divertido, de buen humor, como un instructor de vuelo experimentado]",
    "subtitle": "Ah, aprendes más rápido de lo que puedo explicar. Muy bien. Sigamos."
+  },
+  "it": {
+   "spoken": "Ah, impari più in fretta di quanto io riesca a spiegare. Molto bene. Andiamo avanti.",
+   "direction": "[sorpreso e divertito, di buon umore, come un istruttore di volo esperto]",
+   "subtitle": "Ah, impari più in fretta di quanto io riesca a spiegare. Molto bene. Andiamo avanti."
+  },
+  "pt": {
+   "spoken": "Ah, você aprende mais rápido do que eu consigo explicar. Muito bem. Vamos em frente.",
+   "direction": "[surpreso e divertido, bem-humorado, como um instrutor de voo experiente]",
+   "subtitle": "Ah, você aprende mais rápido do que eu consigo explicar. Muito bem. Vamos em frente."
+  },
+  "pl": {
+   "spoken": "O, uczysz się szybciej, niż zdążę wyjaśnić. Bardzo dobrze. Lecimy dalej.",
+   "direction": "[zaskoczony i rozbawiony, w dobrym humorze, jak doświadczony instruktor lotniczy]",
+   "subtitle": "O, uczysz się szybciej, niż zdążę wyjaśnić. Bardzo dobrze. Lecimy dalej."
   }
  },
  "tut_fast_2": {
@@ -862,6 +1462,21 @@
    "spoken": "Un momento, ¿ya lo has hecho? ¡Impresionante! Pues seguimos.",
    "direction": "[sorprendido y divertido, de buen humor, como un instructor de vuelo experimentado]",
    "subtitle": "Un momento, ¿ya lo has hecho? ¡Impresionante! Pues seguimos."
+  },
+  "it": {
+   "spoken": "Aspetta, l'hai già fatto? Impressionante! Allora continuiamo.",
+   "direction": "[sorpreso e divertito, di buon umore, come un istruttore di volo esperto]",
+   "subtitle": "Aspetta, l'hai già fatto? Impressionante! Allora continuiamo."
+  },
+  "pt": {
+   "spoken": "Espera, você já fez isso? Impressionante! Então vamos continuar.",
+   "direction": "[surpreso e divertido, bem-humorado, como um instrutor de voo experiente]",
+   "subtitle": "Espera, você já fez isso? Impressionante! Então vamos continuar."
+  },
+  "pl": {
+   "spoken": "Chwila, już to zrobiłeś? Imponujące! To lecimy dalej.",
+   "direction": "[zaskoczony i rozbawiony, w dobrym humorze, jak doświadczony instruktor lotniczy]",
+   "subtitle": "Chwila, już to zrobiłeś? Imponujące! To lecimy dalej."
   }
  },
  "tut_fast_3": {
@@ -885,6 +1500,21 @@
    "spoken": "¡Oh, ya está! Creo que hablo demasiado. Adelante.",
    "direction": "[sorprendido y divertido, de buen humor, como un instructor de vuelo experimentado]",
    "subtitle": "¡Oh, ya está! Creo que hablo demasiado. Adelante."
+  },
+  "it": {
+   "spoken": "Oh, già fatto! Forse parlo troppo. Avanti.",
+   "direction": "[sorpreso e divertito, di buon umore, come un istruttore di volo esperto]",
+   "subtitle": "Oh, già fatto! Forse parlo troppo. Avanti."
+  },
+  "pt": {
+   "spoken": "Ah, já terminou! Acho que eu falo demais. Seguindo.",
+   "direction": "[surpreso e divertido, bem-humorado, como um instrutor de voo experiente]",
+   "subtitle": "Ah, já terminou! Acho que eu falo demais. Seguindo."
+  },
+  "pl": {
+   "spoken": "O, już gotowe! Chyba za dużo gadam. Dalej.",
+   "direction": "[zaskoczony i rozbawiony, w dobrym humorze, jak doświadczony instruktor lotniczy]",
+   "subtitle": "O, już gotowe! Chyba za dużo gadam. Dalej."
   }
  }
 }

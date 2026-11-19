@@ -40,6 +40,10 @@ var ground_y := 0.0
 var dead_t := 0.0
 var medical := false           # Krankenpatient: liegt auf einer Trage
 var shattered := false        # zerbrechlicher Fahrgast zersprungen (Scherbenanimation statt Blutfleck)
+# Runde 86 – nur Darstellung (ändern Weg, Zeit und Bezahlung nicht):
+var farewell := ""            # Abschied nach dem Aussteigen: "perfect" (winkt am Häuschen), "hard" (rennt schimpfend weg), "" normal
+var exit_from_x := 0.0        # Aussteigeort (für das Wegrennen in der Darstellung)
+var special := ""             # "floppi" (seltener Gast), "42" (Level 42)
 
 func setup(job: Dictionary, p: Dictionary, index: int, instant: bool) -> void:
 	pad = p
@@ -144,6 +148,7 @@ func step_out(taxi_x: float, dest_pad: Dictionary) -> void:
 	dest = dest_pad
 	surface_y = dest_pad.row * Tuning.TILE
 	x = taxi_x
+	exit_from_x = taxi_x
 	state = S.EXITING
 	fade = 1.0
 	target_x = dest_pad.door_x

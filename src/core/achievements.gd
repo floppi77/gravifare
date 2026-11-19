@@ -19,7 +19,16 @@ const LIST := [
 	["day_gold", "day", 1], ["day_streak_7", "day", 7],
 	["workshop_max", "garage", 1], ["new_look", "garage", 1],
 	["pump_boom", "fun", 1], ["crashes_50", "fun", 50], ["community", "fun", 1], ["hours_10", "time", 10],
+	["eggs_20", "egg", 20],
+	["day_nikolaus", "holiday", 1], ["day_xmas", "holiday", 1], ["day_silvester", "holiday", 1], ["day_valentine", "holiday", 1],
+	["all_done", "crown", 31],
 ]
+
+## Runde 86: verdeckt, bis sie erreicht sind (Name und Beschreibung „???“ in der Übersicht; Steam: „Hidden“). Nichts verraten.
+const HIDDEN := ["eggs_20", "day_nikolaus", "day_xmas", "day_silvester", "day_valentine"]
+
+static func is_hidden(id: String) -> bool:
+	return id in HIDDEN
 
 static func ids() -> Array:
 	return LIST.map(func(e): return String(e[0]))
@@ -134,6 +143,21 @@ static func progress(data: Dictionary, id: String) -> Array:
 						break
 		"hours_10":
 			cur = int(float(st.get("play_seconds", 0.0)) / 3600.0)
+		"eggs_20":
+			cur = (st.eggs as Dictionary).size() if st.get("eggs") is Dictionary else 0
+		"day_nikolaus", "day_xmas", "day_silvester", "day_valentine":
+			cur = 1 if st.get("holidays") is Dictionary and (st.holidays as Dictionary).has(id.substr(4)) else 0
+		"all_done":                                   # alle anderen Erfolge (gespeichert oder gerade erreicht)
+			var have := stored(data)
+			for e in LIST:
+				var o := String(e[0])
+				if o == "all_done":
+					continue
+				if have.has(o):
+					cur += 1
+				else:
+					var p := progress(data, o)
+					cur += 1 if p[0] >= p[1] else 0
 	return [mini(cur, g), g]
 
 ## Erfolge, deren Bedingung der Spielstand gerade erfüllt (ohne Blick auf die gespeicherten).

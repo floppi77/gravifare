@@ -33,7 +33,7 @@ eigener Grafik und eigenem Klang.
 
 <p align="center">
   <a href="docs/media/trailer_de.mp4"><img src="docs/media/trailer_thumb_de.jpg" alt="GraviFare – Trailer (Deutsch)" width="760"></a><br>
-  <sub>▶ Trailer ansehen (1080p60, 76 s) · <a href="docs/media/trailer_en.mp4">English version</a></sub>
+  <sub>▶ Trailer ansehen (1080p60, 72 s) · <a href="docs/media/trailer_en.mp4">English version</a></sub>
 </p>
 
 Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Autopilot-Flüge, aufgenommen mit Godots Movie Maker); Schnitt, Kamera und Effekte entstehen per Skript, siehe [tools/trailer](tools/trailer/README.md).
@@ -65,7 +65,7 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 - **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist und **Bestflug ansehen** in der Levelauswahl, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
   **Garage** mit Lackierungen und Aufklebern.
 - **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
-- **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch, Englisch, Französisch und Spanisch** mit Untertiteln.
+- **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch und Polnisch** mit Untertiteln.
 - **Soundtrack** mit 23 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
 - **Steuerung:** Tastatur und Gamepad (Xbox-Layout) mit Vibration, alle Tasten frei belegbar, siehe [CONTROLS.md](CONTROLS.md).
 - **Anzeige:** 16:9, 1440p/2160p und Ultrawide, drei Speicherplätze.
@@ -120,7 +120,7 @@ A homage to the flying-taxi genre, with its own world, levels, art and sound.
 
 <p align="center">
   <a href="docs/media/trailer_en.mp4"><img src="docs/media/trailer_thumb_en.jpg" alt="GraviFare – Trailer (English)" width="760"></a><br>
-  <sub>▶ Watch the trailer (1080p60, 76 s) · <a href="docs/media/trailer_de.mp4">Deutsche Version</a></sub>
+  <sub>▶ Watch the trailer (1080p60, 72 s) · <a href="docs/media/trailer_de.mp4">Deutsche Version</a></sub>
 </p>
 
 Everything in the trailer comes from the real game and its 99 handmade levels (autopilot flights recorded with Godot's Movie Maker); cutting, camera and effects are scripted, see [tools/trailer](tools/trailer/README.md) (German).
@@ -152,7 +152,7 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (a brightly lit map every day with a daily rule – windy day, fog, mirror world, thin tank, glass roof, rush hour, tailwind – and a daily goal with bronze, silver and gold, a streak with rewards and a ghost),
   and a **garage** with paint jobs and stickers.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
-- **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German, English, French and Spanish** with subtitles.
+- **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German, English, French, Spanish, Italian, Portuguese and Polish** with subtitles.
 - **Soundtrack** of 23 music themes with three layers each (C64 and Amiga sound) and a music player.
 - **Controls:** keyboard and gamepad (Xbox layout) with rumble, fully remappable, see [CONTROLS.md](CONTROLS.md) (German).
 - **Display:** 16:9, 1440p/2160p and ultrawide, three save slots.

@@ -37,7 +37,7 @@ def check(y, sr, text, lang):
         _asr = WhisperModel("medium", device="cpu", compute_type="int8", local_files_only=True)
     segs, _ = _asr.transcribe(librosa.resample(y.astype(np.float32), orig_sr=sr, target_sr=16000), language=lang, beam_size=5)
     got, want = norm(" ".join(s.text for s in segs), lang), norm(text, lang)
-    sim = difflib.SequenceMatcher(None, "".join(got), "".join(want)).ratio()
+    sim = difflib.SequenceMatcher(None, "".join(got), "".join(want), autojunk=False).ratio()
     return sim >= 0.88 and len(got) <= len(want), " ".join(got), sim
 
 def decode(wav_bytes):
@@ -49,7 +49,7 @@ def print_serve(workdir):
     os.makedirs(workdir, exist_ok=True)
     args = []
     for vk, per in VOICES.items():
-        for lang in per:
+        for lang in list(per) + (["pl"] if os.path.exists(f"{REFS}/pl/{vk}.ogg") else []):     # Polnisch: Referenzen aus gen_voice_pl.py
             wav = f"{workdir}/{lang}_{vk}.wav"
             subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"{REFS}/{lang}/{vk}.ogg", "-ar", "24000", "-ac", "1", wav], check=True)
             args += ["--voice", f"{vk}_{lang}={wav}={REF_TEXT[lang]}"]
@@ -65,7 +65,7 @@ def main():
     if a.print_serve:
         print_serve(a.print_serve)
         return
-    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es"]}.get(a.lang, [a.lang])
+    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es", "it", "pt", "pl"], "new": ["it", "pt", "pl"]}.get(a.lang, [a.lang])
     mp = OUT + "/manifest.json"
     manifest = json.load(open(mp, encoding="utf-8"))
     weak = []
@@ -84,7 +84,7 @@ def main():
                 best = None
                 for attempt in range(TRIES):
                     y, sr = decode(speak(a.server, f"{vk}_{lang}", (direction(key, lang) + " " + text).strip(), SEED + attempt * 13 + len(key)))
-                    ok, got, sim = voice_lang.check(y, sr, text, lang) if lang in ("fr", "es") else check(y, sr, text, lang)
+                    ok, got, sim = voice_lang.check(y, sr, text, lang) if lang not in ("de", "en") else check(y, sr, text, lang)
                     if best is None or sim > best[0]:
                         best = (sim, y, sr, got)
                     print(f"  {lang}/{vk}_{key} Versuch {attempt + 1}: {'ok' if ok else 'verworfen'} ({got!r}, {sim:.2f})", flush=True)

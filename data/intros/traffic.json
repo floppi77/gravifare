@@ -6,7 +6,10 @@
   "de": "Verkehr",
   "en": "Traffic",
   "fr": "Circulation",
-  "es": "Tráfico"
+  "es": "Tráfico",
+  "it": "Traffico",
+  "pt": "Tráfego",
+  "pl": "Ruch"
  },
  "map": [
   "########################################",
@@ -105,7 +108,10 @@
    "de": "Verkehr",
    "en": "Traffic",
    "fr": "Circulation",
-   "es": "Tráfico"
+   "es": "Tráfico",
+   "it": "Traffico",
+   "pt": "Tráfego",
+   "pl": "Ruch"
   }
  }
 }

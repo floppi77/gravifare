@@ -6,7 +6,10 @@
   "de": "Fahrende Plattformen",
   "en": "Moving pads",
   "fr": "Pads mobiles",
-  "es": "Plataformas móviles"
+  "es": "Plataformas móviles",
+  "it": "Piattaforme mobili",
+  "pt": "Plataformas móveis",
+  "pl": "Ruchome lądowiska"
  },
  "map": [
   "########################################",
@@ -76,7 +79,10 @@
    "de": "Fahrende Plattformen",
    "en": "Moving pads",
    "fr": "Pads mobiles",
-   "es": "Plataformas móviles"
+   "es": "Plataformas móviles",
+   "it": "Piattaforme mobili",
+   "pt": "Plataformas móveis",
+   "pl": "Ruchome lądowiska"
   }
  }
 }

@@ -6,7 +6,10 @@
   "de": "Abstoßende Magnete",
   "en": "Repelling magnets",
   "fr": "Aimants répulsifs",
-  "es": "Imanes que repelen"
+  "es": "Imanes que repelen",
+  "it": "Magneti che respingono",
+  "pt": "Ímãs que repelem",
+  "pl": "Odpychające magnesy"
  },
  "map": [
   "########################################",
@@ -89,7 +92,10 @@
    "de": "Abstoßende Magnete",
    "en": "Repelling magnets",
    "fr": "Aimants répulsifs",
-   "es": "Imanes que repelen"
+   "es": "Imanes que repelen",
+   "it": "Magneti che respingono",
+   "pt": "Ímãs que repelem",
+   "pl": "Odpychające magnesy"
   }
  }
 }

@@ -6,7 +6,10 @@
   "de": "Schiebetore",
   "en": "Sliding gates",
   "fr": "Portes coulissantes",
-  "es": "Puertas correderas"
+  "es": "Puertas correderas",
+  "it": "Cancelli scorrevoli",
+  "pt": "Portões deslizantes",
+  "pl": "Bramy przesuwne"
  },
  "map": [
   "########################################",
@@ -74,7 +77,10 @@
    "de": "Schiebetore",
    "en": "Sliding gates",
    "fr": "Portes coulissantes",
-   "es": "Puertas correderas"
+   "es": "Puertas correderas",
+   "it": "Cancelli scorrevoli",
+   "pt": "Portões deslizantes",
+   "pl": "Bramy przesuwne"
   }
  }
 }

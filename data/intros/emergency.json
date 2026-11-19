@@ -6,7 +6,10 @@
   "de": "Notfall",
   "en": "Emergency",
   "fr": "Urgence",
-  "es": "Urgencia"
+  "es": "Urgencia",
+  "it": "Emergenza",
+  "pt": "Emergência",
+  "pl": "Nagły wypadek"
  },
  "map": [
   "########################################",
@@ -60,7 +63,10 @@
    "de": "Notfall",
    "en": "Emergency",
    "fr": "Urgence",
-   "es": "Urgencia"
+   "es": "Urgencia",
+   "it": "Emergenza",
+   "pt": "Emergência",
+   "pl": "Nagły wypadek"
   }
  }
 }

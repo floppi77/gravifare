@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Flow": Szenenwechsel und aktuelles Level. Levelreihenfolge = sortierte Dateinamen.
 
-const VERSION := "1.6.6"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
+const VERSION := "1.7.0"                # Spielversion (Anzeige in Speicherplatz-Bildschirm und Hauptmenü)
 const MENU := "res://src/ui/main_menu.tscn"
 const GAME := "res://src/game/game.tscn"
 var current_level := ""
@@ -43,6 +43,9 @@ var editor_skip_solve := false          # Debug: Speichern im Editor ohne Handl�
 var editor_session := ""                # Die in dieser Editorsitzung gespeicherte Fassung bleibt über den Testflug hinweg die, die das nächste Speichern ersetzt
 var editor_original := ""               # Debug: Id des mitgelieferten Levels, das der Editor gerade bearbeitet (bleibt über den Testflug erhalten)
 var editor_runs := {}                   # Geschaffte Testflüge noch nicht gespeicherter Fassungen (Entwürfe): Level-ID → {time, score, plays}; der Editor übernimmt sie beim Speichern in den Spielstand
+var career_clock := 0.0                 # Runde 85: Karriere-Uhr (Flugzeit der laufenden Karriere in Sekunden, inkl. verlorener Versuche)
+var career_splits: Array = []           # Zwischenzeiten je geschafftem Sektor: [{"sector": n, "time": s}]
+var career_full := false                # Karriere ab Level 1 begonnen: nur dann zählen Bestzeiten der Uhr
 var menu_screen := ""                   # Bildschirm, mit dem das Hauptmenü startet ("community": zurück zur Community-Liste)
 
 ## Geschafften Testflug eines Entwurfs merken (Bestzeit, Bestwert, Zahl der Flüge), bis die Fassung gespeichert wird.
@@ -118,7 +121,10 @@ func start_campaign(id: String) -> void:
 	shift = false
 	daily = false
 	Save.reset_workshop()                  # neue Karriere beginnt ohne Einbauten
-	Save.set_campaign({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}})
+	career_clock = 0.0
+	career_splits = []
+	career_full = level_ids().find(id) == 0
+	Save.set_campaign(career_fields({"level": id, "lives": lives, "fuel": entry_fuel, "credits": entry_credits, "seed": run_seed, "carry": {}}))
 	start_level(id)
 
 ## Start aus der Levelauswahl: Läuft eine Karriere, wird es ein Übungsflug (die Karriere bleibt unberührt), sonst beginnt ab hier eine neue Karriere.
@@ -221,6 +227,8 @@ func set_debug(on: bool) -> void:
 func lose_sector(sector: int) -> LevelData:
 	var first := "s%d_01" % sector
 	Save.lose_sector(sector, first, randi() % 1000000)
+	Save.data.campaign = career_fields(Save.data.campaign)      # die Karriere-Uhr läuft über das Game Over hinweg weiter
+	Save.write()
 	return LevelData.load_file(level_path(first))
 
 ## Index der laufenden Karte in der Schicht (0 = Sektor 1), -1 außerhalb einer Schicht.
@@ -253,11 +261,68 @@ func resume_campaign() -> bool:
 	entry_credits = maxf(0.0, float(c.get("credits", 0.0)))
 	carry_passenger = c.get("carry", {}) if c.get("carry", {}) is Dictionary else {}
 	run_seed = int(c.get("seed", 0))
+	career_clock = maxf(0.0, float(c.get("clock", 0.0)))
+	career_splits = c.get("splits", []) if c.get("splits", []) is Array else []
+	career_full = bool(c.get("full", false))
 	practice = false
 	shift = false
 	daily = false
 	start_level(String(c.level))
 	return true
+
+## Karriere-Uhr in den gespeicherten Karriere-Eintrag übernehmen (ohne zu schreiben): Abbruch ins Menü, verlorenes Leben oder
+## Schließen des Fensters dürfen die Zeit des laufenden Versuchs nicht zurückgeben.
+func store_clock() -> void:
+	if is_career() and not Save.campaign().is_empty():
+		Save.data.campaign["clock"] = career_clock
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and get_tree().current_scene != null and get_tree().current_scene.scene_file_path == GAME:
+		store_clock()
+		Save.write()
+
+## Felder der Karriere-Uhr an einen Karriere-Eintrag des Spielstands anhängen.
+func career_fields(c: Dictionary) -> Dictionary:
+	c["clock"] = career_clock
+	c["splits"] = career_splits.duplicate(true)
+	c["full"] = career_full
+	return c
+
+## Läuft gerade die Karriere selbst (kein Übungsflug, keine Schicht, Community, Flugschule oder Bestflug)?
+func is_career() -> bool:
+	return not (practice or shift or daily or community or in_tutorial() or not watch.is_empty() or editor_autopilot)
+
+## Zwischenzeit am Ende eines Sektors festhalten. Gibt {sector, time, best (vorherige Bestzeit, -1 ohne), total_best} zurück.
+## Bestzeiten (je Sektor die schnellste Zwischenzeit, dazu die schnellste ganze Karriere) zählen nur für Karrieren ab Level 1.
+func note_career_split(sector: int, last_sector: bool) -> Dictionary:
+	for sp in career_splits:
+		if int(sp.get("sector", 0)) == sector:
+			return {}
+	career_splits.append({"sector": sector, "time": career_clock})
+	var st: Dictionary = Save.data.stats
+	var bests: Dictionary = st.get("speed_splits", {}) if st.get("speed_splits", {}) is Dictionary else {}
+	var key := str(sector)
+	var prev := float(bests.get(key, -1.0))
+	var out := {"sector": sector, "time": career_clock, "best": prev, "total_best": -1.0}
+	if career_full and not Save.dev_session:
+		if prev < 0.0 or career_clock < prev:
+			bests[key] = career_clock
+		st["speed_splits"] = bests
+		if last_sector:
+			var tb := float(st.get("speed_total", -1.0))
+			out.total_best = tb
+			if tb < 0.0 or career_clock < tb:
+				st["speed_total"] = career_clock
+		Save.write()
+	return out
+
+## Zeit als h:mm:ss.z bzw. m:ss.z (Karriere-Uhr).
+static func clock_text(t: float) -> String:
+	var ds := int(floor(maxf(t, 0.0) * 10.0))
+	var s := ds / 10
+	if s >= 3600:
+		return "%d:%02d:%02d.%d" % [s / 3600, (s / 60) % 60, s % 60, ds % 10]
+	return "%d:%02d.%d" % [s / 60, s % 60, ds % 10]
 
 ## Community-Level: ein Level, volle Leben, voller Tank, keine Credits, Serientaxi; die Karriere bleibt unberührt (wie der Übungsflug).
 func start_community(id: String, autopilot := false) -> void:
@@ -310,11 +375,13 @@ func next_level_id() -> String:
 	return ids[i + 1] if i >= 0 and i + 1 < ids.size() else ""
 
 func to_menu() -> void:
+	var g := get_tree().current_scene
+	if g != null and g.scene_file_path == GAME:
+		store_clock()                  # Karriere-Uhr: abgebrochener Versuch zählt mit (vor dem Zurücksetzen der Modus-Schalter)
 	menu_screen = ("editor:" + return_to_editor if return_to_editor != "" else "community") if community else ("levels" if not watch.is_empty() else "")
 	watch = {}
 	return_to_editor = ""
 	editor_autopilot = false
-	var g := get_tree().current_scene
 	if shift:
 		finish_shift()                 # Schicht abgebrochen: Wertung trotzdem sichern (nicht geflogene Karten zählen 0)
 		shift = false
@@ -355,6 +422,13 @@ var _frame := 0
 func _ready() -> void:
 	community_store().game_version = VERSION
 	Save.debug = Settings.values.debug
+	if DisplayServer.get_name() != "headless":          # Runde 86: Schnee-Ebene über allen Szenen (sichtbar nur an den Schneetagen)
+		var layer := CanvasLayer.new()
+		layer.layer = 110
+		var snow := Control.new()
+		snow.set_script(load("res://src/ui/snow_view.gd"))
+		layer.add_child(snow)
+		add_child(layer)
 	for a in OS.get_cmdline_user_args():
 		if a == "--dump-input":
 			for act in ["ui_accept", "ui_cancel", "ui_up", "ui_down", "gear", "pause"]:
@@ -365,6 +439,7 @@ func _ready() -> void:
 		if a.begins_with("--lives="):         # Dev: Anzahl Leben für diesen Lauf
 			lives = int(a.substr(8))
 		if a.begins_with("--lang="):          # Dev: Sprache für diesen Lauf setzen (nicht gespeichert)
+			Settings.lang_override = a.substr(7)
 			Loc.set_language(a.substr(7))
 		if a.begins_with("--shot="):
 			_shot = a.substr(7)

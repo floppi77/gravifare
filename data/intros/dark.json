@@ -6,7 +6,10 @@
   "de": "Dunkelheit",
   "en": "Darkness",
   "fr": "Obscurité",
-  "es": "Oscuridad"
+  "es": "Oscuridad",
+  "it": "Buio",
+  "pt": "Escuridão",
+  "pl": "Ciemność"
  },
  "map": [
   "########################################",
@@ -86,7 +89,10 @@
    "de": "Dunkelheit",
    "en": "Darkness",
    "fr": "Obscurité",
-   "es": "Oscuridad"
+   "es": "Oscuridad",
+   "it": "Buio",
+   "pt": "Escuridão",
+   "pl": "Ciemność"
   }
  }
 }

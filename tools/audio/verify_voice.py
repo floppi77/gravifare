@@ -12,6 +12,7 @@ DIG = {"de": ["null", "eins", "zwei", "drei", "vier", "funf", "sechs", "sieben",
 def norm(t, lang="en"):
     t = unicodedata.normalize("NFKD", t.lower())
     t = "".join(c for c in t if not unicodedata.combining(c))
+    t = re.sub(r"\b42\b", {"de": "zweiundvierzig", "en": "forty two"}.get(lang, "42"), t).replace("forty-two", "forty two")     # Runde 86: Level 42
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     words = []
     for w in t.split():
@@ -34,11 +35,11 @@ for key, meta in sorted(manifest.items()):
     import librosa                                         # selbst einlesen: neuere PyAV-Fassungen vertragen faster-whispers Dateizugriff nicht
     audio, _ = librosa.load(f"assets/audio/voice/{key}.ogg", sr=16000, mono=True)
     segs, _ = model.transcribe(audio, language=lang, beam_size=5)
-    if lang in ("fr", "es"):
+    if lang not in ("de", "en"):
         got = " ".join(voice_lang.norm(" ".join(s.text for s in segs), lang)); want = " ".join(voice_lang.norm(meta["text"], lang))
     else:
         got = norm(" ".join(s.text for s in segs), lang); want = norm(meta["text"], lang)
-    sim = difflib.SequenceMatcher(None, got.replace(" ", ""), want.replace(" ", "")).ratio()
+    sim = difflib.SequenceMatcher(None, got.replace(" ", ""), want.replace(" ", ""), autojunk=False).ratio()
     # Alternativschreibweisen
     ok = sim >= 0.88   # kleine Schreibabweichungen der Erkennung (bitter/bitte) erlaubt
     total += 1

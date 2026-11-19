@@ -6,7 +6,10 @@
   "de": "Schwerkraftzonen",
   "en": "Gravity zones",
   "fr": "Zones de gravité",
-  "es": "Zonas de gravedad"
+  "es": "Zonas de gravedad",
+  "it": "Zone di gravità",
+  "pt": "Zonas de gravidade",
+  "pl": "Strefy grawitacji"
  },
  "map": [
   "########################################",
@@ -109,7 +112,10 @@
    "de": "Schwerkraftzonen",
    "en": "Gravity zones",
    "fr": "Zones de gravité",
-   "es": "Zonas de gravedad"
+   "es": "Zonas de gravedad",
+   "it": "Zone di gravità",
+   "pt": "Zonas de gravidade",
+   "pl": "Strefy grawitacji"
   }
  }
 }

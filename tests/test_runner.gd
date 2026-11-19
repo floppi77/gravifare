@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -486,9 +486,9 @@ func _test_languages_fr_es() -> void:
 	var loc: Node = get_root().get_node("Loc")
 	if loc.tables.is_empty():
 		loc._ready()
-	check(loc.LOCALES == ["de", "en", "fr", "es"], "Sprachen: Deutsch, Englisch, Französisch, Spanisch")
+	check(loc.LOCALES == ["de", "en", "fr", "es", "it", "pt", "pl"], "Sprachen: Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch, Polnisch (Runde 85)")
 	var tok := RegEx.create_from_string("(?<![\\w+])(LB|RB|LT|RT|Back(?! to)|Start|A|B|X|Y)(?!\\w)")
-	for lang in ["fr", "es"]:
+	for lang in ["fr", "es", "it", "pt", "pl"]:
 		var d := _read_json("res://data/i18n/%s.json" % lang)
 		var bad: Array = []
 		for k in en:
@@ -515,17 +515,22 @@ func _test_languages_fr_es() -> void:
 			var lvl := LevelData.load_file("res://data/levels/" + f)
 			if lvl.display_name("fr") == lvl.names.get("en", "x") and lvl.names.get("fr", "") == "":
 				miss.append(lvl.id)
-			elif String(lvl.names.get("fr", "")) == "" or String(lvl.names.get("es", "")) == "":
-				miss.append(lvl.id)
-	check(miss.is_empty() and names.has("TUT"), "Levelnamen auf Französisch und Spanisch (ohne Änderung der Level-Dateien) %s" % str(miss))
+			else:
+				for lg in ["fr", "es", "it", "pt", "pl"]:
+					if String(lvl.names.get(lg, "")) == "" and not miss.has(lvl.id):
+						miss.append(lvl.id)
+	for lg in ["fr", "es", "it", "pt", "pl"]:
+		if String(names.get("TUT", {}).get(lg, "")) == "":
+			miss.append("TUT/" + lg)
+	check(miss.is_empty() and names.has("TUT"), "Levelnamen in allen weiteren Sprachen (ohne Änderung der Level-Dateien) %s" % str(miss))
 	var vl := _read_json("res://data/voice_lines.json")
 	var vbad: Array = []
 	for g in vl:
 		for k in vl[g].en:
-			for lang in ["fr", "es"]:
+			for lang in ["fr", "es", "it", "pt", "pl"]:
 				if String(vl[g].get(lang, {}).get(k, "")) == "":
 					vbad.append("%s/%s/%s" % [g, lang, k])
-	check(vbad.is_empty(), "Untertitel der Sprechzeilen auf Französisch und Spanisch %s" % str(vbad.slice(0, 6)))
+	check(vbad.is_empty(), "Untertitel der Sprechzeilen in allen weiteren Sprachen %s" % str(vbad.slice(0, 6)))
 	check(loc.pick({"de": "a", "en": "b"}, "fr") == "b" and loc.pick({"de": "a"}, "es") == "a" and loc.pick(null, "fr", "x") == "x", "Fehlt eine Sprache, gilt Englisch, dann Deutsch")
 	var sfx := FileAccess.get_file_as_string("res://src/core/sfx.gd")
 	check(sfx.contains("voice/en/%s_%s.ogg"), "Fehlt eine Aufnahme, spricht die englische Stimme (Untertitel in der Sprache)")
@@ -586,6 +591,335 @@ func _ref_diag(x0: int, y0: int, x1: int, y1: int, w: int, p: float) -> PackedVe
 				run_start2 = y
 	return pts
 
+func _test_round86() -> void:
+	## Runde 86: kleine Details (nur Darstellung, Ton und Kalender – der Ablauf der Simulation bleibt gleich) und native Stimmen it/pt/pl.
+	var Cal = load("res://src/core/calendar.gd")
+	check(Cal.hat_for({"month": 11, "day": 8}) == "party" and Cal.hat_for({"month": 12, "day": 24}) == "xmas" and Cal.hat_for({"month": 12, "day": 27}) == "" and Cal.hat_for({"month": 6, "day": 1}) == "",
+		"Kalender: Partyhut am Jahrestag, Mütze 1.–26. Dezember, sonst nichts")
+	check(Cal.fireworks_for({"month": 12, "day": 31}) and Cal.fireworks_for({"month": 1, "day": 1}) and not Cal.fireworks_for({"month": 1, "day": 2}), "Kalender: Feuerwerk an Silvester und Neujahr")
+	check(Cal.snow_for({"month": 12, "day": 6}) and Cal.snow_for({"month": 12, "day": 25}) and not Cal.snow_for({"month": 12, "day": 7}) and not Cal.snow_for({"month": 1, "day": 6}),
+		"Kalender: Schnee an Nikolaus und 24.–26. Dezember")
+	check(FileAccess.get_file_as_string("res://src/core/flow.gd").contains("snow_view.gd") and ResourceLoader.exists("res://src/ui/snow_view.gd"), "Schnee liegt in einer Ebene über allen Szenen")
+	var tvs := FileAccess.get_file_as_string("res://src/game/taxi_view.gd")
+	check(tvs.contains("FACE_SHIFT_PX6 := [-5.0, -3.0, -2.0, 0.0, 2.0, 3.0, 5.0]") and tvs.contains("(u + face_dx)"), "Zubehör folgt dem Kopf in jeder Drehstufe der Mischform")
+	check(Cal.late_night_for({"hour": 2}) and Cal.late_night_for({"hour": 4}) and not Cal.late_night_for({"hour": 5}) and not Cal.late_night_for({"hour": 1}), "Kalender: Spätnacht 2–5 Uhr")
+	Cal.force_hat = "xmas"
+	Cal.force_late = 1
+	check(Cal.hat() == "xmas" and Cal.late_night(), "Debug-Menü kann Hut und Spätnacht erzwingen")
+	Cal.force_hat = "auto"
+	Cal.force_late = -1
+	var late: Dictionary = NeonSigns.late_content(NeonSigns.CONTENT["S2-11"])
+	check(not late.words.has("24H") and late.words.has("SLEEP") and late.small.has("ZZZ") and NeonSigns.CONTENT["S2-11"].small.has("24H"), "Leuchtreklame spätnachts: SLEEP/ZZZ statt 24H (Vorlage unverändert)")
+	# Besondere Fahrgäste
+	var lv42: LevelData = LevelData.load_file("res://data/levels/s4_09.json")
+	var r42 := Run.new()
+	r42.start(lv42, -1.0, 0.0, 1)
+	check(lv42.number == 42 and r42.actor != null and r42.actor.special == "42" and r42.actor.voice_key() in ["f0", "m0"], "Level 42: der erste Fahrgast spricht „42“ (Stimme f0 bzw. m0)")
+	Run.debug_floppi = true
+	var r1 := Run.new()
+	r1.start(LevelData.load_file("res://data/levels/s1_03.json"), -1.0, 0.0, 1)
+	Run.debug_floppi = false
+	check(r1.actor.special == "floppi" and r1.actor.pname == "floppi" and r1.actor.voice_key() == "m0" and r1.current_job().passenger == "floppi", "Seltener Gast: floppi mit Stimme m0 (auch im Auftrag fürs HUD)")
+	var hits := 0
+	for sd in 400:
+		var rr := Run.new()
+		rr.start(LevelData.load_file("res://data/levels/s1_03.json"), -1.0, 0.0, sd)
+		hits += int(rr.actor.special == "floppi")
+	check(hits >= 1 and hits <= 12, "Seltener Gast etwa 1 %% (%d von 400 Läufen)" % hits)
+	var rp := Run.new()
+	rp.start(LevelData.load_file("res://data/levels/s1_03.json"), -1.0, 0.0, 1)
+	check(rp.waiting_actors().size() <= 1 and rp.patience_left(rp.actor) > 0.9, "Ungeduld: Restgeduld des wartenden Fahrgasts (voll am Anfang)")
+	var run_src := FileAccess.get_file_as_string("res://src/core/run.gd")
+	check(run_src.contains("func _note_farewell") and run_src.contains("\"farewell_hard\"") and run_src.contains("_land_pen(last_vy) > 0.005"), "Abschied: harte Landung → wegrennen und schimpfen, perfekte → winken")
+	var pv := FileAccess.get_file_as_string("res://src/game/props_view.gd")
+	check(pv.contains("func _hard_view") and pv.contains("func _draw_wavers") and pv.contains("func _draw_impatience") and pv.contains("HARD_RUN := 1.9"), "Darstellung: Rennen (ohne Einfluss auf Weg und Bezahlung), Winken, Uhr bei Ungeduld")
+	var tv := FileAccess.get_file_as_string("res://src/game/taxi_view.gd")
+	check(tv.contains("func tip_coin") and tv.contains("func slosh") and tv.contains("idle_t > nap_after") and tv.contains("sector == 5") and tv.contains("sector == 8") and tv.contains("func _draw_hat"),
+		"Taxi: Münze, Kaffeetasse, Nickerchen, Sonnenbrille (Sektor 5), Stirnlampe (Sektor 8), Hut")
+	# Hupe
+	check(load("res://src/core/controls.gd").ACTIONS.has("horn") and load("res://src/core/controls.gd").REMAPPABLE.has("horn") and ResourceLoader.exists("res://assets/audio/sfx/horn.wav") and load("res://src/core/sfx.gd").NAMES.has("horn"), "Hupe: Aktion H / X, belegbar, eigener Klang")
+	var vl := _read_json("res://data/voice_lines.json")
+	var vmiss: Array = []
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		for pair in [["t0", "horn_1"], ["t0", "horn_2"], ["t0", "horn_3"], ["m0", "floppi_thanks"], ["m0", "answer_42"], ["f0", "answer_42"]]:
+			if String(vl.get(pair[0], {}).get(lang, {}).get(pair[1], "")) == "" or not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, pair[0], pair[1]]):
+				vmiss.append("%s/%s_%s" % [lang, pair[0], pair[1]])
+	check(vmiss.is_empty(), "Neue Sprechzeilen (Tankwart zur Hupe, floppi, 42) in allen sieben Sprachen, Text und Aufnahme %s" % str(vmiss))
+	# Statistik
+	var SaveS = load("res://src/core/save.gd")
+	check(is_equal_approx(SaveS.distance_km({"distance": 26000.0}), 4.0) and SaveS.coffee_cups({"play_seconds": 3600.0}) == 6, "Statistik: Strecke (Taxi 26 Einheiten ≈ 4 m) und geschätzter Kaffee")
+	var prev := TranslationServer.get_locale()
+	TranslationServer.set_locale("de")
+	var LocS = load("res://src/core/loc.gd")
+	var de_txt: String = LocS.decimal_text(1234.5, 1)
+	TranslationServer.set_locale("en")
+	var en_txt: String = LocS.decimal_text(1234.5, 1)
+	TranslationServer.set_locale(prev)
+	check(de_txt == "1.234,5" and en_txt == "1,234.5", "Zahlen: 1.234,5 bzw. 1,234.5")
+	var miss: Array = []
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		var tj := _read_json("res://data/i18n/%s.json" % lang)
+		for key in ["ACT_HORN", "STAT_DISTANCE", "STAT_COFFEE", "DEBUG_EGGS", "HELP_DEBUGEGGS", "DEBUG_EGG_HAT", "DEBUG_EGG_FLOPPI", "DEBUG_EGG_L42"]:
+			if String(tj.get(key, "")) == "":
+				miss.append(lang + "/" + key)
+	check(miss.is_empty(), "Texte der Runde 86 in allen sieben Sprachen %s" % str(miss))
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm.contains("func show_debug_eggs") and mm.contains('"debugeggs"') and mm.contains('Flow.start_selected(id)'), "Debug-Menü „Eastereggs“: alles einzeln ansehbar")
+	var sd: Dictionary = {"distance": 0.0}
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("Save.add_distance(run.sim.vel.length() * delta)") and sd.size() == 1, "Strecke wird nur im Flug gezählt")
+	# Ostern, Valentinstag, Feiertage
+	var es26: Dictionary = Cal.easter_sunday(2026)
+	var es27: Dictionary = Cal.easter_sunday(2027)
+	var es24: Dictionary = Cal.easter_sunday(2024)
+	var es25: Dictionary = Cal.easter_sunday(2025)
+	check(es26.month == 4 and es26.day == 5 and es27.month == 3 and es27.day == 28 and es24.month == 3 and es24.day == 31 and es25.month == 4 and es25.day == 20,
+		"Ostersonntag richtig berechnet (2024–2027)")
+	check(Cal.easter_for({"year": 2027, "month": 3, "day": 26}) and Cal.easter_for({"year": 2027, "month": 3, "day": 29}) and not Cal.easter_for({"year": 2027, "month": 3, "day": 25})
+		and not Cal.easter_for({"year": 2027, "month": 3, "day": 30}) and Cal.easter_for({"year": 2026, "month": 4, "day": 3}), "Ostereier von Karfreitag bis Ostermontag")
+	check(Cal.valentine_for({"month": 2, "day": 14}) and not Cal.valentine_for({"month": 2, "day": 15}), "Valentinstag am 14. Februar")
+	check(Cal.holiday_for({"month": 12, "day": 6}) == "nikolaus" and Cal.holiday_for({"month": 12, "day": 24}) == "xmas" and Cal.holiday_for({"month": 12, "day": 26}) == "xmas"
+		and Cal.holiday_for({"month": 12, "day": 31}) == "silvester" and Cal.holiday_for({"month": 2, "day": 14}) == "valentine" and Cal.holiday_for({"month": 12, "day": 27}) == "",
+		"Feiertage für die Erfolge: Nikolaus, Weihnachten 24.–26.12., Silvester, Valentinstag")
+	var EE = load("res://src/game/easter_egg.gd")
+	var no_spot: Array = []
+	var bad_spot: Array = []
+	for s in range(1, 10):
+		for i in range(1, 12):
+			var lv := LevelData.load_file("res://data/levels/s%d_%02d.json" % [s, i])
+			var sp: Dictionary = EE.spot(lv, "2027-03-28:night:" + lv.id)
+			if sp.is_empty():
+				no_spot.append(lv.id)
+				continue
+			var c: Vector2i = sp.cell
+			var p: Vector2 = sp.pos
+			if lv.cell(c.x, c.y + 1) != LevelData.SOLID or not lv.is_solid_at(p + Vector2(0, 2)) or lv.is_solid_at(p - Vector2(0, 2)) or lv.is_solid_at(p - Vector2(0, 30)):
+				bad_spot.append(lv.id)
+	check(no_spot.is_empty() and bad_spot.is_empty(), "Osterei: in jeder Karte ein Versteck auf festem Fels mit Platz für das Taxi darüber (ohne: %s, falsch: %s)" % [str(no_spot), str(bad_spot)])
+	var lv1 := LevelData.load_file("res://data/levels/s1_03.json")
+	var e1: Dictionary = EE.spot(lv1, "2027-03-28:day:s1_03")
+	var e1b: Dictionary = EE.spot(lv1, "2027-03-28:day:s1_03")
+	check(e1.pos == e1b.pos and EE.touches(e1, e1.pos + Vector2(0, -10)) and not EE.touches(e1, e1.pos + Vector2(0, -40)) and not EE.touches({}, e1.pos), "Osterei: Versteck fest je Tag und Karte, Berührung durch das Taxi")
+	var gsrc := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(gsrc.contains("not (Flow.shift or Flow.daily)") and gsrc.contains("Save.note_egg(egg_key)") and gsrc.contains("_counts()"), "Ostereier nur in Tag- und Nachtschicht, gezählt nur bei echten Flügen")
+	var sv86: Node = get_root().get_node("Save")
+	var keep86 := [sv86.data, sv86.debug, sv86.community_mode]
+	sv86.data = {"completed": {}, "stats": {}}
+	sv86.debug = false
+	sv86.community_mode = false
+	var first: bool = sv86.note_egg("2027-03-28:night:s1_03")
+	var again: bool = sv86.note_egg("2027-03-28:night:s1_03")
+	var other: bool = sv86.note_egg("2027-03-29:night:s1_03")
+	sv86.note_holiday("valentine", 2027)
+	var cnt: int = sv86.egg_count()
+	var has: bool = sv86.has_egg("2027-03-28:night:s1_03")
+	var hol: bool = sv86.data.stats.holidays.has("valentine")
+	sv86.debug = true
+	var dbg: bool = sv86.note_egg("2027-03-30:night:s1_03")
+	sv86.data = keep86[0]
+	sv86.debug = keep86[1]
+	sv86.community_mode = keep86[2]
+	check(first and not again and other and cnt == 2 and has and hol and not dbg, "Ostereier: je Tag, Schicht und Karte einmal gezählt, nicht im Debug-Modus; Feiertag gemerkt")
+	var Ach = load("res://src/core/achievements.gd")
+	var eggs := {}
+	for i in 20:
+		eggs["2027-03-28:night:k%d" % i] = true
+	var dE := {"completed": {}, "stats": {"eggs": eggs, "holidays": {"nikolaus": 2026, "valentine": 2027}}}
+	check(Ach.progress(dE, "eggs_20") == [20, 20] and Ach.progress(dE, "day_nikolaus")[0] == 1 and Ach.progress(dE, "day_valentine")[0] == 1 and Ach.progress(dE, "day_xmas")[0] == 0 and Ach.progress(dE, "day_silvester")[0] == 0,
+		"Erfolge: 20 Ostereier, an Nikolaus/Weihnachten/Silvester/Valentinstag gespielt")
+	check(Ach.goal("all_done") == Ach.LIST.size() - 1, "Erfolg „Alle Erfolge“: Ziel = alle anderen (%d)" % (Ach.LIST.size() - 1))
+	var allst := {}
+	for id in Ach.ids():
+		if id != "all_done":
+			allst[id] = "2027-01-01"
+	var dAll := {"completed": {}, "stats": {}, "achievements": allst}
+	var rAll: Dictionary = Ach.update(dAll, "2027-01-02")
+	var allst2 := allst.duplicate()
+	allst2.erase("hours_10")
+	var dMiss := {"completed": {}, "stats": {}, "achievements": allst2}
+	check(rAll.new == ["all_done"] and not Ach.reached(dMiss).has("all_done"), "Erfolg „Alle Erfolge“ erst, wenn alle anderen erreicht sind")
+	var hid_ok := true
+	for id in Ach.HIDDEN:
+		hid_ok = hid_ok and Ach.ids().has(id)
+	var am := FileAccess.get_file_as_string("res://src/ui/achievements_view.gd")
+	check(hid_ok and Ach.is_hidden("eggs_20") and not Ach.is_hidden("all_done") and am.contains("ACH_HIDDEN"), "Saison-Erfolge bleiben verdeckt, bis sie erreicht sind")
+	var miss86: Array = []
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		var tj := _read_json("res://data/i18n/%s.json" % lang)
+		for id in Ach.ids():
+			for key in ["ACH_" + String(id).to_upper(), "ACH_" + String(id).to_upper() + "_D"]:
+				if String(tj.get(key, "")) == "":
+					miss86.append(lang + "/" + key)
+		for key in ["ACH_HIDDEN", "ACH_HIDDEN_D", "MSG_EGG", "DEBUG_EGG_EASTER", "DEBUG_EGG_VALENTINE", "DEBUG_EGG_DAILY"]:
+			if String(tj.get(key, "")) == "":
+				miss86.append(lang + "/" + key)
+	check(miss86.is_empty(), "Alle Erfolge und Oster-/Valentinstexte in allen sieben Sprachen %s" % str(miss86))
+	var tv86 := FileAccess.get_file_as_string("res://src/game/taxi_view.gd")
+	var pv86 := FileAccess.get_file_as_string("res://src/game/props_view.gd")
+	check(tv86.contains("func blush") and tv86.contains("func _draw_valentine") and pv86.contains("func _draw_kisses") and pv86.contains("func _draw_egg") and gsrc.contains("props.on_kiss = taxi.blush"),
+		"Valentinstag: Kusshand, Erröten, Herz-Duftbaum, gebrochenes Herz; Osterei mit Zerplatzen")
+	check(mm.contains("Calendar.force_easter") and mm.contains("Calendar.force_valentine") and mm.contains("Flow.start_daily()"), "Debug-Menü: Ostereier und Valentinstag erzwingen, Tagschicht starten")
+
+func _test_round85() -> void:
+	## Runde 85: Strom sparen (Bildrate im Hintergrund/Menü), Mono, Schwerkraftanzeige, Karriere-Uhr, Hinweis auf neue Versionen, Sprachen it/pt/pl.
+	var st: Node = get_root().get_node("Settings")
+	var SetS = load("res://src/core/settings.gd")
+	var def: Node = SetS.new()
+	check(int(def.values.fps_background) == 30 and int(def.values.fps_menu) == 30 and def.values.mono == false and def.values.speedrun_clock == false and def.values.update_check == "ask",
+		"Neue Optionen: Hintergrund und Menü mit 30 FPS, Stereo, Speedrun-Uhr aus, Update-Suche wird erst erfragt")
+	def.free()
+	check(SetS.power_fps(0, 30, 30, true, false) == 0 and SetS.power_fps(144, 30, 30, true, false) == 144, "Im Spiel gilt die normale Begrenzung")
+	check(SetS.power_fps(0, 30, 60, false, false) == 30 and SetS.power_fps(0, 30, 60, true, true) == 60 and SetS.power_fps(0, 30, 60, false, true) == 30,
+		"Ohne Fokus gilt die Hintergrund-Stufe (auch im Menü), im Menü die Menü-Stufe")
+	check(SetS.power_fps(20, 30, 30, false, true) == 20 and SetS.power_fps(0, 0, 0, false, true) == 0, "Die Sparstufe senkt nur: ein niedrigeres FPS-Limit bleibt, „wie im Spiel“ (0) spart nichts")
+	check(SetS.FPS_STEPS == [15, 30, 60, 0], "Sparstufen 15, 30, 60, wie im Spiel")
+	var sets := FileAccess.get_file_as_string("res://src/core/settings.gd")
+	check(sets.contains("NOTIFICATION_APPLICATION_FOCUS_OUT") and sets.contains("get_tree().get_script() != null") and sets.contains("--write-movie") and sets.contains('"full_fps"'),
+		"Sparen: reagiert auf den Fokus, nie bei Messläufen, Aufnahmen und headless; Gruppe full_fps hebt die Menü-Stufe auf")
+	check(FileAccess.get_file_as_string("res://src/ui/level_editor.gd").contains('add_to_group("full_fps")'), "Der Level-Editor bleibt bei voller Bildrate")
+	check(SetS.MENU_SCENES.has("res://src/ui/main_menu.tscn") and not SetS.MENU_SCENES.has("res://src/ui/credits.tscn") and not SetS.MENU_SCENES.has("res://src/ui/finale.tscn"),
+		"Menü-Stufe in Hauptmenü & Co., nicht in Credits und Finale (Szenen mit Bewegung)")
+	# Mono
+	var old_mono: bool = st.values.mono
+	st.values.mono = true
+	st._apply_mono()
+	var mono_on := false
+	for i in AudioServer.get_bus_effect_count(0):
+		var fx := AudioServer.get_bus_effect(0, i)
+		if fx is AudioEffectStereoEnhance and is_zero_approx((fx as AudioEffectStereoEnhance).pan_pullout) and AudioServer.is_bus_effect_enabled(0, i):
+			mono_on = true
+	st.values.mono = false
+	st._apply_mono()
+	var mono_off := true
+	for i in AudioServer.get_bus_effect_count(0):
+		if AudioServer.get_bus_effect(0, i) is AudioEffectStereoEnhance and AudioServer.is_bus_effect_enabled(0, i):
+			mono_off = false
+	st.values.mono = old_mono
+	st._apply_mono()
+	check(mono_on and mono_off, "Mono: Stereo-Effekt mit pan_pullout 0 am Master-Bus, nur bei eingeschalteter Option aktiv")
+	# Schwerkraft
+	var gl: LevelData = LevelData.load_file("res://data/intros/gravity.json")
+	var zone: Dictionary = {}
+	for z in gl.zones:
+		if String(z.kind) == "gravity":
+			zone = z
+			break
+	var inside := (zone.rect as Rect2).get_center() if not zone.is_empty() else Vector2.ZERO
+	var t_on := 0.0
+	if not zone.is_empty():
+		while t_on < 30.0 and not gl.zone_active(zone, t_on):
+			t_on += 0.25
+	check(not zone.is_empty() and is_equal_approx(gl.gravity_at(inside, t_on), gl.gravity * float(zone.g)) and is_equal_approx(gl.gravity_at(Vector2(-50, -50), 0.0), gl.gravity),
+		"Schwerkraft am Ort: in der Zone Grundschwerkraft × g, außerhalb die Grundschwerkraft")
+	var s4: LevelData = LevelData.load_file("res://data/levels/s4_01.json")
+	var HudS = load("res://src/game/hud.gd")
+	check(HudS.decimal(s4.gravity / Tuning.GRAVITY, "de") == "0,9" and HudS.decimal(1.0, "en") == "1.0" and HudS.decimal(1.0, "pl") == "1,0", "Anzeige: Sektor 4 zeigt 0,9 g, Komma außer im Englischen")
+	var hud_src := FileAccess.get_file_as_string("res://src/game/hud.gd")
+	check(hud_src.contains("_draw_gravity(fr)") and hud_src.contains("_draw_career_clock()") and hud_src.contains("gravity_at(run.sim.pos"), "HUD zeichnet Schwerkraftanzeige und Karriere-Uhr")
+	# Karriere-Uhr
+	var flow: Node = get_root().get_node("Flow")
+	var FlowS = load("res://src/core/flow.gd")
+	check(FlowS.clock_text(0.0) == "0:00.0" and FlowS.clock_text(75.26) == "1:15.2" and FlowS.clock_text(3725.5) == "1:02:05.5", "Uhr: m:ss.z, ab einer Stunde h:mm:ss.z")
+	var sv: Node = get_root().get_node("Save")
+	var old_data: Dictionary = sv.data.duplicate(true)
+	var old_slot: int = sv.slot
+	var old_dev: bool = sv.dev_session
+	var old_flags := [flow.career_clock, flow.career_splits.duplicate(), flow.career_full, flow.practice, flow.shift, flow.daily, flow.community, flow.watch, flow.current_level, flow.editor_autopilot]
+	sv.slot = 0
+	sv.dev_session = false
+	sv.data = sv._default_data()
+	flow.practice = false
+	flow.shift = false
+	flow.daily = false
+	flow.community = false
+	flow.watch = {}
+	flow.editor_autopilot = false
+	flow.current_level = "s1_11"
+	check(flow.is_career(), "Karriere: Uhr läuft nur in der Karriere selbst")
+	flow.practice = true
+	check(not flow.is_career(), "Übungsflug: keine Karriere-Uhr")
+	flow.practice = false
+	flow.career_full = true
+	flow.career_splits = []
+	flow.career_clock = 600.0
+	var a: Dictionary = flow.note_career_split(1, false)
+	flow.career_clock = 640.0
+	var dup: Dictionary = flow.note_career_split(1, false)
+	check(float(a.time) == 600.0 and float(a.best) < 0.0 and dup.is_empty() and is_equal_approx(float(sv.data.stats.speed_splits["1"]), 600.0), "Zwischenzeit je Sektor einmal, erste Zeit wird Bestzeit")
+	flow.career_splits = []
+	flow.career_clock = 580.0
+	var b: Dictionary = flow.note_career_split(1, false)
+	check(is_equal_approx(float(b.best), 600.0) and is_equal_approx(float(sv.data.stats.speed_splits["1"]), 580.0), "Schnellere Zwischenzeit: Abstand zur alten Bestzeit, neue Bestzeit gespeichert")
+	flow.career_full = false
+	flow.career_splits = []
+	flow.career_clock = 100.0
+	flow.note_career_split(1, false)
+	check(is_equal_approx(float(sv.data.stats.speed_splits["1"]), 580.0), "Karriere nicht ab Level 1: zählt nicht für Bestzeiten")
+	flow.career_full = true
+	flow.career_splits = []
+	flow.career_clock = 9000.0
+	flow.note_career_split(9, true)
+	check(is_equal_approx(float(sv.data.stats.get("speed_total", -1.0)), 9000.0), "Letzter Sektor: ganze Karrierezeit als Bestzeit")
+	var c: Dictionary = flow.career_fields({"level": "s2_01"})
+	check(c.has("clock") and c.has("splits") and c.has("full") and c.level == "s2_01", "Karriere-Eintrag des Spielstands trägt Uhr, Zwischenzeiten und Herkunft")
+	sv.data = old_data
+	sv.slot = old_slot
+	sv.dev_session = old_dev
+	flow.career_clock = old_flags[0]
+	flow.career_splits = old_flags[1]
+	flow.career_full = old_flags[2]
+	flow.practice = old_flags[3]
+	flow.shift = old_flags[4]
+	flow.daily = old_flags[5]
+	flow.community = old_flags[6]
+	flow.watch = old_flags[7]
+	flow.current_level = old_flags[8]
+	flow.editor_autopilot = old_flags[9]
+	var game_src := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(game_src.contains("Flow.career_clock += delta / maxf(Engine.time_scale, 0.05)") and game_src.contains("Flow.note_career_split(run.level.sector, run.level.number >= 99)") and game_src.contains("Flow.career_fields({"),
+		"Spiel: Uhr in echter Zeit, Zwischenzeit am Sektorende, Uhr wird mit der Karriere gespeichert")
+	var flow_src := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	check(flow_src.contains("Save.data.campaign = career_fields(Save.data.campaign)"), "Game Over: die Karriere-Uhr läuft weiter")
+	var tm := flow_src.find("func to_menu()")
+	check(tm >= 0 and flow_src.find("store_clock()", tm) < flow_src.find("watch = {}", tm) and game_src.contains("Flow.store_clock()                 # Karriere-Uhr mit dem verlorenen Leben sichern") and flow_src.contains("NOTIFICATION_WM_CLOSE_REQUEST"),
+		"Abbruch ins Menü, verlorenes Leben und Schließen des Fensters sichern die Uhr (kein Zurückgewinnen von Zeit)")
+	# Neue Versionen
+	var UC = load("res://src/core/update_check.gd")
+	check(UC.is_newer("v1.6.7", "1.6.6") and UC.is_newer("v1.10.0", "1.9.9") and UC.is_newer("2.0", "1.6.6") and not UC.is_newer("v1.6.6", "1.6.6") and not UC.is_newer("v1.6.5", "1.6.6") and not UC.is_newer("kaputt", "1.6.6"),
+		"Versionsvergleich: Zahl für Zahl, unbrauchbare Angaben sind nie neuer")
+	check(UC.tag_from('{"tag_name": "v1.7.0", "draft": false, "prerelease": false}') == "v1.7.0" and UC.tag_from('{"tag_name": "v1.7.0", "prerelease": true}') == "" and UC.tag_from("<html>") == "" and UC.tag_from('{"tag_name": "nightly"}') == "",
+		"Antwort: nur echte Veröffentlichungen mit Versionsnummer zählen")
+	check(UC.pending("v1.7.0", "1.6.6") == "v1.7.0" and UC.pending("v1.6.6", "1.6.6") == "" and UC.pending("", "1.6.6") == "" and UC.plain("v1.7.0") == "1.7.0", "Gefundene Version gilt nur, solange sie neuer ist als die laufende")
+	var uc_src := FileAccess.get_file_as_string("res://src/core/update_check.gd")
+	check(uc_src.contains('update_check != "on"') and uc_src.contains("Save.dev_session") and uc_src.contains("== today") and uc_src.contains("api.github.com/repos/floppi77/gravifare/releases/latest"),
+		"Nachfrage nur mit Zustimmung, höchstens einmal am Tag, nie in Entwicklungsläufen")
+	var mm_src := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm_src.contains("OS.get_cmdline_user_args().is_empty()") and mm_src.contains("show_update_ask()") and mm_src.contains('"update_check", "on"') and mm_src.contains('"update_check", "off"'),
+		"Hauptmenü fragt einmal (nicht bei Entwicklungsaufrufen) und merkt sich die Antwort")
+	var op_src := FileAccess.get_file_as_string("res://src/ui/options_panel.gd")
+	check(op_src.contains('_fps_save("OPT_FPS_BG", "fps_background")') and op_src.contains('_fps_save("OPT_FPS_MENU", "fps_menu")') and op_src.contains('"OPT_SPEEDRUN", "speedrun_clock"') and op_src.contains("OPT_UPDATES") and op_src.contains("OPT_MONO"),
+		"Optionen: Bildrate im Hintergrund und in Menüs (Anzeige), Mono (Bedienhilfen), Speedrun-Uhr und Update-Suche (Spiel)")
+	var miss: Array = []
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		var tj := _read_json("res://data/i18n/%s.json" % lang)
+		for key in ["OPT_FPS_BG", "OPT_FPS_MENU", "OPT_FPS_AS_GAME", "OPT_AUDIO_OUT", "OPT_STEREO", "OPT_MONO", "OPT_SPEEDRUN", "OPT_UPDATES", "HUD_SPLIT", "UPDATE_AVAILABLE", "HELP_UPDATE", "UPDATE_ASK", "UPDATE_ASK_SUB", "UPDATE_YES", "UPDATE_NO", "HELP_LANG_IT", "HELP_LANG_PT", "HELP_LANG_PL"]:
+			if String(tj.get(key, "")) == "":
+				miss.append(lang + "/" + key)
+	check(miss.is_empty(), "Texte der Runde 85 in allen sieben Sprachen %s" % str(miss))
+	# Sprachen
+	check(load("res://src/core/night_shift.gd").format_stamp("2026-11-18", 9, 5, "pl") == "18.11.2026, 09:05" and load("res://src/core/night_shift.gd").format_stamp("2026-11-18", 9, 5, "it") == "18/11/2026, 09:05",
+		"Datum der Nachtschicht: Polnisch mit Punkten, Italienisch/Portugiesisch mit Schrägstrichen")
+	var mk_src := FileAccess.get_file_as_string("res://src/ui/menu_kit.gd")
+	check(mk_src.contains("flag_it.png") and mk_src.contains("flag_pt.png") and mk_src.contains("flag_pl.png") and mk_src.contains('add_theme_constant_override("separation", 5)'),
+		"Sieben Flaggen in der Sprachwahl (Spalte enger, passt in 360 Zeilen)")
+	check(7 * 26 + 6 * 5 + 74 <= 340, "Flaggenspalte endet über dem Hilfetext")
+	var cos := _read_json("res://data/cosmetics.json")
+	var cmiss := 0
+	for it in cos.items:
+		for lg in ["it", "pt", "pl"]:
+			if String(it.name.get(lg, "")) == "":
+				cmiss += 1
+	check(cmiss == 0, "Lackierungen und Aufkleber in it/pt/pl")
+
 func _test_round84() -> void:
 	## Runde 84: schräge Linien aus dem Zwischenspeicher (gleiche Bildpunkte), Autopilot plant im Bild gedrosselt, Credits als Szene.
 	var rng := RandomNumberGenerator.new()
@@ -635,7 +969,7 @@ func _test_round84() -> void:
 		fnode._ready()
 	var font: Font = fnode.hud
 	var large_k: float = get_root().get_node("Settings").TEXT_LARGE_K
-	for lg in ["de", "en", "fr", "es"]:
+	for lg in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		for big in [false, true]:
 			var fs := roundi(10.0 * (large_k if big else 1.0))
 			var cfs := roundi(11.0 * (large_k if big else 1.0))
@@ -893,10 +1227,10 @@ func _test_round80() -> void:
 	check(res.complete and absf(pl.time - float(dd.result.time)) < 0.001, "Bestflug: Aufzeichnung reproduzierbar (%.2f s)" % pl.time)
 	# Steam
 	check(SteamBridge.api_name("first_fare") == "ACH_FIRST_FARE" and (Engine.has_singleton("Steam") or SteamBridge.push(["first_fare"]) == 0), "Steam: Brücke ohne GodotSteam wirkungslos, Namen ACH_<ID>")
-	check(FileAccess.file_exists("res://docs/steam_achievements.md") and FileAccess.get_file_as_string("res://docs/steam_achievements.md").contains("ACH_HOURS_10"), "Steam: Liste der Erfolge für Steamworks (docs/steam_achievements.md)")
+	check(FileAccess.file_exists("res://docs/steam_achievements.md") and FileAccess.get_file_as_string("res://docs/steam_achievements.md").contains("ACH_HOURS_10") and FileAccess.get_file_as_string("res://docs/steam_achievements.md").contains("ACH_ALL_DONE"), "Steam: Liste der Erfolge für Steamworks (docs/steam_achievements.md)")
 	# Texte in allen Sprachen
 	var missing: Array = []
-	for lang in ["de", "en", "fr", "es"]:
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		var tj := _read_json("res://data/i18n/%s.json" % lang)
 		for key in ["OPT_COLOR_SAFE", "OPT_TEXT_LARGE", "OPT_CAT_ACCESS", "OPT_ACCESS_NOTE", "MENU_BUG", "HELP_BUG", "BUG_TITLE", "BUG_TEXT", "BUG_MAIL", "BUG_MAIL_OPENED", "BUG_MAIL_FAILED",
 				"BUG_LOGS", "BUG_LOGS_OPENED", "BUG_COPY", "BUG_COPIED", "BUG_MAIL_Q1", "BUG_MAIL_Q2", "LVL_WATCH", "WATCH_TAG", "WATCH_HINT", "WATCH_DONE"]:
@@ -908,14 +1242,14 @@ func _test_round79() -> void:
 	## Runde 79: Flugschule schaltet weiter, wenn die Aufgabe schon während der Erklärung erfüllt ist (drei Sprüche reihum, alle Sprachen).
 	var vl := _read_json("res://data/voice_lines.json")
 	var lines_ok := true
-	for lang in ["de", "en", "fr", "es"]:
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		for n in [1, 2, 3]:
 			lines_ok = lines_ok and String(vl.i0[lang].get("tut_fast_%d" % n, "")) != ""
 	var clips_ok := true
-	for lang in ["de", "en", "fr", "es"]:
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		for n in [1, 2, 3]:
 			clips_ok = clips_ok and ResourceLoader.exists("res://assets/audio/voice/%s/i0_tut_fast_%d.ogg" % [lang, n])
-	check(lines_ok and clips_ok, "Flugschule: drei „Schneller als erklärt“-Sprüche in allen vier Sprachen, gesprochen und als Untertitel")
+	check(lines_ok and clips_ok, "Flugschule: drei „Schneller als erklärt“-Sprüche in allen sieben Sprachen, gesprochen und als Untertitel")
 	var gs := GDScript.new()
 	gs.source_code = "extends Node\nvar spoken: Array = []\nvar stopped := 0\nfunc tutorial_voice_stop() -> void:\n\tstopped += 1\nfunc tutorial_speak(k: String) -> Dictionary:\n\tspoken.append(k)\n\treturn {\"len\": 2.0, \"text\": k}\n"
 	gs.reload()
@@ -1225,7 +1559,7 @@ func _test_round72() -> void:
 	check(views_ok, "Ansichten rechnen mit dem Raster 1/n (PX aus PixelDraw.px_of, keine feste Konstante)")
 	var pds := _src("res://src/game/pixel_draw.gd")
 	check(not pds.contains("* 3.0") and pds.contains("n_of(ci)"), "PixelDraw: kein festes Raster von 1/3 mehr")
-	check(_src("res://src/game/neon_signs.gd").contains("static func plan(lv: LevelData, style: Dictionary, n := 3)") and _src("res://src/game/level_style.gd").contains("_sign_n"), "Leuchtreklame wird in der Pixelgröße des Bildschirms geplant und gerastert")
+	check(_src("res://src/game/neon_signs.gd").contains("static func plan(lv: LevelData, style: Dictionary, n := 3") and _src("res://src/game/level_style.gd").contains("_sign_n"), "Leuchtreklame wird in der Pixelgröße des Bildschirms geplant und gerastert")
 	check(_src("res://src/game/landing_assist.gd").contains("PixelDraw.wsnap("), "Landeassistent: Linienbreiten auf ganzen Bildpunkten")
 	# Schritt 3: Blätter je Pixelgröße
 	var look = load("res://src/game/sector_look.gd")
@@ -3775,7 +4109,7 @@ func _test_voice_lines_complete() -> void:
 				var voices: Array = PassengerActor.VOICES_F + PassengerActor.VOICES_M if group == "passenger_extra" else [group]
 				for v in voices:
 					total += 1
-					var clip_lang: String = lang                                          # seit Runde 79 hat jede Sprache eigene Aufnahmen
+					var clip_lang: String = lang                                          # seit Runde 79 (fr/es) bzw. 85 (it/pt/pl) hat jede Sprache eigene Aufnahmen
 					if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [clip_lang, v, key]):
 						missing.append("%s/%s_%s" % [lang, v, key])
 	check(missing.is_empty() and total > 50, "Alle %d Sondersprachzeilen (Tankwart, Zentrale, Passagier-Reaktionen) haben Text und Clip %s" % [total, str(missing.slice(0, 4))])
@@ -3786,12 +4120,12 @@ func _test_passenger_voices() -> void:
 	for n in range(1, 10):
 		lines.append("dest_%d" % n)
 	var missing: Array = []
-	for lang in ["de", "en", "fr", "es"]:
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		for v in PassengerActor.VOICES_F + PassengerActor.VOICES_M:
 			for l in lines:
 				if not ResourceLoader.exists("res://assets/audio/voice/%s/%s_%s.ogg" % [lang, v, l]):
 					missing.append("%s/%s_%s" % [lang, v, l])
-	check(missing.is_empty(), "Alle 14 Fahrgaststimmen haben in allen vier Sprachen die Grundzeilen %s" % str(missing.slice(0, 4)))
+	check(missing.is_empty(), "Alle 14 Fahrgaststimmen haben in allen sieben Sprachen die Grundzeilen %s" % str(missing.slice(0, 4)))
 	var seen := {}
 	var stable := true
 	var right_gender := true
@@ -4348,10 +4682,10 @@ func _test_night_shift() -> void:
 	# Finale der Nachtschicht: Ansage je Note (gesprochen und als Untertitel), eigene Musik, Fahrer-Ablauf
 	var voice_ok := true
 	for g in ["S", "A", "B", "C", "D", "E"]:
-		for lang in ["de", "en", "fr", "es"]:
+		for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 			voice_ok = voice_ok and ResourceLoader.exists("res://assets/audio/voice/%s/d0_shift_%s.ogg" % [lang, g])
 		voice_ok = voice_ok and String(get_root().get_node("Sfx").line_text("d0", "shift_" + g)) != ""
-	check(voice_ok, "Nachtschicht-Finale: Ansage der Zentrale zu jeder Note (S–E) in allen vier Sprachen")
+	check(voice_ok, "Nachtschicht-Finale: Ansage der Zentrale zu jeder Note (S–E) in allen sieben Sprachen")
 	check(ResourceLoader.exists("res://assets/audio/music/night_A.ogg") and ResourceLoader.exists("res://assets/audio/music/night_B.ogg") and ResourceLoader.exists("res://assets/audio/music/night_C.ogg"), "Nachtschicht-Finale: eigenes Musikstück „night“ (drei Schichten)")
 	var night_len := (load("res://assets/audio/music/night_A.ogg") as AudioStream).get_length()
 	check(night_len > 50.0 and night_len < 70.0, "Nachtschicht-Finale: Musikstück dauert etwa eine Minute (%.0f s)" % night_len)
@@ -5630,7 +5964,7 @@ func _test_editor_labels_fit() -> void:
 	var old_locale := TranslationServer.get_locale()
 	var bad: Array = []
 	var rows := 0
-	for lang in ["de", "en", "fr", "es"]:
+	for lang in ["de", "en", "fr", "es", "it", "pt", "pl"]:
 		var tl := Translation.new()
 		tl.locale = lang
 		var texts := _read_json("res://data/i18n/%s.json" % lang)

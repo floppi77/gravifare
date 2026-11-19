@@ -6,7 +6,10 @@
   "de": "Magnete im Takt",
   "en": "Pulsing magnets",
   "fr": "Aimants pulsés",
-  "es": "Imanes pulsantes"
+  "es": "Imanes pulsantes",
+  "it": "Magneti pulsanti",
+  "pt": "Ímãs pulsantes",
+  "pl": "Pulsujące magnesy"
  },
  "map": [
   "########################################",
@@ -67,7 +70,10 @@
    "de": "Magnete im Takt",
    "en": "Pulsing magnets",
    "fr": "Aimants pulsés",
-   "es": "Imanes pulsantes"
+   "es": "Imanes pulsantes",
+   "it": "Magneti pulsanti",
+   "pt": "Ímãs pulsantes",
+   "pl": "Pulsujące magnesy"
   }
  }
 }

@@ -6,7 +6,10 @@
   "de": "VIP-Fahrgast",
   "en": "VIP passenger",
   "fr": "Passager VIP",
-  "es": "Pasajero VIP"
+  "es": "Pasajero VIP",
+  "it": "Passeggero VIP",
+  "pt": "Passageiro VIP",
+  "pl": "Pasażer VIP"
  },
  "map": [
   "########################################",
@@ -60,7 +63,10 @@
    "de": "VIP-Fahrgast",
    "en": "VIP passenger",
    "fr": "Passager VIP",
-   "es": "Pasajero VIP"
+   "es": "Pasajero VIP",
+   "it": "Passeggero VIP",
+   "pt": "Passageiro VIP",
+   "pl": "Pasażer VIP"
   }
  }
 }

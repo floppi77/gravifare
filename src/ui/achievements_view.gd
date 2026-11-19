@@ -174,17 +174,18 @@ func _card(r: Rect2, id: String, have: Dictionary) -> void:
 	var name_col := Color(0.95, 0.97, 1.0) if done else Color(0.62, 0.66, 0.8)
 	var right_w := 64.0
 	var g := Achievements.goal(id)
-	var desc := tr("ACH_%s_D" % id.to_upper())
+	var veiled := not done and Achievements.is_hidden(id)             # verdeckt, bis erreicht
+	var desc := tr("ACH_HIDDEN_D") if veiled else tr("ACH_%s_D" % id.to_upper())
 	if desc.contains("%d"):
 		desc = desc % g
-	canvas.draw_string(Fonts.ui, Vector2(tx, r.position.y + 14.0), tr("ACH_" + id.to_upper()), HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 36.0 - right_w, 10, name_col)
+	canvas.draw_string(Fonts.ui, Vector2(tx, r.position.y + 14.0), tr("ACH_HIDDEN") if veiled else tr("ACH_" + id.to_upper()), HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 36.0 - right_w, 10, name_col)
 	canvas.draw_string(Fonts.ui, Vector2(tx, r.position.y + 26.0), desc, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0, 7, Color(0.6, 0.65, 0.82) if done else Color(0.48, 0.52, 0.66))
 	var rx := r.end.x - 8.0
 	if done:
 		var d := _date(String(have[id]))
 		var dw := Fonts.hud.get_string_size(d, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x
 		canvas.draw_string(Fonts.hud, Vector2(rx - dw, r.position.y + 13.0), d, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(col, 0.9))
-	elif g > 1:
+	elif g > 1 and not veiled:
 		var p := Achievements.progress(data, id)
 		var txt := "%d / %d" % [p[0], p[1]]
 		var pw := Fonts.hud.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x
@@ -193,14 +194,14 @@ func _card(r: Rect2, id: String, have: Dictionary) -> void:
 		canvas.draw_rect(bar, Color(0.16, 0.18, 0.32))
 		canvas.draw_rect(Rect2(bar.position, Vector2(bar.size.x * clampf(float(p[0]) / float(p[1]), 0.0, 1.0), bar.size.y)), Color(col, 0.7))
 
-## Datum JJJJ-MM-TT in der Schreibweise der Sprache (de: TT.MM.JJJJ, fr/es: TT/MM/JJJJ, en: JJJJ-MM-TT).
+## Datum JJJJ-MM-TT in der Schreibweise der Sprache (de/pl: TT.MM.JJJJ, fr/es/it/pt: TT/MM/JJJJ, en: JJJJ-MM-TT).
 static func _date(iso: String) -> String:
 	var p := iso.split("-")
 	if p.size() != 3:
 		return iso
 	match TranslationServer.get_locale().substr(0, 2):
-		"de": return "%s.%s.%s" % [p[2], p[1], p[0]]
-		"fr", "es": return "%s/%s/%s" % [p[2], p[1], p[0]]
+		"de", "pl": return "%s.%s.%s" % [p[2], p[1], p[0]]
+		"fr", "es", "it", "pt": return "%s/%s/%s" % [p[2], p[1], p[0]]
 	return iso
 
 ## Dev (--export-ach-icons=<Ordner>): je Erfolg ACH_<ID>.png und ACH_<ID>_locked.png in 64×64 (in 256×256 gezeichnet, dann verkleinert).

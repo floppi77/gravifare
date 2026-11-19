@@ -6,7 +6,10 @@
   "de": "Hitzezonen",
   "en": "Heat zones",
   "fr": "Zones de chaleur",
-  "es": "Zonas de calor"
+  "es": "Zonas de calor",
+  "it": "Zone di calore",
+  "pt": "Zonas de calor",
+  "pl": "Strefy żaru"
  },
  "map": [
   "########################################",
@@ -77,7 +80,10 @@
    "de": "Hitzezonen",
    "en": "Heat zones",
    "fr": "Zones de chaleur",
-   "es": "Zonas de calor"
+   "es": "Zonas de calor",
+   "it": "Zone di calore",
+   "pt": "Zonas de calor",
+   "pl": "Strefy żaru"
   }
  }
 }

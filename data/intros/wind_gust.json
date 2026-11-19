@@ -6,7 +6,10 @@
   "de": "Böen",
   "en": "Gusts",
   "fr": "Rafales",
-  "es": "Ráfagas"
+  "es": "Ráfagas",
+  "it": "Raffiche",
+  "pt": "Rajadas",
+  "pl": "Podmuchy"
  },
  "map": [
   "########################################",
@@ -83,7 +86,10 @@
    "de": "Böen",
    "en": "Gusts",
    "fr": "Rafales",
-   "es": "Ráfagas"
+   "es": "Ráfagas",
+   "it": "Raffiche",
+   "pt": "Rajadas",
+   "pl": "Podmuchy"
   }
  }
 }

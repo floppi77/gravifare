@@ -6,7 +6,10 @@
   "de": "Trümmer",
   "en": "Debris",
   "fr": "Débris",
-  "es": "Escombros"
+  "es": "Escombros",
+  "it": "Detriti",
+  "pt": "Destroços",
+  "pl": "Szczątki"
  },
  "map": [
   "########################################",
@@ -82,7 +85,10 @@
    "de": "Trümmer",
    "en": "Debris",
    "fr": "Débris",
-   "es": "Escombros"
+   "es": "Escombros",
+   "it": "Detriti",
+   "pt": "Destroços",
+   "pl": "Szczątki"
   }
  }
 }

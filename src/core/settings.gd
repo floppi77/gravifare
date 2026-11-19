@@ -10,8 +10,16 @@ var values := {
 	"pad_glyphs": "auto",                  # Controllersymbole: auto (erkannt) | xbox | ps
 	"color_safe": false,                   # Farbsehschwäche: Signalfarben blau/gelb/purpurrot statt grün/gelb/rot (siehe signal_colors.gd)
 	"text_large": false,                   # Große Schrift für HUD, Untertitel, Flugschule und Einspieler
+	"fps_background": 30,                  # Runde 85: Bildrate, solange das Fenster nicht im Vordergrund ist (0 = wie im Spiel)
+	"fps_menu": 30,                        # … und in Menüs und im Pausenmenü (0 = wie im Spiel); der Level-Editor ist ausgenommen
+	"mono": false,                         # Bedienhilfe: Ton in Mono (Stereo ist Standard)
+	"speedrun_clock": false,               # Karriere-Uhr mit Zwischenzeiten je Sektor im Bild
+	"update_check": "ask",                 # Nach neuen Versionen fragen: ask (noch nicht gefragt) | on | off
+	"update_last": "",                     # Datum der letzten Nachfrage (höchstens einmal am Tag)
+	"update_seen": "",                     # zuletzt gefundene neuere Version (Anzeige auch ohne neue Nachfrage)
 }
 const TEXT_LARGE_K := 1.3                  # Faktor der großen Schrift
+var lang_override := ""                    # Dev (--lang=): Sprache dieses Laufs, wird nicht gespeichert
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -37,6 +45,11 @@ func load_settings() -> void:
 			values[k] = v
 	for k in ["master", "music", "sfx", "voice", "deadzone", "vibration"]:
 		values[k] = clampf(values[k], 0.0, 1.0)
+	for k in ["fps_background", "fps_menu"]:
+		if not (int(values[k]) in FPS_STEPS):
+			values[k] = 30
+	if not (String(values.update_check) in ["ask", "on", "off"]):
+		values.update_check = "ask"
 
 ## Atomar wie der Spielstand: erst in eine .tmp-Datei, dann umbenennen (ein Absturz beim Schreiben lässt die alte Datei stehen).
 func save_settings() -> void:
@@ -62,6 +75,8 @@ func apply() -> void:
 	Sfx.set_volume("SFX", values.sfx)
 	Sfx.set_volume("Voice", values.voice)
 	var lang: String = values.language
+	if lang_override != "":
+		lang = lang_override                       # Dev: --lang=<code> gilt für den ganzen Lauf, auch nach dem Ändern einer Option
 	if lang == "":
 		lang = Loc.system_language()
 	Loc.set_language(lang)
@@ -73,7 +88,8 @@ func apply() -> void:
 	SignalColors.safe = values.color_safe
 	for a in ["thrust_left", "thrust_right", "thrust_up", "thrust_down"]:
 		InputMap.action_set_deadzone(a, values.deadzone)
-	Engine.max_fps = int(values.fps_cap)
+	_apply_mono()
+	_apply_fps()
 	_update_fps_overlay()
 
 const DISPLAY_KEYS := ["fullscreen", "vsync"]
@@ -149,3 +165,72 @@ func _update_fps_overlay() -> void:
 func _process(_d: float) -> void:
 	if _fps_label != null and values.show_fps:
 		_fps_label.text = "%d FPS" % Engine.get_frames_per_second()
+	var m := _menu_now()
+	if m != _menu:
+		_menu = m
+		_apply_fps()
+
+# ------------------------------------------------------------------ Strom sparen (Runde 85)
+## Ruhige Bildschirme brauchen keine volle Bildrate: Hat das Fenster nicht den Fokus, gilt `fps_background`, in Menüs und im
+## Pausenmenü `fps_menu` (beide Standard 30). Das Spiel selbst, der Level-Editor, Einspieler, Credits und Finale laufen mit der
+## normalen Begrenzung (`fps_cap`). Aufnahmen (Movie Maker, feste Bildrate), Messläufe mit eigenem Hauptskript und headless
+## Läufe bleiben ungedrosselt.
+const FPS_STEPS := [15, 30, 60, 0]
+const MENU_SCENES := ["res://src/ui/main_menu.tscn", "res://src/ui/stats.tscn", "res://src/ui/achievements_view.tscn", "res://src/ui/garage.tscn"]
+var focused := true
+var _menu := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		focused = what == NOTIFICATION_APPLICATION_FOCUS_IN
+		_apply_fps()
+
+## Steht gerade ein Menü (oder das Pausenmenü) im Bild? Knoten der Gruppe "full_fps" (Level-Editor) heben es auf.
+func _menu_now() -> bool:
+	if not is_inside_tree():
+		return false
+	var sc := get_tree().current_scene
+	if sc == null:
+		return false
+	if sc.scene_file_path == "res://src/game/game.tscn":
+		return sc.get("paused") == true
+	return sc.scene_file_path in MENU_SCENES and get_tree().get_first_node_in_group("full_fps") == null
+
+## Wirksame Höchstbildrate: die kleinere aus normaler Begrenzung und Sparstufe (0 = unbegrenzt).
+static func power_fps(cap: int, background: int, menu: int, is_focused: bool, in_menu: bool) -> int:
+	var save := 0
+	if not is_focused:
+		save = background
+	elif in_menu:
+		save = menu
+	if save <= 0:
+		return cap
+	return save if cap <= 0 else mini(cap, save)
+
+func _power_save_allowed() -> bool:
+	if DisplayServer.get_name() == "headless" or not is_inside_tree() or get_tree().get_script() != null:
+		return false
+	for a in OS.get_cmdline_args():
+		if a in ["--write-movie", "--fixed-fps"] or a.begins_with("--write-movie=") or a.begins_with("--fixed-fps="):
+			return false
+	return true
+
+func _apply_fps() -> void:
+	var cap := int(values.fps_cap)
+	if _power_save_allowed():
+		cap = power_fps(cap, int(values.fps_background), int(values.fps_menu), focused, _menu)
+	if Engine.max_fps != cap:
+		Engine.max_fps = cap
+
+# ------------------------------------------------------------------ Mono (Runde 85)
+## Mono über einen Stereo-Effekt am Master-Bus: pan_pullout 0 legt beide Kanäle auf ihre Mitte (L = R).
+var _mono_fx: AudioEffectStereoEnhance
+
+func _apply_mono() -> void:
+	if _mono_fx == null:
+		_mono_fx = AudioEffectStereoEnhance.new()
+		_mono_fx.pan_pullout = 0.0
+		AudioServer.add_bus_effect(0, _mono_fx)
+	for i in AudioServer.get_bus_effect_count(0):
+		if AudioServer.get_bus_effect(0, i) == _mono_fx:
+			AudioServer.set_bus_effect_enabled(0, i, bool(values.mono))

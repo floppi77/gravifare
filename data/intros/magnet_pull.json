@@ -6,7 +6,10 @@
   "de": "Anziehende Magnete",
   "en": "Attracting magnets",
   "fr": "Aimants attractifs",
-  "es": "Imanes que atraen"
+  "es": "Imanes que atraen",
+  "it": "Magneti che attirano",
+  "pt": "Ímãs que atraem",
+  "pl": "Przyciągające magnesy"
  },
  "map": [
   "########################################",
@@ -90,7 +93,10 @@
    "de": "Anziehende Magnete",
    "en": "Attracting magnets",
    "fr": "Aimants attractifs",
-   "es": "Imanes que atraen"
+   "es": "Imanes que atraen",
+   "it": "Magneti che attirano",
+   "pt": "Ímãs que atraem",
+   "pl": "Przyciągające magnesy"
   }
  }
 }

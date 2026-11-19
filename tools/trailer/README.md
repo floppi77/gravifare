@@ -1,6 +1,6 @@
 # Trailer
 
-Der Trailer (`docs/media/trailer_de.mp4`, `trailer_en.mp4`, 1080p60, rund 76 s) entsteht vollständig aus dem echten Spiel: Der Autopilot fliegt die Level,
+Der Trailer (`docs/media/trailer_de.mp4`, `trailer_en.mp4`, 1080p60, rund 72 s; Fassung 5 aus Runde 85) entsteht vollständig aus dem echten Spiel: Der Autopilot fliegt die Level,
 Godots Movie Maker nimmt sie in 1920×1080 bei 60 Bildern pro Sekunde auf, ein Python-Kompositor schneidet, fährt die Kamera am Taxi entlang und legt Effekte darüber.
 Ton: die Schichten des Spielthemas `t14` (132 BPM), dazu synthetische Riser, Einschläge, Kicks und die Spiel-Effekte und -Stimmen an den Stellen, an denen sie im Bild passieren.
 
@@ -27,13 +27,15 @@ Ton: die Schichten des Spielthemas `t14` (132 BPM), dazu synthetische Riser, Ein
 
 Voraussetzungen: `ffmpeg`, `gamescope`, Python 3 mit `numpy`, `scipy`, `pillow`.
 
-Die Aufnahmen der aktuellen Fassung (Grafik ab 0.9.11, mit Werkstatt und Editor) liegen in `~/.cache/gravifare-trailer/clips_v3` (Umgebungsvariable `GF_TRAILER_CLIPS` wählt einen anderen Ordner; `clips_v2` und `clips` enthalten die der früheren Fassungen). Die erste Fassung des Trailers liegt lokal unter `docs/media/alt/` (nicht im Repo).
+**Fassung 5 (4K):** Alle Aufnahmen entstehen in 3840×2160 (Pixelgröße 6, die größte eigene Grafikstufe des Spiels). Dafür muss in der Aufnahmekopie `window/size/window_width_override=3840` und `window_height_override=2160` stehen – der Movie Maker nimmt sonst in der Fenstergröße des Projekts (1920×1080) auf, auch wenn `--resolution` größer ist. Der Kompositor gibt 1080p aus und zoomt höchstens 2-fach (1:1 aus der 4K-Aufnahme oder verkleinert); die Nahaufnahme mit Zoom 3 ergibt 9 Bildpunkte je Spielpixel. Tempo nur 1× oder 2× (jedes Ausgabebild ist ein echtes Aufnahmebild; früher überblendete Zwischentempi wie 0,6 oder 1,6 zwei Bilder und ruckelten). Die Zeitlupe im Finale stammt aus einer eigenen Aufnahme mit 240 Bildern je Spielsekunde (`GF_REC_FPS=240`, `rec/jobs_v5_slow.txt`). Aufnahmen: `~/.cache/gravifare-trailer/clips_v5`, Liste `rec/jobs_v5.txt`.
+
+Die Aufnahmen der Fassung 4 (Runde 85, 1080p: Mischform-Taxi, Fels je Sektor, Leuchtreklame, Zwischenflug-Hintergründe je Sektor, neue Instrumente) liegen in `~/.cache/gravifare-trailer/clips_v4`, die Aufnahmeliste in `rec/jobs_v4.txt` (44 Aufnahmen, je Sprache 13 Level ohne Bedienfeld, 3 mit Bedienfeld, 3 Zwischenflüge `trans2/5/9` in die Sektoren 2, 5 und 9, Tanken, Werkstatt, Editor). `rec_one.sh` legt für jede Aufnahme einen frischen Spielstand mit `hints=false` an, sonst zeigen die Level beim ersten Auftreten einer Gefahr den Einspieler („Neu: …“) über dem Spiel. Die Level dürfen nicht in `BOT_HAND_LEVELS` stehen (der Autopilot muss sie fliegen). Momente für die Texteinblendungen (`SPOT` in `timeline.py`) werden mit `python3 tools/trailer/sheet.py <clip> <out.png> t1 t2 …` an Kontaktbögen der Rohaufnahmen ausgesucht (die Taxi-Position aus der Spur ist markiert). Umgebungsvariable `GF_TRAILER_CLIPS` wählt einen anderen Ordner; `clips_v3`, `clips_v2` und `clips` enthalten die früheren Fassungen. Die erste Fassung des Trailers liegt lokal unter `docs/media/alt/` (nicht im Repo).
 
 ## Aufnahmekopie
 
 `tools/trailer/rec/` enthält die Teile für die Projektkopie: `ws_trailer.*` und `ed_trailer.*` (an die Wurzel der Kopie), `no_pad.gd`
 (nach `src/core/`, als letzter Autoload `NoPad` eintragen), `rec_one.sh` (eine Aufnahme, `GF_REC_SP` = Ordner, der die Kopie als `rec/` enthält)
-und `jobs.txt` (alle 38 Aufnahmen: `cat jobs.txt | xargs -P 3 -L 1 ./rec_one.sh`). Der Ordner hat eine `.gdignore`, im Projekt selbst werden die Szenen nicht geladen.
+und `jobs_v4.txt` (alle 44 Aufnahmen: `cat jobs_v4.txt | xargs -P 4 -L 1 ./rec_one.sh`; `jobs.txt` ist die Liste der Fassung 3). Der Ordner hat eine `.gdignore`, im Projekt selbst werden die Szenen nicht geladen.
 
 ## Taxi-Spur
 

@@ -6,7 +6,10 @@
   "de": "Plasmastrahlen",
   "en": "Plasma beams",
   "fr": "Rayons plasma",
-  "es": "Rayos de plasma"
+  "es": "Rayos de plasma",
+  "it": "Raggi al plasma",
+  "pt": "Raios de plasma",
+  "pl": "Wiązki plazmy"
  },
  "map": [
   "########################################",
@@ -81,7 +84,10 @@
    "de": "Plasmastrahlen",
    "en": "Plasma beams",
    "fr": "Rayons plasma",
-   "es": "Rayos de plasma"
+   "es": "Rayos de plasma",
+   "it": "Raggi al plasma",
+   "pt": "Raios de plasma",
+   "pl": "Wiązki plazmy"
   }
  }
 }

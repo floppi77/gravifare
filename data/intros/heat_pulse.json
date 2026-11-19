@@ -6,7 +6,10 @@
   "de": "Lavablasen im Takt",
   "en": "Pulsing lava",
   "fr": "Lave pulsée",
-  "es": "Lava pulsante"
+  "es": "Lava pulsante",
+  "it": "Lava pulsante",
+  "pt": "Lava pulsante",
+  "pl": "Pulsująca lawa"
  },
  "map": [
   "########################################",
@@ -80,7 +83,10 @@
    "de": "Lavablasen im Takt",
    "en": "Pulsing lava",
    "fr": "Lave pulsée",
-   "es": "Lava pulsante"
+   "es": "Lava pulsante",
+   "it": "Lava pulsante",
+   "pt": "Lava pulsante",
+   "pl": "Pulsująca lawa"
   }
  }
 }

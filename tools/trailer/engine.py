@@ -6,8 +6,20 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from scipy.ndimage import gaussian_filter1d
 
-W, H, FPS = 1920, 1080, 60
+W, H, FPS = 1920, 1080, 60          # Ausgabe
 CLIPS = None   # Ordner der Aufnahmen, setzt render.py
+UNIT = 6       # Bildpunkte je Spielpixel in der Aufnahme (4K = Pixelgröße 6); für scharfes Skalieren
+_INFO = {}
+
+
+def clip_info(clip):
+    """(Breite, Höhe, Bilder je Sekunde) einer Aufnahme (Fassung 5: 3840×2160, 60 bzw. 240 für Zeitlupen)."""
+    if clip not in _INFO:
+        out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height,r_frame_rate", "-of", "csv=p=0",
+                              f"{CLIPS}/{clip}.avi"], capture_output=True, text=True).stdout.strip().split(",")
+        num, den = out[2].split("/")
+        _INFO[clip] = (int(out[0]), int(out[1]), float(num) / float(den))
+    return _INFO[clip]
 
 
 def ease(x):
@@ -28,7 +40,8 @@ def keyframes(kf, u, default=1.0):
 
 
 class Trace:
-    def __init__(self, path, sigma=0.45):
+    def __init__(self, path, sigma=0.45, fps=FPS):
+        self.fps = fps
         rows = [l.split() for l in open(path)]
         self.f = np.array([int(r[0]) for r in rows])
         self.x = np.array([float(r[1]) for r in rows])
@@ -37,20 +50,21 @@ class Trace:
         self.vx = np.array([float(r[4]) for r in rows])
         self.vy = np.array([float(r[5]) for r in rows])
         self.hull = np.array([float(r[6]) for r in rows])
-        s = sigma * FPS
+        s = sigma * fps
         self.sx = gaussian_filter1d(self.x, s, mode="nearest")
         self.sy = gaussian_filter1d(self.y, s, mode="nearest")
 
     def at(self, t, smooth=True):
-        i = min(max(int(round(t * FPS)), 0), len(self.x) - 1)
+        i = min(max(int(round(t * self.fps)), 0), len(self.x) - 1)
         return (self.sx[i], self.sy[i]) if smooth else (self.x[i], self.y[i])
 
 
 class Source:
     """Sequentieller Leser einer Aufnahme ab Zeit t0 (Sekunden), liefert Frames per Index."""
     def __init__(self, clip, t0, span):
+        self.w, self.h, _ = clip_info(clip)
         self.cmd = ["ffmpeg", "-v", "error", "-ss", f"{t0:.4f}", "-t", f"{span:.4f}", "-i", f"{CLIPS}/{clip}.avi", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]
-        self.p = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=W * H * 3 * 4)
+        self.p = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=self.w * self.h * 3 * 2)
         self.t0 = t0
         self.cache = {}
         self.next = 0
@@ -59,10 +73,10 @@ class Source:
     def frame(self, k):
         """k = Frameindex relativ zu t0; nur nicht fallend aufrufen."""
         while self.next <= k:
-            raw = self.p.stdout.read(W * H * 3)
-            if len(raw) < W * H * 3:
+            raw = self.p.stdout.read(self.w * self.h * 3)
+            if len(raw) < self.w * self.h * 3:
                 break
-            self.last = np.frombuffer(raw, np.uint8).reshape(H, W, 3)
+            self.last = np.frombuffer(raw, np.uint8).reshape(self.h, self.w, 3)
             self.cache[self.next] = self.last
             self.next += 1
             for old in [i for i in self.cache if i < k - 2]:
@@ -84,7 +98,8 @@ class Shot:
                  bloom=0.35, ca=0.6, shake=0.0, nearest=True, sigma=0.45, trace=None, lead=0.0, fix_to=None):
         self.__dict__.update(locals())
         del self.__dict__["self"]
-        self.trace_obj = Trace(f"{CLIPS}/{trace or clip}.trace", sigma) if cam == "follow" else None
+        self.sw, self.sh, self.fps = clip_info(clip)
+        self.trace_obj = Trace(f"{CLIPS}/{trace or clip}.trace", sigma, self.fps) if cam == "follow" else None
         self.reader = None
 
     def src_time(self, u):
@@ -96,40 +111,52 @@ class Shot:
         return self.src + float(np.trapezoid([keyframes(self.speed, x) for x in us], us))
 
     def render(self, u):
+        """Bild zur Ausgabezeit u: immer ein echtes Einzelbild der Aufnahme (keine Überblendung zweier Bilder – die ruckelte),
+        Ausschnitt in Aufnahme-Bildpunkten, Zoom 1 = ganzes Bild. Skaliert wird scharf: 1:1, wenn der Ausschnitt genau so breit ist
+        wie die Ausgabe; Nächster-Nachbar, wenn ein Spielpixel ganzzahlig viele Ausgabe-Bildpunkte ergibt; sonst Flächenmittel
+        (verkleinern) bzw. bikubisch (vergrößern). Bewegt sich die Kamera, wird immer stufenlos gerechnet (ein Raster mit
+        Nächster-Nachbar ließe das Bild in Spielpixel-Schritten springen)."""
         ts = self.src_time(u)
         span = self.dur * (max(keyframes(self.speed, x) for x in np.linspace(0, self.dur, 20)) if isinstance(self.speed, (list, tuple)) else self.speed) + 1.0
         if self.reader is None:
             self.reader = Source(self.clip, self.src, span + 0.5)
-        k = (ts - self.src) * FPS
-        k0 = int(np.floor(k))
-        a = self.reader.frame(k0)
-        fr = k - k0
-        if fr > 0.02:
-            b = self.reader.frame(k0 + 1)
-            img = (a.astype(np.float32) * (1 - fr) + b.astype(np.float32) * fr).astype(np.uint8)
-        else:
-            img = a
+        k = int(round((ts - self.src) * self.fps))
+        img = self.reader.frame(k)
         z = keyframes(self.zoom, u)
-        if z > 1.0001 or self.cam == "fix" and z != 1.0:
-            cw, ch = W / z, H / z
-            if self.cam == "follow":
-                px, py = self.trace_obj.at(ts + self.lead)
-                cx = px - (self.at[0] - 0.5) * cw
-                cy = py - (self.at[1] - 0.5) * ch
-            else:
-                cx, cy = self.fix
-                if self.fix_to is not None:
-                    k = min(max(u / max(self.dur, 1e-6), 0.0), 1.0)
-                    cx, cy = cx + (self.fix_to[0] - cx) * k, cy + (self.fix_to[1] - cy) * k
-            if self.shake:
-                cx += np.sin(u * 91.0) * self.shake + np.sin(u * 57.0 + 1) * self.shake * 0.6
-                cy += np.sin(u * 83.0 + 2) * self.shake + np.sin(u * 61.0) * self.shake * 0.6
-            cx = min(max(cx, cw / 2), W - cw / 2)
-            cy = min(max(cy, ch / 2), H - ch / 2)
-            im = Image.fromarray(img).resize((W, H), Image.NEAREST if self.nearest and abs(z - round(z)) < 0.02 else Image.BICUBIC,
-                                             box=(cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2))
-            img = np.asarray(im)
-        return img
+        sw, sh = self.sw, self.sh
+        cw, ch = sw / z, sh / z
+        if self.cam == "follow":
+            px, py = self.trace_obj.at(ts + self.lead)
+            cx = px - (self.at[0] - 0.5) * cw
+            cy = py - (self.at[1] - 0.5) * ch
+        else:
+            fx, fy = self.fix[0] * sw / W, self.fix[1] * sh / H          # feste Kamera in Ausgabe-Koordinaten (1920×1080) angegeben
+            cx, cy = fx, fy
+            if self.fix_to is not None:
+                kk = min(max(u / max(self.dur, 1e-6), 0.0), 1.0)
+                cx = fx + (self.fix_to[0] * sw / W - fx) * kk
+                cy = fy + (self.fix_to[1] * sh / H - fy) * kk
+        if self.shake:
+            cx += np.sin(u * 91.0) * self.shake + np.sin(u * 57.0 + 1) * self.shake * 0.6
+            cy += np.sin(u * 83.0 + 2) * self.shake + np.sin(u * 61.0) * self.shake * 0.6
+        cx = min(max(cx, cw / 2), sw - cw / 2)
+        cy = min(max(cy, ch / 2), sh - ch / 2)
+        x0, y0 = cx - cw / 2, cy - ch / 2
+        scale = W / cw
+        if abs(scale - 1.0) < 1e-3:
+            xi, yi = int(round(x0)), int(round(y0))
+            return np.ascontiguousarray(img[yi:yi + H, xi:xi + W])
+        unit = UNIT * scale * (3840.0 / sw)
+        still_cam = self.cam == "fix" and self.fix_to is None and not isinstance(self.zoom, (list, tuple)) and not self.shake
+        if self.nearest and still_cam and abs(unit - round(unit)) < 0.03 and scale > 1.0:
+            xi, yi = int(round(x0 / UNIT)) * UNIT, int(round(y0 / UNIT)) * UNIT    # ruhende Kamera: Spielpixel auf ganze Ausgabe-Bildpunkte
+            box = (xi, yi, xi + int(round(cw)), yi + int(round(ch)))
+            flt = Image.NEAREST
+        else:
+            box = (x0, y0, x0 + cw, y0 + ch)
+            flt = Image.BOX if scale < 1.0 else Image.BICUBIC
+        im = Image.fromarray(img).resize((W, H), flt, box=box)
+        return np.asarray(im)
 
     def close(self):
         if self.reader:

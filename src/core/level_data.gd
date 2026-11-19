@@ -398,6 +398,14 @@ func zone_k(z: Dictionary, t: float) -> float:
 	var amp := smoothstep(0.0, 0.12, c.y) * (1.0 - smoothstep(0.88, 1.0, c.y))
 	return float(z.k) * (1.0 if int(c.x) == 0 else -1.0) * amp
 
+## Runde 85: Schwerkraft (px/s²) am Ort p zur Zeit t: Grundschwerkraft samt aktiver Schwerkraftzonen (für die Anzeige im HUD).
+func gravity_at(p: Vector2, t: float) -> float:
+	var g := gravity
+	for z in zones:
+		if String(z.kind) == "gravity" and (z.rect as Rect2).has_point(p) and zone_active(z, t):
+			g += (float(z.g) - 1.0) * gravity
+	return g
+
 ## Zusätzliche Beschleunigung (px/s²) durch Zonen am Ort p zur Zeit t.
 func zone_accel(p: Vector2, t: float) -> Vector2:
 	var a := Vector2.ZERO

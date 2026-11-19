@@ -4,6 +4,12 @@ extends Control
 const Stage := preload("res://src/core/stage.gd")
 const CommunitySelect := preload("res://src/ui/community_select.gd")
 const LevelEditor := preload("res://src/ui/level_editor.gd")
+const UpdateCheck := preload("res://src/core/update_check.gd")
+const Calendar := preload("res://src/core/calendar.gd")
+const TaxiView := preload("res://src/game/taxi_view.gd")
+static var update_asked := false          # Runde 85: Frage nach der Update-Suche höchstens einmal je Programmstart
+var update_btn: Button
+var update_node: Node
 
 var box: VBoxContainer
 var stage: Control
@@ -17,7 +23,7 @@ var bug_btn: Button = null          # „Bug melden“ unten rechts (nur im Haup
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
 const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_COMMUNITY",
-	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN"]
+	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_DEBUGEGGS", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN", "HELP_LANG_FR", "HELP_LANG_ES", "HELP_LANG_IT", "HELP_LANG_PT", "HELP_LANG_PL", "HELP_UPDATE"]
 
 func _ready() -> void:
 	preload("res://src/ui/ach_toast.gd").flush(get_tree())          # anstehende Erfolge (z. B. rückwirkend beim ersten Start)
@@ -88,6 +94,8 @@ func _ready() -> void:
 		show_bug()
 	elif OS.get_cmdline_user_args().has("--confirm"):   # Dev: die Nachfrage „Neues Spiel“ zeigen
 		show_new_confirm(func(): pass)
+	elif OS.get_cmdline_user_args().has("--update-ask"):   # Dev: die Frage nach der Update-Suche zeigen (Runde 85)
+		show_update_ask()
 	else:
 		show_main()
 
@@ -107,6 +115,9 @@ func _clear() -> void:
 	if bug_btn != null and is_instance_valid(bug_btn):
 		bug_btn.queue_free()
 	bug_btn = null
+	if update_btn != null and is_instance_valid(update_btn):
+		update_btn.queue_free()
+	update_btn = null
 	help.text = ""
 
 ## Fokus setzen: auf die Flagge der gewählten Sprache (nach einem Sprachwechsel), auf den zuletzt geöffneten Menüpunkt (`restore`, nach „Zurück“),
@@ -264,18 +275,21 @@ func show_main(focus_lang := "") -> void:
 			show_main()
 		var lb := _menu_button(tr("DEBUG_LEAVE"), "debug", leave, true)
 		var fb := _menu_button(tr("DEBUG_TAXI3D") % ("3D" if Cosmetics.taxi_3d else "2D"), "debug3d", flip, true)
+		var eb := _menu_button(tr("DEBUG_EGGS"), "debugeggs", show_debug_eggs, true)
 		drow.add_child(lb)
 		drow.add_child(fb)
-		_link_debug_row.call_deferred(quit_btn, lb, fb)
+		drow.add_child(eb)
+		_link_debug_row.call_deferred(quit_btn, lb, fb, eb)
 		box.add_child(drow)
 	# Sprachwahl: zwei Flaggen ohne Text untereinander links neben dem Menü (Auf/Ab wechselt, Rechts führt ins Menü, Links aus dem Menü zu den Flaggen)
 	flags_col = MenuKit.flag_column(func(code): show_main(code))
-	flags_col.position = Vector2(14, 138)
+	flags_col.position = Vector2(14, 74)                 # sieben Flaggen, senkrecht mittig neben dem Menü
 	stage.add_child(flags_col)
 	for fb in flags_col.get_children():
 		_bind_help(fb)
 	_focus_first(focus_lang, true)
 	_slide_in()
+	_update_flow.call_deferred()
 
 ## Links/Rechts innerhalb einer Zeile fest verdrahten: Die automatische Suche überspringt ausgegraute Knöpfe, Tagesflug und Nachtschicht (beide gesperrt) waren so nur von
 ## oben oder unten erreichbar.
@@ -303,18 +317,77 @@ func _equalize_grid(grid: GridContainer, extras: Array = []) -> void:
 			(extra as Control).custom_minimum_size.x = w            # so breit wie eine Spalte, mittig unter dem Gitter
 
 ## Debug-Zeile unter „Beenden“ fest verdrahten: Die automatische Suche fand sie mit Controller/Pfeiltasten nicht (Runde 82).
-func _link_debug_row(quit_btn: Control, lb: Control, fb: Control) -> void:
-	if not (is_instance_valid(quit_btn) and is_instance_valid(lb) and is_instance_valid(fb)):
+func _link_debug_row(quit_btn: Control, lb: Control, fb: Control, eb: Control) -> void:
+	if not (is_instance_valid(quit_btn) and is_instance_valid(lb) and is_instance_valid(fb) and is_instance_valid(eb)):
 		return
 	quit_btn.focus_neighbor_bottom = quit_btn.get_path_to(lb)
-	for b in [lb, fb]:
+	for b in [lb, fb, eb]:
 		b.focus_neighbor_top = b.get_path_to(quit_btn)
 		b.focus_neighbor_bottom = b.get_path_to(b)
 	lb.focus_neighbor_right = lb.get_path_to(fb)
 	fb.focus_neighbor_left = fb.get_path_to(lb)
+	fb.focus_neighbor_right = fb.get_path_to(eb)
+	eb.focus_neighbor_left = eb.get_path_to(fb)
 	lb.focus_neighbor_left = lb.get_path_to(lb)
 	if bug_btn != null and is_instance_valid(bug_btn):
-		fb.focus_neighbor_right = fb.get_path_to(bug_btn)
+		eb.focus_neighbor_right = eb.get_path_to(bug_btn)
+
+## Runde 86 (nur Debug): Eastereggs zum Ansehen – Hut, Feuerwerk, Spätnacht-Leuchtreklame, Schnee, Ostereier, Valentinstag, seltener Gast, schnelles Nickerchen
+## erzwingen (gilt bis zum Spielende) und passende Level direkt starten (Übungsflug, wenn eine Karriere läuft).
+func show_debug_eggs() -> void:
+	_clear()
+	_pin_top(true)
+	box.add_child(MenuKit.screen_title(tr("DEBUG_EGGS"), 20))
+	var grid := GridContainer.new()                          # zwei Spalten, damit alles auf einen Bildschirm passt
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 4)
+	box.add_child(grid)
+	var hats := ["auto", "none", "party", "xmas"]
+	var hat_names := {"auto": "DEBUG_EGG_AUTO", "none": "OFF", "party": "DEBUG_EGG_PARTY", "xmas": "DEBUG_EGG_XMAS"}
+	var hb := MenuKit.button("", func(): pass)
+	var hr := func(): hb.text = tr("DEBUG_EGG_HAT") + ": " + tr(hat_names[Calendar.force_hat])
+	hr.call()
+	hb.pressed.connect(func():
+		Calendar.force_hat = hats[(hats.find(Calendar.force_hat) + 1) % hats.size()]
+		hr.call())
+	grid.add_child(hb)
+	var tri := func(key: String, getter: Callable, setter: Callable) -> Button:
+		var b := MenuKit.button("", func(): pass)
+		var r := func():
+			var v: int = getter.call()
+			b.text = tr(key) + ": " + (tr("DEBUG_EGG_AUTO") if v < 0 else tr("ON" if v == 1 else "OFF"))
+		r.call()
+		b.pressed.connect(func():
+			var v: int = getter.call()
+			setter.call(0 if v < 0 else (1 if v == 0 else -1))
+			r.call())
+		return b
+	grid.add_child(tri.call("DEBUG_EGG_FIREWORKS", func(): return Calendar.force_fireworks, func(v): Calendar.force_fireworks = v))
+	grid.add_child(tri.call("DEBUG_EGG_LATE", func(): return Calendar.force_late, func(v): Calendar.force_late = v))
+	grid.add_child(tri.call("DEBUG_EGG_SNOW", func(): return Calendar.force_snow, func(v): Calendar.force_snow = v))
+	grid.add_child(tri.call("DEBUG_EGG_EASTER", func(): return Calendar.force_easter, func(v): Calendar.force_easter = v))
+	grid.add_child(tri.call("DEBUG_EGG_VALENTINE", func(): return Calendar.force_valentine, func(v): Calendar.force_valentine = v))
+	var fl := MenuKit.button("", func(): pass)
+	var flr := func(): fl.text = tr("DEBUG_EGG_FLOPPI") + ": " + tr("ON" if Run.debug_floppi else "OFF")
+	flr.call()
+	fl.pressed.connect(func():
+		Run.debug_floppi = not Run.debug_floppi
+		flr.call())
+	grid.add_child(fl)
+	var nb := MenuKit.button("", func(): pass)
+	var nr := func(): nb.text = tr("DEBUG_EGG_NAP") + ": " + tr("ON" if TaxiView.nap_after < 5.0 else "OFF")
+	nr.call()
+	nb.pressed.connect(func():
+		TaxiView.nap_after = 9.0 if TaxiView.nap_after < 5.0 else 2.0
+		nr.call())
+	grid.add_child(nb)
+	for entry in [["DEBUG_EGG_L42", "s4_09"], ["DEBUG_EGG_S5", "s5_01"], ["DEBUG_EGG_S8", "s8_01"], ["DEBUG_EGG_NEON", "s2_11"]]:
+		var id: String = entry[1]
+		grid.add_child(MenuKit.button(tr(entry[0]), func(): Flow.start_selected(id)))
+	grid.add_child(MenuKit.button(tr("DEBUG_EGG_DAILY"), func(): Flow.start_daily()))
+	box.add_child(MenuKit.button(tr("MENU_BACK"), show_main))
+	_focus_first()
 
 ## „Bug melden“ rechtsbündig über der Versionsangabe; Fokuswege von „Beenden“ und „Ko-fi“ (Rechts) und zurück (Links/Hoch).
 func _place_bug_button(grid: GridContainer, quit_btn: Control) -> void:
@@ -455,6 +528,62 @@ func show_slots() -> void:
 		preload("res://src/ui/ach_toast.gd").flush(get_tree())
 	ss.back = show_main if Save.slot != 0 else Callable()
 	_show_screen(ss)
+
+# ------------------------------------------------------------------ Runde 85: neue Versionen
+## Einmal fragen (nur echte Starts, keine Entwicklungsaufrufe), sonst bei Zustimmung nachsehen und einen gefundenen Hinweis zeigen.
+func _update_flow() -> void:
+	if not is_inside_tree() or not box.visible:
+		return
+	if Settings.values.update_check == "ask":
+		if not update_asked and not Save.dev_session and OS.get_cmdline_user_args().is_empty() and DisplayServer.get_name() != "headless":
+			update_asked = true
+			show_update_ask()
+		return
+	_show_update_button(UpdateCheck.pending(String(Settings.values.update_seen), Flow.VERSION))
+	if update_node == null:
+		update_node = UpdateCheck.new()
+		add_child(update_node)
+		update_node.found.connect(_show_update_button)
+	update_node.check(Daily.today())
+
+## Knopf „Version x verfügbar“ oben rechts; öffnet die Projektseite. Per Gamepad über „Bug melden“ (Hoch) erreichbar.
+func _show_update_button(ver: String) -> void:
+	if ver == "" or not is_instance_valid(bug_btn) or not box.visible:
+		return
+	if update_btn != null and is_instance_valid(update_btn):
+		update_btn.queue_free()
+	update_btn = _menu_button(tr("UPDATE_AVAILABLE") % UpdateCheck.plain(ver), "update", func(): OS.shell_open(UpdateCheck.PAGE_URL), true)
+	update_btn.add_theme_color_override("font_color", Color("#5dff9a"))
+	stage.add_child(update_btn)
+	var sz := update_btn.get_combined_minimum_size()
+	update_btn.size = sz
+	update_btn.position = Vector2(640.0 - 6.0 - sz.x, 6.0)
+	bug_btn.focus_neighbor_top = bug_btn.get_path_to(update_btn)
+	update_btn.focus_neighbor_bottom = update_btn.get_path_to(bug_btn)
+	update_btn.focus_neighbor_left = update_btn.get_path_to(bug_btn)
+	update_btn.focus_neighbor_top = update_btn.get_path_to(update_btn)
+	update_btn.focus_neighbor_right = update_btn.get_path_to(update_btn)
+
+## Beim ersten Start: Darf das Spiel nach neuen Versionen sehen? (Antwort jederzeit in Optionen › Spiel änderbar.)
+func show_update_ask() -> void:
+	_clear()
+	_pin_top(true)
+	_header()
+	box.add_child(MenuKit.title(tr("UPDATE_ASK")))
+	var sub := Label.new()
+	sub.text = tr("UPDATE_ASK_SUB")
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.custom_minimum_size = Vector2(240, 0)
+	sub.add_theme_font_size_override("font_size", 8)
+	box.add_child(sub)
+	box.add_child(MenuKit.button(tr("UPDATE_YES"), func():
+		Settings.set_value("update_check", "on")
+		show_main()))
+	box.add_child(MenuKit.button(tr("UPDATE_NO"), func():
+		Settings.set_value("update_check", "off")
+		show_main()))
+	_focus_first()
 
 ## Neues Spiel bei laufender Karriere: erst nachfragen, der Fortschritt des Laufs geht sonst verloren.
 func show_new_confirm(start: Callable) -> void:

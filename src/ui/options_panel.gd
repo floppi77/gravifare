@@ -45,6 +45,7 @@ func _fit_buttons() -> void:
 
 func _focus() -> void:
 	_fit_buttons()
+	add_theme_constant_override("separation", 1 if get_child_count() > 8 else 4)     # lange Seiten (Anzeige, Runde 85) enger, damit das Logo im Bild bleibt
 	await get_tree().process_frame
 	for c in find_children("*", "Button", true, false):
 		c.grab_focus()
@@ -130,10 +131,25 @@ func show_display() -> void:
 		Settings.set_value("fps_cap", steps[(i + 1) % steps.size()])
 		fr.call())
 	add_child(fps)
+	add_child(_fps_save("OPT_FPS_BG", "fps_background"))
+	add_child(_fps_save("OPT_FPS_MENU", "fps_menu"))
 	add_child(_toggle("OPT_SHOW_FPS", "show_fps"))
 	add_child(_toggle("OPT_REDUCE", "reduce_motion"))
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
+
+## Runde 85: Sparstufe der Bildrate (Hintergrund bzw. Menüs) reihum 15 → 30 → 60 → wie im Spiel.
+func _fps_save(label_key: String, setting: String) -> Button:
+	var b := MenuKit.button("", func(): pass)
+	var refresh := func():
+		var v := int(Settings.values[setting])
+		b.text = tr(label_key) + ": " + (tr("OPT_FPS_AS_GAME") if v <= 0 else str(v))
+	refresh.call()
+	b.pressed.connect(func():
+		var steps: Array = Settings.FPS_STEPS
+		Settings.set_value(setting, steps[(steps.find(int(Settings.values[setting])) + 1) % steps.size()])
+		refresh.call())
+	return b
 
 ## Bedienhilfen: Farbtafel für Farbsehschwäche (SignalColors) und große Schrift (HUD, Untertitel, Flugschule, Einspieler).
 func show_access() -> void:
@@ -142,6 +158,13 @@ func show_access() -> void:
 	add_child(MenuKit.screen_title(tr("OPT_CAT_ACCESS"), 20))
 	add_child(_toggle("OPT_COLOR_SAFE", "color_safe"))
 	add_child(_toggle("OPT_TEXT_LARGE", "text_large"))
+	var mono := MenuKit.button("", func(): pass)
+	var mr := func(): mono.text = tr("OPT_AUDIO_OUT") + ": " + tr("OPT_MONO" if Settings.values.mono else "OPT_STEREO")
+	mr.call()
+	mono.pressed.connect(func():
+		Settings.set_value("mono", not Settings.values.mono)
+		mr.call())
+	add_child(mono)
 	var note := Label.new()
 	note.text = tr("OPT_ACCESS_NOTE")
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -173,6 +196,14 @@ func show_game() -> void:
 	add_child(_toggle("OPT_HINTS", "hints"))
 	add_child(_toggle("OPT_ASSIST", "landing_assist"))
 	add_child(_toggle("OPT_GHOST", "ghost"))
+	add_child(_toggle("OPT_SPEEDRUN", "speedrun_clock"))
+	var upd := MenuKit.button("", func(): pass)
+	var ur := func(): upd.text = tr("OPT_UPDATES") + ": " + tr("ON" if Settings.values.update_check == "on" else "OFF")
+	ur.call()
+	upd.pressed.connect(func():
+		Settings.set_value("update_check", "off" if Settings.values.update_check == "on" else "on")
+		ur.call())
+	add_child(upd)
 	add_child(MenuKit.button(tr("MENU_BACK"), show_root))
 	_focus()
 
@@ -197,6 +228,13 @@ func show_bindings() -> void:
 		l.add_theme_color_override("font_color", Color("#a9b8ff"))
 		head.add_child(l)
 	add_child(head)
+	var th := MenuKit.make_theme()
+	var flat := {}
+	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+		var sb := th.get_stylebox(st, "Button").duplicate() as StyleBox
+		sb.content_margin_top = 1.0
+		sb.content_margin_bottom = 1.0
+		flat[st] = sb
 	for action in Controls.REMAPPABLE:
 		var row := HBoxContainer.new()
 		row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -209,9 +247,11 @@ func show_bindings() -> void:
 			var kind: String = cell[0]
 			var slot: int = cell[1]
 			var b := Button.new()
-			b.custom_minimum_size = Vector2(62, 16)
+			b.custom_minimum_size = Vector2(62, 13)
 			b.focus_mode = Control.FOCUS_ALL
 			b.add_theme_font_size_override("font_size", 8)
+			for st in ["normal", "hover", "pressed", "focus", "disabled"]:          # Runde 86: acht Zeilen (Hupe) – flachere Knöpfe im Menüstil
+				b.add_theme_stylebox_override(st, flat[st])
 			b.text = Controls.slot_label(action, kind, slot)
 			b.pressed.connect(func():
 				listen = {"action": action, "kind": kind, "slot": slot, "btn": b}

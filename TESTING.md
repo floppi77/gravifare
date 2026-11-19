@@ -10,7 +10,11 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Version 1.6.6, Runde 84, 2026-11-18):** 3975 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Runde 86, 2026-11-19):** 4101 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+
+- **Runde 86:** Eastereggs (`_test_round86`; Einzelheiten absichtlich nicht dokumentiert). Die Stimmtests verlangen jetzt in allen sieben Sprachen eigene Aufnahmen (native Sprachausgabe it/pt/pl aus Runde 85).
+
+- **Runde 85:** Sparstufen der Bildrate (`power_fps`, nie bei Messläufen/Aufnahmen), Mono am Master-Bus, Schwerkraft am Ort samt Zonen und Anzeige mit Komma, Karriere-Uhr (nur Karriere, Zwischenzeit einmal je Sektor, Bestzeiten nur ab Level 1, Uhr bei Abbruch/Absturz/Schließen gesichert), Versionsvergleich und Antwort der Update-Abfrage, Texte in sieben Sprachen (`_test_round85`); alle Sprachtests prüfen jetzt de/en/fr/es/it/pt/pl. Ansicht: `--update-ask`, `--debug-split`, `--lang=pl --options=display`.
 
 - **Runde 84:** schräge Linien aus dem Zwischenspeicher gleich dem Bresenham Punkt für Punkt, Linienzug in einem Aufruf, Autopilot-Drosselung nur im Bild, Credits-Szene (jeder Eintrag wird gezeigt, Schilder passen in vier Sprachen, mit großer Schrift und Ultrawide, Lackierung und Richtung wechseln, flache Bahn in der Mitte) (`_test_round84`). Ansicht: `--scene=credits --credits-t=62` (Bild mit `--fixed-fps 60 --shot=out.png --frames=20`). Zeitmessung je Level: `tools/perf/frame_bench.gd` (siehe dort).
 - **Runden 81–83:** Mischform des Taxis für alle Lackierungen (`_test_round81`), Flugschule und Debug-Zeile (`_test_round82`), Leuchten der nächsten Plattform im Dunkeln und Abrechnung im Nachtschicht-Ergebnis (`_test_round83`). Ansicht: `--shift --debug-complete` (Abrechnung), `--taxi2d` (altes Taxi zum Vergleich). Zeichenzeit messen: `--shift --shift-map=4 --no-brief --profile-draw` (gibt „draw n=… zones=…us“ aus).

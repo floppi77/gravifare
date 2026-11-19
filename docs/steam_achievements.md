@@ -13,7 +13,7 @@ Stand: Runde 80 (2026-11-18). Ein Steam-Auftritt ist **nicht** geplant; dies ist
 ## Für einen späteren Steam-Release
 
 1. GodotSteam (GDExtension, passend zu Godot 4.7) als Addon einbinden; Lizenz MIT – in THIRD_PARTY_LICENSES.md aufnehmen.
-2. In Steamworks die 26 Erfolge mit den API-Namen unten anlegen (Name/Beschreibung DE und EN; FR/ES stehen in `data/i18n/fr.json`/`es.json`).
+2. In Steamworks die 32 Erfolge mit den API-Namen unten anlegen (Name/Beschreibung DE und EN; FR/ES stehen in `data/i18n/fr.json`/`es.json`).
 3. Symbole hochladen: `docs/steam/icons/` (64×64 PNG, erreicht und gesperrt). Neu erzeugen mit
    `godot --path . -- --scene=achievements_view --export-ach-icons=<Ordner>` (braucht ein Fenster bzw. `gamescope --backend headless`).
 4. `steam_appid.txt` nur für lokale Tests neben die ausführbare Datei legen (nicht ausliefern).
@@ -48,3 +48,9 @@ Stand: Runde 80 (2026-11-18). Ein Steam-Auftritt ist **nicht** geplant; dies ist
 | `ACH_CRASHES_50` | Stehaufmännchen | Bounce back | Survive 50 crashes | `icons/ACH_CRASHES_50.png`, `icons/ACH_CRASHES_50_locked.png` |
 | `ACH_COMMUNITY` | Gemeinschaftsgeist | Community spirit | Complete a community level | `icons/ACH_COMMUNITY.png`, `icons/ACH_COMMUNITY_locked.png` |
 | `ACH_HOURS_10` | Dauerschicht | Long haul | Play for 10 hours | `icons/ACH_HOURS_10.png`, `icons/ACH_HOURS_10_locked.png` |
+| `ACH_EGGS_20` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_EGGS_20` / `ACH_EGGS_20_D` in `data/i18n` | `icons/ACH_EGGS_20.png`, `icons/ACH_EGGS_20_locked.png` |
+| `ACH_DAY_NIKOLAUS` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_NIKOLAUS` / `ACH_DAY_NIKOLAUS_D` in `data/i18n` | `icons/ACH_DAY_NIKOLAUS.png`, `icons/ACH_DAY_NIKOLAUS_locked.png` |
+| `ACH_DAY_XMAS` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_XMAS` / `ACH_DAY_XMAS_D` in `data/i18n` | `icons/ACH_DAY_XMAS.png`, `icons/ACH_DAY_XMAS_locked.png` |
+| `ACH_DAY_SILVESTER` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_SILVESTER` / `ACH_DAY_SILVESTER_D` in `data/i18n` | `icons/ACH_DAY_SILVESTER.png`, `icons/ACH_DAY_SILVESTER_locked.png` |
+| `ACH_DAY_VALENTINE` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_VALENTINE` / `ACH_DAY_VALENTINE_D` in `data/i18n` | `icons/ACH_DAY_VALENTINE.png`, `icons/ACH_DAY_VALENTINE_locked.png` |
+| `ACH_ALL_DONE` | Taxi-Ikone | Taxi icon | Unlock all 31 other achievements | `icons/ACH_ALL_DONE.png`, `icons/ACH_ALL_DONE_locked.png` |

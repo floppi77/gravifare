@@ -6,7 +6,10 @@
   "de": "Krankentransport",
   "en": "Medical transport",
   "fr": "Transport médical",
-  "es": "Transporte médico"
+  "es": "Transporte médico",
+  "it": "Trasporto medico",
+  "pt": "Transporte médico",
+  "pl": "Transport medyczny"
  },
  "map": [
   "########################################",
@@ -61,7 +64,10 @@
    "de": "Krankentransport",
    "en": "Medical transport",
    "fr": "Transport médical",
-   "es": "Transporte médico"
+   "es": "Transporte médico",
+   "it": "Trasporto medico",
+   "pt": "Transporte médico",
+   "pl": "Transport medyczny"
   }
  }
 }

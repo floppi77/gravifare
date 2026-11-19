@@ -161,12 +161,14 @@ static func flag_button(tex: Texture2D, selected: bool, tip: String, cb: Callabl
 	b.focus_entered.connect(func(): Sfx.play("ui_move", -6.0))
 	return b
 
-## Die Sprach-Flaggenknöpfe (de, en, fr, es); Meta "lang" = Sprachcode, "help" = Schlüssel des Hilfetexts im Hauptmenü.
+## Die Sprach-Flaggenknöpfe (de, en, fr, es, it, pt, pl); Meta "lang" = Sprachcode, "help" = Schlüssel des Hilfetexts im Hauptmenü.
 static func _flag_buttons(on_select: Callable) -> Array:
 	var out: Array = []
 	var cur := TranslationServer.get_locale().substr(0, 2)
 	for entry in [["de", "res://assets/art/flag_de.png", "Deutsch", "HELP_LANG_DE"], ["en", "res://assets/art/flag_en.png", "English", "HELP_LANG_EN"],
-			["fr", "res://assets/art/flag_fr.png", "Français", "HELP_LANG_FR"], ["es", "res://assets/art/flag_es.png", "Español", "HELP_LANG_ES"]]:
+			["fr", "res://assets/art/flag_fr.png", "Français", "HELP_LANG_FR"], ["es", "res://assets/art/flag_es.png", "Español", "HELP_LANG_ES"],
+			["it", "res://assets/art/flag_it.png", "Italiano", "HELP_LANG_IT"], ["pt", "res://assets/art/flag_pt.png", "Português", "HELP_LANG_PT"],
+			["pl", "res://assets/art/flag_pl.png", "Polski", "HELP_LANG_PL"]]:
 		var code: String = entry[0]
 		var fb := flag_button(load(entry[1]), cur == code, entry[2], func():
 			Settings.set_value("language", code)
@@ -203,7 +205,7 @@ static func flag_row(on_select: Callable) -> HBoxContainer:
 ## Sprachwahl als Spalte (Hauptmenü, links neben dem Menü): Auf/Ab wechselt zwischen den Flaggen, Rechts führt ins Menü.
 static func flag_column(on_select: Callable) -> VBoxContainer:
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
+	col.add_theme_constant_override("separation", 5)          # sieben Flaggen (Runde 85): 7 × 26 + 6 × 5 = 212 Einheiten
 	for fb in _flag_buttons(on_select):
 		col.add_child(fb)
 	return col

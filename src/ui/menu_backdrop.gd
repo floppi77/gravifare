@@ -20,6 +20,11 @@ var hero := true                 # Taxi im Vordergrund (die Credits haben ihr ei
 var rng := RandomNumberGenerator.new()
 var _wf := 1.0                    # Breitenfaktor (Ultrawide > 1): Sterne, Verkehr und Kacheln verteilen sich über die ganze Breite
 var _oy := 0.0                    # Versatz nach unten bei höheren Fenstern (Skyline bleibt unten)
+const Calendar := preload("res://src/core/calendar.gd")
+var fireworks := Calendar.fireworks()     # Runde 86: Silvester und Neujahr – Feuerwerk über der Stadt
+var hat := Calendar.hat()                 # Runde 86: Partyhut (Jahrestag) bzw. Weihnachtsmütze auf dem Taxi
+var rockets: Array = []                   # {x, y, vy, age, fuse, col, burst: Array}
+var rocket_timer := 0.6
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -57,6 +62,8 @@ func _process(delta: float) -> void:
 	for m in meteors:
 		m.age += delta
 	meteors = meteors.filter(func(m): return m.age < 0.9)
+	if fireworks:
+		_step_fireworks(delta)
 	if hero_t > 11.0:
 		hero_t = -3.0
 	queue_redraw()
@@ -72,6 +79,8 @@ func _draw() -> void:
 	draw_texture_rect(shade, Rect2(0, 0, size.x * 0.6, size.y), false)      # links dunkler: Menü bleibt lesbar
 	_draw_stars()
 	_draw_meteors()
+	if fireworks:
+		_draw_fireworks()
 	_draw_cars(false)
 	_haze(240.0, 0.16, 0.0)
 	_draw_cars(true)
@@ -158,4 +167,64 @@ func _draw_hero() -> void:
 	draw_texture_rect(taxi, Rect2(-ts * 0.5, ts), false)
 	if sticker != null:
 		draw_texture_rect(sticker, Rect2(Vector2(-0.40625 * ts.x, -0.21 * ts.y), Vector2.ONE * 0.25 * ts.x), false)
+	if hat != "":
+		_draw_hat(Vector2(0.0, -ts.y * 0.47), ts.x / 26.0)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+# ---------------------------------------------------------------- Runde 86: Kalender
+func _draw_hat(top: Vector2, u: float) -> void:
+	var bl := top + Vector2(-1.6, 0.4) * u
+	var br := top + Vector2(1.6, 0.4) * u
+	if hat == "party":
+		var tip := top + Vector2(0.0, -4.0) * u
+		draw_colored_polygon(PackedVector2Array([bl, br, tip]), Color("#4fc3ff"))
+		for k in 3:
+			draw_line(bl.lerp(tip, 0.2 + k * 0.25), br.lerp(tip, 0.2 + k * 0.25), Color("#ff4fc8"), maxf(1.0, u * 0.5))
+		draw_circle(tip, u * 0.8, Color("#ffe14a"))
+	else:
+		var tip := top + Vector2(2.6, -2.6 + 0.2 * sin(t * 2.0)) * u
+		draw_colored_polygon(PackedVector2Array([bl, br, top + Vector2(0.8, -2.8) * u, tip]), Color("#d6283c"))
+		draw_rect(Rect2(top + Vector2(-1.9, -0.2) * u, Vector2(3.8, 0.9) * u), Color("#f4f4f8"))
+		draw_circle(tip, u * 0.8, Color("#f4f4f8"))
+
+const ROCKET_COLS := [Color("#ffe14a"), Color("#ff4fc8"), Color("#4fc3ff"), Color("#5dff9a"), Color("#ff8a3a"), Color("#ffffff")]
+
+func _step_fireworks(delta: float) -> void:
+	rocket_timer -= delta
+	if rocket_timer <= 0.0:
+		rocket_timer = rng.randf_range(0.5, 1.4)
+		rockets.append({"x": rng.randf_range(260.0, 620.0 * _wf), "y": 330.0, "vy": -rng.randf_range(190.0, 250.0), "age": 0.0,
+			"fuse": rng.randf_range(0.9, 1.3), "col": ROCKET_COLS[rng.randi() % ROCKET_COLS.size()], "burst": []})
+	for r in rockets:
+		r.age += delta
+		if r.burst.is_empty():
+			r.y += r.vy * delta
+			r.vy += 60.0 * delta
+			if r.age >= r.fuse:
+				for i in 44:
+					var a := TAU * float(i) / 44.0 + rng.randf() * 0.1
+					var sp := rng.randf_range(45.0, 85.0)
+					r.burst.append([r.x, r.y, cos(a) * sp, sin(a) * sp])
+		else:
+			for p in r.burst:
+				p[0] += p[2] * delta
+				p[1] += p[3] * delta
+				p[2] *= 1.0 - 1.4 * delta
+				p[3] = p[3] * (1.0 - 1.4 * delta) + 30.0 * delta
+	rockets = rockets.filter(func(r): return r.age < float(r.fuse) + 1.6)
+
+func _draw_fireworks() -> void:
+	for r in rockets:
+		var col: Color = r.col
+		if r.burst.is_empty():
+			draw_rect(Rect2(r.x - 0.7, r.y + _oy, 1.4, 3.0), Color(1.0, 0.85, 0.6, 0.9))
+			continue
+		var age := float(r.age) - float(r.fuse)
+		var fade := 1.0 - clampf(age / 1.6, 0.0, 1.0)
+		if age < 0.15:                                                        # Blitz beim Zerplatzen
+			draw_circle(Vector2(float(r.x), float(r.y) + _oy), 10.0 * (1.0 - age / 0.15), Color(col.r, col.g, col.b, 0.35))
+		for p in r.burst:
+			var pp := Vector2(float(p[0]), float(p[1]) + _oy)
+			draw_circle(pp, 2.4, Color(col.r, col.g, col.b, fade * 0.25))      # Schein
+			draw_rect(Rect2(pp - Vector2(1.1, 1.1), Vector2(2.2, 2.2)), Color(col.r, col.g, col.b, fade))
+			draw_rect(Rect2(pp - Vector2(0.5, 0.5), Vector2(1.0, 1.0)), Color(1, 1, 1, fade * 0.8))

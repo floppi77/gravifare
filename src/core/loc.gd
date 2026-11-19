@@ -2,8 +2,8 @@ extends Node
 ## Autoload "Loc": lädt data/i18n/<locale>.json als Translation-Objekte. Fehlende Schlüssel
 ## fallen auf den Schlüssel selbst zurück (sichtbar, aber nie ein Absturz).
 
-const LOCALES := ["de", "en", "fr", "es"]
-const NAMES := {"de": "Deutsch", "en": "English", "fr": "Français", "es": "Español"}
+const LOCALES := ["de", "en", "fr", "es", "it", "pt", "pl"]
+const NAMES := {"de": "Deutsch", "en": "English", "fr": "Français", "es": "Español", "it": "Italiano", "pt": "Português", "pl": "Polski"}
 
 var tables := {}                    # Sprache → Schlüssel → Text (für Anzeigen in beiden Sprachen gleichzeitig)
 var translations := {}              # Sprache → Translation (für den Austausch der Knopfnamen)
@@ -80,6 +80,21 @@ static func pick(d, lang: String, fallback := "") -> String:
 	if not (d is Dictionary):
 		return String(d) if d != null else fallback
 	return String(d.get(lang, d.get("en", d.get("de", fallback))))
+
+## Runde 86: Dezimalzahl mit Komma (alle Sprachen außer Englisch) und Tausenderpunkten bzw. -kommas.
+static func decimal_text(v: float, digits := 1) -> String:
+	var lang := TranslationServer.get_locale().substr(0, 2)
+	var s := String.num(v, digits)
+	if digits > 0 and not s.contains("."):
+		s += "." + "0".repeat(digits)
+	var parts := s.split(".")
+	var whole: String = parts[0]
+	var grouped := ""
+	for i in whole.length():
+		if i > 0 and (whole.length() - i) % 3 == 0:
+			grouped += "," if lang == "en" else "."
+		grouped += whole[i]
+	return grouped + ("" if parts.size() < 2 else ("." if lang == "en" else ",") + parts[1])
 
 ## Aktuelle Sprache als zweibuchstabiger Code.
 static func code() -> String:

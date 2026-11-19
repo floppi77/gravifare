@@ -11,10 +11,11 @@ const ACTIONS := {
 	"gear":         {"keys": [KEY_SPACE],        "btn": [JOY_BUTTON_A]},
 	"eject":        {"keys": [KEY_E],            "btn": [JOY_BUTTON_Y]},
 	"restart":      {"keys": [KEY_R],            "btn": [JOY_BUTTON_BACK]},
+	"horn":         {"keys": [KEY_H],            "btn": [JOY_BUTTON_X]},       # Runde 86: Hupe (ohne Spielwirkung)
 	"pause":        {"keys": [KEY_ESCAPE],       "btn": [JOY_BUTTON_START]},
 	"text_skip":    {"keys": [KEY_U],            "btn": [JOY_BUTTON_B]},       # Tutorial-Text überspringen (fest, nicht belegbar)
 }
-const REMAPPABLE := ["thrust_up", "thrust_left", "thrust_down", "thrust_right", "gear", "eject", "restart"]
+const REMAPPABLE := ["thrust_up", "thrust_left", "thrust_down", "thrust_right", "gear", "eject", "restart", "horn"]
 const PAD_NAMES := ["A", "B", "X", "Y", "Back", "Guide", "Start", "L3", "R3", "LB", "RB", "D↑", "D↓", "D←", "D→", "Misc"]
 
 var path := "user://controls.cfg"

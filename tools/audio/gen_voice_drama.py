@@ -13,7 +13,7 @@ import numpy as np
 
 SRC = "tools/audio/drama_tutorial.json"
 OUT = "assets/audio/voice"
-TARGET_DB = {"de": -17.4, "en": -16.3, "fr": -16.8, "es": -16.8}      # mittlerer Pegel der aktiven Sprache, wie die bisherigen Clips
+TARGET_DB = {"de": -17.4, "en": -16.3, "fr": -16.8, "es": -16.8, "it": -16.8, "pt": -16.8, "pl": -16.8}      # mittlerer Pegel der aktiven Sprache, wie die bisherigen Clips
 NUM_DE = {"null": "0", "zwei": "2", "drei": "3", "vier": "4", "fünf": "5", "sechs": "6", "sieben": "7", "acht": "8", "neun": "9", "zehn": "10",
           "tausend": "1000", "fünfhundert": "500", "fünfunddreißig": "35"}
 NUM_EN = {"zero": "0", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
@@ -42,7 +42,10 @@ def chunks(text: str, limit=280):
     return out + ([cur] if cur else [])
 
 def speak(url, voice, text, seed):
-    body = json.dumps({"text": text, "voice": voice, "split": False, "seed": seed}).encode()
+    req = {"text": text, "split": False, "seed": seed}
+    if voice:                                             # ohne Stimme: zufälliger Sprecher (polnische Referenzen, gen_voice_pl.py)
+        req["voice"] = voice
+    body = json.dumps(req).encode()
     if not url.startswith("http://127.0.0.1:"):          # nur der lokale drama-Server
         raise ValueError("nur lokale Server erlaubt: " + url)
     return urllib.request.urlopen(urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}), timeout=300).read()  # nosec B310 (Schema oben geprüft)
@@ -85,7 +88,7 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.85, help="Mindestähnlichkeit der Spracherkennung")
     a = ap.parse_args()
     src = json.load(open(SRC, encoding="utf-8"))
-    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es"]}.get(a.lang, [a.lang])
+    langs = {"both": ["de", "en"], "all": ["de", "en", "fr", "es", "it", "pt", "pl"], "new": ["it", "pt", "pl"]}.get(a.lang, [a.lang])
     import sys
     sys.path.insert(0, "tools/audio")
     import voice_lang

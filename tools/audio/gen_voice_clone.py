@@ -14,13 +14,18 @@ REF_TEXT = {
     "en": "Welcome to flight school. I am your flight instructor, and I will explain everything you need to know to serve as a taxi pilot. Listen carefully, and keep your thrusters steady.",
     "fr": "Bienvenue à l’école de pilotage. Je suis votre instructeur de vol et je vais vous expliquer tout ce qu’il faut savoir pour piloter un taxi. Écoutez bien, et gardez les réacteurs bien stables.",
     "es": "Bienvenido a la escuela de vuelo. Soy tu instructor de vuelo y te explicaré todo lo que necesitas saber para pilotar un taxi. Escucha con atención y mantén los propulsores estables.",
+    "it": "Benvenuto alla scuola di volo. Sono il tuo istruttore di volo e ti spiegherò tutto quello che devi sapere per pilotare un taxi. Ascolta bene e tieni stabili i propulsori.",
+    "pt": "Bem-vindo à escola de voo. Eu sou o seu instrutor de voo e vou explicar tudo o que você precisa saber para pilotar um táxi. Preste atenção e mantenha os propulsores firmes.",
+    "pl": "Witaj w szkole lotniczej. Jestem twoim instruktorem lotu i wyjaśnię ci wszystko, co musisz wiedzieć, żeby pilotować taksówkę. Słuchaj uważnie i trzymaj dysze równo.",
 }
-LANGNAME = {"de": "German", "en": "English", "fr": "French", "es": "Spanish"}
+LANGNAME = {"de": "German", "en": "English", "fr": "French", "es": "Spanish", "it": "Italian", "pt": "Portuguese", "pl": "Polish"}
 REF_DIR = OUT + "/ref"
 INSTRUCT_EXTRA = {"de": " Er spricht wie ein erfahrener Fluglehrer: ruhig, klar, freundlich und mit natürlichem Sprachfluss.",
                   "en": " He speaks like an experienced flight instructor: calm, clear, friendly and with a natural flow.",
                   "fr": " Il parle comme un instructeur de vol expérimenté : calme, clair, aimable, avec un débit naturel.",
-                  "es": " Habla como un instructor de vuelo experimentado: tranquilo, claro, amable y con un ritmo natural."}
+                  "es": " Habla como un instructor de vuelo experimentado: tranquilo, claro, amable y con un ritmo natural.",
+                  "it": " Parla come un istruttore di volo esperto: calmo, chiaro, cordiale e con un ritmo naturale.",
+                  "pt": " Fala como um instrutor de voo experiente: calmo, claro, simpático e com um ritmo natural."}
 
 
 def make_refs(langs, force):

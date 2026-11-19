@@ -6,7 +6,10 @@
   "de": "Schieber",
   "en": "Sliders",
   "fr": "Glissières",
-  "es": "Correderas"
+  "es": "Correderas",
+  "it": "Pistoni",
+  "pt": "Pistões",
+  "pl": "Tłoki"
  },
  "map": [
   "########################################",
@@ -82,7 +85,10 @@
    "de": "Schieber",
    "en": "Sliders",
    "fr": "Glissières",
-   "es": "Correderas"
+   "es": "Correderas",
+   "it": "Pistoni",
+   "pt": "Pistões",
+   "pl": "Tłoki"
   }
  }
 }

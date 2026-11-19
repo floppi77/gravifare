@@ -6,7 +6,10 @@
   "de": "Strömungen",
   "en": "Currents",
   "fr": "Courants",
-  "es": "Corrientes"
+  "es": "Corrientes",
+  "it": "Correnti",
+  "pt": "Correntes",
+  "pl": "Prądy"
  },
  "map": [
   "########################################",
@@ -88,7 +91,10 @@
    "de": "Strömungen",
    "en": "Currents",
    "fr": "Courants",
-   "es": "Corrientes"
+   "es": "Corrientes",
+   "it": "Correnti",
+   "pt": "Correntes",
+   "pl": "Prądy"
   }
  }
 }

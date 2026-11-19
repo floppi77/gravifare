@@ -47,6 +47,28 @@ VOICES["es"] = {
     "t0": ("Un gasolinero mayor con voz grave y ronca, gruñón pero bonachón, que habla con mucho énfasis." + _ES_M, 505),
     "d0": ("Una operadora de radio de unos cuarenta años con voz tranquila, serena, algo irónica y dicción clara, como por radio." + _ES, 606),
 }
+_IT = " Madrelingua italiana, pronuncia italiana standard senza accento."
+_IT_M = " Madrelingua italiano, pronuncia italiana standard senza accento."
+_PT = " Falante nativa de português do Brasil, sotaque brasileiro neutro."
+_PT_M = " Falante nativo de português do Brasil, sotaque brasileiro neutro."
+VOICES["it"] = {   # Runde 85
+    "f0": ("Una giovane donna dalla voce chiara, calda e allegra, tono medio, spigliata e cordiale." + _IT, 101),
+    "f1": ("Una donna sui trentacinque anni dalla voce un po' più grave, calma e sicura, con un umorismo asciutto." + _IT, 202),
+    "m0": ("Un uomo sui trentacinque anni dalla voce di baritono profonda, calma e calda, rilassato e cordiale." + _IT_M, 303),
+    "m1": ("Un uomo anziano dalla voce profonda, calda e leggermente roca, pacato e bonario." + _IT_M, 404),
+    "t0": ("Un vecchio benzinaio dalla voce profonda e roca, brontolone ma di buon cuore, che parla con molta enfasi." + _IT_M, 505),
+    "d0": ("Una centralinista sui quarant'anni dalla voce calma, controllata, leggermente ironica e dalla dizione chiara, come alla radio." + _IT, 606),
+}
+VOICES["pt"] = {   # Runde 85: brasilianisches Portugiesisch
+    "f0": ("Uma mulher jovem com voz clara, calorosa e alegre, tom médio, descontraída e simpática." + _PT, 101),
+    "f1": ("Uma mulher de uns trinta e cinco anos com voz um pouco mais grave, calma e segura, com um humor seco." + _PT, 202),
+    "m0": ("Um homem de uns trinta e cinco anos com voz de barítono grave, calma e calorosa, descontraído e simpático." + _PT_M, 303),
+    "m1": ("Um homem mais velho com voz grave, calorosa e levemente rouca, sereno e bondoso." + _PT_M, 404),
+    "t0": ("Um frentista idoso com voz grave e rouca, ranzinza mas bonachão, que fala com muita ênfase." + _PT_M, 505),
+    "d0": ("Uma operadora de rádio de uns quarenta anos com voz calma, controlada, um pouco irônica e dicção clara, como no rádio." + _PT, 606),
+}
+VOICES["it"]["i0"] = VOICES["it"]["m0"]
+VOICES["pt"]["i0"] = VOICES["pt"]["m0"]
 VOICES["fr"]["i0"] = VOICES["fr"]["m0"]
 VOICES["es"]["i0"] = VOICES["es"]["m0"]
 SPECIAL = json.load(open("data/voice_lines.json"))          # gemeinsame Quelle für Generator und Spiel-Untertitel
@@ -61,6 +83,9 @@ NUM_DE = ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "a
 NUM_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 NUM_FR = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"]
 NUM_ES = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"]
+NUM_IT = ["zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove"]
+NUM_PT = ["zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"]
+NUM_PL = ["zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć"]
 LINES = {
     "de": {"language": "German", "lines": {
         "call": "Hey Taxi!", "thanks": "Danke!", "angry": "Hey, Idiot!", "dest_exit": "Zum Ausgang, bitte!", "dest_H": "Zum Krankenhaus, bitte!", **{f"dest_{n}": f"Plattform {NUM_DE[n]}, bitte!" for n in range(1, 10)}}},
@@ -70,6 +95,13 @@ LINES = {
         "call": "Hé, taxi !", "thanks": "Merci !", "angry": "Hé, espèce d’idiot !", "dest_exit": "À la sortie, s’il vous plaît !", "dest_H": "À l’hôpital, s’il vous plaît !", **{f"dest_{n}": f"Plateforme {NUM_FR[n]}, s’il vous plaît !" for n in range(1, 10)}}},
     "es": {"language": "Spanish", "lines": {
         "call": "¡Eh, taxi!", "thanks": "¡Gracias!", "angry": "¡Oye, idiota!", "dest_exit": "¡A la salida, por favor!", "dest_H": "¡Al hospital, por favor!", **{f"dest_{n}": f"¡A la plataforma {NUM_ES[n]}, por favor!" for n in range(1, 10)}}},
+    "it": {"language": "Italian", "lines": {
+        "call": "Ehi, taxi!", "thanks": "Grazie!", "angry": "Ehi, idiota!", "dest_exit": "All'uscita, per favore!", "dest_H": "All'ospedale, per favore!", **{f"dest_{n}": f"Piattaforma {NUM_IT[n]}, per favore!" for n in range(1, 10)}}},
+    "pt": {"language": "Portuguese", "lines": {
+        "call": "Ei, táxi!", "thanks": "Valeu!", "angry": "Ei, seu idiota!", "dest_exit": "Para a saída, por favor!", "dest_H": "Para o hospital, por favor!", **{f"dest_{n}": f"Plataforma {NUM_PT[n]}, por favor!" for n in range(1, 10)}}},
+    # Polnisch spricht Drama 3 (Qwen3-TTS kann kein Polnisch): Texte hier, Erzeugung in gen_voice_pl.py
+    "pl": {"language": "Polish", "lines": {
+        "call": "Hej, taxi!", "thanks": "Dzięki!", "angry": "Hej, idioto!", "dest_exit": "Do wyjścia, proszę!", "dest_H": "Do szpitala, proszę!", **{f"dest_{n}": f"Lądowisko {NUM_PL[n]}, proszę!" for n in range(1, 10)}}},
 }
 
 def trim(x, sr):
@@ -94,12 +126,14 @@ def norm(t, lang):
            "en": ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]}
     t = unicodedata.normalize("NFKD", t.lower())
     t = "".join(c for c in t if not unicodedata.combining(c))
+    t = re.sub(r"\b42\b", {"de": "zweiundvierzig", "en": "forty two"}.get(lang, "42"), t)     # Runde 86: Level 42
+    t = t.replace("forty-two", "forty two")
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     return [dig[lang][int(w)] if w.isdigit() and int(w) < 10 else w for w in t.split()]
 
 _asr = None
 def clip_ok(x, sr, text, lang):
-    if lang in ("fr", "es"):                         # Französisch/Spanisch: gemeinsame Prüfung mit Zahlwörtern (tools/audio/voice_lang.py)
+    if lang not in ("de", "en"):                     # weitere Sprachen: gemeinsame Prüfung mit Zahlwörtern (tools/audio/voice_lang.py)
         sys.path.insert(0, "tools/audio")
         import voice_lang
         return voice_lang.check(x, sr, text, lang)
@@ -113,7 +147,7 @@ def clip_ok(x, sr, text, lang):
     y = librosa.resample(x.astype(np.float32), orig_sr=sr, target_sr=16000)
     segs, _ = _asr.transcribe(y, language=lang, beam_size=5)
     got = norm(" ".join(sg.text for sg in segs), lang); want = norm(text, lang)
-    sim = difflib.SequenceMatcher(None, "".join(got), "".join(want)).ratio()
+    sim = difflib.SequenceMatcher(None, "".join(got), "".join(want), autojunk=False).ratio()
     return sim >= 0.88 and len(got) <= len(want), " ".join(got), sim
 
 def radio(x, sr):
@@ -142,10 +176,13 @@ def main():
     manifest = {"model": MODEL, "license": "Apache-2.0", "voices": {f"{l}/{k}": {"instruct": v[0], "seed": v[1]} for l, vs in VOICES.items() for k, v in vs.items()}, "clips": {}}
     for lang, cfg in LINES.items():
         if a.lang and a.lang != lang: continue
+        if lang not in VOICES: continue              # Polnisch: gen_voice_pl.py (Drama 3)
         os.makedirs(f"{OUT}/{lang}", exist_ok=True)
         for vk, (instruct, seed) in VOICES[lang].items():
             if a.only and a.only != vk: continue
             lines = dict(cfg["lines"]); lines.update(SPECIAL["passenger_extra"][lang]) if vk in PASSENGER_VOICES else None
+            if vk in PASSENGER_VOICES:
+                lines.update(SPECIAL.get(vk, {}).get(lang, {}))          # Runde 86: Sonderzeilen einzelner Stimmen (m0 floppi_thanks, f0/m0 answer_42)
             if vk not in PASSENGER_VOICES:
                 lines = SPECIAL.get(vk, {}).get(lang, {})
             for key, text in lines.items():
@@ -156,7 +193,7 @@ def main():
                 for attempt in range(a.tries if a.validate else 1):
                     torch.manual_seed(seed + a.bump + attempt * 13)  # identischer Seed je Stimme, Versatz bei Wiederholung
                     say = text
-                    if lang in ("fr", "es"):                 # Ziffern im Untertitel („plateforme 2“) für die Sprachausgabe ausschreiben
+                    if lang not in ("de", "en"):             # Ziffern im Untertitel („plateforme 2“) für die Sprachausgabe ausschreiben
                         sys.path.insert(0, "tools/audio")
                         import voice_lang
                         say = voice_lang.spoken(text, lang)

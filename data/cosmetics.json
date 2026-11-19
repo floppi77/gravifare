@@ -7,7 +7,10 @@
 	"de": "Taxi-Gelb",
 	"en": "Taxi Yellow",
 	"fr": "Jaune taxi",
-	"es": "Amarillo taxi"
+	"es": "Amarillo taxi",
+	"it": "Giallo taxi",
+	"pt": "Amarelo táxi",
+	"pl": "Taksówkowa żółć"
    },
    "unlock": null
   },
@@ -18,7 +21,10 @@
 	"de": "Neon-Magenta",
 	"en": "Neon Magenta",
 	"fr": "Magenta néon",
-	"es": "Magenta neón"
+	"es": "Magenta neón",
+	"it": "Magenta neon",
+	"pt": "Magenta neon",
+	"pl": "Neonowa magenta"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -32,7 +38,10 @@
 	"de": "Minze",
 	"en": "Mint",
 	"fr": "Menthe",
-	"es": "Menta"
+	"es": "Menta",
+	"it": "Menta",
+	"pt": "Menta",
+	"pl": "Mięta"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -46,7 +55,10 @@
 	"de": "Nachtblau",
 	"en": "Midnight",
 	"fr": "Bleu nuit",
-	"es": "Azul noche"
+	"es": "Azul noche",
+	"it": "Mezzanotte",
+	"pt": "Meia-noite",
+	"pl": "Północ"
    },
    "unlock": {
 	"stat": "perfect_landings",
@@ -60,7 +72,10 @@
 	"de": "Abendrot",
 	"en": "Sunset",
 	"fr": "Coucher de soleil",
-	"es": "Atardecer"
+	"es": "Atardecer",
+	"it": "Tramonto",
+	"pt": "Pôr do sol",
+	"pl": "Zachód słońca"
    },
    "unlock": {
 	"stat": "deliveries",
@@ -74,7 +89,10 @@
 	"de": "Zuckerguss",
 	"en": "Candy",
 	"fr": "Bonbon",
-	"es": "Caramelo"
+	"es": "Caramelo",
+	"it": "Caramella",
+	"pt": "Bala",
+	"pl": "Cukierek"
    },
    "unlock": {
 	"stat": "best_streak",
@@ -88,7 +106,10 @@
 	"de": "Wespe",
 	"en": "Wasp",
 	"fr": "Guêpe",
-	"es": "Avispa"
+	"es": "Avispa",
+	"it": "Vespa",
+	"pt": "Vespa",
+	"pl": "Osa"
    },
    "unlock": {
 	"stat": "crashes",
@@ -102,7 +123,10 @@
 	"de": "Gold",
 	"en": "Gold",
 	"fr": "Or",
-	"es": "Oro"
+	"es": "Oro",
+	"it": "Oro",
+	"pt": "Ouro",
+	"pl": "Złoto"
    },
    "unlock": {
 	"stat": "stars_all",
@@ -116,7 +140,10 @@
 	"de": "Kein Aufkleber",
 	"en": "No sticker",
 	"fr": "Sans autocollant",
-	"es": "Sin pegatina"
+	"es": "Sin pegatina",
+	"it": "Nessun adesivo",
+	"pt": "Sem adesivo",
+	"pl": "Bez naklejki"
    },
    "unlock": null
   },
@@ -127,7 +154,10 @@
 	"de": "Flamme",
 	"en": "Flame",
 	"fr": "Flamme",
-	"es": "Llama"
+	"es": "Llama",
+	"it": "Fiamma",
+	"pt": "Chama",
+	"pl": "Płomień"
    },
    "unlock": {
 	"stat": "levels_done",
@@ -141,7 +171,10 @@
 	"de": "Stern",
 	"en": "Star",
 	"fr": "Étoile",
-	"es": "Estrella"
+	"es": "Estrella",
+	"it": "Stella",
+	"pt": "Estrela",
+	"pl": "Gwiazda"
    },
    "unlock": {
 	"stat": "stars_time",
@@ -155,7 +188,10 @@
 	"de": "Blitz",
 	"en": "Bolt",
 	"fr": "Éclair",
-	"es": "Rayo"
+	"es": "Rayo",
+	"it": "Fulmine",
+	"pt": "Raio",
+	"pl": "Błyskawica"
    },
    "unlock": {
 	"stat": "stars_clean",
@@ -169,7 +205,10 @@
 	"de": "Herz",
 	"en": "Heart",
 	"fr": "Cœur",
-	"es": "Corazón"
+	"es": "Corazón",
+	"it": "Cuore",
+	"pt": "Coração",
+	"pl": "Serce"
    },
    "unlock": {
 	"stat": "deliveries",
@@ -183,7 +222,10 @@
 	"de": "Tankstellenschreck",
 	"en": "Pump Terror",
 	"fr": "Terreur des pompes",
-	"es": "Terror de surtidores"
+	"es": "Terror de surtidores",
+	"it": "Terrore delle pompe",
+	"pt": "Terror das bombas",
+	"pl": "Postrach dystrybutorów"
    },
    "unlock": {
 	"stat": "pump_explosions",
@@ -197,7 +239,10 @@
 	"de": "Krone",
 	"en": "Crown",
 	"fr": "Couronne",
-	"es": "Corona"
+	"es": "Corona",
+	"it": "Corona",
+	"pt": "Coroa",
+	"pl": "Korona"
    },
    "unlock": {
 	"stat": "stars_pro",
@@ -211,7 +256,10 @@
 	"de": "Sonne",
 	"en": "Sun",
 	"fr": "Soleil",
-	"es": "Sol"
+	"es": "Sol",
+	"it": "Sole",
+	"pt": "Sol",
+	"pl": "Słońce"
    },
    "unlock": {
 	"stat": "daily_best_streak",
@@ -225,7 +273,10 @@
 	"de": "Himmelblau",
 	"en": "Sky Blue",
 	"fr": "Bleu ciel",
-	"es": "Azul cielo"
+	"es": "Azul cielo",
+	"it": "Azzurro cielo",
+	"pt": "Azul-céu",
+	"pl": "Błękit nieba"
    },
    "unlock": {
 	"stat": "daily_best_streak",
@@ -239,7 +290,10 @@
 	"de": "Medaille",
 	"en": "Medal",
 	"fr": "Médaille",
-	"es": "Medalla"
+	"es": "Medalla",
+	"it": "Medaglia",
+	"pt": "Medalha",
+	"pl": "Medal"
    },
    "unlock": {
 	"stat": "day_golds",
@@ -253,7 +307,10 @@
 	"de": "Platin",
 	"en": "Platinum",
 	"fr": "Platine",
-	"es": "Platino"
+	"es": "Platino",
+	"it": "Platino",
+	"pt": "Platina",
+	"pl": "Platyna"
    },
    "unlock": {
 	"stat": "daily_best_streak",

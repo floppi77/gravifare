@@ -6,7 +6,10 @@
   "de": "Meteoriten",
   "en": "Meteors",
   "fr": "Météores",
-  "es": "Meteoritos"
+  "es": "Meteoritos",
+  "it": "Meteore",
+  "pt": "Meteoros",
+  "pl": "Meteory"
  },
  "map": [
   "########################################",
@@ -82,7 +85,10 @@
    "de": "Meteoriten",
    "en": "Meteors",
    "fr": "Météores",
-   "es": "Meteoritos"
+   "es": "Meteoritos",
+   "it": "Meteore",
+   "pt": "Meteoros",
+   "pl": "Meteory"
   }
  }
 }

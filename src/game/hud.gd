@@ -39,6 +39,12 @@ var gauges := HudGauges.new()    # Tank- und Hüllenanzeige links oben (eigene Z
 const GAUGE_FUEL := Vector2(3, 2)
 const GAUGE_HULL := Vector2(74, 2)
 
+var split := {}                  # Runde 85: Zwischenzeit am Sektorende (Karriere-Uhr), steht SPLIT_SHOW Sekunden im Bild
+var split_t := 0.0
+const SPLIT_SHOW := 7.0
+var grav_shown := -1.0           # zuletzt angezeigter Schwerkraftwert (g): ändert er sich, leuchtet die Anzeige kurz auf
+var grav_flash := 0.0
+
 func bind(r: Run) -> void:
 	run = r
 
@@ -76,6 +82,8 @@ func _process(delta: float) -> void:
 		result_age += delta
 	hint_t = maxf(0.0, hint_t - delta)
 	sub_t = maxf(0.0, sub_t - delta)
+	split_t = maxf(0.0, split_t - delta)
+	grav_flash = maxf(0.0, grav_flash - delta * 1.2)
 	if run != null:
 		gauges.update(delta, run.sim.fuel / Tuning.FUEL_MAX, run.sim.hull / Tuning.HULL_MAX)
 	queue_redraw()
@@ -141,6 +149,8 @@ func _draw() -> void:
 		var ratio: float = clampf(r, 0.0, 2.0)
 		var col := SignalColors.by_level(ratio, Tuning.GAUGE_GREEN, 1.0)
 		_gauge_row(i, ratio, col)
+	_draw_gravity(fr)
+	_draw_career_clock()
 	# Countdown des letzten Pflichtfahrgasts: unter dem Tor, ab 10 s rot blinkend
 	if run.exit_countdown > 0.0 and run.result == Run.Result.RUNNING:
 		var cd := run.exit_countdown
@@ -232,6 +242,80 @@ func _draw() -> void:
 		_draw_briefing()
 	if paused:
 		draw_rect(_full_rect(), Color(0, 0, 0, 0.55))
+
+# ---------------------------------------------------------------- Runde 85: Schwerkraft und Karriere-Uhr
+## Schwerkraft am Ort des Taxis in g (Grundschwerkraft des Levels samt Schwerkraftzonen, 1 g = Tuning.GRAVITY).
+func gravity_now() -> float:
+	if run == null or run.level == null:
+		return 1.0
+	return run.level.gravity_at(run.sim.pos, run.level.clock) / Tuning.GRAVITY
+
+## Zahl mit einer Nachkommastelle, Komma in allen Sprachen außer Englisch.
+static func decimal(v: float, lang: String) -> String:
+	var t := "%.1f" % v
+	return t if lang == "en" else t.replace(".", ",")
+
+## Schwerkraftanzeige rechts unter dem oberen Streifen: Planetensymbol mit Pfeil und der Wert in g. Gedämpft bei 1 g,
+## heller (kühl unter, warm über 1 g), sobald sie abweicht; ändert sich der Wert (Zone, Sektor), leuchtet sie kurz auf.
+func _draw_gravity(fr: Rect2) -> void:
+	var g := gravity_now()
+	var shown := snappedf(g, 0.1)
+	if grav_shown >= 0.0 and absf(shown - grav_shown) > 0.01:
+		grav_flash = 0.0 if Settings.values.reduce_motion else 1.0
+	grav_shown = shown
+	var w := 34.0
+	var x := minf(fr.end.x, 640.0) - w - 2.0
+	var y := 17.5
+	var col := Color("#9aa6d8")
+	if shown < 0.95:
+		col = Color("#7fe3ff")
+	elif shown > 1.05:
+		col = Color("#ffb35a")
+	col = col.lerp(Color.WHITE, grav_flash * 0.8)
+	draw_rect(Rect2(x, y, w, 10.0), Color(0.03, 0.04, 0.12, 0.72 + 0.2 * grav_flash))
+	draw_rect(Rect2(x, y, w, 10.0), Color("#3a4580").lerp(col, 0.35 + 0.65 * grav_flash), false, 0.67)
+	var c := Vector2(x + 6.0, y + 9.6)                        # Planet: Bogen am unteren Rand, Pfeil darauf zu
+	draw_arc(c, 3.6, PI * 1.08, PI * 1.92, 10, col, 0.9)
+	draw_line(Vector2(c.x, y + 1.6), Vector2(c.x, y + 5.0), col, 0.67)
+	draw_polyline(PackedVector2Array([Vector2(c.x - 1.5, y + 3.7), Vector2(c.x, y + 5.3), Vector2(c.x + 1.5, y + 3.7)]), col, 0.67)
+	_fit_text(font, Vector2(x + 11.0, y + 8.0), decimal(shown, Loc.code()) + " g", w - 12.0, mini(Settings.fs(7), 9), col, HORIZONTAL_ALIGNMENT_LEFT)
+
+func show_split(sp: Dictionary) -> void:
+	if sp.is_empty():
+		return
+	split = sp
+	split_t = SPLIT_SHOW
+
+## Karriere-Uhr (Option „Speedrun-Uhr“) links unter dem oberen Streifen; am Sektorende darunter die Zwischenzeit mit dem Abstand
+## zur bisherigen Bestzeit dieses Sektors (grün schneller, rot langsamer).
+func _draw_career_clock() -> void:
+	if not Settings.values.speedrun_clock or not Flow.is_career():
+		return
+	var x := 3.0
+	var y := 17.5
+	var w := 50.0
+	var col := Color("#d8e0ff")
+	draw_rect(Rect2(x, y, w, 10.0), Color(0.03, 0.04, 0.12, 0.72))
+	draw_rect(Rect2(x, y, w, 10.0), Color("#3a4580"), false, 0.67)
+	var c := Vector2(x + 5.5, y + 5.4)                        # Stoppuhr
+	draw_arc(c, 3.0, 0.0, TAU, 14, col, 0.67)
+	draw_line(c, c + Vector2(0.0, -2.0), col, 0.67)
+	draw_line(c, c + Vector2(1.4, 0.6), col, 0.67)
+	draw_line(Vector2(c.x - 0.8, y + 1.0), Vector2(c.x + 0.8, y + 1.0), col, 0.67)
+	_fit_text(font, Vector2(x + 10.5, y + 8.0), Flow.clock_text(Flow.career_clock), w - 12.0, mini(Settings.fs(7), 9), col, HORIZONTAL_ALIGNMENT_LEFT)
+	if split_t <= 0.0 or split.is_empty():
+		return
+	var a := clampf(split_t / 0.6, 0.0, 1.0)
+	var line := tr("HUD_SPLIT") % [int(split.sector), Flow.clock_text(float(split.time))]
+	var dcol := Color(0.85, 0.88, 1.0, a)
+	var prev := float(split.get("best", -1.0))
+	if prev >= 0.0:
+		var d := float(split.time) - prev
+		line += "  " + ("−" if d < 0.0 else "+") + Flow.clock_text(absf(d))
+		dcol = (SignalColors.good() if d < 0.0 else SignalColors.bad())
+		dcol.a = a
+	draw_rect(Rect2(x, y + 11.0, 104.0, 10.0), Color(0.03, 0.04, 0.12, 0.72 * a))
+	_fit_text(font, Vector2(x + 3.0, y + 18.5), line, 98.0, mini(Settings.fs(7), 9), dcol, HORIZONTAL_ALIGNMENT_LEFT)
 
 ## Eine Zeile der Landeanzeige: Symbol (Pfeil nach unten = Sinken, Doppelpfeil = seitwärts, Winkel = Neigung), Balken, Grenzmarke.
 func _gauge_row(i: int, ratio: float, col: Color) -> void:

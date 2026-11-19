@@ -8,8 +8,11 @@ REF_TEXT = {
     "en": "Good day! I would like to arrive today, so please fly quickly but safely. Thank you very much for taking me along.",
     "fr": "Bonjour ! J’aimerais arriver aujourd’hui, alors volez vite, mais prudemment. Merci beaucoup de m’emmener.",
     "es": "¡Buenos días! Me gustaría llegar hoy, así que vuele rápido, pero con cuidado. Muchas gracias por llevarme.",
+    "it": "Buongiorno! Vorrei arrivare oggi, quindi voli veloce, ma con prudenza. Grazie mille per il passaggio.",
+    "pt": "Bom dia! Eu queria chegar hoje, então voe rápido, mas com cuidado. Muito obrigado pela carona.",
+    "pl": "Dzień dobry! Chciałbym dotrzeć jeszcze dziś, więc proszę lecieć szybko, ale bezpiecznie. Bardzo dziękuję za podwiezienie.",
 }
-LANGNAME = {"de": "German", "en": "English", "fr": "French", "es": "Spanish"}
+LANGNAME = {"de": "German", "en": "English", "fr": "French", "es": "Spanish", "it": "Italian", "pt": "Portuguese", "pl": "Polish"}
 
 _DE_TAIL = " Deutsche Muttersprachlerin, akzentfreies Standarddeutsch mit deutscher Aussprache."
 _DE_TAIL_M = " Deutscher Muttersprachler, akzentfreies Standarddeutsch mit deutscher Aussprache."
@@ -58,6 +61,36 @@ VOICES = {
            "fr": ("Un très vieil homme d’environ quatre-vingts ans à la voix fine et cassée, lente, chaleureuse et un peu forte, comme s’il entendait mal. Locuteur natif français, accent standard de France.", 1206),
            "es": ("Un hombre muy mayor de unos ochenta años con voz fina y quebrada, lenta, cálida y algo alta, como si oyera mal. Hablante nativo de español de España, acento castellano neutro.", 1206)},
 }
+# Runde 85: Italienisch und Portugiesisch (Qwen3-TTS), dieselben Figuren. Polnisch hat keine Qwen-Beschreibung (gen_voice_pl.py).
+_IT_F, _IT_M = " Madrelingua italiana, pronuncia italiana standard senza accento.", " Madrelingua italiano, pronuncia italiana standard senza accento."
+_PT_F, _PT_M = " Falante nativa de português do Brasil, sotaque brasileiro neutro.", " Falante nativo de português do Brasil, sotaque brasileiro neutro."
+_MORE = {
+    "f2": ("Una ragazza di circa diciassette anni dalla voce chiara, acuta ed eccitata, veloce e vivace, un po' ridanciana." + _IT_F,
+           "Uma garota de uns dezessete anos com voz clara, aguda e animada, rápida e cheia de vida, um pouco risonha." + _PT_F),
+    "f3": ("Una donna di quasi trent'anni dalla voce di contralto grave e fumosa, lenta, cool e rilassata, un po' beffarda." + _IT_F,
+           "Uma mulher de quase trinta anos com voz de contralto grave e esfumaçada, lenta, tranquila e descontraída, um pouco zombeteira." + _PT_F),
+    "f4": ("Una donna d'affari sui quarantacinque anni dalla voce chiara, decisa, leggermente nasale, tono medio, risoluta e rapida, sempre di fretta." + _IT_F,
+           "Uma executiva de uns quarenta e cinco anos com voz clara, firme, levemente nasal, tom médio, decidida e rápida, sempre com pressa." + _PT_F),
+    "f5": ("Un'anziana signora poco più che settantenne dalla voce calda, leggermente incrinata e tremolante, lenta e gentile, tono medio-alto." + _IT_F,
+           "Uma senhora idosa de pouco mais de setenta anos com voz calorosa, levemente falhada e trêmula, lenta e bondosa, tom médio-alto." + _PT_F),
+    "f6": ("Una donna sui trent'anni dalla voce morbida, sussurrata e dolce, tono medio-alto, calma e sognante." + _IT_F,
+           "Uma mulher de uns trinta anos com voz suave, sussurrada e doce, tom médio-alto, calma e sonhadora." + _PT_F),
+    "m2": ("Un ragazzo di circa diciannove anni dalla voce di tenore chiara, eccitata e giovanile, veloce, un po' disinvolta." + _IT_M,
+           "Um rapaz de uns dezenove anos com voz de tenor clara, animada e jovem, rápida, um pouco despojada." + _PT_M),
+    "m3": ("Un uomo sui quarant'anni dalla voce di basso molto profonda e rimbombante, lenta e bonaria, potente e calda." + _IT_M,
+           "Um homem de uns quarenta anos com voz de baixo muito grave e retumbante, lenta e bonachona, potente e calorosa." + _PT_M),
+    "m4": ("Un uomo di quasi trent'anni dalla voce chiara, leggermente nasale, veloce, nervosa e spiritosa, saltellante." + _IT_M,
+           "Um homem de quase trinta anos com voz clara, levemente nasal, rápida, nervosa e engraçada, agitada." + _PT_M),
+    "m5": ("Un uomo sui quarantacinque anni dalla voce da annunciatore liscia e chiara, tono medio, sicura e precisa, come un conduttore del telegiornale." + _IT_M,
+           "Um homem de uns quarenta e cinco anos com voz de locutor suave e clara, tom médio, segura e precisa, como um apresentador de telejornal." + _PT_M),
+    "m6": ("Un uomo molto anziano di circa ottant'anni dalla voce sottile e incrinata, lenta, calda e un po' forte, come se ci sentisse poco." + _IT_M,
+           "Um homem muito idoso de uns oitenta anos com voz fina e falhada, lenta, calorosa e um pouco alta, como se ouvisse mal." + _PT_M),
+}
+for _vk, (_it, _pt) in _MORE.items():
+    _seed = VOICES[_vk]["de"][1]
+    VOICES[_vk]["it"] = (_it, _seed)
+    VOICES[_vk]["pt"] = (_pt, _seed)
+
 # Zielbereich der mittleren Grundfrequenz (Hz, Median) der Referenz: gen_passenger_refs.py wählt unter mehreren Kandidaten den passenden.
 TARGET_F0 = {"f2": (310, 400), "f3": (180, 225), "f4": (240, 285), "f5": (200, 250), "f6": (260, 310),
              "m2": (190, 240), "m3": (85, 115), "m4": (170, 210), "m5": (115, 145), "m6": (140, 185)}
@@ -78,8 +111,18 @@ def direction(key: str, lang: str) -> str:
     es = {"call": "[llamando, amable, saludando]", "thanks": "[agradecido, cálido]", "angry": "[furioso, regañando]",
           "soft": "[asombrado, aliviado]", "hard": "[dolorido, asustado]", "bored": "[molesto, impaciente]",
           "wrong_pad": "[irritado, firme]", "bumpy": "[preocupado, nervioso]", "hurry": "[apremiante, con prisa]"}
-    d = {"de": de, "en": en, "fr": fr, "es": es}[lang]
+    it = {"call": "[chiamando, cordiale, salutando con la mano]", "thanks": "[grato, caloroso]", "angry": "[furioso, sgridando]",
+          "soft": "[stupito, sollevato]", "hard": "[dolorante, spaventato]", "bored": "[seccato, impaziente]",
+          "wrong_pad": "[irritato, deciso]", "bumpy": "[preoccupato, ansioso]", "hurry": "[incalzante, di fretta]"}
+    pt = {"call": "[chamando, simpático, acenando]", "thanks": "[agradecido, caloroso]", "angry": "[furioso, xingando]",
+          "soft": "[admirado, aliviado]", "hard": "[com dor, assustado]", "bored": "[irritado, impaciente]",
+          "wrong_pad": "[contrariado, firme]", "bumpy": "[preocupado, ansioso]", "hurry": "[apressando, com pressa]"}
+    pl = {"call": "[wołając, przyjaźnie, machając]", "thanks": "[z wdzięcznością, ciepło]", "angry": "[wściekle, krzycząc]",
+          "soft": "[zdumiony, z ulgą]", "hard": "[z bólem, przestraszony]", "bored": "[zirytowany, niecierpliwy]",
+          "wrong_pad": "[poirytowany, stanowczo]", "bumpy": "[zmartwiony, niespokojny]", "hurry": "[ponaglająco, w pośpiechu]"}
+    d = {"de": de, "en": en, "fr": fr, "es": es, "it": it, "pt": pt, "pl": pl}[lang]
     base = key.rsplit("_", 1)[0] if key.startswith("hurry_") else key
     if key.startswith("dest_"):
-        return {"de": "[freundlich, klar]", "en": "[friendly, clear]", "fr": "[aimable, clair]", "es": "[amable, claro]"}[lang]
+        return {"de": "[freundlich, klar]", "en": "[friendly, clear]", "fr": "[aimable, clair]", "es": "[amable, claro]",
+                "it": "[cordiale, chiaro]", "pt": "[simpático, claro]", "pl": "[przyjaźnie, wyraźnie]"}[lang]
     return d.get(base, "")
