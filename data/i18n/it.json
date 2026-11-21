@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Seduttore",
  "OT_LIC_CHARMER_D": "Parte con seduttore e clienti abituali, ma passeggeri meno pazienti del 10 %.",
  "OT_LIC_GAMBLER": "Giocatore",
- "OT_LIC_GAMBLER_D": "Parte con bussolotto e portafortuna, ma un taxi in meno."
+ "OT_LIC_GAMBLER_D": "Parte con bussolotto e portafortuna, ma un taxi in meno.",
+ "OT_CURSE_LINE": "Questa tappa: %s"
 }

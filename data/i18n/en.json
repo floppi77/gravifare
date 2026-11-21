@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Charmer",
  "OT_LIC_CHARMER_D": "Starts with charmer and regulars, but passengers 10 % less patient.",
  "OT_LIC_GAMBLER": "Gambler",
- "OT_LIC_GAMBLER_D": "Starts with dice cup and lucky charm, but one taxi less."
+ "OT_LIC_GAMBLER_D": "Starts with dice cup and lucky charm, but one taxi less.",
+ "OT_CURSE_LINE": "This stage: %s"
 }

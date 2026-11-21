@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Czaruś",
  "OT_LIC_CHARMER_D": "Start z czarusiem i stałymi klientami, ale pasażerowie o 10 % mniej cierpliwi.",
  "OT_LIC_GAMBLER": "Hazardzista",
- "OT_LIC_GAMBLER_D": "Start z kubkiem kości i talizmanem, ale jedną taksówką mniej."
+ "OT_LIC_GAMBLER_D": "Start z kubkiem kości i talizmanem, ale jedną taksówką mniej.",
+ "OT_CURSE_LINE": "Ten etap: %s"
 }

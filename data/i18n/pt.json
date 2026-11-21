@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Charmoso",
  "OT_LIC_CHARMER_D": "Começa com charmoso e clientes fiéis, mas passageiros 10 % menos pacientes.",
  "OT_LIC_GAMBLER": "Apostador",
- "OT_LIC_GAMBLER_D": "Começa com copo de dados e amuleto, mas um táxi a menos."
+ "OT_LIC_GAMBLER_D": "Começa com copo de dados e amuleto, mas um táxi a menos.",
+ "OT_CURSE_LINE": "Esta etapa: %s"
 }

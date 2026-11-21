@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Charmeur",
  "OT_LIC_CHARMER_D": "Commence avec charmeur et habitués, mais passagers 10 % moins patients.",
  "OT_LIC_GAMBLER": "Flambeur",
- "OT_LIC_GAMBLER_D": "Commence avec gobelet de dés et porte-bonheur, mais un taxi de moins."
+ "OT_LIC_GAMBLER_D": "Commence avec gobelet de dés et porte-bonheur, mais un taxi de moins.",
+ "OT_CURSE_LINE": "Cette étape : %s"
 }

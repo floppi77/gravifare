@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Charmeur",
  "OT_LIC_CHARMER_D": "Start mit Charmeur und Stammkundschaft, aber Fahrgäste 10 % ungeduldiger.",
  "OT_LIC_GAMBLER": "Glücksritter",
- "OT_LIC_GAMBLER_D": "Start mit Würfelbecher und Glücksbringer, aber einem Taxi weniger."
+ "OT_LIC_GAMBLER_D": "Start mit Würfelbecher und Glücksbringer, aber einem Taxi weniger.",
+ "OT_CURSE_LINE": "Diese Etappe: %s"
 }

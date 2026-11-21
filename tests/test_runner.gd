@@ -765,6 +765,22 @@ func _test_round87() -> void:
 		Overtime.record(m, r2, "2026-11-21")
 	var board: Array = m.best.short
 	check(board.size() == Overtime.BOARD_SIZE and int(board[0].score) >= int(board[1].score) and int(m.stage_max) == 1, "Bestenliste: zehn Plätze, absteigend; nicht geschaffte Läufe schalten keine Stufe frei")
+	# Fliegbarkeit: Sperrliste aus tools/overtime_check.gd, Angebote halten sie ein
+	var bj := _read_json("res://data/overtime_block.json")
+	var bl: Dictionary = bj.get("block", {})
+	var bl_ok := not bl.is_empty()
+	for cid in bl:
+		bl_ok = bl_ok and not Overtime.curse(String(cid)).is_empty() and (bl[cid] as Array).all(func(id): return ids.has(id))
+	check(bl_ok and Overtime.blocked("heavy", String(bl.get("heavy", ["x"])[0])), "Sperrliste der Zwischenfälle vorhanden, nur bekannte Zwischenfälle und Level")
+	var viol := []
+	for sd in 40:
+		var bs := Overtime.new_run(sd * 131, "long", "standard", 7, {"xp": 99999, "stage_max": 10})
+		bs.etappe = (sd * 7) % 27
+		for o in Overtime.offers(bs, ids):
+			for c in o.curses:
+				if Overtime.blocked(String(c), String(o.level)):
+					viol.append("%s:%s" % [o.level, c])
+	check(viol.is_empty(), "Kreuzungen bieten nie einen gesperrten Zwischenfall an %s" % str(viol.slice(0, 5)))
 	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(150) == 1 and Overtime.rank_of(1000000) == Overtime.RANK_XP.size() - 1 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
 
 func _test_round87_hooks() -> void:

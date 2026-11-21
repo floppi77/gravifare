@@ -1150,5 +1150,6 @@
  "OT_LIC_CHARMER": "Encantador",
  "OT_LIC_CHARMER_D": "Empieza con encantador y clientes fijos, pero pasajeros un 10 % menos pacientes.",
  "OT_LIC_GAMBLER": "Jugador",
- "OT_LIC_GAMBLER_D": "Empieza con cubilete y amuleto, pero un taxi menos."
+ "OT_LIC_GAMBLER_D": "Empieza con cubilete y amuleto, pero un taxi menos.",
+ "OT_CURSE_LINE": "Esta etapa: %s"
 }

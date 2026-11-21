@@ -39,6 +39,9 @@ static func make(st: Dictionary, close: Callable) -> Control:
 		if int(p.get("max", 1)) > 1 and int(p.get("max", 1)) < 9:
 			name += "  " + TranslationServer.translate("OT_STACK") % [n, int(p.max)]
 		grid.add_child(_line(String(p.get("cat", "run")), String(p.get("rar", "c")), name, OvertimeIcon.RAR_COLOR.get(String(p.get("rar", "c")), Color.WHITE)))
+	for c in st.get("curses", []):
+		if String(st.get("phase", "")) == "fly" and not (st.get("pacts", []) as Array).has(c):
+			grid.add_child(_line("", "", TranslationServer.translate("OT_CURSE_LINE") % TranslationServer.translate("OT_CURSE_%s" % String(c).to_upper()), Color("#ffb3a8"), String(Overtime.curse(String(c)).get("kind", "sim"))))
 	for c in st.get("pacts", []):
 		grid.add_child(_line("", "", TranslationServer.translate("OT_PACT_LINE") % TranslationServer.translate("OT_CURSE_%s" % String(c).to_upper()), Color("#c77dff"), String(Overtime.curse(String(c)).get("kind", "sim"))))
 	var lic := Label.new()
