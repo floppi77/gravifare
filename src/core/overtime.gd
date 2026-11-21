@@ -373,6 +373,7 @@ static func offers(st: Dictionary, ids: Array) -> Array:
 		if not pool_p.is_empty():
 			out[1].pact = String(pool_p[rng.randi() % pool_p.size()])
 			out[1].reward = _roll_perk(st, rng, true, true)
+	_apply_bribe(st, out)
 	return out
 
 static func active_pacts(st: Dictionary) -> Array:
@@ -406,6 +407,7 @@ static func choose(st: Dictionary, o: Dictionary) -> void:
 	st.used.append(st.level)
 	st.phase = "fly"
 	st.bribed = -1
+	st["bribe"] = {}
 	var sal := int(effects(st).salary)
 	if sal > 0:
 		var pay := float(SALARY * sal) * (1.0 + 0.25 * float(sector_of(st, int(st.etappe)) - 1))
@@ -424,18 +426,32 @@ static func reroll_cross(st: Dictionary) -> bool:
 static func bribe_price(st: Dictionary) -> int:
 	return BRIBE_BASE * sector_of(st, int(st.etappe))
 
-## Schmiergeld: einen Zwischenfall eines Angebots streichen (einmal je Kreuzung). Gibt true zurück, wenn es geklappt hat.
-static func bribe(st: Dictionary, o: Dictionary, curse_index: int) -> bool:
-	var cs: Array = o.get("curses", [])
-	if float(effects(st).bribe) <= 0.0 or int(st.bribed) >= 0 or curse_index < 0 or curse_index >= cs.size() or float(st.credits) < bribe_price(st):
+## Schmiergeld: einen Zwischenfall eines Angebots streichen (einmal je Kreuzung). Die Streichung steht im Zustand, damit sie auch nach dem
+## Fortsetzen gilt (neu würfeln verwirft sie). Gibt true zurück, wenn es geklappt hat.
+static func bribe(st: Dictionary, ids: Array, offer_index: int, curse_index: int) -> bool:
+	var os := offers(st, ids)
+	if offer_index < 0 or offer_index >= os.size():
+		return false
+	var cs: Array = os[offer_index].get("curses", [])
+	if float(effects(st).bribe) <= 0.0 or int(st.bribed) == int(st.etappe) or curse_index < 0 or curse_index >= cs.size() or float(st.credits) < bribe_price(st):
 		return false
 	st.credits = float(st.credits) - bribe_price(st)
-	cs.remove_at(curse_index)
-	o.fare_bonus = FARE_PER_CURSE * float(cs.size())
-	if cs.size() < 2 and String(o.get("pact", "")) == "":
-		o.reward = ""
 	st.bribed = int(st.etappe)
+	st["bribe"] = {"e": int(st.etappe), "r": int((st.get("rerolls", {}) as Dictionary).get(str(int(st.etappe)), 0)), "i": offer_index, "c": String(cs[curse_index])}
 	return true
+
+static func _apply_bribe(st: Dictionary, out: Array) -> void:
+	var b: Dictionary = st.get("bribe", {})
+	if b.is_empty() or int(b.get("e", -1)) != int(st.etappe) or int(b.get("r", -1)) != int((st.get("rerolls", {}) as Dictionary).get(str(int(st.etappe)), 0)):
+		return
+	var i := int(b.get("i", -1))
+	if i < 0 or i >= out.size():
+		return
+	var o: Dictionary = out[i]
+	(o.curses as Array).erase(String(b.get("c", "")))
+	o.fare_bonus = FARE_PER_CURSE * float((o.curses as Array).size())
+	if (o.curses as Array).size() < 2 and String(o.get("pact", "")) == "":
+		o.reward = ""
 
 # --------------------------------------------------------------------------- Etappe beendet
 

@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86", "_test_round87"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86", "_test_round87", "_test_round87_hooks"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -736,7 +736,7 @@ func _test_round87() -> void:
 	fx = Overtime.effects(fxs)
 	check((float(fx.side_l) == 0.75) != (float(fx.side_r) == 0.75) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15 + 0.24), "Schiefe Düse trifft genau eine Seite; Lohn und Zwischenfälle im Fahrpreis")
 	# Wertung
-	check(Overtime.etappe_score(1000, 300, 0) == 1000 and Overtime.etappe_score(1000, 300, 2) == 1500 and Overtime.etappe_score(1000, 300, 0, 1.5) == 1150, "Etappenpunkte: +25 %% je Zwischenfall, Ass verstärkt nur die Boni")
+	check(Overtime.etappe_score(1000, 300, 0) == 1000 and Overtime.etappe_score(1000, 300, 2) == 1500 and Overtime.etappe_score(1000, 300, 0, 1.5) == 1150, "Etappenpunkte: +25 % je Zwischenfall, Ass verstärkt nur die Boni")
 	var fin := Overtime.new_run(3, "short", "standard", 0, meta)
 	fin.results = [{"score": 1000}, {"score": 500}]
 	fin.lives = 2
@@ -762,6 +762,145 @@ func _test_round87() -> void:
 	var board: Array = m.best.short
 	check(board.size() == Overtime.BOARD_SIZE and int(board[0].score) >= int(board[1].score) and int(m.stage_max) == 1, "Bestenliste: zehn Plätze, absteigend; nicht geschaffte Läufe schalten keine Stufe frei")
 	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(150) == 1 and Overtime.rank_of(1000000) == Overtime.RANK_XP.size() - 1 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
+
+func _test_round87_hooks() -> void:
+	## Runde 87: Ausstattung und Zwischenfälle der Sonderschicht in TaxiSim und Run; Grundwerte rechnen wie bisher.
+	var lvl := _lvl()
+	var fly := func(mods: Dictionary, input: Vector2, ticks: int) -> TaxiSim:
+		var s := TaxiSim.new()
+		s.setup(lvl)
+		s.apply_mods(mods)
+		s.state = TaxiSim.State.FLYING
+		s.pos = Vector2(400, 100)
+		s.vel = Vector2.ZERO
+		for i in ticks:
+			s.step(input, false)
+		return s
+	var base: TaxiSim = fly.call({}, Vector2(0, -1), 30)
+	var same: TaxiSim = fly.call(Overtime.sim_mods(Overtime.effects(Overtime.new_run(1, "short", "standard", 0, Overtime.default_meta()))), Vector2(0, -1), 30)
+	check(base.vel == same.vel and base.pos == same.pos and base.fuel == same.fuel, "Serienwerte der Sonderschicht fliegen bitgleich wie die Karriere")
+	var turbo: TaxiSim = fly.call({"thrust_k": 1.15}, Vector2(0, -1), 30)
+	check(turbo.vel.y < base.vel.y - 5.0, "Turbodüse: steigt schneller (%.1f gegen %.1f)" % [turbo.vel.y, base.vel.y])
+	var left: TaxiSim = fly.call({"side_l": 0.75}, Vector2(-1, 0), 30)
+	var right: TaxiSim = fly.call({"side_l": 0.75}, Vector2(1, 0), 30)
+	check(absf(left.vel.x) < absf(right.vel.x) * 0.85, "Schiefe Düse: links schwächer als rechts")
+	var s := TaxiSim.new()
+	s.setup(lvl)
+	s.apply_mods({"thrust_k": 1.1, "leak": 0.4, "overheat": true, "angel": 1, "spike_shield": 1, "impact_safe": 52.0})
+	s.apply_mods({})
+	check(s.thrust_k == 1.0 and s.leak == 0.0 and not s.overheat and s.angel == 0 and s.spike_shield == 0 and s.impact_safe == Tuning.IMPACT_SAFE, "apply_mods ohne Schlüssel setzt alles auf Serie zurück (nichts bleibt aus der Vor-Etappe)")
+	var leak := TaxiSim.new()
+	leak.setup(lvl)
+	leak.apply_mods({"leak": 0.35})
+	var f0 := leak.fuel
+	for i in 240:
+		leak.step(Vector2.ZERO, true)
+	check(leak.state == TaxiSim.State.LANDED and absf((f0 - leak.fuel) - 0.7) < 0.01, "Leck: verliert auch im Stand 0,35 je Sekunde (%.2f)" % (f0 - leak.fuel))
+	var hot: TaxiSim = fly.call({"overheat": true}, Vector2(0, -1), 1)
+	var p_full := hot.up_power()
+	var got_hot := false
+	for i in int(3.2 * 120):
+		hot.step(Vector2(0, -1), false)
+		hot.pos = Vector2(400, 100)
+		hot.vel = Vector2.ZERO
+		got_hot = got_hot or hot.events.any(func(e): return e.type == "overheat")
+	check(got_hot and hot.jet_hot and p_full > 0.0 and is_equal_approx(hot.up_power(), Tuning.THRUST_UP * TaxiSim.OVERHEAT_K), "Heiße Düse: nach 3 s Vollgas nur noch 60 % Schub")
+	for i in int(4.0 * 120):
+		hot.step(Vector2.ZERO, false)
+		hot.pos = Vector2(400, 100)
+		hot.vel = Vector2.ZERO
+	check(not hot.jet_hot, "Heiße Düse: kühlt ohne Vollgas wieder ab")
+	var ang := TaxiSim.new()
+	ang.setup(lvl)
+	ang.apply_mods({"angel": 1})
+	ang.state = TaxiSim.State.FLYING
+	ang.hull = 5.0
+	ang._impact(100.0)
+	check(ang.state != TaxiSim.State.DESTROYED and ang.hull == 1.0 and ang.angel == 0, "Schutzengel: Zerstörung lässt einen Hüllenpunkt, einmal")
+	ang._impact(200.0)
+	check(ang.state == TaxiSim.State.DESTROYED, "Schutzengel verbraucht: das nächste Mal ist das Taxi verloren")
+	var sp := TaxiSim.new()
+	sp.setup(lvl)
+	sp.apply_mods({"spike_shield": 1})
+	sp._spike_hit()
+	var h1 := sp.hull
+	sp.spike_cd = 0.0
+	sp._spike_hit()
+	check(h1 == Tuning.HULL_MAX and sp.hull == Tuning.HULL_MAX - Tuning.SPIKE_DAMAGE, "Dornenschutz: erste Berührung je Level kostet nichts, die zweite schon")
+	var bump := TaxiSim.new()
+	bump.setup(lvl)
+	bump.apply_mods({"impact_safe": Tuning.IMPACT_SAFE + 12.0})
+	bump._impact(50.0)
+	check(bump.hull == Tuning.HULL_MAX, "Stoßfänger: Aufprall mit 50 px/s bleibt harmlos")
+	# Run: Fahrpreis, Barzahler, Notreserve, Säule im Takt, Schleudersitz
+	var info := {"fare": 100.0, "par": 20.0, "slope": 1.0, "base": 0.0, "penalty": 0.0, "combo": 0, "job": 0}
+	var pa := PassengerActor.new()
+	pa.pay_info = info
+	var pay0 := pa.pay_for(0.0)
+	pa.pay_info = info.merged({"tmax": 0.2})
+	check(pa.pay_for(0.0) > pay0, "Taxameter-Tuning: schnelle Fahrt zahlt mehr als bisher höchstens")
+	var r := Run.new()
+	r.ot = {"fare_k": 2.0}
+	r.start(lvl)
+	var job: Dictionary = r.jobs[0]
+	check(is_equal_approx(float(r._make_pay_info(job, 1.0, 0.0).fare), float(job.fare) * r.job_mult(job) * 2.0), "Fahrpreis-Faktor der Sonderschicht landet in der Zahlung")
+	var rc := Run.new()
+	rc.ot = {"cash": 1.0}
+	rc.start(lvl)
+	var pac := PassengerActor.new()
+	pac.pay_info = info.duplicate()
+	rc.money = 10.0
+	rc._pay_leaver(pac, 0.0)
+	check(rc.money == 10.0 and rc.ot_pot > 0.0, "Barzahler: Geld liegt in der Kasse, nicht auf dem Konto")
+	rc.sim.hull = 0.0
+	rc.sim.state = TaxiSim.State.DESTROYED
+	rc.step(Vector2.ZERO, true)
+	rc.respawn_after_crash()
+	check(rc.ot_pot == 0.0 and rc.log.any(func(e): return e.type == "ot_cash_lost") or rc.pending_log.any(func(e): return e.type == "ot_cash_lost"), "Barzahler: Absturz kostet die Kasse")
+	var rr := Run.new()
+	rr.ot = {"reserve": 1.0}
+	rr.start(lvl)
+	rr.sim.state = TaxiSim.State.FLYING
+	rr.sim.pos = Vector2(400, 100)
+	rr.sim.fuel = 0.0
+	rr.step(Vector2.ZERO, false)
+	var refill := rr.sim.fuel
+	rr.sim.fuel = 0.0
+	rr.step(Vector2.ZERO, false)
+	check(refill >= Run.RESERVE_FUEL - 0.1 and rr.sim.fuel == 0.0 and rr.fuel_dead_t > 0.0, "Notreserve: einmal 15 % Sprit, danach nicht mehr")
+	var rp := Run.new()
+	rp.ot = {"pump_cycle": 1.0}
+	rp.start(lvl)
+	rp.level_time = 3.0
+	var open_now := not rp._ot_pump_shut()
+	rp.level_time = 9.0
+	check(open_now and rp._ot_pump_shut(), "Säule im Takt: 7 s offen, 5 s zu")
+	var rs := Run.new()
+	rs.ot = {"seat": 1.0}
+	rs.start(lvl)
+	_land_on(rs, String(lvl.jobs[0].from))
+	for i in 600:
+		rs.step(Vector2.ZERO, true)
+	var was_carry := rs.phase == Run.Phase.CARRYING
+	rs.sim.hull = 0.0
+	rs.sim.state = TaxiSim.State.DESTROYED
+	rs.step(Vector2.ZERO, true)
+	rs.respawn_after_crash()
+	for i in 360:
+		rs.step(Vector2.ZERO, true)
+	check(was_carry and rs.missed == 0 and rs.job_index == 0 and rs.actor != null, "Schleudersitz: Fahrgast überlebt den Absturz und wartet erneut")
+	var rk := Run.new()
+	rk.ot = {"repair_k": 0.6}
+	rk.start(lvl)
+	rk.taxi_damage = 50.0
+	rk.money = 10000.0
+	rk._finish_level()
+	check(is_equal_approx(rk.repair_cost, snappedf(50.0 * Tuning.REPAIR_COST * 0.6, 1.0)), "Billigwerkstatt: Reparatur 40 % günstiger")
+	var re := Run.new()
+	re.ot = {"extra_add": 1.0}
+	var lv9 := LevelData.load_file("res://data/levels/s2_01.json")
+	re.start(lv9)
+	check(re.extra_slots() == Tuning.extra_slots(lv9.number) + 1, "Doppelschicht: ein Zusatzfahrgast mehr gleichzeitig")
 
 func _test_round86() -> void:
 	## Runde 86: kleine Details (nur Darstellung, Ton und Kalender – der Ablauf der Simulation bleibt gleich) und native Stimmen it/pt/pl.

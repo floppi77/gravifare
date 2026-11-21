@@ -254,8 +254,11 @@ const DIST_BONUS_WINDOW := 0.06   # max. Abzug je harter Landung (Sinkrate = Lim
 
 ## `slope_k`: teure Fahrten verlieren schneller an Wert, billige langsamer (die Zeit läuft für sie schneller bzw. langsamer; siehe Run.price_slope).
 ## Alle starten bei PAY_MAX; bei k = 1 liegt der Faktor bei der Richtzeit genau bei 1,0.
-static func time_factor(t: float, par: float, slope_k := 1.0) -> float:
+## `bonus` (Sonderschicht, Taxameter-Tuning): schnelle Fahrten steigen steiler und höher (nur unter der Richtzeit; 0 = wie immer).
+static func time_factor(t: float, par: float, slope_k := 1.0, bonus := 0.0) -> float:
 	var ratio := t / maxf(par, 1.0) * slope_k
+	if bonus > 0.0 and ratio < 1.0:
+		return clampf(1.0 + (1.0 - ratio) * (PAY_SLOPE + bonus), PAY_MIN, PAY_MAX + bonus)
 	return clampf(1.0 + (1.0 - ratio) * PAY_SLOPE, PAY_MIN, PAY_MAX)
 
 ## Landeabzug (Anteil des Fahrpreises). Regelstand 4: linear ab dem Ende des grünen Ampelbereichs (GAUGE_GREEN × erlaubte Sinkrate, mit

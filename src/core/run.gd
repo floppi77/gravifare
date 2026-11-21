@@ -112,6 +112,12 @@ var near_cd := 0.0                # Sperrzeit nach einem Beinahe-Treffer (Trinkg
 var near_tips := 0                # Trinkgelder der laufenden Fahrt (höchstens Tuning.NEAR_TIP_MAX)
 var tips := 0.0                   # Trinkgeld in diesem Level (Ergebnisansicht)
 var _shift_pick_job := -1         # Auftrag, dessen Abholung schon gezählt ist
+# Sonderschicht (Overtime.run_mods): Wirtschaft und Fahrgäste. Leer = jede andere Spielart, dann rechnet alles wie bisher.
+var ot: Dictionary = {}
+var ot_pot := 0.0                 # Zwischenfall „Barzahler“: Einnahmen des Levels, ausgezahlt erst am Levelende
+var ot_reserve_used := false      # Notreserve schon genutzt (einmal je Etappe)
+var ot_pump_closed := false       # Säule im Takt: gerade geschlossen gemeldet
+var ot_events := {}               # Zähler für die Etappenauswertung (Prämien, Notreserve, Schutzengel …)
 var _shift_drop_job := -1
 
 func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> void:
@@ -186,6 +192,10 @@ func start(lvl: LevelData, fuel_in := -1.0, credits_in := 0.0, seed := -1) -> vo
 	tips = 0.0
 	_shift_pick_job = -1
 	_shift_drop_job = -1
+	ot_pot = 0.0
+	ot_reserve_used = false
+	ot_pump_closed = false
+	ot_events = {}
 	level_time = 0.0
 	pump_touches = 0
 	pump_cd = 0.0
@@ -252,6 +262,10 @@ static func chain_jobs(lvl: LevelData, n: int, rng: RandomNumberGenerator) -> Ar
 
 ## Runde 86: Abschied nach dem Aussteigen – nur Darstellung und Ton (Weg, Zeit und Bezahlung bleiben gleich).
 ## Harte Landung (Landeabzug) → rennt schimpfend weg; perfekte Landung → winkt am Häuschen; sonst wie bisher.
+## Wert aus den Sonderschicht-Wirkungen (Grundwert, wenn keine Sonderschicht läuft).
+func otv(key: String, d: float) -> float:
+	return float(ot.get(key, d))
+
 func _note_farewell(a: PassengerActor) -> void:
 	if a == null:
 		return
@@ -512,7 +526,7 @@ func kind_mult(job: Dictionary) -> float:
 func deadline_of(job: Dictionary) -> float:
 	if kind_of(job) != "emergency":
 		return -1.0
-	return par_of(job) * (Tuning.emergency_deadline(level.sector) if rules >= 4 else Tuning.EMERGENCY_DEADLINE)
+	return par_of(job) * (Tuning.emergency_deadline(level.sector) if rules >= 4 else Tuning.EMERGENCY_DEADLINE) * otv("deadline_k", 1.0)
 
 ## Restzeit des Notfalls im laufenden Auftrag (-1: kein Notfall oder Fahrgast noch nicht da / schon abgesetzt).
 func emergency_left() -> float:
@@ -570,7 +584,7 @@ func prospect() -> float:
 	var j := current_job()
 	if j.is_empty():
 		return 0.0
-	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j), price_slope(j)) * combo_mult(streak)
+	return float(j.get("fare", 50)) * job_mult(j) * Tuning.time_factor(job_clock, par_of(j), price_slope(j), otv("tmax", 0.0)) * combo_mult(streak) * otv("fare_k", 1.0)
 
 ## Wie schnell der Fahrpreis mit der Zeit fällt: Je höher der Ausgangspreis gegenüber dem Durchschnitt des Levels, desto schneller sinkt er
 ## (großzügige Fahrgäste kürzen schneller), wer wenig zahlt, zahlt länger wenig. 0,8 … 1,3.
@@ -608,7 +622,10 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		return
 	if level.has_meteors():
 		level.meteor_avoid = _meteor_avoid()
+	sim.loaded = phase == Phase.CARRYING or not _extra_aboard().is_empty()      # Schwere Fracht (Sonderschicht) wirkt nur mit Fahrgast an Bord
 	sim.step(input, gear_request, dt)
+	if not ot.is_empty():
+		_ot_step(dt)
 	for e in sim.events:
 		log.append(e)
 		if e.type == "landed":
@@ -621,6 +638,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 			damage_taken += float(e.amount)
 			taxi_damage += float(e.amount)
 			_ride_hit(e)
+		elif e.type == "angel" or e.type == "shield":
+			ot_events[e.type] = int(ot_events.get(e.type, 0)) + 1
 	_check_fuel(dt)
 	if sim.state == TaxiSim.State.DESTROYED:
 		result = Result.FAILED
@@ -665,7 +684,7 @@ func _service_life(dt: float) -> void:
 		life_timer = 0.0
 		life_note = false
 		return
-	if shift_mode:                           # Nachtschicht: Lebensstationen sind außer Betrieb
+	if shift_mode or otv("no_life", 0.0) > 0.0:     # Nachtschicht (und höchste Überstunden-Stufe): Lebensstationen sind außer Betrieb
 		if not life_note:
 			life_note = true
 			log.append({"type": "life_denied", "full": false, "off": true, "price": 0})
@@ -691,6 +710,12 @@ func _check_fuel(dt: float) -> void:
 	var refuelable: bool = sim.state == TaxiSim.State.LANDED and bool(sim.landed_pad.get("fuel", false)) and not station_down()
 	if refuelable:
 		fuel_dead_t = 0.0
+		return
+	if otv("reserve", 0.0) > 0.0 and not ot_reserve_used:
+		ot_reserve_used = true                   # Notreserve (Sonderschicht): einmal je Etappe springt der Reservetank ein
+		sim.fuel = minf(sim.fuel_cap, RESERVE_FUEL)
+		log.append({"type": "ot_reserve"})
+		ot_events["reserve"] = 1
 		return
 	if fuel_dead_t == 0.0:
 		log.append({"type": "out_of_fuel"})
@@ -734,7 +759,7 @@ func due_share(fee: float) -> float:
 ## Gemeinsame Buchhaltung für einen nicht beförderten Pflichtauftrag (verpasst oder rausgeworfen).
 func _lose_job(pname: String, extra_fee := 0.0) -> void:
 	var lj: Dictionary = jobs[job_index]
-	var fee := maxf(snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.missed_fee_factor(level.sector), 1.0), snappedf(extra_fee, 1.0))
+	var fee := maxf(snappedf(float(lj.get("fare", 50)) * job_mult(lj) * Tuning.missed_fee_factor(level.sector) * otv("missed_k", 1.0), 1.0), snappedf(extra_fee, 1.0))
 	missed += 1
 	var shown := due_share(fee)                  # Meldung: der Betrag, der tatsächlich abgezogen wird (nach dem 40-%-Deckel)
 	missed_due += fee                            # fällig am Levelende, nicht sofort
@@ -839,7 +864,7 @@ func _pick_new_pad(job: Dictionary, current_id: String, attempt: int) -> String:
 ## Perfekte Landung = weich (≤ 22 px/s), kaum seitlich (≤ 12 px/s), waagerecht (≤ 4°). Serie bis +30 % Fahrpreis.
 func _evaluate_landing(e: Dictionary) -> void:
 	var flown := _flown(e)
-	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
+	if not flown and float(e.vy) <= Tuning.LAND_SOFT_VY + otv("soft_add", 0.0) and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT:
 		return          # Hüpfer direkt nach dem Abheben: weder perfekt noch Serienbruch
 	landing_count += 1
 	last_landing_perfect = perfect_landing(e)
@@ -853,7 +878,7 @@ func _evaluate_landing(e: Dictionary) -> void:
 
 ## Zählt diese Landung als perfekt (weich, gerade, waagerecht, nach echtem Flug)? Das Spiel wählt danach den Aufsetzklang.
 func perfect_landing(e: Dictionary) -> bool:
-	return _flown(e) and float(e.vy) <= Tuning.LAND_SOFT_VY and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT
+	return _flown(e) and float(e.vy) <= Tuning.LAND_SOFT_VY + otv("soft_add", 0.0) and float(e.vx) <= Tuning.PERFECT_VX and float(e.tilt) <= Tuning.PERFECT_TILT
 
 ## Echter Flug seit dem Abheben, kein Hüpfer auf der Stelle.
 func _flown(e: Dictionary) -> bool:
@@ -865,7 +890,7 @@ func _break_streak() -> void:
 	streak = 0
 
 func combo_mult(combo: int) -> float:
-	return 1.0 + Tuning.COMBO_STEP * float(mini(combo, Tuning.COMBO_MAX))
+	return 1.0 + Tuning.COMBO_STEP * otv("combo_k", 1.0) * float(mini(combo, Tuning.COMBO_MAX))
 
 func _finish_level() -> void:
 	var job := current_job()
@@ -876,11 +901,15 @@ func _finish_level() -> void:
 		job_index += 1
 		actor = null
 	_settle_pending()
+	if ot_pot > 0.0:                            # Barzahler: jetzt wird bar ausgezahlt
+		money += ot_pot
+		log.append({"type": "ot_cash", "amount": ot_pot})
+		ot_pot = 0.0
 	var due := minf(missed_due, floorf(money * Tuning.MISSED_FEE_CAP))           # Strafen für verlorene Pflichtfahrgäste: höchstens 40 % des Guthabens
 	money -= due
 	missed_fees += due
 	missed_due = 0.0
-	repair_cost = minf(snappedf(minf(taxi_damage, Tuning.HULL_MAX) * Tuning.REPAIR_COST, 1.0), money)
+	repair_cost = minf(snappedf(minf(taxi_damage, Tuning.HULL_MAX) * Tuning.REPAIR_COST * otv("repair_k", 1.0), 1.0), money)
 	if repair_cost > 0.0:
 		money -= repair_cost
 		log.append({"type": "cost", "what": "repair", "amount": repair_cost})
@@ -1054,8 +1083,8 @@ func _service_pad(dt: float) -> void:
 		if not pump_warned:
 			pump_warned = true
 			log.append({"type": "pump_out"})
-	elif pad.fuel and sim.fuel < sim.fuel_cap:
-		var want := minf(Tuning.REFUEL_RATE * dt, sim.fuel_cap - sim.fuel)
+	elif pad.fuel and sim.fuel < sim.fuel_cap and not _ot_pump_shut():
+		var want := minf(Tuning.REFUEL_RATE * otv("refuel_k", 1.0) * dt, sim.fuel_cap - sim.fuel)
 		var low := sim.fuel < Tuning.EMERGENCY_FUEL
 		var cost := want * fuel_price()
 		if rules >= 3 and low and not free_latch and money < cost:
@@ -1092,6 +1121,7 @@ func _service_pad(dt: float) -> void:
 				_note_drop(job)
 				dropoff_clock = job_clock
 				actor.pay_info = _make_pay_info(job, dropoff_clock, pen_pick, pen_drop)
+				_ot_picky(actor)
 				actor.step_out(sim.pos.x, level.pads[String(job.to)])
 				_note_farewell(actor)
 		Phase.DROPOFF:
@@ -1139,8 +1169,8 @@ func _check_near_tip(dt: float) -> void:
 		if not ex.is_empty() and int(ex.state) == ES.CARRY:
 			ride = ex.job
 	var tip := 0.0
-	if not ride.is_empty() and near_tips < Tuning.NEAR_TIP_MAX:
-		tip = maxf(1.0, roundf(float(ride.get("fare", 50)) * Tuning.NEAR_TIP_FRACTION))      # Grundfahrpreis (ohne VIP-/Notfall-Aufschlag)
+	if not ride.is_empty() and near_tips < Tuning.NEAR_TIP_MAX + int(otv("tip_add", 0.0)):
+		tip = maxf(1.0, roundf(float(ride.get("fare", 50)) * Tuning.NEAR_TIP_FRACTION * otv("tip_k", 1.0)))      # Grundfahrpreis (ohne VIP-/Notfall-Aufschlag)
 		near_tips += 1
 		money += tip
 		earned += tip
@@ -1171,9 +1201,15 @@ func _make_pay_info(job: Dictionary, base_clock: float, pen_pickup: float, pen_d
 	# Aufteilung für die Meldung: Landung, Treffer, falsche Plattform (die Fahrtanteile im Verhältnis ihrer Summen, nach der Obergrenze)
 	var raw := pen_hit_sum + pen_wrong_sum
 	var hit := pen_ride * pen_hit_sum / raw if raw > 0.0 else 0.0
-	return {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "slope": price_slope(job), "base": base_clock,
+	var info := {"fare": float(job.get("fare", 50)) * job_mult(job), "par": par_of(job), "slope": price_slope(job), "base": base_clock,
 		"penalty": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff) * (1.0 - pen_ride), "combo": streak, "job": job_index, "name": String(job.get("passenger", "")),
 		"pen_land": 1.0 - (1.0 - pen_pickup) * (1.0 - pen_dropoff), "pen_hit": hit, "pen_wrong": pen_ride - hit}
+	if not ot.is_empty():                       # Sonderschicht: Fahrpreis, Gehzeit, Zeitbonus und Serienbonus nach Ausstattung und Zwischenfällen
+		info.fare = float(info.fare) * otv("fare_k", 1.0)
+		info["walk_k"] = otv("walk_k", 1.0)
+		info["tmax"] = otv("tmax", 0.0)
+		info["combo_k"] = otv("combo_k", 1.0)
+	return info
 
 func _reset_ride_pen() -> void:
 	pen_ride = 0.0
@@ -1184,7 +1220,7 @@ func _reset_ride_pen() -> void:
 ## (mit der Sinkrate des Werkstatt-Fahrwerks); ältere Läufe wie damals.
 func _land_pen(vy: float, pickup := false) -> float:
 	if rules >= 4:
-		return 0.0 if pickup else Tuning.landing_penalty(vy, sim.land_vy, rules)
+		return 0.0 if pickup else Tuning.landing_penalty(vy, sim.land_vy, rules) * otv("pen_k", 1.0)
 	return Tuning.landing_penalty(vy, Tuning.LAND_VY, rules)
 
 ## Auszahlung, wenn der Fahrgast sein Häuschen erreicht hat; extra_time = noch fehlende Gehzeit (beim Levelende).
@@ -1195,7 +1231,10 @@ func _pay_leaver(l: PassengerActor, extra_time: float) -> void:
 	var factor := l.factor_for(extra_time)
 	var pen := float(l.pay_info.penalty)
 	var total_time := float(l.pay_info.base) + l.exit_time + extra_time
-	money += pay
+	if otv("cash", 0.0) > 0.0 and result == Result.RUNNING:
+		ot_pot += pay                           # Barzahler: in der Kasse, nicht auf dem Konto (ein Absturz kostet sie)
+	else:
+		money += pay
 	earned += pay
 	var is_extra: bool = l.pay_info.get("extra", false)
 	if is_extra:
@@ -1252,7 +1291,11 @@ func _respawn_after_crash() -> void:
 	respawns += 1
 	fuel_dead_t = 0.0
 	fuel_fail = false
-	var fee := minf(Tuning.replacement_fee(level.number), money)
+	if ot_pot > 0.0:
+		log.append({"type": "ot_cash_lost", "amount": ot_pot})
+		earned -= ot_pot
+		ot_pot = 0.0
+	var fee := minf(Tuning.replacement_fee(level.number) * otv("taxi_fee_k", 1.0), money)
 	if fee > 0.0:
 		money -= fee
 		taxi_fees += fee
@@ -1265,7 +1308,18 @@ func _respawn_after_crash() -> void:
 	result = Result.RUNNING
 	last_vy = 0.0
 	streak = 0
-	if lost:
+	if lost and otv("seat", 0.0) > 0.0:
+		# Schleudersitz (Sonderschicht): Der Fahrgast überlebt und wartet erneut an seiner Plattform; seine Zeit läuft weiter.
+		log.append({"type": "ot_seat", "name": actor.pname})
+		ot_events["seat"] = int(ot_events.get("seat", 0)) + 1
+		actor = null
+		pen_pick = 0.0
+		pen_drop = 0.0
+		_reset_ride_pen()
+		respawn_keep_clock = true
+		spawn_timer = 1.5
+		spawn_wait = false
+	elif lost:
 		# Pflichtfahrgast mit dem Taxi verloren: der Auftrag gilt als verpasst (Strafe, ein Pflichtfahrgast weniger).
 		# War es der letzte (Ausgangs-)Fahrgast, bleibt das Tor offen.
 		_reset_ride_pen()
@@ -1295,7 +1349,7 @@ func _respawn_after_crash() -> void:
 ## dazu +25 % je Berührung der Zapfsäule, gedeckelt (1,6 × Maximalpreis).
 func fuel_price() -> float:
 	var touches := mini(pump_touches, Tuning.PUMP_TOUCHES_TO_BREAK)
-	return minf(price_base * (1.0 + Tuning.PRICE_TOUCH_SURCHARGE * float(touches)), level.fuel_price_max * Tuning.PRICE_HARD_CAP)
+	return minf(price_base * (1.0 + Tuning.PRICE_TOUCH_SURCHARGE * float(touches)), level.fuel_price_max * Tuning.PRICE_HARD_CAP) * otv("fuel_price_k", 1.0)
 
 func station_down() -> bool:
 	return pump_touches >= Tuning.PUMP_TOUCHES_TO_BREAK
@@ -1387,7 +1441,10 @@ func extras_active() -> bool:
 
 ## Gleichzeitig wartende Zusatzfahrgäste: im Tutorial genau einer (nur auf Befehl des Skripts), sonst nach Levelnummer.
 func extra_slots() -> int:
-	return 1 if level.tutorial else Tuning.extra_slots(level.number)
+	if level.tutorial:
+		return 1
+	var n := Tuning.extra_slots(level.number)
+	return n + int(otv("extra_add", 0.0)) if n > 0 else 0
 
 func extra_busy() -> bool:
 	return not _extra_aboard().is_empty() or extras.any(func(e): return int(e.state) == ES.BOARD)
@@ -1431,7 +1488,7 @@ func extra_of(a: PassengerActor) -> Dictionary:
 
 ## Voraussichtlicher Fahrpreis eines wartenden/aufgenommenen Zusatzfahrgasts (tickt mit der Zeit herunter).
 func extra_prospect(e: Dictionary) -> float:
-	return float(e.job.fare) * job_mult(e.job) * Tuning.time_factor(float(e.clock), par_of(e.job), price_slope(e.job)) * combo_mult(streak)
+	return float(e.job.fare) * job_mult(e.job) * Tuning.time_factor(float(e.clock), par_of(e.job), price_slope(e.job), otv("tmax", 0.0)) * combo_mult(streak) * otv("fare_k", 1.0)
 
 func extra_factor(e: Dictionary) -> float:
 	return Tuning.time_factor(float(e.clock), par_of(e.job), price_slope(e.job))
@@ -1499,8 +1556,8 @@ func _spawn_extra(force_from := "", force_to := "") -> void:
 		job["fare"] = snappedf(base_fare * 1.25, 5.0)
 	var roll := type_rng.randf()                     # eigener Strom: je Zusatzfahrgast genau ein Wurf, flow_rng bleibt unverändert
 	var roll_kind := type_rng.randf()
-	if rules >= 3 and types_enabled and not medical and not level.tutorial and force_from == "" and roll < Tuning.extra_kind_chance(level.sector):
-		job["kind"] = "vip" if roll_kind < 0.5 else "emergency"
+	if rules >= 3 and types_enabled and not medical and not level.tutorial and force_from == "" and roll < Tuning.extra_kind_chance(level.sector) * (1.0 + 0.5 * (otv("vip_k", 1.0) - 1.0)):
+		job["kind"] = "vip" if roll_kind < 0.5 * otv("vip_k", 1.0) else "emergency"
 	var a := PassengerActor.new()
 	a.setup(job, level.pads[from_id], 100 + extra_count, false)
 	var pat := flow_rng.randf_range(Tuning.EXTRA_PATIENCE_MIN, Tuning.EXTRA_PATIENCE_MAX) * patience_k
@@ -1593,6 +1650,7 @@ func _service_extras() -> void:
 			info["extra"] = true
 			info["job"] = -1
 			aboard.actor.pay_info = info
+			_ot_picky(aboard.actor)
 			aboard.actor.step_out(sim.pos.x, level.pads[String(aboard.job.to)])
 			_note_farewell(aboard.actor)
 		return
@@ -1607,3 +1665,34 @@ func _service_extras() -> void:
 		w.state = ES.BOARD
 		w.pen_pick = _land_pen(last_vy, true)
 		_reset_ride_pen()
+
+# ---------------------------------------------------------------- Sonderschicht (Ausstattung und Zwischenfälle in der Auftragslogik)
+const RESERVE_FUEL := 15.0
+const PUMP_CYCLE := 12.0          # Säule im Takt: alle 12 s …
+const PUMP_OPEN := 7.0            # … 7 s offen
+const PICKY_VY := 35.0            # Anspruchsvolle Kundschaft: ab dieser Sinkrate beim Absetzen zahlt der Fahrgast nichts (wie „hart“ der Nachtschicht)
+
+func _ot_step(dt: float) -> void:
+	var rep := otv("self_repair", 0.0)
+	if rep > 0.0 and sim.state == TaxiSim.State.LANDED and sim.hull < Tuning.HULL_MAX:
+		var h := minf(rep * dt, Tuning.HULL_MAX - sim.hull)
+		sim.hull += h
+		taxi_damage = maxf(0.0, taxi_damage - h)
+	if otv("pump_cycle", 0.0) > 0.0 and sim.state == TaxiSim.State.LANDED and bool(sim.landed_pad.get("fuel", false)):
+		var shut := _ot_pump_shut()
+		if shut and not ot_pump_closed:
+			log.append({"type": "ot_pump_closed", "open_in": PUMP_CYCLE - fmod(level_time, PUMP_CYCLE)})
+		ot_pump_closed = shut
+	else:
+		ot_pump_closed = false
+
+## Säule im Takt: gerade geschlossen?
+func _ot_pump_shut() -> bool:
+	return otv("pump_cycle", 0.0) > 0.0 and fmod(level_time, PUMP_CYCLE) >= PUMP_OPEN
+
+## Zwischenfall „Anspruchsvolle Kundschaft“: Nach einer harten Landung zahlt der Fahrgast nichts.
+func _ot_picky(a: PassengerActor) -> void:
+	if otv("picky", 0.0) <= 0.0 or a == null or a.pay_info.is_empty() or last_vy <= PICKY_VY:
+		return
+	a.pay_info["fare"] = 0.0
+	log.append({"type": "ot_picky", "name": a.pname, "voice": a.voice_key()})

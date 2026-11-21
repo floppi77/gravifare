@@ -30,6 +30,27 @@ var burn_k := 1.0            # Werkstatt: Verbrauchsfaktor, Aufprallschaden-Fakt
 var damage_k := 1.0
 var land_vy := Tuning.LAND_VY
 var rules := 4               # Regelstand (Run.rules): ab 4 trifft Lava schon am Rumpf und mit Tuning.HEAT_DAMAGE
+# Sonderschicht (Overtime.sim_mods): Ausstattung und Zwischenfälle. Alle Grundwerte lassen die Rechnung bitgleich (Faktor 1, Grenzen wie in Tuning).
+var thrust_k := 1.0          # Hauptdüse
+var side_k := 1.0            # Seitendüsen
+var side_l := 1.0            # Schiefe Düse: eine Seite schwächer
+var side_r := 1.0
+var down_k := 1.0            # Bremsdüse
+var drag_k := 1.0            # Dämpfung (Schmierfilm: weniger)
+var gear_time_k := 1.0       # Fahrwerkszeit
+var land_tilt := Tuning.LAND_TILT
+var land_vx := Tuning.LAND_VX
+var impact_safe := Tuning.IMPACT_SAFE
+var heat_k := 1.0            # Hitze und Plasmastrahl
+var mover_k := 1.0           # Trümmer, Verkehr, Meteoriten
+var spike_shield := 0        # Dornenschutz: so viele Berührungen ohne Schaden (je Level)
+var overheat := false        # Heiße Düse: Dauerschub überhitzt die Hauptdüse
+var jet_heat := 0.0          # Sekunden Dauerschub (kühlt ab, wenn man vom Gas geht)
+var jet_hot := false
+var leak := 0.0              # Leck: Sprit je Sekunde, auch im Stand
+var heavy_k := 1.0           # Schwere Fracht: Schubfaktor mit Fahrgast an Bord
+var loaded := false          # Fahrgast an Bord (setzt Run vor jedem Schritt)
+var angel := 0               # Schutzengel: so oft bleibt bei Zerstörung 1 Hüllenpunkt
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -67,11 +88,45 @@ func setup(lvl: LevelData) -> void:
 			landed_pad = pad
 			break
 
-## Werkstatt-Einbauten anwenden ({burn, damage, land_vy}, siehe Workshop.mods_for).
+## Werkstatt-Einbauten anwenden ({burn, damage, land_vy}, siehe Workshop.mods_for), in der Sonderschicht auch Ausstattung und Zwischenfälle
+## (Overtime.sim_mods). Fehlende Schlüssel setzen den Serienwert: Das Taxi lebt über mehrere Level, nichts darf von einer Etappe in die nächste mitlaufen.
 func apply_mods(m: Dictionary) -> void:
 	burn_k = float(m.get("burn", 1.0))
 	damage_k = float(m.get("damage", 1.0))
 	land_vy = float(m.get("land_vy", Tuning.LAND_VY))
+	thrust_k = float(m.get("thrust_k", 1.0))
+	side_k = float(m.get("side_k", 1.0))
+	side_l = float(m.get("side_l", 1.0))
+	side_r = float(m.get("side_r", 1.0))
+	down_k = float(m.get("down_k", 1.0))
+	drag_k = float(m.get("drag_k", 1.0))
+	gear_time_k = float(m.get("gear_time_k", 1.0))
+	land_tilt = float(m.get("land_tilt", Tuning.LAND_TILT))
+	land_vx = float(m.get("land_vx", Tuning.LAND_VX))
+	impact_safe = float(m.get("impact_safe", Tuning.IMPACT_SAFE))
+	heat_k = float(m.get("heat_k", 1.0))
+	mover_k = float(m.get("mover_k", 1.0))
+	spike_shield = int(m.get("spike_shield", 0))
+	overheat = bool(m.get("overheat", false))
+	leak = float(m.get("leak", 0.0))
+	heavy_k = float(m.get("heavy_k", 1.0))
+	angel = int(m.get("angel", 0))
+	jet_heat = 0.0
+	jet_hot = false
+	loaded = false
+
+## Hülle aufgebraucht? Dann ist das Taxi zerstört – außer ein Schutzengel (Sonderschicht) lässt einen Hüllenpunkt übrig.
+func _hull_check() -> void:
+	if hull > 0.0:
+		return
+	if angel > 0:
+		angel -= 1
+		hull = 1.0
+		events.append({"type": "angel"})
+		return
+	hull = 0.0
+	state = State.DESTROYED
+	events.append({"type": "destroyed"})
 
 ## Wirksame Düsenstärken und Dämpfung: gleiten vom Reisemodus (Fahrwerk drin) zum Feinmodus (draußen).
 ## Tor schließt auf dem Taxi: Schaden, und das Taxi wird zur nächstgelegenen freien Seite hinausgeschleudert.
@@ -115,35 +170,31 @@ func _crush_hit(dir: Vector2) -> void:
 		landed_pad = {}
 	hull -= Tuning.DOOR_CRUSH_DAMAGE
 	events.append({"type": "damage", "amount": Tuning.DOOR_CRUSH_DAMAGE, "speed": 0.0, "crush": true})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	_hull_check()
 
 ## Schaden durch bewegliche Hindernisse (mit kurzer Sperre gegen Mehrfachzählung).
 func _mover_damage(kind: String) -> void:
 	if mover_cd > 0.0 or state == State.DESTROYED:
 		return
 	var dmg := Tuning.DEBRIS_DAMAGE if kind == "debris" else (Tuning.SLIDER_DAMAGE if kind == "slider" else (Tuning.METEOR_DAMAGE if kind == "meteor" else (Tuning.BEAM_DAMAGE if kind == "beam" else (Tuning.VEHICLE_DAMAGE if kind == "vehicle" else Tuning.PADSLAB_DAMAGE))))
+	if kind == "debris" or kind == "vehicle" or kind == "meteor":
+		dmg *= mover_k                       # Rammbügel
+	elif kind == "beam":
+		dmg *= heat_k                        # Hitzeschild
 	mover_cd = Tuning.MOVER_COOLDOWN
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "mover": kind})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	_hull_check()
 
 ## Plasmastrahl: Hüllenschaden alle 0,3 s, solange das Taxi im Strahl ist; man kann ungehindert weiterfliegen.
 func _beam_burn() -> void:
 	if beam_cd > 0.0 or state == State.DESTROYED:
 		return
 	beam_cd = 0.3
-	hull -= Tuning.BEAM_DAMAGE
-	events.append({"type": "damage", "amount": Tuning.BEAM_DAMAGE, "speed": 0.0, "mover": "beam"})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	var bdmg := Tuning.BEAM_DAMAGE * heat_k
+	hull -= bdmg
+	events.append({"type": "damage", "amount": bdmg, "speed": 0.0, "mover": "beam"})
+	_hull_check()
 
 ## Hitzezone (Lava): solange das Taxi sie berührt, alle 0,25 s Hüllenschaden. Regelstand 4: Rumpf berührt die Zone, 9 Schaden;
 ## bis Regelstand 3: Mittelpunkt in der Zone, 3 Schaden.
@@ -154,14 +205,11 @@ func _heat(dt: float) -> void:
 	var hot := level.heat_at(pos, time, Tuning.HULL_HALF) if rules >= 4 else level.heat_at(pos, time)
 	if not hot:
 		return
-	var dmg := Tuning.HEAT_DAMAGE if rules >= 4 else Tuning.HEAT_DAMAGE_V3
+	var dmg := (Tuning.HEAT_DAMAGE if rules >= 4 else Tuning.HEAT_DAMAGE_V3) * heat_k
 	heat_cd = 0.25
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": 0.0, "heat": true})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	_hull_check()
 
 ## Meteoritenschauer: kurz bevor ein Meteorit fällt, einmal Alarm melden (danach mindestens 6 s Ruhe).
 func _meteor_alert(dt: float) -> void:
@@ -233,10 +281,10 @@ func _mover_push() -> void:
 		_mover_damage(m.kind)
 		return
 
-func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear)
-func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear)
-func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear)
-func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, gear)
+func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear) * (thrust_k * (heavy_k if loaded else 1.0) * (OVERHEAT_K if jet_hot else 1.0))
+func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear) * down_k
+func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear) * side_k
+func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, gear) * drag_k
 ## Dämpfung je Achse: Das ausgefahrene Fahrwerk bremst seitlich und nach oben voll (Feinmanöver-Feature), nach unten nur mit
 ## GEAR_FALL_FACTOR der Wirkung – dort tragen Schwerkraft und Massenträgheit das Taxi weiter.
 func drag_v() -> Vector2: return Vector2(drag(), lerpf(Tuning.DRAG, drag(), Tuning.GEAR_FALL_FACTOR) if vel.y > 0.0 else drag())
@@ -253,8 +301,8 @@ func foot_points() -> Array[Vector2]:
 ## Landesicherheit 0..1 für das HUD (1 = sicher). Nur aussagekräftig mit Fahrwerk.
 func landing_margin() -> float:
 	var m_vy := 1.0 - clampf(vel.y / land_vy, 0.0, 2.0)
-	var m_vx := 1.0 - clampf(absf(vel.x) / Tuning.LAND_VX, 0.0, 2.0)
-	var m_t := 1.0 - clampf(absf(tilt) / Tuning.LAND_TILT, 0.0, 2.0)
+	var m_vx := 1.0 - clampf(absf(vel.x) / land_vx, 0.0, 2.0)
+	var m_t := 1.0 - clampf(absf(tilt) / land_tilt, 0.0, 2.0)
 	return clampf(minf(m_vy, minf(m_vx, m_t)), -1.0, 1.0)
 
 func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
@@ -273,7 +321,9 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	_door_crush()
 	_mover_push()
 	gear_cmd = gear_request
-	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / Tuning.GEAR_TIME)
+	gear = move_toward(gear, 1.0 if gear_cmd else 0.0, dt / (Tuning.GEAR_TIME * gear_time_k))
+	if leak > 0.0:
+		fuel = maxf(0.0, fuel - leak * dt)        # Leck: läuft auch im Stand aus
 
 	var up := clampf(-input.y, 0.0, 1.0)
 	var down := clampf(input.y, 0.0, 1.0)
@@ -281,6 +331,8 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	if fuel <= 0.0:
 		up = 0.0; down = 0.0; side = 0.0
 	thrust_in = Vector2(side, -up + down)
+	if overheat:
+		_jet_heat(up, dt)
 
 	if state == State.LANDED:
 		# Abheben nur mit Schub nach oben; sonst bleibt das Taxi sicher stehen.
@@ -307,7 +359,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 		acc += level.zone_accel(pos, time)
 	acc.y -= up_power() * up
 	acc.y += down_power() * down
-	acc.x += side_power() * side
+	acc.x += side_power() * side * (side_l if side < 0.0 else side_r)
 	fuel = maxf(0.0, fuel - dt * burn_k * (Tuning.BURN_UP * up + Tuning.BURN_DOWN * down + Tuning.BURN_SIDE * absf(side)))
 
 	vel += acc * dt
@@ -379,7 +431,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 	# Gültig ist nur die Landeplatte: Beide Füße stehen darauf, wenn die Rumpfmitte im Landefenster liegt.
 	var on_plate: bool = on_pad and pos.x >= float(pad_l.get("land_lo", pad_l.x0)) - 0.5 and pos.x <= float(pad_l.get("land_hi", pad_l.x1)) + 0.5
 	var ok := gear_extended() and on_plate and speed_y <= land_vy \
-		and speed_x <= Tuning.LAND_VX and absf(tilt) <= Tuning.LAND_TILT
+		and speed_x <= land_vx and absf(tilt) <= land_tilt
 	if ok:
 		var surf_y: float = pad_l.row * Tuning.TILE
 		pos.y = surf_y - glen - Tuning.HULL_HALF.y
@@ -389,7 +441,7 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 		landed_pad = pad_l
 		events.append({"type": "landed", "pad": pad_l.id, "soft": speed_y <= Tuning.LAND_SOFT_VY, "vy": speed_y, "vx": speed_x, "tilt": tilt_in, "air_t": air_t, "air_path": air_path})
 	else:
-		var reason := "pos" if not on_pad else ("plate" if not on_plate else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > Tuning.LAND_TILT else "speed")))
+		var reason := "pos" if not on_pad else ("plate" if not on_plate else ("gear" if not gear_extended() else ("tilt" if absf(tilt) > land_tilt else "speed")))
 		events.append({"type": "bad_landing", "reason": reason})
 		_impact(maxf(speed_y, absf(vel.x)) * 1.2)
 		# aus der Wand/Plattform herausheben und zurückfedern
@@ -404,22 +456,24 @@ func _touch_down(hit_l: bool, hit_r: bool, fy: float, glen: float) -> void:
 func _impact(speed: float) -> void:
 	## Balance: bis IMPACT_SAFE harmlos; danach Hüllenschaden, der mit der Geschwindigkeit überproportional
 	## steigt; ab CRASH_SPEED ist das Taxi sofort zerstört.
-	if speed <= Tuning.IMPACT_SAFE:
+	if speed <= impact_safe:
 		return
 	if speed >= Tuning.CRASH_SPEED:
 		events.append({"type": "damage", "amount": hull, "speed": speed, "fatal": true})
+		if angel > 0:                        # Schutzengel (Sonderschicht): auch der Totalschaden lässt einen Hüllenpunkt
+			angel -= 1
+			hull = 1.0
+			events.append({"type": "angel"})
+			return
 		hull = 0.0
 		state = State.DESTROYED
 		events.append({"type": "destroyed", "instant": true})
 		return
-	var k := (speed - Tuning.IMPACT_SAFE) / (Tuning.CRASH_SPEED - Tuning.IMPACT_SAFE)
+	var k := (speed - impact_safe) / (Tuning.CRASH_SPEED - impact_safe)
 	var dmg := Tuning.HULL_MAX * pow(k, Tuning.DAMAGE_EXP) * damage_k
 	hull -= dmg
 	events.append({"type": "damage", "amount": dmg, "speed": speed})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	_hull_check()
 
 ## Dornen: fester Zusatzschaden je Berührung (nicht tempoabhängig), mit kurzer Sperre gegen Mehrfachzählung.
 func _spikes(box_center: Vector2) -> void:
@@ -430,12 +484,31 @@ func _spike_hit() -> void:
 	if spike_cd > 0.0 or state == State.DESTROYED:
 		return
 	spike_cd = Tuning.SPIKE_COOLDOWN
+	if spike_shield > 0:                     # Dornenschutz (Sonderschicht): diese Berührung kostet nichts
+		spike_shield -= 1
+		events.append({"type": "shield"})
+		return
 	hull -= Tuning.SPIKE_DAMAGE
 	events.append({"type": "damage", "amount": Tuning.SPIKE_DAMAGE, "speed": 0.0, "spike": true})
-	if hull <= 0.0:
-		hull = 0.0
-		state = State.DESTROYED
-		events.append({"type": "destroyed"})
+	_hull_check()
+
+## Heiße Düse (Sonderschicht): Nach OVERHEAT_AT Sekunden Vollgas überhitzt die Hauptdüse und bringt nur noch OVERHEAT_K, bis sie unter
+## OVERHEAT_COOL abgekühlt ist. Abkühlen geht langsamer als Aufheizen; leichtes Schweben (unter 60 % Schub) heizt nicht.
+const OVERHEAT_AT := 3.0
+const OVERHEAT_COOL := 1.0
+const OVERHEAT_K := 0.6
+const OVERHEAT_RATE := 0.6
+func _jet_heat(up: float, dt: float) -> void:
+	if up > 0.6 and state == State.FLYING:
+		jet_heat = minf(OVERHEAT_AT + 1.0, jet_heat + dt)
+	else:
+		jet_heat = maxf(0.0, jet_heat - dt * OVERHEAT_RATE)
+	if not jet_hot and jet_heat >= OVERHEAT_AT:
+		jet_hot = true
+		events.append({"type": "overheat"})
+	elif jet_hot and jet_heat <= OVERHEAT_COOL:
+		jet_hot = false
+		events.append({"type": "cooled"})
 
 func refuel(amount: float) -> void:
 	fuel = minf(fuel_cap, fuel + amount)
