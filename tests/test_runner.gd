@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86", "_test_round87"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -590,6 +590,178 @@ func _ref_diag(x0: int, y0: int, x1: int, y1: int, w: int, p: float) -> PackedVe
 				err2 += dy
 				run_start2 = y
 	return pts
+
+func _test_round87() -> void:
+	## Runde 87: Sonderschicht (Roguelike) – Kernlogik: Seed-Code, Etappenplan, Kreuzungen, Halt, Wirkungen, Wertung, Dienstgrad, Bestenliste.
+	var ids: Array = []
+	for f in DirAccess.get_files_at("res://data/levels"):
+		if f.ends_with(".json"):
+			ids.append(f.get_basename())
+	ids.sort()
+	# Seed-Code
+	var codes_ok := true
+	for s in [0, 1, 31, 32, 123456, 999999999, int(pow(32, 6)) - 1]:
+		codes_ok = codes_ok and Overtime.seed_of(Overtime.code_of(s)) == s and Overtime.code_of(s).length() == 6
+	check(codes_ok, "Seed-Code: sechs Zeichen, Hin- und Rückweg verlustfrei")
+	check(Overtime.seed_of("abc") == -1 and Overtime.seed_of("ABCDE!") == -1 and Overtime.seed_of(" k7m2qa ") == Overtime.seed_of("K7M2QA") and Overtime.seed_of("O0O0O0") == Overtime.seed_of("OOOOOO"),
+		"Seed-Code: ungültige Codes abgelehnt, Kleinschreibung und 0/O egal")
+	# Katalog
+	var known := true
+	var unknown := []
+	for p in Overtime.perks():
+		for k in p.get("fx", {}):
+			if not Overtime.FX.has(k):
+				unknown.append(String(p.id) + ":" + k)
+	for c in Overtime.curses():
+		for k in c.get("fx", {}):
+			if not Overtime.FX.has(k):
+				unknown.append(String(c.id) + ":" + k)
+	for l in Overtime.licenses():
+		for k in l.get("fx", {}):
+			if not Overtime.FX.has(k):
+				unknown.append(String(l.id) + ":" + k)
+		for pid in l.get("perks", {}):
+			if Overtime.perk(String(pid)).is_empty():
+				unknown.append("lic:" + String(pid))
+	for st in Overtime.STAGES:
+		for k in st:
+			if k != "taxis" and not Overtime.FX.has(k):
+				unknown.append("stage:" + k)
+	check(unknown.is_empty(), "Katalog: jede Wirkung ist bekannt %s" % str(unknown))
+	check(Overtime.perks().size() >= 40 and Overtime.curses().size() >= 15 and Overtime.licenses().size() >= 6, "Katalog: %d Teile, %d Zwischenfälle, %d Lizenzen" % [Overtime.perks().size(), Overtime.curses().size(), Overtime.licenses().size()])
+	for c in Overtime.curses():
+		known = known and not ["wind", "fog", "mirror", "fuel", "glass", "rush", "tailwind", "dark"].has(String(c.id))
+	check(known, "Keine Regel der Tagschicht und keine Dunkelheit unter den Zwischenfällen")
+	var pact_ok := true
+	for p in Overtime.pact_pool():
+		pact_ok = pact_ok and not Overtime.curse(String(p)).is_empty()
+	check(pact_ok, "Pakte verweisen auf vorhandene Zwischenfälle")
+	# Lauf und Etappenplan
+	var meta := Overtime.default_meta()
+	for len_id in ["short", "medium", "long"]:
+		var st0 := Overtime.new_run(42, len_id, "standard", 0, meta)
+		var secs := []
+		for e in Overtime.total(st0):
+			secs.append(Overtime.sector_of(st0, e))
+		var asc := true
+		for i in range(1, secs.size()):
+			asc = asc and secs[i] >= secs[i - 1]
+		check(Overtime.total(st0) == 9 * Overtime.per_sector(len_id) and asc and secs[0] == 1 and secs[-1] == 9 and secs.count(5) == Overtime.per_sector(len_id),
+			"Länge %s: %d Etappen, Sektoren aufsteigend, je Sektor %d" % [len_id, Overtime.total(st0), Overtime.per_sector(len_id)])
+	var st := Overtime.new_run(777, "medium", "racer", 3, meta)
+	check(String(st.license) == "standard" and int(st.stage) == 0 and int(st.lives) == Overtime.START_TAXIS and float(st.credits) == 0.0 and st.phase == "cross",
+		"Neuer Lauf: gesperrte Lizenz und Stufe fallen auf Standard/0 zurück, 3 Taxis, kein Startgeld")
+	var a := Overtime.offers(st, ids)
+	var b := Overtime.offers(st, ids)
+	check(a == b and a.size() == 3, "Kreuzung: gleicher Zustand = gleiche drei Angebote")
+	var lv_ok := true
+	var groups_ok := true
+	for o in a:
+		lv_ok = lv_ok and String(o.level).begins_with("s1_")
+		var gs := []
+		for c in o.curses:
+			var g := String(Overtime.curse(String(c)).group)
+			groups_ok = groups_ok and not gs.has(g)
+			gs.append(g)
+	check(lv_ok and a[0].level != a[1].level and a[1].level != a[2].level and a[0].level != a[2].level, "Kreuzung: drei verschiedene Level aus dem Sektor der Etappe")
+	check(groups_ok and a[0].curses.size() == 0 and a[1].curses.size() == 1 and a[2].curses.size() == 2 and String(a[2].reward) != "", "Kreuzung: ruhig (0), mittel (1), riskant (2 mit Prämie), nie zwei aus einer Gruppe")
+	check(not Overtime.reroll_cross(st), "Neu würfeln ohne Marke geht nicht")
+	st.tokens = 1
+	check(Overtime.reroll_cross(st) and Overtime.offers(st, ids) != a and int(st.tokens) == 0, "Neu würfeln mit Marke: neue Angebote")
+	# Unabhängigkeit der Kreuzungen von der Wahl (kurze Schicht: jeder Sektor eine Etappe)
+	var s1 := Overtime.new_run(99, "short", "standard", 0, meta)
+	var s2 := s1.duplicate(true)
+	var o1 := Overtime.offers(s1, ids)
+	Overtime.choose(s1, o1[0])
+	Overtime.choose(s2, o1[2])
+	Overtime.etappe_done(s1, {"points": 100, "credits": 500.0})
+	Overtime.etappe_done(s2, {"points": 100, "credits": 500.0})
+	var n1 := Overtime.offers(s1, ids)
+	var n2 := Overtime.offers(s2, ids)
+	check(n1.map(func(o): return o.level) == n2.map(func(o): return o.level) and String(n1[0].level).begins_with("s2_"), "Die Wahl an Kreuzung 1 verschiebt die Level an Kreuzung 2 nicht")
+	check(s2.perks.size() == 1 and s1.perks.is_empty(), "Prämie des riskanten Auftrags kommt nach der Etappe")
+	# Ablauf bis zum Halt
+	var h := Overtime.new_run(5, "short", "standard", 0, meta)
+	var phases := []
+	for e in 9:
+		var of := Overtime.offers(h, ids)
+		Overtime.choose(h, of[0])
+		Overtime.etappe_done(h, {"points": 200, "credits": 3000.0, "lives": 3})
+		phases.append(h.phase)
+		if h.phase == "halt":
+			Overtime.leave_halt(h)
+	check(phases == ["cross", "cross", "halt", "cross", "cross", "halt", "cross", "cross", "done"], "Kurze Schicht: Halt nach Etappe 3 und 6, nach 9 Ende %s" % str(phases))
+	var uniq := {}
+	for u in h.used:
+		uniq[u] = true
+	check(h.used.size() == 9 and uniq.size() == 9 and int(h.halts) == 2, "Kurze Schicht: 9 verschiedene Level, 2 Halte")
+	# Halt: Angebot, Preise, Kauf
+	var w := Overtime.new_run(11, "short", "standard", 0, {"xp": 99999})
+	w.halts = 1
+	w.credits = 100000.0
+	var items := Overtime.shop(w)
+	check(items.size() == Overtime.SHOP_SLOTS and Overtime.shop(w) == items, "Halt: vier Teile, bleiben beim zweiten Blick gleich")
+	var legend := false
+	for it in items:
+		legend = legend or String(Overtime.perk(String(it.id)).rar) == "l"
+	var p0 := Overtime.price(w, String(items[0].id))
+	check(Overtime.buy(w, 0) and not Overtime.buy(w, 0) and float(w.credits) == 100000.0 - p0, "Halt: Kauf zieht den Preis ab, verkauftes Teil nicht doppelt")
+	var p1 := Overtime.price(w, String(items[1].id))
+	w.halts = 3
+	check(Overtime.price(w, String(items[1].id)) > p1, "Halt: Preise steigen je Halt und je eingebauter Stufe")
+	var w2 := Overtime.new_run(11, "short", "standard", 0, {"xp": 0})
+	w2.halts = 1
+	var rank_ok := true
+	for i in 30:
+		w2.shop = []
+		w2.shop_rolls = i
+		for it in Overtime.shop(w2):
+			rank_ok = rank_ok and int(Overtime.perk(String(it.id)).rank) == 0 and String(Overtime.perk(String(it.id)).rar) != "l"
+	check(rank_ok, "Halt: Dienstgrad 0 sieht nur Grundteile, legendäre erst ab dem zweiten Halt")
+	w2.credits = 1000.0
+	w2.shop_rolls = 0
+	check(Overtime.reroll_shop(w2) and float(w2.credits) == 850.0 and Overtime.reroll_shop(w2) and float(w2.credits) == 550.0, "Halt neu würfeln: 150, dann 300 Credits")
+	# Wirkungen
+	var fxs := Overtime.new_run(1, "short", "standard", 0, meta)
+	fxs.perks = {"turbo": 3, "greedy": 1, "saver": 3, "softgear": 3, "tariff": 2}
+	var fx := Overtime.effects(fxs)
+	check(is_equal_approx(float(fx.thrust_k), 1.15) and is_equal_approx(float(fx.burn), 1.07) and is_equal_approx(float(fx.land_vy), 9.0) and is_equal_approx(float(fx.fare_k), 1.10),
+		"Wirkungen stapeln und bleiben in ihren Grenzen (Schub höchstens +15 %%: %.3f)" % float(fx.thrust_k))
+	var base_fx := Overtime.effects(Overtime.new_run(1, "short", "standard", 0, meta))
+	var mods := Overtime.sim_mods(base_fx)
+	check(float(mods.thrust_k) == 1.0 and float(mods.burn) == 1.0 and float(mods.land_vy) == Tuning.LAND_VY and float(mods.impact_safe) == Tuning.IMPACT_SAFE and float(mods.land_tilt) == Tuning.LAND_TILT and not bool(mods.overheat),
+		"Ohne Ausstattung: Serientaxi (alle Werte wie in der Karriere)")
+	fxs.curses = ["crooked", "stingy"]
+	fxs.offer = {"fare_bonus": 0.24}
+	fx = Overtime.effects(fxs)
+	check((float(fx.side_l) == 0.75) != (float(fx.side_r) == 0.75) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15 + 0.24), "Schiefe Düse trifft genau eine Seite; Lohn und Zwischenfälle im Fahrpreis")
+	# Wertung
+	check(Overtime.etappe_score(1000, 300, 0) == 1000 and Overtime.etappe_score(1000, 300, 2) == 1500 and Overtime.etappe_score(1000, 300, 0, 1.5) == 1150, "Etappenpunkte: +25 %% je Zwischenfall, Ass verstärkt nur die Boni")
+	var fin := Overtime.new_run(3, "short", "standard", 0, meta)
+	fin.results = [{"score": 1000}, {"score": 500}]
+	fin.lives = 2
+	fin.done = true
+	fin.stage = 2
+	var f := Overtime.final(fin)
+	check(int(f.etappen) == 1500 and int(f.taxi_points) == 600 and int(f.finish) == 300 and int(f.total) == int(round(2400 * 1.2)), "Schlusswertung: Etappen + 300 je Taxi + 20 %% Abschluss, mal Stufe (%d)" % int(f.total))
+	Overtime.fail(fin, 100.0)
+	f = Overtime.final(fin)
+	check(int(f.finish) == 0 and int(f.taxi_points) == 0 and not f.won, "Verlorener Lauf: kein Abschlussbonus, keine Taxipunkte")
+	# Dienstgrad und Bestenliste
+	var m := Overtime.default_meta()
+	var won := Overtime.new_run(3, "short", "standard", 0, m)
+	won.results = [{"score": 5000}]
+	won.done = true
+	won.lives = 1
+	var rec := Overtime.record(m, won, "2026-11-21")
+	check(int(m.stage_max) == 1 and int(rec.stage_unlocked) == 1 and int(rec.place) == 1 and int(m.xp) > 0 and (m.best.short as Array).size() == 1, "Geschaffter Lauf: Stufe 1 frei, Erfahrung, Platz 1")
+	for i in 12:
+		var r2 := Overtime.new_run(i, "short", "standard", 0, m)
+		r2.results = [{"score": 100 * i}]
+		Overtime.record(m, r2, "2026-11-21")
+	var board: Array = m.best.short
+	check(board.size() == Overtime.BOARD_SIZE and int(board[0].score) >= int(board[1].score) and int(m.stage_max) == 1, "Bestenliste: zehn Plätze, absteigend; nicht geschaffte Läufe schalten keine Stufe frei")
+	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(150) == 1 and Overtime.rank_of(1000000) == Overtime.RANK_XP.size() - 1 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
 
 func _test_round86() -> void:
 	## Runde 86: kleine Details (nur Darstellung, Ton und Kalender – der Ablauf der Simulation bleibt gleich) und native Stimmen it/pt/pl.
