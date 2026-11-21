@@ -209,7 +209,7 @@ func _card(i: int, o: Dictionary, r: Rect2) -> Button:
 	sf.border_width_top = 4
 	sf.bg_color = Color(0.09, 0.1, 0.24, 0.97)
 	b.add_theme_stylebox_override("normal", sb)
-	b.add_theme_stylebox_override("hover", sf)
+	b.add_theme_stylebox_override("hover", sb)          # nur der Fokus leuchtet: ein ruhender Mauszeiger ließe sonst eine zweite Karte hell stehen
 	b.add_theme_stylebox_override("focus", sf)
 	b.add_theme_stylebox_override("pressed", sf)
 	var v := VBoxContainer.new()
