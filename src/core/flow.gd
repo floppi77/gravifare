@@ -33,7 +33,16 @@ var dev_day_goal := ""
 var community := false:                 # Community-Level (user://community/, siehe community_store.gd): ein Level, zählt nur für die eigenen Bestwerte
 	set(v):
 		community = v
-		Save.community_mode = v
+		Save.community_mode = v or overtime
+var overtime := false:                  # Sonderschicht (overtime.gd): eigener Lauf, zählt nur für ihre Wertung; Statistik, Erfolge und Karriere bleiben unberührt
+	set(v):
+		overtime = v
+		Save.community_mode = v or community
+var ot: Dictionary = {}                 # Zustand des laufenden Sonderschicht-Laufs (gesichert in Save.data.overtime.run: zu Etappenbeginn und nach jeder Etappe)
+var ot_last: Dictionary = {}            # zuletzt beendeter Lauf {state, rec} für das Finale der Sonderschicht
+const OT_STOP := "res://src/ui/overtime_stop.tscn"
+const OT_MENU := "res://src/ui/overtime_menu.tscn"
+const OT_FINALE := "res://src/ui/overtime_finale.tscn"
 var editor_autopilot := false            # Testflug aus dem Level-Editor: der Autopilot fliegt, man sieht ihm zu (zählt nichts)
 var return_to_editor := ""              # Level-ID, in deren Editor es nach einem Testflug zurückgeht (setzt der Editor)
 var watch := {}                         # Bestflug ansehen: gespeicherter Lauf (Replay), den das Spiel nachfliegt; zählt nichts
@@ -290,7 +299,7 @@ func career_fields(c: Dictionary) -> Dictionary:
 
 ## Läuft gerade die Karriere selbst (kein Übungsflug, keine Schicht, Community, Flugschule oder Bestflug)?
 func is_career() -> bool:
-	return not (practice or shift or daily or community or in_tutorial() or not watch.is_empty() or editor_autopilot)
+	return not (practice or shift or daily or community or overtime or in_tutorial() or not watch.is_empty() or editor_autopilot)
 
 ## Zwischenzeit am Ende eines Sektors festhalten. Gibt {sector, time, best (vorherige Bestzeit, -1 ohne), total_best} zurück.
 ## Bestzeiten (je Sektor die schnellste Zwischenzeit, dazu die schnellste ganze Karriere) zählen nur für Karrieren ab Level 1.
@@ -365,6 +374,8 @@ func start_level(id: String) -> void:
 func next_level_id() -> String:
 	if community:
 		return ""                          # Community-Level: ein Level, danach zurück zur Liste
+	if overtime:
+		return String(ot.get("level", "")) if String(ot.get("phase", "")) == "fly" else ""      # Sonderschicht: das an der Kreuzung gewählte Level
 	if shift:
 		var i := shift_index()
 		return String(shift_plan[i + 1]) if i >= 0 and i + 1 < shift_plan.size() else ""
@@ -386,12 +397,199 @@ func to_menu() -> void:
 		finish_shift()                 # Schicht abgebrochen: Wertung trotzdem sichern (nicht geflogene Karten zählen 0)
 		shift = false
 		shift_done = false
+	var to_ot := overtime                # Sonderschicht unterbrochen: Der Lauf bleibt gesichert (Etappenbeginn bzw. Kreuzung), weiter im Menü der Sonderschicht
+	overtime = false
 	Save.write()                       # Statistiken (Serien, Auslieferungen …) sichern
 	community = false
+	if to_ot:
+		get_tree().paused = false
+		Sfx.set_thrust(0.0, 0.0)
+		Sfx.stop_ambient()
+		get_tree().change_scene_to_file(OT_MENU)
+		return
 	get_tree().paused = false
 	Sfx.set_thrust(0.0, 0.0)
 	Sfx.stop_ambient()
 	get_tree().change_scene_to_file(MENU)
+
+# --------------------------------------------------------------------------- Sonderschicht
+
+## Fortschritt der Sonderschicht im Spielstand (Dienstgrad, Stufen, Bestenliste); legt ihn bei Bedarf an.
+func ot_meta() -> Dictionary:
+	if not (Save.data.get("overtime") is Dictionary):
+		Save.data["overtime"] = {}
+	var o: Dictionary = Save.data.overtime
+	if not (o.get("meta") is Dictionary):
+		o["meta"] = Overtime.default_meta()
+	return o.meta
+
+## Gesicherter Lauf ({} ohne).
+func ot_saved() -> Dictionary:
+	var o = Save.data.get("overtime", {})
+	if not (o is Dictionary) or not (o.get("run", {}) is Dictionary):
+		return {}
+	var r: Dictionary = o.get("run", {})
+	return r if int(r.get("version", 0)) == 1 and String(r.get("phase", "")) in ["cross", "halt", "fly"] else {}
+
+func ot_save() -> void:
+	ot_meta()
+	Save.data.overtime["run"] = ot.duplicate(true)
+	Save.write()
+
+func ot_unlocked() -> bool:
+	return Save.debug or Save.sectors_done(level_ids(), Overtime.UNLOCK_SECTORS)
+
+func _ot_enter() -> void:
+	watch = {}
+	shift = false
+	daily = false
+	practice = true                    # schützt die Karriere (kein Fortsetzen-Eintrag, kein Game-Over-Rücksetzen)
+	community = false
+	overtime = true
+
+## Neuen Lauf beginnen (Code ungültig: zufälliger Seed) und zur ersten Kreuzung.
+func start_overtime(code: String, length: String, license_id: String, stage: int) -> void:
+	var seed := Overtime.seed_of(code)
+	if seed < 0:
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		seed = Overtime.seed_of(Overtime.random_code(rng))
+	_ot_enter()
+	ot = Overtime.new_run(seed, length, license_id, stage, ot_meta())
+	ot_save()
+	get_tree().change_scene_to_file(OT_STOP)
+
+## Gesicherten Lauf fortsetzen: an der Kreuzung bzw. im Halt, oder die unterbrochene Etappe von vorn (Stand zu ihrem Beginn).
+func resume_overtime() -> bool:
+	var s := ot_saved()
+	if s.is_empty():
+		return false
+	_ot_enter()
+	ot = s.duplicate(true)
+	if String(ot.phase) == "fly" and level_ids().has(String(ot.level)):
+		ot_begin_etappe()
+	else:
+		if String(ot.phase) == "fly":
+			ot.phase = "cross"
+		get_tree().change_scene_to_file(OT_STOP)
+	return true
+
+## Einstiegswerte der Etappe aus dem Zustand (Taxis, Sprit, Guthaben, mitfahrender Fahrgast, Seed der Etappe).
+func ot_prepare() -> void:
+	lives = clampi(int(ot.get("lives", Overtime.START_TAXIS)), 1, Overtime.MAX_TAXIS)
+	entry_fuel = maxf(Tuning.MIN_START_FUEL, float(ot.get("fuel", Tuning.FUEL_MAX)))
+	entry_credits = maxf(0.0, float(ot.get("credits", 0.0)))
+	carry_passenger = ot.get("carry", {}) if ot.get("carry", {}) is Dictionary else {}
+	run_seed = absi(("%d:run:%d" % [int(ot.get("seed", 0)), int(ot.get("etappe", 0))]).hash()) % 1000000007
+
+func ot_begin_etappe() -> void:
+	ot_prepare()
+	start_level(String(ot.level))
+
+## Neustart der Etappe (R, Pausenmenü): zurück auf den Stand zu Etappenbeginn – auch die Taxis, kostenlos.
+func ot_restart() -> void:
+	var s := ot_saved()
+	if s.is_empty() or String(s.get("phase", "")) != "fly":
+		return
+	ot = s.duplicate(true)
+	ot_begin_etappe()
+
+## Lauf beendet (geschafft oder kein Taxi mehr): sofort werten und den gesicherten Lauf löschen; das Finale zeigt `ot_last`.
+func ot_close() -> void:
+	if ot.is_empty() or bool(ot.get("closed", false)):
+		return
+	var rec := Overtime.record(ot_meta(), ot, Daily.today())
+	ot["closed"] = true
+	ot_last = {"state": ot.duplicate(true), "rec": rec}
+	Save.data.overtime["run"] = {}
+	Save.write()
+
+## Lauf aufgeben (Menü der Sonderschicht): zählt wie verloren, mit den bis dahin geflogenen Etappen.
+func ot_abandon() -> void:
+	var s := ot_saved()
+	if s.is_empty():
+		return
+	ot = s.duplicate(true)
+	ot.phase = "done"
+	Overtime.fail(ot, float(ot.get("credits", 0.0)))
+	ot_close()
+
+func to_overtime_finale() -> void:
+	ot_close()
+	overtime = false
+	community = false
+	get_tree().paused = false
+	Sfx.set_thrust(0.0, 0.0)
+	Sfx.stop_ambient()
+	get_tree().change_scene_to_file(OT_FINALE)
+
+## Entwicklung: Sonderschicht direkt öffnen (--ot=cross|halt|fly|finale|menu, dazu --ot-len=, --ot-seed=, --ot-etappe=, --ot-perks=a,b, --ot-curses=a,b,
+## --ot-credits=, --ot-xp=, --ot-level=). Schreibt nichts in den Spielstand (Save.dev_session).
+func dev_overtime(args: PackedStringArray) -> void:
+	var what := "cross"
+	var length := "short"
+	var code := "GRAVF7"
+	var etappe := 0
+	var perks_s := ""
+	var curses_s := ""
+	var credits := -1.0
+	var level := ""
+	for a in args:
+		if a.begins_with("--ot="):
+			what = a.substr(5)
+		elif a.begins_with("--ot-len="):
+			length = a.substr(9)
+		elif a.begins_with("--ot-seed="):
+			code = a.substr(10)
+		elif a.begins_with("--ot-etappe="):
+			etappe = maxi(0, int(a.substr(12)) - 1)
+		elif a.begins_with("--ot-perks="):
+			perks_s = a.substr(11)
+		elif a.begins_with("--ot-curses="):
+			curses_s = a.substr(12)
+		elif a.begins_with("--ot-credits="):
+			credits = float(a.substr(13))
+		elif a.begins_with("--ot-xp="):
+			ot_meta()["xp"] = int(a.substr(8))
+		elif a.begins_with("--ot-level="):
+			level = resolve_level(a.substr(11))
+	if what == "menu":
+		get_tree().change_scene_to_file(OT_MENU)
+		return
+	_ot_enter()
+	ot = Overtime.new_run(maxi(0, Overtime.seed_of(code)), length, "standard", 0, ot_meta())
+	var ids := level_ids()
+	for e in mini(etappe, Overtime.total(ot) - (0 if what == "finale" else 1)):
+		var os := Overtime.offers(ot, ids)
+		Overtime.choose(ot, os[0])
+		Overtime.etappe_done(ot, {"points": 400 + 60 * e, "bonus": 150, "credits": float(ot.credits) + 600.0, "lives": ot.lives, "stars": 1})
+		if String(ot.phase) == "halt" and what != "halt":
+			Overtime.leave_halt(ot)
+	for p in perks_s.split(",", false):
+		Overtime._add_perk(ot, p)
+	if credits >= 0.0:
+		ot.credits = credits
+	if what == "halt" and String(ot.phase) != "halt":
+		ot.phase = "halt"
+		ot.halts = maxi(1, int(ot.halts))
+	if what == "finale":
+		ot.done = int(ot.etappe) >= Overtime.total(ot)
+		ot.phase = "done"
+		if not ot.done:
+			Overtime.fail(ot, float(ot.credits))
+		to_overtime_finale()
+		return
+	if what == "fly":
+		var os2 := Overtime.offers(ot, ids)
+		var o: Dictionary = os2[0].duplicate(true)
+		if level != "":
+			o.level = level
+		if curses_s != "":
+			o.curses = Array(curses_s.split(",", false))
+		Overtime.choose(ot, o)
+		ot_begin_etappe()
+		return
+	get_tree().change_scene_to_file(OT_STOP)
 
 ## Nach der Nachtschicht: eigenes Finale (Feierabend im Depot) mit der Abrechnung, danach zurück ins Menü.
 func to_shift_finale() -> void:

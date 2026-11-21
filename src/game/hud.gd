@@ -112,8 +112,14 @@ func _draw() -> void:
 	draw_rect(Rect2(344, 0, fr.end.x - 344.0, 16), band)
 	draw_line(Vector2(fr.position.x, 16), Vector2(296, 16), Color("#3a4580"), 0.67)
 	draw_line(Vector2(344, 16), Vector2(fr.end.x, 16), Color("#3a4580"), 0.67)
-	gauges.draw_fuel(self, GAUGE_FUEL, s.fuel / Tuning.FUEL_MAX, s.fuel_cap / Tuning.FUEL_MAX, run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING)
-	gauges.draw_hull(self, GAUGE_HULL, s.hull / Tuning.HULL_MAX)
+	var shake_f := 0.0
+	var shake_h := 0.0
+	if run.otv("ui_shaky", 0.0) > 0.0:            # Sonderschicht, wackelige Instrumente: Anzeigen zittern um bis zu ±12 %
+		var tt := Time.get_ticks_msec() / 1000.0
+		shake_f = 0.08 * sin(tt * 5.3) + 0.04 * sin(tt * 17.1)
+		shake_h = 0.08 * sin(tt * 4.1 + 1.7) + 0.04 * sin(tt * 13.7)
+	gauges.draw_fuel(self, GAUGE_FUEL, clampf(s.fuel / Tuning.FUEL_MAX + shake_f, 0.0, 1.0), s.fuel_cap / Tuning.FUEL_MAX, run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING)
+	gauges.draw_hull(self, GAUGE_HULL, clampf(s.hull / Tuning.HULL_MAX + shake_h, 0.0, 1.0))
 	_fit_text(font, Vector2(147, 12), "¢%d" % int(run.money), 56.0, Settings.fs(9), Color("#ffe14a"), HORIZONTAL_ALIGNMENT_LEFT)       # Settings.fs: Option „Große Schrift“
 	var life_fr: Dictionary = Cosmetics.life_frame(PixelScale.size_for(self))                          # Runde 72: neues Taxi, 10 × 6 Einheiten in der Pixelgröße des Bildschirms
 	for i in Flow.lives:
@@ -137,7 +143,7 @@ func _draw() -> void:
 	var lname: String = run.level.display_name()
 	if not Flow.watch.is_empty():
 		lname = tr("WATCH_TAG") + "  " + lname                  # Bestflug ansehen
-	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial or not Flow.watch.is_empty() else (tr("SHIFT_TAG") + "  " + lname if Flow.shift or result.has("shift") else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname]))), 84.0, Settings.fs(8), Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial or not Flow.watch.is_empty() else (tr("SHIFT_TAG") + "  " + lname if Flow.shift or result.has("shift") else (tr("OT_TAG") % [int(Flow.ot.get("etappe", 0)) + (0 if run.result == Run.Result.COMPLETE else 1), Overtime.total(Flow.ot)] + "  " + lname if Flow.overtime else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname])))), 84.0, Settings.fs(8), Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
 	_fit_text(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], 28.0, Settings.fs(9), Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei Balken mit gezeichneten Symbolen (weiße Marke = Grenze der sicheren Landung;
 	# darüber gestreift, damit der Zustand auch ohne Farbsehen erkennbar ist)
@@ -447,13 +453,20 @@ func _draw_result() -> void:
 	var accent := Color("#5dff9a") if counted else Color("#ffb02e")
 	draw_rect(_full_rect(), Color(0.0, 0.0, 0.03, 0.6))                        # Spielbild abdunkeln (bis zum Fensterrand, auch Ultrawide)
 	_shift_panel(px, py, pw, ph, 38.0, Color(0.08, 0.2, 0.19, 1.0) if counted else Color(0.26, 0.14, 0.08, 1.0), accent)
-	draw_string(font, Vector2(px, py + 20.0), tr("HUD_COMPLETE") if counted else tr("RES_NOT_COUNTED"), HORIZONTAL_ALIGNMENT_CENTER, pw, 16, accent)
+	var head_txt := tr("HUD_COMPLETE") if counted else tr("RES_NOT_COUNTED")
+	if result.has("overtime"):
+		head_txt = tr("OT_RES_HEAD") % [int(result.overtime.etappe), int(result.overtime.of)]
+	draw_string(font, Vector2(px, py + 20.0), head_txt, HORIZONTAL_ALIGNMENT_CENTER, pw, 16, accent)
 	var lname: String = run.level.display_name()
 	_fit_text(ui, Vector2(px + 12.0, py + 33.0), (tr("COMMUNITY_TAG") + " · " + lname if Flow.community else (tr("LVL_NUM") + " · %s") % [run.level.number, lname]), pw - 24.0, 10, Color("#c9cfee"), HORIZONTAL_ALIGNMENT_CENTER)
 	var ix := px + 12.0                                                          # Innenrand
 	var iw := pw - 24.0
 	# ---- Medaillen: drei gleich breite Karten
 	var items := [["time", tr("MEDAL_TIME"), tr("MEDAL_TIME_D")], ["clean", tr("MEDAL_CLEAN"), tr("MEDAL_CLEAN_D")], ["pro", tr("MEDAL_PRO"), tr("MEDAL_PRO_D") % int(round(Tuning.pro_share(run.level.sector) * 100.0))]]
+	var ot_res: Dictionary = result.get("overtime", {})
+	if not ot_res.is_empty():                             # Sonderschicht: keine Medaillen, sondern Boni der Etappenwertung
+		for it in items:
+			it[2] = tr("OT_RES_BONUS")
 	var my := py + 46.0
 	var mgap := 6.0
 	var cw := (iw - mgap * 2.0) / 3.0
@@ -493,9 +506,13 @@ func _draw_result() -> void:
 	var best_line := tr("RES_NEW_BEST") if (float(result.best) <= 0.0 or float(result.time) < float(result.best)) else tr("RES_BEST") % int(result.best)
 	if not counted:
 		best_line = tr("MSG_NOT_COUNTED")
+	if not ot_res.is_empty():
+		best_line = tr("OT_RES_RISK") % [int(ot_res.curses), ("%.2f" % (1.0 + Overtime.RISK_PER_CURSE * float(ot_res.curses))).replace(".", "," if TranslationServer.get_locale().substr(0, 2) != "en" else ".")]
 	if result.get("solved", false):
 		best_line = tr("RES_SOLVED")
 	var best_col := Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else (Color("#ffb02e") if not counted else Color("#8a93c9"))
+	if not ot_res.is_empty():
+		best_col = Color("#ffcb3d") if int(ot_res.curses) > 0 else Color("#8a93c9")
 	if ui.get_string_size(best_line, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x > tw:          # langer Hinweis (nicht gewertet, selbst gelöst): zwei Zeilen
 		draw_multiline_string(ui, Vector2(tl, ky + 64.0), best_line, HORIZONTAL_ALIGNMENT_LEFT, tw, 8, 2, best_col)
 	else:
@@ -532,7 +549,9 @@ func _draw_result() -> void:
 	draw_string(font, Vector2(sr - 120.0, by + 24.0), "%d" % score, HORIZONTAL_ALIGNMENT_RIGHT, 120.0, 16, Color("#ffffff"))
 	var sw := font.get_string_size("%d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 	var best_txt := tr("RES_BEST_SCORE") % best_score
-	draw_string(ui, Vector2(sr - sw - 130.0, by + 23.0), best_txt, HORIZONTAL_ALIGNMENT_RIGHT, 122.0, 8, Color("#ffe14a") if score > 0 and score >= best_score else Color("#8a93c9"))
+	if not ot_res.is_empty():
+		best_txt = tr("OT_RES_RUN") % int(ot_res.run_total)          # Sonderschicht: Summe der Etappen statt Bestwert der Karriere
+	draw_string(ui, Vector2(sr - sw - 130.0, by + 23.0), best_txt, HORIZONTAL_ALIGNMENT_RIGHT, 122.0, 8, Color("#ffe14a") if score > 0 and score >= best_score and ot_res.is_empty() else Color("#8a93c9"))
 	# ---- Weiter-Hinweis
 	var blink := 0.65 + 0.35 * sin(result_age * 4.0)
 	draw_string(ui, Vector2(px, py + ph - 11.0), tr("RES_CONTINUE") if next_exists else tr("RES_TO_MENU"), HORIZONTAL_ALIGNMENT_CENTER, pw, 10, Color(0.66, 0.72, 1.0, blink))

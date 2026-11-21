@@ -10,7 +10,9 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Runde 86, 2026-11-19):** 4103 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Runde 87, 2026-11-21, Branch `rogue`):** siehe unten, alle bestanden. Neu je Runde, jüngste zuerst:
+
+- **Runde 87:** Sonderschicht – Seed-Code, Etappenplan je Länge, Kreuzungen (gleiche Angebote bei gleichem Zustand, unabhängig von der Wahl, Gruppenregel, Prämie, Würfel), Halt (Pool nach Dienstgrad, Preise nach Sektor, Kauf, Neu würfeln), Wirkungen und Grenzen, Wertung, Dienstgrad, Bestenliste (`_test_round87`); Ausstattung und Zwischenfälle in TaxiSim/Run, Serienwerte bitgleich (`_test_round87_hooks`); Trennung von Karriere und Statistik, Fortsetzen, Freischaltung nach Sektor 6, Texte, Hauptmenü (`_test_round87_flow`). Ansicht: `--ot=cross|halt|fly|finale|menu` (siehe DESIGN.md). Fliegbarkeit der Zwischenfälle: `godot --headless -s tools/overtime_check.gd` (schreibt `data/overtime_block.json`), Wirtschaft: `godot --headless -s tools/overtime_sim.gd -- short mixed 3`.
 
 - **Runde 86:** Eastereggs (`_test_round86`; Einzelheiten absichtlich nicht dokumentiert). Die Stimmtests verlangen jetzt in allen sieben Sprachen eigene Aufnahmen (native Sprachausgabe it/pt/pl aus Runde 85).
 

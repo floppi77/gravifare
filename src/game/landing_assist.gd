@@ -69,6 +69,7 @@ static func pick_place(taxi: Vector2, busy: Array, level_w: float, current := 0)
 func sync_state() -> void:
 	if run != null:
 		position = run.sim.pos
+		visible = run.otv("ui_nolight", 0.0) <= 0.0          # Sonderschicht, Ampel kaputt: kein Landeassistent
 
 var gauge_a := 0.0                # Einblendung der Tankanzeige (0 … 1)
 var needle := 0.0                 # angezeigter Füllstand (0 … 1), der Zeiger federt nach

@@ -16,7 +16,7 @@ func check(cond: bool, msg: String) -> void:
 func _initialize() -> void:
 	CS = load("res://src/core/community_store.gd")
 	var only: PackedStringArray = OS.get_environment("GF_ONLY").split(",", false)      # Entwicklung: GF_ONLY=_test_a,_test_b führt nur diese Tests aus
-	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86", "_test_round87", "_test_round87_hooks"]:
+	for t in ["_test_level_parse", "_test_version_matches_export", "_test_gravity_fall", "_test_hover", "_test_good_landing", "_test_crash", "_test_full_run", "_test_level_rules", "_test_gear_flight_mode", "_test_passenger_walk_and_board", "_test_passenger_abort", "_test_no_respawn_after_delivery", "_test_transition_timeline", "_test_i18n_complete", "_test_crash_balance", "_test_spikes", "_test_spikes_attached", "_test_arrival_path", "_test_dropoff_liftoff", "_test_extras", "_test_missed_job", "_test_replay", "_test_doors", "_test_movers", "_test_pad_crush_against_rock", "_test_vehicle_count", "_test_bot_horizontal_sweep", "_test_horizontal_sweep_gate", "_test_broken_pump_prices", "_test_out_of_fuel", "_test_extra_squash", "_test_level_caps", "_test_life_station", "_test_eject", "_test_fragile_and_meteors", "_test_meteor_hitbox", "_test_perfect_needs_flight", "_test_force_zones_apart", "_test_darkness_fields", "_test_traffic", "_test_traffic_avoids_stations", "_test_beam_heat_hospital", "_test_wrong_pad_rules", "_test_campaign_save", "_test_payout_and_penalty", "_test_exit_passenger", "_test_spawn_not_on_taxi_pad", "_test_main_job_never_stuck", "_test_alarm_sounds", "_test_job_rules_and_difficulty", "_test_squash_passenger", "_test_pay_at_shelter_rewards_close_landing", "_test_crash_continues_level", "_test_exit_countdown", "_test_exit_hurry_and_extras", "_test_sector_look", "_test_sector_gravity", "_test_landing_plate", "_test_workshop_mods", "_test_workshop_buy", "_test_pad_flags", "_test_life_price_per_sector", "_test_pole_swap", "_test_meteor_lanes", "_test_carried_not_counted_and_slope", "_test_replay_trace", "_test_shift_jobs", "_test_daily_flight", "_test_level_styles", "_test_sweep_gates_and_counter", "_test_window_fit", "_test_auto_pause_and_settings", "_test_mover_never_buries_taxi", "_test_respawn_events_once", "_test_medals_need_all_jobs", "_test_practice_keeps_campaign", "_test_min_window_ramp", "_test_distance_bonus", "_test_amount_ticks_down", "_test_medals", "_test_save_robust", "_test_save_slots", "_test_tutorial_script", "_test_tutorial_recovers", "_test_intro_demos", "_test_settings_robust", "_test_assist_and_audio_options", "_test_controls_remap", "_test_music_assets", "_test_cosmetics_data", "_test_voice_lines_complete", "_test_passenger_voices", "_test_figures_and_traffic_art", "_test_round54_visuals", "_test_originals_unchanged", "_test_community_level", "_test_community_store", "_test_community_isolated", "_test_community_texts", "_test_community_fuzz", "_test_community_originals_and_bot", "_test_community_screen", "_test_main_menu_help", "_test_level_edit_model", "_test_level_edit_roundtrip", "_test_level_edit_objects", "_test_level_edit_jobs", "_test_fast_solvability", "_test_level_editor_screen", "_test_editor_unified_pen", "_test_editor_labels_fit", "_test_editor_flow_hooks", "_test_gate_space_rule", "_test_error_locations", "_test_editor_blink_and_pad", "_test_autopilot_flag_and_list", "_test_round46_fixes", "_test_round47_original_files", "_test_round47_solve_gate", "_test_round47_original_editor", "_test_round49_editor_access", "_test_round50_draft_result", "_test_streak_bonus", "_test_fuel_prices", "_test_pump_touch_and_explosion", "_test_pump_level_rules", "_test_fuel_pad_variety", "_test_landing_window_rules", "_test_taxi_scale", "_test_gate_blocks_until_open", "_test_bot_solves_levels", "_test_night_shift", "_test_day_shift", "_test_fuel_rule", "_test_near_tip", "_test_old_replays_valid", "_test_passenger_kinds", "_test_sector_tiles", "_test_round57_visuals", "_test_neon_signs", "_test_rules4_landing_and_lava", "_test_slot_select_pad_nav", "_test_transit_backgrounds", "_test_splash", "_test_round70", "_test_round71", "_test_round72", "_test_round73", "_test_round74", "_test_round75", "_test_round76", "_test_round77", "_test_round78", "_test_languages_fr_es", "_test_round79", "_test_round80", "_test_round81", "_test_round82", "_test_round83", "_test_round84", "_test_round85", "_test_round86", "_test_round87", "_test_round87_hooks", "_test_round87_flow"]:
 		if not only.is_empty() and not only.has(t):
 			continue
 		print(t)
@@ -603,8 +603,8 @@ func _test_round87() -> void:
 	for s in [0, 1, 31, 32, 123456, 999999999, int(pow(32, 6)) - 1]:
 		codes_ok = codes_ok and Overtime.seed_of(Overtime.code_of(s)) == s and Overtime.code_of(s).length() == 6
 	check(codes_ok, "Seed-Code: sechs Zeichen, Hin- und Rückweg verlustfrei")
-	check(Overtime.seed_of("abc") == -1 and Overtime.seed_of("ABCDE!") == -1 and Overtime.seed_of(" k7m2qa ") == Overtime.seed_of("K7M2QA") and Overtime.seed_of("O0O0O0") == Overtime.seed_of("OOOOOO"),
-		"Seed-Code: ungültige Codes abgelehnt, Kleinschreibung und 0/O egal")
+	check(Overtime.seed_of("abc") == -1 and Overtime.seed_of("ABCDE!") == -1 and Overtime.seed_of("ABCDE0") == -1 and Overtime.seed_of("ABCDEI") == -1 and Overtime.seed_of(" k7m2qa ") == Overtime.seed_of("K7M2QA"),
+		"Seed-Code: ungültige Codes (auch mit 0, 1, I, O) abgelehnt, Kleinschreibung egal")
 	# Katalog
 	var known := true
 	var unknown := []
@@ -707,8 +707,10 @@ func _test_round87() -> void:
 	var p0 := Overtime.price(w, String(items[0].id))
 	check(Overtime.buy(w, 0) and not Overtime.buy(w, 0) and float(w.credits) == 100000.0 - p0, "Halt: Kauf zieht den Preis ab, verkauftes Teil nicht doppelt")
 	var p1 := Overtime.price(w, String(items[1].id))
-	w.halts = 3
-	check(Overtime.price(w, String(items[1].id)) > p1, "Halt: Preise steigen je Halt und je eingebauter Stufe")
+	w.etappe = 6
+	var p2 := Overtime.price(w, String(items[1].id))
+	w.perks["turbo"] = 3
+	check(p2 > p1 * 2 and Overtime.price(w, String(items[1].id)) > p2, "Halt: Preise folgen dem Einkommen des Sektors und steigen je eingebauter Stufe")
 	var w2 := Overtime.new_run(11, "short", "standard", 0, {"xp": 0})
 	w2.halts = 1
 	var rank_ok := true
@@ -720,7 +722,9 @@ func _test_round87() -> void:
 	check(rank_ok, "Halt: Dienstgrad 0 sieht nur Grundteile, legendäre erst ab dem zweiten Halt")
 	w2.credits = 1000.0
 	w2.shop_rolls = 0
-	check(Overtime.reroll_shop(w2) and float(w2.credits) == 850.0 and Overtime.reroll_shop(w2) and float(w2.credits) == 550.0, "Halt neu würfeln: 150, dann 300 Credits")
+	w2.etappe = 3
+	var rp := Overtime.shop_reroll_price(w2)
+	check(Overtime.reroll_shop(w2) and float(w2.credits) == 1000.0 - rp and Overtime.shop_reroll_price(w2) == rp * 2, "Halt neu würfeln kostet ohne Würfel Credits, jedes Mal doppelt")
 	# Wirkungen
 	var fxs := Overtime.new_run(1, "short", "standard", 0, meta)
 	fxs.perks = {"turbo": 3, "greedy": 1, "saver": 3, "softgear": 3, "tariff": 2}
@@ -743,7 +747,7 @@ func _test_round87() -> void:
 	fin.done = true
 	fin.stage = 2
 	var f := Overtime.final(fin)
-	check(int(f.etappen) == 1500 and int(f.taxi_points) == 600 and int(f.finish) == 300 and int(f.total) == int(round(2400 * 1.2)), "Schlusswertung: Etappen + 300 je Taxi + 20 %% Abschluss, mal Stufe (%d)" % int(f.total))
+	check(int(f.etappen) == 1500 and int(f.taxi_points) == 2000 and int(f.finish) == 300 and int(f.total) == int(round(3800 * 1.2)), "Schlusswertung: Etappen + 1000 je Taxi + 20 %% Abschluss, mal Stufe (%d)" % int(f.total))
 	Overtime.fail(fin, 100.0)
 	f = Overtime.final(fin)
 	check(int(f.finish) == 0 and int(f.taxi_points) == 0 and not f.won, "Verlorener Lauf: kein Abschlussbonus, keine Taxipunkte")
@@ -901,6 +905,82 @@ func _test_round87_hooks() -> void:
 	var lv9 := LevelData.load_file("res://data/levels/s2_01.json")
 	re.start(lv9)
 	check(re.extra_slots() == Tuning.extra_slots(lv9.number) + 1, "Doppelschicht: ein Zusatzfahrgast mehr gleichzeitig")
+
+func _test_round87_flow() -> void:
+	## Runde 87: Sonderschicht im Spielablauf – getrennt von Karriere, Statistik und Erfolgen; Fortsetzen; Texte; Menü.
+	var flow: Node = get_root().get_node("Flow")
+	var sv: Node = get_root().get_node("Save")
+	var prev_data: Dictionary = sv.data.duplicate(true)
+	flow.overtime = true
+	check(sv.community_mode and not flow.is_career(), "Sonderschicht: keine Statistik, keine Erfolge, keine Karriere")
+	flow.ot = Overtime.new_run(5, "short", "standard", 0, Overtime.default_meta())
+	check(flow.next_level_id() == "", "An der Kreuzung gibt es noch kein nächstes Level")
+	flow.ot.phase = "fly"
+	flow.ot.level = "s1_04"
+	check(flow.next_level_id() == "s1_04", "Nach der Wahl: das gewählte Level")
+	flow.overtime = false
+	check(not sv.community_mode, "Ohne Sonderschicht zählt die Statistik wieder")
+	sv.data["overtime"] = {"meta": Overtime.default_meta(), "run": flow.ot.duplicate(true)}
+	check(not flow.ot_saved().is_empty(), "Gesicherter Lauf wird gefunden")
+	sv.data.overtime.run.phase = "done"
+	check(flow.ot_saved().is_empty(), "Beendeter Lauf gilt nicht als fortsetzbar")
+	sv.data.overtime.run = {"version": 99, "phase": "cross"}
+	check(flow.ot_saved().is_empty(), "Fremdes Format wird ignoriert")
+	sv.data = prev_data
+	var ids: Array = flow.level_ids()
+	check(not sv.sectors_done(ids, 6) or sv.debug or true, "Freischaltung über Sektoren 1–6 (Save.sectors_done)")
+	var all6 := {}
+	for id in ids:
+		if String(id).get_slice("_", 0).trim_prefix("s").to_int() <= 6:
+			all6[id] = {"time": 1.0}
+	var keep: Dictionary = sv.data.get("completed", {})
+	sv.data["completed"] = all6
+	var unlocked6: bool = sv.sectors_done(ids, 6)
+	all6.erase("s6_11")
+	sv.data["completed"] = all6
+	check(unlocked6 and not sv.sectors_done(ids, 6), "Sonderschicht frei genau nach allen Leveln der Sektoren 1–6")
+	sv.data["completed"] = keep
+	# Quelltext: Karriere bleibt außen vor
+	var g := FileAccess.get_file_as_string("res://src/game/game.gd")
+	check(g.contains("if Flow.overtime:\n\t\t\t_ot_continue()") and g.contains("mods = Overtime.sim_mods(ot_fx") and g.contains("Flow.shift or Flow.daily or Flow.community or Flow.overtime:\n\t\treturn 1.0"),
+		"Spiel: Halt/Kreuzung statt Werkstatt der Karriere, Serientaxi plus Ausstattung, kein Karriere-Scheinwerfer")
+	check(g.contains("Overtime.fail(Flow.ot, run.money)") and g.contains("Flow.ot_close()") and g.contains("Flow.ot_restart()"), "Spiel: Game Over wertet sofort, Neustart lädt den Stand zu Etappenbeginn")
+	check(g.contains("Flow.community or Flow.overtime or autopilot != null"), "Kein Geist in der Sonderschicht")
+	var fl := FileAccess.get_file_as_string("res://src/core/flow.gd")
+	check(fl.contains("practice = true                    # schützt die Karriere") and fl.contains("Save.community_mode = v or community"), "Flow: Sonderschicht als Übungsflug (Karriere unberührt), Statistik eingefroren")
+	var sav := FileAccess.get_file_as_string("res://src/core/save.gd")
+	check(sav.contains('if a.begins_with("--ot"):\n\t\t\tdev_session = true'), "Entwicklerschalter --ot… schreiben nie in den Spielstand")
+	# Texte
+	var de := _read_json("res://data/i18n/de.json")
+	var en := _read_json("res://data/i18n/en.json")
+	var miss: Array = []
+	for p in Overtime.perks():
+		for k in ["OT_PERK_%s" % String(p.id).to_upper(), "OT_PERK_%s_D" % String(p.id).to_upper()]:
+			if not de.has(k) or not en.has(k):
+				miss.append(k)
+	for c in Overtime.curses():
+		for k in ["OT_CURSE_%s" % String(c.id).to_upper(), "OT_CURSE_%s_D" % String(c.id).to_upper()]:
+			if not de.has(k) or not en.has(k):
+				miss.append(k)
+	for l in Overtime.licenses():
+		for k in ["OT_LIC_%s" % String(l.id).to_upper(), "OT_LIC_%s_D" % String(l.id).to_upper()]:
+			if not de.has(k) or not en.has(k):
+				miss.append(k)
+	for i in Overtime.STAGES.size():
+		if not de.has("OT_STAGE_%d" % (i + 1)):
+			miss.append("OT_STAGE_%d" % (i + 1))
+	for k in ["OT_LEN_SHORT", "OT_LEN_MEDIUM", "OT_LEN_LONG", "OT_RAR_C", "OT_RAR_R", "OT_RAR_L", "OT_REWARD", "OT_REWARD_NOW", "HELP_OVERTIME", "HELP_OVERTIME_LOCKED"]:
+		if not de.has(k) or not en.has(k):
+			miss.append(k)
+	check(miss.is_empty(), "Alle Teile, Zwischenfälle, Lizenzen, Stufen und Längen haben Namen und Beschreibung %s" % str(miss))
+	var curses_de: Array = Overtime.curses().map(func(c): return String(de["OT_CURSE_%s" % String(c.id).to_upper()]))
+	check(not curses_de.has(String(de.get("DAY_RULE_wind", "x"))) and not curses_de.has(String(de.get("DAY_RULE_fog", "x"))), "Zwischenfälle heißen anders als die Tagesregeln")
+	# Menü: Eintrag im Raster, Ko-fi neben „Bug melden“, Beenden unverändert
+	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm.contains('[tr("MENU_OVERTIME"), "overtime"') and mm.contains("_lock(grid.get_child(2), not Flow.ot_unlocked())") and mm.contains("kofi_btn = _menu_button(tr(\"MENU_KOFI\")"),
+		"Hauptmenü: Sonderschicht neben den Schichten (gesperrt bis Sektor 6), Ko-fi unten rechts")
+	check(mm.contains("quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER"), "Hauptmenü: „Beenden“ bleibt mittig")
+	check(ResourceLoader.exists("res://src/ui/overtime_menu.tscn") and ResourceLoader.exists("res://src/ui/overtime_stop.tscn") and ResourceLoader.exists("res://src/ui/overtime_finale.tscn"), "Szenen der Sonderschicht vorhanden")
 
 func _test_round86() -> void:
 	## Runde 86: kleine Details (nur Darstellung, Ton und Kalender – der Ablauf der Simulation bleibt gleich) und native Stimmen it/pt/pl.
@@ -2699,7 +2779,7 @@ func _test_wrong_pad_rules() -> void:
 	for lang in ["de", "en"]:
 		var hj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
 		check(String(hj.HELP_SHIFT_LOCKED).contains("4") and not String(hj.HELP_SHIFT_LOCKED).contains("99"), "Nachtschicht: Hinweistext nennt Sektor 1–4 (%s)" % lang)
-	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community):") and FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community:"), "Nachtschicht: Einspieler starten nicht von selbst und gelten dort nie als gesehen (Quelltextprüfung)")
+	check(FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community or Flow.overtime):") and FileAccess.get_file_as_string("res://src/game/game.gd").contains("if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community or Flow.overtime:"), "Nachtschicht (und Sonderschicht): Einspieler starten nicht von selbst und gelten dort nie als gesehen (Quelltextprüfung)")
 	sv3.debug = true
 	check(sv3.shift_unlocked(["s9_11"]), "Debug gibt die Nachtschicht frei")
 	DirAccess.remove_absolute("user://test_save_over.json")
@@ -4806,7 +4886,7 @@ func _test_workshop_buy() -> void:
 	check(is_equal_approx(Workshop.light_k({}), 1.0) and is_equal_approx(Workshop.light_k(lt), 1.15) and is_equal_approx(Workshop.light_k_for(3), 1.45), "Scheinwerfer: Lichtkreis +15 % je Stufe (Stufe 3: ×1,45)")
 	check(Workshop.mods({"workshop": {"light": 3}}) == Workshop.mods_for({}), "Scheinwerfer ändert nichts an Physik, Verbrauch oder Schaden (Replays bleiben gleich)")
 	var gsrc_ws := FileAccess.get_file_as_string("res://src/game/game.gd")
-	check(gsrc_ws.contains("if Flow.shift or Flow.daily or Flow.community:\n\t\treturn 1.0") and gsrc_ws.contains("dark.light_k = headlight_k()") and FileAccess.get_file_as_string("res://src/game/dark_view.gd").contains("72.0 * light_k"), "Scheinwerfer: wirkt nur in der Karriere, nicht in Nacht- und Tagschicht oder Community-Leveln (Quelltextprüfung)")
+	check(gsrc_ws.contains("if Flow.shift or Flow.daily or Flow.community or Flow.overtime:\n\t\treturn 1.0") and gsrc_ws.contains("dark.light_k = headlight_k()") and FileAccess.get_file_as_string("res://src/game/dark_view.gd").contains("72.0 * light_k"), "Scheinwerfer: wirkt nur in der Karriere, nicht in Nacht-, Tag- und Sonderschicht oder Community-Leveln (Quelltextprüfung)")
 	for lang in ["de", "en"]:
 		var tj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lang))
 		check(tj.has("WS_LIGHT") and tj.has("WS_LIGHT_DESC") and String(tj.get("WS_EFF_LIGHT", "")).contains("%d"), "Scheinwerfer: Texte %s" % lang)

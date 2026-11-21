@@ -103,6 +103,8 @@ func _brake(x: float, Fx) -> CPUParticles2D:
 	add_child(p)
 	return p
 
+var no_lamp := false            # Sonderschicht, Ampel kaputt: keine Landelampe am Taxi
+
 func bind(s: TaxiSim) -> void:
 	sim = s
 
@@ -194,7 +196,7 @@ func _draw() -> void:
 		for sx in [-1.0, 1.0]:
 			draw_line(Vector2(sx * 5.0, 5.5), Vector2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE, 5 + gl), steel, PixelDraw.wsnap(self, 0.7))
 			draw_rect(Rect2(sx * Tuning.FOOT_X / Tuning.TAXI_SCALE - 2, 5 + gl, 4, 0.7), steel)
-		if sim.gear_extended():
+		if sim.gear_extended() and not no_lamp:
 			var ok := sim.landing_margin()
 			var lamp := SignalColors.good() if ok > 0.0 else SignalColors.bad()
 			draw_rect(Rect2(-1, 7, 2, 1), lamp)

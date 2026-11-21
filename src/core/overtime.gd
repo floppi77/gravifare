@@ -25,18 +25,20 @@ const PACT_FROM := 2                   # Pakte ab der dritten Kreuzung …
 const PACT_CHANCE := 0.15              # … mit dieser Wahrscheinlichkeit (ersetzt den mittleren Auftrag)
 const BRIBE_BASE := 250                # Schmiergeld: Zwischenfall streichen für 250 × Sektor Credits (einmal je Kreuzung)
 
-# Werkstatt-Halt
+# Werkstatt-Halt. Preise folgen dem Einkommen des Sektors (Einkommensziel je Level, Mittel der 11 Level): Ein gewöhnliches Teil kostet etwa zwei
+# Drittel eines Levels an Fahrpreisen, ein seltenes das Doppelte, ein legendäres das Vierfache. Nach drei ordentlichen Etappen reicht es für zwei, drei
+# Teile, wenn Sprit und Reparatur bezahlt sind (geprüft mit tools/overtime_sim.gd: der Autopilot ohne Zusatzfahrgäste schafft am ersten Halt ein Teil).
 const SHOP_SLOTS := 4
-const PRICE := {"c": 600, "r": 1300, "l": 2600}
-const PRICE_HALT_STEP := 0.15          # je weiterem Halt +15 %
+const SECTOR_INCOME := [420, 770, 1140, 1770, 2490, 2580, 3490, 4250, 5030]
+const PRICE_K := {"c": 0.6, "r": 1.2, "l": 2.4}
 const PRICE_OWNED_STEP := 0.05         # je schon eingebauter Stufe +5 % (Schneeball: möglich, aber teurer)
 const HAGGLE_STEP := 0.15
-const REROLL_PRICE := 150              # Neu würfeln im Halt ohne Marke: 150, 300, 600 …
+const REROLL_K := 0.3                  # Neu würfeln im Halt ohne Marke: 30 % eines Level-Einkommens, jedes weitere Mal doppelt
 const WEIGHT := {"c": 60.0, "r": 30.0, "l": 10.0}
 const LEGEND_FROM_HALT := 2            # legendäre Teile erst ab dem zweiten Halt (und an Pakten/Prämien ab Etappe 6)
-const SALARY := 100                    # Grundgehalt je Stufe und Etappe, je Sektor +25 %
+const SALARY_K := 0.2                  # Grundgehalt je Stufe und Etappe: 20 % eines Level-Einkommens des Sektors
 const INTEREST := 0.06                 # Zinsen am Halt: 6 % des Guthabens …
-const INTEREST_MAX := 600              # … höchstens 600
+const INTEREST_MAX_K := 0.5            # … höchstens ein halbes Level-Einkommen
 const AUDIT_RATE := 0.15               # Steuerprüfung: 15 % des Guthabens über 500
 const AUDIT_FREE := 500
 const GOLDEN_STEP := 0.015             # Goldenes Taxameter: +1,5 % Fahrpreis je geschaffter Etappe
@@ -44,10 +46,10 @@ const RISK_PERK_STEP := 0.10           # Risikoprämie: +10 % Fahrpreis je Zwisc
 const RESERVE_FUEL := 15.0
 
 # Wertung
-const TAXI_POINTS := 300               # je übrigem Taxi am Ende
+const TAXI_POINTS := 1000              # je übrigem Taxi am Ende
 const FINISH_BONUS := 0.20             # alle Etappen geschafft: +20 % der Etappenpunkte
 const STAGE_STEP := 0.10               # je Überstunden-Stufe +10 % auf alles
-const XP_DIV := 25.0                   # Erfahrung = Punkte / 25
+const XP_DIV := 50.0                   # Erfahrung = Punkte / 50
 const BOARD_SIZE := 10
 const STAGE_MAX := 10
 const RANK_XP := [0, 150, 400, 750, 1200, 1800, 2500, 3400, 4500, 5800, 7300, 9000, 11000]
@@ -139,9 +141,9 @@ static func code_of(seed: int) -> String:
 		s /= CODE_ALPHABET.length()
 	return out
 
-## Seed aus einem Code (Groß-/Kleinschreibung egal, Verwechsler 0→O… werden angeglichen); -1, wenn der Code ungültig ist.
+## Seed aus einem Code (Groß-/Kleinschreibung egal; 0, 1, I und O kommen nicht vor); -1, wenn der Code ungültig ist.
 static func seed_of(code: String) -> int:
-	var c := code.strip_edges().to_upper().replace("0", "O").replace("1", "I")
+	var c := code.strip_edges().to_upper()
 	if c.length() != CODE_LEN:
 		return -1
 	var s := 0
@@ -281,7 +283,7 @@ static func sim_mods(fx: Dictionary, angel := 0) -> Dictionary:
 static func run_mods(fx: Dictionary) -> Dictionary:
 	var out := {}
 	for k in ["fare_k", "tip_add", "tip_k", "repair_k", "taxi_fee_k", "fuel_price_k", "refuel_k", "deadline_k", "missed_k", "walk_k", "vip_k", "tmax",
-			"pen_k", "combo_k", "reserve", "seat", "self_repair", "extra_add", "picky", "cash", "pump_cycle", "soft_add", "no_life"]:
+			"pen_k", "combo_k", "reserve", "seat", "self_repair", "extra_add", "picky", "cash", "pump_cycle", "soft_add", "no_life", "ui_nolight", "ui_nomarker", "ui_shaky"]:
 		out[k] = fx[k]
 	return out
 
@@ -410,7 +412,7 @@ static func choose(st: Dictionary, o: Dictionary) -> void:
 	st["bribe"] = {}
 	var sal := int(effects(st).salary)
 	if sal > 0:
-		var pay := float(SALARY * sal) * (1.0 + 0.25 * float(sector_of(st, int(st.etappe)) - 1))
+		var pay := SALARY_K * float(sal) * income(sector_of(st, int(st.etappe)))
 		st.credits = float(st.credits) + roundf(pay)
 		_note(st, "salary", pay)
 
@@ -495,7 +497,7 @@ static func etappe_done(st: Dictionary, res: Dictionary) -> void:
 		st.shop = []
 		st.shop_rolls = 0
 		if float(fx.interest) > 0.0:
-			var z := minf(INTEREST_MAX, roundf(maxf(0.0, float(st.credits)) * INTEREST))
+			var z := minf(roundf(INTEREST_MAX_K * income(sector_of(st, int(st.etappe) - 1))), roundf(maxf(0.0, float(st.credits)) * INTEREST))
 			st.credits = float(st.credits) + z
 			_note(st, "interest", z)
 	else:
@@ -565,14 +567,22 @@ static func shop(st: Dictionary) -> Array:
 		st.shop = items
 	return st.shop
 
+## Einkommensziel eines Levels im Sektor (Mittel), Maßstab für Preise, Gehalt und Zinsen.
+static func income(sector: int) -> float:
+	return float(SECTOR_INCOME[clampi(sector, 1, SECTORS) - 1])
+
+## Sektor des zuletzt geflogenen Levels (im Halt: der gerade beendete).
+static func shop_sector(st: Dictionary) -> int:
+	return sector_of(st, maxi(0, int(st.get("etappe", 0)) - 1))
+
 static func price(st: Dictionary, id: String) -> int:
 	var p := perk(id)
 	var owned := 0
 	for k in st.get("perks", {}):
 		owned += int(st.perks[k])
 	var fx := effects(st)
-	var k := (1.0 + PRICE_HALT_STEP * float(maxi(int(st.get("halts", 1)) - 1, 0))) * (1.0 + PRICE_OWNED_STEP * float(owned)) * (1.0 - HAGGLE_STEP * float(fx.haggle)) * float(fx.shop_k)
-	return int(snappedf(float(PRICE.get(String(p.get("rar", "c")), 600)) * k, 10.0))
+	var k := float(PRICE_K.get(String(p.get("rar", "c")), 0.9)) * income(shop_sector(st)) * (1.0 + PRICE_OWNED_STEP * float(owned)) * (1.0 - HAGGLE_STEP * float(fx.haggle)) * float(fx.shop_k)
+	return int(snappedf(k, 10.0))
 
 ## Kaufen; false, wenn das Geld nicht reicht oder das Teil schon verkauft ist.
 static func buy(st: Dictionary, slot: int) -> bool:
@@ -590,7 +600,7 @@ static func buy(st: Dictionary, slot: int) -> bool:
 	return true
 
 static func shop_reroll_price(st: Dictionary) -> int:
-	return REROLL_PRICE * int(pow(2, int(st.get("shop_rolls", 0))))
+	return int(snappedf(REROLL_K * income(shop_sector(st)) * pow(2.0, float(st.get("shop_rolls", 0))), 10.0))
 
 ## Halt neu würfeln: mit Marke kostenlos, sonst gegen Credits (150, 300, 600 …).
 static func reroll_shop(st: Dictionary) -> bool:
@@ -624,6 +634,15 @@ static func final(st: Dictionary) -> Dictionary:
 	return {"etappen": sum, "taxis": lives, "taxi_points": taxi_pts, "finish": finish, "stage": stage, "stage_k": stage_k, "total": total_pts,
 		"flown": (st.get("results", []) as Array).size(), "of": total(st), "won": bool(st.get("done", false)) and not bool(st.get("over", false)),
 		"credits": float(st.get("credits", 0.0)), "xp": int(floor(float(total_pts) / XP_DIV))}
+
+## Tausendertrenner der eingestellten Sprache (Punkte in Bestenliste und Schlusswertung).
+static func thousands_sep() -> String:
+	match TranslationServer.get_locale().substr(0, 2):
+		"en":
+			return ","
+		"fr", "pl":
+			return " "
+	return "."
 
 static func rank_of(xp: int) -> int:
 	var r := 0

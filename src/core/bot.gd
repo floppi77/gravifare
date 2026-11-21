@@ -578,11 +578,15 @@ func _sweep_track(ch: String, gate: Dictionary) -> float:
 	return clampf(vg + (c - sim.pos.y) * 4.0, -lim, lim)
 
 ## `rules`: Regelstand der Auftragslogik (Run.RULES; 2 = Tankregel und Aufträge wie bis 1.0.1, für den Nachweis der Fliegbarkeit, siehe Testläufer).
-static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false, rules := Run.RULES, replan_gap := 0.0) -> Dictionary:
+## `mods`/`ot`: Sonderschicht (TaxiSim.apply_mods, Run.ot) – für die Prüfung der Zwischenfälle (tools/overtime_check.gd); leer = wie immer.
+static func fly_level(lvl: LevelData, max_seconds := 600.0, fuel_in := -1.0, record := false, pro_mode := false, rules := Run.RULES, replan_gap := 0.0, mods: Dictionary = {}, ot: Dictionary = {}) -> Dictionary:
 	var r := Run.new()
 	r.rules = rules
+	r.ot = ot
 	r.extras_enabled = false         # Der Bot löst die Auftragskette; Zusatzfahrgäste sind optional
 	r.start(lvl, fuel_in)
+	if not mods.is_empty():
+		r.sim.apply_mods(mods)
 	var bot := Bot.new(r, pro_mode)
 	bot.replan_gap = replan_gap
 	var rep: Replay = null

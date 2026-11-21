@@ -33,6 +33,9 @@ func _ready() -> void:
 	if shift_run:
 		Flow.start_shift.call_deferred()
 		return
+	if Array(OS.get_cmdline_user_args()).any(func(a): return String(a).begins_with("--ot=")):      # Dev: Sonderschicht (siehe Flow.dev_overtime)
+		Flow.dev_overtime.call_deferred(OS.get_cmdline_user_args())
+		return
 	if day_run:
 		Flow.start_daily.call_deferred()
 		return

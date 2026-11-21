@@ -59,7 +59,7 @@
   {"id": "hotjet", "kind": "sim", "group": "thrust", "fx": {"overheat": 1}},
   {"id": "stickygear", "kind": "sim", "group": "gear", "fx": {"gear_time_k": 2.0}},
   {"id": "crooked", "kind": "sim", "group": "side", "fx": {}},
-  {"id": "leak", "kind": "sim", "group": "fuel", "fx": {"leak": 0.35}},
+  {"id": "leak", "kind": "sim", "group": "fuel", "fx": {"leak": 0.15}},
   {"id": "heavy", "kind": "sim", "group": "thrust", "fx": {"heavy_k": -0.12}},
   {"id": "slick", "kind": "sim", "group": "drag", "fx": {"drag_k": -0.5}},
   {"id": "nolight", "kind": "ui", "group": "ui", "fx": {"ui_nolight": 1}},

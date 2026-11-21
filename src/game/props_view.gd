@@ -96,7 +96,7 @@ func _draw_pads() -> void:
 		flags = level.pad_flags()
 		flags_level = level
 	var font := Fonts.hud
-	var target := run.marker_pad()
+	var target := "" if run.otv("ui_nomarker", 0.0) > 0.0 else run.marker_pad()      # Sonderschicht, Funkloch: kein Zielmarker
 	for id in level.pads:
 		var p: Dictionary = level.pads[id]
 		var cxm: float = p.center

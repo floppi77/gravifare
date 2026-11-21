@@ -181,7 +181,7 @@ func _process(delta: float) -> void:
 	if run == null:
 		return
 	_t += delta
-	var target := run.marker_pad()
+	var target := "" if run.otv("ui_nomarker", 0.0) > 0.0 else run.marker_pad()      # Sonderschicht, Funkloch: keine hervorgehobene Zielplattform
 	for id in pad_lights:
 		var l: PointLight2D = pad_lights[id]
 		if level.pads[id].get("moving", false):

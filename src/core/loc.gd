@@ -14,7 +14,7 @@ var pad_style := "xbox"
 const PAD_KEYS := ["HUD_HINT_PAD_PAD", "HUD_HINT_PAD_DYN", "HUD_RESTART", "TRANS_SKIP", "HUD_GAME_OVER_HINT", "CREDITS_KOFI", "MUSIC_HINT",
 	"BIND_PRESS", "RES_CONTINUE", "RES_TO_MENU", "LVL_SWITCH", "FINALE_NEXT", "SHIFT_FIN_NEXT", "ED_HINT_LVL_PAD", "ED_HINT_PAD",
 	"ED_HINT_OBJ_PAD", "ED_HINT_VALUE_PAD", "ED_MODE_TIP", "ED_VEH_ACTIVE", "ED_PICK_A", "ED_HELP_TIP", "ED_HELP_MAP_PAD", "ED_HELP_OBJ_PAD",
-	"ED_HELP_LVL_PAD", "ED_HELP_ALL_PAD"]
+	"ED_HELP_LVL_PAD", "ED_HELP_ALL_PAD", "OT_CROSS_HINT"]
 const PS_TEXT := {"A": "✕", "B": "○", "X": "□", "Y": "△", "LB": "L1", "RB": "R1", "LT": "L2", "RT": "R2", "Back": "Share", "Start": "Options"}
 var _ps_rx: RegEx
 

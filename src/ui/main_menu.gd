@@ -20,9 +20,10 @@ var notice: Label
 var help: Label                    # Hilfetext zum gewählten oder überfahrenen Menüpunkt (unten unter dem Menü)
 var flags_col: Control = null      # Sprachflaggen, untereinander links neben dem Menü
 var bug_btn: Button = null          # „Bug melden“ unten rechts (nur im Hauptmenü)
+var kofi_btn: Button = null         # „Ko-fi“ links neben „Bug melden“ (seit Runde 87: im Raster steht die Sonderschicht)
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
-const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_COMMUNITY",
+const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_OVERTIME", "HELP_OVERTIME_LOCKED", "HELP_COMMUNITY",
 	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_DEBUGEGGS", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN", "HELP_LANG_FR", "HELP_LANG_ES", "HELP_LANG_IT", "HELP_LANG_PT", "HELP_LANG_PL", "HELP_UPDATE"]
 
 func _ready() -> void:
@@ -115,6 +116,9 @@ func _clear() -> void:
 	if bug_btn != null and is_instance_valid(bug_btn):
 		bug_btn.queue_free()
 	bug_btn = null
+	if kofi_btn != null and is_instance_valid(kofi_btn):
+		kofi_btn.queue_free()
+	kofi_btn = null
 	if update_btn != null and is_instance_valid(update_btn):
 		update_btn.queue_free()
 	update_btn = null
@@ -132,6 +136,8 @@ func _focus_first(lang := "", restore := false) -> void:
 	var buttons := box.find_children("*", "Button", true, false)
 	if bug_btn != null and is_instance_valid(bug_btn):
 		buttons.append(bug_btn)                     # „Bug melden“ liegt außerhalb der Spalte (Rückkehr von seiner Seite)
+	if kofi_btn != null and is_instance_valid(kofi_btn):
+		buttons.append(kofi_btn)
 	if restore and _return_focus != "":
 		for c in buttons:
 			if c.get_meta("key", "") == _return_focus and not (c as Button).disabled:
@@ -232,17 +238,18 @@ func show_main(focus_lang := "") -> void:
 	for entry in [
 			[tr("MENU_DAILY"), "daily", func(): Flow.start_daily()],
 			[tr("MENU_SHIFT"), "shift", func(): Flow.start_shift()],
+			[tr("MENU_OVERTIME"), "overtime", func(): get_tree().change_scene_to_file(Flow.OT_MENU)],
 			[tr("MENU_COMMUNITY"), "community", show_community],
 			[tr("MENU_GARAGE"), "garage", func(): get_tree().change_scene_to_file("res://src/ui/garage.tscn")],
 			[tr("MENU_STATS"), "stats", func(): get_tree().change_scene_to_file("res://src/ui/stats.tscn")],
 			[tr("MENU_MUSIC"), "music", show_music],
 			[tr("MENU_OPTIONS"), "options", show_options],
 			[tr("MENU_CREDITS"), "credits", func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
-			[Save.slot_label(), "slot", show_slots],
-			[tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL)]]:      # per Gamepad wie jeder Eintrag anwählbar
+			[Save.slot_label(), "slot", show_slots]]:
 		grid.add_child(_menu_button(entry[0], entry[1], entry[2], true))
 	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagschicht: ab Sektor 1
 	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln der Sektoren 1–4
+	_lock(grid.get_child(2), not Flow.ot_unlocked())           # Sonderschicht: erst nach allen Leveln der Sektoren 1–6
 	if Save.shift_unlocked(ids) and Save.shift_used_today(Daily.today()):      # … und nur ein Versuch pro Tag
 		var sb := grid.get_child(1) as Button
 		sb.disabled = true
@@ -261,6 +268,8 @@ func show_main(focus_lang := "") -> void:
 	bug_btn.add_theme_constant_override("icon_max_width", 11)
 	bug_btn.add_theme_constant_override("h_separation", 4)
 	stage.add_child(bug_btn)
+	kofi_btn = _menu_button(tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL), true)      # per Gamepad wie jeder Eintrag anwählbar
+	stage.add_child(kofi_btn)
 	_place_bug_button.call_deferred(grid, quit_btn)
 	if Save.debug:
 		var drow := HBoxContainer.new()                  # Debug: verlassen und Taxi-Grafik 2D/Mischform (Vergleich) in einer Zeile
@@ -415,18 +424,26 @@ func show_debug_eggs() -> void:
 	_link_grid_full(grid, back)
 	_focus_first()
 
-## „Bug melden“ rechtsbündig über der Versionsangabe; Fokuswege von „Beenden“ und „Ko-fi“ (Rechts) und zurück (Links/Hoch).
+## „Bug melden“ rechtsbündig über der Versionsangabe, „Ko-fi“ links daneben; Fokuswege: Rechts von „Beenden“ zu „Ko-fi“, weiter zu „Bug melden“,
+## zurück mit Links; Hoch führt in die letzte Zeile des Rasters.
 func _place_bug_button(grid: GridContainer, quit_btn: Control) -> void:
-	if bug_btn == null or not is_instance_valid(bug_btn) or not is_instance_valid(quit_btn):
+	if bug_btn == null or not is_instance_valid(bug_btn) or not is_instance_valid(quit_btn) or kofi_btn == null or not is_instance_valid(kofi_btn):
 		return
 	var sz := bug_btn.get_combined_minimum_size()
 	bug_btn.size = sz
 	bug_btn.position = Vector2(640.0 - 6.0 - sz.x, 340.0 - sz.y)
-	var kofi := grid.get_child(grid.get_child_count() - 1) as Control
-	quit_btn.focus_neighbor_right = quit_btn.get_path_to(bug_btn)
-	kofi.focus_neighbor_right = kofi.get_path_to(bug_btn)
-	bug_btn.focus_neighbor_left = bug_btn.get_path_to(quit_btn)
-	bug_btn.focus_neighbor_top = bug_btn.get_path_to(kofi)
+	var ksz := kofi_btn.get_combined_minimum_size()
+	kofi_btn.size = Vector2(ksz.x, sz.y)
+	kofi_btn.position = Vector2(bug_btn.position.x - 6.0 - ksz.x, bug_btn.position.y)
+	var last := grid.get_child(grid.get_child_count() - 1) as Control
+	quit_btn.focus_neighbor_right = quit_btn.get_path_to(kofi_btn)
+	last.focus_neighbor_right = last.get_path_to(kofi_btn)
+	kofi_btn.focus_neighbor_left = kofi_btn.get_path_to(quit_btn)
+	kofi_btn.focus_neighbor_right = kofi_btn.get_path_to(bug_btn)
+	kofi_btn.focus_neighbor_top = kofi_btn.get_path_to(last)
+	kofi_btn.focus_neighbor_bottom = kofi_btn.get_path_to(kofi_btn)
+	bug_btn.focus_neighbor_left = bug_btn.get_path_to(kofi_btn)
+	bug_btn.focus_neighbor_top = bug_btn.get_path_to(last)
 	bug_btn.focus_neighbor_bottom = bug_btn.get_path_to(bug_btn)
 	bug_btn.focus_neighbor_right = bug_btn.get_path_to(bug_btn)
 

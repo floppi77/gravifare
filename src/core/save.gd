@@ -25,6 +25,8 @@ func slot_path(n: int) -> String:
 func _ready() -> void:
 	var want := 0
 	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--ot"):
+			dev_session = true                   # Sonderschicht direkt (Flow.dev_overtime): schreibt nichts
 		if a in ["--autopilot", "--debug-complete", "--debug-input", "--debug-open-exit", "--debug-destroy", "--debug-squash", "--lives", "--shift"] or a.begins_with("--shift-map=") or a == "--shift-demo" or a.begins_with("--shift-quality=") or a == "--daily" or a == "--no-brief" or a == "--options" or a.begins_with("--options=") or a == "--confirm" or a == "--update-ask" or a == "--debug-split" or a == "--bug" or a.begins_with("--date=") or a.begins_with("--hour=") or a.begins_with("--hold-action=") or a.begins_with("--click=") or a.begins_with("--day-rule=") or a.begins_with("--day-goal=") or a.begins_with("--day-date=") or a.begins_with("--debug-input=") or a.begins_with("--lives=") or a.begins_with("--debug-pump=") or a.begins_with("--debug-destroy-at=") or a.begins_with("--inputs=") or a.begins_with("--seed=") or a.begins_with("--clip=") or a.begins_with("--tut-step=") or a.begins_with("--shot=") or a.begins_with("--skip-time=") or a.begins_with("--dark=") or a.begins_with("--ws-light=") or a.begins_with("--debug-result"):
 			dev_session = true
 		if a.begins_with("--level=") or a.begins_with("--scene=") or a == "--levels" or a.begins_with("--shot="):
@@ -400,6 +402,14 @@ func daily_unlocked(ids: Array) -> bool:
 	return debug or daily_pool(ids).size() >= Daily.UNLOCK_LEVELS
 
 ## Nachtschicht: frei, sobald alle Level der Sektoren 1–4 je einmal geschafft wurden (`ids`: alle Level-IDs, die übrigen Sektoren zählen nicht).
+## Alle Level der Sektoren 1 bis `n` einmal geschafft (Freischaltung von Nachtschicht und Sonderschicht)?
+func sectors_done(ids: Array, n: int) -> bool:
+	var done := ever_completed()
+	var need := ids.filter(func(id):
+		var sec := String(id).get_slice("_", 0).trim_prefix("s")
+		return String(id).begins_with("s") and sec.is_valid_int() and int(sec) <= n)
+	return not need.is_empty() and need.all(func(id): return done.has(id))
+
 const SHIFT_UNLOCK_SECTORS := 4
 func shift_unlocked(ids: Array) -> bool:
 	var done := ever_completed()

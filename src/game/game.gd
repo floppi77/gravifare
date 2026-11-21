@@ -61,6 +61,9 @@ var watch_ev := 0                  # nächstes Ereignis (Rauswerfen/Neustart)
 var watch_tick := 0                # Ticks im laufenden Zustand, wie Replay.ticks bei der Aufnahme
 var watch_done_t := -1.0           # nach dem Ende: Sekunden bis zur Rückkehr in die Levelauswahl
 var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (Screenshots)
+var ot_fx: Dictionary = {}       # Sonderschicht: Wirkungen der laufenden Etappe (Overtime.effects), auch für Anzeige und Zwischenfälle der Oberfläche
+var ot_layer: CanvasLayer = null   # Halt über dem Spiel
+var ot_open := false              # Halt oder Kreuzung offen
 
 func _ready() -> void:
 	if Flow.current_level == "":
@@ -79,6 +82,7 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_layers)
 	Input.joy_connection_changed.connect(_on_joy_connection)
 	load_level(level_path)
+	_ot_announce.call_deferred()
 	for hold in OS.get_cmdline_user_args():
 		if hold.begins_with("--hold-action="):          # Dev: eine Eingabeaktion dauerhaft gedrückt halten (z. B. thrust_right), um die Steuerung ohne Hand zu prüfen
 			Input.action_press(hold.substr(14))
@@ -226,12 +230,15 @@ func headlight_k() -> float:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--ws-light="):
 			return Workshop.light_k_for(int(a.get_slice("=", 1)))
-	if Flow.shift or Flow.daily or Flow.community:
+	if Flow.shift or Flow.daily or Flow.community or Flow.overtime:
 		return 1.0
 	return Workshop.light_k(Save.data)
 
 ## Level neu starten: Der Ausgangs-Fahrgast des Vorlevels steigt erneut aus, sein Fahrpreis geht durch den Neustart nicht verloren.
 func restart_level() -> void:
+	if Flow.overtime:
+		Flow.ot_restart()                   # Sonderschicht: Etappe von vorn mit dem Stand zu ihrem Beginn (auch die Taxis)
+		return
 	load_level(level_path)
 	Flow.carry_passenger = entry_carry
 	_release_carried()
@@ -243,7 +250,19 @@ func load_level(path: String) -> void:
 		return
 	run.shift_mode = Flow.shift
 	run.types_enabled = not (Flow.shift or Flow.daily)              # VIP und Notfall nur in Karriere und Community-Leveln
-	if Flow.shift:
+	run.ot = {}
+	ot_fx = {}
+	if Flow.overtime:
+		# Sonderschicht: Ausstattung, Lizenz, Pakte und Zwischenfälle der Etappe. Alles wird hier gesetzt, nichts bleibt aus der Vor-Etappe.
+		ot_fx = Overtime.effects(Flow.ot)
+		if float(ot_fx.newroute) > 0.0:
+			var jr := RandomNumberGenerator.new()
+			jr.seed = Flow.run_seed + 31
+			lvl.jobs = Run.chain_jobs(lvl, maxi(2, lvl.jobs.size() - 1), jr)        # Neuer Fahrplan: andere Fahrten auf derselben Karte
+		run.ot = Overtime.run_mods(ot_fx)
+		run.patience_k = float(ot_fx.patience_k)
+		run.fuel_cap = Tuning.FUEL_MAX * float(ot_fx.fuel_cap)
+	elif Flow.shift:
 		NightShift.apply(lvl, Flow.shift_index(), Flow.shift_date)          # Schwerkraft, Dunkelheit und Aufträge der Schicht
 		run.extras_enabled = false                                                       # nur Pflichtfahrgäste
 	elif Flow.daily:
@@ -269,9 +288,13 @@ func load_level(path: String) -> void:
 		watch_done_t = -1.0
 	run.start(lvl, Flow.entry_fuel, Flow.entry_credits, run_seed)
 	run.lives = Flow.lives
+	if Flow.overtime and float(ot_fx.chain) > 0.0:
+		run.streak = int(Flow.ot.get("streak", 0))          # Kettenreaktion: die Serie läuft über die Etappen weiter
 	var mods := Workshop.mods_for({}) if Flow.daily or Flow.community else Workshop.mods(Save.data)      # Tagschicht und Community-Level: Serientaxi, damit Ergebnisse vergleichbar sind
 	if Flow.daily:
 		mods = DayShift.mods(Flow.daily_rule, mods)
+	if Flow.overtime:
+		mods = Overtime.sim_mods(ot_fx, int(Flow.ot.get("angel", 0)))        # Sonderschicht: Serientaxi plus Ausstattung, nie die Werkstatt der Karriere
 	if watching:
 		mods = Flow.watch.get("mods", {})
 	run.sim.apply_mods(mods)
@@ -316,6 +339,7 @@ func load_level(path: String) -> void:
 	ambient.setup(lvl)
 	fx.setup(run)
 	taxi.bind(run.sim)
+	taxi.no_lamp = run.otv("ui_nolight", 0.0) > 0.0
 	assist.bind(run)
 	taxi.sync_state()
 	taxi.reset_physics_interpolation()
@@ -343,7 +367,7 @@ func _setup_ghost(lvl: LevelData) -> void:
 		ghost.set_script(load("res://src/game/ghost_view.gd"))
 		world.add_child(ghost)
 		world.move_child(ghost, taxi.get_index())
-	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or autopilot != null or watching or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
+	var best := {} if lvl.tutorial or Flow.shift or Flow.daily or Flow.community or Flow.overtime or autopilot != null or watching or not Settings.values.ghost or not Save.is_completed(lvl.id) else Replay.load_best(lvl.id, Save.slot)       # nur Geister aus diesem Speicherplatz und nur für schon geschaffte Level
 	if best.has("sig") and String(best.sig) != Replay.sig_of(lvl):
 		best = {}                        # das Level wurde nach diesem Lauf geändert
 	var trace: Array = best.get("trace", [])
@@ -405,7 +429,7 @@ func level_clip_key() -> String:
 
 ## Einspieler dieses Levels vormerken, falls noch nicht gesehen.
 func _queue_clip(delay: float, now := false) -> void:
-	if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community:
+	if not Settings.values.hints or Flow.shift or Flow.daily or Flow.community or Flow.overtime:
 		return
 	var k := level_clip_key()
 	var seen: Array = Save.data.get("seen_clips", [])
@@ -422,7 +446,7 @@ func start_clip(k: String) -> void:
 	if clip != null:
 		return
 	var seen: Array = Save.data.get("seen_clips", [])
-	if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community):      # nur die Karriere merkt „gesehen“: in den Schichten offen sind auch noch unbekannte Sektoren
+	if not seen.has(k) and not (Flow.shift or Flow.daily or Flow.community or Flow.overtime):      # nur die Karriere merkt „gesehen“: in den Schichten offen sind auch noch unbekannte Sektoren
 		seen.append(k)
 		Save.data["seen_clips"] = seen
 		Save.write()
@@ -449,7 +473,7 @@ func start_clip(k: String) -> void:
 ## Einspieler zu VIP und Notfall: nicht an ein Level gebunden, sondern beim ersten wartenden Fahrgast dieses Typs (Pflicht- oder Zusatzfahrgast).
 const KIND_CLIPS := ["vip", "emergency"]
 func _kind_clip_tick() -> void:
-	if clip_pending != "" or clip != null or not Settings.values.hints or Flow.shift or Flow.daily or Flow.community or run.level.tutorial:
+	if clip_pending != "" or clip != null or not Settings.values.hints or Flow.shift or Flow.daily or Flow.community or Flow.overtime or run.level.tutorial:
 		return
 	var seen: Array = Save.data.get("seen_clips", [])
 	var waiting: Array = []
@@ -677,7 +701,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		Cosmetics.taxi_3d = not Cosmetics.taxi_3d
 		hud.flash_message(tr("DEBUG_TAXI3D") % ("3D" if Cosmetics.taxi_3d else "2D") + "  [F6]", 1.6)
 		return
-	if bay != null:
+	if bay != null or ot_open:                    # Werkstatt, Halt oder Kreuzung haben die Eingabe
 		return
 	if watching:                                  # Bestflug: keine Steuerung; B/Esc/Start (nach dem Ende auch A/Enter) zurück zur Levelauswahl
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel") or (completion_saved and event.is_action_pressed("ui_accept")):
@@ -719,7 +743,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_take_shift_shot()
 	elif (event.is_action_pressed("ui_accept") or _is_click(event)) and run.result == Run.Result.COMPLETE and completion_saved and hud.result_age >= 0.7:
 		get_viewport().set_input_as_handled()     # vor einem Szenenwechsel: danach hat der Knoten keinen Viewport mehr
-		if Flow.next_level_id() != "":
+		if Flow.overtime:
+			_ot_continue()          # Sonderschicht: Halt und Kreuzung, oder die Schlusswertung
+		elif Flow.next_level_id() != "":
 			if Workshop.due(run.level.number) and not Flow.shift:
 				_open_bay()         # Sektor geschafft: erst in die Werkstatt
 			else:
@@ -733,7 +759,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif hud.game_over:
 		if event.is_action_pressed("ui_accept") or _is_click(event):
 			get_viewport().set_input_as_handled()
-			Flow.to_menu()
+			if Flow.overtime:
+				Flow.to_overtime_finale()
+			else:
+				Flow.to_menu()
 	elif event.is_action_pressed("horn"):
 		get_viewport().set_input_as_handled()
 		if run.result == Run.Result.RUNNING and trans_t < 0.0:
@@ -882,6 +911,12 @@ func _physics_process(_delta: float) -> void:
 			hud.result["shift"] = mr
 			hud.result["shift_index"] = Flow.shift_index() + 1
 			hud.result["shift_final"] = Flow.finish_shift() if Flow.next_level_id() == "" else {}
+		elif Flow.overtime:
+			counted = false                  # Sonderschicht: zählt nur für ihre eigene Wertung (keine Karriere, keine Medaillen, kein Geist)
+			var ots := _ot_finish_etappe(score)
+			hud.result["overtime"] = ots
+			hud.result["score"] = int(ots.score)
+			hud.next_exists = true                # weiter zur Kreuzung, zum Halt oder zur Schlusswertung
 		elif Flow.community:
 			if counted and not Flow.editor_autopilot and Flow.community_store().exists(Flow.current_level):      # Community-Level: nur eigene Bestzeit und Bestwert, keine Karriere, keine Medaillen, kein Geist (Autopilot-Testflug zählt nicht)
 				Save.complete_community(Flow.current_level, run.level_time, score)
@@ -926,7 +961,7 @@ func _physics_process(_delta: float) -> void:
 		if Flow.next_level_id() == "":
 			if not Flow.practice:
 				Save.clear_campaign()
-		elif autopilot != null:
+		elif autopilot != null and not Flow.overtime:
 			_begin_transition()                  # Autopilot-Läufe (Dev) laufen ohne Bestätigung weiter
 	if run.result == Run.Result.FAILED and not hud.game_over:
 		restart_timer += Tuning.TICK
@@ -1031,6 +1066,9 @@ func _lose_life() -> void:
 		if Flow.shift:
 			Flow.shift_credits = run.money
 			hud.shift_final = Flow.finish_shift()
+		elif Flow.overtime:
+			Overtime.fail(Flow.ot, run.money)       # kein Taxi mehr: Lauf vorbei, sofort gewertet (ein Abbruch jetzt holt nichts zurück)
+			Flow.ot_close()
 		elif not Flow.practice:
 			hud.over_level = Flow.lose_sector(run.level.sector).number
 		return
@@ -1306,6 +1344,28 @@ func _on_event(e: Dictionary) -> void:
 	if tutorial != null:
 		tutorial.on_event(e)
 	match e.type:
+		"overheat":
+			hud.flash_message(tr("MSG_OT_OVERHEAT"), 1.6)
+			Sfx.play("pump_hit", -6.0, 0.7)                 # tiefes Zischen; „warn“ bleibt dem Tankalarm vorbehalten
+		"cooled":
+			hud.flash_message(tr("MSG_OT_COOLED"), 1.0)
+		"angel":
+			hud.flash_message(tr("MSG_OT_ANGEL"), 2.0)
+			Haptics.pulse(0.3, 0.8, 0.2)
+		"shield":
+			hud.flash_message(tr("MSG_OT_SHIELD"), 1.4)
+		"ot_reserve":
+			hud.flash_message(tr("MSG_OT_RESERVE"), 2.0)
+		"ot_pump_closed":
+			hud.flash_message(tr("MSG_OT_PUMP") % int(ceil(float(e.get("open_in", 5.0)))), 1.6)
+		"ot_picky":
+			hud.flash_message(tr("MSG_OT_PICKY") % String(e.get("name", "")), 2.0)
+		"ot_cash":
+			hud.flash_message(tr("MSG_OT_CASH") % int(e.amount), 1.6)
+		"ot_cash_lost":
+			hud.flash_message(tr("MSG_OT_CASH_LOST") % int(e.amount), 2.0)
+		"ot_seat":
+			hud.flash_message(tr("MSG_OT_SEAT") % String(e.get("name", "")), 2.0)
 		"near_miss":
 			if float(e.get("tip", 0.0)) > 0.0:
 				hud.flash_message(tr("MSG_NEAR_TIP") % int(e.tip), 1.2)
@@ -1586,6 +1646,11 @@ func _play_radio() -> void:
 
 ## Stand für das nächste Level festhalten: Sprit, Credits und Ausgangs-Fahrgast laufen mit.
 func _store_progress() -> void:
+	if Flow.overtime:
+		next_id = String(Flow.ot.level)       # Sonderschicht: Einstiegswerte kommen aus dem Lauf (Käufe im Halt, Grundgehalt, Ersatztaxis)
+		Flow.ot_prepare()
+		entry_carry = {}
+		return
 	next_id = Flow.next_level_id()
 	Flow.entry_fuel = maxf(Tuning.MIN_START_FUEL, run.sim.fuel)
 	Flow.entry_credits = run.money
@@ -1626,6 +1691,11 @@ func _begin_transition() -> void:
 	trans.info = tr("TRANS_FARES") % int(run.money)
 	if nl.gravity != Tuning.GRAVITY:
 		trans.info += "  ·  " + tr("TRANS_GRAVITY") % (nl.gravity / Tuning.GRAVITY)
+	if Flow.overtime:
+		trans.info = tr("OT_TRANS") % [int(Flow.ot.etappe) + 1, Overtime.total(Flow.ot)]
+		var oc := Overtime.active_curses(Flow.ot)
+		if not oc.is_empty():
+			trans.info += "  ·  " + ", ".join(oc.map(func(c): return tr("OT_CURSE_%s" % String(c).to_upper())))
 	if Flow.shift:
 		trans.info = tr("TRANS_SHIFT") % [Flow.shift_results.size() + 1, NightShift.MAPS]
 		var sidx: int = Flow.shift_plan.find(next_id)
@@ -1683,6 +1753,7 @@ func _arrival_tick() -> void:
 		Sfx.set_thrust(0.0, 0.0)
 		arrive_done = true
 		_release_carried()
+		_ot_announce()
 		if run.actor != null and run.actor.state == PassengerActor.S.WAITING:
 			run.actor.wave()
 			_on_event({"type": "call", "voice": run.actor.voice_key(), "name": run.actor.pname})
@@ -1719,3 +1790,85 @@ func _end_transition() -> void:
 	taxi.reset_physics_interpolation()
 	assist.sync_state()
 	assist.reset_physics_interpolation()
+
+# ---------------------------------------------------------------- Sonderschicht
+
+## Etappe geschafft: Punkte bilden, Lauf fortschreiben und sichern. Gibt die Werte für die Ergebnisansicht zurück.
+func _ot_finish_etappe(score: int) -> Dictionary:
+	var med := run.medals() if score > 0 else {"time": false, "clean": false, "pro": false}
+	var stars := int(med.time) + int(med.clean) + int(med.pro)
+	var bonus := int(round(150.0 * stars + 2.0 * maxf(0.0, run.time_target() - run.level_time) + 10.0 * run.perfect_count)) if score > 0 else 0
+	var n := Overtime.active_curses(Flow.ot).size()
+	var e := int(Flow.ot.etappe)
+	Overtime.etappe_done(Flow.ot, {"points": score, "bonus": bonus, "credits": run.money, "fuel": maxf(Tuning.MIN_START_FUEL, run.sim.fuel), "lives": Flow.lives,
+		"carry": run.carried, "streak": run.streak, "angel": run.sim.angel, "net": float(hud.result.get("net", 0.0)), "time": run.level_time, "stars": stars})
+	var last: Dictionary = (Flow.ot.results as Array)[-1]
+	if String(Flow.ot.phase) == "done":
+		Flow.ot_close()                       # alle Etappen geflogen: sofort werten (auch wenn danach das Fenster zugeht)
+	else:
+		Flow.ot_save()
+	var run_total := 0
+	for r in Flow.ot.results:
+		run_total += int(r.score)
+	return {"etappe": e + 1, "of": Overtime.total(Flow.ot), "score": int(last.score), "points": score, "curses": n, "time": med.time, "clean": med.clean, "pro": med.pro,
+		"phase": String(Flow.ot.phase), "run_total": run_total}
+
+## Nach der Ergebnisansicht: Halt (alle drei Etappen), dann die Kreuzung; nach der letzten Etappe die Schlusswertung.
+func _ot_continue() -> void:
+	if String(Flow.ot.get("phase", "")) == "done" or Flow.ot.is_empty():
+		Flow.to_overtime_finale()
+		return
+	if ot_open:
+		return
+	ot_open = true
+	Music.duck(-8.0)
+	ot_layer = CanvasLayer.new()
+	ot_layer.layer = 13
+	add_child(ot_layer)
+	if String(Flow.ot.phase) == "halt":
+		var b := OvertimeBay.new()
+		b.st = Flow.ot
+		b.sector = run.level.sector
+		b.wallet = float(Flow.ot.credits)
+		b.on_change = Flow.ot_save
+		b.leave = func():
+			Overtime.leave_halt(Flow.ot)
+			Flow.ot_save()
+			ot_layer = null                    # die Halle blendet aus und räumt ihre Ebene selbst ab
+			_ot_cross()
+		bay = b
+		ot_layer.add_child(b)
+	else:
+		_ot_cross()
+
+func _ot_cross() -> void:
+	bay = null
+	var layer := CanvasLayer.new()
+	layer.layer = 14
+	add_child(layer)
+	var c := OvertimeCross.new()
+	c.st = Flow.ot
+	c.on_change = Flow.ot_save
+	c.on_pause = Flow.to_menu
+	c.on_pick = func(o: Dictionary):
+		Overtime.choose(Flow.ot, o)
+		Flow.ot_save()
+		layer.queue_free()
+		if ot_layer != null and is_instance_valid(ot_layer):
+			ot_layer.queue_free()
+		ot_layer = null
+		ot_open = false
+		Music.duck(0.0)
+		_begin_transition()
+		trans_t = TV.T_OUT                     # die Kreuzung hat das alte Level schon verdeckt: gleich in den Weltraum
+		trans.t = trans_t
+	layer.add_child(c)
+
+## Sonderschicht: Zwischenfälle der Etappe beim Aufsetzen noch einmal nennen (auch nach Neustart und Fortsetzen, siehe _ready).
+func _ot_announce() -> void:
+	if not Flow.overtime:
+		return
+	var oc := Overtime.active_curses(Flow.ot)
+	if oc.is_empty():
+		return
+	hud.flash_message(tr("MSG_OT_CURSES") % ", ".join(oc.map(func(c): return tr("OT_CURSE_%s" % String(c).to_upper()))), 4.0)

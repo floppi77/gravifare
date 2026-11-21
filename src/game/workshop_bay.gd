@@ -212,6 +212,10 @@ func _item_card(id: String) -> PanelContainer:
 	row.add_child(b)
 	return card
 
+## Ausbaustand je Teil auf dem Diagnosemonitor (die Sonderschicht zeigt hier keine Karriere-Einbauten).
+func _monitor_level(id: String) -> int:
+	return Workshop.level_of(Save.data, id)
+
 func _focus(id: String) -> void:
 	await get_tree().process_frame
 	focus_item = id if id != "" else Workshop.ITEMS[0]
@@ -373,7 +377,7 @@ func _draw_hall_details() -> void:
 	draw_line(Vector2(tc.x - 6, tc.y + 5), Vector2(tc.x - 8, tc.y + 9), g, 1.0); draw_line(Vector2(tc.x + 6, tc.y + 5), Vector2(tc.x + 8, tc.y + 9), g, 1.0)
 	var i := 0
 	for id in Workshop.ITEMS:
-		var l := Workshop.level_of(Save.data, id)
+		var l := _monitor_level(id)
 		for k in Workshop.MAX_LEVEL:
 			draw_rect(Rect2(mon.position.x + 6 + k * 6, mon.position.y + 29 + i * 3.4, 5, 2.4), g if k < l else Color(g, 0.18))
 		i += 1
