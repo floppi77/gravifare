@@ -171,6 +171,10 @@ func _status_text() -> String:
 				parts.append(tr("OT_NOTE_INTEREST") % int(n.amount))
 			"reward":
 				parts.append(tr("OT_NOTE_REWARD") % tr("OT_PERK_%s" % String(n.item).to_upper()))
+			"zulage":
+				parts.append(tr("OT_NOTE_ZULAGE") % int(n.amount))
+			"reward_cash":
+				parts.append(tr("OT_NOTE_REWARD_CASH") % int(n.amount))
 	return "  ·  ".join(parts)
 
 func _tier(i: int, o: Dictionary) -> Array:
@@ -250,7 +254,7 @@ func _card(i: int, o: Dictionary, r: Rect2) -> Button:
 		fill.add_child(mm)
 	var n := Overtime.offer_curse_count(st, o)
 	if n > 0:
-		v.add_child(_lbl(tr("OT_PAY_UP") % int(round(Overtime.FARE_PER_CURSE * 100.0 * n)), 8, Color("#ffe14a")))
+		v.add_child(_lbl(tr("OT_PAY_UP") % int(o.get("zulage", Overtime.zulage(st, n))), 8, Color("#ffe14a")))
 	v.add_child(_lbl(tr("OT_SCORE_K") % _num(1.0 + Overtime.RISK_PER_CURSE * n), 8, Color("#c4d0ff")))
 	if String(o.get("reward", "")) != "":
 		var rk := "OT_REWARD_NOW" if String(o.get("pact", "")) != "" else "OT_REWARD"

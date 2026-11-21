@@ -736,9 +736,31 @@ func _test_round87() -> void:
 	check(float(mods.thrust_k) == 1.0 and float(mods.burn) == 1.0 and float(mods.land_vy) == Tuning.LAND_VY and float(mods.impact_safe) == Tuning.IMPACT_SAFE and float(mods.land_tilt) == Tuning.LAND_TILT and not bool(mods.overheat),
 		"Ohne Ausstattung: Serientaxi (alle Werte wie in der Karriere)")
 	fxs.curses = ["crooked", "stingy"]
-	fxs.offer = {"fare_bonus": 0.24}
+	fxs.offer = {"zulage": 500}
 	fx = Overtime.effects(fxs)
-	check((float(fx.side_l) == 0.75) != (float(fx.side_r) == 0.75) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15 + 0.24), "Schiefe Düse trifft genau eine Seite; Lohn und Zwischenfälle im Fahrpreis")
+	check((float(fx.side_l) == 0.75) != (float(fx.side_r) == 0.75) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15), "Schiefe Düse trifft genau eine Seite; Fahrpreis nur aus Ausstattung und Zwischenfällen (Lohn ist die Gefahrenzulage)")
+	var zs := Overtime.new_run(1, "short", "standard", 0, Overtime.default_meta())
+	var z1 := Overtime.zulage(zs, 2)
+	zs.perks = {"risk": 1}
+	check(z1 == int(snappedf(Overtime.ZULAGE_K * 420.0 * 2.0, 10.0)) and Overtime.zulage(zs, 2) == int(snappedf(Overtime.ZULAGE_K * 420.0 * 4.0, 10.0)), "Gefahrenzulage je Zwischenfall nach Sektor-Einkommen, Risikoprämie verdoppelt sie")
+	var zr := Overtime.new_run(77, "short", "standard", 0, Overtime.default_meta())
+	var zos := Overtime.offers(zr, ids)
+	Overtime.choose(zr, zos[2])
+	var cr := float(zr.credits)
+	Overtime.etappe_done(zr, {"points": 100, "credits": cr})
+	check(float(zr.credits) == cr + float(zos[2].zulage) and int(zos[2].zulage) > 0, "Gefahrenzulage wird nach der Etappe gutgeschrieben")
+	var dup_ok := true
+	for sd in 60:
+		var dr := Overtime.new_run(sd, "long", "standard", 0, {"xp": 99999})
+		dr.etappe = 20
+		dr.perks = {"turbo": 3, "armor": 3, "saver": 3, "scanner": 1, "angel": 2}
+		var rw: Array = []
+		for o in Overtime.offers(dr, ids):
+			var r := String(o.reward)
+			if r != "":
+				dup_ok = dup_ok and not rw.has(r) and Overtime.stack(dr, r) < int(Overtime.perk(r).max)
+				rw.append(r)
+	check(dup_ok, "Prämien einer Kreuzung: nie doppelt, nie ein schon voll ausgebautes Teil")
 	# Wertung
 	check(Overtime.etappe_score(1000, 300, 0) == 1000 and Overtime.etappe_score(1000, 300, 2) == 1500 and Overtime.etappe_score(1000, 300, 0, 1.5) == 1150, "Etappenpunkte: +25 % je Zwischenfall, Ass verstärkt nur die Boni")
 	var fin := Overtime.new_run(3, "short", "standard", 0, meta)
@@ -781,7 +803,7 @@ func _test_round87() -> void:
 				if Overtime.blocked(String(c), String(o.level)):
 					viol.append("%s:%s" % [o.level, c])
 	check(viol.is_empty(), "Kreuzungen bieten nie einen gesperrten Zwischenfall an %s" % str(viol.slice(0, 5)))
-	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(150) == 1 and Overtime.rank_of(1000000) == Overtime.RANK_XP.size() - 1 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
+	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(259) == 0 and Overtime.rank_of(260) == 1 and Overtime.rank_of(1000000) == Overtime.RANKS - 1 and Overtime.rank_xp(5) == 2500 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
 
 func _test_round87_hooks() -> void:
 	## Runde 87: Ausstattung und Zwischenfälle der Sonderschicht in TaxiSim und Run; Grundwerte rechnen wie bisher.
@@ -830,6 +852,16 @@ func _test_round87_hooks() -> void:
 		hot.pos = Vector2(400, 100)
 		hot.vel = Vector2.ZERO
 	check(not hot.jet_hot, "Heiße Düse: kühlt ohne Vollgas wieder ab")
+	var lag: TaxiSim = fly.call({"jet_lag": true}, Vector2(0, -1), 6)
+	var nolag: TaxiSim = fly.call({}, Vector2(0, -1), 6)
+	check(lag.vel.y > nolag.vel.y + 1.0, "Träge Düsen: der Schub kommt verzögert")
+	for i in 12:
+		lag.step(Vector2.ZERO, false)
+	check(lag.thrust_in.y < -0.05, "Träge Düsen: nach dem Loslassen brennt die Düse kurz nach")
+	var sg := TaxiSim.new()
+	sg.setup(lvl)
+	sg.apply_mods(Overtime.sim_mods(Overtime.effects({"seed": 1, "etappe": 0, "perks": {}, "license": "standard", "stage": 0, "curses": ["stickygear"], "pacts": [], "offer": {}})))
+	check(is_equal_approx(sg.gear_time_k, 8.0), "Klemmendes Fahrwerk: achtmal so lange")
 	var ang := TaxiSim.new()
 	ang.setup(lvl)
 	ang.apply_mods({"angel": 1})
@@ -894,7 +926,7 @@ func _test_round87_hooks() -> void:
 	rp.level_time = 3.0
 	var open_now := not rp._ot_pump_shut()
 	rp.level_time = 9.0
-	check(open_now and rp._ot_pump_shut(), "Säule im Takt: 7 s offen, 5 s zu")
+	check(open_now and rp._ot_pump_shut(), "Säule im Takt: 6 s offen, 6 s zu")
 	var rs := Run.new()
 	rs.ot = {"seat": 1.0}
 	rs.start(lvl)
@@ -991,11 +1023,35 @@ func _test_round87_flow() -> void:
 	check(miss.is_empty(), "Alle Teile, Zwischenfälle, Lizenzen, Stufen und Längen haben Namen und Beschreibung %s" % str(miss))
 	var curses_de: Array = Overtime.curses().map(func(c): return String(de["OT_CURSE_%s" % String(c.id).to_upper()]))
 	check(not curses_de.has(String(de.get("DAY_RULE_wind", "x"))) and not curses_de.has(String(de.get("DAY_RULE_fog", "x"))), "Zwischenfälle heißen anders als die Tagesregeln")
-	# Menü: Eintrag im Raster, Ko-fi neben „Bug melden“, Beenden unverändert
+	# Menü: drei Spalten, Sonderschicht neben den Schichten, Ko-fi und „Bug melden“ im Raster, Beenden unverändert
 	var mm := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
-	check(mm.contains('[tr("MENU_OVERTIME"), "overtime"') and mm.contains("_lock(grid.get_child(2), not Flow.ot_unlocked())") and mm.contains("kofi_btn = _menu_button(tr(\"MENU_KOFI\")"),
-		"Hauptmenü: Sonderschicht neben den Schichten (gesperrt bis Sektor 6), Ko-fi unten rechts")
+	check(mm.contains('[tr("MENU_OVERTIME"), "overtime"') and mm.contains("_lock(grid.get_child(2), not Flow.ot_unlocked())") and mm.contains('_icon_button(MenuIcons.texture("kofi"), tr("MENU_KOFI"), "kofi"') and mm.contains('_icon_button(BugIcon.texture(), tr("MENU_BUG"), "bug", show_bug)') and mm.contains('_icon_button(MenuIcons.texture("slot"), Save.slot_label(), "slot"') and mm.contains("grid.columns = 3"),
+		"Hauptmenü: drei Spalten, Sonderschicht neben den Schichten (gesperrt bis Sektor 6); Spielstand, Ko-fi und „Bug melden“ als Symbole unten rechts")
 	check(mm.contains("quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER"), "Hauptmenü: „Beenden“ bleibt mittig")
+	var Ach = load("res://src/core/achievements.gd")
+	var ad := {"completed": {}, "ever": {}, "stats": {}, "achievements": {}, "overtime": {"meta": {"runs": 3, "xp": Overtime.rank_xp(10), "wins_len": {"short": 1, "long": 1}, "stage_won": 5, "pacts_won": 3, "best_score": 120000, "licenses_won": ["standard", "saver"]}}}
+	var got: Array = Ach.reached(ad)
+	check(got.has("ot_first") and got.has("ot_short") and got.has("ot_long") and not got.has("ot_medium") and got.has("ot_stage5") and got.has("ot_rank10") and got.has("ot_pacts3") and got.has("ot_score") and not got.has("ot_licenses"),
+		"Erfolge der Sonderschicht lesen den Fortschritt der Sonderschicht %s" % str(got.filter(func(x): return String(x).begins_with("ot_"))))
+	var ach_txt := true
+	for id in Ach.ids():
+		if String(id).begins_with("ot_"):
+			ach_txt = ach_txt and de.has("ACH_%s" % String(id).to_upper()) and en.has("ACH_%s_D" % String(id).to_upper()) and Ach.category(String(id)) == "overtime"
+	check(ach_txt, "Erfolge der Sonderschicht: Namen, Beschreibungen, eigene Kategorie")
+	var mt := Overtime.default_meta()
+	var won2 := Overtime.new_run(5, "short", "racer", 0, {"xp": 99999})
+	won2.results = [{"score": 777}]
+	won2.done = true
+	Overtime.record(mt, won2, "2026-11-21", "Floppi")
+	check(String(mt.best.short[0].name) == "Floppi" and (mt.licenses_won as Array).has("racer") and int(mt.wins_len.short) == 1, "Bestenliste mit Name des Spielstands; Lizenz und Länge werden für Erfolge gemerkt")
+	var KitS = load("res://src/ui/overtime_kit.gd")                  # zur Laufzeit laden: nutzt Autoloads
+	var lines: Array = KitS.summary_lines(Overtime.effects({"seed": 1, "etappe": 0, "perks": {"turbo": 2}, "license": "standard", "stage": 0, "curses": ["slick"], "pacts": [], "offer": {}}))
+	var keys := lines.map(func(l): return String(l[3]))
+	check(keys.has("thrust_k") and keys.has("drag_k") and not keys.has("burn"), "Übersicht: zeigt genau die veränderten Wirkungen in Zahlen")
+	var nm := true
+	for i in Overtime.RANKS:
+		nm = nm and de.has("OT_RANK_NAME_%d" % i) and en.has("OT_RANK_NAME_%d" % i)
+	check(nm and Overtime.RANKS == 21, "Dienstgrade 0–20 mit Namen")
 	check(ResourceLoader.exists("res://src/ui/overtime_menu.tscn") and ResourceLoader.exists("res://src/ui/overtime_stop.tscn") and ResourceLoader.exists("res://src/ui/overtime_finale.tscn"), "Szenen der Sonderschicht vorhanden")
 
 func _test_round86() -> void:

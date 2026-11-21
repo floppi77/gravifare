@@ -63,15 +63,12 @@ func _build() -> void:
 	title.position = Vector2(0, 6)
 	title.size = Vector2(640, 28)
 	stage.add_child(title)
-	var rl := Label.new()
-	var prog := Overtime.rank_progress(xp)
-	rl.text = tr("OT_RANK") % rank + ("   " + tr("OT_XP") % [int(prog[0]), int(prog[1])] if int(prog[1]) > 0 else "   " + tr("OT_RANK_MAX"))
-	rl.position = Vector2(0, 34)
-	rl.size = Vector2(640, 12)
-	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rl.add_theme_font_size_override("font_size", 9)
-	rl.add_theme_color_override("font_color", Color("#ffe14a"))
-	stage.add_child(rl)
+	var xb = preload("res://src/ui/overtime_finale.gd").XpBar.new()       # Dienstgrad mit Namen und Fortschritt im Dienstgrad
+	xb.xp_from = xp
+	xb.xp_to = xp
+	xb.position = Vector2(220, 26)
+	xb.size = Vector2(200, 30)
+	stage.add_child(xb)
 	var panel := Panel.new()
 	panel.add_theme_stylebox_override("panel", MenuKit.panel_style(0.8))
 	panel.position = Vector2(16, 52)
@@ -142,9 +139,25 @@ func _build() -> void:
 	side.size = Vector2(280, 284)
 	side.add_theme_constant_override("separation", 3)
 	stage.add_child(side)
+	var lic_id := String(_lics()[license_i])
+	var pv_row := HBoxContainer.new()                  # Taxi mit Lizenz-Streifen, Emblem und Start-Ausstattung der Lizenz
+	pv_row.add_theme_constant_override("separation", 8)
+	var pv := OvertimeLook.Preview.new()
+	pv.license = lic_id
+	pv.perks = (Overtime.license(lic_id).get("perks", {}) as Dictionary).duplicate()
+	pv.custom_minimum_size = Vector2(120, 62)
+	pv_row.add_child(pv)
+	var lic_box := VBoxContainer.new()
+	lic_box.add_child(_small(tr("OT_LICENSE") % tr("OT_LIC_" + lic_id.to_upper()), Color("#ffe14a")))
+	var ld := _small(tr("OT_LIC_%s_D" % lic_id.to_upper()), Color("#c4d0ff"))
+	ld.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ld.custom_minimum_size = Vector2(150, 0)
+	lic_box.add_child(ld)
+	pv_row.add_child(lic_box)
+	side.add_child(pv_row)
 	desc = Label.new()
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(280, 96)
+	desc.custom_minimum_size = Vector2(280, 64)
 	desc.add_theme_font_size_override("font_size", 8)
 	desc.add_theme_color_override("font_color", Color("#c4d0ff"))
 	side.add_child(desc)
@@ -168,7 +181,8 @@ func _fill_board() -> void:
 		var extra := tr("OT_LIC_" + String(e.get("license", "standard")).to_upper())
 		if int(e.get("stage", 0)) > 0:
 			extra += " · " + tr("OT_STAGE_SHORT") % int(e.stage)
-		board_box.add_child(_small("%2d.  %s  %s  %s  %s" % [i + 1, _pts(int(e.score)), String(e.get("code", "")), mark, extra], Color("#ffe14a") if i == 0 else Color("#e6ecff")))
+		var who := String(e.get("name", ""))
+		board_box.add_child(_small("%2d.  %s  %s  %s  %s%s" % [i + 1, _pts(int(e.score)), who if who != "" else "–", String(e.get("code", "")), mark, "  " + extra], Color("#ffe14a") if i == 0 else Color("#e6ecff")))
 
 static func _pts(n: int) -> String:
 	var s := str(n)

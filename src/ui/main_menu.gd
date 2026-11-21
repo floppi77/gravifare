@@ -20,7 +20,7 @@ var notice: Label
 var help: Label                    # Hilfetext zum gewählten oder überfahrenen Menüpunkt (unten unter dem Menü)
 var flags_col: Control = null      # Sprachflaggen, untereinander links neben dem Menü
 var bug_btn: Button = null          # „Bug melden“ unten rechts (nur im Hauptmenü)
-var kofi_btn: Button = null         # „Ko-fi“ links neben „Bug melden“ (seit Runde 87: im Raster steht die Sonderschicht)
+var icon_btns: Array = []           # Symbolknöpfe unten rechts: Spielstand, Ko-fi, Bug melden
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
 const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_OVERTIME", "HELP_OVERTIME_LOCKED", "HELP_COMMUNITY",
@@ -39,11 +39,11 @@ func _ready() -> void:
 	stage = Stage.make(self)                  # Menü bleibt auf der zentrierten 640×360-Fläche (Ultrawide: Ränder zeigen nur den Hintergrund)
 	box = VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
-	box.offset_left = 16.0
+	box.offset_left = 58.0                     # Runde 87: rechts der Flaggenspalte (das Raster hat jetzt drei Spalten)
 	box.offset_top = -28.0                     # nach oben: unten bleibt eine Zeile für den Hilfetext frei
 	box.offset_bottom = -28.0
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
-	box.add_theme_constant_override("separation", 2)
+	box.add_theme_constant_override("separation", 1)          # Runde 87: knapper, damit das Logo auch mit „Fortsetzen“ ganz zu sehen ist
 	box.grow_horizontal = Control.GROW_DIRECTION_END
 	box.grow_vertical = Control.GROW_DIRECTION_BOTH
 	box.custom_minimum_size = Vector2(150, 0)
@@ -113,12 +113,11 @@ func _clear() -> void:
 	if flags_col != null and is_instance_valid(flags_col):
 		flags_col.queue_free()
 	flags_col = null
-	if bug_btn != null and is_instance_valid(bug_btn):
-		bug_btn.queue_free()
+	for b in icon_btns:
+		if is_instance_valid(b):
+			b.queue_free()
+	icon_btns = []
 	bug_btn = null
-	if kofi_btn != null and is_instance_valid(kofi_btn):
-		kofi_btn.queue_free()
-	kofi_btn = null
 	if update_btn != null and is_instance_valid(update_btn):
 		update_btn.queue_free()
 	update_btn = null
@@ -134,10 +133,9 @@ func _focus_first(lang := "", restore := false) -> void:
 				c.grab_focus()
 				return
 	var buttons := box.find_children("*", "Button", true, false)
-	if bug_btn != null and is_instance_valid(bug_btn):
-		buttons.append(bug_btn)                     # „Bug melden“ liegt außerhalb der Spalte (Rückkehr von seiner Seite)
-	if kofi_btn != null and is_instance_valid(kofi_btn):
-		buttons.append(kofi_btn)
+	for b in icon_btns:
+		if is_instance_valid(b):
+			buttons.append(b)                       # Symbolknöpfe liegen außerhalb der Spalte (Rückkehr von ihrer Seite)
 	if restore and _return_focus != "":
 		for c in buttons:
 			if c.get_meta("key", "") == _return_focus and not (c as Button).disabled:
@@ -168,6 +166,9 @@ func _bind_help(c: Control) -> void:
 
 ## Hilfetext eines Eintrags; bei der Tagschicht mit der heutigen Regel und dem Ziel.
 func _help_text(key: String) -> String:
+	for b in icon_btns:                               # Symbolknöpfe: Name vor die Erklärung
+		if is_instance_valid(b) and String(b.get_meta("help", "")) == key:
+			return String(b.get_meta("title", "")) + " – " + tr(key)
 	if key == "HELP_DAILY":
 		var date := Daily.today()
 		return tr(key) % (tr("DAY_RULE_" + DayShift.rule_of(date)) + " · " + tr("DAY_GOAL_" + DayShift.goal_of(date)))
@@ -229,11 +230,11 @@ func show_main(focus_lang := "") -> void:
 			show_new_confirm(start_new)))
 	box.add_child(_menu_button(tr("MENU_LEVELS"), "levels", show_levels))
 	box.add_child(_menu_button(tr("MENU_TUTORIAL"), "tutorial", func(): Flow.start_tutorial("")))
-	# Nebenmenüs kompakt in zwei Spalten, damit Menü und Flaggen auf den Bildschirm passen
+	# Nebenmenüs kompakt in drei Spalten (Runde 87: neun Einträge in drei Zeilen); Spielstand, Ko-fi und „Bug melden“ stehen als Symbole unten rechts
 	var grid := GridContainer.new()
-	grid.columns = 2
+	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 4)
-	grid.add_theme_constant_override("v_separation", 2)
+	grid.add_theme_constant_override("v_separation", 1)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	for entry in [
 			[tr("MENU_DAILY"), "daily", func(): Flow.start_daily()],
@@ -245,8 +246,14 @@ func show_main(focus_lang := "") -> void:
 			[tr("MENU_MUSIC"), "music", show_music],
 			[tr("MENU_OPTIONS"), "options", show_options],
 			[tr("MENU_CREDITS"), "credits", func(): get_tree().change_scene_to_file("res://src/ui/credits.tscn")],
-			[Save.slot_label(), "slot", show_slots]]:
+			]:
 		grid.add_child(_menu_button(entry[0], entry[1], entry[2], true))
+	# Symbolknöpfe unten rechts, übereinander: Spielstand, Ko-fi, Bug melden. Name und Erklärung stehen beim Fokus (Controller) bzw. Überfahren in der
+	# Hilfezeile, die Maus zeigt zusätzlich einen Tooltip.
+	var slot_b := _icon_button(MenuIcons.texture("slot"), Save.slot_label(), "slot", show_slots)
+	var kofi_b := _icon_button(MenuIcons.texture("kofi"), tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL))
+	bug_btn = _icon_button(BugIcon.texture(), tr("MENU_BUG"), "bug", show_bug)
+	icon_btns = [slot_b, kofi_b, bug_btn]
 	_lock(grid.get_child(0), not Save.daily_unlocked(ids))     # Tagschicht: ab Sektor 1
 	_lock(grid.get_child(1), not Save.shift_unlocked(ids))     # Nachtschicht: erst nach allen Leveln der Sektoren 1–4
 	_lock(grid.get_child(2), not Flow.ot_unlocked())           # Sonderschicht: erst nach allen Leveln der Sektoren 1–6
@@ -261,16 +268,7 @@ func show_main(focus_lang := "") -> void:
 	quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(quit_btn)
 	_equalize_grid.call_deferred(grid, [quit_btn])
-	# „Bug melden“ (mit Käfer) unten rechts über der Versionsangabe: In der Spalte ist kein Platz mehr (das Logo würde oben abgeschnitten).
-	# Erreichbar mit Rechts von „Beenden“ bzw. „Ko-fi“, zurück mit Links/Hoch.
-	bug_btn = _menu_button(tr("MENU_BUG"), "bug", show_bug, true)
-	bug_btn.icon = BugIcon.texture()
-	bug_btn.add_theme_constant_override("icon_max_width", 11)
-	bug_btn.add_theme_constant_override("h_separation", 4)
-	stage.add_child(bug_btn)
-	kofi_btn = _menu_button(tr("MENU_KOFI"), "kofi", func(): OS.shell_open(Flow.KOFI_URL), true)      # per Gamepad wie jeder Eintrag anwählbar
-	stage.add_child(kofi_btn)
-	_place_bug_button.call_deferred(grid, quit_btn)
+	_place_icon_buttons.call_deferred(grid, quit_btn)
 	if Save.debug:
 		var drow := HBoxContainer.new()                  # Debug: verlassen und Taxi-Grafik 2D/Mischform (Vergleich) in einer Zeile
 		drow.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -304,11 +302,12 @@ func show_main(focus_lang := "") -> void:
 ## oben oder unten erreichbar.
 func _link_grid(grid: GridContainer) -> void:
 	var n := grid.get_child_count()
+	var cols := maxi(grid.columns, 1)
 	for i in n:
 		var b := grid.get_child(i) as Control
-		if i % 2 == 0 and i + 1 < n:
+		if i % cols < cols - 1 and i + 1 < n:
 			b.focus_neighbor_right = b.get_path_to(grid.get_child(i + 1))
-		elif i % 2 == 1:
+		if i % cols > 0:
 			b.focus_neighbor_left = b.get_path_to(grid.get_child(i - 1))
 
 ## Gitter fest in allen vier Richtungen verdrahten (Gamepad/Pfeiltasten): Links/Rechts in der Zeile, Hoch/Runter in der Spalte, aus der letzten Zeile
@@ -424,29 +423,6 @@ func show_debug_eggs() -> void:
 	_link_grid_full(grid, back)
 	_focus_first()
 
-## „Bug melden“ rechtsbündig über der Versionsangabe, „Ko-fi“ links daneben; Fokuswege: Rechts von „Beenden“ zu „Ko-fi“, weiter zu „Bug melden“,
-## zurück mit Links; Hoch führt in die letzte Zeile des Rasters.
-func _place_bug_button(grid: GridContainer, quit_btn: Control) -> void:
-	if bug_btn == null or not is_instance_valid(bug_btn) or not is_instance_valid(quit_btn) or kofi_btn == null or not is_instance_valid(kofi_btn):
-		return
-	var sz := bug_btn.get_combined_minimum_size()
-	bug_btn.size = sz
-	bug_btn.position = Vector2(640.0 - 6.0 - sz.x, 340.0 - sz.y)
-	var ksz := kofi_btn.get_combined_minimum_size()
-	kofi_btn.size = Vector2(ksz.x, sz.y)
-	kofi_btn.position = Vector2(bug_btn.position.x - 6.0 - ksz.x, bug_btn.position.y)
-	var last := grid.get_child(grid.get_child_count() - 1) as Control
-	quit_btn.focus_neighbor_right = quit_btn.get_path_to(kofi_btn)
-	last.focus_neighbor_right = last.get_path_to(kofi_btn)
-	kofi_btn.focus_neighbor_left = kofi_btn.get_path_to(quit_btn)
-	kofi_btn.focus_neighbor_right = kofi_btn.get_path_to(bug_btn)
-	kofi_btn.focus_neighbor_top = kofi_btn.get_path_to(last)
-	kofi_btn.focus_neighbor_bottom = kofi_btn.get_path_to(kofi_btn)
-	bug_btn.focus_neighbor_left = bug_btn.get_path_to(kofi_btn)
-	bug_btn.focus_neighbor_top = bug_btn.get_path_to(last)
-	bug_btn.focus_neighbor_bottom = bug_btn.get_path_to(bug_btn)
-	bug_btn.focus_neighbor_right = bug_btn.get_path_to(bug_btn)
-
 ## Dunkle Tafel hinter den Menüknöpfen (nicht hinter Logo und Untertitel): die Knöpfe liegen sonst direkt auf dem detailreichen Stadtbild.
 func _add_button_panel() -> void:
 	var panel := Panel.new()
@@ -467,6 +443,39 @@ func _add_button_panel() -> void:
 	box.item_rect_changed.connect(fit)
 	box.sort_children.connect(func(): fit.call_deferred())
 	box.visibility_changed.connect(fit)
+
+## Kleiner Symbolknopf (Spielstand, Ko-fi, Bug melden): nur das Symbol; der Name steht im Tooltip und vor der Erklärung in der Hilfezeile.
+func _icon_button(tex: Texture2D, title: String, key: String, cb: Callable) -> Button:
+	var b := _menu_button("", key, cb, true)
+	b.icon = tex
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.expand_icon = false
+	b.add_theme_constant_override("icon_max_width", 13)
+	b.custom_minimum_size = Vector2(24, 22)
+	b.tooltip_text = title
+	b.set_meta("title", title)
+	stage.add_child(b)
+	return b
+
+## Symbolknöpfe unten rechts über der Versionsangabe; Fokuswege: Rechts aus der rechten Rasterspalte (Zeile 1–3) bzw. von „Beenden“, Hoch/Runter
+## zwischen den Symbolen, Links zurück ins Raster.
+func _place_icon_buttons(grid: GridContainer, quit_btn: Control) -> void:
+	if icon_btns.size() != 3 or not is_instance_valid(quit_btn):
+		return
+	var cols := grid.columns
+	var n := grid.get_child_count()
+	for i in 3:
+		var b: Button = icon_btns[i]
+		b.size = Vector2(24, 22)
+		b.position = Vector2(640.0 - 6.0 - 24.0, 340.0 - 22.0 * float(3 - i) - 3.0 * float(2 - i))
+		var row_end := mini(n - 1, i * cols + cols - 1)
+		var left: Control = grid.get_child(row_end) if row_end >= 0 else quit_btn
+		left.focus_neighbor_right = left.get_path_to(b)
+		b.focus_neighbor_left = b.get_path_to(left)
+		b.focus_neighbor_right = b.get_path_to(b)
+		b.focus_neighbor_top = b.get_path_to(icon_btns[i - 1] if i > 0 else b)
+		b.focus_neighbor_bottom = b.get_path_to(icon_btns[i + 1] if i < 2 else b)
+	quit_btn.focus_neighbor_right = quit_btn.get_path_to(icon_btns[2])
 
 func _small_button(text: String, cb: Callable) -> Button:
 	var sb := MenuKit.button(text, cb)
@@ -601,7 +610,7 @@ func _show_update_button(ver: String) -> void:
 	var sz := update_btn.get_combined_minimum_size()
 	update_btn.size = sz
 	update_btn.position = Vector2(640.0 - 6.0 - sz.x, 6.0)
-	bug_btn.focus_neighbor_top = bug_btn.get_path_to(update_btn)
+	bug_btn.focus_neighbor_right = bug_btn.get_path_to(update_btn)          # „Bug melden“ steht rechts unten im Raster
 	update_btn.focus_neighbor_bottom = update_btn.get_path_to(bug_btn)
 	update_btn.focus_neighbor_left = update_btn.get_path_to(bug_btn)
 	update_btn.focus_neighbor_top = update_btn.get_path_to(update_btn)

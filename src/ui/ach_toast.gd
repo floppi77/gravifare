@@ -9,7 +9,7 @@ const Achievements := preload("res://src/core/achievements.gd")
 
 const CAT_COLORS := {"fare": Color("#35e0d2"), "sector": Color("#8c9cff"), "medal": Color("#ffd24a"), "landing": Color("#5dff9a"),
 	"money": Color("#b6f06a"), "shift": Color("#b07cff"), "day": Color("#ffa04a"), "garage": Color("#ff7ac8"), "fun": Color("#ff6464"),
-	"time": Color("#7fd3ff"), "egg": Color("#ff9ae6"), "holiday": Color("#ff5a7a"), "crown": Color("#ffe680")}
+	"time": Color("#7fd3ff"), "egg": Color("#ff9ae6"), "holiday": Color("#ff5a7a"), "crown": Color("#ffe680"), "overtime": Color("#ffb347")}
 const T_IN := 0.3
 const T_STAY := 2.8
 const T_OUT := 0.3
@@ -172,6 +172,11 @@ static func draw_badge(ci: CanvasItem, id: String, c: Vector2, r: float, unlocke
 			ci.draw_polyline(PackedVector2Array([c + Vector2(-u * 0.6, 0), c + Vector2(-u * 0.3, -u * 0.25), c + Vector2(0, 0), c + Vector2(u * 0.3, -u * 0.25), c + Vector2(u * 0.6, 0)]), bg, w * 0.8, true)
 		"holiday":
 			_holiday_symbol(ci, id, c, u, s, w)
+		"overtime":                                  # Sonderschicht: Uhr mit Pfeil im Kreis (Überstunden)
+			ci.draw_arc(c, u * 0.85, -PI * 0.35, PI * 1.45, 20, s, w * 1.3, true)
+			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(u * 0.55, -u * 0.95), c + Vector2(u * 1.05, -u * 0.55), c + Vector2(u * 0.45, -u * 0.35)]), s)
+			ci.draw_line(c, c + Vector2(0, -u * 0.5), s, w, true)
+			ci.draw_line(c, c + Vector2(u * 0.4, u * 0.15), s, w, true)
 		"crown":
 			ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-u * 0.9, u * 0.55), c + Vector2(-u * 0.9, -u * 0.45), c + Vector2(-u * 0.45, 0),
 				c + Vector2(0, -u * 0.75), c + Vector2(u * 0.45, 0), c + Vector2(u * 0.9, -u * 0.45), c + Vector2(u * 0.9, u * 0.55)]), s)

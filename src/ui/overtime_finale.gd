@@ -16,6 +16,8 @@ func _ready() -> void:
 	Music.duck(0.0)
 	theme = MenuKit.make_theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	Save.write()                                         # Sonderschicht vorbei: jetzt zählen ihre Erfolge (in der Schicht ist der Abgleich ausgesetzt)
+	preload("res://src/ui/ach_toast.gd").flush(get_tree())
 	st = Flow.ot_last.get("state", {})
 	rec = Flow.ot_last.get("rec", {})
 	f = rec.get("final", Overtime.final(st) if not st.is_empty() else {})
@@ -63,13 +65,14 @@ func _ready() -> void:
 	var chart := Chart.new()
 	chart.results = st.get("results", [])
 	chart.of = int(f.of)
-	chart.position = Vector2(28, 188)
-	chart.size = Vector2(276, 92)
+	chart.position = Vector2(28, 178)
+	chart.size = Vector2(276, 104)
 	stage.add_child(chart)
 	var leg := Label.new()
 	leg.text = tr("OT_FIN_CHART")
 	leg.position = Vector2(28, 284)
 	leg.size = Vector2(276, 24)
+	leg.custom_minimum_size = Vector2(276, 0)
 	leg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	leg.add_theme_font_size_override("font_size", 7)
 	leg.add_theme_color_override("font_color", Color("#7d89c4"))
@@ -89,7 +92,11 @@ func _ready() -> void:
 	v.add_child(_lbl(tr("OT_FIN_XP") % int(f.xp), 10, Color("#ffe14a")))
 	var r0 := int(rec.get("rank_before", 0))
 	var r1 := int(rec.get("rank", r0))
-	v.add_child(_lbl(tr("OT_FIN_RANK_UP") % r1 if r1 > r0 else tr("OT_RANK") % r1, 10, Color("#7dff9a") if r1 > r0 else Color("#e6ecff")))
+	xp_bar = XpBar.new()                                 # läuft hörbar hoch; bei jedem Aufstieg Klang, Name und von vorn
+	xp_bar.xp_from = maxi(0, int(Flow.ot_meta().get("xp", 0)) - int(f.xp))
+	xp_bar.xp_to = int(Flow.ot_meta().get("xp", 0))
+	xp_bar.custom_minimum_size = Vector2(276, 30)
+	v.add_child(xp_bar)
 	var news: Array = []
 	for r in range(r0 + 1, r1 + 1):
 		for u in Overtime.unlocks_at(r):
@@ -103,6 +110,12 @@ func _ready() -> void:
 		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		nl.custom_minimum_size = Vector2(276, 0)
 		v.add_child(nl)
+	var nxt := Overtime.unlocks_at(r1 + 1)
+	if not nxt.is_empty() and r1 + 1 < Overtime.RANKS:
+		var nx := _lbl(tr("OT_FIN_NEXT") % [Overtime.rank_name(r1 + 1), nxt.size()], 7, Color("#7d89c4"))
+		nx.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		nx.custom_minimum_size = Vector2(276, 0)
+		v.add_child(nx)
 	var place := int(rec.get("place", 0))
 	v.add_child(_lbl(tr("OT_FIN_PLACE") % [place, tr("OT_LEN_" + String(st.length).to_upper())] if place > 0 else tr("OT_FIN_NOPLACE"), 9, Color("#ffe14a") if place == 1 else Color("#e6ecff")))
 	var b := MenuKit.button(tr("OT_FIN_CONTINUE"), _leave)
@@ -111,27 +124,94 @@ func _ready() -> void:
 	stage.add_child(b)
 	b.grab_focus.call_deferred()
 
+var xp_bar: XpBar
+
+## Erfahrungsbalken: Dienstgrad mit Nummer und Name, Fortschritt im Dienstgrad. Läuft nach dem Aufbau vom alten zum neuen Stand hoch (mit
+## Klickgeräusch); jedes Mal, wenn er voll ist, ertönt der Aufstieg und er beginnt im nächsten Dienstgrad von vorn.
+class XpBar extends Control:
+	var xp_from := 0
+	var xp_to := 0
+	var shown := 0.0
+	var t := 0.0
+	var tick := 0.0
+	var flash := 0.0
+	var last_rank := -1
+	func _ready() -> void:
+		shown = float(xp_from)
+		last_rank = Overtime.rank_of(xp_from)
+	func _process(d: float) -> void:
+		t += d
+		flash = maxf(0.0, flash - d * 1.5)
+		if t > 0.8 and shown < float(xp_to):
+			var speed := maxf(60.0, float(xp_to - xp_from) / 2.6)
+			shown = minf(float(xp_to), shown + speed * d)
+			tick -= d
+			if tick <= 0.0:
+				tick = 0.06
+				var pr := Overtime.rank_progress(int(shown))
+				Sfx.play("price_tick", -12.0, 0.9 + 0.5 * (float(pr[0]) / maxf(float(pr[1]), 1.0)))
+			var r := Overtime.rank_of(int(shown))
+			if r > last_rank:
+				last_rank = r
+				flash = 1.0
+				Sfx.play("perfect", -3.0, 1.0)
+				Haptics.pulse(0.15, 0.5, 0.15)
+		queue_redraw()
+	func _draw() -> void:
+		var r := Overtime.rank_of(int(shown))
+		var pr := Overtime.rank_progress(int(shown))
+		var col := Color("#7dff9a").lerp(Color.WHITE, flash)
+		draw_string(Fonts.ui, Vector2(0, 9), TranslationServer.translate("OT_RANK") % r + " · " + Overtime.rank_name(r), HORIZONTAL_ALIGNMENT_LEFT, size.x, 9, col)
+		var bar := Rect2(0, 14, size.x, 7)
+		draw_rect(bar, Color("#232a52"))
+		var k := 1.0 if int(pr[1]) == 0 else float(pr[0]) / float(pr[1])
+		draw_rect(Rect2(bar.position, Vector2(bar.size.x * k, bar.size.y)), Color("#ffcb3d").lerp(Color.WHITE, flash * 0.6))
+		draw_rect(bar, Color("#5a6496"), false, 1.0)
+		var txt: String = (TranslationServer.translate("OT_XP") % [int(pr[0]), int(pr[1])]) if int(pr[1]) > 0 else TranslationServer.translate("OT_RANK_MAX")
+		draw_string(Fonts.ui, Vector2(0, 30), txt, HORIZONTAL_ALIGNMENT_RIGHT, size.x, 7, Color("#a9b8ff"))
+
+## Etappen als Balken: Höhe = Etappenpunkte (Achse links mit 0 und Höchstwert), unten die Etappennummer, über dem Balken die Zahl der
+## Zwischenfälle; Farbe nach Zahl der Zwischenfälle. Nicht geflogene Etappen als flache Striche.
 class Chart extends Control:
 	var results: Array = []
 	var of := 9
 	func _draw() -> void:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.03, 0.04, 0.12, 0.8))
+		var ui := Fonts.ui
+		var ax := 26.0                                   # Platz für die Punkte-Achse
+		var plot := Rect2(ax, 8.0, size.x - ax - 2.0, size.y - 20.0)
+		draw_rect(plot, Color(0.03, 0.04, 0.12, 0.8))
 		var top := 1
 		for r in results:
 			top = maxi(top, int(r.get("score", 0)))
+		var sep := Overtime.thousands_sep()
+		draw_string(ui, Vector2(0, plot.position.y + 6.0), _short(top, sep), HORIZONTAL_ALIGNMENT_RIGHT, ax - 3.0, 6, Color("#a9b8ff"))
+		draw_string(ui, Vector2(0, plot.end.y), "0", HORIZONTAL_ALIGNMENT_RIGHT, ax - 3.0, 6, Color("#a9b8ff"))
+		draw_line(Vector2(plot.position.x, plot.position.y), Vector2(plot.position.x, plot.end.y), Color("#5a6496"), 1.0)
+		draw_line(Vector2(plot.position.x, plot.end.y), Vector2(plot.end.x, plot.end.y), Color("#5a6496"), 1.0)
 		var n := maxi(of, 1)
-		var w := floorf((size.x - 4.0) / float(n))
+		var w := floorf((plot.size.x - 2.0) / float(n))
+		var label_every := 1 if n <= 18 else 3
 		for i in n:
-			var x := 2.0 + float(i) * w
+			var x := plot.position.x + 2.0 + float(i) * w
+			if (i + 1) % label_every == 0 or i == 0:
+				draw_string(ui, Vector2(x - 4.0, plot.end.y + 9.0), str(i + 1), HORIZONTAL_ALIGNMENT_CENTER, w + 8.0, 6, Color("#7d89c4"))
 			if i >= results.size():
-				draw_rect(Rect2(x + 1.0, size.y - 4.0, w - 2.0, 2.0), Color("#232a52"))
+				draw_rect(Rect2(x + 1.0, plot.end.y - 2.0, w - 2.0, 1.0), Color("#232a52"))
 				continue
 			var r: Dictionary = results[i]
-			var h := maxf(2.0, (size.y - 8.0) * float(r.get("score", 0)) / float(top))
+			var h := maxf(2.0, (plot.size.y - 10.0) * float(r.get("score", 0)) / float(top))
 			var nc := (r.get("curses", []) as Array).size()
 			var c: Color = [Color("#7dff9a"), Color("#ffcb3d"), Color("#ff6a5a"), Color("#c77dff")][mini(nc, 3)]
-			draw_rect(Rect2(x + 1.0, size.y - 2.0 - h, w - 2.0, h), c)
-			draw_rect(Rect2(x + 1.0, size.y - 2.0 - h, w - 2.0, 1.0), c.lightened(0.4))
+			draw_rect(Rect2(x + 1.0, plot.end.y - h, w - 2.0, h), c)
+			draw_rect(Rect2(x + 1.0, plot.end.y - h, w - 2.0, 1.0), c.lightened(0.4))
+			draw_string(ui, Vector2(x - 4.0, plot.end.y - h - 2.0), str(nc), HORIZONTAL_ALIGNMENT_CENTER, w + 8.0, 6, c.lightened(0.3))
+	static func _short(v: int, sep: String) -> String:
+		var s := str(v)
+		var out := ""
+		while s.length() > 3:
+			out = sep + s.substr(s.length() - 3) + out
+			s = s.substr(0, s.length() - 3)
+		return s + out
 
 func _row(g: GridContainer, a: String, b: String, c := Color("#e6ecff"), fs := 9) -> void:
 	var l := _lbl(a, fs, c)

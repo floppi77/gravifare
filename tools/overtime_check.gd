@@ -4,20 +4,24 @@ extends SceneTree
 ## Level, die er schon ohne Zwischenfall nicht schafft (von Hand gebaut), bekommen nur die milden Physik-Zwischenfälle nicht gesperrt.
 ## Ergebnis: data/overtime_block.json (wird von Overtime.blocked gelesen).
 ##
-## Aufruf: godot --headless -s tools/overtime_check.gd [-- s1_01,s1_02] [--out=<pfad>]
+## Aufruf: godot --headless -s tools/overtime_check.gd [-- s1_01,s1_02] [--out=<pfad>] [--curses=hotjet,slick] (nur diese prüfen)
 ## Dauer: rund eine Sekunde je Flug, alle 99 Level etwa 15–25 Minuten.
 
-const CHECK := ["hotjet", "stickygear", "crooked_l", "crooked_r", "leak", "heavy", "slick", "newroute", "pumpcycle"]
-const MILD := ["stickygear", "crooked_l", "crooked_r", "leak", "pumpcycle"]     # dürfen auch auf Leveln bleiben, die der Autopilot nicht ohne Weiteres schafft
+const CHECK := ["hotjet", "stickygear", "crooked_l", "crooked_r", "leak", "heavy", "slick", "sluggish", "newroute", "pumpcycle"]
+const MILD := ["crooked_l", "crooked_r", "leak", "pumpcycle"]     # dürfen auch auf Leveln bleiben, die der Autopilot nicht ohne Weiteres schafft
 const NEWROUTE_SEEDS := [11, 22, 33]
 const SECONDS := 600.0
 
 func _initialize() -> void:
 	var only: Array = []
 	var out_path := "res://data/overtime_block.json"
+	var check: Array = CHECK
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			out_path = a.substr(6)
+		elif a.begins_with("--curses="):
+			var want := Array(a.substr(9).split(",", false))
+			check = CHECK.filter(func(c): return want.has(String(c).get_slice("_", 0)))
 		else:
 			only = Array(a.split(",", false))
 	var ids: Array = []
@@ -32,7 +36,7 @@ func _initialize() -> void:
 		var base := _fly(id, "", 0)
 		var base_ok := _solved(base)
 		var line := "%s base=%s" % [id, "ok" if base_ok else "x"]
-		for c in CHECK:
+		for c in check:
 			var cid := String(c).get_slice("_", 0)
 			if cid == "pumpcycle" and not Overtime.level_info(id).fuel:
 				continue

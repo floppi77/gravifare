@@ -51,6 +51,8 @@ var leak := 0.0              # Leck: Sprit je Sekunde, auch im Stand
 var heavy_k := 1.0           # Schwere Fracht: Schubfaktor mit Fahrgast an Bord
 var loaded := false          # Fahrgast an Bord (setzt Run vor jedem Schritt)
 var angel := 0               # Schutzengel: so oft bleibt bei Zerstörung 1 Hüllenpunkt
+var jet_lag := false         # Träge Düsen: Schub folgt der Eingabe verzögert und brennt nach dem Loslassen kurz nach
+var jet_eff := Vector2.ZERO  # wirksamer Schub (x seitlich, y = hoch − runter) bei trägen Düsen
 
 func setup(lvl: LevelData) -> void:
 	level = lvl
@@ -111,6 +113,8 @@ func apply_mods(m: Dictionary) -> void:
 	leak = float(m.get("leak", 0.0))
 	heavy_k = float(m.get("heavy_k", 1.0))
 	angel = int(m.get("angel", 0))
+	jet_lag = bool(m.get("jet_lag", false))
+	jet_eff = Vector2.ZERO
 	jet_heat = 0.0
 	jet_hot = false
 	loaded = false
@@ -330,6 +334,13 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	var side := clampf(input.x, -1.0, 1.0)
 	if fuel <= 0.0:
 		up = 0.0; down = 0.0; side = 0.0
+	if jet_lag:                              # Träge Düsen (Sonderschicht): Schub läuft der Eingabe nach (Zeitkonstante JET_LAG) und brennt nach
+		jet_eff = jet_eff.lerp(Vector2(side, up - down), minf(1.0, dt / JET_LAG))
+		side = jet_eff.x
+		up = maxf(0.0, jet_eff.y)
+		down = maxf(0.0, -jet_eff.y)
+		if fuel <= 0.0:
+			up = 0.0; down = 0.0; side = 0.0
 	thrust_in = Vector2(side, -up + down)
 	if overheat:
 		_jet_heat(up, dt)
@@ -494,7 +505,8 @@ func _spike_hit() -> void:
 
 ## Heiße Düse (Sonderschicht): Nach OVERHEAT_AT Sekunden Vollgas überhitzt die Hauptdüse und bringt nur noch OVERHEAT_K, bis sie unter
 ## OVERHEAT_COOL abgekühlt ist. Abkühlen geht langsamer als Aufheizen; leichtes Schweben (unter 60 % Schub) heizt nicht.
-const OVERHEAT_AT := 3.0
+const JET_LAG := 0.28                    # Träge Düsen: Zeitkonstante in Sekunden
+const OVERHEAT_AT := 1.5
 const OVERHEAT_COOL := 1.0
 const OVERHEAT_K := 0.6
 const OVERHEAT_RATE := 0.6

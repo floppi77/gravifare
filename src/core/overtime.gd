@@ -19,7 +19,7 @@ const CODE_LEN := 6
 
 # Kreuzung
 const OFFERS := 3
-const FARE_PER_CURSE := 0.12           # Lohn: +12 % Fahrpreis je Zwischenfall der Etappe
+const ZULAGE_K := 0.35                 # Gefahrenzulage: je Zwischenfall 35 % eines Level-Einkommens des Sektors, ausgezahlt nach geschaffter Etappe
 const RISK_PER_CURSE := 0.25           # Wertung: +25 % Etappenpunkte je Zwischenfall
 const PACT_FROM := 2                   # Pakte ab der dritten Kreuzung …
 const PACT_CHANCE := 0.15              # … mit dieser Wahrscheinlichkeit (ersetzt den mittleren Auftrag)
@@ -42,22 +42,24 @@ const INTEREST_MAX_K := 0.5            # … höchstens ein halbes Level-Einkomm
 const AUDIT_RATE := 0.15               # Steuerprüfung: 15 % des Guthabens über 500
 const AUDIT_FREE := 500
 const GOLDEN_STEP := 0.015             # Goldenes Taxameter: +1,5 % Fahrpreis je geschaffter Etappe
-const RISK_PERK_STEP := 0.10           # Risikoprämie: +10 % Fahrpreis je Zwischenfall der Etappe
+const RISK_PERK_K := 2.0               # Risikoprämie: doppelte Gefahrenzulage
 const RESERVE_FUEL := 15.0
 
 # Wertung
 const TAXI_POINTS := 1000              # je übrigem Taxi am Ende
 const FINISH_BONUS := 0.20             # alle Etappen geschafft: +20 % der Etappenpunkte
 const STAGE_STEP := 0.10               # je Überstunden-Stufe +10 % auf alles
-const XP_DIV := 50.0                   # Erfahrung = Punkte / 50
+const XP_DIV := 100.0                  # Erfahrung = Punkte / 100
 const BOARD_SIZE := 10
 const STAGE_MAX := 10
-const RANK_XP := [0, 150, 400, 750, 1200, 1800, 2500, 3400, 4500, 5800, 7300, 9000, 11000]
+const RANKS := 21                      # Dienstgrad 0 … 20; nötige Erfahrung: 200 · r + 60 · r² (Rang 1: 260, Rang 5: 2500, Rang 10: 8000, Rang 20: 28000)
+static func rank_xp(r: int) -> int:
+	return 200 * r + 60 * r * r
 
 ## Wirkungen: Grundwert und erlaubter Bereich (Ausstattung stapelt additiv, Zwischenfälle ebenso; danach begrenzt). Die Physikgrenzen halten die
 ## handgemachten Level fair: Der Autopilot prüft sie mit Serientaxi, zu viel Schub oder Dämpfung würde sie trivial machen.
 const FX := {
-	"thrust_k": [1.0, 0.7, 1.15], "side_k": [1.0, 0.7, 1.2], "down_k": [1.0, 1.0, 1.3], "drag_k": [1.0, 0.4, 1.3], "gear_time_k": [1.0, 0.5, 3.0],
+	"thrust_k": [1.0, 0.7, 1.15], "side_k": [1.0, 0.7, 1.2], "down_k": [1.0, 1.0, 1.3], "drag_k": [1.0, 0.2, 1.3], "gear_time_k": [1.0, 0.5, 9.0], "jet_lag": [0.0, 0.0, 1.0],
 	"land_tilt": [0.0, 0.0, 0.06], "land_vx": [0.0, 0.0, 8.0], "land_vy": [0.0, 0.0, 9.0], "impact_safe": [0.0, 0.0, 12.0], "burn": [1.0, 0.75, 1.5],
 	"damage": [1.0, 0.7, 1.2], "heat_k": [1.0, 0.5, 1.0], "mover_k": [1.0, 0.6, 1.0], "spike_shield": [0.0, 0.0, 1.0], "overheat": [0.0, 0.0, 1.0],
 	"leak": [0.0, 0.0, 0.5], "heavy_k": [1.0, 0.8, 1.0], "soft_add": [0.0, 0.0, 4.0], "fuel_cap": [1.0, 1.0, 1.3],
@@ -195,10 +197,10 @@ static func new_run(seed: int, length: String, license_id: String, stage: int, m
 	return st
 
 static func start_capital(r: int) -> int:
-	return mini(700, 100 * (r / 2))
+	return mini(1000, 50 * r)
 
 static func start_tokens(r: int) -> int:
-	return (1 if r >= 4 else 0) + (1 if r >= 10 else 0)
+	return (1 if r >= 6 else 0) + (1 if r >= 12 else 0) + (1 if r >= 18 else 0)
 
 static func _stage_sum(stage: int, key: String) -> float:
 	var v := 0.0
@@ -244,11 +246,10 @@ static func effects(st: Dictionary) -> Dictionary:
 	for key in FX:
 		var spec: Array = FX[key]
 		out[key] = clampf(float(spec[0]) + float(add.get(key, 0.0)), float(spec[1]), float(spec[2]))
-	# Fahrpreis: Ausstattung und Lizenz, Lohn des Auftrags, Goldenes Taxameter und Risikoprämie
-	var n := active.size()
-	var fare := 1.0 + float(out.fare_add) + float((st.get("offer", {}) as Dictionary).get("fare_bonus", 0.0))
+	# Fahrpreis: Ausstattung, Lizenz, Zwischenfälle (Knausrige Kundschaft) und Goldenes Taxameter. Der Lohn für Zwischenfälle ist die Gefahrenzulage
+	# (feste Credits nach der Etappe), nicht ein Fahrpreisaufschlag: sonst höben sich etwa „Knausrige Kundschaft“ und der Lohn gegenseitig auf.
+	var fare := 1.0 + float(out.fare_add)
 	fare += GOLDEN_STEP * float(st.get("etappe", 0)) * float(out.golden)
-	fare += RISK_PERK_STEP * float(n) * float(out.risk)
 	out["fare_k"] = clampf(fare, 0.5, 3.0)
 	if active.has("crooked"):
 		var left := _rng(st, "crooked", int(st.get("etappe", 0))).randi() % 2 == 0
@@ -258,6 +259,9 @@ static func effects(st: Dictionary) -> Dictionary:
 		out["side_l"] = 1.0
 		out["side_r"] = 1.0
 	return out
+
+static func effects_base(st: Dictionary) -> Dictionary:
+	return effects(st)
 
 static func _put(add: Dictionary, fx: Dictionary, k: float) -> void:
 	for key in fx:
@@ -277,7 +281,7 @@ static func sim_mods(fx: Dictionary, angel := 0) -> Dictionary:
 		"side_l": fx.side_l, "side_r": fx.side_r, "down_k": fx.down_k, "drag_k": fx.drag_k, "gear_time_k": fx.gear_time_k,
 		"land_tilt": Tuning.LAND_TILT + float(fx.land_tilt), "land_vx": Tuning.LAND_VX + float(fx.land_vx), "impact_safe": Tuning.IMPACT_SAFE + float(fx.impact_safe),
 		"heat_k": fx.heat_k, "mover_k": fx.mover_k, "spike_shield": int(fx.spike_shield), "overheat": float(fx.overheat) > 0.0, "leak": fx.leak,
-		"heavy_k": fx.heavy_k, "angel": angel}
+		"heavy_k": fx.heavy_k, "jet_lag": float(fx.jet_lag) > 0.0, "angel": angel}
 
 ## Werte für Run.ot (Wirtschaft und Fahrgäste); leer = keine Sonderschicht.
 static func run_mods(fx: Dictionary) -> Dictionary:
@@ -366,17 +370,28 @@ static func offers(st: Dictionary, ids: Array) -> Array:
 			var cid := String(all_ids[rng.randi() % all_ids.size()])
 			if curse_ok(cid, lid, cs + active_pacts(st)):
 				cs.append(cid)
-		var o := {"level": lid, "curses": cs, "fare_bonus": FARE_PER_CURSE * float(cs.size()), "pact": "", "reward": ""}
+		var o := {"level": lid, "curses": cs, "pact": "", "reward": ""}
 		if cs.size() >= 2:
-			o.reward = _roll_perk(st, rng, cs.size() >= 3 or e >= 6)
+			o.reward = _roll_perk(st, rng, cs.size() >= 3 or e >= 6, false, _rewards_of(out))
 		out.append(o)
 	if e >= PACT_FROM and out.size() >= 2 and rng.randf() < PACT_CHANCE:
 		var pool_p: Array = pact_pool().filter(func(p): return not (st.get("pacts", []) as Array).has(p) and curse_ok(String(p), String(out[1].level), out[1].curses + active_pacts(st)))
 		if not pool_p.is_empty():
 			out[1].pact = String(pool_p[rng.randi() % pool_p.size()])
-			out[1].reward = _roll_perk(st, rng, true, true)
+			out[1].reward = _roll_perk(st, rng, true, true, _rewards_of(out))
 	_apply_bribe(st, out)
+	for o in out:
+		o["zulage"] = zulage(st, offer_curse_count(st, o))
 	return out
+
+## Prämien, die an dieser Kreuzung schon vergeben sind (keine zweimal).
+static func _rewards_of(out: Array) -> Array:
+	return out.map(func(o): return String(o.get("reward", ""))).filter(func(r): return r != "")
+
+## Gefahrenzulage für `n` Zwischenfälle an der laufenden Etappe (Credits nach geschaffter Etappe; Risikoprämie verdoppelt).
+static func zulage(st: Dictionary, n: int) -> int:
+	var k := RISK_PERK_K if float(effects_base(st).risk) > 0.0 else 1.0
+	return int(snappedf(ZULAGE_K * income(sector_of(st, int(st.get("etappe", 0)))) * float(n) * k, 10.0))
 
 static func active_pacts(st: Dictionary) -> Array:
 	return (st.get("pacts", []) as Array).duplicate()
@@ -404,7 +419,7 @@ static func choose(st: Dictionary, o: Dictionary) -> void:
 	st.level = String(o.level)
 	st.curses = (o.get("curses", []) as Array).duplicate()
 	var ob := o.duplicate(true)
-	ob["fare_bonus"] = FARE_PER_CURSE * float(offer_curse_count(st, {"curses": st.curses}))
+	ob["zulage"] = zulage(st, offer_curse_count(st, {"curses": st.curses}))
 	st.offer = ob
 	st.used.append(st.level)
 	st.phase = "fly"
@@ -451,7 +466,6 @@ static func _apply_bribe(st: Dictionary, out: Array) -> void:
 		return
 	var o: Dictionary = out[i]
 	(o.curses as Array).erase(String(b.get("c", "")))
-	o.fare_bonus = FARE_PER_CURSE * float((o.curses as Array).size())
 	if (o.curses as Array).size() < 2 and String(o.get("pact", "")) == "":
 		o.reward = ""
 
@@ -480,9 +494,19 @@ static func etappe_done(st: Dictionary, res: Dictionary) -> void:
 		var tax := roundf(maxf(0.0, float(st.credits) - AUDIT_FREE) * AUDIT_RATE)
 		st.credits = float(st.credits) - tax
 		_note(st, "audit", tax)
+	var zl := int((st.get("offer", {}) as Dictionary).get("zulage", 0))
+	if zl > 0:
+		st.credits = float(st.credits) + zl
+		_note(st, "zulage", zl)
 	if String(st.get("reward", "")) != "":
-		_add_perk(st, String(st.reward))
-		_note(st, "reward", 0.0, String(st.reward))
+		var rw := String(st.reward)
+		if stack(st, rw) >= int(perk(rw).get("max", 1)) or (rw == "spare" and int(st.lives) >= MAX_TAXIS):
+			var cash := price(st, rw)                    # schon voll ausgebaut (kommt eigentlich nicht vor): Gegenwert in Credits
+			st.credits = float(st.credits) + cash
+			_note(st, "reward_cash", cash, rw)
+		else:
+			_add_perk(st, rw)
+			_note(st, "reward", 0.0, rw)
 		st.reward = ""
 	st.etappe = int(st.etappe) + 1
 	st.curses = []
@@ -646,30 +670,42 @@ static func thousands_sep() -> String:
 
 static func rank_of(xp: int) -> int:
 	var r := 0
-	for i in RANK_XP.size():
-		if xp >= int(RANK_XP[i]):
+	for i in RANKS:
+		if xp >= rank_xp(i):
 			r = i
 	return r
 
 ## Erfahrung bis zum nächsten Dienstgrad: [erreicht im Rang, nötig im Rang] (bei Höchstrang [0, 0]).
 static func rank_progress(xp: int) -> Array:
 	var r := rank_of(xp)
-	if r >= RANK_XP.size() - 1:
+	if r >= RANKS - 1:
 		return [0, 0]
-	return [xp - int(RANK_XP[r]), int(RANK_XP[r + 1]) - int(RANK_XP[r])]
+	return [xp - rank_xp(r), rank_xp(r + 1) - rank_xp(r)]
+
+## Name des Dienstgrads (Texte OT_RANK_NAME_0 … 20).
+static func rank_name(r: int) -> String:
+	return TranslationServer.translate("OT_RANK_NAME_%d" % clampi(r, 0, RANKS - 1))
 
 static func default_meta() -> Dictionary:
 	return {"xp": 0, "stage_max": 0, "runs": 0, "wins": 0, "best": {"short": [], "medium": [], "long": []}}
 
 ## Abschluss des Laufs in den Fortschritt übernehmen: Erfahrung, Stufe, Bestenliste. Gibt {rank_before, rank, place, stage_unlocked} zurück.
-static func record(meta: Dictionary, st: Dictionary, date: String) -> Dictionary:
+static func record(meta: Dictionary, st: Dictionary, date: String, player := "") -> Dictionary:
 	var f := final(st)
 	var before := rank_of(int(meta.get("xp", 0)))
 	meta["xp"] = int(meta.get("xp", 0)) + int(f.xp)
 	meta["runs"] = int(meta.get("runs", 0)) + 1
 	var unlocked := -1
+	meta["best_score"] = maxi(int(meta.get("best_score", 0)), int(f.total))
+	meta["etappen"] = int(meta.get("etappen", 0)) + int(f.flown)
 	if f.won:
 		meta["wins"] = int(meta.get("wins", 0)) + 1
+		var wl: Dictionary = meta.get("wins_len", {}) if meta.get("wins_len") is Dictionary else {}
+		wl[String(st.get("length", "short"))] = int(wl.get(String(st.get("length", "short")), 0)) + 1
+		meta["wins_len"] = wl
+		meta["stage_won"] = maxi(int(meta.get("stage_won", -1)), int(st.get("stage", 0)))
+		meta["pacts_won"] = maxi(int(meta.get("pacts_won", 0)), (st.get("pacts", []) as Array).size())
+		meta["licenses_won"] = _union(meta.get("licenses_won", []), [String(st.get("license", "standard"))])
 		var nxt := mini(STAGE_MAX, int(st.get("stage", 0)) + 1)
 		if nxt > int(meta.get("stage_max", 0)):
 			meta["stage_max"] = nxt
@@ -678,7 +714,7 @@ static func record(meta: Dictionary, st: Dictionary, date: String) -> Dictionary
 		meta["best"] = {}
 	var length := String(st.get("length", "short"))
 	var board: Array = meta.best.get(length, []) if meta.best.get(length, []) is Array else []
-	var entry := {"score": f.total, "code": String(st.get("code", "")), "date": date, "license": String(st.get("license", "standard")), "stage": int(st.get("stage", 0)),
+	var entry := {"score": f.total, "code": String(st.get("code", "")), "date": date, "name": player, "license": String(st.get("license", "standard")), "stage": int(st.get("stage", 0)),
 		"flown": f.flown, "of": f.of, "won": f.won}
 	board.append(entry)
 	board.sort_custom(func(a, b): return int(a.score) > int(b.score))
@@ -689,6 +725,13 @@ static func record(meta: Dictionary, st: Dictionary, date: String) -> Dictionary
 		place = 0
 	meta.best[length] = board
 	return {"rank_before": before, "rank": rank_of(int(meta.xp)), "place": place, "stage_unlocked": unlocked, "final": f}
+
+static func _union(a, b: Array) -> Array:
+	var out: Array = (a as Array).duplicate() if a is Array else []
+	for x in b:
+		if not out.has(x):
+			out.append(x)
+	return out
 
 ## Lizenzen, die mit diesem Dienstgrad wählbar sind.
 static func licenses_for(r: int) -> Array:

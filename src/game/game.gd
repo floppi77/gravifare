@@ -340,6 +340,9 @@ func load_level(path: String) -> void:
 	fx.setup(run)
 	taxi.bind(run.sim)
 	taxi.no_lamp = run.otv("ui_nolight", 0.0) > 0.0
+	taxi.kit_draw = Callable()
+	if Flow.overtime:                                  # Lizenz und Ausstattung sind am Taxi zu sehen
+		taxi.kit_draw = func(ci: CanvasItem): OvertimeLook.draw_on_taxi(ci, Tuning.TAXI_RECT, Flow.ot.get("perks", {}), String(Flow.ot.get("license", "standard")), run.sim.gear, taxi.t, not Settings.values.reduce_motion)
 	assist.bind(run)
 	taxi.sync_state()
 	taxi.reset_physics_interpolation()
@@ -850,7 +853,9 @@ func _physics_process(_delta: float) -> void:
 		Sfx.set_thrust(0.0, 0.0)
 	if run.sim.fuel < 25.0 and run.sim.fuel > 0.0 and run.result == Run.Result.RUNNING and not summary:
 		warn_cd -= Tuning.TICK
-		if warn_cd <= 0.0:
+		if warn_cd <= 0.0 and run.otv("ui_shaky", 0.0) > 0.0:
+			warn_cd = 1.0                                   # Sonderschicht, wackelige Instrumente: der Tankalarm schweigt
+		elif warn_cd <= 0.0:
 			Sfx.play("warn", -6.0)
 			hud.fuel_ping()                           # die Tankanzeige blitzt im Takt des Alarms
 			warn_cd = lerpf(0.12, 1.0, clampf(run.sim.fuel / 25.0, 0.0, 1.0))        # je leerer der Tank, desto schneller piept es
@@ -1800,6 +1805,7 @@ func _ot_finish_etappe(score: int) -> Dictionary:
 	var bonus := int(round(150.0 * stars + 2.0 * maxf(0.0, run.time_target() - run.level_time) + 10.0 * run.perfect_count)) if score > 0 else 0
 	var n := Overtime.active_curses(Flow.ot).size()
 	var e := int(Flow.ot.etappe)
+	var zl := int((Flow.ot.get("offer", {}) as Dictionary).get("zulage", 0))
 	Overtime.etappe_done(Flow.ot, {"points": score, "bonus": bonus, "credits": run.money, "fuel": maxf(Tuning.MIN_START_FUEL, run.sim.fuel), "lives": Flow.lives,
 		"carry": run.carried, "streak": run.streak, "angel": run.sim.angel, "net": float(hud.result.get("net", 0.0)), "time": run.level_time, "stars": stars})
 	var last: Dictionary = (Flow.ot.results as Array)[-1]
@@ -1811,7 +1817,7 @@ func _ot_finish_etappe(score: int) -> Dictionary:
 	for r in Flow.ot.results:
 		run_total += int(r.score)
 	return {"etappe": e + 1, "of": Overtime.total(Flow.ot), "score": int(last.score), "points": score, "curses": n, "time": med.time, "clean": med.clean, "pro": med.pro,
-		"phase": String(Flow.ot.phase), "run_total": run_total}
+		"phase": String(Flow.ot.phase), "run_total": run_total, "zulage": zl}
 
 ## Nach der Ergebnisansicht: Halt (alle drei Etappen), dann die Kreuzung; nach der letzten Etappe die Schlusswertung.
 func _ot_continue() -> void:

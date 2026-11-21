@@ -1283,6 +1283,10 @@ func _draw_pumps() -> void:
 		var lvl_n := (pf - run.level.fuel_price_min) / span
 		var col := SignalColors.by_level(lvl_n, 0.34, 0.67, Color("#ff6a4a"))
 		var txt := "%.2f" % pf
+		var cyc := run.otv("pump_cycle", 0.0) > 0.0           # Sonderschicht, Säule im Takt: zu = rote Restzeit statt Preis
+		if cyc and run._ot_pump_shut():
+			txt = "%ds" % int(ceil(Run.PUMP_CYCLE - fmod(run.level_time, Run.PUMP_CYCLE)))
+			col = SignalColors.bad()
 		if stage >= 3:
 			txt = "ERR"
 			col = SignalColors.bad()
@@ -1291,6 +1295,8 @@ func _draw_pumps() -> void:
 		if pump_flash > 0.0:
 			draw_rect(Rect2(-7.0, -9.5, 14.0, 6.0), Color(1, 1, 1, pump_flash * 0.55))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		if cyc:
+			_draw_pump_cycle(Vector2(r.position.x + 8.0, top - 4.0))
 		if stage >= 2:      # Funken am beschädigten Kopf
 			var k := int(t * 18.0)
 			for i in 3:
@@ -1298,6 +1304,23 @@ func _draw_pumps() -> void:
 				var ry := fmod(absf(cos(float(k * 5 + i * 11))) * 6.0, 6.0)
 				if (k + i) % 3 != 0:
 					draw_rect(Rect2(pivot.x - 4.5 + rx, pivot.y - 9.0 + ry, 0.9, 0.9), Color("#ffd37a"))
+
+## Säule im Takt (Sonderschicht): Ampel über der Säule (grün offen, rot zu) und ein Balken, der die Restzeit der Phase zeigt; kurz vor dem
+## Wechsel blinkt die Ampel.
+func _draw_pump_cycle(c: Vector2) -> void:
+	var ph := fmod(run.level_time, Run.PUMP_CYCLE)
+	var open := ph < Run.PUMP_OPEN
+	var left := (Run.PUMP_OPEN - ph) if open else (Run.PUMP_CYCLE - ph)
+	var span := Run.PUMP_OPEN if open else Run.PUMP_CYCLE - Run.PUMP_OPEN
+	var col := SignalColors.good() if open else SignalColors.bad()
+	var blink := left < 1.5 and int(t * 8.0) % 2 == 0
+	draw_rect(Rect2(c.x - 3.0, c.y - 3.0, 6.0, 6.0), Color("#0c0f24"))
+	draw_rect(Rect2(c.x - 2.0, c.y - 2.0, 4.0, 4.0), Color(col, 0.35) if blink else col)
+	if not Settings.values.reduce_motion:
+		draw_circle(c, 6.0, Color(col, 0.12 if blink else 0.22))
+	var w := 12.0
+	draw_rect(Rect2(c.x - w * 0.5, c.y + 4.0, w, 1.4), Color("#232a52"))
+	draw_rect(Rect2(c.x - w * 0.5, c.y + 4.0, w * clampf(left / span, 0.0, 1.0), 1.4), col)
 
 ## Reflexionen auf den Pads: ein Glanzstreifen läuft über die Fläche, und das Taxi spiegelt sich im Metall, wenn es
 ## darüber schwebt (nur die unterste Kante, wird mit der Höhe blasser). Bei „Weniger Bewegung“ aus.

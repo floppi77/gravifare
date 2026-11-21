@@ -20,7 +20,16 @@ func _ready() -> void:
 	sb.set_content_margin_all(12)
 	frame.add_theme_stylebox_override("panel", sb)
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	center.add_child(frame)
+	if Flow.overtime:                          # Sonderschicht: links das Pausenmenü, rechts Lizenz, Ausstattung, Zwischenfälle und Wirkung insgesamt
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		center.add_child(row)
+		row.add_child(frame)
+		row.add_child(OvertimeKit.panel(Flow.ot, Vector2(400, 330)))
+	else:
+		center.add_child(frame)
 	box = VBoxContainer.new()
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 4)
@@ -48,8 +57,6 @@ func show_main(focus_lang := "") -> void:
 		box.add_child(MenuKit.button(tr("MENU_RESTART"), func():
 			game._set_paused(false)
 			game.restart_level()))
-	if Flow.overtime:                      # Sonderschicht: eingebaute Ausstattung und Pakte ansehen
-		box.add_child(MenuKit.button(tr("OT_CROSS_KIT"), _open_kit))
 	var ck: String = game.level_clip_key()
 	if ck != "":
 		box.add_child(MenuKit.button(tr("MENU_CLIP"), func():
@@ -65,29 +72,20 @@ func show_main(focus_lang := "") -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
 	box.add_child(gap)
-	box.add_child(MenuKit.flag_row(func(code): show_main(code)))      # Sprachwahl auch im Spiel
+	if Flow.overtime:                          # Sonderschicht: Flaggen in zwei Reihen, damit rechts die Übersicht Platz hat
+		var fg := GridContainer.new()
+		fg.columns = 4
+		fg.add_theme_constant_override("h_separation", 6)
+		fg.add_theme_constant_override("v_separation", 6)
+		fg.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		for fb in MenuKit._flag_buttons(func(code): show_main(code)):
+			fg.add_child(fb)
+		box.add_child(fg)
+	else:
+		box.add_child(MenuKit.flag_row(func(code): show_main(code)))      # Sprachwahl auch im Spiel
 	_focus_first(focus_lang)
 
-var kit_node: Control = null
-
-func _open_kit() -> void:
-	in_sub = true
-	frame.visible = false
-	kit_node = OvertimeKit.make(Flow.ot, _close_kit)
-	add_child(kit_node)
-
-func _close_kit() -> void:
-	if kit_node != null and is_instance_valid(kit_node):
-		kit_node.queue_free()
-	kit_node = null
-	frame.visible = true
-	show_main()
-
 func _unhandled_input(event: InputEvent) -> void:
-	if kit_node != null and (event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")):
-		get_viewport().set_input_as_handled()
-		_close_kit()
-		return
 	if in_sub and (event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause")):     # Esc/Start gehen hier eine Ebene zurück, wie B
 		get_viewport().set_input_as_handled()
 		var panel := box.get_child(0) as OptionsPanel if box.get_child_count() > 0 else null

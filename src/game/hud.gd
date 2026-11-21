@@ -114,10 +114,10 @@ func _draw() -> void:
 	draw_line(Vector2(344, 16), Vector2(fr.end.x, 16), Color("#3a4580"), 0.67)
 	var shake_f := 0.0
 	var shake_h := 0.0
-	if run.otv("ui_shaky", 0.0) > 0.0:            # Sonderschicht, wackelige Instrumente: Anzeigen zittern um bis zu ±12 %
+	if run.otv("ui_shaky", 0.0) > 0.0:            # Sonderschicht, wackelige Instrumente: Anzeigen schwanken um bis zu ±29 %
 		var tt := Time.get_ticks_msec() / 1000.0
-		shake_f = 0.08 * sin(tt * 5.3) + 0.04 * sin(tt * 17.1)
-		shake_h = 0.08 * sin(tt * 4.1 + 1.7) + 0.04 * sin(tt * 13.7)
+		shake_f = 0.2 * sin(tt * 1.1) + 0.09 * sin(tt * 2.3 + 0.6)      # langsam und weit: man kann sich nicht auf die Anzeige verlassen
+		shake_h = 0.2 * sin(tt * 0.9 + 1.7) + 0.09 * sin(tt * 2.1)
 	gauges.draw_fuel(self, GAUGE_FUEL, clampf(s.fuel / Tuning.FUEL_MAX + shake_f, 0.0, 1.0), s.fuel_cap / Tuning.FUEL_MAX, run.fuel_dead_t > 0.0 and run.result == Run.Result.RUNNING)
 	gauges.draw_hull(self, GAUGE_HULL, clampf(s.hull / Tuning.HULL_MAX + shake_h, 0.0, 1.0))
 	_fit_text(font, Vector2(147, 12), "¢%d" % int(run.money), 56.0, Settings.fs(9), Color("#ffe14a"), HORIZONTAL_ALIGNMENT_LEFT)       # Settings.fs: Option „Große Schrift“
@@ -508,6 +508,8 @@ func _draw_result() -> void:
 		best_line = tr("MSG_NOT_COUNTED")
 	if not ot_res.is_empty():
 		best_line = tr("OT_RES_RISK") % [int(ot_res.curses), ("%.2f" % (1.0 + Overtime.RISK_PER_CURSE * float(ot_res.curses))).replace(".", "," if TranslationServer.get_locale().substr(0, 2) != "en" else ".")]
+		if int(ot_res.get("zulage", 0)) > 0:
+			best_line += "  ·  " + tr("OT_NOTE_ZULAGE") % int(ot_res.zulage)
 	if result.get("solved", false):
 		best_line = tr("RES_SOLVED")
 	var best_col := Color("#ffe14a") if best_line == tr("RES_NEW_BEST") else (Color("#ffb02e") if not counted else Color("#8a93c9"))

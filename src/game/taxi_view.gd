@@ -104,6 +104,30 @@ func _brake(x: float, Fx) -> CPUParticles2D:
 	return p
 
 var no_lamp := false            # Sonderschicht, Ampel kaputt: keine Landelampe am Taxi
+var kit_draw: Callable          # Sonderschicht: zeichnet Lizenz und eingebaute Teile ans Taxi (OvertimeLook.draw_on_taxi)
+
+## Heiße Düse (Sonderschicht): Hitzestreifen unter der Motorgondel, im Blickfeld am Taxi. Er füllt sich mit Dauerschub (gelb → rot); überhitzt läuft
+## er blau-weiß leer, bis die Düse wieder zieht (voller Streifen = überhitzt).
+func _draw_heat_strip() -> void:
+	var x0 := 8.5
+	var w := 9.0
+	var y := 16.4
+	var a := _u0(x0, y)
+	var b := _u0(x0 + w, y + 0.7)
+	var r := Rect2(a, b - a)
+	if not sim.jet_hot and sim.jet_heat <= 0.01:
+		return
+	draw_rect(r.grow(0.35), Color(0.05, 0.06, 0.15, 0.85))
+	if sim.jet_hot:
+		var k := clampf((sim.jet_heat - TaxiSim.OVERHEAT_COOL) / (TaxiSim.OVERHEAT_AT + 1.0 - TaxiSim.OVERHEAT_COOL), 0.0, 1.0)
+		draw_rect(Rect2(r.position, Vector2(r.size.x * k, r.size.y)), Color("#9fdcff").lerp(Color.WHITE, 0.3 * sin(t * 6.0) + 0.3))
+	else:
+		var k := clampf(sim.jet_heat / TaxiSim.OVERHEAT_AT, 0.0, 1.0)
+		draw_rect(Rect2(r.position, Vector2(r.size.x * k, r.size.y)), Color("#ffcb3d").lerp(Color("#ff3b2e"), k))
+
+## Taxi-Einheiten ohne Kopfversatz (Rumpfteile drehen in der Mischform nicht mit dem Fahrer).
+func _u0(u: float, v: float) -> Vector2:
+	return Vector2(Tuning.TAXI_RECT.position.x + u * Tuning.TAXI_RECT.size.x / Tuning.TAXI_UNITS.x, Tuning.TAXI_RECT.position.y + v * Tuning.TAXI_RECT.size.y / Tuning.TAXI_UNITS.y)
 
 func bind(s: TaxiSim) -> void:
 	sim = s
@@ -207,6 +231,11 @@ func _draw() -> void:
 	var mod := Color.WHITE
 	if flash > 0.0:
 		mod = Color(1, 0.4 + 0.6 * (1.0 - flash), 0.4 + 0.6 * (1.0 - flash))
+	if sim.overheat:                          # Heiße Düse (Sonderschicht): der Rumpf glüht mit der Hitze, überhitzt pulsierend rot
+		var hk := clampf(sim.jet_heat / TaxiSim.OVERHEAT_AT, 0.0, 1.0)
+		if sim.jet_hot:
+			hk = 0.75 + (0.25 * sin(t * 10.0) if not Settings.values.reduce_motion else 0.15)
+		mod = mod * Color(1.0, 1.0 - 0.55 * hk, 1.0 - 0.6 * hk)
 	var n := PixelScale.size_for(self)       # 720p … 2160p: je Bildschirmskalierung das eigens gerasterte Taxi, 1:1
 	if n != size_n:
 		size_n = n
@@ -223,6 +252,10 @@ func _draw() -> void:
 		draw_texture_rect_region(sticker_frame.tex, Tuning.sticker_rect(int(sticker_frame.n), int(sticker_frame.src.size.x)), sticker_frame.src, mod)
 	if sim.state != TaxiSim.State.DESTROYED:
 		_draw_details(n)
+		if kit_draw.is_valid():
+			kit_draw.call(self)
+		if sim.overheat:
+			_draw_heat_strip()
 	# Schadenanzeige: Funken/Rauch
 	if hurt > 0.45 and int(t * 8.0) % 2 == 0:
 		draw_rect(Rect2(-6 + (int(t * 13.0) % 5), -8 - (int(t * 7.0) % 3), 1, 1), Color("#ffd37a"))

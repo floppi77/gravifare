@@ -13,7 +13,7 @@ Stand: Runde 80 (2026-11-18). Ein Steam-Auftritt ist **nicht** geplant; dies ist
 ## Für einen späteren Steam-Release
 
 1. GodotSteam (GDExtension, passend zu Godot 4.7) als Addon einbinden; Lizenz MIT – in THIRD_PARTY_LICENSES.md aufnehmen.
-2. In Steamworks die 32 Erfolge mit den API-Namen unten anlegen (Name/Beschreibung DE und EN; FR/ES stehen in `data/i18n/fr.json`/`es.json`).
+2. In Steamworks die 41 Erfolge mit den API-Namen unten anlegen (Name/Beschreibung DE und EN; FR/ES stehen in `data/i18n/fr.json`/`es.json`).
 3. Symbole hochladen: `docs/steam/icons/` (64×64 PNG, erreicht und gesperrt). Neu erzeugen mit
    `godot --path . -- --scene=achievements_view --export-ach-icons=<Ordner>` (braucht ein Fenster bzw. `gamescope --backend headless`).
 4. `steam_appid.txt` nur für lokale Tests neben die ausführbare Datei legen (nicht ausliefern).
@@ -53,4 +53,13 @@ Stand: Runde 80 (2026-11-18). Ein Steam-Auftritt ist **nicht** geplant; dies ist
 | `ACH_DAY_XMAS` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_XMAS` / `ACH_DAY_XMAS_D` in `data/i18n` | `icons/ACH_DAY_XMAS.png`, `icons/ACH_DAY_XMAS_locked.png` |
 | `ACH_DAY_SILVESTER` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_SILVESTER` / `ACH_DAY_SILVESTER_D` in `data/i18n` | `icons/ACH_DAY_SILVESTER.png`, `icons/ACH_DAY_SILVESTER_locked.png` |
 | `ACH_DAY_VALENTINE` | *versteckt* | *hidden* | in Steamworks als „Hidden“ anlegen; Texte: `ACH_DAY_VALENTINE` / `ACH_DAY_VALENTINE_D` in `data/i18n` | `icons/ACH_DAY_VALENTINE.png`, `icons/ACH_DAY_VALENTINE_locked.png` |
-| `ACH_ALL_DONE` | Taxi-Ikone | Taxi icon | Unlock all 31 other achievements | `icons/ACH_ALL_DONE.png`, `icons/ACH_ALL_DONE_locked.png` |
+| `ACH_OT_FIRST` | Überstunden | Overtime | Finish an overtime run | `icons/ACH_OT_FIRST.png`, `icons/ACH_OT_FIRST_locked.png` |
+| `ACH_OT_SHORT` | Kurz und knackig | Short and sweet | Complete a short overtime run | `icons/ACH_OT_SHORT.png`, `icons/ACH_OT_SHORT_locked.png` |
+| `ACH_OT_MEDIUM` | Durchgehalten | Stayed the course | Complete a medium overtime run | `icons/ACH_OT_MEDIUM.png`, `icons/ACH_OT_MEDIUM_locked.png` |
+| `ACH_OT_LONG` | Marathonschicht | Marathon shift | Complete a long overtime run | `icons/ACH_OT_LONG.png`, `icons/ACH_OT_LONG_locked.png` |
+| `ACH_OT_STAGE5` | Unermüdlich | Tireless | Complete an overtime run at overtime level 5 or higher | `icons/ACH_OT_STAGE5.png`, `icons/ACH_OT_STAGE5_locked.png` |
+| `ACH_OT_RANK10` | Oberdisponent | Head dispatcher | Reach rank 10 | `icons/ACH_OT_RANK10.png`, `icons/ACH_OT_RANK10_locked.png` |
+| `ACH_OT_PACTS3` | Teufelspakt | Devil’s bargain | Complete an overtime run with 3 pacts | `icons/ACH_OT_PACTS3.png`, `icons/ACH_OT_PACTS3_locked.png` |
+| `ACH_OT_SCORE` | Rekordschicht | Record shift | Score 100000 points in one overtime run | `icons/ACH_OT_SCORE.png`, `icons/ACH_OT_SCORE_locked.png` |
+| `ACH_OT_LICENSES` | Lizenzsammler | License collector | Complete an overtime run with each of the 6 licenses | `icons/ACH_OT_LICENSES.png`, `icons/ACH_OT_LICENSES_locked.png` |
+| `ACH_ALL_DONE` | Taxi-Ikone | Taxi icon | Unlock all 40 other achievements | `icons/ACH_ALL_DONE.png`, `icons/ACH_ALL_DONE_locked.png` |

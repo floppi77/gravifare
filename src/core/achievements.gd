@@ -20,8 +20,10 @@ const LIST := [
 	["workshop_max", "garage", 1], ["new_look", "garage", 1],
 	["pump_boom", "fun", 1], ["crashes_50", "fun", 50], ["community", "fun", 1], ["hours_10", "time", 10],
 	["eggs_20", "egg", 20],
+	["ot_first", "overtime", 1], ["ot_short", "overtime", 1], ["ot_medium", "overtime", 1], ["ot_long", "overtime", 1],
+	["ot_stage5", "overtime", 1], ["ot_rank10", "overtime", 10], ["ot_pacts3", "overtime", 3], ["ot_score", "overtime", 100000], ["ot_licenses", "overtime", 6],
 	["day_nikolaus", "holiday", 1], ["day_xmas", "holiday", 1], ["day_silvester", "holiday", 1], ["day_valentine", "holiday", 1],
-	["all_done", "crown", 31],
+	["all_done", "crown", 40],
 ]
 
 ## Runde 86: verdeckt, bis sie erreicht sind (Name und Beschreibung „???“ in der Übersicht; Steam: „Hidden“). Nichts verraten.
@@ -147,6 +149,8 @@ static func progress(data: Dictionary, id: String) -> Array:
 			cur = (st.eggs as Dictionary).size() if st.get("eggs") is Dictionary else 0
 		"day_nikolaus", "day_xmas", "day_silvester", "day_valentine":
 			cur = 1 if st.get("holidays") is Dictionary and (st.holidays as Dictionary).has(id.substr(4)) else 0
+		"ot_first", "ot_short", "ot_medium", "ot_long", "ot_stage5", "ot_rank10", "ot_pacts3", "ot_score", "ot_licenses":
+			cur = _overtime(data, id)
 		"all_done":                                   # alle anderen Erfolge (gespeichert oder gerade erreicht)
 			var have := stored(data)
 			for e in LIST:
@@ -159,6 +163,30 @@ static func progress(data: Dictionary, id: String) -> Array:
 					var p := progress(data, o)
 					cur += 1 if p[0] >= p[1] else 0
 	return [mini(cur, g), g]
+
+## Sonderschicht (Save.data.overtime.meta, siehe Overtime.record).
+static func _overtime(data: Dictionary, id: String) -> int:
+	var o = data.get("overtime", {})
+	var m = o.get("meta", {}) if o is Dictionary else {}
+	if not (m is Dictionary):
+		return 0
+	var wl: Dictionary = m.get("wins_len", {}) if m.get("wins_len") is Dictionary else {}
+	match id:
+		"ot_first":
+			return int(m.get("runs", 0))
+		"ot_short", "ot_medium", "ot_long":
+			return 1 if int(wl.get(id.substr(3), 0)) > 0 else 0
+		"ot_stage5":
+			return 1 if int(m.get("stage_won", -1)) >= 5 else 0
+		"ot_rank10":
+			return Overtime.rank_of(int(m.get("xp", 0)))
+		"ot_pacts3":
+			return int(m.get("pacts_won", 0))
+		"ot_score":
+			return int(m.get("best_score", 0))
+		"ot_licenses":
+			return (m.get("licenses_won", []) as Array).size() if m.get("licenses_won") is Array else 0
+	return 0
 
 ## Erfolge, deren Bedingung der Spielstand gerade erfüllt (ohne Blick auf die gespeicherten).
 static func reached(data: Dictionary) -> Array:

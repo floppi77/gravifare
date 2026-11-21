@@ -1669,7 +1669,7 @@ func _service_extras() -> void:
 # ---------------------------------------------------------------- Sonderschicht (Ausstattung und Zwischenfälle in der Auftragslogik)
 const RESERVE_FUEL := 15.0
 const PUMP_CYCLE := 12.0          # Säule im Takt: alle 12 s …
-const PUMP_OPEN := 7.0            # … 7 s offen
+const PUMP_OPEN := 6.0            # … 6 s offen (die Hälfte der Zeit)
 const PICKY_VY := 35.0            # Anspruchsvolle Kundschaft: ab dieser Sinkrate beim Absetzen zahlt der Fahrgast nichts (wie „hart“ der Nachtschicht)
 
 func _ot_step(dt: float) -> void:

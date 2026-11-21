@@ -498,7 +498,7 @@ func ot_restart() -> void:
 func ot_close() -> void:
 	if ot.is_empty() or bool(ot.get("closed", false)):
 		return
-	var rec := Overtime.record(ot_meta(), ot, Daily.today())
+	var rec := Overtime.record(ot_meta(), ot, Daily.today(), Save.slot_name())
 	ot["closed"] = true
 	ot_last = {"state": ot.duplicate(true), "rec": rec}
 	Save.data.overtime["run"] = {}
@@ -524,7 +524,7 @@ func to_overtime_finale() -> void:
 	get_tree().change_scene_to_file(OT_FINALE)
 
 ## Entwicklung: Sonderschicht direkt öffnen (--ot=cross|halt|fly|finale|menu, dazu --ot-len=, --ot-seed=, --ot-etappe=, --ot-perks=a,b, --ot-curses=a,b,
-## --ot-credits=, --ot-xp=, --ot-level=). Schreibt nichts in den Spielstand (Save.dev_session).
+## --ot-credits=, --ot-xp=, --ot-level=, --ot-lic=). Schreibt nichts in den Spielstand (Save.dev_session).
 func dev_overtime(args: PackedStringArray) -> void:
 	var what := "cross"
 	var length := "short"
@@ -534,6 +534,7 @@ func dev_overtime(args: PackedStringArray) -> void:
 	var curses_s := ""
 	var credits := -1.0
 	var level := ""
+	var lic := "standard"
 	for a in args:
 		if a.begins_with("--ot="):
 			what = a.substr(5)
@@ -551,13 +552,15 @@ func dev_overtime(args: PackedStringArray) -> void:
 			credits = float(a.substr(13))
 		elif a.begins_with("--ot-xp="):
 			ot_meta()["xp"] = int(a.substr(8))
+		elif a.begins_with("--ot-lic="):
+			lic = a.substr(9)
 		elif a.begins_with("--ot-level="):
 			level = resolve_level(a.substr(11))
 	if what == "menu":
 		get_tree().change_scene_to_file(OT_MENU)
 		return
 	_ot_enter()
-	ot = Overtime.new_run(maxi(0, Overtime.seed_of(code)), length, "standard", 0, ot_meta())
+	ot = Overtime.new_run(maxi(0, Overtime.seed_of(code)), length, lic, 0, ot_meta())
 	var ids := level_ids()
 	for e in mini(etappe, Overtime.total(ot) - (0 if what == "finale" else 1)):
 		var os := Overtime.offers(ot, ids)
