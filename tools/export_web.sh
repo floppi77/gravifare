@@ -13,6 +13,20 @@ trap 'rm -rf "$WORK"' EXIT
 rsync -a --exclude .git --exclude .venv --exclude build --exclude scratch --exclude addons --exclude docs --exclude tests --exclude tools ./ "$WORK"/
 sed -i '/^_mcp_game_helper=/d; /^\[editor_plugins\]$/,/^\[/{/^\[editor_plugins\]$/d; /^\[/!d}' "$WORK/project.godot"
 for l in de fr es it pt pl ref; do rm -rf "$WORK/assets/audio/voice/$l"; done
+# Ton wie auf dem Desktop: alles über Godots eigenen Mischer („Stream“). Im Browser-Standard „Sample“ spielten Effekte und Stimmen
+# stumm (die Busse SFX/Voice entstehen erst zur Laufzeit in Sfx._ready, die Sample-Wiedergabe des Browsers kennt sie nicht).
+python3 -I - "$WORK/project.godot" <<'P'
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+line = "general/default_playback_type.web=0"
+if "[audio]" in s:
+	s = s.replace("[audio]\n", "[audio]\n\n" + line + "\n", 1)
+else:
+	s = s.rstrip("\n") + "\n\n[audio]\n\n" + line + "\n"
+open(p, "w", encoding="utf-8").write(s)
+P
+grep -q "^general/default_playback_type.web=0" "$WORK/project.godot" || { echo "Ton-Einstellung fehlt in der Exportkopie" >&2; exit 1; }
 godot --headless --path "$WORK" --import >/dev/null 2>&1 || true
 rm -rf "$OUT"
 mkdir -p "$OUT" build/release

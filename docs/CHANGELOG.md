@@ -3,6 +3,18 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.8.2
+
+### Deutsch
+
+**Fehlerbehebungen**
+- Browser-Fassung: Soundeffekte und Sprachausgabe sind jetzt zu hören (bisher lief nur die Musik)
+
+### English
+
+**Bug fixes**
+- Browser version: sound effects and voice acting can now be heard (only the music played before)
+
 ## 1.8.1
 
 ### Deutsch
