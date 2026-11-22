@@ -624,7 +624,7 @@ func to_finale() -> void:
 var _shot := ""
 var _shot_frame := 0
 var _presses: Array = []
-var _clicks: Array = []             # Dev: --click=x,y@frame (Viewport-Koordinaten, Bewegung + Linksklick)
+var _clicks: Array = []             # Dev: --click=x,y@frame (Viewport-Koordinaten, Bewegung + Linksklick), --hover=x,y@frame (nur Bewegung)
 var _frame := 0
 
 func _ready() -> void:
@@ -653,10 +653,10 @@ func _ready() -> void:
 			_shot = a.substr(7)
 		elif a.begins_with("--frames="):
 			_shot_frame = int(a.substr(9))
-		elif a.begins_with("--click="):
+		elif a.begins_with("--click=") or a.begins_with("--hover="):
 			var cp := a.substr(8).split("@")
 			var xy := cp[0].split(",")
-			_clicks.append([Vector2(float(xy[0]), float(xy[1])), int(cp[1])])
+			_clicks.append([Vector2(float(xy[0]), float(xy[1])), int(cp[1]), a.begins_with("--click=")])
 		elif a.begins_with("--press="):
 			var parts := a.substr(8).split("@")
 			_presses.append([parts[0], int(parts[1])])
@@ -671,6 +671,8 @@ func _process(_d: float) -> void:
 			mm.position = c[0]
 			mm.global_position = c[0]
 			Input.parse_input_event(mm)
+			if not c[2]:
+				continue                     # --hover: nur den Zeiger bewegen (Bilder ohne Tooltip unter dem Zeiger)
 			var mb := InputEventMouseButton.new()
 			mb.button_index = MOUSE_BUTTON_LEFT
 			mb.position = c[0]

@@ -27,7 +27,8 @@ A hover-taxi arcade game in Godot 4.7 – inertia, gravity, precise landings.</p
 GraviFare ist ein 2D-Arcade-Taxispiel: Du fliegst ein Schwebetaxi durch **99 Level in 9 Sektoren**, holst Fahrgäste ab,
 setzt sie an der richtigen Plattform ab und landest dabei so sanft wie möglich. Der Sprit kostet Credits, jede Beule die
 Hülle – und das Taxi hat Schwung. Eine Hommage an das Genre der Flugtaxi-Spiele, mit eigener Welt, eigenen Leveln,
-eigener Grafik und eigenem Klang.
+eigener Grafik und eigenem Klang. Neben der Karriere gibt es jeden Tag eine **Tagschicht** und eine **Nachtschicht**, mit der
+**Sonderschicht** einen Roguelike-Modus und einen **Level-Editor** für eigene Level.
 
 ## Trailer
 
@@ -44,6 +45,8 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 |---|---|
 | ![Hauptmenü](docs/media/de/menu.jpg) | ![Sektor 5 – Hitze und Lavablasen im Takt](docs/media/de/lava.jpg) |
 | **Hauptmenü** | **Sektor 5 – Hitze und Lavablasen im Takt** |
+| ![Sonderschicht – an der Kreuzung einen Auftrag wählen](docs/media/de/overtime.jpg) | ![Sonderschicht – Zwischenfall „Schwache Seitendüse“: an der linken Düse sprühen Funken](docs/media/de/overtime_fly.jpg) |
+| **Sonderschicht (Roguelike) – an der Kreuzung einen Auftrag wählen** | **Sonderschicht – Zwischenfälle ändern das Fluggefühl (hier: schwache Seitendüse)** |
 | ![Flugschule mit Fluglehrer (Stimme, Untertitel, Hinweise)](docs/media/de/tutorial.jpg) | ![Sektor 1 – Fahrgäste, Tankstelle, Tor](docs/media/de/sector1.jpg) |
 | **Flugschule mit Fluglehrer (Stimme, Untertitel, Hinweise)** | **Sektor 1 – Fahrgäste, Tankstelle, Tor** |
 | ![Sektor 3 – bewegliche Plattformen](docs/media/de/sector3.jpg) | ![Sektor 6](docs/media/de/sector6.jpg) |
@@ -62,9 +65,10 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 - **Flugschule:** ein vertontes Tutorial mit Fluglehrer erklärt Schub, Fahrwerk, Landeampel, Tanken, Taxistation und Fahrgäste.
 - **Karriere mit Leben und Credits:** Fahrpreise, Spritkosten, Reparaturen, Ersatztaxis und eine **Werkstatt** nach jedem Sektor
   (Düsen, Hülle, Fahrwerk, Scheinwerfer). Game Over setzt den Sektor zurück, jeder Einbau verliert eine Stufe. Fahrgäste mit Sonderwünschen: **VIP** (zahlt fast doppelt, wenig Geduld) und **Notfall** (doppelter Preis, Frist in Sekunden).
-- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist und **Bestflug ansehen** in der Levelauswahl, **Nachtschicht** (jeden Tag eine Schicht aus 9 immer dunkleren Karten mit Note S bis E), **Tagschicht** (jeden Tag eine hell beleuchtete Karte mit Tagesregel – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt, Rückenwind – und Tagesziel mit Bronze, Silber und Gold, Serie mit Belohnungen und Geist),
-  **Garage** mit Lackierungen und Aufklebern.
-- **Sonderschicht** (Roguelike, frei nach Abschluss von Sektor 6 oder auf Wunsch sofort beim neuen Spielstand): 9, 18 oder 27 Etappen durch alle Sektoren, an jeder Kreuzung ein Auftrag mit Zwischenfällen (heiße Düse, Leck, Funkloch, Barzahler …), im Werkstatt-Halt Ausstattung aus über 40 Teilen, Pakte, Lizenzen, Dienstgrad, Überstunden-Stufen und Bestenliste. Seed frei wählbar; die Level bleiben die handgemachten.
+- **Landeassistent** direkt am Taxi, Medaillen (Zeit, sauber, Profi), Bestzeit-Geist und **Bestflug ansehen** in der Levelauswahl, **Garage** mit Lackierungen und Aufklebern.
+- **Tagschicht** (frei nach Abschluss von Sektor 1): Jeden Tag wartet eine hell beleuchtete Karte aus den schon geschafften Leveln, dazu eine **Tagesregel**, die das Fliegen verändert – Windtag, Nebel, Spiegelwelt, Dünner Tank, Glasdach, Eilfahrt oder Rückenwind, jede Woche neu auf die Wochentage verteilt. Ein **Tagesziel** (Express, Präzision, Sauber oder Gewinn) bringt Bronze, Silber oder Gold. Wer täglich fliegt, baut eine Serie auf und schaltet damit Lackierungen und Aufkleber frei; der beste Flug des Tages fliegt als Geist mit.
+- **Nachtschicht** (frei nach Abschluss von Sektor 4): eine Schicht pro Tag aus **9 Karten**, eine je Sektor, die immer dunkler werden, bis nur noch Lampen und Scheinwerfer leuchten. Am selben Tag fliegen alle dieselbe Strecke mit denselben Aufträgen, und es gibt **nur einen Versuch**. Die Pflichtfahrgäste haben kein Zeitlimit; gewertet werden Wartezeit, Landungen, Hülle und knappe Vorbeiflüge, dazu übrige Taxis und Credits. Am Ende steht eine **Note von S bis E**.
+- **Sonderschicht** – der Roguelike-Modus (frei nach Abschluss von Sektor 6 oder auf Wunsch sofort beim neuen Spielstand): 9, 18 oder 27 Etappen durch alle Sektoren. An jeder Kreuzung wählst du einen Auftrag mit Zwischenfällen, die das Fluggefühl von Level zu Level teils stark verändern (heiße Düse, klemmendes Fahrwerk, träge Düsen, schwache Seitendüse, Schmierfilm …) oder ans Geld gehen (Barzahler, Steuerprüfung). Im Werkstatt-Halt gibt es Ausstattung aus 46 Teilen, dazu Pakte, Lizenzen, Dienstgrade, Überstunden-Stufen und eine Bestenliste. Seed frei wählbar; die Level bleiben die handgemachten.
 - **Level-Editor:** eigene Level bauen (Editor mit der echten Spielansicht, per Maus, Tastatur und Controller) sowie geteilte Level einlesen und spielen (Code aus der Zwischenablage oder Datei), mit strenger Prüfung und getrennt von der Karriere. Gespeichert wird nur, was der Ersteller selbst von Hand gelöst hat ([Format und Regeln](docs/COMMUNITY.md)).
 - **Sprachausgabe** für Fahrgäste (14 verschiedene Stimmen, je Fahrgast zufällig gewählt), Tankwart, Funk-Zentrale und Fluglehrer, **Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch und Polnisch** mit Untertiteln.
 - **Soundtrack** mit 23 Musikthemen in je drei Schichten (C64- und Amiga-Klang) und eigenem Musikplayer.
@@ -93,7 +97,7 @@ Godot 4.7.x und die passenden Exportvorlagen vorausgesetzt:
 ```bash
 godot --headless --import                # einmal nach dem Checkout
 godot --path .                           # Spiel starten
-godot --headless -s tests/test_runner.gd # Tests (über 3400 Prüfungen)
+godot --headless -s tests/test_runner.gd # Tests (über 4200 Prüfungen)
 tools/export_release.sh                  # Pakete für Linux, Windows, macOS nach build/release/
 ```
 
@@ -115,7 +119,8 @@ mit Qwen3-TTS (Apache-2.0); die Fluglehrer-Stimme im Tutorial und zehn weitere F
 
 GraviFare is a 2D arcade taxi game: you fly a hover taxi through **99 levels in 9 sectors**, pick up passengers, drop them
 at the right platform and land as gently as you can. Fuel costs credits, every dent costs hull – and the taxi has momentum.
-A homage to the flying-taxi genre, with its own world, levels, art and sound.
+A homage to the flying-taxi genre, with its own world, levels, art and sound. Besides the career there is a **day shift**
+and a **night shift** every day, **Overtime** as a roguelike mode and a **level editor** for your own levels.
 
 ## Trailer
 
@@ -132,6 +137,8 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 |---|---|
 | ![Main menu](docs/media/en/menu.jpg) | ![Sector 5 – heat and lava bubbles in rhythm](docs/media/en/lava.jpg) |
 | **Main menu** | **Sector 5 – heat and lava bubbles in rhythm** |
+| ![Overtime – pick a job at the crossing](docs/media/en/overtime.jpg) | ![Overtime – incident "Weak side jet": sparks fly from the left jet](docs/media/en/overtime_fly.jpg) |
+| **Overtime (roguelike) – pick a job at the crossing** | **Overtime – incidents change how the taxi handles (here: weak side jet)** |
 | ![Flight school with an instructor (voice, subtitles, hints)](docs/media/en/tutorial.jpg) | ![Sector 1 – passengers, fuel station, gate](docs/media/en/sector1.jpg) |
 | **Flight school with an instructor (voice, subtitles, hints)** | **Sector 1 – passengers, fuel station, gate** |
 | ![Sector 3 – moving platforms](docs/media/en/sector3.jpg) | ![Sector 6](docs/media/en/sector6.jpg) |
@@ -150,9 +157,10 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **Flight school:** a fully voiced tutorial with a flight instructor covers thrust, landing gear, the landing light, refuelling, the taxi station and passengers.
 - **Career with lives and credits:** fares, fuel costs, repairs, replacement taxis and a **workshop** after each sector
   (jets, hull, landing gear, headlight). Game over resets the sector and every upgrade loses one level. Special passengers: **VIP** (pays almost double, little patience) and **Emergency** (double fare, deadline in seconds).
-- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost, a **night shift** (one shift a day: 9 ever-darker maps, graded S to E), a **day shift** (a brightly lit map every day with a daily rule – windy day, fog, mirror world, thin tank, glass roof, rush hour, tailwind – and a daily goal with bronze, silver and gold, a streak with rewards and a ghost),
-  and a **garage** with paint jobs and stickers.
-- **Overtime** (roguelike, unlocked after completing sector 6, or right away when creating a new save): 9, 18 or 27 stages through all sectors, a job with incidents at every crossing (hot jet, leaky tank, radio blackout, cash only …), more than 40 parts of gear at pit stops, pacts, licenses, ranks, overtime levels and a leaderboard. Seed of your choice; the levels stay the handmade ones.
+- **Landing assist** right at the taxi, medals (time, clean, pro), best-time ghost and **watch best flight** in the level select, and a **garage** with paint jobs and stickers.
+- **Day shift** (unlocked after completing sector 1): every day a brightly lit map from the levels you have already beaten, plus a **daily rule** that changes how you fly – windy day, fog, mirror world, thin tank, glass roof, rush hour or tailwind, shuffled across the weekdays every week. A **daily goal** (express, precision, clean or profit) earns bronze, silver or gold. Fly every day to build a streak that unlocks paint jobs and stickers; your best flight of the day flies along as a ghost.
+- **Night shift** (unlocked after completing sector 4): one shift a day of **9 maps**, one per sector, getting darker until only lamps and headlights are left. Everyone flies the same route with the same jobs that day, and there is **only one attempt**. Required passengers have no time limit; you are scored on waiting time, landings, hull and near misses, plus taxis and credits left. At the end you get a **grade from S to E**.
+- **Overtime** – the roguelike mode (unlocked after completing sector 6, or right away when creating a new save): 9, 18 or 27 stages through all sectors. At every crossing you pick a job with incidents that can change how your taxi handles a lot from one level to the next (hot jet, sticky gear, sluggish jets, weak side jet, slick hull …) or go after your money (cash only, tax audit). Pit stops offer gear from 46 parts, plus pacts, licenses, ranks, overtime levels and a leaderboard. Seed of your choice; the levels stay the handmade ones.
 - **Level editor:** build your own levels (editor with the real game view, mouse, keyboard and controller) and import and play shared ones (a code from the clipboard or a file), strictly validated and kept apart from the career. A level can only be saved once its creator has solved it by hand ([format and rules](docs/COMMUNITY.md)).
 - **Voice acting** for passengers (14 different voices, chosen at random per passenger), fuel attendant, dispatch and the instructor, **German, English, French, Spanish, Italian, Portuguese and Polish** with subtitles.
 - **Soundtrack** of 23 music themes with three layers each (C64 and Amiga sound) and a music player.
@@ -179,7 +187,7 @@ Requires Godot 4.7.x and the matching export templates:
 ```bash
 godot --headless --import                # once after checkout
 godot --path .                           # run the game
-godot --headless -s tests/test_runner.gd # tests (over 3400 checks)
+godot --headless -s tests/test_runner.gd # tests (over 4200 checks)
 tools/export_release.sh                  # packages for Linux, Windows, macOS in build/release/
 ```
 
