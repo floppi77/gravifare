@@ -10,7 +10,7 @@
 | `godot --headless --path . -- --dump-input` | zeigt die zur Laufzeit registrierten Eingabeaktionen |
 | `godot --path . --rendering-driver opengl3 -- --shot=out.png --frames=40` | Screenshot für visuelle Kontrolle |
 
-**Stand (Runde 87c, 2026-11-22, Branch `rogue`):** 4209 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
+**Stand (Version 1.8.0, 2026-11-22):** 4209 Prüfungen, alle bestanden. Neu je Runde, jüngste zuerst:
 
 - **Runde 87:** Sonderschicht – Seed-Code, Etappenplan je Länge, Kreuzungen (gleiche Angebote bei gleichem Zustand, unabhängig von der Wahl, Gruppenregel, Prämie, Würfel), Halt (Pool nach Dienstgrad, Preise nach Sektor, Kauf, Neu würfeln), Wirkungen und Grenzen, Wertung, Dienstgrad, Bestenliste (`_test_round87`); Ausstattung und Zwischenfälle in TaxiSim/Run, Serienwerte bitgleich (`_test_round87_hooks`); Trennung von Karriere und Statistik, Fortsetzen, Freischaltung nach Sektor 6 und sofortige Freischaltung beim neuen Spielstand (nur Sonderschicht, Tag-/Nachtschicht bleiben zu), Texte, Hauptmenü (`_test_round87_flow`). Neues-Spiel-Übersicht: `--slots --slot-modes`, Warnung: `--slots --slot-warn`. Editor: Fahrzeugrouten mit gemeinsamem Eingang, Punkte einfügen per „+“, Enden ziehen (`_test_level_editor_screen`, `_test_editor_unified_pen`). Level 72 ist seit dem Umbau ein Handlevel (`BOT_HAND_LEVELS`). Ansicht: `--ot=cross|halt|fly|finale|menu` (siehe DESIGN.md). Fliegbarkeit der Zwischenfälle: `godot --headless -s tools/overtime_check.gd` (schreibt `data/overtime_block.json`), Wirtschaft: `godot --headless -s tools/overtime_sim.gd -- short mixed 3`.
 

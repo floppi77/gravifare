@@ -3,6 +3,52 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.8.0
+
+### Deutsch
+
+**Neu: Sonderschicht – der Roguelike-Modus**
+- Neuer Spielmodus neben Tag- und Nachtschicht: 9, 18 oder 27 Etappen durch alle neun Sektoren. An jeder Kreuzung wählst du einen Auftrag – ruhig, mittel, riskant oder als Pakt –, jeweils mit Zwischenfällen, Gefahrenzulage, Wertungsfaktor und Prämie; die Karten zeigen das Level als Vorschaubild
+- 18 Zwischenfälle, die es nur hier gibt, darunter heiße Düse, Leck im Tank, klemmendes Fahrwerk, träge Düsen, schwache Seitendüse, Schmierfilm, Funkloch, wackelige Instrumente, Säule im Takt, Barzahler und Steuerprüfung. Angeboten werden sie nur auf Leveln, die damit lösbar bleiben
+- Werkstatt-Halt nach jedem Sektor: 46 Ausstattungsteile (gewöhnlich, selten, legendär) für Düsen, Tank, Hülle, Landung, Fahrgäste und den Lauf selbst; neu würfeln oder einen Zwischenfall streichen
+- Sechs Lizenzen, Dienstgrade 0 bis 20 mit Namen, Überstunden-Stufen, Bestenliste je Spielstand mit nachvollziehbarer Punktzahl und neun eigene Erfolge
+- Seed als Code frei wählbar, Abbrechen jederzeit, Fortsetzen am Beginn der Etappe
+- Lizenz und Ausstattung sind am Taxi zu sehen; das Pausenmenü zeigt alle Wirkungen in Zahlen
+- Frei nach Abschluss von Sektor 6 – oder beim Anlegen eines neuen Spielstands sofort, für alle, die nur den Roguelike-Modus spielen möchten
+- Getrennt von der Karriere: Credits, Werkstatt, Medaillen und Statistik bleiben unberührt
+
+**Spiel**
+- Neuer Spielstand: Übersicht aller Spielmodi mit kurzer Erklärung und wann sie frei werden
+- Hauptmenü dreispaltig; Spielstand, Ko-fi und „Bug melden“ als Symbole unten rechts (mit Hilfetext, auch per Controller)
+- Anzeige oben: der Spielmodus als Symbol statt als Schriftzug, lange Levelnamen werden gekürzt
+- Wandernde Schleusen (z. B. Level 52 „Gussform“) schieben das Taxi jetzt mit, statt es hinauszuschleudern; bisherige Bestflüge und Geister laufen unverändert
+- Level 72 „Expresslinie“ umgebaut: deutlich mehr Verkehr auf zwei Routen
+
+**Level-Editor**
+- Fahrzeugrouten: Zwischenpunkte lassen sich über einen „+“-Griff in der Streckenmitte einfügen, mehrere Routen können denselben Eingang nutzen
+
+### English
+
+**New: Overtime – the roguelike mode**
+- A new mode next to Day and Night shift: 9, 18 or 27 stages through all nine sectors. At every crossing you pick a job – calm, medium, risky or a pact – each with incidents, hazard pay, a score multiplier and a reward; the cards show a preview image of the level
+- 18 incidents found only here, among them hot jet, leaky tank, sticky gear, sluggish jets, weak side jet, slick hull, radio blackout, shaky gauges, timed pump, cash only and tax audit. They are only offered on levels that stay solvable with them
+- Pit stop after every sector: 46 parts of gear (common, rare, legendary) for jets, tank, hull, landing, passengers and the run itself; reroll or strike an incident
+- Six licenses, ranks 0 to 20 with names, overtime levels, a leaderboard per save with a transparent score, and nine achievements of its own
+- Seed as a code of your choice, quit any time, continue at the start of the stage
+- License and gear are visible on the taxi; the pause menu shows every effect in numbers
+- Unlocked after completing sector 6 – or right away when creating a new save, for everyone who only wants to play the roguelike mode
+- Separate from the career: credits, workshop, medals and statistics stay untouched
+
+**Game**
+- New save: an overview of all modes with a short explanation and when they unlock
+- Main menu in three columns; save slot, Ko-fi and "Report a bug" as icons in the bottom right (with help text, controller included)
+- Top bar: the game mode as an icon instead of a label, long level names are shortened
+- Wandering locks (e.g. level 52 "Casting Mold") now push the taxi along instead of throwing it out; existing best flights and ghosts play back as before
+- Level 72 "Express Line" rebuilt: a lot more traffic on two routes
+
+**Level editor**
+- Vehicle routes: waypoints can be inserted with a "+" handle in the middle of each segment, and several routes can share one entry
+
 ## 1.7.1
 
 ### Deutsch
