@@ -15,6 +15,7 @@ A hover-taxi arcade game in Godot 4.7 – inertia, gravity, precise landings.</p
 </p>
 
 <p align="center">
+  <a href="https://floppi77.itch.io/gravifare"><b>▶ Im Browser spielen · Play in browser</b></a> &nbsp;·&nbsp;
   <a href="https://github.com/floppi77/gravifare/releases/latest"><b>⬇ Download (Windows · Linux · macOS)</b></a>
 </p>
 
@@ -78,6 +79,9 @@ Alles im Trailer stammt aus dem echten Spiel und den 99 handgemachten Leveln (Au
 - **Bug melden** direkt aus dem Hauptmenü: öffnet eine E-Mail mit Betreff und Systemangaben, dazu der Protokollordner.
 
 ## Herunterladen und spielen
+
+**Direkt im Browser:** Auf [itch.io](https://floppi77.itch.io/gravifare) läuft das vollständige Spiel ohne Installation im Browser
+(nur Englisch; Spielstände bleiben im Browser gespeichert). Die Download-Fassung unten spricht alle sieben Sprachen.
 
 Unter [Releases](https://github.com/floppi77/gravifare/releases/latest) liegen fertige Pakete für **Windows (x86-64)**,
 **Linux (x86-64)** und **macOS (Apple Silicon und Intel)**. Entpacken und starten:
@@ -168,6 +172,9 @@ Everything in the trailer comes from the real game and its 99 handmade levels (a
 - **Display:** 16:9, 1440p/2160p and ultrawide, three save slots.
 
 ## Download and play
+
+**Right in your browser:** on [itch.io](https://floppi77.itch.io/gravifare) the complete game runs in the browser without installing anything
+(English only; saves are kept in the browser). The download version below speaks all seven languages.
 
 Ready-made packages for **Windows (x86-64)**, **Linux (x86-64)** and **macOS (Apple Silicon and Intel)** are on the
 [Releases](https://github.com/floppi77/gravifare/releases/latest) page. Unzip and run:
