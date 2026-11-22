@@ -895,6 +895,29 @@ func set_path_point(ref: Dictionary, idx: int, p: Vector2) -> void:
 		pts[idx][1] = snappedf(clampf(p.y, -8.0, 64.0), 0.01)
 		_mark_changed())
 
+## Mittelpunkt der Strecke (Pfadpunkt k → k+1), dessen Einfüge-Griff höchstens `radius` von `p` entfernt liegt; -1 wenn keiner.
+func path_mid_near(ref: Dictionary, p: Vector2, radius: float) -> int:
+	var best := -1
+	var best_d := radius
+	var pts := path_points(ref)
+	for k in range(pts.size() - 1):
+		var m := (Vector2(pts[k][0], pts[k][1]) + Vector2(pts[k + 1][0], pts[k + 1][1])) * 0.5
+		var d := m.distance_to(p)
+		if d <= best_d:
+			best = k
+			best_d = d
+	return best
+
+## Neuen Zwischenpunkt an Stelle `idx` einfügen (zwischen idx-1 und idx); false, wenn der Pfad schon voll ist oder `idx` kein Innenplatz ist.
+func insert_path_point(ref: Dictionary, idx: int, p: Vector2) -> bool:
+	var pts := path_points(ref)
+	if pts.size() < 2 or pts.size() >= CL.MAX_PATH_POINTS or idx < 1 or idx > pts.size() - 1:
+		return false
+	_edit(func():
+		pts.insert(idx, [snappedf(clampf(p.x, -8.0, 64.0), 0.01), snappedf(clampf(p.y, -8.0, 64.0), 0.01)])
+		_mark_changed())
+	return true
+
 func remove_path_point(ref: Dictionary, idx: int) -> void:
 	var pts := path_points(ref)
 	if pts.size() <= 2 or idx < 0 or idx >= pts.size():

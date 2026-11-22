@@ -96,6 +96,7 @@ var kind_btns: Array = []
 var drag_mode := ""                         # "move" | "size" | "point"
 var drag_origin := Vector2i.ZERO
 var drag_point := -1
+var drag_new_at := Vector2i(-1, -1)          # Klick auf ein Pfadende in der Wand (Fahrzeug gewählt): ohne Ziehen beginnt dort eine neue Route
 var veh_pts: Array = []                     # Fahrzeugpfad im Bau: Eingang, Zwischenpunkte (Feldmittelpunkte)
 var stroke_mode := 0                        # Zeichenmodus des laufenden Strichs (Linie, Rechteck, Füllen)
 var pal_btns: Array = []
@@ -1188,8 +1189,26 @@ func _begin_object(erase: bool, at: Vector2i) -> void:
 			active = true
 			drag_mode = "point"
 			drag_point = pj
+			var ends: bool = pj == 0 or pj == model.path_points(obj_ref).size() - 1
+			# Eingang/Ausgang in der Wand bei gewähltem Fahrzeug: Ziehen verschiebt den Punkt, ein Klick ohne Ziehen beginnt dort eine neue Route (gemeinsamer Eingang)
+			drag_new_at = at if LevelEdit.KINDS[kind_idx] == "vehicle" and ends and _veh_solid(at) else Vector2i(-1, -1)
 			model.begin_stroke()
 			return
+		var seg: int = model.path_mid_near(obj_ref, center, 0.8)      # Einfüge-Griff „+“ in der Mitte einer Strecke: neuer Zwischenpunkt, gleich ziehbar
+		if seg >= 0:
+			model.begin_stroke()
+			if model.insert_path_point(obj_ref, seg + 1, center):
+				active = true
+				drag_mode = "point"
+				drag_point = seg + 1
+				_changed_soft()
+			else:
+				model.end_stroke()
+				_say(tr("ED_PATH_FULL"))
+			return
+	if LevelEdit.KINDS[kind_idx] == "vehicle" and _veh_solid(at):
+		_veh_click(at)                                                # Fahrzeug gewählt, Klick auf Wand/Rand: immer ein neuer Eingang, auch wenn dort schon ein Pfad oder eine Zone liegt
+		return
 	var ref: Dictionary = model.pick_object(at.x, at.y)
 	if not ref.is_empty():
 		if not model.same_ref(ref, obj_ref):
@@ -1231,8 +1250,10 @@ func _move_stroke(at: Vector2i) -> void:
 				model.size_object(obj_ref, drag_origin, at)
 				moved = true
 			"point":
-				model.set_path_point(obj_ref, drag_point, Vector2(at) + Vector2(0.5, 0.5))
-				moved = true
+				if at != drag_new_at:
+					drag_new_at = Vector2i(-1, -1)
+					model.set_path_point(obj_ref, drag_point, Vector2(at) + Vector2(0.5, 0.5))
+					moved = true
 		if moved:
 			_refresh_param_vals()
 			_changed_soft()
@@ -1253,6 +1274,11 @@ func _end_stroke() -> void:
 	if page == 1:
 		model.end_stroke()
 		drag_mode = ""
+		if drag_new_at.x >= 0:
+			var at := drag_new_at
+			drag_new_at = Vector2i(-1, -1)
+			_veh_click(at)
+			return
 		_rebuild_params()
 		_changed()
 		return
@@ -1460,6 +1486,13 @@ func _draw_path(pts: Array, cs: float, col: Color, final: bool, cursor_p := Vect
 		overlay.draw_line(_pt(pts[i]) * cs, _pt(pts[i + 1]) * cs, col, 2.0)
 	if cursor_p != Vector2.INF and not pts.is_empty():
 		overlay.draw_dashed_line(_pt(pts[pts.size() - 1]) * cs, cursor_p * cs, Color(col.r, col.g, col.b, 0.6), 1.0, 3.0)
+	if final:                                                         # gewählter Pfad: Einfüge-Griffe in der Mitte jeder Strecke
+		for i in range(pts.size() - 1):
+			var m := (_pt(pts[i]) + _pt(pts[i + 1])) * 0.5 * cs
+			overlay.draw_circle(m, 3.0, Color(0.02, 0.03, 0.1, 0.85))
+			overlay.draw_circle(m, 3.0, col, false, 1.0)
+			overlay.draw_line(m - Vector2(1.8, 0), m + Vector2(1.8, 0), Color.WHITE, 1.0)
+			overlay.draw_line(m - Vector2(0, 1.8), m + Vector2(0, 1.8), Color.WHITE, 1.0)
 	for i in pts.size():
 		var p := _pt(pts[i]) * cs
 		var last := final and i == pts.size() - 1

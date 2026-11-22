@@ -130,12 +130,13 @@ const BOT_FUEL_OVERRIDE := {"s4_05": 38.0, "s8_08": 38.0, "s9_05": 40.0, "s5_11"
 ## Runde 65: Lava trifft schon am Rumpf (9 je 0,25 s); in Level 50 und 51 streift der Autopilot die pulsierende Lava über Pad 6 bzw. am Engpass,
 ## liefert aber alle Fahrgäste ab. Dort genügt eine Resthülle über 45 %.
 ## Level 94 (s9_06) am 2026-11-18 vom Entwickler mit neuen Aufträgen umgebaut (Autopilot scheitert, Handlösung).
+## Level 72 (s7_06) am 2026-11-22 vom Entwickler umgebaut (vier Fahrzeuge auf der Expresslinie, Tempo 56): Handlösung, Autopilot scheitert am dichten Verkehr.
 ## Level 52 (s5_08) hat der Entwickler am 2026-11-13 von Hand umgebaut (Lava und Plattform versetzt): seitdem in BOT_HAND_LEVELS; ebenso Level 69, 75, 76 (2026-11-14, Balance Sektor 7).
 const BOT_LENIENT := {"s9_11": [2, 90.0], "s8_03": [1, 75.0], "s5_06": [1, 45.0], "s5_07": [1, 45.0]}
 
 ## Von Hand gebaute Level (Stand 2026-11), die der Autopilot ab 35 % Sprit nicht oder nicht sauber schafft (lange Wartezeiten an Wandertoren, Strahlen und Fahrzeugbahnen,
 ## Zapfsäule weit weg). Der Entwickler hat sie alle selbst gelöst; für sie wird nur die statische Lösbarkeit geprüft. Alle anderen Level muss der Autopilot weiter lösen.
-const BOT_HAND_LEVELS := ["s7_03", "s7_09", "s7_10", "s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04", "s9_06"]
+const BOT_HAND_LEVELS := ["s7_06", "s7_03", "s7_09", "s7_10", "s5_08", "s2_05", "s3_03", "s3_05", "s3_09", "s3_10", "s4_06", "s8_01", "s8_02", "s8_05", "s8_06", "s8_07", "s8_08", "s8_09", "s8_10", "s9_01", "s9_02", "s9_03", "s9_04", "s9_07", "s9_08", "s9_11", "s6_04", "s9_06"]
 ## Runde 60: Level, die der Autopilot mit der strengen Tankregel (unter 35 % gratis nur ohne Geld) ab Mindest-Sprit nicht mehr löst. Er tankt erst, wenn
 ## Credits da sind, zahlt dann auch unter 35 % und fliegt mit zu wenig Sprit los. Der Auftraggeber verlangt hier keine Autopilot-Lösung (2026-11-10);
 ## geprüft wird die Fliegbarkeit mit Regelstand 2 (Tankregel und Aufträge wie bis 1.0.1) und die statische Lösbarkeit; das Ergebnis mit den neuen Regeln wird nur ausgegeben.
@@ -1067,6 +1068,13 @@ func _test_round87_flow() -> void:
 	var ssel := FileAccess.get_file_as_string("res://src/ui/slot_select.gd")
 	check(ssel.contains("_show_modes(n)") and ssel.contains("Save.unlock_ot_early()") and ssel.contains("_focus(no)") and ssel.contains('"SLOT_MODE_SHIFT_D"') and ssel.contains('"SLOT_MODE_OT_D"'),
 		"Neuer Spielstand: Übersicht der Modi, Sofort-Sonderschicht nur nach Warnung (Fokus auf Zurück)")
+	var rogue_all := true
+	for lg in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		var dj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lg))
+		for k in ["SLOT_MODE_CAREER_X", "SLOT_MODE_DAILY_X", "SLOT_MODE_SHIFT_X", "SLOT_COL_MODE", "SLOT_COL_WHAT", "SLOT_COL_WHEN", "SLOT_OT_WARN"]:
+			rogue_all = rogue_all and String(dj.get(k, "")) != ""
+		rogue_all = rogue_all and String(dj.get("SLOT_MODE_OT_X", "")).to_lower().contains("roguelike")
+	check(rogue_all, "Modus-Übersicht: alle Modi kurz erklärt, Sonderschicht als Roguelike-Modus benannt (7 Sprachen)")
 	var sv_src := FileAccess.get_file_as_string("res://src/core/save.gd")
 	check(sv_src.contains('data["ot_early"] = true\n\twrite()'), "Sofort-Freischaltung wird im Spielstand gespeichert")
 	# Quelltext: Karriere bleibt außen vor
@@ -6663,6 +6671,38 @@ func _test_level_editor_screen() -> void:
 		ed._obj_add()
 	check(ed.model.movers.size() + ed.model.zones.size() == 10, "Editor-Bildschirm: alle Arten lassen sich setzen (das Fahrzeug braucht einen Pfad)")
 	ed._veh_cancel()
+	# Fahrzeugrouten: zweite Route am selben Eingang, Punkte einfügen und Enden ziehen
+	ed.kind_idx = LevelEdit_KINDS().find("vehicle")
+	var nveh: int = ed.model.movers.size()
+	for c in [Vector2i(0, 12), Vector2i(10, 12), Vector2i(39, 12)]:
+		ed._begin(false, c)
+		ed._end_stroke()
+	var ra: Dictionary = ed.obj_ref
+	check(ed.model.movers.size() == nveh + 1 and ed.model.path_points(ra).size() == 3 and ed.veh_pts.is_empty(), "Editor-Bildschirm: Fahrzeugroute anlegen")
+	ed._begin(false, Vector2i(0, 12))
+	ed._end_stroke()
+	check(ed.veh_pts.size() == 1 and ed.model.path_points(ra)[0][0] == 0.5, "Editor-Bildschirm: Klick auf den Eingang der gewählten Route beginnt eine neue Route dort")
+	for c in [Vector2i(20, 4), Vector2i(39, 4)]:
+		ed._begin(false, c)
+		ed._end_stroke()
+	var rb: Dictionary = ed.obj_ref
+	check(ed.model.movers.size() == nveh + 2 and not ed.model.same_ref(ra, rb) and ed.model.path_points(rb)[0] == ed.model.path_points(ra)[0], "Editor-Bildschirm: zwei Routen mit gemeinsamem Eingang")
+	ed._select_obj(ra)
+	ed._begin(false, Vector2i(39, 4))
+	ed._end_stroke()
+	check(ed.veh_pts.size() == 1, "Editor-Bildschirm: Fahrzeug gewählt, Klick auf eine Wand mit fremdem Pfadende beginnt eine neue Route")
+	ed._veh_cancel()
+	ed._select_obj(rb)
+	ed._begin(false, Vector2i(10, 8))                 # Mitte der Strecke Eingang → (20,4)
+	ed._move_stroke(Vector2i(10, 10))
+	ed._end_stroke()
+	check(ed.model.path_points(rb).size() == 4 and ed.model.path_points(rb)[1][0] == 10.5 and ed.model.path_points(rb)[1][1] == 10.5, "Editor-Bildschirm: „+“ ziehen fügt einen Zwischenpunkt ein")
+	ed._undo_redo(true)
+	check(ed.model.path_points(rb).size() == 3, "Editor-Bildschirm: Einfügen lässt sich rückgängig machen")
+	ed._begin(false, Vector2i(39, 4))
+	ed._move_stroke(Vector2i(39, 6))
+	ed._end_stroke()
+	check(ed.veh_pts.is_empty() and ed.model.path_points(rb)[2][1] == 6.5, "Editor-Bildschirm: Pfadende ziehen verschiebt es (keine neue Route)")
 	ed._set_page(2)
 	ed._job_mode()
 	check(not ed.model.jobs.is_empty() and ed.job_box.get_child_count() >= ed.model.jobs.size() * 6, "Editor-Bildschirm: Auftragsliste wird eigene Aufträge")
@@ -6902,6 +6942,14 @@ func _test_editor_unified_pen() -> void:
 	var p0y: float = m.path_points(v)[0][1]
 	m.move_object(v, 1, 1)
 	check(m.path_points(v)[0][0] == p0x + 1.0 and m.path_points(v)[0][1] == p0y + 1.0, "Stift: das ganze Fahrzeug lässt sich verschieben")
+	var pa := Vector2(m.path_points(v)[0][0], m.path_points(v)[0][1])
+	var pb := Vector2(m.path_points(v)[1][0], m.path_points(v)[1][1])
+	check(m.path_mid_near(v, (pa + pb) * 0.5 + Vector2(0.3, 0.3), 0.8) == 0 and m.path_mid_near(v, pa, 0.8) == -1, "Stift: Einfüge-Griff in der Streckenmitte erkennen")
+	check(m.insert_path_point(v, 1, Vector2(15.5, 10.5)) and m.path_points(v).size() == 3 and m.path_points(v)[1][0] == 15.5 and not m.insert_path_point(v, 0, Vector2(1, 1)),
+		"Stift: Zwischenpunkt einfügen (nur zwischen Eingang und Ausgang)")
+	while m.path_points(v).size() < 16:
+		m.insert_path_point(v, 1, Vector2(15.5, 10.5))
+	check(not m.insert_path_point(v, 1, Vector2(16.5, 10.5)) and m.path_points(v).size() == 16, "Stift: höchstens 16 Pfadpunkte")
 	# Größe beim Setzen
 	var m2 = LE.blank()
 	var w: Dictionary = m2.add_object("wind", 10, 6)

@@ -12,6 +12,11 @@ var row: HBoxContainer
 var dialog: Control = null
 var osk: Control = null
 var back_btn: Control = null
+var head: Label
+const MODE_COL_NAME := 106.0                 # Spaltenbreiten der Modus-Übersicht (640er Raster)
+const MODE_COL_TEXT := 274.0
+const MODE_COL_WHEN := 114.0
+const MODE_GAP := 10
 var dialog_back: Callable = Callable()     # B/Esc im Dialog: dorthin zurück (leer: Dialog schließen)
 
 func _ready() -> void:
@@ -22,7 +27,7 @@ func _ready() -> void:
 	add_child(logo)
 	logo.position = Vector2(170, 10)
 	logo.size = Vector2(300, 90)
-	var head := MenuKit.screen_title(tr("SLOT_TITLE"))
+	head = MenuKit.screen_title(tr("SLOT_TITLE"))
 	head.position = Vector2(0, 98)
 	head.size = Vector2(640, 26)
 	add_child(head)
@@ -210,35 +215,85 @@ func _ask_name(n: int, create: bool) -> void:
 ## Neues Spiel: Übersicht, ab wann Tag-, Nacht- und Sonderschicht frei werden. Wer nur die Sonderschicht (Roguelike) spielen will,
 ## schaltet sie hier nach einer Warnung sofort frei; das gilt dauerhaft für diesen Spielstand (Save.ot_early), Tag- und Nachtschicht bleiben gesperrt.
 func _show_modes(n: int) -> void:
-	_swap_dialog(Vector2(110, 120), Vector2(420, 200), 4)
+	_swap_dialog(Vector2(50, 92), Vector2(540, 262), 5)
+	head.visible = false                                       # eigene Überschrift; der Platz geht an die Erklärungen
 	dialog_back = _close_dialog
 	dialog.add_child(MenuKit.title(tr("SLOT_MODES_TITLE"), 14))
-	var g := GridContainer.new()
-	g.columns = 3
-	g.add_theme_constant_override("h_separation", 6)
-	g.add_theme_constant_override("v_separation", 3)
-	g.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	for m in [["career", "SLOT_MODE_CAREER", "SLOT_MODE_CAREER_D"], ["daily", "MENU_DAILY", "SLOT_MODE_DAILY_D"],
-			["shift", "MENU_SHIFT", "SLOT_MODE_SHIFT_D"], ["overtime", "MENU_OVERTIME", "SLOT_MODE_OT_D"]]:
+	# Tabelle: Kopfzeile, dann je Modus ein eigener Kasten (abwechselnd heller, links ein Streifen in der Farbe des Modus)
+	var table := VBoxContainer.new()
+	table.add_theme_constant_override("separation", 3)
+	table.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", MODE_GAP)
+	var hm := MarginContainer.new()
+	hm.add_theme_constant_override("margin_left", 9)
+	hm.add_child(hdr)
+	for c in [["SLOT_COL_MODE", MODE_COL_NAME, HORIZONTAL_ALIGNMENT_LEFT], ["SLOT_COL_WHAT", MODE_COL_TEXT, HORIZONTAL_ALIGNMENT_LEFT], ["SLOT_COL_WHEN", MODE_COL_WHEN, HORIZONTAL_ALIGNMENT_RIGHT]]:
+		var hl := _label(tr(String(c[0])).to_upper(), 7, Color("#8b97c9"), 0.0)
+		hl.custom_minimum_size = Vector2(float(c[1]), 0)
+		hl.horizontal_alignment = c[2]
+		hdr.add_child(hl)
+	table.add_child(hm)
+	var modes := [["career", "SLOT_MODE_CAREER", "SLOT_MODE_CAREER_X", "SLOT_MODE_CAREER_D"], ["daily", "MENU_DAILY", "SLOT_MODE_DAILY_X", "SLOT_MODE_DAILY_D"],
+			["shift", "MENU_SHIFT", "SLOT_MODE_SHIFT_X", "SLOT_MODE_SHIFT_D"], ["overtime", "MENU_OVERTIME", "SLOT_MODE_OT_X", "SLOT_MODE_OT_D"]]
+	for i in modes.size():
+		var m: Array = modes[i]
+		var col: Color = HudScript.MODE_COLORS[m[0]]
+		var cell := PanelContainer.new()
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.06, 0.07, 0.18, 0.9 if i % 2 == 0 else 0.78)
+		sb.border_color = col
+		sb.border_width_left = 3
+		sb.set_corner_radius_all(4)
+		sb.content_margin_left = 6.0
+		sb.content_margin_right = 7.0
+		sb.content_margin_top = 4.0
+		sb.content_margin_bottom = 4.0
+		cell.add_theme_stylebox_override("panel", sb)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", MODE_GAP)
+		var nm := HBoxContainer.new()
+		nm.add_theme_constant_override("separation", 5)
+		nm.custom_minimum_size = Vector2(MODE_COL_NAME, 0)
 		var ic := ModeIcon.new()
 		ic.mode = String(m[0])
-		ic.custom_minimum_size = Vector2(10, 10)
+		ic.custom_minimum_size = Vector2(12, 14)
 		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		g.add_child(ic)
-		g.add_child(_label(tr(String(m[1])), 10, HudScript.MODE_COLORS[m[0]], 0.0))
-		g.add_child(_label(tr(String(m[2])), 9, Color("#c4d0ff"), 0.0))
-	dialog.add_child(g)
-	var sp := Control.new()
-	sp.custom_minimum_size = Vector2(0, 4)
-	dialog.add_child(sp)
+		nm.add_child(ic)
+		var nl := _label(tr(String(m[1])), 10, col, 0.0)
+		nl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		nm.add_child(nl)
+		row.add_child(nm)
+		var d := _label(tr(String(m[2])), 8, Color("#d3dcff"), 0.0)
+		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		d.add_theme_constant_override("line_spacing", 0)
+		d.custom_minimum_size = Vector2(MODE_COL_TEXT, 0)
+		d.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(d)
+		var w := _label(tr(String(m[3])), 8, Color("#9fe6a0") if m[0] == "career" else Color("#ffe14a"), 0.0)
+		w.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		w.add_theme_constant_override("line_spacing", 0)
+		w.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		w.custom_minimum_size = Vector2(MODE_COL_WHEN, 0)
+		w.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(w)
+		cell.add_child(row)
+		table.add_child(cell)
+	dialog.add_child(table)
+	var btns := HBoxContainer.new()                            # nebeneinander, damit auch lange Erklärungen (fr, pl) Platz haben
+	btns.alignment = BoxContainer.ALIGNMENT_CENTER
+	btns.add_theme_constant_override("separation", 8)
 	var go := MenuKit.button(tr("SLOT_MODES_GO"), func(): chosen.call(n))
-	dialog.add_child(go)
-	dialog.add_child(MenuKit.button(tr("SLOT_OT_NOW"), func(): _warn_ot(n)))
+	go.custom_minimum_size.x = maxf(go.custom_minimum_size.x, 120.0)
+	btns.add_child(go)
+	btns.add_child(MenuKit.button(tr("SLOT_OT_NOW"), func(): _warn_ot(n)))
+	dialog.add_child(btns)
 	_focus(go)
 
 ## Warnung vor der sofortigen Sonderschicht; „Zurück“ hat den Fokus.
 func _warn_ot(n: int) -> void:
 	_swap_dialog(Vector2(130, 130), Vector2(380, 170), 6)
+	head.visible = true
 	dialog_back = func(): _show_modes(n)
 	dialog.add_child(MenuKit.title(tr("SLOT_OT_WARN_TITLE"), 14))
 	dialog.add_child(_label(tr("SLOT_OT_WARN"), 9, Color("#ffcf8a"), 360.0))
@@ -253,6 +308,8 @@ func _warn_ot(n: int) -> void:
 ## Disketten und „Zurück“ ein- oder ausblenden (während eines Dialogs zählt nur dessen eigener Zurück-Knopf).
 func _show_row(on: bool) -> void:
 	row.visible = on
+	if on and head != null:
+		head.visible = true
 	if back_btn != null:
 		back_btn.visible = on
 
@@ -286,11 +343,12 @@ class ModeIcon extends Control:
 	func _draw() -> void:
 		var g: Array = HudScript.MODE_ICONS[mode]
 		var c: Color = HudScript.MODE_COLORS[mode]
-		var k := size.x / 8.0
+		var k := minf(size.x, size.y) / 8.0
+		var oy := (size.y - 8.0 * k) * 0.5
 		for yy in 8:
 			for xx in 8:
 				if String(g[yy])[xx] == "#":
-					draw_rect(Rect2(xx * k, yy * k, k, k), c)
+					draw_rect(Rect2(xx * k, oy + yy * k, k, k), c)
 
 ## Controller: Bildschirmtastatur für den Namen.
 func _open_osk(edit: LineEdit) -> void:
