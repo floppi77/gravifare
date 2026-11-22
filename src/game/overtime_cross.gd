@@ -84,7 +84,7 @@ func _build(focus := 0) -> void:
 	var gap := 8.0
 	var w := (600.0 - gap * float(n - 1)) / float(maxi(n, 1))
 	for i in n:
-		var b := _card(i, offers[i], Rect2(20.0 + float(i) * (w + gap), 60, w, 196))
+		var b := _card(i, offers[i], Rect2(20.0 + float(i) * (w + gap), 58, w, 190))
 		cards.append(b)
 		stage_c.add_child(b)
 	for i in n:
@@ -92,8 +92,9 @@ func _build(focus := 0) -> void:
 		b.focus_neighbor_left = cards[(i - 1 + n) % n].get_path()
 		b.focus_neighbor_right = cards[(i + 1) % n].get_path()
 	desc = Label.new()
-	desc.position = Vector2(24, 262)
-	desc.size = Vector2(592, 54)
+	desc.position = Vector2(24, 252)
+	desc.size = Vector2(592, 66)
+	desc.clip_text = true
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.add_theme_font_size_override("font_size", 8)
 	desc.add_theme_color_override("font_color", Color("#a9b8ff"))
@@ -216,16 +217,41 @@ func _card(i: int, o: Dictionary, r: Rect2) -> Button:
 	v.position = Vector2(8, 6)
 	v.size = r.size - Vector2(16, 12)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	v.add_theme_constant_override("separation", 3)
+	v.add_theme_constant_override("separation", 2)
 	b.add_child(v)
 	var tg := _lbl(tier[0], 8, col)
 	v.add_child(tg)
 	var nm := _lbl(tr("TRANS_LEVEL") % [lvl.number if lvl != null else 0, lvl.display_name(lang) if lvl != null else String(o.level)], 10, Color.WHITE)
-	nm.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	nm.clip_text = true                                    # einzeilig, lange Namen mit „…“ (sonst rutscht unten die Prämie aus der Karte)
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.custom_minimum_size = Vector2(r.size.x - 16.0, 0)
 	v.add_child(nm)
+	var shot := "res://assets/art/levels/%s.jpg" % String(o.level)
+	var pic := Control.new()                                 # Vorschaubild in fester Größe (alle Karten gleich), sonst der gezeichnete Grundriss
 	var cs: Array = (o.curses as Array).duplicate()
 	if String(o.get("pact", "")) != "":
 		cs.append(String(o.pact))
+	var n := Overtime.offer_curse_count(st, o)
+	var rows := maxi(1, cs.size()) + (1 if n > 0 else 0) + 1 + (1 if String(o.get("reward", "")) != "" else 0)
+	pic.custom_minimum_size = Vector2(0, clampf(174.0 - 17.0 * float(1 + rows) - 24.0, 26.0, 50.0))   # bei drei Zwischenfällen wird das Bild flacher, damit die Prämie in der Karte bleibt
+	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(pic)
+	if ResourceLoader.exists(shot):
+		var tr_img := TextureRect.new()
+		tr_img.texture = load(shot)
+		tr_img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr_img.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		tr_img.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tr_img.set_anchors_preset(Control.PRESET_FULL_RECT)
+		pic.add_child(tr_img)
+	elif lvl != null:
+		var mm := MiniMap.new()
+		mm.lvl = lvl
+		mm.edge = (SectorLook.of(lvl.sector).edge as Color)
+		mm.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mm.set_anchors_preset(Control.PRESET_FULL_RECT)
+		pic.add_child(mm)
 	if cs.is_empty():
 		v.add_child(_lbl(tr("OT_NO_CURSE"), 8, COL_CALM))
 	for c in cs:
@@ -245,21 +271,15 @@ func _card(i: int, o: Dictionary, r: Rect2) -> Button:
 	fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(fill)
-	if lvl != null:
-		var mm := MiniMap.new()                          # Grundriss des Levels: Fels, Plattformen, Tankstelle, Ausgang
-		mm.lvl = lvl
-		mm.edge = (SectorLook.of(lvl.sector).edge as Color)
-		mm.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		mm.set_anchors_preset(Control.PRESET_FULL_RECT)
-		fill.add_child(mm)
-	var n := Overtime.offer_curse_count(st, o)
 	if n > 0:
 		v.add_child(_lbl(tr("OT_PAY_UP") % int(o.get("zulage", Overtime.zulage(st, n))), 8, Color("#ffe14a")))
 	v.add_child(_lbl(tr("OT_SCORE_K") % _num(1.0 + Overtime.RISK_PER_CURSE * n), 8, Color("#c4d0ff")))
 	if String(o.get("reward", "")) != "":
 		var rk := "OT_REWARD_NOW" if String(o.get("pact", "")) != "" else "OT_REWARD"
 		var rl := _lbl(tr(rk) % tr("OT_PERK_%s" % String(o.reward).to_upper()), 8, OvertimeIcon.RAR_COLOR.get(String(Overtime.perk(String(o.reward)).get("rar", "c")), Color.WHITE))
-		rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rl.clip_text = true
+		rl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		rl.custom_minimum_size = Vector2(r.size.x - 16.0, 0)
 		v.add_child(rl)
 	b.pressed.connect(func(): _pick(i))
 	b.focus_entered.connect(func():
@@ -294,6 +314,8 @@ func _describe(i: int) -> void:
 	if lines.is_empty():
 		lines.append(tr("OT_CALM_D"))
 	desc.text = "\n".join(lines)
+	desc.add_theme_font_size_override("font_size", 8 if lines.size() <= 4 else 7)      # viele Zeilen: eine Stufe kleiner, damit nichts unter die Knöpfe rutscht
+	desc.add_theme_constant_override("line_spacing", 0 if lines.size() > 4 else 1)
 
 func _focused() -> int:
 	var f := get_viewport().gui_get_focus_owner()

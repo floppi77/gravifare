@@ -738,7 +738,7 @@ func _test_round87() -> void:
 	fxs.curses = ["crooked", "stingy"]
 	fxs.offer = {"zulage": 500}
 	fx = Overtime.effects(fxs)
-	check((is_equal_approx(float(fx.side_l), Overtime.CROOKED_K)) != (is_equal_approx(float(fx.side_r), Overtime.CROOKED_K)) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15), "Schiefe Düse trifft genau eine Seite; Fahrpreis nur aus Ausstattung und Zwischenfällen (Lohn ist die Gefahrenzulage)")
+	check((is_equal_approx(float(fx.side_l), Overtime.CROOKED_K)) != (is_equal_approx(float(fx.side_r), Overtime.CROOKED_K)) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15), "Schwache Seitendüse trifft genau eine Seite; Fahrpreis nur aus Ausstattung und Zwischenfällen (Lohn ist die Gefahrenzulage)")
 	var zs := Overtime.new_run(1, "short", "standard", 0, Overtime.default_meta())
 	var z1 := Overtime.zulage(zs, 2)
 	zs.perks = {"risk": 1}
@@ -803,6 +803,13 @@ func _test_round87() -> void:
 				if Overtime.blocked(String(c), String(o.level)):
 					viol.append("%s:%s" % [o.level, c])
 	check(viol.is_empty(), "Kreuzungen bieten nie einen gesperrten Zwischenfall an %s" % str(viol.slice(0, 5)))
+	Overtime._level_info["zz_wind_strong"] = {"pads": 4, "fuel": true, "movers": false, "wind_x": 45.0}
+	Overtime._level_info["zz_wind_weak"] = {"pads": 4, "fuel": true, "movers": false, "wind_x": 32.0}
+	check(not Overtime.curse_ok("crooked", "zz_wind_strong", []) and Overtime.curse_ok("crooked", "zz_wind_weak", []), "Schwache Seitendüse: nie bei dauerhaftem Seitenwind, der stärker ist als sie im Feinmodus")
+	Overtime._level_info.erase("zz_wind_strong")
+	Overtime._level_info.erase("zz_wind_weak")
+	var tool_src := FileAccess.get_file_as_string("res://tools/overtime_check.gd")
+	check(tool_src.contains("const CROOKED_CHECK_K := 0.5") and tool_src.contains("fx.side_r = CROOKED_CHECK_K"), "Prüfwerkzeug fliegt die schwache Seitendüse mit 50 % (Spielraum, z. B. an Magneten)")
 	check(Overtime.rank_of(0) == 0 and Overtime.rank_of(259) == 0 and Overtime.rank_of(260) == 1 and Overtime.rank_of(1000000) == Overtime.RANKS - 1 and Overtime.rank_xp(5) == 2500 and Overtime.licenses_for(0) == ["standard"], "Dienstgrad nach Erfahrung, Lizenzen nach Dienstgrad")
 
 func _test_round87_hooks() -> void:
@@ -825,7 +832,7 @@ func _test_round87_hooks() -> void:
 	check(turbo.vel.y < base.vel.y - 5.0, "Turbodüse: steigt schneller (%.1f gegen %.1f)" % [turbo.vel.y, base.vel.y])
 	var left: TaxiSim = fly.call({"side_l": 0.6}, Vector2(-1, 0), 30)
 	var right: TaxiSim = fly.call({"side_l": 0.6}, Vector2(1, 0), 30)
-	check(absf(left.vel.x) < absf(right.vel.x) * 0.85, "Schiefe Düse: links schwächer als rechts")
+	check(absf(left.vel.x) < absf(right.vel.x) * 0.85, "Schwache Seitendüse: links schwächer als rechts")
 	var s := TaxiSim.new()
 	s.setup(lvl)
 	s.apply_mods({"thrust_k": 1.1, "leak": 0.4, "overheat": true, "angel": 1, "spike_shield": 1, "impact_safe": 52.0})
@@ -887,7 +894,7 @@ func _test_round87_hooks() -> void:
 		res[rl] = [absf(gs.pos.x - x0), gs.hull, gs.events.any(func(e): return e.type == "scrape")]
 	check(gate.vertical and float(res[5][0]) < 0.01 and float(res[5][1]) == Tuning.HULL_MAX and bool(res[5][2]), "Regelstand 5: wandernde Schleuse schiebt das Taxi senkrecht mit, ohne Schaden")
 	check(float(res[4][0]) > 4.0 and float(res[4][1]) < Tuning.HULL_MAX, "Regelstand 4 (alte Läufe): Schleuse schleudert das Taxi wie bisher hinaus")
-	# Schiefe Düse: Funken an der schwachen Seite, sobald sie zündet (Schub nach links kommt aus der rechten Düse)
+	# Schwache Seitendüse: Funken an der schwachen Seite, sobald sie zündet (Schub nach links kommt aus der rechten Düse)
 	var tv: Node2D = load("res://src/game/taxi_view.gd").new()
 	tv._ready()                                       # ohne Baum: Partikel anlegen, wie beim Einhängen
 	var ws := TaxiSim.new()
@@ -903,7 +910,7 @@ func _test_round87_hooks() -> void:
 	tv.sync_state()
 	var fire_r: bool = tv.weak_sparks.emitting
 	tv.free()
-	check((fire_l and not fire_r) or bool(get_root().get_node("Settings").values.reduce_motion), "Schiefe Düse: Funken an der schwachen (rechten) Düse, wenn sie zündet; die starke Seite bleibt ruhig")
+	check((fire_l and not fire_r) or bool(get_root().get_node("Settings").values.reduce_motion), "Schwache Seitendüse: Funken an der schwachen (rechten) Düse, wenn sie zündet; die starke Seite bleibt ruhig")
 	var sg := TaxiSim.new()
 	sg.setup(lvl)
 	sg.apply_mods(Overtime.sim_mods(Overtime.effects({"seed": 1, "etappe": 0, "perks": {}, "license": "standard", "stage": 0, "curses": ["stickygear"], "pacts": [], "offer": {}})))
@@ -1047,7 +1054,21 @@ func _test_round87_flow() -> void:
 	all6.erase("s6_11")
 	sv.data["completed"] = all6
 	check(unlocked6 and not sv.sectors_done(ids, 6), "Sonderschicht frei genau nach allen Leveln der Sektoren 1–6")
+	# Neues Spiel: Sonderschicht sofort freischalten (gilt nur für sie, dauerhaft im Spielstand)
+	sv.data["completed"] = {}
+	var dbg: bool = sv.debug
+	sv.debug = false
+	var early_before: bool = flow.ot_unlocked()
+	sv.data["ot_early"] = true
+	check(not early_before and flow.ot_unlocked() and not sv.shift_unlocked(ids) and not sv.daily_unlocked(ids), "Sofort freigeschaltet: Sonderschicht offen, Tag- und Nachtschicht weiter gesperrt")
+	sv.data.erase("ot_early")
+	sv.debug = dbg
 	sv.data["completed"] = keep
+	var ssel := FileAccess.get_file_as_string("res://src/ui/slot_select.gd")
+	check(ssel.contains("_show_modes(n)") and ssel.contains("Save.unlock_ot_early()") and ssel.contains("_focus(no)") and ssel.contains('"SLOT_MODE_SHIFT_D"') and ssel.contains('"SLOT_MODE_OT_D"'),
+		"Neuer Spielstand: Übersicht der Modi, Sofort-Sonderschicht nur nach Warnung (Fokus auf Zurück)")
+	var sv_src := FileAccess.get_file_as_string("res://src/core/save.gd")
+	check(sv_src.contains('data["ot_early"] = true\n\twrite()'), "Sofort-Freischaltung wird im Spielstand gespeichert")
 	# Quelltext: Karriere bleibt außen vor
 	var g := FileAccess.get_file_as_string("res://src/game/game.gd")
 	check(g.contains("if Flow.overtime:\n\t\t\t_ot_continue()") and g.contains("mods = Overtime.sim_mods(ot_fx") and g.contains("Flow.shift or Flow.daily or Flow.community or Flow.overtime:\n\t\treturn 1.0"),

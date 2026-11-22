@@ -41,7 +41,7 @@ var dust: CPUParticles2D
 var puff: CPUParticles2D
 var sparks: CPUParticles2D
 var smoke: CPUParticles2D
-var weak_sparks: CPUParticles2D    # Sonderschicht, Schiefe Düse: Funkenschlag an der schwachen Seitendüse
+var weak_sparks: CPUParticles2D    # Sonderschicht, Schwache Seitendüse: Funkenschlag an der schwachen Seitendüse
 var weak_t := 0.0
 
 func _ready() -> void:
@@ -81,9 +81,10 @@ func _ready() -> void:
 	sparks.spread = 120.0
 	sparks.gravity = Vector2(0, 170)
 	add_child(sparks)
-	weak_sparks = Fx.make_particles(16, 0.35, Vector2(40, 95), 0.9, Color(1, 0.85, 0.35, 1), Color(1, 0.35, 0.1, 0.0))
-	weak_sparks.spread = 55.0
-	weak_sparks.gravity = Vector2(0, 160)
+	weak_sparks = Fx.make_particles(18, 0.28, Vector2(30, 70), 1.1, Color(1, 1, 0.85, 1), Color(1, 0.75, 0.2, 0.0))
+	weak_sparks.local_coords = true                    # bleiben an der Düse (in Weltkoordinaten blieben sie im Flug als Spur unter dem Taxi zurück)
+	weak_sparks.spread = 70.0
+	weak_sparks.gravity = Vector2(0, 120)
 	weak_sparks.emitting = false
 	add_child(weak_sparks)
 	smoke = Fx.make_particles(14, 1.3, Vector2(8, 18), 1.8, Color(0.42, 0.42, 0.5, 0.65), Color(0.2, 0.2, 0.26, 0.0), false)
@@ -184,7 +185,7 @@ func update_effects() -> void:
 	else:
 		dust.emitting = false
 
-## Schiefe Düse (Sonderschicht): An der schwachen Seitendüse schlagen Funken, sobald sie zündet, und alle paar Sekunden spuckt sie auch im Leerlauf.
+## Schwache Seitendüse (Sonderschicht): An der schwachen Seitendüse schlagen Funken, sobald sie zündet, und alle paar Sekunden spuckt sie auch im Leerlauf.
 ## Schub nach links (side_l) kommt aus der rechten Düse, Schub nach rechts (side_r) aus der linken.
 func _weak_side(fuel_ok: bool) -> void:
 	if sim == null or (sim.side_l >= 0.999 and sim.side_r >= 0.999) or sim.state == TaxiSim.State.DESTROYED or Settings.values.reduce_motion:
@@ -198,6 +199,19 @@ func _weak_side(fuel_ok: bool) -> void:
 	weak_t += Tuning.TICK
 	var sputter := fmod(weak_t, 2.6) < 0.12               # kurzes Spucken im Leerlauf
 	weak_sparks.emitting = firing or sputter
+
+## Schwache Seitendüse: helle Funkenpixel direkt an der schwachen Seitendüse (zündet sie oder spuckt sie im Leerlauf), im Pixelraster wie die Flammen.
+func _weak_spark_pixels() -> void:
+	if sim == null or weak_sparks == null or not weak_sparks.emitting or Settings.values.reduce_motion:
+		return
+	var dir := signf(weak_sparks.position.x)
+	var k := int(t * 30.0)
+	for i in 9:
+		var h := absf(sin(float(k * 13 + i * 7) * 1.7))
+		var v := absf(cos(float(k * 11 + i * 5) * 2.3))
+		var p := Vector2(dir * (17.0 + h * 10.0), -3.5 + v * 7.0 + h * h * 4.0)
+		var sz := 1.6 if i % 4 == 0 else 1.1
+		draw_rect(Rect2(p - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), Color(1, 1, 0.8) if i % 3 != 0 else Color(1, 0.65, 0.2))
 
 func sync_state() -> void:
 	## Wird einmal pro Physik-Tick aufgerufen; Position wird dank Interpolation geglättet.
@@ -317,7 +331,11 @@ func _pixel_flames(flick: float) -> void:
 			_flame_rows(Vector2(sx * 9, -5.5), Vector2(0, -1), 3.0 + 4.0 * flick, 2.6, ICE, sx)
 	if absf(flame_side) > 0.05:
 		var sd := -signf(flame_side)
-		_flame_rows(Vector2(sd * 16.0, 0), Vector2(sd, 0), 3.0 + 6.0 * absf(flame_side) * flick, 2.8, ICE, 5.0)
+		var sk := 1.0
+		if sim != null and ((sd > 0.0 and sim.side_l < 0.999) or (sd < 0.0 and sim.side_r < 0.999)):
+			sk = 0.35 + 0.65 * absf(sin(t * 37.0) * sin(t * 13.0)) if not Settings.values.reduce_motion else 0.6     # schwache Düse: die Flamme stottert
+		_flame_rows(Vector2(sd * 16.0, 0), Vector2(sd, 0), (3.0 + 6.0 * absf(flame_side) * flick) * sk, 2.8, ICE, 5.0)
+	_weak_spark_pixels()
 
 
 

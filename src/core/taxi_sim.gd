@@ -33,7 +33,7 @@ var rules := 4               # Regelstand (Run.rules): ab 4 trifft Lava schon am
 # Sonderschicht (Overtime.sim_mods): Ausstattung und Zwischenfälle. Alle Grundwerte lassen die Rechnung bitgleich (Faktor 1, Grenzen wie in Tuning).
 var thrust_k := 1.0          # Hauptdüse
 var side_k := 1.0            # Seitendüsen
-var side_l := 1.0            # Schiefe Düse: eine Seite schwächer
+var side_l := 1.0            # Schwache Seitendüse: eine Seite schwächer
 var side_r := 1.0
 var down_k := 1.0            # Bremsdüse
 var drag_k := 1.0            # Dämpfung (Schmierfilm: weniger)

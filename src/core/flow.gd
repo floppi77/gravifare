@@ -437,7 +437,7 @@ func ot_save() -> void:
 	Save.write()
 
 func ot_unlocked() -> bool:
-	return Save.debug or Save.sectors_done(level_ids(), Overtime.UNLOCK_SECTORS)
+	return Save.debug or Save.ot_early() or Save.sectors_done(level_ids(), Overtime.UNLOCK_SECTORS)
 
 func _ot_enter() -> void:
 	watch = {}

@@ -10,6 +10,7 @@ extends SceneTree
 const CHECK := ["hotjet", "stickygear", "crooked_l", "crooked_r", "leak", "heavy", "slick", "sluggish", "newroute", "pumpcycle"]
 const MILD := ["crooked_l", "crooked_r", "pumpcycle"]     # dürfen auch auf Leveln bleiben, die der Autopilot nicht ohne Weiteres schafft
 const NEWROUTE_SEEDS := [11, 22, 33]
+const CROOKED_CHECK_K := 0.5             # Schwache Seitendüse: geprüft mit 50 % statt der echten 60 % (Spielraum für Menschen, z. B. an Magneten)
 const SECONDS := 600.0
 
 func _initialize() -> void:
@@ -82,11 +83,11 @@ func _fly(id: String, c: String, seed: int) -> Dictionary:
 		st.curses = [cid]
 	var fx := Overtime.effects(st)
 	if c == "crooked_l":
-		fx.side_l = 0.6
+		fx.side_l = CROOKED_CHECK_K
 		fx.side_r = 1.0
 	elif c == "crooked_r":
 		fx.side_l = 1.0
-		fx.side_r = 0.6
+		fx.side_r = CROOKED_CHECK_K
 	if cid == "newroute":
 		var jr := RandomNumberGenerator.new()
 		jr.seed = seed

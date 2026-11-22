@@ -44,7 +44,7 @@ const AUDIT_FREE := 500
 const GOLDEN_STEP := 0.015             # Goldenes Taxameter: +1,5 % Fahrpreis je geschaffter Etappe
 const RISK_PERK_K := 2.0               # Risikoprämie: doppelte Gefahrenzulage
 const RESERVE_FUEL := 15.0
-const CROOKED_K := 0.6                # Schiefe Düse: eine Seitendüse mit 60 % Kraft
+const CROOKED_K := 0.6                # Schwache Seitendüse: eine Seitendüse mit 60 % Kraft
 
 # Wertung
 const TAXI_POINTS := 1000              # je übrigem Taxi am Ende
@@ -297,7 +297,7 @@ static func run_mods(fx: Dictionary) -> Dictionary:
 static func level_info(id: String) -> Dictionary:
 	if not _level_info.has(id):
 		var lvl := LevelData.load_file("res://data/levels/%s.json" % id)
-		var info := {"pads": 0, "fuel": false, "movers": false}
+		var info := {"pads": 0, "fuel": false, "movers": false, "wind_x": 0.0}
 		if lvl != null:
 			for pid in lvl.pads:
 				if lvl.is_passenger_pad(String(pid)):
@@ -305,6 +305,9 @@ static func level_info(id: String) -> Dictionary:
 				if bool(lvl.pads[pid].get("fuel", false)):
 					info.fuel = true
 			info.movers = lvl.has_movers()
+			for z in lvl.zones:                              # dauerhafter Seitenwind (nicht pulsierend): stärkster waagerechter Zug
+				if String(z.kind) == "wind" and not bool(z.get("cycle", false)) and (float(z.period) <= 0.0 or float(z.on) >= float(z.period)):
+					info.wind_x = maxf(float(info.wind_x), absf((z.a as Vector2).x))
 		_level_info[id] = info
 	return _level_info[id]
 
@@ -328,6 +331,8 @@ static func curse_ok(cid: String, level_id: String, taken: Array) -> bool:
 			return int(info.pads) >= 3
 		"pumpcycle":
 			return bool(info.fuel)
+		"crooked":                                       # dauerhafter Seitenwind stärker als die schwache Düse im Feinmodus: nicht anbieten
+			return float(info.get("wind_x", 0.0)) < CROOKED_K * Tuning.GEAR_THRUST_SIDE
 	return true
 
 ## Anzahl Zwischenfälle je Angebot an Etappe `e`: ruhig, mittel, riskant (riskant bringt eine Prämie).

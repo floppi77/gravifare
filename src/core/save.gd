@@ -410,6 +410,15 @@ func sectors_done(ids: Array, n: int) -> bool:
 		return String(id).begins_with("s") and sec.is_valid_int() and int(sec) <= n)
 	return not need.is_empty() and need.all(func(id): return done.has(id))
 
+## Sonderschicht beim Anlegen des Spielstands sofort freigeschaltet (nur Roguelike gewünscht); gilt dauerhaft für diesen Spielstand,
+## Tag- und Nachtschicht bleiben davon unberührt.
+func ot_early() -> bool:
+	return bool(data.get("ot_early", false))
+
+func unlock_ot_early() -> void:
+	data["ot_early"] = true
+	write()
+
 const SHIFT_UNLOCK_SECTORS := 4
 func shift_unlocked(ids: Array) -> bool:
 	var done := ever_completed()

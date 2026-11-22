@@ -4,12 +4,15 @@ extends Control
 ## darunter vergibt „✎“ einen Namen und „✕“ löscht nach Rückfrage. Ein freier Platz fragt beim ersten Mal nach einem Namen.
 ## `back` ist leer, solange noch kein Spielstand gewählt wurde.
 const Osk := preload("res://src/ui/osk.gd")
+const HudScript := preload("res://src/game/hud.gd")
 
 var chosen: Callable
 var back: Callable = Callable()
 var row: HBoxContainer
 var dialog: Control = null
 var osk: Control = null
+var back_btn: Control = null
+var dialog_back: Callable = Callable()     # B/Esc im Dialog: dorthin zurück (leer: Dialog schließen)
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -30,6 +33,11 @@ func _ready() -> void:
 	row.size = Vector2(640, 196)
 	add_child(row)
 	_build()
+	for a in OS.get_cmdline_user_args():          # Dev (Bildschirmfotos): --slot-modes / --slot-warn zeigen die Neues-Spiel-Übersicht bzw. die Warnung für Platz 3
+		if a == "--slot-modes":
+			_show_modes(3)
+		elif a == "--slot-warn":
+			_warn_ot(3)
 
 func _build() -> void:
 	for c in row.get_children():
@@ -72,10 +80,14 @@ func _build() -> void:
 		if first == null or n == Save.slot:
 			first = card
 	var bb: Control = null
+	if back_btn != null:                        # beim Neuaufbau nicht stapeln
+		back_btn.queue_free()
+		back_btn = null
 	if back.is_valid():
 		bb = MenuKit.button(tr("MENU_BACK"), func(): back.call())
 		bb.position = Vector2(256, 334)
 		add_child(bb)
+		back_btn = bb
 	_link_focus(cards, slot_btns, bb, cards.find(first))
 	_focus(first)
 
@@ -129,7 +141,7 @@ func _focus(c: Control) -> void:
 		c.grab_focus()
 
 func _ask_delete(n: int) -> void:
-	row.visible = false
+	_show_row(false)
 	dialog = VBoxContainer.new()
 	dialog.alignment = BoxContainer.ALIGNMENT_CENTER
 	dialog.add_theme_constant_override("separation", 5)
@@ -154,7 +166,7 @@ func _ask_delete(n: int) -> void:
 
 ## Name eines Spielstands eingeben. `create`: freier Platz, danach wird er gewählt (auch „Ohne Namen“).
 func _ask_name(n: int, create: bool) -> void:
-	row.visible = false
+	_show_row(false)
 	dialog = VBoxContainer.new()
 	dialog.alignment = BoxContainer.ALIGNMENT_CENTER
 	dialog.add_theme_constant_override("separation", 6)
@@ -182,7 +194,7 @@ func _ask_name(n: int, create: bool) -> void:
 	var finish := func(name_text: String, proceed: bool):
 		Save.rename_slot(n, name_text)
 		if proceed:
-			chosen.call(n)
+			_show_modes(n)
 		else:
 			_close_dialog()
 	edit.text_submitted.connect(func(t): finish.call(t, create))
@@ -190,10 +202,95 @@ func _ask_name(n: int, create: bool) -> void:
 	dialog.add_child(ok)
 	dialog.add_child(MenuKit.button("⌨ " + tr("SLOT_KEYBOARD"), func(): _open_osk(edit)))
 	if create:
-		dialog.add_child(MenuKit.button(tr("SLOT_NO_NAME"), func(): chosen.call(n)))
+		dialog.add_child(MenuKit.button(tr("SLOT_NO_NAME"), func(): _show_modes(n)))
 	dialog.add_child(MenuKit.button(tr("SLOT_NO"), _close_dialog))
 	add_child(dialog)
 	_focus(edit if Controls.last_device == "keyboard" else ok)
+
+## Neues Spiel: Übersicht, ab wann Tag-, Nacht- und Sonderschicht frei werden. Wer nur die Sonderschicht (Roguelike) spielen will,
+## schaltet sie hier nach einer Warnung sofort frei; das gilt dauerhaft für diesen Spielstand (Save.ot_early), Tag- und Nachtschicht bleiben gesperrt.
+func _show_modes(n: int) -> void:
+	_swap_dialog(Vector2(110, 120), Vector2(420, 200), 4)
+	dialog_back = _close_dialog
+	dialog.add_child(MenuKit.title(tr("SLOT_MODES_TITLE"), 14))
+	var g := GridContainer.new()
+	g.columns = 3
+	g.add_theme_constant_override("h_separation", 6)
+	g.add_theme_constant_override("v_separation", 3)
+	g.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	for m in [["career", "SLOT_MODE_CAREER", "SLOT_MODE_CAREER_D"], ["daily", "MENU_DAILY", "SLOT_MODE_DAILY_D"],
+			["shift", "MENU_SHIFT", "SLOT_MODE_SHIFT_D"], ["overtime", "MENU_OVERTIME", "SLOT_MODE_OT_D"]]:
+		var ic := ModeIcon.new()
+		ic.mode = String(m[0])
+		ic.custom_minimum_size = Vector2(10, 10)
+		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		g.add_child(ic)
+		g.add_child(_label(tr(String(m[1])), 10, HudScript.MODE_COLORS[m[0]], 0.0))
+		g.add_child(_label(tr(String(m[2])), 9, Color("#c4d0ff"), 0.0))
+	dialog.add_child(g)
+	var sp := Control.new()
+	sp.custom_minimum_size = Vector2(0, 4)
+	dialog.add_child(sp)
+	var go := MenuKit.button(tr("SLOT_MODES_GO"), func(): chosen.call(n))
+	dialog.add_child(go)
+	dialog.add_child(MenuKit.button(tr("SLOT_OT_NOW"), func(): _warn_ot(n)))
+	_focus(go)
+
+## Warnung vor der sofortigen Sonderschicht; „Zurück“ hat den Fokus.
+func _warn_ot(n: int) -> void:
+	_swap_dialog(Vector2(130, 130), Vector2(380, 170), 6)
+	dialog_back = func(): _show_modes(n)
+	dialog.add_child(MenuKit.title(tr("SLOT_OT_WARN_TITLE"), 14))
+	dialog.add_child(_label(tr("SLOT_OT_WARN"), 9, Color("#ffcf8a"), 360.0))
+	var no := MenuKit.button(tr("SLOT_OT_BACK"), func(): _show_modes(n))
+	dialog.add_child(no)
+	dialog.add_child(MenuKit.button(tr("SLOT_OT_YES"), func():
+		Save.select_slot(n)
+		Save.unlock_ot_early()
+		chosen.call(n)))
+	_focus(no)
+
+## Disketten und „Zurück“ ein- oder ausblenden (während eines Dialogs zählt nur dessen eigener Zurück-Knopf).
+func _show_row(on: bool) -> void:
+	row.visible = on
+	if back_btn != null:
+		back_btn.visible = on
+
+## Dialog ersetzen (die Disketten bleiben ausgeblendet).
+func _swap_dialog(pos: Vector2, sz: Vector2, sep: int) -> void:
+	if dialog != null:
+		dialog.queue_free()
+	_show_row(false)
+	dialog = VBoxContainer.new()
+	(dialog as VBoxContainer).alignment = BoxContainer.ALIGNMENT_CENTER
+	dialog.add_theme_constant_override("separation", sep)
+	dialog.position = pos
+	dialog.size = sz
+	add_child(dialog)
+
+func _label(text: String, fs: int, col: Color, wrap_w: float) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", fs)
+	l.add_theme_color_override("font_color", col)
+	if wrap_w > 0.0:
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.custom_minimum_size = Vector2(wrap_w, 0)
+		l.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	return l
+
+## Pixel-Symbol eines Spielmodus (dieselben wie im HUD).
+class ModeIcon extends Control:
+	var mode := "career"
+	func _draw() -> void:
+		var g: Array = HudScript.MODE_ICONS[mode]
+		var c: Color = HudScript.MODE_COLORS[mode]
+		var k := size.x / 8.0
+		for yy in 8:
+			for xx in 8:
+				if String(g[yy])[xx] == "#":
+					draw_rect(Rect2(xx * k, yy * k, k, k), c)
 
 ## Controller: Bildschirmtastatur für den Namen.
 func _open_osk(edit: LineEdit) -> void:
@@ -215,7 +312,8 @@ func _open_osk(edit: LineEdit) -> void:
 func _close_dialog() -> void:
 	dialog.queue_free()
 	dialog = null
-	row.visible = true
+	dialog_back = Callable()
+	_show_row(true)
 	_build()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -225,7 +323,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if dialog != null:
 		get_viewport().set_input_as_handled()
-		_close_dialog()
+		if dialog_back.is_valid():
+			dialog_back.call()
+		else:
+			_close_dialog()
 	elif back.is_valid():
 		get_viewport().set_input_as_handled()
 		back.call()
