@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Carrello inceppato",
  "OT_CURSE_STICKYGEAR_D": "Il carrello impiega otto volte di più.",
  "OT_CURSE_CROOKED": "Ugello storto",
- "OT_CURSE_CROOKED_D": "Un ugello laterale ha solo il 75 % di potenza.",
+ "OT_CURSE_CROOKED_D": "Un ugello laterale ha solo il 60 % di potenza.",
  "OT_CURSE_LEAK": "Serbatoio bucato",
- "OT_CURSE_LEAK_D": "Il carburante perde piano, anche da fermo.",
+ "OT_CURSE_LEAK_D": "Il carburante perde parecchio, anche da fermo (quasi mezzo punto percentuale al secondo).",
  "OT_CURSE_HEAVY": "Carico pesante",
  "OT_CURSE_HEAVY_D": "Spinta ridotta del 12 % con un passeggero a bordo.",
  "OT_CURSE_SLICK": "Scafo scivoloso",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "Collezionista di licenze",
  "ACH_OT_LICENSES_D": "Completa straordinari con ciascuna delle %d licenze",
  "OT_CURSE_SLUGGISH": "Ugelli pigri",
- "OT_CURSE_SLUGGISH_D": "Gli ugelli reagiscono in ritardo e bruciano ancora un attimo dopo il rilascio."
+ "OT_CURSE_SLUGGISH_D": "Gli ugelli reagiscono in ritardo e bruciano ancora un attimo dopo il rilascio.",
+ "OT_COL_SCORE": "Punti",
+ "OT_COL_NAME": "Salvataggio",
+ "OT_COL_SEED": "Seed",
+ "OT_COL_ETAPPEN": "Tappe",
+ "OT_COL_LICENSE": "Licenza"
 }

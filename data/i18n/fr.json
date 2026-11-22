@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Train grippé",
  "OT_CURSE_STICKYGEAR_D": "Le train met huit fois plus de temps.",
  "OT_CURSE_CROOKED": "Réacteur tordu",
- "OT_CURSE_CROOKED_D": "Un réacteur latéral n’a que 75 % de puissance.",
+ "OT_CURSE_CROOKED_D": "Un réacteur latéral n’a que 60 % de puissance.",
  "OT_CURSE_LEAK": "Réservoir percé",
- "OT_CURSE_LEAK_D": "Le carburant fuit lentement, même à l’arrêt.",
+ "OT_CURSE_LEAK_D": "Le carburant fuit nettement, même à l’arrêt (presque un demi-pour-cent par seconde).",
  "OT_CURSE_HEAVY": "Charge lourde",
  "OT_CURSE_HEAVY_D": "12 % de poussée en moins avec un passager à bord.",
  "OT_CURSE_SLICK": "Coque huileuse",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "Collection de licences",
  "ACH_OT_LICENSES_D": "Réussissez des heures sup avec chacune des %d licences",
  "OT_CURSE_SLUGGISH": "Réacteurs mous",
- "OT_CURSE_SLUGGISH_D": "Les réacteurs réagissent en retard et brûlent encore un instant après relâchement."
+ "OT_CURSE_SLUGGISH_D": "Les réacteurs réagissent en retard et brûlent encore un instant après relâchement.",
+ "OT_COL_SCORE": "Points",
+ "OT_COL_NAME": "Sauvegarde",
+ "OT_COL_SEED": "Graine",
+ "OT_COL_ETAPPEN": "Étapes",
+ "OT_COL_LICENSE": "Licence"
 }

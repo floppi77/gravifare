@@ -66,8 +66,9 @@ func _build() -> void:
 	var xb = preload("res://src/ui/overtime_finale.gd").XpBar.new()       # Dienstgrad mit Namen und Fortschritt im Dienstgrad
 	xb.xp_from = xp
 	xb.xp_to = xp
-	xb.position = Vector2(220, 26)
-	xb.size = Vector2(200, 30)
+	xb.compact = true
+	xb.position = Vector2(120, 35)
+	xb.size = Vector2(400, 11)
 	stage.add_child(xb)
 	var panel := Panel.new()
 	panel.add_theme_stylebox_override("panel", MenuKit.panel_style(0.8))
@@ -164,17 +165,23 @@ func _build() -> void:
 	var bt := MenuKit.title(tr("OT_BOARD") % tr("OT_LEN_" + _length().to_upper()), 11)
 	side.add_child(bt)
 	board_box = VBoxContainer.new()
-	board_box.add_theme_constant_override("separation", 1)
+	board_box.add_theme_constant_override("separation", 0)
 	side.add_child(board_box)
 	_fill_board()
 	var first := focus_name if focus_name != "" else ("resume" if not saved.is_empty() else "start")
 	_focus.call_deferred(first)
+
+## Bestenliste als Tabelle: Kopfzeile, dann je Lauf eine Zeile mit abwechselnder Hintergrundfarbe (Platz 1 golden).
+const BOARD_COLS := [["#", 16, HORIZONTAL_ALIGNMENT_RIGHT], ["OT_COL_SCORE", 50, HORIZONTAL_ALIGNMENT_RIGHT], ["OT_COL_NAME", 58, HORIZONTAL_ALIGNMENT_LEFT],
+	["OT_COL_SEED", 40, HORIZONTAL_ALIGNMENT_LEFT], ["OT_COL_ETAPPEN", 30, HORIZONTAL_ALIGNMENT_CENTER], ["OT_COL_LICENSE", 54, HORIZONTAL_ALIGNMENT_LEFT]]
 
 func _fill_board() -> void:
 	var meta := Flow.ot_meta()
 	var board: Array = (meta.get("best", {}) as Dictionary).get(_length(), []) if meta.get("best") is Dictionary else []
 	if board.is_empty():
 		board_box.add_child(_small(tr("OT_BOARD_EMPTY"), Color("#7d89c4")))
+		return
+	board_box.add_child(_board_row(BOARD_COLS.map(func(c): return tr(String(c[0])) if String(c[0]) != "#" else "#"), Color(0.16, 0.19, 0.4, 0.95), Color("#a9b8ff")))
 	for i in board.size():
 		var e: Dictionary = board[i]
 		var mark := "✓" if bool(e.get("won", false)) else "%d/%d" % [int(e.get("flown", 0)), int(e.get("of", 0))]
@@ -182,7 +189,31 @@ func _fill_board() -> void:
 		if int(e.get("stage", 0)) > 0:
 			extra += " · " + tr("OT_STAGE_SHORT") % int(e.stage)
 		var who := String(e.get("name", ""))
-		board_box.add_child(_small("%2d.  %s  %s  %s  %s%s" % [i + 1, _pts(int(e.score)), who if who != "" else "–", String(e.get("code", "")), mark, "  " + extra], Color("#ffe14a") if i == 0 else Color("#e6ecff")))
+		var bg := Color(0.09, 0.11, 0.25, 0.9) if i % 2 == 0 else Color(0.05, 0.06, 0.16, 0.9)
+		if i == 0:
+			bg = Color(0.3, 0.24, 0.06, 0.9)
+		board_box.add_child(_board_row([str(i + 1), _pts(int(e.score)).strip_edges(), who if who != "" else "–", String(e.get("code", "")), mark, extra], bg,
+			Color("#ffe14a") if i == 0 else Color("#e6ecff")))
+
+func _board_row(cells: Array, bg: Color, col: Color) -> PanelContainer:
+	var pc := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = bg
+	sb.content_margin_left = 3
+	sb.content_margin_right = 3
+	sb.set_corner_radius_all(2)
+	pc.add_theme_stylebox_override("panel", sb)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 4)
+	pc.add_child(h)
+	for k in cells.size():
+		var l := _small(String(cells[k]), col)
+		l.custom_minimum_size = Vector2(float(BOARD_COLS[k][1]), 0)
+		l.horizontal_alignment = BOARD_COLS[k][2]
+		l.clip_text = true
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		h.add_child(l)
+	return pc
 
 static func _pts(n: int) -> String:
 	var s := str(n)

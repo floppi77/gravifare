@@ -960,6 +960,30 @@ func hits_closed_door(center: Vector2, half: Vector2) -> bool:
 					return true
 	return false
 
+## Regelstand 5: Wandernde Schleuse mit senkrecht fahrender Öffnung – Verschiebung (nur senkrecht), die die Box ganz in die Öffnung bringt, wenn ein
+## Flügel sie trifft. Null, wenn kein solcher Flügel trifft oder die Box höher als die Öffnung ist (dann gilt das Hinausschleudern).
+func sweep_carry(center: Vector2, half: Vector2) -> Vector2:
+	var box := Rect2(center - half, half * 2.0)
+	for ch in doors:
+		if not is_sweep(ch) or doors_forced_open:
+			continue
+		var hg := float(doors[ch].gap_cells) * Tuning.TILE * 0.5
+		for gate in doors[ch].gates:
+			if not gate.vertical or not box.intersects(gate.rect):
+				continue
+			var hit := false
+			for leaf in door_leaf_rects(ch, gate, clock):
+				if leaf.size.x > 0.0 and leaf.size.y > 0.0 and box.intersects(leaf):
+					hit = true
+			if not hit or half.y * 2.0 > hg * 2.0 - 0.2:
+				continue
+			var c := sweep_center(ch, gate, clock)
+			if box.position.y < c - hg:
+				return Vector2(0.0, c - hg - box.position.y + 0.05)
+			if box.end.y > c + hg:
+				return Vector2(0.0, c + hg - box.end.y - 0.05)
+	return Vector2.ZERO
+
 ## Weg aus dem Tor für eine Box, die die Flügel treffen: quer zu ihrer Fahrrichtung zur näheren freien Seite, ganz aus dem Tor heraus. Null, wenn beide Seiten belegt sind.
 func door_escape(center: Vector2, half: Vector2) -> Vector2:
 	var box := Rect2(center - half, half * 2.0)

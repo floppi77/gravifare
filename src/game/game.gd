@@ -64,6 +64,7 @@ var debug_input := Vector2.INF   # --debug-input=x,y erzwingt konstanten Schub (
 var ot_fx: Dictionary = {}       # Sonderschicht: Wirkungen der laufenden Etappe (Overtime.effects), auch für Anzeige und Zwischenfälle der Oberfläche
 var ot_layer: CanvasLayer = null   # Halt über dem Spiel
 var ot_open := false              # Halt oder Kreuzung offen
+var scrape_t := -9.0              # letzte Funken am Schleusenflügel
 
 func _ready() -> void:
 	if Flow.current_level == "":
@@ -1349,6 +1350,12 @@ func _on_event(e: Dictionary) -> void:
 	if tutorial != null:
 		tutorial.on_event(e)
 	match e.type:
+		"scrape":                                        # Regelstand 5: Schleusenflügel schiebt das Taxi mit – Funken, leichtes Rütteln (gedrosselt)
+			if run.sim.time - scrape_t > 0.25:
+				scrape_t = run.sim.time
+				taxi.burst_sparks()
+				Haptics.pulse(0.06, 0.3, 0.06)
+				_add_shake(0.3)
 		"overheat":
 			hud.flash_message(tr("MSG_OT_OVERHEAT"), 1.6)
 			Sfx.play("pump_hit", -6.0, 0.7)                 # tiefes Zischen; „warn“ bleibt dem Tankalarm vorbehalten

@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Zacinające się podwozie",
  "OT_CURSE_STICKYGEAR_D": "Podwozie potrzebuje ośmiokrotnie więcej czasu.",
  "OT_CURSE_CROOKED": "Krzywa dysza",
- "OT_CURSE_CROOKED_D": "Jedna dysza boczna ma tylko 75 % mocy.",
+ "OT_CURSE_CROOKED_D": "Jedna dysza boczna ma tylko 60 % mocy.",
  "OT_CURSE_LEAK": "Dziurawy zbiornik",
- "OT_CURSE_LEAK_D": "Paliwo powoli wycieka, nawet na postoju.",
+ "OT_CURSE_LEAK_D": "Paliwo wyraźnie wycieka, nawet na postoju (prawie pół procenta na sekundę).",
  "OT_CURSE_HEAVY": "Ciężki ładunek",
  "OT_CURSE_HEAVY_D": "Z pasażerem na pokładzie o 12 % mniej ciągu.",
  "OT_CURSE_SLICK": "Śliski kadłub",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "Kolekcjoner licencji",
  "ACH_OT_LICENSES_D": "Ukończ nadgodziny z każdą z %d licencji",
  "OT_CURSE_SLUGGISH": "Ociężałe dysze",
- "OT_CURSE_SLUGGISH_D": "Dysze reagują z opóźnieniem i chwilę dopalają po puszczeniu."
+ "OT_CURSE_SLUGGISH_D": "Dysze reagują z opóźnieniem i chwilę dopalają po puszczeniu.",
+ "OT_COL_SCORE": "Punkty",
+ "OT_COL_NAME": "Zapis",
+ "OT_COL_SEED": "Ziarno",
+ "OT_COL_ETAPPEN": "Etapy",
+ "OT_COL_LICENSE": "Licencja"
 }

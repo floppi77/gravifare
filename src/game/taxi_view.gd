@@ -41,6 +41,8 @@ var dust: CPUParticles2D
 var puff: CPUParticles2D
 var sparks: CPUParticles2D
 var smoke: CPUParticles2D
+var weak_sparks: CPUParticles2D    # Sonderschicht, Schiefe Düse: Funkenschlag an der schwachen Seitendüse
+var weak_t := 0.0
 
 func _ready() -> void:
 	scale = Vector2.ONE * Tuning.TAXI_SCALE            # Zeichencode bleibt in Entwurfsmaßen
@@ -79,6 +81,11 @@ func _ready() -> void:
 	sparks.spread = 120.0
 	sparks.gravity = Vector2(0, 170)
 	add_child(sparks)
+	weak_sparks = Fx.make_particles(16, 0.35, Vector2(40, 95), 0.9, Color(1, 0.85, 0.35, 1), Color(1, 0.35, 0.1, 0.0))
+	weak_sparks.spread = 55.0
+	weak_sparks.gravity = Vector2(0, 160)
+	weak_sparks.emitting = false
+	add_child(weak_sparks)
 	smoke = Fx.make_particles(14, 1.3, Vector2(8, 18), 1.8, Color(0.42, 0.42, 0.5, 0.65), Color(0.2, 0.2, 0.26, 0.0), false)
 	smoke.position = Vector2(4, -8)
 	smoke.direction = Vector2(0, -1)
@@ -163,6 +170,7 @@ func update_effects() -> void:
 	side_r.emitting = flame_side < -0.05 and fuel_ok
 	brake_l.emitting = flame_down > 0.05 and fuel_ok
 	brake_r.emitting = flame_down > 0.05 and fuel_ok
+	_weak_side(fuel_ok)
 	var hurt := 1.0 - sim.hull / Tuning.HULL_MAX
 	smoke.emitting = hurt > 0.4 and sim.state != TaxiSim.State.DESTROYED
 	light.energy = 2.4 + 1.2 * flame_main + (0.0 if sim.state == TaxiSim.State.LANDED else 0.0)
@@ -175,6 +183,21 @@ func update_effects() -> void:
 		dust.emitting = near * flame_main > 0.2
 	else:
 		dust.emitting = false
+
+## Schiefe Düse (Sonderschicht): An der schwachen Seitendüse schlagen Funken, sobald sie zündet, und alle paar Sekunden spuckt sie auch im Leerlauf.
+## Schub nach links (side_l) kommt aus der rechten Düse, Schub nach rechts (side_r) aus der linken.
+func _weak_side(fuel_ok: bool) -> void:
+	if sim == null or (sim.side_l >= 0.999 and sim.side_r >= 0.999) or sim.state == TaxiSim.State.DESTROYED or Settings.values.reduce_motion:
+		weak_sparks.emitting = false
+		return
+	var right := sim.side_l < 0.999                       # schwach nach links = rechte Düse
+	var dir := 1.0 if right else -1.0
+	weak_sparks.position = Vector2(15.5 * dir, 0.5)
+	weak_sparks.direction = Vector2(dir, 0.3)
+	var firing := fuel_ok and ((flame_side < -0.05) if right else (flame_side > 0.05))
+	weak_t += Tuning.TICK
+	var sputter := fmod(weak_t, 2.6) < 0.12               # kurzes Spucken im Leerlauf
+	weak_sparks.emitting = firing or sputter
 
 func sync_state() -> void:
 	## Wird einmal pro Physik-Tick aufgerufen; Position wird dank Interpolation geglättet.

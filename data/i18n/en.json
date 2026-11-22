@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Sticky gear",
  "OT_CURSE_STICKYGEAR_D": "The landing gear takes eight times as long.",
  "OT_CURSE_CROOKED": "Crooked jet",
- "OT_CURSE_CROOKED_D": "One side jet has only 75 % power.",
+ "OT_CURSE_CROOKED_D": "One side jet has only 60 % power.",
  "OT_CURSE_LEAK": "Leaky tank",
- "OT_CURSE_LEAK_D": "Fuel slowly drains, even while parked.",
+ "OT_CURSE_LEAK_D": "Fuel drains noticeably, even while parked (almost half a percent per second).",
  "OT_CURSE_HEAVY": "Heavy load",
  "OT_CURSE_HEAVY_D": "12 % less thrust with a passenger on board.",
  "OT_CURSE_SLICK": "Slick hull",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "License collector",
  "ACH_OT_LICENSES_D": "Complete an overtime run with each of the %d licenses",
  "OT_CURSE_SLUGGISH": "Sluggish jets",
- "OT_CURSE_SLUGGISH_D": "The jets respond late and keep burning briefly after you let go."
+ "OT_CURSE_SLUGGISH_D": "The jets respond late and keep burning briefly after you let go.",
+ "OT_COL_SCORE": "Score",
+ "OT_COL_NAME": "Save",
+ "OT_COL_SEED": "Seed",
+ "OT_COL_ETAPPEN": "Stages",
+ "OT_COL_LICENSE": "License"
 }

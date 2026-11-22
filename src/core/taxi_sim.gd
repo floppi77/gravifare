@@ -52,6 +52,7 @@ var heavy_k := 1.0           # Schwere Fracht: Schubfaktor mit Fahrgast an Bord
 var loaded := false          # Fahrgast an Bord (setzt Run vor jedem Schritt)
 var angel := 0               # Schutzengel: so oft bleibt bei Zerstörung 1 Hüllenpunkt
 var jet_lag := false         # Träge Düsen: Schub folgt der Eingabe verzögert und brennt nach dem Loslassen kurz nach
+var gear_snap := false       # Klemmendes Fahrwerk: Feinmodus, sobald das Fahrwerk sich bewegt; Schnellflug erst, wenn es ganz eingefahren ist
 var jet_eff := Vector2.ZERO  # wirksamer Schub (x seitlich, y = hoch − runter) bei trägen Düsen
 
 func setup(lvl: LevelData) -> void:
@@ -114,6 +115,7 @@ func apply_mods(m: Dictionary) -> void:
 	heavy_k = float(m.get("heavy_k", 1.0))
 	angel = int(m.get("angel", 0))
 	jet_lag = bool(m.get("jet_lag", false))
+	gear_snap = bool(m.get("gear_snap", false))
 	jet_eff = Vector2.ZERO
 	jet_heat = 0.0
 	jet_hot = false
@@ -141,6 +143,18 @@ func _door_crush() -> void:
 	var off := Vector2(0, Tuning.GEAR_LEN * gear * 0.5)
 	if not level.hits_closed_door(pos + off, half):
 		return
+	if rules >= 5:                           # Regelstand 5: Eine wandernde Schleuse (senkrecht) nimmt das Taxi mit, statt es hinauszuschleudern
+		var push := level.sweep_carry(pos + off, half)
+		if push != Vector2.ZERO and not level.box_hits_cells(pos + off + push, half):
+			pos += push
+			vel.y = clampf(push.y / Tuning.TICK, -Tuning.MAX_SPEED, Tuning.MAX_SPEED)
+			if state == State.LANDED:
+				state = State.FLYING
+				landed_pad = {}
+				air_t = 0.0
+				air_path = 0.0
+			events.append({"type": "scrape"})
+			return
 	var out := level.door_escape(pos + off, half)
 	if out == Vector2.ZERO:
 		_crush_out(off, half)
@@ -285,14 +299,16 @@ func _mover_push() -> void:
 		_mover_damage(m.kind)
 		return
 
-func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, gear) * (thrust_k * (heavy_k if loaded else 1.0) * (OVERHEAT_K if jet_hot else 1.0))
-func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, gear) * down_k
-func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, gear) * side_k
-func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, gear) * drag_k
+## Anteil des Feinmodus 0…1: sonst der Fahrwerksstand (stufenloser Übergang); mit klemmendem Fahrwerk (Sonderschicht) voll, sobald es nicht ganz eingefahren ist.
+func mode() -> float: return (1.0 if gear > 0.0 else 0.0) if gear_snap else gear
+func up_power() -> float: return lerpf(Tuning.THRUST_UP, Tuning.GEAR_THRUST_UP, mode()) * (thrust_k * (heavy_k if loaded else 1.0) * (OVERHEAT_K if jet_hot else 1.0))
+func down_power() -> float: return lerpf(Tuning.THRUST_DOWN, Tuning.GEAR_THRUST_DOWN, mode()) * down_k
+func side_power() -> float: return lerpf(Tuning.THRUST_SIDE, Tuning.GEAR_THRUST_SIDE, mode()) * side_k
+func drag() -> float: return lerpf(Tuning.DRAG, Tuning.GEAR_DRAG, mode()) * drag_k
 ## Dämpfung je Achse: Das ausgefahrene Fahrwerk bremst seitlich und nach oben voll (Feinmanöver-Feature), nach unten nur mit
 ## GEAR_FALL_FACTOR der Wirkung – dort tragen Schwerkraft und Massenträgheit das Taxi weiter.
 func drag_v() -> Vector2: return Vector2(drag(), lerpf(Tuning.DRAG, drag(), Tuning.GEAR_FALL_FACTOR) if vel.y > 0.0 else drag())
-func max_speed() -> float: return lerpf(Tuning.MAX_SPEED, Tuning.GEAR_MAX_SPEED, gear)
+func max_speed() -> float: return lerpf(Tuning.MAX_SPEED, Tuning.GEAR_MAX_SPEED, mode())
 func max_fall_speed() -> float: return lerpf(Tuning.MAX_SPEED, max_speed(), Tuning.GEAR_FALL_FACTOR)
 
 func gear_extended() -> bool:
@@ -334,8 +350,16 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 	var side := clampf(input.x, -1.0, 1.0)
 	if fuel <= 0.0:
 		up = 0.0; down = 0.0; side = 0.0
-	if jet_lag:                              # Träge Düsen (Sonderschicht): Schub läuft der Eingabe nach (Zeitkonstante JET_LAG) und brennt nach
-		jet_eff = jet_eff.lerp(Vector2(side, up - down), minf(1.0, dt / JET_LAG))
+	var lift_cmd := up                       # Abheben nur mit echtem Schub nach oben (nicht mit Nachbrennen)
+	if jet_lag:                              # Träge Düsen (Sonderschicht): Schub läuft der Eingabe nach (Zeitkonstante JET_LAG) und brennt kurz nach
+		if state == State.LANDED and lift_cmd <= 0.0:
+			jet_eff = Vector2.ZERO               # gelandet ohne Schub: nichts brennt nach (sonst hüpfte das Taxi im Takt)
+		var want := Vector2(side, up - down)
+		jet_eff = jet_eff.lerp(want, minf(1.0, dt / JET_LAG))
+		if absf(want.x - jet_eff.x) < JET_LAG_EPS:
+			jet_eff.x = want.x                   # Rest ausklingen lassen (sonst brennte sie ewig ein bisschen nach)
+		if absf(want.y - jet_eff.y) < JET_LAG_EPS:
+			jet_eff.y = want.y
 		side = jet_eff.x
 		up = maxf(0.0, jet_eff.y)
 		down = maxf(0.0, -jet_eff.y)
@@ -347,7 +371,7 @@ func step(input: Vector2, gear_request: bool, dt: float = Tuning.TICK) -> void:
 
 	if state == State.LANDED:
 		# Abheben nur mit Schub nach oben; sonst bleibt das Taxi sicher stehen.
-		if up > 0.0:
+		if up > 0.0 and lift_cmd > 0.0:
 			vel.x = float(landed_pad.get("dx_step", 0.0)) / dt        # fährt die Plattform, startet das Taxi mit ihrem Tempo
 			state = State.FLYING
 			landed_pad = {}
@@ -505,7 +529,8 @@ func _spike_hit() -> void:
 
 ## Heiße Düse (Sonderschicht): Nach OVERHEAT_AT Sekunden Vollgas überhitzt die Hauptdüse und bringt nur noch OVERHEAT_K, bis sie unter
 ## OVERHEAT_COOL abgekühlt ist. Abkühlen geht langsamer als Aufheizen; leichtes Schweben (unter 60 % Schub) heizt nicht.
-const JET_LAG := 0.28                    # Träge Düsen: Zeitkonstante in Sekunden
+const JET_LAG := 0.22                    # Träge Düsen: Zeitkonstante in Sekunden
+const JET_LAG_EPS := 0.04                # darunter ist der Nachbrand aus (sonst klänge er nie ganz ab)
 const OVERHEAT_AT := 1.5
 const OVERHEAT_COOL := 1.0
 const OVERHEAT_K := 0.6

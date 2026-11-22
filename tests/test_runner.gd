@@ -738,7 +738,7 @@ func _test_round87() -> void:
 	fxs.curses = ["crooked", "stingy"]
 	fxs.offer = {"zulage": 500}
 	fx = Overtime.effects(fxs)
-	check((float(fx.side_l) == 0.75) != (float(fx.side_r) == 0.75) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15), "Schiefe Düse trifft genau eine Seite; Fahrpreis nur aus Ausstattung und Zwischenfällen (Lohn ist die Gefahrenzulage)")
+	check((is_equal_approx(float(fx.side_l), Overtime.CROOKED_K)) != (is_equal_approx(float(fx.side_r), Overtime.CROOKED_K)) and is_equal_approx(float(fx.fare_k), 1.0 + 0.10 - 0.15), "Schiefe Düse trifft genau eine Seite; Fahrpreis nur aus Ausstattung und Zwischenfällen (Lohn ist die Gefahrenzulage)")
 	var zs := Overtime.new_run(1, "short", "standard", 0, Overtime.default_meta())
 	var z1 := Overtime.zulage(zs, 2)
 	zs.perks = {"risk": 1}
@@ -823,8 +823,8 @@ func _test_round87_hooks() -> void:
 	check(base.vel == same.vel and base.pos == same.pos and base.fuel == same.fuel, "Serienwerte der Sonderschicht fliegen bitgleich wie die Karriere")
 	var turbo: TaxiSim = fly.call({"thrust_k": 1.15}, Vector2(0, -1), 30)
 	check(turbo.vel.y < base.vel.y - 5.0, "Turbodüse: steigt schneller (%.1f gegen %.1f)" % [turbo.vel.y, base.vel.y])
-	var left: TaxiSim = fly.call({"side_l": 0.75}, Vector2(-1, 0), 30)
-	var right: TaxiSim = fly.call({"side_l": 0.75}, Vector2(1, 0), 30)
+	var left: TaxiSim = fly.call({"side_l": 0.6}, Vector2(-1, 0), 30)
+	var right: TaxiSim = fly.call({"side_l": 0.6}, Vector2(1, 0), 30)
 	check(absf(left.vel.x) < absf(right.vel.x) * 0.85, "Schiefe Düse: links schwächer als rechts")
 	var s := TaxiSim.new()
 	s.setup(lvl)
@@ -858,10 +858,70 @@ func _test_round87_hooks() -> void:
 	for i in 12:
 		lag.step(Vector2.ZERO, false)
 	check(lag.thrust_in.y < -0.05, "Träge Düsen: nach dem Loslassen brennt die Düse kurz nach")
+	var still := TaxiSim.new()
+	still.setup(lvl)
+	still.apply_mods({"jet_lag": true})
+	still.jet_eff = Vector2(0.0, 0.5)                  # Restschub vom Anflug
+	var hops := 0
+	for i in 120:
+		still.step(Vector2.ZERO, true)
+		hops += still.events.filter(func(e): return e.type == "liftoff").size()
+	check(still.state == TaxiSim.State.LANDED and hops == 0 and still.thrust_in == Vector2.ZERO, "Träge Düsen: gelandet ohne Schub bleibt das Taxi ruhig stehen (kein Hüpfen im Takt)")
+	# Regelstand 5: Wandernde Schleuse (Gussform, Level 52) nimmt das Taxi mit; Regelstand 4 schleudert es wie bisher hinaus
+	var gl := LevelData.load_file("res://data/levels/s5_08.json")
+	var gate: Dictionary = gl.doors.values()[0].gates[0]
+	var gch: String = gl.doors.keys()[0]
+	var res := {}
+	for rl in [5, 4]:
+		var gs := TaxiSim.new()
+		gs.setup(gl)
+		gs.rules = rl
+		gs.state = TaxiSim.State.FLYING
+		gs.time = 1.0
+		gl.clock = 1.0
+		var c := gl.sweep_center(gch, gate, 1.0)
+		var hg := float(gl.doors[gch].gap_cells) * Tuning.TILE * 0.5
+		gs.pos = Vector2((gate.rect as Rect2).get_center().x, c - hg + Tuning.HULL_HALF.y - 2.0)       # Oberkante 2 px im oberen Flügel
+		var x0 := gs.pos.x
+		gs._door_crush()
+		res[rl] = [absf(gs.pos.x - x0), gs.hull, gs.events.any(func(e): return e.type == "scrape")]
+	check(gate.vertical and float(res[5][0]) < 0.01 and float(res[5][1]) == Tuning.HULL_MAX and bool(res[5][2]), "Regelstand 5: wandernde Schleuse schiebt das Taxi senkrecht mit, ohne Schaden")
+	check(float(res[4][0]) > 4.0 and float(res[4][1]) < Tuning.HULL_MAX, "Regelstand 4 (alte Läufe): Schleuse schleudert das Taxi wie bisher hinaus")
+	# Schiefe Düse: Funken an der schwachen Seite, sobald sie zündet (Schub nach links kommt aus der rechten Düse)
+	var tv: Node2D = load("res://src/game/taxi_view.gd").new()
+	tv._ready()                                       # ohne Baum: Partikel anlegen, wie beim Einhängen
+	var ws := TaxiSim.new()
+	ws.setup(lvl)
+	ws.apply_mods({"side_l": Overtime.CROOKED_K})
+	ws.fuel = 50.0
+	tv.bind(ws)
+	ws.thrust_in = Vector2(-1, 0)
+	tv.weak_t = 1.0
+	tv.sync_state()
+	var fire_l: bool = tv.weak_sparks.emitting and tv.weak_sparks.position.x > 0.0
+	ws.thrust_in = Vector2(1, 0)
+	tv.sync_state()
+	var fire_r: bool = tv.weak_sparks.emitting
+	tv.free()
+	check((fire_l and not fire_r) or bool(get_root().get_node("Settings").values.reduce_motion), "Schiefe Düse: Funken an der schwachen (rechten) Düse, wenn sie zündet; die starke Seite bleibt ruhig")
 	var sg := TaxiSim.new()
 	sg.setup(lvl)
 	sg.apply_mods(Overtime.sim_mods(Overtime.effects({"seed": 1, "etappe": 0, "perks": {}, "license": "standard", "stage": 0, "curses": ["stickygear"], "pacts": [], "offer": {}})))
-	check(is_equal_approx(sg.gear_time_k, 8.0), "Klemmendes Fahrwerk: achtmal so lange")
+	check(is_equal_approx(sg.gear_time_k, 8.0) and sg.gear_snap, "Klemmendes Fahrwerk: achtmal so lange")
+	sg.state = TaxiSim.State.FLYING
+	sg.gear = 0.0
+	var fast := sg.max_speed()
+	sg.gear = 0.05
+	var slow_out := sg.max_speed()
+	sg.gear = 0.97
+	var slow_in := sg.max_speed()
+	sg.gear = 0.0
+	check(fast == Tuning.MAX_SPEED and slow_out == Tuning.GEAR_MAX_SPEED and slow_in == Tuning.GEAR_MAX_SPEED and sg.max_speed() == Tuning.MAX_SPEED,
+		"Klemmendes Fahrwerk: Feinmodus, sobald es sich bewegt; Schnellflug erst ganz eingefahren")
+	var ng := TaxiSim.new()
+	ng.setup(lvl)
+	ng.gear = 0.5
+	check(is_equal_approx(ng.max_speed(), lerpf(Tuning.MAX_SPEED, Tuning.GEAR_MAX_SPEED, 0.5)), "Ohne klemmendes Fahrwerk: stufenloser Übergang wie bisher")
 	var ang := TaxiSim.new()
 	ang.setup(lvl)
 	ang.apply_mods({"angel": 1})
@@ -8211,7 +8271,7 @@ func _test_neon_signs() -> void:
 
 func _test_rules4_landing_and_lava() -> void:
 	# Runde 65 (Regelstand 4): Landeabzug nur beim Absetzen und erst ab Gelb der Landeampel; Lava 9 je 0,25 s, Treffer schon am Rumpf
-	check(Run.RULES == 4, "Regelstand 4")
+	check(Run.RULES >= 4, "Regelstand mindestens 4")
 	var g := Tuning.LAND_VY * Tuning.GAUGE_GREEN
 	check(Tuning.landing_penalty(g) == 0.0 and Tuning.landing_penalty(g - 5.0) == 0.0, "Grüne Landung (bis %.1f px/s) kostet nichts" % g)
 	check(is_equal_approx(Tuning.landing_penalty(Tuning.LAND_VY), Tuning.LAND_PENALTY_MAX) and Tuning.landing_penalty((g + Tuning.LAND_VY) * 0.5) > 0.1, "Ab Gelb steigt der Abzug bis 30 % am Limit")

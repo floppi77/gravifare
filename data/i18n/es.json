@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Tren atascado",
  "OT_CURSE_STICKYGEAR_D": "El tren tarda ocho veces más.",
  "OT_CURSE_CROOKED": "Propulsor torcido",
- "OT_CURSE_CROOKED_D": "Un propulsor lateral solo tiene un 75 % de fuerza.",
+ "OT_CURSE_CROOKED_D": "Un propulsor lateral solo tiene un 60 % de fuerza.",
  "OT_CURSE_LEAK": "Depósito con fuga",
- "OT_CURSE_LEAK_D": "El combustible se escapa poco a poco, incluso parado.",
+ "OT_CURSE_LEAK_D": "El combustible se escapa bastante, incluso parado (casi medio por ciento por segundo).",
  "OT_CURSE_HEAVY": "Carga pesada",
  "OT_CURSE_HEAVY_D": "Un 12 % menos de empuje con pasajero a bordo.",
  "OT_CURSE_SLICK": "Casco resbaladizo",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "Coleccionista de licencias",
  "ACH_OT_LICENSES_D": "Completa horas extra con cada una de las %d licencias",
  "OT_CURSE_SLUGGISH": "Propulsores lentos",
- "OT_CURSE_SLUGGISH_D": "Los propulsores reaccionan con retraso y siguen ardiendo un momento al soltar."
+ "OT_CURSE_SLUGGISH_D": "Los propulsores reaccionan con retraso y siguen ardiendo un momento al soltar.",
+ "OT_COL_SCORE": "Puntos",
+ "OT_COL_NAME": "Partida",
+ "OT_COL_SEED": "Semilla",
+ "OT_COL_ETAPPEN": "Etapas",
+ "OT_COL_LICENSE": "Licencia"
 }

@@ -136,6 +136,7 @@ class XpBar extends Control:
 	var tick := 0.0
 	var flash := 0.0
 	var last_rank := -1
+	var compact := false              # eine Zeile: Dienstgrad links, Balken rechts mit Erfahrung darin (Menü)
 	func _ready() -> void:
 		shown = float(xp_from)
 		last_rank = Overtime.rank_of(xp_from)
@@ -161,6 +162,18 @@ class XpBar extends Control:
 		var r := Overtime.rank_of(int(shown))
 		var pr := Overtime.rank_progress(int(shown))
 		var col := Color("#7dff9a").lerp(Color.WHITE, flash)
+		if compact:
+			var label := TranslationServer.translate("OT_RANK") % r + " · " + Overtime.rank_name(r)
+			var lw := minf(Fonts.ui.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 8.0, size.x * 0.55)
+			draw_string(Fonts.ui, Vector2(0, 9), label, HORIZONTAL_ALIGNMENT_LEFT, lw, 9, Color("#ffe14a"))
+			var cb := Rect2(lw, 1, size.x - lw, 10)
+			draw_rect(cb, Color("#232a52"))
+			var ck := 1.0 if int(pr[1]) == 0 else float(pr[0]) / float(pr[1])
+			draw_rect(Rect2(cb.position, Vector2(cb.size.x * ck, cb.size.y)), Color("#c9871f"))
+			draw_rect(cb, Color("#5a6496"), false, 1.0)
+			var ct: String = (TranslationServer.translate("OT_XP") % [int(pr[0]), int(pr[1])]) if int(pr[1]) > 0 else TranslationServer.translate("OT_RANK_MAX")
+			draw_string(Fonts.ui, Vector2(cb.position.x, 9), ct, HORIZONTAL_ALIGNMENT_CENTER, cb.size.x, 7, Color.WHITE)
+			return
 		draw_string(Fonts.ui, Vector2(0, 9), TranslationServer.translate("OT_RANK") % r + " · " + Overtime.rank_name(r), HORIZONTAL_ALIGNMENT_LEFT, size.x, 9, col)
 		var bar := Rect2(0, 14, size.x, 7)
 		draw_rect(bar, Color("#232a52"))

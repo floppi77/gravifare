@@ -91,6 +91,9 @@ func _gauge_tick(delta: float) -> void:
 		needle_v = 0.0
 		return
 	var target := clampf(run.sim.fuel / Tuning.FUEL_MAX, 0.0, 1.0)
+	if run.otv("ui_shaky", 0.0) > 0.0:                    # Sonderschicht, wackelige Instrumente: auch der Zeiger an der Säule schwankt
+		var tt := Time.get_ticks_msec() / 1000.0
+		target = clampf(target + 0.2 * sin(tt * 1.1) + 0.09 * sin(tt * 2.3 + 0.6), 0.0, 1.0)
 	needle_v += ((target - needle) * 90.0 - needle_v * 11.0) * delta        # Feder mit Dämpfung: der Zeiger schwingt leicht nach
 	needle = clampf(needle + needle_v * delta, -0.03, 1.03)
 

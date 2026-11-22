@@ -557,6 +557,13 @@ func dev_overtime(args: PackedStringArray) -> void:
 		elif a.begins_with("--ot-level="):
 			level = resolve_level(a.substr(11))
 	if what == "menu":
+		if args.has("--ot-board"):                    # Beispiel-Bestenliste (nur Ansicht)
+			var m := ot_meta()
+			var b: Array = []
+			for i in 7:
+				b.append({"score": 98000 - i * 9100, "code": Overtime.code_of(1000 + i * 777), "date": "2026-11-21", "name": ["floppi", "Spielstand 2", "Nachtflug", "Testpilot mit sehr langem Namen", "floppi", "Alex", "Kim"][i],
+					"license": ["standard", "racer", "tank", "saver", "charmer", "gambler", "standard"][i], "stage": [0, 2, 0, 1, 0, 3, 0][i], "flown": 9 - (i % 3), "of": 9, "won": i % 3 == 0})
+			m["best"] = {"short": b, "medium": [], "long": []}
 		get_tree().change_scene_to_file(OT_MENU)
 		return
 	_ot_enter()

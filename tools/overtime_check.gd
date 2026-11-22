@@ -8,7 +8,7 @@ extends SceneTree
 ## Dauer: rund eine Sekunde je Flug, alle 99 Level etwa 15–25 Minuten.
 
 const CHECK := ["hotjet", "stickygear", "crooked_l", "crooked_r", "leak", "heavy", "slick", "sluggish", "newroute", "pumpcycle"]
-const MILD := ["crooked_l", "crooked_r", "leak", "pumpcycle"]     # dürfen auch auf Leveln bleiben, die der Autopilot nicht ohne Weiteres schafft
+const MILD := ["crooked_l", "crooked_r", "pumpcycle"]     # dürfen auch auf Leveln bleiben, die der Autopilot nicht ohne Weiteres schafft
 const NEWROUTE_SEEDS := [11, 22, 33]
 const SECONDS := 600.0
 
@@ -82,11 +82,11 @@ func _fly(id: String, c: String, seed: int) -> Dictionary:
 		st.curses = [cid]
 	var fx := Overtime.effects(st)
 	if c == "crooked_l":
-		fx.side_l = 0.75
+		fx.side_l = 0.6
 		fx.side_r = 1.0
 	elif c == "crooked_r":
 		fx.side_l = 1.0
-		fx.side_r = 0.75
+		fx.side_r = 0.6
 	if cid == "newroute":
 		var jr := RandomNumberGenerator.new()
 		jr.seed = seed

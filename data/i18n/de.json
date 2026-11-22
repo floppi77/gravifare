@@ -1110,9 +1110,9 @@
  "OT_CURSE_STICKYGEAR": "Klemmendes Fahrwerk",
  "OT_CURSE_STICKYGEAR_D": "Das Fahrwerk braucht achtmal so lange.",
  "OT_CURSE_CROOKED": "Schiefe Düse",
- "OT_CURSE_CROOKED_D": "Eine Seitendüse hat nur 75 % Kraft.",
+ "OT_CURSE_CROOKED_D": "Eine Seitendüse hat nur 60 % Kraft.",
  "OT_CURSE_LEAK": "Leck im Tank",
- "OT_CURSE_LEAK_D": "Sprit läuft langsam aus, auch im Stand.",
+ "OT_CURSE_LEAK_D": "Sprit läuft spürbar aus, auch im Stand (fast ein halbes Prozent je Sekunde).",
  "OT_CURSE_HEAVY": "Schwere Fracht",
  "OT_CURSE_HEAVY_D": "Mit Fahrgast an Bord 12 % weniger Schub.",
  "OT_CURSE_SLICK": "Schmierfilm",
@@ -1232,5 +1232,10 @@
  "ACH_OT_LICENSES": "Lizenzsammler",
  "ACH_OT_LICENSES_D": "Mit jeder der %d Lizenzen eine Sonderschicht schaffen",
  "OT_CURSE_SLUGGISH": "Träge Düsen",
- "OT_CURSE_SLUGGISH_D": "Die Düsen reagieren verzögert und brennen nach dem Loslassen kurz nach."
+ "OT_CURSE_SLUGGISH_D": "Die Düsen reagieren verzögert und brennen nach dem Loslassen kurz nach.",
+ "OT_COL_SCORE": "Punkte",
+ "OT_COL_NAME": "Spielstand",
+ "OT_COL_SEED": "Seed",
+ "OT_COL_ETAPPEN": "Etappen",
+ "OT_COL_LICENSE": "Lizenz"
 }

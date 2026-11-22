@@ -143,7 +143,7 @@ func _draw() -> void:
 	var lname: String = run.level.display_name()
 	if not Flow.watch.is_empty():
 		lname = tr("WATCH_TAG") + "  " + lname                  # Bestflug ansehen
-	_fit_text(font, Vector2(374, 12), lname if run.level.tutorial or not Flow.watch.is_empty() else (tr("SHIFT_TAG") + "  " + lname if Flow.shift or result.has("shift") else (tr("OT_TAG") % [int(Flow.ot.get("etappe", 0)) + (0 if run.result == Run.Result.COMPLETE else 1), Overtime.total(Flow.ot)] + "  " + lname if Flow.overtime else (tr("DAILY_TAG") + "  " + lname if Flow.daily else (tr("COMMUNITY_TAG") + ("  " + tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else "") + "  " + lname if Flow.community else "%d/99  %s" % [run.level.number, lname])))), 84.0, Settings.fs(8), Color("#c4d0ff"), HORIZONTAL_ALIGNMENT_LEFT)       # nur auf dem oberen Rand, nicht im Eck des Tores
+	_draw_level_tag(font, lname)                           # Runde 87: Modus als Symbol, dann Zähler und Levelname (lange Namen mit „…“)
 	_fit_text(font, Vector2(460, 12), "%d/%d" % [run.delivered, run.level.jobs.size()], 28.0, Settings.fs(9), Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT)
 	# Landeampel: Sinkrate, Seitengeschwindigkeit, Neigung als drei Balken mit gezeichneten Symbolen (weiße Marke = Grenze der sicheren Landung;
 	# darüber gestreift, damit der Zustand auch ohne Farbsehen erkennbar ist)
@@ -393,6 +393,57 @@ func _wrap_lines(f: Font, text: String, width: float, sz: int) -> Array:
 	return out
 
 ## Text, der in `width` passen muss: Schriftgröße schrumpft bis 6 px, damit nichts abgeschnitten wird oder überläuft.
+## Modus-Symbole (8 × 8 Pixel, im Pixelraster): Karriere Taxi, Tagschicht Sonne, Nachtschicht Mond, Sonderschicht Uhr mit Pfeil, Community Baustein.
+const MODE_ICONS := {
+	"career": ["..####..", ".#....#.", "########", "#.#.#.#.", ".#.#.#.#", "########", "..####..", "...##..."],
+	"daily": ["...#....", ".#.#.#..", "..###...", "#######.", "..###...", ".#.#.#..", "...#....", "........"],
+	"shift": ["..###...", ".##.....", "##......", "##......", "##......", ".##.....", "..###...", "........"],
+	"overtime": ["..####.#", ".#....##", "#..#.###", "#..#....", "#..##..#", "#......#", ".#....#.", "..####.."],
+	"community": ["..##....", "..##....", "######..", "######..", "..######", "..######", "....##..", "....##.."],
+}
+const MODE_COLORS := {"career": Color("#ffcb3d"), "daily": Color("#ffa04a"), "shift": Color("#b07cff"), "overtime": Color("#ff9a3a"), "community": Color("#35e0d2")}
+
+## Oberer Streifen, Mitte: Symbol des Modus, Zähler (Level/Karte/Etappe) und Levelname; passt er nicht, wird er mit „…“ gekürzt.
+func _draw_level_tag(font: Font, lname: String) -> void:
+	var col := Color("#c4d0ff")
+	var x := 374.0
+	var w := 84.0
+	if run.level.tutorial or not Flow.watch.is_empty():
+		_fit_ellipsis(font, Vector2(x, 12), lname, w, Settings.fs(8), col)
+		return
+	var mode := "career"
+	var count := "%d/99" % run.level.number
+	if Flow.shift or result.has("shift"):
+		mode = "shift"
+		count = "%d/%d" % [maxi(1, Flow.shift_index() + 1), NightShift.MAPS]
+	elif Flow.overtime:
+		mode = "overtime"
+		count = "%d/%d" % [int(Flow.ot.get("etappe", 0)) + (0 if run.result == Run.Result.COMPLETE else 1), Overtime.total(Flow.ot)]
+	elif Flow.daily:
+		mode = "daily"
+		count = ""
+	elif Flow.community:
+		mode = "community"
+		count = tr("ED_AUTOPILOT_TAG") if Flow.editor_autopilot else ""
+	var g: Array = MODE_ICONS[mode]
+	var ic: Color = MODE_COLORS[mode]
+	for yy in 8:
+		for xx in 8:
+			if String(g[yy])[xx] == "#":
+				draw_rect(Rect2(x + xx, 4.0 + yy, 1, 1), ic)
+	var text := (count + "  " + lname) if count != "" else lname
+	_fit_ellipsis(font, Vector2(x + 11.0, 12), text, w - 11.0, Settings.fs(8), col)
+
+## Text in `width`: erst eine Stufe kleiner, dann mit „…“ gekürzt (nie unleserlich klein, nie über den Rand).
+func _fit_ellipsis(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color) -> void:
+	var sz := fs
+	if f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:
+		sz = maxi(7, fs - 1)
+	var t := text
+	while t.length() > 1 and f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:
+		t = t.substr(0, t.length() - 2).strip_edges() + "…"
+	draw_string(f, pos, t, HORIZONTAL_ALIGNMENT_LEFT, width, sz, col)
+
 func _fit_text(f: Font, pos: Vector2, text: String, width: float, fs: int, col: Color, align: int) -> void:
 	var sz := fs
 	while sz > 6 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:

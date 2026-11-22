@@ -25,13 +25,13 @@ const PACT_FROM := 2                   # Pakte ab der dritten Kreuzung …
 const PACT_CHANCE := 0.15              # … mit dieser Wahrscheinlichkeit (ersetzt den mittleren Auftrag)
 const BRIBE_BASE := 250                # Schmiergeld: Zwischenfall streichen für 250 × Sektor Credits (einmal je Kreuzung)
 
-# Werkstatt-Halt. Preise folgen dem Einkommen des Sektors (Einkommensziel je Level, Mittel der 11 Level): Ein gewöhnliches Teil kostet etwa zwei
-# Drittel eines Levels an Fahrpreisen, ein seltenes das Doppelte, ein legendäres das Vierfache. Nach drei ordentlichen Etappen reicht es für zwei, drei
-# Teile, wenn Sprit und Reparatur bezahlt sind (geprüft mit tools/overtime_sim.gd: der Autopilot ohne Zusatzfahrgäste schafft am ersten Halt ein Teil).
+# Werkstatt-Halt. Preise folgen dem Einkommen des Sektors (Einkommensziel je Level, Mittel der 11 Level): Ein gewöhnliches Teil kostet etwa
+# 1,2 Level an Fahrpreisen, ein seltenes das Doppelte, ein legendäres das Vierfache, und jede eingebaute Stufe macht alles 10 % teurer.
+# Ziel: an einem Halt ein bis drei Teile, wer gut fliegt und spart, mehr.
 const SHOP_SLOTS := 4
 const SECTOR_INCOME := [420, 770, 1140, 1770, 2490, 2580, 3490, 4250, 5030]
-const PRICE_K := {"c": 0.6, "r": 1.2, "l": 2.4}
-const PRICE_OWNED_STEP := 0.05         # je schon eingebauter Stufe +5 % (Schneeball: möglich, aber teurer)
+const PRICE_K := {"c": 1.2, "r": 2.4, "l": 4.8}   # Runde 87b: verdoppelt (im zweiten Halt der kurzen Schicht gingen sonst 5–6 Teile)
+const PRICE_OWNED_STEP := 0.10         # je schon eingebauter Stufe +10 % (Schneeball: möglich, aber teurer)
 const HAGGLE_STEP := 0.15
 const REROLL_K := 0.3                  # Neu würfeln im Halt ohne Marke: 30 % eines Level-Einkommens, jedes weitere Mal doppelt
 const WEIGHT := {"c": 60.0, "r": 30.0, "l": 10.0}
@@ -44,6 +44,7 @@ const AUDIT_FREE := 500
 const GOLDEN_STEP := 0.015             # Goldenes Taxameter: +1,5 % Fahrpreis je geschaffter Etappe
 const RISK_PERK_K := 2.0               # Risikoprämie: doppelte Gefahrenzulage
 const RESERVE_FUEL := 15.0
+const CROOKED_K := 0.6                # Schiefe Düse: eine Seitendüse mit 60 % Kraft
 
 # Wertung
 const TAXI_POINTS := 1000              # je übrigem Taxi am Ende
@@ -253,8 +254,8 @@ static func effects(st: Dictionary) -> Dictionary:
 	out["fare_k"] = clampf(fare, 0.5, 3.0)
 	if active.has("crooked"):
 		var left := _rng(st, "crooked", int(st.get("etappe", 0))).randi() % 2 == 0
-		out["side_l"] = 0.75 if left else 1.0
-		out["side_r"] = 1.0 if left else 0.75
+		out["side_l"] = CROOKED_K if left else 1.0
+		out["side_r"] = 1.0 if left else CROOKED_K
 	else:
 		out["side_l"] = 1.0
 		out["side_r"] = 1.0
@@ -281,7 +282,7 @@ static func sim_mods(fx: Dictionary, angel := 0) -> Dictionary:
 		"side_l": fx.side_l, "side_r": fx.side_r, "down_k": fx.down_k, "drag_k": fx.drag_k, "gear_time_k": fx.gear_time_k,
 		"land_tilt": Tuning.LAND_TILT + float(fx.land_tilt), "land_vx": Tuning.LAND_VX + float(fx.land_vx), "impact_safe": Tuning.IMPACT_SAFE + float(fx.impact_safe),
 		"heat_k": fx.heat_k, "mover_k": fx.mover_k, "spike_shield": int(fx.spike_shield), "overheat": float(fx.overheat) > 0.0, "leak": fx.leak,
-		"heavy_k": fx.heavy_k, "jet_lag": float(fx.jet_lag) > 0.0, "angel": angel}
+		"heavy_k": fx.heavy_k, "jet_lag": float(fx.jet_lag) > 0.0, "gear_snap": float(fx.gear_time_k) > 1.5, "angel": angel}
 
 ## Werte für Run.ot (Wirtschaft und Fahrgäste); leer = keine Sonderschicht.
 static func run_mods(fx: Dictionary) -> Dictionary:

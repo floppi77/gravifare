@@ -103,7 +103,7 @@ var near_misses := 0              # knappe Vorbeiflüge in diesem Level (das Spi
 ## 2 = bis Version 1.0.1; 3 = Sprit unter 35 % nur gratis, wenn das Geld nicht reicht, Trinkgeld für Beinahe-Treffer, Fahrgasttypen VIP und Notfall;
 ## 4 = Landeabzug nur beim Absetzen (mit Fahrgast an Bord) und erst ab Gelb der Landeampel, Lava 9 Schaden je 0,25 s schon bei Berührung des Rumpfs.
 ##     Dazu: Ausgangszeit halbiert (mind. 22,5 s bzw. 1,1 × Richtzeit), Notfall-Frist je Sektor 0,65 … 1,15 × Richtzeit.
-const RULES := 4
+const RULES := 5             # 5: wandernde Schleusen nehmen das Taxi mit (Runde 87); ältere Läufe rechnen mit ihrem Regelstand
 var rules := RULES
 var free_latch := false           # Regelstand 3: Bei diesem Tankhalt reichte das Geld nicht, unter 35 % tankt die Station gratis (bis zum Abheben)
 var types_enabled := true         # Fahrgasttypen VIP und Notfall (Karriere, Community); Tag- und Nachtschicht schalten sie ab
