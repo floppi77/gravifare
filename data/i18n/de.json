@@ -1257,5 +1257,7 @@
  "SLOT_MODE_OT_X": "Der Roguelike-Modus: an Kreuzungen Aufträge wählen, Ausstattung sammeln, Zwischenfälle meistern – jeder Lauf anders, mit Bestenliste.",
  "SLOT_COL_MODE": "Modus",
  "SLOT_COL_WHAT": "Worum es geht",
- "SLOT_COL_WHEN": "Verfügbar"
+ "SLOT_COL_WHEN": "Verfügbar",
+ "MENU_WEB_DOWNLOAD": "Spiel herunterladen",
+ "HELP_WEBDL": "Die Fassung zum Herunterladen für Windows, Linux und macOS: läuft ohne Browser und spricht sieben Sprachen."
 }

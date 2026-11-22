@@ -3,6 +3,26 @@
 Die Texte stehen in den GitHub-Release-Notes („Neu in x“ / „What's new in x“), hier zur Nachlese.
 The text of each section is used in the GitHub release notes ("Neu in x" / "What's new in x").
 
+## 1.8.1
+
+### Deutsch
+
+**Neu**
+- GraviFare läuft jetzt auch im Browser: das vollständige Spiel mit allen 99 Leveln und allen Spielmodi, direkt auf itch.io spielbar (nur Englisch, Spielstände bleiben im Browser gespeichert). Die Download-Fassung für Windows, Linux und macOS bleibt mit sieben Sprachen erhalten
+
+**Fehlerbehebungen**
+- Sonderzeichen wie ★, ✓ und die Pfeiltasten werden jetzt mit eigenen Ersatzschriften dargestellt statt mit den Schriften des Systems; vorher konnten dort Kästchen stehen
+- Spielstandwahl: Die Überschrift wird nicht mehr von den Rahmen der Disketten überdeckt
+
+### English
+
+**New**
+- GraviFare now runs in the browser too: the complete game with all 99 levels and every mode, playable right on itch.io (English only, saves are kept in the browser). The download version for Windows, Linux and macOS stays, with seven languages
+
+**Bug fixes**
+- Special characters such as ★, ✓ and the arrow keys now use bundled fallback fonts instead of the system's fonts; boxes could show up before
+- Save slot selection: the heading is no longer covered by the frames of the floppy disks
+
 ## 1.8.0
 
 ### Deutsch

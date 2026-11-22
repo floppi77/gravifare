@@ -1257,5 +1257,7 @@
  "SLOT_MODE_OT_X": "Le mode roguelike : choisir des courses aux carrefours, réunir de l’équipement, surmonter les incidents – chaque partie est différente, avec classement.",
  "SLOT_COL_MODE": "Mode",
  "SLOT_COL_WHAT": "Le principe",
- "SLOT_COL_WHEN": "Disponible"
+ "SLOT_COL_WHEN": "Disponible",
+ "MENU_WEB_DOWNLOAD": "Télécharger le jeu",
+ "HELP_WEBDL": "La version à télécharger pour Windows, Linux et macOS : sans navigateur, en sept langues."
 }

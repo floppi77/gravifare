@@ -170,6 +170,8 @@ static func _flag_buttons(on_select: Callable) -> Array:
 			["it", "res://assets/art/flag_it.png", "Italiano", "HELP_LANG_IT"], ["pt", "res://assets/art/flag_pt.png", "Português", "HELP_LANG_PT"],
 			["pl", "res://assets/art/flag_pl.png", "Polski", "HELP_LANG_PL"]]:
 		var code: String = entry[0]
+		if not code in Loc.available():                 # Browser-Fassung: nur Englisch
+			continue
 		var fb := flag_button(load(entry[1]), cur == code, entry[2], func():
 			Settings.set_value("language", code)
 			on_select.call(code))

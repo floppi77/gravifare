@@ -32,7 +32,7 @@ func _ready() -> void:
 			values.text_large = true
 	apply()
 	apply_display()
-	if not values.fullscreen:
+	if not values.fullscreen and not OS.has_feature("web"):      # im Browser bestimmt die Seite die Größe der Zeichenfläche
 		fit_window(first_start)
 
 func load_settings() -> void:

@@ -7,6 +7,7 @@
 | Windows | `GraviFare-<Version>-windows-x86_64.zip` | entpacken, `gravifare.exe` starten |
 | Linux | `GraviFare-<Version>-linux-x86_64.zip` | entpacken, `gravifare.x86_64` starten (ggf. `chmod +x`) |
 | macOS (Intel und Apple Silicon) | `GraviFare-<Version>-macos-universal.zip` | entpacken, `GraviFare.app` nach „Programme“ ziehen |
+| Browser (nur Englisch) | `GraviFare-<Version>-web.zip` | direkt spielbar auf [itch.io](https://floppi77.itch.io/gravifare); das ZIP ist für eigene Webserver |
 
 Die Pakete sind nicht signiert, die Mac-App nicht von Apple notarisiert; Windows warnt beim ersten Start (SmartScreen › „Weitere Informationen“ › „Trotzdem ausführen“). Beim ersten Start daher im
 Finder Rechtsklick › „Öffnen“ wählen. Meldet macOS „beschädigt“, entfernt dieser Befehl im
@@ -57,6 +58,7 @@ Das Spiel spricht Deutsch und Englisch – umschalten per Flagge im Hauptmenü.
 | Windows | `GraviFare-<version>-windows-x86_64.zip` | unzip, run `gravifare.exe` |
 | Linux | `GraviFare-<version>-linux-x86_64.zip` | unzip, run `gravifare.x86_64` (`chmod +x` if needed) |
 | macOS (Intel and Apple Silicon) | `GraviFare-<version>-macos-universal.zip` | unzip, drag `GraviFare.app` into “Applications” |
+| Browser (English only) | `GraviFare-<version>-web.zip` | play it right away on [itch.io](https://floppi77.itch.io/gravifare); the ZIP is for your own web server |
 
 The packages are unsigned and the Mac app is not notarised by Apple; Windows warns on first launch (SmartScreen › “More info” › “Run anyway”). On first launch, right-click it in
 the Finder › “Open”. If macOS reports it as “damaged”, this Terminal command removes only the

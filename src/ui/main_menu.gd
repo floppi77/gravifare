@@ -24,7 +24,7 @@ var icon_btns: Array = []           # Symbolknöpfe unten rechts: Spielstand, Ko
 var _return_focus := ""            # Menüpunkt, der zuletzt geöffnet wurde: dorthin springt der Fokus nach „Zurück“
 ## Hilfetexte der Menüpunkte (data/i18n); ein Test prüft, dass alle in beiden Sprachen vorhanden sind.
 const HELP_KEYS := ["HELP_CONTINUE", "HELP_PLAY", "HELP_LEVELS", "HELP_TUTORIAL", "HELP_DAILY", "HELP_DAILY_LOCKED", "HELP_SHIFT", "HELP_SHIFT_LOCKED", "HELP_SHIFT_DONE", "HELP_OVERTIME", "HELP_OVERTIME_LOCKED", "HELP_COMMUNITY",
-	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_DEBUGEGGS", "HELP_QUIT", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN", "HELP_LANG_FR", "HELP_LANG_ES", "HELP_LANG_IT", "HELP_LANG_PT", "HELP_LANG_PL", "HELP_UPDATE"]
+	"HELP_GARAGE", "HELP_STATS", "HELP_MUSIC", "HELP_OPTIONS", "HELP_CREDITS", "HELP_SLOT", "HELP_KOFI", "HELP_BUG", "HELP_DEBUG3D", "HELP_DEBUGEGGS", "HELP_QUIT", "HELP_WEBDL", "HELP_DEBUG", "HELP_LANG_DE", "HELP_LANG_EN", "HELP_LANG_FR", "HELP_LANG_ES", "HELP_LANG_IT", "HELP_LANG_PT", "HELP_LANG_PL", "HELP_UPDATE"]
 
 func _ready() -> void:
 	preload("res://src/ui/ach_toast.gd").flush(get_tree())          # anstehende Erfolge (z. B. rückwirkend beim ersten Start)
@@ -264,7 +264,9 @@ func show_main(focus_lang := "") -> void:
 	box.add_child(grid)
 	_link_grid(grid)
 	# „Beenden“ allein in der letzten Zeile, mittig unter beiden Spalten (elf Einträge hätten es links allein stehen lassen)
-	var quit_btn := _menu_button(tr("MENU_QUIT"), "quit", func(): get_tree().quit(), true)
+	# Browser-Fassung: „Beenden“ ginge dort ins Leere; an derselben Stelle führt ein Knopf zum Download der Desktop-Fassung
+	var quit_btn := _menu_button(tr("MENU_WEB_DOWNLOAD"), "webdl", func(): OS.shell_open(Flow.ITCH_URL), true) if OS.has_feature("web") \
+		else _menu_button(tr("MENU_QUIT"), "quit", func(): get_tree().quit(), true)
 	quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(quit_btn)
 	_equalize_grid.call_deferred(grid, [quit_btn])
@@ -289,11 +291,12 @@ func show_main(focus_lang := "") -> void:
 		_link_debug_row.call_deferred(quit_btn, lb, fb, eb)
 		box.add_child(drow)
 	# Sprachwahl: zwei Flaggen ohne Text untereinander links neben dem Menü (Auf/Ab wechselt, Rechts führt ins Menü, Links aus dem Menü zu den Flaggen)
-	flags_col = MenuKit.flag_column(func(code): show_main(code))
-	flags_col.position = Vector2(14, 74)                 # sieben Flaggen, senkrecht mittig neben dem Menü
-	stage.add_child(flags_col)
-	for fb in flags_col.get_children():
-		_bind_help(fb)
+	if Loc.available().size() > 1:                       # Browser-Fassung: nur Englisch, keine Flaggen
+		flags_col = MenuKit.flag_column(func(code): show_main(code))
+		flags_col.position = Vector2(14, 74)             # sieben Flaggen, senkrecht mittig neben dem Menü
+		stage.add_child(flags_col)
+		for fb in flags_col.get_children():
+			_bind_help(fb)
 	_focus_first(focus_lang, true)
 	_slide_in()
 	_update_flow.call_deferred()
@@ -584,7 +587,7 @@ func show_slots() -> void:
 # ------------------------------------------------------------------ Runde 85: neue Versionen
 ## Einmal fragen (nur echte Starts, keine Entwicklungsaufrufe), sonst bei Zustimmung nachsehen und einen gefundenen Hinweis zeigen.
 func _update_flow() -> void:
-	if not is_inside_tree() or not box.visible:
+	if not is_inside_tree() or not box.visible or OS.has_feature("web"):     # Browser-Fassung: immer die aktuelle, keine Nachfrage
 		return
 	if Settings.values.update_check == "ask":
 		if not update_asked and not Save.dev_session and OS.get_cmdline_user_args().is_empty() and DisplayServer.get_name() != "headless":
@@ -678,12 +681,13 @@ func show_bug() -> void:
 	mail.icon = BugIcon.texture()
 	mail.add_theme_constant_override("icon_max_width", 11)
 	box.add_child(mail)
-	box.add_child(MenuKit.button(tr("BUG_LOGS"), func():
-		var dir := ProjectSettings.globalize_path("user://logs")
-		DirAccess.make_dir_recursive_absolute(dir)
-		var logf := dir.path_join("godot.log")
-		var err := OS.shell_show_in_file_manager(logf if FileAccess.file_exists(logf) else dir)
-		note.text = tr("BUG_LOGS_OPENED") if err == OK else dir))
+	if not OS.has_feature("web"):                        # im Browser gibt es keinen Protokollordner zum Öffnen
+		box.add_child(MenuKit.button(tr("BUG_LOGS"), func():
+			var dir := ProjectSettings.globalize_path("user://logs")
+			DirAccess.make_dir_recursive_absolute(dir)
+			var logf := dir.path_join("godot.log")
+			var err := OS.shell_show_in_file_manager(logf if FileAccess.file_exists(logf) else dir)
+			note.text = tr("BUG_LOGS_OPENED") if err == OK else dir))
 	box.add_child(MenuKit.button(tr("BUG_COPY"), func():
 		DisplayServer.clipboard_set(BugReport.ADDRESS)
 		note.text = tr("BUG_COPIED") % BugReport.ADDRESS))

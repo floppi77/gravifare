@@ -1257,5 +1257,7 @@
  "SLOT_MODE_OT_X": "O modo roguelike: escolher corridas nos cruzamentos, juntar equipamento, superar incidentes – cada partida é diferente, com ranking.",
  "SLOT_COL_MODE": "Modo",
  "SLOT_COL_WHAT": "Do que se trata",
- "SLOT_COL_WHEN": "Disponível"
+ "SLOT_COL_WHEN": "Disponível",
+ "MENU_WEB_DOWNLOAD": "Baixar o jogo",
+ "HELP_WEBDL": "A versão para baixar para Windows, Linux e macOS: roda sem navegador e fala sete idiomas."
 }

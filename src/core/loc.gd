@@ -70,10 +70,14 @@ func set_pad_style(style: String) -> void:
 func text_in(code: String, key: String) -> String:
 	return String(tables.get(code, {}).get(key, key))
 
+## Wählbare Sprachen. Browser-Fassung: nur Englisch (die Sprachausgabe der übrigen Sprachen ist dort nicht enthalten, tools/export_web.sh).
+static func available() -> Array:
+	return ["en"] if OS.has_feature("web") else LOCALES
+
 ## Sprache des Systems, falls das Spiel sie hat, sonst Englisch.
 static func system_language() -> String:
 	var l := OS.get_locale_language()
-	return l if l in LOCALES else "en"
+	return l if l in available() else "en"
 
 ## Text aus einem Wörterbuch je Sprache {de, en, …}: gewünschte Sprache, sonst Englisch, sonst Deutsch.
 static func pick(d, lang: String, fallback := "") -> String:
@@ -101,4 +105,4 @@ static func code() -> String:
 	return TranslationServer.get_locale().substr(0, 2)
 
 func set_language(code: String) -> void:
-	TranslationServer.set_locale(code)
+	TranslationServer.set_locale(code if code in available() else "en")

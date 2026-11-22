@@ -120,3 +120,13 @@ jobs:
             "dist/GraviFare-${VERSION}-macos-universal.zip" \
             "$ITCH_TARGET:osx" \
             --userversion "$VERSION"
+
+          # Browser-Fassung (ab 1.8.1): eigener Kanal; auf itch.io einmalig als „im Browser spielbar“ markieren.
+          if [ -f "dist/GraviFare-${VERSION}-web.zip" ]; then
+            butler push "${OPTS[@]}" \
+              "dist/GraviFare-${VERSION}-web.zip" \
+              "$ITCH_TARGET:html5" \
+              --userversion "$VERSION"
+          else
+            echo "Keine Browser-Fassung in diesem Release."
+          fi

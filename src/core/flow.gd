@@ -84,6 +84,7 @@ func resolve_level(arg: String) -> String:
 	return a
 
 const KOFI_URL := "https://ko-fi.com/floppi77"
+const ITCH_URL := "https://floppi77.itch.io/gravifare"     # Browser-Fassung: Knopf zum Download der Desktop-Fassung
 const TUTORIAL_ID := "tutorial"
 var tutorial_next := ""                 # nach dem Tutorial: Level, in das es übergeht ("" = zurück ins Menü)
 

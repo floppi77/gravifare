@@ -1257,5 +1257,7 @@
  "SLOT_MODE_OT_X": "The roguelike mode: pick jobs at crossings, collect gear, master incidents – every run is different, with a leaderboard.",
  "SLOT_COL_MODE": "Mode",
  "SLOT_COL_WHAT": "What it is",
- "SLOT_COL_WHEN": "Available"
+ "SLOT_COL_WHEN": "Available",
+ "MENU_WEB_DOWNLOAD": "Download the game",
+ "HELP_WEBDL": "The download version for Windows, Linux and macOS: runs without a browser and speaks seven languages."
 }

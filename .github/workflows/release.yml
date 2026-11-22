@@ -100,9 +100,11 @@ jobs:
 
       # tools/export_release.sh importiert die Assets selbst, exportiert aus einer Kopie ohne
       # Entwicklungsdateien und packt je Plattform ein ZIP mit Lizenztexten samt SHA256SUMS.txt.
+      # Danach die Browser-Fassung (nur Englisch, ohne Threads) als eigenes ZIP für itch.io.
       - name: Exportieren
         run: |
           tools/export_release.sh "${TAG#v}"
+          tools/export_web.sh "${TAG#v}"
           mkdir dist
           cp build/release/*.zip dist/
 
@@ -113,6 +115,7 @@ jobs:
             python3 -c "import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None; assert any(n.endswith('licenses/GODOT_LICENSE.txt') for n in z.namelist()), 'Lizenztexte fehlen'" "$f"
           done
           python3 -c "import sys, zipfile; n = zipfile.ZipFile(sys.argv[1]).namelist(); assert any('GraviFare.app/Contents/MacOS/' in x for x in n), 'Mac-App unvollständig'" dist/*-macos-universal.zip
+          python3 -c "import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); n = set(z.namelist()); assert z.testzip() is None; assert {'index.html', 'index.js', 'index.wasm', 'index.pck'} <= n, 'Web-Fassung unvollständig'; assert max(i.file_size for i in z.infolist()) < 200 * 1024 * 1024, 'Datei zu groß für itch.io'" dist/*-web.zip
           mkdir probe
           unzip -q dist/*-linux-x86_64.zip -d probe
           chmod +x probe/gravifare.x86_64

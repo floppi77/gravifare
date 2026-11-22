@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bvhmj6kahaa04"
-path="res://.godot/imported/NotoSansSymbols2-PadSubset.ttf-3320e1df0df16de53c9b37652004e18e.fontdata"
+uid="uid://xj8y850x1gp2"
+path="res://.godot/imported/NotoSansSymbols2-Subset.ttf-ab55754484c4b4e8023fc9c2a6bb10f9.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/noto_symbols2/NotoSansSymbols2-PadSubset.ttf"
-dest_files=["res://.godot/imported/NotoSansSymbols2-PadSubset.ttf-3320e1df0df16de53c9b37652004e18e.fontdata"]
+source_file="res://assets/fonts/noto_symbols2/NotoSansSymbols2-Subset.ttf"
+dest_files=["res://.godot/imported/NotoSansSymbols2-Subset.ttf-ab55754484c4b4e8023fc9c2a6bb10f9.fontdata"]
 
 [params]
 

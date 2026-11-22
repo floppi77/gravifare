@@ -159,6 +159,8 @@ func pad_connected() -> bool:
 
 ## Sprachen in Anzeigereihenfolge: die eingestellte zuerst, die andere darunter.
 static func lang_order() -> Array:
+	if Loc.available().size() < 2:               # Browser-Fassung: nur Englisch, keine zweite Zeile
+		return ["en"]
 	var cur := TranslationServer.get_locale().substr(0, 2)
 	if cur == "de" or cur == "en":
 		return ["en", "de"] if cur == "en" else ["de", "en"]
@@ -390,16 +392,18 @@ func _draw_canvas() -> void:
 	var ta := _ramp(t, 0.35, 0.8)
 	if ta > 0.0:
 		_center(Fonts.title, TITLE_Y, _txt(langs[0], "PAD_HINT_TITLE"), 26, Color(YEL, ta), 1.0)
-		_center(Fonts.title, TITLE_Y + 17.0, _txt(langs[1], "PAD_HINT_TITLE"), 18, Color(LAV, ta), 0.6)
+		if langs.size() > 1:
+			_center(Fonts.title, TITLE_Y + 17.0, _txt(langs[1], "PAD_HINT_TITLE"), 18, Color(LAV, ta), 0.6)
 	var ba := _ramp(t, 0.55, 1.0)
 	if ba > 0.0:
 		_center(Fonts.ui, BODY_Y, _txt(langs[0], "PAD_HINT_BODY"), 9, Color(WHITE, 0.92 * ba))
-		_center(Fonts.ui, BODY_Y + 12.0, _txt(langs[1], "PAD_HINT_BODY"), 8, Color(DIM, ba))
+		if langs.size() > 1:
+			_center(Fonts.ui, BODY_Y + 12.0, _txt(langs[1], "PAD_HINT_BODY"), 8, Color(DIM, ba))
 	var sa := _ramp(t, 0.75, 1.2)
 	if sa > 0.0:
 		var on := pad_connected()
 		var key := "PAD_HINT_ON" if on else "PAD_HINT_OFF"
-		var txt := "%s  ·  %s" % [_txt(langs[0], key), _txt(langs[1], key)]
+		var txt := "  ·  ".join(langs.map(func(l): return _txt(l, key)))
 		var f: Font = Fonts.hud
 		var fs := 8
 		var w := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
@@ -411,7 +415,7 @@ func _draw_canvas() -> void:
 		canvas.draw_string(f, Vector2(x + 10.0, STATUS_Y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(col.lerp(WHITE, 0.35), sa))
 	var ha := _ramp(t, 1.0, 1.4) * 0.8
 	if ha > 0.0:
-		var hint := "%s  ·  %s" % [_txt(langs[0], "PAD_HINT_GO"), _txt(langs[1], "PAD_HINT_GO")]
+		var hint := "  ·  ".join(langs.map(func(l): return _txt(l, "PAD_HINT_GO")))
 		var hf: Font = Fonts.hud
 		var hw := hf.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x
 		canvas.draw_string(hf, Vector2(634.0 - hw, 352.0), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(DIM, ha))

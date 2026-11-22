@@ -92,7 +92,8 @@ func _ready() -> void:
 	actions.add_child(_action(tr("CM_COPY_ORIG"), _open_originals.bind(false)))
 	if Save.debug and LevelFiles.can_write() and edit_original.is_valid():
 		actions.add_child(_action(tr("CM_EDIT_ORIG"), _open_originals.bind(true)))
-	actions.add_child(_action(tr("CM_OPEN_DIR"), _open_folder))
+	if not OS.has_feature("web"):                       # im Browser gibt es keinen Ordner zum Öffnen
+		actions.add_child(_action(tr("CM_OPEN_DIR"), _open_folder))
 	actions.add_child(_action(tr("MENU_BACK"), func(): back.call()))
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

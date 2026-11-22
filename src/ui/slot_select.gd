@@ -28,8 +28,8 @@ func _ready() -> void:
 	logo.position = Vector2(170, 10)
 	logo.size = Vector2(300, 90)
 	head = MenuKit.screen_title(tr("SLOT_TITLE"))
-	head.position = Vector2(0, 98)
-	head.size = Vector2(640, 26)
+	head.position = Vector2(0, 88)                 # die Pixel-Überschrift ist 34 hoch: endet vor den Disketten (ab 124), sonst überdecken deren Rahmen die Schrift
+	head.size = Vector2(640, 34)
 	add_child(head)
 	row = HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER

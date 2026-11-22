@@ -72,7 +72,9 @@ func show_main(focus_lang := "") -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
 	box.add_child(gap)
-	if Flow.overtime:                          # Sonderschicht: Flaggen in zwei Reihen, damit rechts die Übersicht Platz hat
+	if Loc.available().size() < 2:             # Browser-Fassung: nur Englisch, keine Flaggen
+		pass
+	elif Flow.overtime:                        # Sonderschicht: Flaggen in zwei Reihen, damit rechts die Übersicht Platz hat
 		var fg := GridContainer.new()
 		fg.columns = 4
 		fg.add_theme_constant_override("h_separation", 6)

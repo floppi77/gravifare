@@ -187,7 +187,8 @@ func show_game() -> void:
 	lr.call()
 	lang.pressed.connect(func():
 		var cur: String = TranslationServer.get_locale().substr(0, 2)
-		Settings.set_value("language", Loc.LOCALES[(Loc.LOCALES.find(cur) + 1) % Loc.LOCALES.size()])
+		var langs := Loc.available()
+		Settings.set_value("language", langs[(langs.find(cur) + 1) % langs.size()])
 		if rebuild.is_valid():
 			rebuild.call()
 		else:

@@ -1075,6 +1075,17 @@ func _test_round87_flow() -> void:
 			rogue_all = rogue_all and String(dj.get(k, "")) != ""
 		rogue_all = rogue_all and String(dj.get("SLOT_MODE_OT_X", "")).to_lower().contains("roguelike")
 	check(rogue_all, "Modus-Übersicht: alle Modi kurz erklärt, Sonderschicht als Roguelike-Modus benannt (7 Sprachen)")
+	# Browser-Fassung: nur Englisch (Sprachausgabe der übrigen Sprachen nicht im Paket), sonst alle sieben; Beenden wird dort zum Download-Knopf
+	var loc_s = load("res://src/core/loc.gd")
+	check(loc_s.available().size() == 7 and not OS.has_feature("web"), "Desktop: alle sieben Sprachen wählbar")
+	var presets := FileAccess.get_file_as_string("res://export_presets.cfg")
+	var web_ok := presets.contains('name="Web"') and presets.contains("variant/thread_support=false")
+	for lg in ["de", "fr", "es", "it", "pt", "pl"]:
+		web_ok = web_ok and presets.contains("assets/audio/voice/%s/*" % lg)
+	check(web_ok and not presets.contains("assets/audio/voice/en/*"), "Web-Export: ohne Threads (itch.io), nur englische Sprachausgabe im Paket")
+	var mm_src := FileAccess.get_file_as_string("res://src/ui/main_menu.gd")
+	check(mm_src.contains('OS.has_feature("web")') and mm_src.contains("Flow.ITCH_URL") and FileAccess.get_file_as_string("res://src/core/loc.gd").contains('["en"] if OS.has_feature("web")'),
+		"Browser: Download-Knopf statt Beenden, nur Englisch")
 	var sv_src := FileAccess.get_file_as_string("res://src/core/save.gd")
 	check(sv_src.contains('data["ot_early"] = true\n\twrite()'), "Sofort-Freischaltung wird im Spielstand gespeichert")
 	# Quelltext: Karriere bleibt außen vor
@@ -1884,8 +1895,34 @@ func _test_round78() -> void:
 		for ch in ["✕", "○", "□", "△"]:
 			sym_ok = sym_ok and f.has_char(ch.unicode_at(0))
 	check(sym_ok, "Alle drei Schriften zeigen ✕ ○ □ △ (Ersatzschrift Noto Sans Symbols 2)")
+	# Jedes Zeichen aus Texten und Zeichenketten des Spiels muss jede Schrift darstellen können (mit Ersatzschriften), sonst stehen im
+	# Browser Kästchen: dort gibt es keine Systemschriften (★ in der Pflichtzeile fehlte so). Katakana der Leuchtreklame sind Röhren, keine Schrift.
+	var used := {}
+	var texts: Array = []
+	for lg in ["de", "en", "fr", "es", "it", "pt", "pl"]:
+		var dj: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/%s.json" % lg))
+		texts.append_array(dj.values())
+	texts.append(FileAccess.get_file_as_string("res://data/credits.json"))
+	var rx := RegEx.create_from_string("\"(?:[^\"\\\\]|\\\\.)*\"")
+	var gds: Array = []
+	_collect_files("res://src", ".gd", gds)
+	for gp in gds:
+		if String(gp).ends_with("neon_signs.gd"):
+			continue
+		for m in rx.search_all(FileAccess.get_file_as_string(gp)):
+			texts.append(m.get_string())
+	for t in texts:
+		for ch in String(t):
+			if ch.unicode_at(0) > 0x7e:
+				used[ch] = true
+	var missing: Array = []
+	for ch in used:
+		for f in [fn.hud, fn.ui, fn.title]:
+			if not f.has_char(String(ch).unicode_at(0)) and not missing.has(ch):
+				missing.append(ch)
+	check(missing.is_empty() and used.size() > 50, "Alle Zeichen der Spieltexte in allen drei Schriften vorhanden (%d Zeichen, fehlend: %s)" % [used.size(), str(missing)])
 	var lic := FileAccess.get_file_as_string("res://THIRD_PARTY_LICENSES.md")
-	check(lic.contains("Noto Sans Symbols 2") and FileAccess.file_exists("res://assets/fonts/noto_symbols2/OFL.txt"), "Ersatzschrift mit Herkunft und Lizenz im Inventar")
+	check(lic.contains("Noto Sans Symbols 2") and lic.contains("NotoSansSymbols-Subset.ttf") and FileAccess.file_exists("res://assets/fonts/noto_symbols2/OFL.txt") and FileAccess.file_exists("res://assets/fonts/noto_symbols/OFL.txt"), "Ersatzschriften mit Herkunft und Lizenz im Inventar")
 	# Erfolge
 	var A = load("res://src/core/achievements.gd")
 	var names_ok := true
@@ -8441,3 +8478,14 @@ func _test_slot_select_pad_nav() -> void:
 		DirAccess.remove_absolute(sv.slot_path(n))
 	sv.slot_prefix = prev_prefix
 
+
+## Alle Dateien mit Endung `ext` unter `dir` (rekursiv) nach `out`.
+func _collect_files(dir: String, ext: String, out: Array) -> void:
+	var d := DirAccess.open(dir)
+	if d == null:
+		return
+	for f in d.get_files():
+		if f.ends_with(ext):
+			out.append(dir.path_join(f))
+	for sub in d.get_directories():
+		_collect_files(dir.path_join(sub), ext, out)
